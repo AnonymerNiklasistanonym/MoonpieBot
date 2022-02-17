@@ -2,32 +2,85 @@
 
 A custom twitch bot
 
+## Setup
+
+1. Install all dependencies
+
+   ```sh
+   npm install
+   ```
+
+2. Build the bot (it needs to be compiled from TypeScript to JavaScript)
+
+   ```sh
+   npm run build
+   ```
+
+3. Provide the necessary environment variables or a [`.env`](./.env.example) file with the following information:
+
+   ```sh
+   # error, warn, info, debug
+   MOONPIE_CONFIG_CONSOLE_LOG_LEVEL=info
+   MOONPIE_CONFIG_FILE_LOG_LEVEL=debug
+
+   # Get it from: https://twitchapps.com/tmi/
+   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+
+   MOONPIE_CONFIG_TWITCH_CHANNEL=moonpiechannel
+
+   MOONPIE_CONFIG_DB_FILEPATH=./database.db
+   ```
+
+4. Run the bot
+
+   ```sh
+   npm run start
+   ```
+
+## TODOs
+
+Things that need to be added before it can be released:
+
+- [ ] Add GitHub Actions for tests and build
+- [ ] Find out why the database can not be created and only be used which makes no sense
+- [ ] Add database tests
+- [ ] Add commands for:
+  - [ ] Add manual for all moonpie commands
+  - [ ] Use Regex for parsing moonpie commands
+    - [ ] `!moonpie xyz`
+    - [ ] `!moonpie commands`
+    - [ ] `!moonpie set $USER $NEW_COUNT`
+    - [ ] `!moonpie add $USER $NUMBER_ADD`
+    - [ ] `!moonpie remove $USER $NUMBER_REMOVE`
+    - [ ] `!moonpie leaderboard`
+    - [ ] `!moonpie get $USER`
+    - [ ] `!moonpie add-admin $USER`
+    - [ ] `!moonpie remove-admin $USER`
+  - [ ] moonpie leaderboard [top 10] (also add leaderboard number to normal command)
+  - [ ] moonpie custom count set by broadcasters and selected members (add MoonpieAdmin table)
+- [ ] Clean code and code comments
+- [ ] Test if it works on Windows
+- [ ] Add simple to understand instructions
+- [ ] Check if the bot can see if a stream is happening and otherwise blocking claiming moonpies
+
 ## Features
 
 A bot that has the following functionality:
 
-- Every day a user can claim a *moonpie*:
-
-  Open Questions:
-
-  - Is it only possible during the stream
-  - Does the user automatically claim it or should they send a special message like `!claimMoonpie`
+- Every day a user can claim a *moonpie* using the command `!moonpie`:
 
   Implementation:
 
-  - SQLite database that keeps track of twitch ID and time of the claimed moonpie which should be enough information to work
-
-  Future goals:
-
-  - Encryption of database for privacy reasons
+  - SQLite database that keeps track of the twitch ID and the last time of the claimed moonpie so it's limited to once a day
 
 Given as input:
 
-- Twitch account
-  - name `MOONPIE_CONFIG_TWITCH_NAME`
-  - key `MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN`
-- Timezone `MOONPIE_CONFIG_TIMEZONE`
-- Sqlite3 database filepath `MOONPIE_CONFIG_DB_FILEPATH`
+- Twitch bot account
+  - Name: `MOONPIE_CONFIG_TWITCH_NAME`
+  - OAuthToken: `MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN`
+- The Twitch channel where the bot is being run: `MOONPIE_CONFIG_TWITCH_CHANNEL`
+- Sqlite3 database filepath: `MOONPIE_CONFIG_DB_FILEPATH`
 
 ## Implementation
 
@@ -107,6 +160,8 @@ Production commands do not read the `.env` file!
 
 ## Credits
 
+The following docs and websites were useful during the creation of this bot.
+
 - Setup Typescript project:
   - [medium.com: Setting up Node.JS with Typescript, Nodemon, Eslint, Mocha and Istanbul by Daniel Gong](https://coolgk.medium.com/setting-up-node-js-with-typescript-nodemon-eslint-mocha-and-istanbul-111a77d84ea7)
 - Twitch integration:
@@ -115,8 +170,3 @@ Production commands do not read the `.env` file!
   - [sqlitetutorial.net: SQLite Node.js](https://www.sqlitetutorial.net/sqlite-nodejs/)
 - Logging with winston:
   - [Winston Logger With Typescript Typescript by Kimserey](https://kimsereylam.com/typescript/2021/12/03/winston-logger-with-typescript.html)
-
-## Get twitch token
-
-1. Register your application at https://dev.twitch.tv/console/apps/create
-2. After registering copy the client ID from this website

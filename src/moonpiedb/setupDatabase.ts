@@ -11,8 +11,12 @@ export const setupTables = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {
-  logger.info("Setup database tables");
+  logger.info("Setup database..");
+
+  // Create database
   await database.open(databasePath, logger);
+  logger.info(`> Database was created/loaded '${databasePath}'`);
+
   // Moonpie table
   await database.requests.post(
     databasePath,
@@ -46,7 +50,7 @@ export const setupTables = async (
     undefined,
     logger
   );
-  logger.info("Finished setting up database tables");
+  logger.info(`> Database tables were created/loaded '${databasePath}'`);
 };
 
 /**
