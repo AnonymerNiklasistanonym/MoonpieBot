@@ -4,19 +4,26 @@ A custom twitch bot
 
 ## Setup
 
-1. Install all dependencies
+1. Install a recent version of [nodejs](https://nodejs.org/en/download/)
+2. Clone this repository via git or download the source code
+3. Open the directory of the cloned or downloaded source code in a terminal
+   - Windows: Powershell
+   - Linux: xfce-terminal or another one
+4. Install all nodejs dependencies
 
    ```sh
    npm install
    ```
 
-2. Build the bot (it needs to be compiled from TypeScript to JavaScript)
+5. Build the bot (it needs to be compiled from TypeScript to JavaScript)
 
    ```sh
    npm run build
    ```
 
-3. Provide the necessary environment variables or a [`.env`](./.env.example) file with the following information:
+   *TODO: Think about adding a command to clean dev dependencies for a smaller footprint*
+
+6. Provide the necessary environment variables or a [`.env`](./.env.example) file with the following information:
 
    ```sh
    # error, warn, info, debug
@@ -32,11 +39,13 @@ A custom twitch bot
    MOONPIE_CONFIG_DB_FILEPATH=./database.db
    ```
 
-4. Run the bot
+7. Run the bot
 
    ```sh
    npm run start
    ```
+
+   If there are errors you can probably find advanced log messages in the log files in the directory `logs` that is created while running the bot.
 
 ## TODOs
 
