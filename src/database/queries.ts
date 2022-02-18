@@ -350,6 +350,55 @@ export const dropTable = (tableName: string, ifExists = false): string => {
 };
 
 /**
+ * Create database view
+ * ```sql
+ * CREATE VIEW IF NOT EXISTS leaderboard
+ * AS
+ * SELECT
+ *     contacts.count,
+ *     contacts.name
+ * FROM
+ *     contacts
+ * ORDER BY
+ *     contacts.count DESC
+ * );
+ * ```
+ *
+ * @returns Query
+ * @param viewName
+ * @param columns
+ * @param ifNotExists
+ */
+export const createView = (
+  viewName: string,
+  tableName: string,
+  columns: (string | SelectColumn)[],
+  options?: SelectQueryOptions,
+  ifNotExists = false
+): string => {
+  // eslint-disable-next-line complexity
+  return (
+    `CREATE VIEW ${ifNotExists ? "IF NOT EXISTS " : ""}${viewName} AS ` +
+    `${select(tableName, columns, options)}`
+  );
+};
+
+/**
+ * Delete a database view
+ * ```sql
+ * DROP VIEW leaderboard;
+ * DROP VIEW IF EXISTS leaderboard;
+ * ```
+ *
+ * @param viewName
+ * @param ifExists Only remove view if it exists
+ * @returns Query
+ */
+export const dropView = (viewName: string, ifExists = false): string => {
+  return `DROP VIEW ${ifExists ? "IF EXISTS " : ""}${viewName};`;
+};
+
+/**
  * Update database table row values
  * ```sql
  * UPDATE employees

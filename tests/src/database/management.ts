@@ -6,7 +6,7 @@ import winston from "winston";
 export default (databasePath: string): Mocha.Suite => {
   return describe("management", () => {
     const logger = winston.createLogger({
-      level: "debug",
+      level: "warn",
       transports: [new winston.transports.Console()],
     });
 

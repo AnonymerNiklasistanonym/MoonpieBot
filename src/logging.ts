@@ -17,12 +17,17 @@ export const createLogger = (filePath = "./moonpiebot.log") => {
     ],
     format: format.combine(
       format.timestamp(),
-      format.printf(({ timestamp, level, message, service, section }) => {
-        if (section !== undefined) {
-          return `[${timestamp}] ${service}#${section} ${level}: ${message}`;
+      format.printf(
+        ({ timestamp, level, message, service, section, subsection }) => {
+          if (section !== undefined) {
+            if (subsection !== undefined) {
+              return `[${timestamp}] ${service}#${section}#${subsection} ${level}: ${message}`;
+            }
+            return `[${timestamp}] ${service}#${section} ${level}: ${message}`;
+          }
+          return `[${timestamp}] ${service} ${level}: ${message}`;
         }
-        return `[${timestamp}] ${service} ${level}: ${message}`;
-      })
+      )
     ),
     defaultMeta: {
       service: "MoonpieBot",

@@ -26,7 +26,6 @@ export const setupTables = async (
     database.queries.createTable(
       moonpie.table.name,
       [
-        // TODO Check if an INTEGER can be used as twitch ID
         {
           name: moonpie.table.column.twitchId,
           options: { notNull: true, primaryKey: true, unique: true },
@@ -53,6 +52,36 @@ export const setupTables = async (
     undefined,
     logger
   );
+  // Moonpie leaderboard table
+  await database.requests.post(
+    databasePath,
+    database.queries.createView(
+      moonpie.viewLeaderboard.name,
+      moonpie.table.name,
+      [
+        {
+          columnName: moonpie.table.column.twitchId,
+        },
+        {
+          columnName: moonpie.table.column.twitchName,
+        },
+        {
+          columnName: moonpie.table.column.moonpieCount,
+        },
+      ],
+      {
+        orderBy: [
+          {
+            ascending: false,
+            column: moonpie.table.column.moonpieCount,
+          },
+        ],
+      },
+      true
+    ),
+    undefined,
+    logger
+  );
   logger.info(`> Database tables were created/loaded '${databasePath}'`);
 };
 
@@ -67,7 +96,7 @@ export const setupInitialData = async (
 ): Promise<void> => {
   // Add initial account
   try {
-    const twitchAccountId = await moonpie.create(
+    await moonpie.create(
       databasePath,
       {
         id: "533005638",
@@ -75,7 +104,6 @@ export const setupInitialData = async (
       },
       logger
     );
-    logger.debug(`Example account has the ID: ${twitchAccountId}`);
     await moonpie.update(
       databasePath,
       {
@@ -83,6 +111,32 @@ export const setupInitialData = async (
         name: "Boss727",
         count: 727,
         timestamp: new Date().getTime(),
+      },
+      logger
+    );
+    await moonpie.create(
+      databasePath,
+      {
+        id: "533005639",
+        name: "Boss42",
+      },
+      logger
+    );
+    await moonpie.update(
+      databasePath,
+      {
+        id: "533005639",
+        name: "Boss42",
+        count: 42,
+        timestamp: new Date().getTime(),
+      },
+      logger
+    );
+    await moonpie.create(
+      databasePath,
+      {
+        id: "533005640",
+        name: "Boss0",
       },
       logger
     );

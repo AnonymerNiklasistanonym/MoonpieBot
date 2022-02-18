@@ -54,6 +54,7 @@ Things that need to be added before it can be released:
 - [ ] Add GitHub Actions for tests and build
 - [ ] Find out why the database can not be created and only be used which makes no sense
 - [ ] Add database tests
+- [ ] Add daily rotating log file
 - [ ] Add commands for:
   - [ ] Add manual for all moonpie commands
   - [ ] Use Regex for parsing moonpie commands

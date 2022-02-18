@@ -31,6 +31,21 @@ export const table = {
   name: "moonpie",
 } as const;
 
+/** Information about the SQlite table for moonpies */
+export const viewLeaderboard = {
+  /** SQlite column names for moonpie table */
+  column: {
+    /** The *unique* Twitch ID */
+    twitchId: "id",
+    /** The *current* Twitch account name at the last time of the claim (for the leaderboard) */
+    twitchName: "name",
+    /** The current number of moonpies */
+    moonpieCount: "count",
+  },
+  /** SQlite table name for moonpies */
+  name: "moonpieleaderboard",
+} as const;
+
 // Exists
 // -----------------------------------------------------------------------------
 
@@ -213,7 +228,6 @@ export interface GetMoonpieLeaderboardOut {
  * Get the moonpie count of a Twitch user.
  *
  * @param databasePath Path to database
- * @param twitchId Twitch ID
  * @throws When not able to get the moonpie count or database fails
  * @returns The moonpie count of the Twitch ID user
  */
@@ -225,14 +239,47 @@ export const getMoonpieLeaderboard = async (
   const runResult = await database.requests.getAll(
     databasePath,
     database.queries.select(
-      table.name,
-      [table.column.moonpieCount, table.column.twitchName],
+      viewLeaderboard.name,
+      [viewLeaderboard.column.moonpieCount, viewLeaderboard.column.twitchName],
       {
-        orderBy: [{ column: table.column.moonpieCount, ascending: false }],
         limit: 10,
       }
     ),
     [],
+    logger
+  );
+  if (runResult) {
+    return runResult as unknown as GetMoonpieLeaderboardDbOut[];
+  }
+  throw Error(GeneralError.NOT_FOUND);
+};
+
+/**
+ * Get the moonpie count of a Twitch user.
+ *
+ * @param databasePath Path to database
+ * @param twitchId Twitch ID
+ * @throws When not able to get the moonpie count or database fails
+ * @returns The moonpie count of the Twitch ID user
+ */
+export const getMoonpieLeaderboardRank = async (
+  databasePath: string,
+  twitchId: string,
+  logger: Logger
+): Promise<GetMoonpieLeaderboardOut[]> => {
+  /* <GetMoonpieCountDbOut> */
+  const runResult = await database.requests.getEach(
+    databasePath,
+    database.queries.select(
+      viewLeaderboard.name,
+      [viewLeaderboard.column.moonpieCount, viewLeaderboard.column.twitchName],
+      {
+        whereColumn: {
+          columnName: viewLeaderboard.column.twitchId,
+        },
+      }
+    ),
+    [twitchId],
     logger
   );
   if (runResult) {

@@ -7,7 +7,7 @@ dotenv.config();
 
 // connections
 import { createLogger } from "./logging";
-import { createTwitchConnection } from "./twitch";
+import { createTwitchClient } from "./twitch";
 // commands
 import { commandHello } from "./commands/hello";
 import {
@@ -37,7 +37,7 @@ for (const VARIABLE_NAME of [
 const logger = createLogger();
 logger.info("Start MoonpieBot");
 
-const client = createTwitchConnection(
+const client = createTwitchClient(
   `${process.env.MOONPIE_CONFIG_TWITCH_NAME}`,
   `${process.env.MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN}`,
   [`${process.env.MOONPIE_CONFIG_TWITCH_CHANNEL}`],

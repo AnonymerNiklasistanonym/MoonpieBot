@@ -185,6 +185,26 @@ export default (): Mocha.Suite => {
           "SELECT a,b,c FROM test INNER JOIN other_test ON other_test.other_id=id WHERE test.id=?;"
         );
 
+      const querySelect5 = database.queries.select("test", ["a", "b", "c"], {
+        innerJoins: [
+          {
+            otherColumn: "other_id",
+            otherTableName: "other_test",
+            thisColumn: "id",
+          },
+        ],
+        whereColumn: { columnName: "id", tableName: "test" },
+        limit: 10,
+        offset: 2,
+      });
+      chai.expect(querySelect5).to.be.a("string");
+      chai.expect(querySelect5.length).to.be.above(0, "Query not empty");
+      chai
+        .expect(querySelect5)
+        .to.deep.equal(
+          "SELECT a,b,c FROM test INNER JOIN other_test ON other_test.other_id=id WHERE test.id=? LIMIT 10 OFFSET 2;"
+        );
+
       // TODO Check all select query options
     });
     it("update", () => {
