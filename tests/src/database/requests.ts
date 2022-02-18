@@ -6,10 +6,8 @@ import winston from "winston";
 export default (databasePath: string): Mocha.Suite => {
   return describe("requests", () => {
     const logger = winston.createLogger({
-      transports: [
-        new winston.transports.Console(),
-        new winston.transports.File({ filename: "combined.log" }),
-      ],
+      level: "debug",
+      transports: [new winston.transports.Console()],
     });
 
     const tableName = "test";
