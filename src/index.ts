@@ -54,7 +54,7 @@ client
         : path.join(__dirname, "..", "..", "moonpie.db");
     try {
       await setupTables(databasePath, logger);
-      await setupInitialData(databasePath, logger);
+      //await setupInitialData(databasePath, logger);
     } catch (err) {
       if (err === ErrorCodeOpen.SQLITE_CANTOPEN) {
         logger.error(`The database '${databasePath}' could not be opened`);
