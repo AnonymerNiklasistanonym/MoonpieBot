@@ -4,15 +4,25 @@ import {
   transports,
   format,
 } from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
 
-export const createLogger = (filePath = "./moonpiebot.log") => {
+export const createLogger = () => {
   return createWinstonLogger({
     transports: [
-      new transports.File({
+      new DailyRotateFile({
         dirname: "logs",
-        filename: filePath,
+        filename: "moonpiebot-%DATE%.log",
+        datePattern: "YYYY-MM-DD-HH",
+        zippedArchive: false,
+        maxSize: "100m",
+        maxFiles: "28d",
         level: "debug",
       }),
+      //new transports.File({
+      //  dirname: "logs",
+      //  filename: filePath,
+      //  level: "debug",
+      //}),
       new transports.Console({ level: "info" }),
     ],
     format: format.combine(
