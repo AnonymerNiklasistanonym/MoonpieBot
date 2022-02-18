@@ -196,6 +196,51 @@ export const getMoonpie = async (
   throw Error(GeneralError.NOT_FOUND);
 };
 
+// Get moonpie count leaderboard
+// -----------------------------------------------------------------------------
+
+export interface GetMoonpieLeaderboardDbOut {
+  name: string;
+  count: number;
+}
+
+export interface GetMoonpieLeaderboardOut {
+  name: string;
+  count: number;
+}
+
+/**
+ * Get the moonpie count of a Twitch user.
+ *
+ * @param databasePath Path to database
+ * @param twitchId Twitch ID
+ * @throws When not able to get the moonpie count or database fails
+ * @returns The moonpie count of the Twitch ID user
+ */
+export const getMoonpieLeaderboard = async (
+  databasePath: string,
+  logger: Logger
+): Promise<GetMoonpieLeaderboardOut[]> => {
+  /* <GetMoonpieCountDbOut> */
+  const runResult = await database.requests.getAll(
+    databasePath,
+    database.queries.select(
+      table.name,
+      [table.column.moonpieCount, table.column.twitchName],
+      {
+        orderBy: [{ column: table.column.moonpieCount, ascending: false }],
+        limit: 10,
+      }
+    ),
+    [],
+    logger
+  );
+  if (runResult) {
+    return runResult as unknown as GetMoonpieLeaderboardDbOut[];
+  }
+  throw Error(GeneralError.NOT_FOUND);
+};
+
 // Update
 // -----------------------------------------------------------------------------
 

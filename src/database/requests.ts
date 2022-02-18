@@ -52,7 +52,7 @@ export const isDatabaseError = (error: unknown): boolean => {
  * @param parameters Optional values that are inserted for query `?` symbols
  * @returns Either undefined when no result or the found result
  */
-export const getEach = async <DB_OUT extends { [key: string]: unknown }>(
+export const getEach = async <DB_OUT extends { [key: string]: any }>(
   databasePath: string,
   query: string,
   parameters: (string | number)[] = [],
@@ -101,7 +101,7 @@ export const getEach = async <DB_OUT extends { [key: string]: unknown }>(
  * @param parameters Optional values that are inserted for query `?` symbols
  * @returns Either an empty list when no result or the found results
  */
-export const getAll = async <DB_OUT extends { [key: string]: unknown }>(
+export const getAll = async <DB_OUT extends { [key: string]: any }>(
   databasePath: string,
   query: string,
   parameters: (string | number)[] = [],

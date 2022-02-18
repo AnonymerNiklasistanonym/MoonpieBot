@@ -8,6 +8,7 @@ import {
   getMoonpie,
   update,
   remove,
+  getMoonpieLeaderboard,
 } from "../moonpiedb/moonpieManager";
 
 // TODO Add in the future the possibility to access the message and return moonpie count for other people
@@ -183,4 +184,25 @@ export const commandMoonpieSet24 = async (
   } else {
     await client.say(channel, "never existed...");
   }
+};
+
+export const commandMoonpieTop10 = async (
+  client: Client,
+  channel: string,
+  messageId: string | undefined,
+  moonpieDbPath: string,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+  }
+
+  const moonpieEntries = await getMoonpieLeaderboard(moonpieDbPath, logger);
+  let message = "";
+  for (let i = 0; i < moonpieEntries.length; i++) {
+    message += `${i + 1}. ${moonpieEntries[i].name}: ${
+      moonpieEntries[i].count
+    } `;
+  }
+  await client.say(channel, message);
 };

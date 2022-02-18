@@ -14,6 +14,7 @@ import {
   commandMoonpie,
   commandMoonpieSet0,
   commandMoonpieSet24,
+  commandMoonpieTop10,
 } from "./commands/moonpie";
 import { setupTables, setupInitialData } from "./moonpiedb/setupDatabase";
 import * as path from "path";
@@ -140,6 +141,18 @@ client
       // TODO !removemoonpie
 
       // TODO !moonpieleaderboard
+
+      if (message.trim().toLowerCase().startsWith("!moonpieleaderboard")) {
+        commandMoonpieTop10(
+          client,
+          channel,
+          tags.id,
+          databasePath,
+          logger
+        ).catch((err) => {
+          logger.error(err);
+        });
+      }
     });
   })
   .catch((err) => {

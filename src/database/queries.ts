@@ -91,6 +91,8 @@ export interface SelectQueryOptions {
    * Inner join descriptions
    */
   innerJoins?: SelectQueryInnerJoin[];
+  limit?: number;
+  offset?: number;
   /**
    * Describe a specification of which value a row needs to have to be included
    * `WHERE column = ?`
@@ -141,6 +143,7 @@ export const select = (
   let whereStr = "";
   let orderStr = "";
   let uniqueStr = "";
+  let limitStr = "";
   if (options) {
     if (options.unique) {
       uniqueStr = "DISTINCT ";
@@ -174,6 +177,12 @@ export const select = (
           )
           .join(",");
     }
+    if (options.limit) {
+      limitStr = ` LIMIT ${options.limit}`;
+      if (options.offset) {
+        limitStr += ` OFFSET ${options.offset}`;
+      }
+    }
   }
   const columnStrings = columns.reduce(
     (previousVal: string[], currentValue) => {
@@ -194,7 +203,7 @@ export const select = (
   );
   return (
     `SELECT ${uniqueStr}${columnStrings.join(",")} ` +
-    `FROM ${tableName}${innerJoinsStr}${whereStr}${orderStr};`
+    `FROM ${tableName}${innerJoinsStr}${whereStr}${orderStr}${limitStr};`
   );
 };
 

@@ -14,6 +14,9 @@ export const setupTables = async (
   logger.info("Setup database..");
 
   // Create database
+  if (!(await database.exists(databasePath, logger))) {
+    await database.create(databasePath, logger);
+  }
   await database.open(databasePath, logger);
   logger.info(`> Database was created/loaded '${databasePath}'`);
 

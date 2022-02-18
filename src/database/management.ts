@@ -54,6 +54,7 @@ export const create = async (
   logger: Logger
 ): Promise<Database> => {
   return new Promise((resolve, reject) => {
+    logger.debug(`create database '${dbNamePath}'`);
     const db = new sqlite3.Database(
       dbNamePath,
       sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
@@ -71,7 +72,11 @@ export const create = async (
   });
 };
 
-export const remove = async (dbNamePath: string): Promise<void> => {
+export const remove = async (
+  dbNamePath: string,
+  logger: Logger
+): Promise<void> => {
+  logger.debug(`remove database '${dbNamePath}'`);
   try {
     await fs.access(dbNamePath);
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -81,7 +86,11 @@ export const remove = async (dbNamePath: string): Promise<void> => {
   }
 };
 
-export const exists = async (dbNamePath: string): Promise<boolean> => {
+export const exists = async (
+  dbNamePath: string,
+  logger: Logger
+): Promise<boolean> => {
+  logger.debug(`check if database '${dbNamePath}' exists`);
   try {
     await fs.access(dbNamePath);
     return true;
