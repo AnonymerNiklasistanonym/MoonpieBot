@@ -4,6 +4,7 @@ import type { Logger } from "winston";
 import {
   commandMoonpie,
   commandMoonpieCommands,
+  commandMoonpieGetUser,
   commandMoonpieLeaderboard,
 } from "./commands/moonpie";
 
@@ -27,21 +28,25 @@ export const moonpieChatHandler = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {
-  const regexMoonpie = /\s*!moonpie(\s*$|\s.*$)/;
-  const regexMoonpieClaim = /\s*!moonpie(\s*$|\s.*$)/;
-  const regexMoonpieCommands = /\s*!moonpie\s+commands\s*$/;
-  const regexMoonpieLeaderboard = /\s*!moonpie\s+leaderboard\s*$/;
+  const regexMoonpie = /\s*!moonpie(\s*$|\s.*$)/i;
+  const regexMoonpieClaim = /\s*!moonpie(\s*$|\s.*$)/i;
+  const regexMoonpieCommands = /\s*!moonpie\s+commands\s*$/i;
+  const regexMoonpieLeaderboard = /\s*!moonpie\s+leaderboard\s*$/i;
+  const regexMoonpieGet = /\s*!moonpie\s+get\s+(.*?)\s*$/i;
+  const regexMoonpieSet = /\s*!moonpie\s+set\s+([0-9]+)\s*$/i;
+  const regexMoonpieAdd = /\s*!moonpie\s+add\s+([0-9]+)\s*$/i;
+  const regexMoonpieRemove = /\s*!moonpie\s+remove\s+([0-9]+)\s*$/i;
 
-  if (message.toLowerCase().match(regexMoonpie)) {
+  if (message.match(regexMoonpie)) {
     logDetectedCommand(logger, tags, "!moonpie");
     // > !moonpie commands
-    if (message.toLowerCase().match(regexMoonpieCommands)) {
+    if (message.match(regexMoonpieCommands)) {
       logDetectedCommand(logger, tags, "!moonpie commands");
       await commandMoonpieCommands(client, channel, tags.id, logger);
       return;
     }
     // > !moonpie leaderboard
-    if (message.toLowerCase().match(regexMoonpieLeaderboard)) {
+    if (message.match(regexMoonpieLeaderboard)) {
       logDetectedCommand(logger, tags, "!moonpie leaderboard");
       await commandMoonpieLeaderboard(
         client,
@@ -53,15 +58,98 @@ export const moonpieChatHandler = async (
       return;
     }
     // > !moonpie get $USER
-    // TODO
+    if (message.match(regexMoonpieGet)) {
+      logDetectedCommand(logger, tags, "!moonpie get $USER");
+      const match = regexMoonpieGet.exec(message);
+      if (match && match.length >= 2 && match[1] !== undefined) {
+        await commandMoonpieGetUser(
+          client,
+          channel,
+          tags.username,
+          tags["user-id"],
+          tags.id,
+          match[1],
+          databasePath,
+          logger
+        );
+      } else {
+        logger.error(
+          `User was not found for !moonpie get $USER in message '${message}'`
+        );
+      }
+      return;
+    }
     // > !moonpie set $USER (only broadcaster badge)
     // TODO
+    if (message.match(regexMoonpieSet)) {
+      logDetectedCommand(logger, tags, "!moonpie set $USER $COUNT");
+      const match = regexMoonpieGet.exec(message);
+      if (match && match.length >= 2 && match[1] !== undefined) {
+        await commandMoonpieGetUser(
+          client,
+          channel,
+          tags.username,
+          tags["user-id"],
+          tags.id,
+          match[1],
+          databasePath,
+          logger
+        );
+      } else {
+        logger.error(
+          `User was not found for !moonpie get $USER in message '${message}'`
+        );
+      }
+      return;
+    }
     // > !moonpie add $USER $COUNT (only broadcaster badge)
     // TODO
+    if (message.match(regexMoonpieAdd)) {
+      logDetectedCommand(logger, tags, "!moonpie add $USER $COUNT");
+      const match = regexMoonpieGet.exec(message);
+      if (match && match.length >= 2 && match[1] !== undefined) {
+        await commandMoonpieGetUser(
+          client,
+          channel,
+          tags.username,
+          tags["user-id"],
+          tags.id,
+          match[1],
+          databasePath,
+          logger
+        );
+      } else {
+        logger.error(
+          `User was not found for !moonpie get $USER in message '${message}'`
+        );
+      }
+      return;
+    }
     // > !moonpie remove $USER $COUNT (only broadcaster badge)
     // TODO
+    if (message.match(regexMoonpieRemove)) {
+      logDetectedCommand(logger, tags, "!moonpie remove $USER $COUNT");
+      const match = regexMoonpieGet.exec(message);
+      if (match && match.length >= 2 && match[1] !== undefined) {
+        await commandMoonpieGetUser(
+          client,
+          channel,
+          tags.username,
+          tags["user-id"],
+          tags.id,
+          match[1],
+          databasePath,
+          logger
+        );
+      } else {
+        logger.error(
+          `User was not found for !moonpie get $USER in message '${message}'`
+        );
+      }
+      return;
+    }
     // > !moonpie ($MESSAGE)
-    if (message.toLowerCase().match(regexMoonpieClaim)) {
+    if (message.match(regexMoonpieClaim)) {
       logDetectedCommand(logger, tags, "!moonpie ($MESSAGE)");
       await commandMoonpie(
         client,

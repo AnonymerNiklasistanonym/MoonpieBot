@@ -10,6 +10,8 @@ import {
   remove,
   getMoonpieLeaderboard,
   getMoonpieLeaderboardEntry,
+  getMoonpieName,
+  existsName,
 } from "../moonpiedb/moonpieManager";
 
 // TODO Add in the future the possibility to access the message and return moonpie count for other people
@@ -54,8 +56,6 @@ export const commandMoonpie = async (
       `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
     );
   }
-
-  // TODO Moonpie integration
 
   // Check if a moonpie entry already exists
   let newMoonpieCount = 1;
@@ -208,7 +208,7 @@ export const commandMoonpieTop15 = async (
 
   const moonpieEntries = await getMoonpieLeaderboard(moonpieDbPath, 15, logger);
   const message = moonpieEntries
-    .map((a) => `${a.rank}. ${a.name}: ${a.count}`)
+    .map((a) => `${a.rank}. ${a.name} (${a.count})`)
     .join(", ");
   await client.say(channel, message);
 };
@@ -264,5 +264,60 @@ export const commandMoonpieLeaderboard = async (
     `Successfully replied to message ${messageId} with: '${JSON.stringify(
       sentMessage
     )}'`
+  );
+};
+
+export const commandMoonpieGetUser = async (
+  client: Client,
+  channel: string,
+  username: string | undefined,
+  userId: string | undefined,
+  messageId: string | undefined,
+  usernameMoonpieEntry: string,
+  moonpieDbPath: string,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+  }
+  if (username === undefined) {
+    throw Error(
+      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
+    );
+  }
+  if (userId === undefined) {
+    throw Error(
+      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
+    );
+  }
+
+  let message = "";
+
+  if (await existsName(moonpieDbPath, usernameMoonpieEntry, logger)) {
+    const moonpieEntry = await getMoonpieName(
+      moonpieDbPath,
+      usernameMoonpieEntry,
+      logger
+    );
+
+    const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
+      moonpieDbPath,
+      moonpieEntry.id,
+      logger
+    );
+    message = `@${username} The user ${usernameMoonpieEntry} has ${
+      currentMoonpieLeaderboardEntry.count
+    } moonpie${
+      currentMoonpieLeaderboardEntry.count > 1 ? "s" : ""
+    } and is rank ${currentMoonpieLeaderboardEntry.rank} on the leaderboard!`;
+  } else {
+    message = `@${username} The user ${usernameMoonpieEntry} has never claimed a moonpie!`;
+  }
+
+  const sentMessage = await client.say(channel, message);
+  logger.info(
+    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
+      sentMessage
+    )}`
   );
 };

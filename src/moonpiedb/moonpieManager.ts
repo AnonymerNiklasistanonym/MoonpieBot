@@ -81,6 +81,36 @@ export const exists = async (
   return false;
 };
 
+/**
+ * Check if moonpie entry exists given a Twitch name.
+ *
+ * @param databasePath Path to database
+ * @param twitchName Twitch name
+ * @returns True if the moonpie entry exists
+ */
+export const existsName = async (
+  databasePath: string,
+  twitchName: string,
+  logger: Logger
+): Promise<boolean> => {
+  logger.debug("database: exists");
+  try {
+    /*<database.queries.ExistsDbOut>*/
+    const runResultExists = await database.requests.getEach(
+      databasePath,
+      database.queries.exists(table.name, `lower(${table.column.twitchName})`),
+      [twitchName.toLowerCase()],
+      logger
+    );
+    if (runResultExists) {
+      return runResultExists.exists_value === 1;
+    }
+  } catch (error) {
+    return false;
+  }
+  return false;
+};
+
 // Create
 // -----------------------------------------------------------------------------
 
@@ -204,6 +234,48 @@ export const getMoonpie = async (
       }
     ),
     [twitchId],
+    logger
+  );
+  if (runResult) {
+    return runResult;
+  }
+  throw Error(GeneralError.NOT_FOUND);
+};
+
+/**
+ * Get the moonpie count of a Twitch user.
+ *
+ * @param databasePath Path to database
+ * @param twitchName Twitch name
+ * @throws When not able to get the moonpie count or database fails
+ * @returns The moonpie count of the Twitch name user
+ */
+export const getMoonpieName = async (
+  databasePath: string,
+  twitchName: string,
+  logger: Logger
+): Promise<GetMoonpieOut> => {
+  // Special validations for DB entry request
+  // > Check if entry already exists
+  if ((await existsName(databasePath, twitchName, logger)) === false) {
+    throw Error(GeneralError.NOT_EXISTING);
+  }
+
+  const runResult = await database.requests.getEach<GetMoonpieDbOut>(
+    databasePath,
+    database.queries.select(
+      table.name,
+      [
+        table.column.twitchId,
+        table.column.moonpieCount,
+        table.column.twitchName,
+        table.column.date,
+      ],
+      {
+        whereColumn: `lower(${table.column.twitchName})`,
+      }
+    ),
+    [twitchName.toLowerCase()],
     logger
   );
   if (runResult) {
