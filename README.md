@@ -51,13 +51,13 @@ A custom twitch bot
 
 Things that need to be added before it can be released:
 
-- [ ] Add GitHub Actions for tests and build
-- [ ] Find out why the database can not be created and only be used which makes no sense
-- [ ] Add database tests
-- [ ] Add daily rotating log file
-- [ ] Add commands for:
-  - [ ] Add manual for all moonpie commands
-  - [ ] Use Regex for parsing moonpie commands
+- [ ] Database
+  - [ ] Add more tests
+  - [ ] (*not important*) Add better row number integration
+- [ ] Logging
+  - [ ] Add daily rotating log file instead of one big file
+- [ ] Commands:
+  - [ ] Update commands and use Regex for parsing
     - [ ] `!moonpie xyz`
     - [ ] `!moonpie commands`
     - [ ] `!moonpie set $USER $NEW_COUNT`
@@ -65,13 +65,12 @@ Things that need to be added before it can be released:
     - [ ] `!moonpie remove $USER $NUMBER_REMOVE`
     - [ ] `!moonpie leaderboard`
     - [ ] `!moonpie get $USER`
+  - [ ] (*not important*) Add admin integration
     - [ ] `!moonpie add-admin $USER`
     - [ ] `!moonpie remove-admin $USER`
-  - [ ] moonpie leaderboard [top 10] (also add leaderboard number to normal command)
-  - [ ] moonpie custom count set by broadcasters and selected members (add MoonpieAdmin table)
+  - [ ] Add permission system so that `set`/`add`/`remove` can only be set by broadcasters
 - [ ] Clean code and code comments
 - [ ] Test if it works on Windows
-- [ ] Add simple to understand instructions
 - [ ] Check if the bot can see if a stream is happening and otherwise blocking claiming moonpies
 
 ## Features
@@ -153,20 +152,12 @@ Copy [launch.json](.vscode/launch.json) and [tasks.json](.vscode/tasks.json) fro
 
 ## Configuration Files
 
-- ESLint: `.eslintrc.json` `.eslintignore`
+- ESLint: `.eslintrc.json`, `.eslintignore`
 - Mocha: `.mocharc.json`
 - Istanbul: `.nycrc`
 - Nodemon: `nodemon.json`
 - Typescript: `tsconfig.json`
 - Prettier: `.prettierrc`
-
-### Production
-
-Production commands do not read the `.env` file!
-
-- `npm start` - start application
-- `npm build` - compile typescript with no source maps and comments are removed from ts files
-- `npm test` - run tests
 
 ## Credits
 
@@ -178,5 +169,7 @@ The following docs and websites were useful during the creation of this bot.
   - [twilio.com: Creating Twitch Chat Bots with Node.js by Sam Agnew](https://www.twilio.com/blog/creating-twitch-chat-bots-with-node-js)
 - Database integration:
   - [sqlitetutorial.net: SQLite Node.js](https://www.sqlitetutorial.net/sqlite-nodejs/)
+  - [sqlitetutorial.net: SQLite Create View](https://www.sqlitetutorial.net/sqlite-create-view/)
+  - [sqlitetutorial.net: SQLite ROW_NUMBER](https://www.sqlitetutorial.net/sqlite-window-functions/sqlite-row_number/)
 - Logging with winston:
   - [Winston Logger With Typescript Typescript by Kimserey](https://kimsereylam.com/typescript/2021/12/03/winston-logger-with-typescript.html)
