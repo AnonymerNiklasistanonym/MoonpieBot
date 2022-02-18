@@ -99,6 +99,11 @@ export const remove = async (
     await fs.unlink(dbNamePath);
   } catch (error) {
     // File does not exist, do nothing
+    logger.warn(error);
+  }
+  // Sanity check on Windows
+  if (await exists(dbNamePath, logger)) {
+    throw Error("Database still exists!");
   }
 };
 
