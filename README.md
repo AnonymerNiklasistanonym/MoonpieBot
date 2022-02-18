@@ -135,6 +135,10 @@ Given as input:
 3. Follow the instructions and click `Connect`
 4. After enabling permission you get forwarded to a page where you can get the token
 
+## Inspect Database
+
+To inspect the SQLite database and edit it or run custom queries (for example for development) the program [DB Browser for SQLite](https://sqlitebrowser.org/dl/) can be used.
+
 ### Development
 
 - The entry point of the app is `src/index.ts`
