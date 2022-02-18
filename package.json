@@ -1,7 +1,7 @@
 {
     "name": "moonpiebot",
     "version": "1.0.0",
-    "description": "This is a generic template for node + typescript projects. It bootstraps a template project with [some popular packages](#Configuration-Files) and [npm script commands](#NPM-Scripts) pre-configured.",
+    "description": "A custom twitch bot",
     "main": "dist/src",
     "directories": {
         "test": "tests"
@@ -15,9 +15,7 @@
         "test:dev": "cross-env NODE_PATH=. nyc mocha -- -r dotenv/config \"tests/**/*.test.ts\"",
         "mocha": "cross-env NODE_PATH=. mocha -r dotenv/config",
         "lint": "eslint --ext .js,.ts .",
-        "lint:fix": "eslint --fix --ext .js,.ts .",
-        "format": "prettier",
-        "prepublishOnly": "npm run build -- --declaration"
+        "lint:fix": "eslint --fix --ext .js,.ts ."
     },
     "repository": {
         "type": "git",
@@ -57,19 +55,6 @@
         "source-map-support": "^0.5.21",
         "ts-node": "^10.5.0",
         "typescript": "^4.5.5"
-    },
-    "scripts.original": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "main.original": "ecosystem.config.js",
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged",
-            "pre-push": "npm run test:dev && npm audit"
-        }
-    },
-    "lint-staged": {
-        "{tests,src}/**/*.{js,ts}": "eslint --fix"
     },
     "dependencies": {
         "sqlite3": "^4.2.0",
