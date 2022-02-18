@@ -21,11 +21,19 @@ A custom twitch bot
 
    - Get the latest version from [here](https://github.com/AnonymerNiklasistanonym/MoonpieBot/archive/refs/heads/main.zip) or by using the [github website](https://github.com/AnonymerNiklasistanonym/MoonpieBot) (Click `Code` and then `Download ZIP`)
 
-   Install [`git'](https://git-scm.com/downloads)
 3. Open the directory of the cloned or downloaded source code in the console/terminal
    - Windows: Powershell/WindowsTerminal/...
    - Linux: xfce-terminal/...
 4. Install all nodejs dependencies
+
+   On Windows you need to install a special dependency first for `sqlite3` to be installed without having Python, Visual Studio, etc. installed:
+   
+   ```sh
+   # source: https://www.npmjs.com/package/sqlite3#installing
+   npm install https://github.com/mapbox/node-sqlite3/tarball/master
+   ```
+   
+   Then always run this command (this is enough for all dependencies on Linux):
 
    ```sh
    npm install
