@@ -321,3 +321,230 @@ export const commandMoonpieGetUser = async (
     )}`
   );
 };
+
+export const commandMoonpieSetUserCount = async (
+  client: Client,
+  channel: string,
+  username: string | undefined,
+  userId: string | undefined,
+  messageId: string | undefined,
+  usernameMoonpieEntry: string,
+  countMoonpies: number,
+  isBroadcaster: boolean,
+  moonpieDbPath: string,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+  }
+  if (username === undefined) {
+    throw Error(
+      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
+    );
+  }
+  if (userId === undefined) {
+    throw Error(
+      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
+    );
+  }
+  if (!isBroadcaster) {
+    throw Error(
+      `The user ${username} is not a broadcaster and thus is not allowed to use this command`
+    );
+  }
+
+  // Check if a moonpie entry already exists
+  if (!(await existsName(moonpieDbPath, usernameMoonpieEntry, logger))) {
+    throw Error(
+      `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be changed`
+    );
+  }
+
+  const moonpieEntry = await getMoonpieName(
+    moonpieDbPath,
+    usernameMoonpieEntry,
+    logger
+  );
+  await update(
+    moonpieDbPath,
+    {
+      id: moonpieEntry.id,
+      name: moonpieEntry.name,
+      count: countMoonpies,
+      timestamp: moonpieEntry.timestamp,
+    },
+    logger
+  );
+
+  const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
+    moonpieDbPath,
+    moonpieEntry.id,
+    logger
+  );
+
+  const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${countMoonpies} moonpie${
+    countMoonpies > 1 ? "s" : ""
+  } and they are now rank ${
+    currentMoonpieLeaderboardEntry.rank
+  } on the leaderboard!`;
+
+  const sentMessage = await client.say(channel, message);
+  logger.info(
+    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
+      sentMessage
+    )}`
+  );
+};
+
+export const commandMoonpieAddUserCount = async (
+  client: Client,
+  channel: string,
+  username: string | undefined,
+  userId: string | undefined,
+  messageId: string | undefined,
+  usernameMoonpieEntry: string,
+  countMoonpies: number,
+  isBroadcaster: boolean,
+  moonpieDbPath: string,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+  }
+  if (username === undefined) {
+    throw Error(
+      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
+    );
+  }
+  if (userId === undefined) {
+    throw Error(
+      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
+    );
+  }
+
+  if (!isBroadcaster) {
+    throw Error(
+      `The user ${username} is not a broadcaster and thus is not allowed to use this command`
+    );
+  }
+  // Check if a moonpie entry already exists
+  if (!(await existsName(moonpieDbPath, usernameMoonpieEntry, logger))) {
+    throw Error(
+      `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be changed`
+    );
+  }
+
+  const moonpieEntry = await getMoonpieName(
+    moonpieDbPath,
+    usernameMoonpieEntry,
+    logger
+  );
+  await update(
+    moonpieDbPath,
+    {
+      id: moonpieEntry.id,
+      name: moonpieEntry.name,
+      count: Math.max(moonpieEntry.count + countMoonpies, 0),
+      timestamp: moonpieEntry.timestamp,
+    },
+    logger
+  );
+
+  const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
+    moonpieDbPath,
+    moonpieEntry.id,
+    logger
+  );
+
+  const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${
+    currentMoonpieLeaderboardEntry.count
+  } moonpie${
+    currentMoonpieLeaderboardEntry.count > 1 ? "s" : ""
+  } and they are now rank ${
+    currentMoonpieLeaderboardEntry.rank
+  } on the leaderboard!`;
+
+  const sentMessage = await client.say(channel, message);
+  logger.info(
+    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
+      sentMessage
+    )}`
+  );
+};
+
+export const commandMoonpieRemoveUserCount = async (
+  client: Client,
+  channel: string,
+  username: string | undefined,
+  userId: string | undefined,
+  messageId: string | undefined,
+  usernameMoonpieEntry: string,
+  countMoonpies: number,
+  isBroadcaster: boolean,
+  moonpieDbPath: string,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+  }
+  if (username === undefined) {
+    throw Error(
+      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
+    );
+  }
+  if (userId === undefined) {
+    throw Error(
+      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
+    );
+  }
+
+  if (!isBroadcaster) {
+    throw Error(
+      `The user ${username} is not a broadcaster and thus is not allowed to use this command`
+    );
+  }
+
+  // Check if a moonpie entry already exists
+  if (!(await existsName(moonpieDbPath, usernameMoonpieEntry, logger))) {
+    throw Error(
+      `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be changed`
+    );
+  }
+
+  const moonpieEntry = await getMoonpieName(
+    moonpieDbPath,
+    usernameMoonpieEntry,
+    logger
+  );
+  await update(
+    moonpieDbPath,
+    {
+      id: moonpieEntry.id,
+      name: moonpieEntry.name,
+      count: Math.max(moonpieEntry.count - countMoonpies, 0),
+      timestamp: moonpieEntry.timestamp,
+    },
+    logger
+  );
+
+  const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
+    moonpieDbPath,
+    moonpieEntry.id,
+    logger
+  );
+
+  const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${
+    currentMoonpieLeaderboardEntry.count
+  } moonpie${
+    currentMoonpieLeaderboardEntry.count > 1 ? "s" : ""
+  } and they are now rank ${
+    currentMoonpieLeaderboardEntry.rank
+  } on the leaderboard!`;
+
+  const sentMessage = await client.say(channel, message);
+  logger.info(
+    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
+      sentMessage
+    )}`
+  );
+};
