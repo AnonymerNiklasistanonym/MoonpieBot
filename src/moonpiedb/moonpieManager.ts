@@ -65,13 +65,15 @@ export const exists = async (
 ): Promise<boolean> => {
   logger.debug("database: exists");
   try {
-    /*<database.queries.ExistsDbOut>*/
-    const runResultExists = await database.requests.getEach(
-      databasePath,
-      database.queries.exists(table.name, table.column.twitchId),
-      [twitchId],
-      logger
-    );
+    const runResultExists =
+      await database.requests.getEach<database.queries.ExistsDbOut>(
+        databasePath,
+        // The warning makes literally no sense
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        database.queries.exists(table.name, table.column.twitchId),
+        [twitchId],
+        logger
+      );
     if (runResultExists) {
       return runResultExists.exists_value === 1;
     }
@@ -95,13 +97,18 @@ export const existsName = async (
 ): Promise<boolean> => {
   logger.debug("database: exists");
   try {
-    /*<database.queries.ExistsDbOut>*/
-    const runResultExists = await database.requests.getEach(
-      databasePath,
-      database.queries.exists(table.name, `lower(${table.column.twitchName})`),
-      [twitchName.toLowerCase()],
-      logger
-    );
+    const runResultExists =
+      await database.requests.getEach<database.queries.ExistsDbOut>(
+        databasePath,
+        // The warning makes literally no sense
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        database.queries.exists(
+          table.name,
+          `lower(${table.column.twitchName})`
+        ),
+        [twitchName.toLowerCase()],
+        logger
+      );
     if (runResultExists) {
       return runResultExists.exists_value === 1;
     }

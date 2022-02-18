@@ -79,6 +79,8 @@ const loggerDatabaseError = (
  * @param parameters Optional values that are inserted for query `?` symbols
  * @returns Either undefined when no result or the found result
  */
+// Disable eslint warning because never/unknown make it impossible to use types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getEach = async <DB_OUT extends { [key: string]: any }>(
   databasePath: string,
   query: string,
@@ -143,6 +145,8 @@ export const getEach = async <DB_OUT extends { [key: string]: any }>(
  * @param parameters Optional values that are inserted for query `?` symbols
  * @returns Either an empty list when no result or the found results
  */
+// Disable eslint warning because never/unknown make it impossible to use types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getAll = async <DB_OUT extends { [key: string]: any }>(
   databasePath: string,
   query: string,

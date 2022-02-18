@@ -14,9 +14,13 @@ export const setupTables = async (
   logger.info("Setup database..");
 
   // Create database
+  // The warning makes literally no sense
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   if (!(await database.exists(databasePath, logger))) {
     await database.create(databasePath, logger);
   }
+  // The warning makes literally no sense
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   await database.open(databasePath, logger);
   logger.info(`> Database was created/loaded '${databasePath}'`);
 

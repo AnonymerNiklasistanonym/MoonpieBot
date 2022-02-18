@@ -12,6 +12,8 @@ export default (databasePath: string): Mocha.Suite => {
 
     it("remove", async () => {
       await database.remove(databasePath, logger);
+      // The warning makes literally no sense
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const exists = await database.exists(databasePath, logger);
       chai.expect(exists).to.equal(false, "Database does not exist");
     });
@@ -19,6 +21,8 @@ export default (databasePath: string): Mocha.Suite => {
       await database.remove(databasePath, logger);
       const db = await database.create(databasePath, logger);
       chai.expect(db).to.not.equal(undefined, "Database not undefined");
+      // The warning makes literally no sense
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const exists = await database.exists(databasePath, logger);
       chai.expect(exists).to.equal(true, "Database exists");
       const db2 = await database.create(databasePath, logger);
@@ -27,6 +31,8 @@ export default (databasePath: string): Mocha.Suite => {
     it("open", async () => {
       await database.remove(databasePath, logger);
       await database.create(databasePath, logger);
+      // The warning makes literally no sense
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const dbReadWrite = await database.open(databasePath, logger);
       chai
         .expect(dbReadWrite)
@@ -34,6 +40,8 @@ export default (databasePath: string): Mocha.Suite => {
 
       await database.remove(databasePath, logger);
       await database.create(databasePath, logger);
+      // The warning makes literally no sense
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const dbReadOnly = await database.open(databasePath, logger, {
         readOnly: true,
       });
@@ -42,6 +50,8 @@ export default (databasePath: string): Mocha.Suite => {
       await database.remove(databasePath, logger);
       let throwsException1 = false;
       try {
+        // The warning makes literally no sense
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await database.open(databasePath, logger);
       } catch (error) {
         throwsException1 = true;
@@ -54,6 +64,8 @@ export default (databasePath: string): Mocha.Suite => {
       await database.remove(databasePath, logger);
       let throwsException2 = false;
       try {
+        // The warning makes literally no sense
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await database.open(databasePath, logger, { readOnly: true });
       } catch (error) {
         throwsException2 = true;
