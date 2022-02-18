@@ -195,7 +195,7 @@ export const commandMoonpieSet24 = async (
   }
 };
 
-export const commandMoonpieTop10 = async (
+export const commandMoonpieTop15 = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
@@ -206,9 +206,63 @@ export const commandMoonpieTop10 = async (
     throw Error(`Unable to reply to message since ${messageId} is undefined!`);
   }
 
-  const moonpieEntries = await getMoonpieLeaderboard(moonpieDbPath, logger);
+  const moonpieEntries = await getMoonpieLeaderboard(moonpieDbPath, 15, logger);
   const message = moonpieEntries
     .map((a) => `${a.rank}. ${a.name}: ${a.count}`)
     .join(", ");
   await client.say(channel, message);
+};
+
+export const commandMoonpieCommands = async (
+  client: Client,
+  channel: string,
+  messageId: string | undefined,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+  }
+
+  const commands = [
+    "!moonpie [claim one moonepie per day]",
+    "!moonpie commands [get all available commands]",
+    "!moonpie leaderboard [get the top moonpie holder]",
+    "!moonpie get $USER [get the moonpie count of a user]",
+    "!moonpie set $USER [set moonpies of a user]",
+    "!moonpie add $USER [add moonpies to a user]",
+    "!moonpie remove $USER $COUNT [remove moonpies of a user]",
+  ];
+  const sentMessage = await client.say(
+    channel,
+    "The following commands are supported: " + commands.join(", ")
+  );
+  logger.info(
+    `Successfully replied to message ${messageId} with: '${JSON.stringify(
+      sentMessage
+    )}'`
+  );
+};
+
+export const commandMoonpieLeaderboard = async (
+  client: Client,
+  channel: string,
+  messageId: string | undefined,
+  moonpieDbPath: string,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+  }
+
+  const moonpieEntries = await getMoonpieLeaderboard(moonpieDbPath, 15, logger);
+  const message = moonpieEntries
+    .map((a) => `${a.rank}. ${a.name}: ${a.count}`)
+    .join(", ");
+
+  const sentMessage = await client.say(channel, message);
+  logger.info(
+    `Successfully replied to message ${messageId} with: '${JSON.stringify(
+      sentMessage
+    )}'`
+  );
 };

@@ -5,10 +5,26 @@ A custom twitch bot
 ## Setup
 
 1. Install a recent version of [nodejs](https://nodejs.org/en/download/)
-2. Clone this repository via git or download the source code
-3. Open the directory of the cloned or downloaded source code in a terminal
-   - Windows: Powershell
-   - Linux: xfce-terminal or another one
+2. Get the source code
+
+   Either by cloning this repository via git:
+
+   - Install [git](https://git-scm.com/downloads)
+   - Open the console/terminal in the directory where you want to have the source code and run:
+
+     ```sh
+     # cd path/to/dir
+     git clone "https://github.com/AnonymerNiklasistanonym/MoonpieBot.git"
+     ```
+
+   Or by downloading the source code:
+
+   - Get the latest version from [here](https://github.com/AnonymerNiklasistanonym/MoonpieBot/archive/refs/heads/main.zip) or by using the [github website](https://github.com/AnonymerNiklasistanonym/MoonpieBot) (Click `Code` and then `Download ZIP`)
+
+   Install [`git'](https://git-scm.com/downloads)
+3. Open the directory of the cloned or downloaded source code in the console/terminal
+   - Windows: Powershell/WindowsTerminal/...
+   - Linux: xfce-terminal/...
 4. Install all nodejs dependencies
 
    ```sh

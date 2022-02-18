@@ -236,6 +236,7 @@ export interface GetMoonpieLeaderboardOut {
  */
 export const getMoonpieLeaderboard = async (
   databasePath: string,
+  limit: number,
   logger: Logger
 ): Promise<GetMoonpieLeaderboardOut[]> => {
   const runResult = await database.requests.getAll<GetMoonpieLeaderboardDbOut>(
@@ -248,7 +249,7 @@ export const getMoonpieLeaderboard = async (
         viewLeaderboard.column.rank,
       ],
       {
-        limit: 10,
+        limit,
       }
     ),
     [],

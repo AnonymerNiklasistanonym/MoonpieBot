@@ -9,16 +9,11 @@ dotenv.config();
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
 // commands
-import { commandHello } from "./commands/hello";
-import {
-  commandMoonpie,
-  commandMoonpieSet0,
-  commandMoonpieSet24,
-  commandMoonpieTop10,
-} from "./commands/moonpie";
+import { commandMoonpieSet0, commandMoonpieSet24 } from "./commands/moonpie";
 import { setupTables, setupInitialData } from "./moonpiedb/setupDatabase";
 import * as path from "path";
 import { ErrorCodeOpen } from "./database";
+import { moonpieChatHandler } from "./moonpieChatHandler";
 
 for (const VARIABLE_NAME of [
   "TWITCH_CHANNEL",
@@ -72,35 +67,15 @@ client
       // Ignore echoed messages.
       if (self) return;
 
-      // Catch messages that start with '!hello'
-      if (message.trim().toLowerCase().startsWith("!hello")) {
-        logger.info(
-          `Detected command '!hello' by ${tags?.username} in message ${tags?.id}`
-        );
-        commandHello(client, channel, tags.username, tags.id, logger).catch(
-          (err) => {
-            logger.error(err);
-          }
-        );
-      }
-
-      // Catch messages that start with '!moonpie'
-      if (message.trim().toLowerCase().startsWith("!moonpie")) {
-        logger.info(
-          `Detected command '!moonpie' by ${tags?.username} in message ${tags?.id}`
-        );
-        commandMoonpie(
-          client,
-          channel,
-          tags.username,
-          tags["user-id"],
-          tags.id,
-          databasePath,
-          logger
-        ).catch((err) => {
-          logger.error(err);
-        });
-      }
+      // Handle moonpie messages
+      moonpieChatHandler(
+        client,
+        channel,
+        tags,
+        message,
+        databasePath,
+        logger
+      ).catch(logger.error);
 
       if (message.trim().toLowerCase().startsWith("!setmoonpie0")) {
         console.log(tags);
@@ -126,26 +101,6 @@ client
           channel,
           tags.username,
           tags["user-id"],
-          tags.id,
-          databasePath,
-          logger
-        ).catch((err) => {
-          logger.error(err);
-        });
-      }
-
-      // TODO !setmoonpie
-
-      // TODO !addmoonpie
-
-      // TODO !removemoonpie
-
-      // TODO !moonpieleaderboard
-
-      if (message.trim().toLowerCase().startsWith("!moonpieleaderboard")) {
-        commandMoonpieTop10(
-          client,
-          channel,
           tags.id,
           databasePath,
           logger
