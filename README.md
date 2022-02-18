@@ -63,6 +63,13 @@ A custom twitch bot
    MOONPIE_CONFIG_DB_FILEPATH=./database.db
    ```
 
+   - Get Twitch OAuth token:
+
+     1. Log into your twitch account (or better the account of the bot) in the browser
+     2. Visit the webpage https://twitchapps.com/tmi/
+     3. Follow the instructions and click `Connect`
+     4. After enabling permission you get forwarded to a page where you can get the token
+
 7. Run the bot
 
    ```sh
@@ -127,13 +134,6 @@ Given as input:
     - `prettier` (for code format)
 
 ## Notes
-
-## Get Twitch OAuth Token
-
-1. Log into your twitch account in the browser.
-2. Visit the webpage https://twitchapps.com/tmi/
-3. Follow the instructions and click `Connect`
-4. After enabling permission you get forwarded to a page where you can get the token
 
 ## Inspect Database
 
