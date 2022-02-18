@@ -89,6 +89,7 @@ Things that need to be added before it can be released:
 - [ ] Clean code and code comments
 - [ ] Find out what the bug is behind the database not being able to closed
 - [ ] (*not important*) Check if the bot can see if a stream is happening and otherwise blocking claiming moonpies
+- [ ] (*not important*) Add cooldown environment variable
 
 ## Features
 

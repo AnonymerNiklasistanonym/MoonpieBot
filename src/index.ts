@@ -10,7 +10,8 @@ import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
 // commands
 import { commandMoonpieSet0, commandMoonpieSet24 } from "./commands/moonpie";
-import { setupTables, setupInitialData } from "./moonpiedb/setupDatabase";
+import { setupTables } from "./moonpiedb/setupDatabase";
+//import { setupInitialData } from "./moonpiedb/setupDatabase";
 import * as path from "path";
 import { ErrorCodeOpen } from "./database";
 import { moonpieChatHandler } from "./moonpieChatHandler";
