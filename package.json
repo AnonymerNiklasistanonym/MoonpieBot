@@ -8,7 +8,8 @@
     },
     "scripts": {
         "start": "cross-env NODE_PATH=./dist NODE_ENV=production node .",
-        "build": "rm -fr ./dist/* && tsc",
+        "prebuild": "rimraf ./dist/*",
+        "build": "tsc",
         "test": "cross-env NODE_PATH=. nyc mocha -- \"tests/**/*.test.ts\"",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",
         "build:dev": "tsc --sourceMap --removeComments false --pretty",
@@ -51,6 +52,7 @@
         "nodemon": "^2.0.15",
         "nyc": "^15.1.0",
         "prettier": "^2.5.1",
+        "rimraf": "^3.0.2",
         "sinon": "^13.0.1",
         "source-map-support": "^0.5.21",
         "ts-node": "^10.5.0",
