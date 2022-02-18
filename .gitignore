@@ -169,3 +169,4 @@ tmp/
 .eslintcache
 src/moonpiedb.ts
 *.db
+*.db-journal

@@ -75,7 +75,7 @@ export const setupTables = async (
           alias: moonpie.viewLeaderboard.column.moonpieCount,
         },
         {
-          columnName: `ROW_NUMBER () OVER (ORDER BY ${moonpie.table.name}.${moonpie.table.column.moonpieCount} DESC)`,
+          columnName: `ROW_NUMBER () OVER (ORDER BY ${moonpie.table.name}.${moonpie.table.column.moonpieCount} DESC, ${moonpie.table.name}.${moonpie.table.column.date} ASC, ${moonpie.table.name}.${moonpie.table.column.twitchName} ASC)`,
           alias: moonpie.viewLeaderboard.column.rank,
         },
       ],
@@ -84,6 +84,14 @@ export const setupTables = async (
           {
             ascending: false,
             column: moonpie.table.column.moonpieCount,
+          },
+          {
+            ascending: true,
+            column: moonpie.table.column.date,
+          },
+          {
+            ascending: true,
+            column: moonpie.table.column.twitchName,
           },
         ],
       },
