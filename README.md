@@ -37,7 +37,15 @@ A custom twitch bot
    npm run build
    ```
 
-   *TODO: Think about adding a command to clean dev dependencies for a smaller footprint*
+   If you want you can now also remove all dependencies that were installed to the `node_modules` directory that were only necessary to build the program and are not necessary for running the bot:
+
+   ```sh
+   # Keep in mind that if you want to update the bot after
+   # the source code was updated you need to run
+   # > npm install
+   # again to get the development dependencies again
+   npm prune --production
+   ```
 
 6. Provide the necessary environment variables or a [`.env`](./.env.example) file with the following information:
 
