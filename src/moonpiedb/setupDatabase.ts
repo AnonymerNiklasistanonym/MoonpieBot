@@ -61,12 +61,22 @@ export const setupTables = async (
       [
         {
           columnName: moonpie.table.column.twitchId,
+          tableName: moonpie.table.name,
+          alias: moonpie.viewLeaderboard.column.twitchId,
         },
         {
           columnName: moonpie.table.column.twitchName,
+          tableName: moonpie.table.name,
+          alias: moonpie.viewLeaderboard.column.twitchName,
         },
         {
           columnName: moonpie.table.column.moonpieCount,
+          tableName: moonpie.table.name,
+          alias: moonpie.viewLeaderboard.column.moonpieCount,
+        },
+        {
+          columnName: `ROW_NUMBER () OVER (ORDER BY ${moonpie.table.name}.${moonpie.table.column.moonpieCount} DESC)`,
+          alias: moonpie.viewLeaderboard.column.rank,
         },
       ],
       {

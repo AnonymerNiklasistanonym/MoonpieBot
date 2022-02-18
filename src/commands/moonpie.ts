@@ -9,6 +9,7 @@ import {
   update,
   remove,
   getMoonpieLeaderboard,
+  getMoonpieLeaderboardEntry,
 } from "../moonpiedb/moonpieManager";
 
 // TODO Add in the future the possibility to access the message and return moonpie count for other people
@@ -60,24 +61,26 @@ export const commandMoonpie = async (
   let newMoonpieCount = 1;
   let millisecondsSinceLastClaim = 0;
   let alreadyClaimedAMoonpie = false;
+  let newTimestamp = new Date().getTime();
   if (await exists(moonpieDbPath, userId, logger)) {
-    const moonpieCount = await getMoonpie(moonpieDbPath, userId, logger);
+    const moonpieEntry = await getMoonpie(moonpieDbPath, userId, logger);
 
     // If a moonpie entry already exists check if a moonpie was redeemed in the last 24 hours
     const currentTimestamp = new Date().getTime();
     millisecondsSinceLastClaim = Math.max(
-      currentTimestamp - moonpieCount.timestamp,
+      currentTimestamp - moonpieEntry.timestamp,
       0
     );
     logger.info(
-      `millisecondsSinceLastClaim=${currentTimestamp}-${moonpieCount.timestamp}=${millisecondsSinceLastClaim}`
+      `millisecondsSinceLastClaim=${currentTimestamp}-${moonpieEntry.timestamp}=${millisecondsSinceLastClaim}`
     );
 
     if (millisecondsSinceLastClaim > 24 * 60 * 60 * 1000) {
-      newMoonpieCount = moonpieCount.count + 1;
+      newMoonpieCount = moonpieEntry.count + 1;
     } else {
-      newMoonpieCount = moonpieCount.count;
+      newMoonpieCount = moonpieEntry.count;
       alreadyClaimedAMoonpie = true;
+      newTimestamp = moonpieEntry.timestamp;
     }
   } else {
     await create(moonpieDbPath, { id: userId, name: username }, logger);
@@ -88,22 +91,28 @@ export const commandMoonpie = async (
       id: userId,
       name: username,
       count: newMoonpieCount,
-      timestamp: new Date().getTime(),
+      timestamp: newTimestamp,
     },
+    logger
+  );
+
+  const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
+    moonpieDbPath,
+    userId,
     logger
   );
 
   let message = `@${username} You just claimed a moonpie! You have now ${newMoonpieCount} moonpie${
     newMoonpieCount > 1 ? "s" : ""
-  }!!!`;
+  } and are rank ${currentMoonpieLeaderboardEntry.rank} on the leaderboard!!!`;
 
   if (alreadyClaimedAMoonpie) {
-    // TODO Add when the moonpie was redeemed
-
     const ago = `${secondsToString(millisecondsSinceLastClaim / 1000)}`;
     message = `@${username} You already claimed a moonpie for today (${ago})! You have ${newMoonpieCount} moonpie${
       newMoonpieCount > 1 ? "s" : ""
-    }!!!`;
+    } and are rank ${
+      currentMoonpieLeaderboardEntry.rank
+    } on the leaderboard!!!`;
   }
 
   const sentMessage = await client.say(channel, message);
@@ -198,11 +207,8 @@ export const commandMoonpieTop10 = async (
   }
 
   const moonpieEntries = await getMoonpieLeaderboard(moonpieDbPath, logger);
-  let message = "";
-  for (let i = 0; i < moonpieEntries.length; i++) {
-    message += `${i + 1}. ${moonpieEntries[i].name}: ${
-      moonpieEntries[i].count
-    } `;
-  }
+  const message = moonpieEntries
+    .map((a) => `${a.rank}. ${a.name}: ${a.count}`)
+    .join(", ");
   await client.say(channel, message);
 };

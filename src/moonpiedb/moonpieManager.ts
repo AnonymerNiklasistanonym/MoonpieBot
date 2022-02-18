@@ -41,6 +41,8 @@ export const viewLeaderboard = {
     twitchName: "name",
     /** The current number of moonpies */
     moonpieCount: "count",
+    /** The current rank on the leaderboard */
+    rank: "rank",
   },
   /** SQlite table name for moonpies */
   name: "moonpieleaderboard",
@@ -187,8 +189,7 @@ export const getMoonpie = async (
     throw Error(GeneralError.NOT_EXISTING);
   }
 
-  /* <GetMoonpieCountDbOut> */
-  const runResult = await database.requests.getEach(
+  const runResult = await database.requests.getEach<GetMoonpieDbOut>(
     databasePath,
     database.queries.select(
       table.name,
@@ -206,7 +207,7 @@ export const getMoonpie = async (
     logger
   );
   if (runResult) {
-    return runResult as unknown as GetMoonpieDbOut;
+    return runResult;
   }
   throw Error(GeneralError.NOT_FOUND);
 };
@@ -217,11 +218,13 @@ export const getMoonpie = async (
 export interface GetMoonpieLeaderboardDbOut {
   name: string;
   count: number;
+  rank: number;
 }
 
 export interface GetMoonpieLeaderboardOut {
   name: string;
   count: number;
+  rank: number;
 }
 
 /**
@@ -235,12 +238,15 @@ export const getMoonpieLeaderboard = async (
   databasePath: string,
   logger: Logger
 ): Promise<GetMoonpieLeaderboardOut[]> => {
-  /* <GetMoonpieCountDbOut> */
-  const runResult = await database.requests.getAll(
+  const runResult = await database.requests.getAll<GetMoonpieLeaderboardDbOut>(
     databasePath,
     database.queries.select(
       viewLeaderboard.name,
-      [viewLeaderboard.column.moonpieCount, viewLeaderboard.column.twitchName],
+      [
+        viewLeaderboard.column.moonpieCount,
+        viewLeaderboard.column.twitchName,
+        viewLeaderboard.column.rank,
+      ],
       {
         limit: 10,
       }
@@ -249,7 +255,7 @@ export const getMoonpieLeaderboard = async (
     logger
   );
   if (runResult) {
-    return runResult as unknown as GetMoonpieLeaderboardDbOut[];
+    return runResult;
   }
   throw Error(GeneralError.NOT_FOUND);
 };
@@ -262,17 +268,20 @@ export const getMoonpieLeaderboard = async (
  * @throws When not able to get the moonpie count or database fails
  * @returns The moonpie count of the Twitch ID user
  */
-export const getMoonpieLeaderboardRank = async (
+export const getMoonpieLeaderboardEntry = async (
   databasePath: string,
   twitchId: string,
   logger: Logger
-): Promise<GetMoonpieLeaderboardOut[]> => {
-  /* <GetMoonpieCountDbOut> */
-  const runResult = await database.requests.getEach(
+): Promise<GetMoonpieLeaderboardOut> => {
+  const runResult = await database.requests.getEach<GetMoonpieLeaderboardDbOut>(
     databasePath,
     database.queries.select(
       viewLeaderboard.name,
-      [viewLeaderboard.column.moonpieCount, viewLeaderboard.column.twitchName],
+      [
+        viewLeaderboard.column.moonpieCount,
+        viewLeaderboard.column.twitchName,
+        viewLeaderboard.column.rank,
+      ],
       {
         whereColumn: {
           columnName: viewLeaderboard.column.twitchId,
@@ -283,7 +292,7 @@ export const getMoonpieLeaderboardRank = async (
     logger
   );
   if (runResult) {
-    return runResult as unknown as GetMoonpieLeaderboardDbOut[];
+    return runResult;
   }
   throw Error(GeneralError.NOT_FOUND);
 };
