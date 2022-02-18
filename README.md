@@ -76,26 +76,19 @@ A custom twitch bot
 Things that need to be added before it can be released:
 
 - [ ] Database
-  - [ ] Add more tests
-  - [ ] (*not important*) Add better row number integration
+  - [ ] (*not important*) Add more tests
+  - [ ] (*not important*) Add better `ROW_NUMBER () OVER ()` integration
+  - [ ] (*not important*) Add better `lower()` integration
 - [ ] Logging
   - [ ] Add daily rotating log file instead of one big file
 - [ ] Commands:
-  - [ ] Update commands and use Regex for parsing
-    - [ ] `!moonpie xyz`
-    - [ ] `!moonpie commands`
-    - [ ] `!moonpie set $USER $NEW_COUNT`
-    - [ ] `!moonpie add $USER $NUMBER_ADD`
-    - [ ] `!moonpie remove $USER $NUMBER_REMOVE`
-    - [ ] `!moonpie leaderboard`
-    - [ ] `!moonpie get $USER`
+  - [ ] `!moonpie delete $USER` (add integration on how to drop a user from the database without manual intervention)
   - [ ] (*not important*) Add admin integration
     - [ ] `!moonpie add-admin $USER`
     - [ ] `!moonpie remove-admin $USER`
-  - [ ] Add permission system so that `set`/`add`/`remove` can only be set by broadcasters
 - [ ] Clean code and code comments
-- [ ] Test if it works on Windows
-- [ ] Check if the bot can see if a stream is happening and otherwise blocking claiming moonpies
+- [ ] Find out what the bug is behind the database not being able to closed
+- [ ] (*not important*) Check if the bot can see if a stream is happening and otherwise blocking claiming moonpies
 
 ## Features
 
