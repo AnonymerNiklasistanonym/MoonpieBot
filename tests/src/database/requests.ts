@@ -3,8 +3,9 @@ import chai from "chai";
 import { describe } from "mocha";
 import winston from "winston";
 import { itAllowFail } from "../allowFail";
+import path from "path";
 
-export default (databasePath: string): Mocha.Suite => {
+export default (databaseDirPath: string): Mocha.Suite => {
   return describe("requests", () => {
     const logger = winston.createLogger({
       level: "warn",
@@ -53,6 +54,7 @@ export default (databasePath: string): Mocha.Suite => {
       unique_text_and_not_null: string;
     }
     itAllowFail("post", process.platform === "win32", async () => {
+      const databasePath = path.join(databaseDirPath, "post.db");
       await database.remove(databasePath, logger);
       await database.create(databasePath, logger);
 
@@ -132,6 +134,7 @@ export default (databasePath: string): Mocha.Suite => {
       chai.expect(throwsException2).to.equal(true);
     });
     itAllowFail("get each", process.platform === "win32", async () => {
+      const databasePath = path.join(databaseDirPath, "getEach.db");
       await database.remove(databasePath, logger);
       await database.create(databasePath, logger);
 
@@ -239,6 +242,7 @@ export default (databasePath: string): Mocha.Suite => {
       }
     });
     itAllowFail("get all", process.platform === "win32", async () => {
+      const databasePath = path.join(databaseDirPath, "getAll.db");
       await database.remove(databasePath, logger);
       await database.create(databasePath, logger);
 
