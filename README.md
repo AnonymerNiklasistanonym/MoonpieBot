@@ -1,10 +1,10 @@
 # MoonpieBot
 
-A custom twitch chat bot.
+A custom Twitch chat bot.
 
 ## Features
 
-Given a Twiitch account name, OAuth token and channel name the bot will imitate this account in the given channel.
+Given a Twitch account name, a connected OAuth token and the channel name where the bot should be deployed will imitate the given account in the given channel.
 
 - Every day a user can claim a *moonpie* and the count is saved in a persistent database:
 
