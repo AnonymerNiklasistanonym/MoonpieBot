@@ -1,8 +1,11 @@
 import { expect } from "chai";
 import {
+  regexMoonpieAdd,
   regexMoonpieClaim,
   regexMoonpieGet,
   regexMoonpieLeaderboard,
+  regexMoonpieRemove,
+  regexMoonpieSet,
 } from "src/moonpieChatHandler";
 
 describe("regex", () => {
@@ -86,6 +89,148 @@ describe("regex", () => {
       const message6 = "abc !moonpie get username";
       const matches6 = message6.match(regexMoonpieGet);
       expect(matches6).to.be.null;
+
+      const message7 = "!moonpie get username text after that";
+      const matches7 = message7.match(regexMoonpieGet);
+      expect(matches7).to.be.null;
+    });
+
+    it("!moonpie add $USER $COUNT", () => {
+      const message0 = "!monpie";
+      const matches0 = message0.match(regexMoonpieAdd);
+      expect(matches0).to.be.null;
+
+      const message1 = "!moonpie";
+      const matches1 = message1.match(regexMoonpieAdd);
+      expect(matches1).to.be.null;
+
+      const message2 = "!moonpie message after that";
+      const matches2 = message2.match(regexMoonpieAdd);
+      expect(matches2).to.be.null;
+
+      const message3 = "!moonpie add";
+      const matches3 = message3.match(regexMoonpieAdd);
+      expect(matches3).to.be.null;
+
+      const message4 = "!moonpie add username";
+      const matches4 = message4.match(regexMoonpieAdd);
+      expect(matches4).to.be.null;
+
+      const message5 = "!moonpie add username 100";
+      const matches5 = message5.match(regexMoonpieAdd);
+      expect(matches5).to.not.be.null;
+      if (matches5) {
+        expect(matches5[1]).to.be.equal("username");
+        expect(parseInt(matches5[2])).to.be.equal(100);
+      }
+
+      const message6 = "!moonpie add username 100a";
+      const matches6 = message6.match(regexMoonpieAdd);
+      expect(matches6).to.be.null;
+
+      const message7 = "abc !moonpie add username 100";
+      const matches7 = message7.match(regexMoonpieAdd);
+      expect(matches7).to.be.null;
+
+      const message8 = "!moonpie add username 100 text after that";
+      const matches8 = message8.match(regexMoonpieAdd);
+      expect(matches8).to.be.null;
+
+      const message9 = "!moonpie get username 100";
+      const matches9 = message9.match(regexMoonpieAdd);
+      expect(matches9).to.be.null;
+    });
+
+    it("!moonpie remove $USER $COUNT", () => {
+      const message0 = "!monpie";
+      const matches0 = message0.match(regexMoonpieRemove);
+      expect(matches0).to.be.null;
+
+      const message1 = "!moonpie";
+      const matches1 = message1.match(regexMoonpieRemove);
+      expect(matches1).to.be.null;
+
+      const message2 = "!moonpie message after that";
+      const matches2 = message2.match(regexMoonpieRemove);
+      expect(matches2).to.be.null;
+
+      const message3 = "!moonpie remove";
+      const matches3 = message3.match(regexMoonpieRemove);
+      expect(matches3).to.be.null;
+
+      const message4 = "!moonpie remove username";
+      const matches4 = message4.match(regexMoonpieRemove);
+      expect(matches4).to.be.null;
+
+      const message5 = "!moonpie remove username 100";
+      const matches5 = message5.match(regexMoonpieRemove);
+      expect(matches5).to.not.be.null;
+      if (matches5) {
+        expect(matches5[1]).to.be.equal("username");
+        expect(parseInt(matches5[2])).to.be.equal(100);
+      }
+
+      const message6 = "!moonpie remove username 100a";
+      const matches6 = message6.match(regexMoonpieRemove);
+      expect(matches6).to.be.null;
+
+      const message7 = "abc !moonpie remove username 100";
+      const matches7 = message7.match(regexMoonpieRemove);
+      expect(matches7).to.be.null;
+
+      const message8 = "!moonpie remove username 100 text after that";
+      const matches8 = message8.match(regexMoonpieRemove);
+      expect(matches8).to.be.null;
+
+      const message9 = "!moonpie set username 100";
+      const matches9 = message9.match(regexMoonpieRemove);
+      expect(matches9).to.be.null;
+    });
+
+    it("!moonpie set $USER $COUNT", () => {
+      const message0 = "!monpie";
+      const matches0 = message0.match(regexMoonpieSet);
+      expect(matches0).to.be.null;
+
+      const message1 = "!moonpie";
+      const matches1 = message1.match(regexMoonpieSet);
+      expect(matches1).to.be.null;
+
+      const message2 = "!moonpie message after that";
+      const matches2 = message2.match(regexMoonpieSet);
+      expect(matches2).to.be.null;
+
+      const message3 = "!moonpie set";
+      const matches3 = message3.match(regexMoonpieSet);
+      expect(matches3).to.be.null;
+
+      const message4 = "!moonpie set username";
+      const matches4 = message4.match(regexMoonpieSet);
+      expect(matches4).to.be.null;
+
+      const message5 = "!moonpie set username 100";
+      const matches5 = message5.match(regexMoonpieSet);
+      expect(matches5).to.not.be.null;
+      if (matches5) {
+        expect(matches5[1]).to.be.equal("username");
+        expect(parseInt(matches5[2])).to.be.equal(100);
+      }
+
+      const message6 = "!moonpie set username 100a";
+      const matches6 = message6.match(regexMoonpieSet);
+      expect(matches6).to.be.null;
+
+      const message7 = "abc !moonpie set username 100";
+      const matches7 = message7.match(regexMoonpieSet);
+      expect(matches7).to.be.null;
+
+      const message8 = "!moonpie set username 100 text after that";
+      const matches8 = message8.match(regexMoonpieSet);
+      expect(matches8).to.be.null;
+
+      const message9 = "!moonpie add username 100";
+      const matches9 = message9.match(regexMoonpieSet);
+      expect(matches9).to.be.null;
     });
   });
 });

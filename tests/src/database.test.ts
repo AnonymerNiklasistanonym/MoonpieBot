@@ -1,6 +1,6 @@
-import databaseManagement from "./database/management";
-import databaseQueries from "./database/queries";
-import databaseRequests from "./database/requests";
+import databaseManagement from "./database/management.test";
+import databaseQueries from "./database/queries.test";
+import databaseRequests from "./database/requests.test";
 import { describe } from "mocha";
 import os from "os";
 import path from "path";

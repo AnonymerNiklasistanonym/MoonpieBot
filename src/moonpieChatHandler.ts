@@ -27,9 +27,9 @@ export const regexMoonpie = /^\s*!moonpie(\s*|\s.*)$/i;
 export const regexMoonpieClaim = /^\s*!moonpie(\s*|\s.*)$/i;
 export const regexMoonpieCommands = /^\s*!moonpie\s+commands\s*$/i;
 export const regexMoonpieLeaderboard = /^\s*!moonpie\s+leaderboard\s*$/i;
-export const regexMoonpieGet = /^\s*!moonpie\s+get\s+(.*?)\s*$/i;
-export const regexMoonpieSet = /^\s*!moonpie\s+set\s+(.*?)\s+([0-9]+)\s*$/i;
-export const regexMoonpieAdd = /^\s*!moonpie\s+add\s+(.*?)\s+([0-9]+)\s*$/i;
+export const regexMoonpieGet = /^\s*!moonpie\s+get\s+(\S+)\s*$/i;
+export const regexMoonpieSet = /^\s*!moonpie\s+set\s+(\S+)\s+([0-9]+)\s*$/i;
+export const regexMoonpieAdd = /^\s*!moonpie\s+add\s+(\S+)\s+([0-9]+)\s*$/i;
 export const regexMoonpieRemove =
   /^\s*!moonpie\s+remove\s+(.*?)\s+([0-9]+)\s*$/i;
 
