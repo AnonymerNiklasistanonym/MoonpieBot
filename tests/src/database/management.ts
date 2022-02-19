@@ -2,6 +2,7 @@ import * as database from "../../../src/database";
 import chai from "chai";
 import { describe } from "mocha";
 import winston from "winston";
+import { itAllowFail } from "../allowFail";
 
 export default (databasePath: string): Mocha.Suite => {
   return describe("management", () => {
@@ -10,14 +11,14 @@ export default (databasePath: string): Mocha.Suite => {
       transports: [new winston.transports.Console()],
     });
 
-    it("remove", async () => {
+    itAllowFail("remove", process.platform === "win32", async () => {
       await database.remove(databasePath, logger);
       // The warning makes literally no sense
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const exists = await database.exists(databasePath, logger);
       chai.expect(exists).to.equal(false, "Database does not exist");
     });
-    it("create", async () => {
+    itAllowFail("create", process.platform === "win32", async () => {
       await database.remove(databasePath, logger);
       const db = await database.create(databasePath, logger);
       chai.expect(db).to.not.equal(undefined, "Database not undefined");
@@ -28,7 +29,7 @@ export default (databasePath: string): Mocha.Suite => {
       const db2 = await database.create(databasePath, logger);
       chai.expect(db2).to.not.equal(undefined, "Database not undefined");
     });
-    it("open", async () => {
+    itAllowFail("open", process.platform === "win32", async () => {
       await database.remove(databasePath, logger);
       await database.create(databasePath, logger);
       // The warning makes literally no sense

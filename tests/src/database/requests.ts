@@ -2,6 +2,7 @@ import * as database from "../../../src/database";
 import chai from "chai";
 import { describe } from "mocha";
 import winston from "winston";
+import { itAllowFail } from "../allowFail";
 
 export default (databasePath: string): Mocha.Suite => {
   return describe("requests", () => {
@@ -51,7 +52,7 @@ export default (databasePath: string): Mocha.Suite => {
       // eslint-disable-next-line camelcase
       unique_text_and_not_null: string;
     }
-    it("post", async () => {
+    itAllowFail("post", process.platform === "win32", async () => {
       await database.remove(databasePath, logger);
       await database.create(databasePath, logger);
 
@@ -130,7 +131,7 @@ export default (databasePath: string): Mocha.Suite => {
       }
       chai.expect(throwsException2).to.equal(true);
     });
-    it("get each", async () => {
+    itAllowFail("get each", process.platform === "win32", async () => {
       await database.remove(databasePath, logger);
       await database.create(databasePath, logger);
 
@@ -237,7 +238,7 @@ export default (databasePath: string): Mocha.Suite => {
         chai.assert(false);
       }
     });
-    it("get all", async () => {
+    itAllowFail("get all", process.platform === "win32", async () => {
       await database.remove(databasePath, logger);
       await database.create(databasePath, logger);
 
