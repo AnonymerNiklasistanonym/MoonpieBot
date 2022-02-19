@@ -1,13 +1,28 @@
 # MoonpieBot
 
-A custom twitch bot
+A custom twitch chat bot.
+
+## Features
+
+Given a Twiitch account name, OAuth token and channel name the bot will imitate this account in the given channel.
+
+- Every day a user can claim a *moonpie* and the count is saved in a persistent database:
+
+  | Command | Permissions | Description |
+  | ------ | -- | -------- |
+  | `!moonpie` | everyone | (If not already claimed) Claim a moonpie and return the current count and the leaderboard position |
+  | `!moonpie leaderboard` | everyone | Show the top 15 moonpie holders |
+  | `!moonpie get $USER` | everyone | Return the current count and the leaderboard position of `$USER` if found in database |
+  | `!moonpie add $USER $COUNT` | broadcaster badge | Add moonpie `$COUNT` to `$USER` if found in database |
+  | `!moonpie remove $USER $COUNT` | broadcaster badge | Remove moonpie `$COUNT` to `$USER` if found in database |
+  | `!moonpie set $USER $COUNT` | broadcaster badge | Set moonpie `$COUNT` to `$USER` if found in database |
 
 ## Setup
 
-1. Install a recent version of [nodejs](https://nodejs.org/en/download/)
-2. Get the source code
+1. Install a recent version of [Node.js](https://nodejs.org/en/download/) so the `node` and `npm` command are available
+2. Get the source code of the bot
 
-   Either by cloning this repository via git:
+   Either by cloning this repository via `git`:
 
    - Install [git](https://git-scm.com/downloads)
    - Open the console/terminal in the directory where you want to have the source code and run:
@@ -17,57 +32,75 @@ A custom twitch bot
      git clone "https://github.com/AnonymerNiklasistanonym/MoonpieBot.git"
      ```
 
-   Or by downloading the source code:
+   Or by manually downloading it:
 
-   - Get the latest version from [here](https://github.com/AnonymerNiklasistanonym/MoonpieBot/archive/refs/heads/main.zip) or by using the [github website](https://github.com/AnonymerNiklasistanonym/MoonpieBot) (Click `Code` and then `Download ZIP`)
+   - Get the latest version from [here](https://github.com/AnonymerNiklasistanonym/MoonpieBot/archive/refs/heads/main.zip) or by using the [GitHub website](https://github.com/AnonymerNiklasistanonym/MoonpieBot) by clicking `Code` and then `Download ZIP`
 
 3. Open the directory of the cloned or downloaded source code in the console/terminal
    - Windows: Powershell/WindowsTerminal/...
    - Linux: xfce-terminal/...
-4. Install all nodejs dependencies
+4. Install all dependencies
 
-   On Windows you need to install a special dependency first for `sqlite3` to be installed without having Python, Visual Studio, etc. installed:
+   ---
+
+   On Windows you can install a special dependency first so the dependency [`sqlite3`](https://www.npmjs.com/package/sqlite3) can be installed without having its build tools (Python, Visual Studio with C++ environment, ...) installed which is also much faster:
    
    ```sh
    # source: https://www.npmjs.com/package/sqlite3#installing
    npm install https://github.com/mapbox/node-sqlite3/tarball/master
    ```
-   
-   Then always run this command (this is enough for all dependencies on Linux):
+
+   ---
+
+   To install all depdencies always run:
 
    ```sh
    npm install
    ```
 
-5. Build the bot (it needs to be compiled from TypeScript to JavaScript)
+5. Build the bot (it needs to be compiled from TypeScript to JavaScript so it can be run via `node`)
 
    ```sh
    npm run build
    ```
 
-   If you want you can now also remove all dependencies that were installed to the `node_modules` directory that were only necessary to build the program and are not necessary for running the bot:
+   If you want you can now also remove all development dependencies that were installed to the `node_modules` directory and only necessary to build the program but not for running it:
 
    ```sh
-   # Keep in mind that if you want to update the bot after
-   # the source code was updated you need to run
+   # Keep in mind that if you want to update the bot after the source code was updated you need to run
    # > npm install
-   # again to get the development dependencies again
+   # to get the development dependencies again
    npm prune --production
    ```
 
-6. Provide the necessary environment variables or a [`.env`](./.env.example) file with the following information:
+6. Provide the necessary environment variables or a `.env` file in the source code directory with the following information:
+
+   ---
+   
+   You can copy the [`.env.example`](./.env.example) file, rename it to `.env` and then edit the "variables" in there.
+   
+   ---
+   
+   Logging information:
 
    ```sh
    # error, warn, info, debug
    MOONPIE_CONFIG_CONSOLE_LOG_LEVEL=info
    MOONPIE_CONFIG_FILE_LOG_LEVEL=debug
+   ```
 
-   # Get it from: https://twitchapps.com/tmi/
+   Twitch account information:
+
+   ```sh
    MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+   # Get a token from: https://twitchapps.com/tmi/
    MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
-
    MOONPIE_CONFIG_TWITCH_CHANNEL=moonpiechannel
+   ```
 
+   Database location:
+
+   ```sh
    MOONPIE_CONFIG_DB_FILEPATH=./database.db
    ```
 
@@ -94,60 +127,39 @@ Things that need to be added before it can be released:
   - [ ] (*not important*) Add more tests
   - [ ] (*not important*) Add better `ROW_NUMBER () OVER ()` integration
   - [ ] (*not important*) Add better `lower()` integration
-- [ ] Logging
-  - [ ] Add daily rotating log file instead of one big file
 - [ ] Commands:
   - [ ] `!moonpie delete $USER` (add integration on how to drop a user from the database without manual intervention)
   - [ ] (*not important*) Add admin integration
     - [ ] `!moonpie add-admin $USER`
     - [ ] `!moonpie remove-admin $USER`
 - [ ] Clean code and code comments
-- [ ] Find out what the bug is behind the database not being able to closed
 - [ ] (*not important*) Check if the bot can see if a stream is happening and otherwise blocking claiming moonpies
 - [ ] (*not important*) Add cooldown environment variable
 
-## Features
-
-A bot that has the following functionality:
-
-- Every day a user can claim a *moonpie* using the command `!moonpie`:
-
-  Implementation:
-
-  - SQLite database that keeps track of the twitch ID and the last time of the claimed moonpie so it's limited to once a day
-
-Given as input:
-
-- Twitch bot account
-  - Name: `MOONPIE_CONFIG_TWITCH_NAME`
-  - OAuthToken: `MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN`
-- The Twitch channel where the bot is being run: `MOONPIE_CONFIG_TWITCH_CHANNEL`
-- Sqlite3 database filepath: `MOONPIE_CONFIG_DB_FILEPATH`
-
 ## Implementation
+
+Not every detail but the big components on which this bot is made of:
 
 - Node.js
 - Typescript
-- Dependencies:
+- Node.js dependencies:
   - Production:
     - `dotenv` (for reading in environment variables config)
     - `tmi.js` (for the Twitch connection)
     - `sqlite3` (for a persistent database)
     - `winston` (for logging to a file)
   - Development:
-    - `nodemon` (restart program after changes have been made)
+    - `nodemon` (live restart of bot after changes have been made)
     - `mocha` (for tests)
-    - `istanbul` (for code coverage)
+    - `nyc` (for code coverage)
     - `eslint` (for code format and linting)
     - `prettier` (for code format)
 
-## Notes
-
 ## Inspect Database
 
-To inspect the SQLite database and edit it or run custom queries (for example for development) the program [DB Browser for SQLite](https://sqlitebrowser.org/dl/) can be used.
+To inspect the SQLite database manually and edit it or run custom queries (for example for development) the program [DB Browser for SQLite](https://sqlitebrowser.org/dl/) can be used.
 
-### Development
+## Development
 
 - The entry point of the app is `src/index.ts`
 - A `.env` file should be created which is used for environment variables in the local dev environment
@@ -158,29 +170,7 @@ To inspect the SQLite database and edit it or run custom queries (for example fo
 - `npm run build:dev` - build typescript with source maps and comments in code are kept
 - `npm run mocha` - a helper npm script for running customised mocha command e.g. test a single file `npm run mocha -- file-name-or-pattern`
 
-### Pre-Commit Hook
-
-`eslint --cache --fix` is triggered before each commit. This command tries to fix linting errors when it is possible.
-
-`eslint` has been configured to also check and fix formatting errors detected by `prettier`. (https://prettier.io/docs/en/integrating-with-linters.html)
-
-### Pre-Push Hook
-
-`npm run test:dev` is triggered before each push. Push will fail if tests fail or test coverage is below the threshold defined in `./.nycrc`.
-
-`npm run audit` is triggered before each push. Push will fail if there are vulnerabilities in dependencies. You should run `npm audit fix` to fix the vulnerabilities and commit the changes before you push again.
-
-### Debug Configurations for VS Code
-
-[Run VS Code in Windows Subsystem for Linux](https://code.visualstudio.com/remote-tutorials/wsl/run-in-wsl)
-
-Copy [launch.json](.vscode/launch.json) and [tasks.json](.vscode/tasks.json) from the [.vscode](.vscode) folder to your project's `.vscode` folder.
-
-- `Start (NodeTS WSL)` - starts the app in debug mode
-- `Test All (NodeTS WSL)` - run tests in debug mode
-- `Test Current File (NodeTS WSL)` - run test on the current open/focused file e.g. if `someFile.test.ts` is the file in focus, and you pressed the "start debugging" button or Ctrl + F5, this command will run `mocha someFile.test.ts`
-
-## Configuration Files
+Configuration files:
 
 - ESLint: `.eslintrc.json`, `.eslintignore`
 - Mocha: `.mocharc.json`
