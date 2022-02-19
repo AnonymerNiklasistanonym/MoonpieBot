@@ -23,6 +23,16 @@ const logDetectedCommand = (
   });
 };
 
+export const regexMoonpie = /^\s*!moonpie(\s*|\s.*)$/i;
+export const regexMoonpieClaim = /^\s*!moonpie(\s*|\s.*)$/i;
+export const regexMoonpieCommands = /^\s*!moonpie\s+commands\s*$/i;
+export const regexMoonpieLeaderboard = /^\s*!moonpie\s+leaderboard\s*$/i;
+export const regexMoonpieGet = /^\s*!moonpie\s+get\s+(.*?)\s*$/i;
+export const regexMoonpieSet = /^\s*!moonpie\s+set\s+(.*?)\s+([0-9]+)\s*$/i;
+export const regexMoonpieAdd = /^\s*!moonpie\s+add\s+(.*?)\s+([0-9]+)\s*$/i;
+export const regexMoonpieRemove =
+  /^\s*!moonpie\s+remove\s+(.*?)\s+([0-9]+)\s*$/i;
+
 export const moonpieChatHandler = async (
   client: Client,
   channel: string,
@@ -31,15 +41,6 @@ export const moonpieChatHandler = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {
-  const regexMoonpie = /\s*!moonpie(\s*$|\s.*$)/i;
-  const regexMoonpieClaim = /\s*!moonpie(\s*$|\s.*$)/i;
-  const regexMoonpieCommands = /\s*!moonpie\s+commands\s*$/i;
-  const regexMoonpieLeaderboard = /\s*!moonpie\s+leaderboard\s*$/i;
-  const regexMoonpieGet = /\s*!moonpie\s+get\s+(.*?)\s*$/i;
-  const regexMoonpieSet = /\s*!moonpie\s+set\s+(.*?)\s+([0-9]+)\s*$/i;
-  const regexMoonpieAdd = /\s*!moonpie\s+add\s+(.*?)\s+([0-9]+)\s*$/i;
-  const regexMoonpieRemove = /\s*!moonpie\s+remove\s+(.*?)\s+([0-9]+)\s*$/i;
-
   if (message.match(regexMoonpie)) {
     logDetectedCommand(logger, tags, "!moonpie");
     // > !moonpie commands
