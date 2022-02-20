@@ -14,6 +14,7 @@ import { setupTables } from "./moonpiedb/setupDatabase";
 import * as path from "path";
 import { ErrorCodeOpen } from "./database";
 import { moonpieChatHandler } from "./moonpieChatHandler";
+import { moonpieBotVersion } from "./version";
 
 for (const VARIABLE_NAME of [
   "TWITCH_CHANNEL",
@@ -29,14 +30,10 @@ for (const VARIABLE_NAME of [
   );
 }
 
-export const moonpieBotVersion = {
-  major: 1,
-  minor: 0,
-  patch: 0,
-};
-
 const logger = createLogger();
-logger.info("Start MoonpieBot");
+logger.info(
+  `Start MoonpieBot v${moonpieBotVersion.major}.${moonpieBotVersion.minor}.${moonpieBotVersion.patch}`
+);
 
 const client = createTwitchClient(
   `${process.env.MOONPIE_CONFIG_TWITCH_NAME}`,

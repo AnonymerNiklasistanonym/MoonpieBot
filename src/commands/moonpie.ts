@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { moonpieBotVersion } from "src";
+import { moonpieBotVersion } from "src/version";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
