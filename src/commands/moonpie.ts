@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+import { moonpieBotVersion } from "src";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
@@ -112,6 +113,26 @@ export const commandMoonpie = async (
       currentMoonpieLeaderboardEntry.rank
     } on the leaderboard!!!`;
   }
+
+  const sentMessage = await client.say(channel, message);
+  logger.info(
+    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
+      sentMessage
+    )}`
+  );
+};
+
+export const commandMoonpieAbout = async (
+  client: Client,
+  channel: string,
+  messageId: string | undefined,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+  }
+
+  const message = `MoonpieBot v${moonpieBotVersion.major}.${moonpieBotVersion.minor}.${moonpieBotVersion.patch} (https://github.com/AnonymerNiklasistanonym/MoonpieBot)`;
 
   const sentMessage = await client.say(channel, message);
   logger.info(

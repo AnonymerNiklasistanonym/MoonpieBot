@@ -10,6 +10,7 @@ import {
   commandMoonpieAddUserCount,
   commandMoonpieRemoveUserCount,
   commandMoonpieDeleteUser,
+  commandMoonpieAbout,
 } from "./commands/moonpie";
 
 const logDetectedCommand = (
@@ -28,6 +29,7 @@ export const regexMoonpie = /^\s*!moonpie(\s*|\s.*)$/i;
 export const regexMoonpieClaim = /^\s*!moonpie(\s*|\s.*)$/i;
 export const regexMoonpieCommands = /^\s*!moonpie\s+commands\s*$/i;
 export const regexMoonpieLeaderboard = /^\s*!moonpie\s+leaderboard\s*$/i;
+export const regexMoonpieAbout = /^\s*!moonpie\s+about\s*$/i;
 export const regexMoonpieGet = /^\s*!moonpie\s+get\s+(\S+)\s*$/i;
 export const regexMoonpieSet = /^\s*!moonpie\s+set\s+(\S+)\s+([0-9]+)\s*$/i;
 export const regexMoonpieAdd = /^\s*!moonpie\s+add\s+(\S+)\s+([0-9]+)\s*$/i;
@@ -61,6 +63,12 @@ export const moonpieChatHandler = async (
         databasePath,
         logger
       );
+      return;
+    }
+    // > !moonpie about
+    if (message.match(regexMoonpieAbout)) {
+      logDetectedCommand(logger, tags, "!moonpie about");
+      await commandMoonpieAbout(client, channel, tags.id, logger);
       return;
     }
     // > !moonpie delete $USER

@@ -29,6 +29,12 @@ for (const VARIABLE_NAME of [
   );
 }
 
+export const moonpieBotVersion = {
+  major: 1,
+  minor: 0,
+  patch: 0,
+};
+
 const logger = createLogger();
 logger.info("Start MoonpieBot");
 

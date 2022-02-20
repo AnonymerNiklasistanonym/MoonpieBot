@@ -13,6 +13,7 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
   | `!moonpie` | everyone | (If not already claimed) Claim a moonpie and return the current count and the leaderboard position |
   | `!moonpie leaderboard` | everyone | Show the top 15 moonpie holders |
   | `!moonpie get $USER` | everyone | Return the current count and the leaderboard position of `$USER` if found in database |
+  | `!moonpie about` | everyone | Show the version and source code link of the bot |
   | `!moonpie add $USER $COUNT` | broadcaster badge | Add moonpie `$COUNT` to `$USER` if found in database |
   | `!moonpie remove $USER $COUNT` | broadcaster badge | Remove moonpie `$COUNT` to `$USER` if found in database |
   | `!moonpie set $USER $COUNT` | broadcaster badge | Set moonpie `$COUNT` to `$USER` if found in database |
@@ -129,7 +130,6 @@ Things that need to be added before it can be released:
   - [ ] (*not important*) Add better `ROW_NUMBER () OVER ()` integration
   - [ ] (*not important*) Add better `lower()` integration
 - [ ] Commands:
-  - [ ] `!moonpie delete $USER` (add integration on how to drop a user from the database without manual intervention)
   - [ ] (*not important*) Add admin integration
     - [ ] `!moonpie add-admin $USER`
     - [ ] `!moonpie remove-admin $USER`
