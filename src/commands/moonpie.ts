@@ -7,15 +7,12 @@ import {
   exists,
   getMoonpie,
   update,
-  remove,
   getMoonpieLeaderboard,
   getMoonpieLeaderboardEntry,
   getMoonpieName,
   existsName,
   removeName,
 } from "../moonpiedb/moonpieManager";
-
-// TODO Add in the future the possibility to access the message and return moonpie count for other people
 
 const secondsToString = (seconds: number) => {
   // The input should never be higher than 24 hours
@@ -122,78 +119,6 @@ export const commandMoonpie = async (
       sentMessage
     )}`
   );
-};
-
-export const commandMoonpieSet0 = async (
-  client: Client,
-  channel: string,
-  username: string | undefined,
-  userId: string | undefined,
-  messageId: string | undefined,
-  moonpieDbPath: string,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
-  }
-  if (username === undefined) {
-    throw Error(
-      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
-    );
-  }
-  if (userId === undefined) {
-    throw Error(
-      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
-    );
-  }
-
-  if (await exists(moonpieDbPath, userId, logger)) {
-    await remove(moonpieDbPath, userId, logger);
-    await client.say(channel, "ppPoof");
-  } else {
-    await client.say(channel, "never existed...");
-  }
-};
-
-export const commandMoonpieSet24 = async (
-  client: Client,
-  channel: string,
-  username: string | undefined,
-  userId: string | undefined,
-  messageId: string | undefined,
-  moonpieDbPath: string,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
-  }
-  if (username === undefined) {
-    throw Error(
-      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
-    );
-  }
-  if (userId === undefined) {
-    throw Error(
-      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
-    );
-  }
-
-  if (await exists(moonpieDbPath, userId, logger)) {
-    const moonpieEntry = await getMoonpie(moonpieDbPath, userId, logger);
-    await update(
-      moonpieDbPath,
-      {
-        id: userId,
-        name: username,
-        count: moonpieEntry.count,
-        timestamp: moonpieEntry.timestamp - 24 * 60 * 60 * 1000 + 15 * 1000,
-      },
-      logger
-    );
-    await client.say(channel, "back to the future");
-  } else {
-    await client.say(channel, "never existed...");
-  }
 };
 
 export const commandMoonpieTop15 = async (

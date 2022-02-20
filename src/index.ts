@@ -9,7 +9,6 @@ dotenv.config();
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
 // commands
-import { commandMoonpieSet0, commandMoonpieSet24 } from "./commands/moonpie";
 import { setupTables } from "./moonpiedb/setupDatabase";
 //import { setupInitialData } from "./moonpiedb/setupDatabase";
 import * as path from "path";
@@ -82,38 +81,6 @@ client
           .say(channel, `@${tags.username} Error: ${(err as Error).message}`)
           .catch(logger.error);
       });
-
-      if (message.trim().toLowerCase().startsWith("!setmoonpie0")) {
-        console.log(tags);
-        client
-          .say(channel, "DEV command: Your moonpie entry was deleted")
-          .catch((err) => logger.error(err));
-        commandMoonpieSet0(
-          client,
-          channel,
-          tags.username,
-          tags["user-id"],
-          tags.id,
-          databasePath,
-          logger
-        ).catch((err) => {
-          logger.error(err);
-        });
-      }
-      if (message.trim().toLowerCase().startsWith("!setmoonpie24")) {
-        // TODO Use a list of approved users
-        commandMoonpieSet24(
-          client,
-          channel,
-          tags.username,
-          tags["user-id"],
-          tags.id,
-          databasePath,
-          logger
-        ).catch((err) => {
-          logger.error(err);
-        });
-      }
     });
   })
   .catch((err) => {
