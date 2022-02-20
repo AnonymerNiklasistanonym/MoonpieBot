@@ -190,6 +190,32 @@ export const remove = async (
   return postResult.changes > 0;
 };
 
+/**
+ * Remove moonpie entry.
+ *
+ * @param databasePath Path to database
+ * @param twitchName Twitch ID
+ * @throws When not able to remove moonpie entry or database fails
+ * @returns True if the moonpie entry was removed or already doesn't exist
+ */
+export const removeName = async (
+  databasePath: string,
+  twitchName: string,
+  logger: Logger
+): Promise<boolean> => {
+  if ((await existsName(databasePath, twitchName, logger)) === false) {
+    return true;
+  }
+
+  const postResult = await database.requests.post(
+    databasePath,
+    database.queries.remove(table.name, table.column.twitchName),
+    [twitchName],
+    logger
+  );
+  return postResult.changes > 0;
+};
+
 // Get moonpie count
 // -----------------------------------------------------------------------------
 

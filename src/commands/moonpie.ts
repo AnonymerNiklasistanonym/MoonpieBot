@@ -12,6 +12,7 @@ import {
   getMoonpieLeaderboardEntry,
   getMoonpieName,
   existsName,
+  removeName,
 } from "../moonpiedb/moonpieManager";
 
 // TODO Add in the future the possibility to access the message and return moonpie count for other people
@@ -231,6 +232,7 @@ export const commandMoonpieCommands = async (
     "!moonpie set $USER [set moonpies of a user]",
     "!moonpie add $USER [add moonpies to a user]",
     "!moonpie remove $USER $COUNT [remove moonpies of a user]",
+    "!moonpie delete $USER [remove a user from the database]",
   ];
   const sentMessage = await client.say(
     channel,
@@ -540,6 +542,56 @@ export const commandMoonpieRemoveUserCount = async (
   } and they are now rank ${
     currentMoonpieLeaderboardEntry.rank
   } on the leaderboard!`;
+
+  const sentMessage = await client.say(channel, message);
+  logger.info(
+    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
+      sentMessage
+    )}`
+  );
+};
+
+export const commandMoonpieDeleteUser = async (
+  client: Client,
+  channel: string,
+  username: string | undefined,
+  userId: string | undefined,
+  messageId: string | undefined,
+  usernameMoonpieEntry: string,
+  isBroadcaster: boolean,
+  moonpieDbPath: string,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+  }
+  if (username === undefined) {
+    throw Error(
+      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
+    );
+  }
+  if (userId === undefined) {
+    throw Error(
+      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
+    );
+  }
+
+  if (!isBroadcaster) {
+    throw Error(
+      `The user ${username} is not a broadcaster and thus is not allowed to use this command`
+    );
+  }
+
+  // Check if a moonpie entry already exists
+  if (!(await existsName(moonpieDbPath, usernameMoonpieEntry, logger))) {
+    throw Error(
+      `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be deleted`
+    );
+  }
+
+  await removeName(moonpieDbPath, usernameMoonpieEntry, logger);
+
+  const message = `@${username} You deleted the entry of the user ${usernameMoonpieEntry}`;
 
   const sentMessage = await client.say(channel, message);
   logger.info(

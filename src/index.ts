@@ -76,7 +76,12 @@ client
         message,
         databasePath,
         logger
-      ).catch(logger.error);
+      ).catch((err) => {
+        logger.error(err);
+        client
+          .say(channel, `@${tags.username} Error: ${(err as Error).message}`)
+          .catch(logger.error);
+      });
 
       if (message.trim().toLowerCase().startsWith("!setmoonpie0")) {
         console.log(tags);

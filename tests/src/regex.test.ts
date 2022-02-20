@@ -2,6 +2,7 @@ import { expect } from "chai";
 import {
   regexMoonpieAdd,
   regexMoonpieClaim,
+  regexMoonpieDelete,
   regexMoonpieGet,
   regexMoonpieLeaderboard,
   regexMoonpieRemove,
@@ -92,6 +93,46 @@ describe("regex", () => {
 
       const message7 = "!moonpie get username text after that";
       const matches7 = message7.match(regexMoonpieGet);
+      expect(matches7).to.be.null;
+    });
+
+    it("!moonpie delete $USER", () => {
+      const message0 = "!monpie";
+      const matches0 = message0.match(regexMoonpieDelete);
+      expect(matches0).to.be.null;
+
+      const message1 = "!moonpie";
+      const matches1 = message1.match(regexMoonpieDelete);
+      expect(matches1).to.be.null;
+
+      const message2 = "!moonpie message after that";
+      const matches2 = message2.match(regexMoonpieDelete);
+      expect(matches2).to.be.null;
+
+      const message3 = "!moonpie delete";
+      const matches3 = message3.match(regexMoonpieDelete);
+      expect(matches3).to.be.null;
+
+      const message4 = "!moonpie delete username";
+      const matches4 = message4.match(regexMoonpieDelete);
+      expect(matches4).to.not.be.null;
+      if (matches4) {
+        expect(matches4[1]).to.be.equal("username");
+      }
+
+      const message5 = "!moonpie delete AbCD";
+      const matches5 = message5.match(regexMoonpieDelete);
+      expect(matches5).to.not.be.null;
+      if (matches5) {
+        expect(matches5[1]).to.be.equal("AbCD");
+      }
+
+      const message6 = "abc !moonpie delete username";
+      const matches6 = message6.match(regexMoonpieDelete);
+      expect(matches6).to.be.null;
+
+      const message7 = "!moonpie delete username text after that";
+      const matches7 = message7.match(regexMoonpieDelete);
       expect(matches7).to.be.null;
     });
 

@@ -9,6 +9,7 @@ import {
   commandMoonpieSetUserCount,
   commandMoonpieAddUserCount,
   commandMoonpieRemoveUserCount,
+  commandMoonpieDeleteUser,
 } from "./commands/moonpie";
 
 const logDetectedCommand = (
@@ -32,6 +33,7 @@ export const regexMoonpieSet = /^\s*!moonpie\s+set\s+(\S+)\s+([0-9]+)\s*$/i;
 export const regexMoonpieAdd = /^\s*!moonpie\s+add\s+(\S+)\s+([0-9]+)\s*$/i;
 export const regexMoonpieRemove =
   /^\s*!moonpie\s+remove\s+(.*?)\s+([0-9]+)\s*$/i;
+export const regexMoonpieDelete = /^\s*!moonpie\s+delete\s+(\S+)\s*$/i;
 
 export const moonpieChatHandler = async (
   client: Client,
@@ -59,6 +61,29 @@ export const moonpieChatHandler = async (
         databasePath,
         logger
       );
+      return;
+    }
+    // > !moonpie delete $USER
+    if (message.match(regexMoonpieDelete)) {
+      logDetectedCommand(logger, tags, "!moonpie delete $USER");
+      const match = regexMoonpieDelete.exec(message);
+      if (match && match.length >= 2) {
+        await commandMoonpieDeleteUser(
+          client,
+          channel,
+          tags.username,
+          tags["user-id"],
+          tags.id,
+          match[1],
+          tags?.badges?.broadcaster === "1",
+          databasePath,
+          logger
+        );
+      } else {
+        logger.error(
+          `User was not found for !moonpie delete $USER in message '${message}'`
+        );
+      }
       return;
     }
     // > !moonpie get $USER

@@ -16,6 +16,7 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
   | `!moonpie add $USER $COUNT` | broadcaster badge | Add moonpie `$COUNT` to `$USER` if found in database |
   | `!moonpie remove $USER $COUNT` | broadcaster badge | Remove moonpie `$COUNT` to `$USER` if found in database |
   | `!moonpie set $USER $COUNT` | broadcaster badge | Set moonpie `$COUNT` to `$USER` if found in database |
+  | `!moonpie delete $USER` | broadcaster badge | Delete a `$USER` from the database if found in database |
 
 ## Setup
 
@@ -44,7 +45,7 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
    ---
 
    On Windows you can install a special dependency first so the dependency [`sqlite3`](https://www.npmjs.com/package/sqlite3) can be installed without having its build tools (Python, Visual Studio with C++ environment, ...) installed which is also much faster:
-   
+
    ```sh
    # source: https://www.npmjs.com/package/sqlite3#installing
    npm install https://github.com/mapbox/node-sqlite3/tarball/master
@@ -76,11 +77,11 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
 6. Provide the necessary environment variables or a `.env` file in the source code directory with the following information:
 
    ---
-   
+
    You can copy the [`.env.example`](./.env.example) file, rename it to `.env` and then edit the "variables" in there.
-   
+
    ---
-   
+
    Logging information:
 
    ```sh
