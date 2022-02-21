@@ -25,3 +25,7 @@ npm install "https://github.com/mapbox/node-sqlite3/tarball/master"
 npm install
 npm run build
 npm prune --production
+
+# Wait for any input before closing the window
+Write-Host "`n>> The script has finished. Press any key to close the window."
+[Console]::ReadKey()

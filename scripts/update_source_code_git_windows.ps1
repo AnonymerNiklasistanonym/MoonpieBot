@@ -19,3 +19,7 @@ Set-Location ..
 
 # Update git repository
 git pull
+
+# Wait for any input before closing the window
+Write-Host "`n>> The script has finished. Press any key to close the window."
+[Console]::ReadKey()
