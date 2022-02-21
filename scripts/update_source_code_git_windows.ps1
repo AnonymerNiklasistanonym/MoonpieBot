@@ -17,6 +17,9 @@ Set-Location $PSScriptRoot
 # Go to the root directory of this repository
 Set-Location ..
 
+# Reset package.json files
+git checkout main -- "package.json"
+git checkout main -- "package-lock.json"
 # Update git repository
 git pull
 
