@@ -1,8 +1,8 @@
-import { open } from "../database";
+import { open } from "../core";
 
 import { RunResult } from "sqlite3";
 import { SqliteInternalError } from "./management";
-import { Logger } from "winston";
+import type { Logger } from "winston";
 
 /**
  * List of errors that can happen during a post request

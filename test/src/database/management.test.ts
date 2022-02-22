@@ -1,16 +1,14 @@
-import * as database from "src/database";
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+import * as database from "../../../src/database/core";
 import chai from "chai";
 import { describe } from "mocha";
-import winston from "winston";
+import { getTestLogger } from "../logger";
 import { itAllowFail } from "../allowFail";
 import path from "path";
 
 export default (databaseDirPath: string): Mocha.Suite => {
   return describe("management", () => {
-    const logger = winston.createLogger({
-      level: "warn",
-      transports: [new winston.transports.Console()],
-    });
+    const logger = getTestLogger("Management");
 
     itAllowFail("remove", process.platform === "win32", async () => {
       const databasePath = path.join(databaseDirPath, "remove.db");

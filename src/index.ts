@@ -9,18 +9,20 @@ dotenv.config();
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
 // commands
-import { setupTables } from "./moonpiedb/setupDatabase";
+import { setupTables } from "./database/moonpies/setupDatabase";
 //import { setupInitialData } from "./moonpiedb/setupDatabase";
 import * as path from "path";
-import { ErrorCodeOpen } from "./database";
+import { ErrorCodeOpen } from "./database/core";
 import { moonpieChatHandler } from "./moonpieChatHandler";
 import { moonpieBotVersion } from "./version";
 
 for (const VARIABLE_NAME of [
+  "DIR_LOGS",
+  "CONSOLE_LOG_LEVEL",
+  "FILE_LOG_LEVEL",
   "TWITCH_CHANNEL",
   "TWITCH_NAME",
   "TWITCH_OAUTH_TOKEN",
-  "CONFIG_TIMEZONE",
   "DB_FILEPATH",
 ]) {
   console.log(
@@ -30,7 +32,7 @@ for (const VARIABLE_NAME of [
   );
 }
 
-const logger = createLogger();
+const logger = createLogger(process.env.MOONPIE_CONFIG_DIR_LOGS);
 logger.info(
   `Start MoonpieBot v${moonpieBotVersion.major}.${moonpieBotVersion.minor}.${moonpieBotVersion.patch}`
 );

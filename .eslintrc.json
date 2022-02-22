@@ -16,7 +16,7 @@
   "plugins": ["@typescript-eslint", "security", "prettier"],
   "parserOptions": {
     "ecmaVersion": 8,
-    "project": "./tsconfig.json"
+    "project": "./tsconfig.eslint.json"
   },
   "rules": {
     "prettier/prettier": "error"

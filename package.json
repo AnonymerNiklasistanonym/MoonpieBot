@@ -2,19 +2,18 @@
     "name": "moonpiebot",
     "version": "1.0.0",
     "description": "A custom twitch bot",
-    "main": "dist/src",
+    "main": "dist",
     "directories": {
-        "test": "tests"
+        "test": "test"
     },
     "scripts": {
         "start": "node .",
         "start:dev": "cross-env NODE_PATH=./dist NODE_ENV=production node .",
         "prebuild": "rimraf ./dist/*",
         "build": "tsc",
-        "test": "cross-env NODE_PATH=. nyc mocha -- \"tests/**/*.test.ts\"",
+        "test": "cross-env NODE_PATH=. nyc mocha -- \"test/**/*.test.ts\"",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",
         "build:dev": "tsc --sourceMap --removeComments false --pretty",
-        "test:dev": "cross-env NODE_PATH=. nyc mocha -- -r dotenv/config \"tests/**/*.test.ts\"",
         "mocha": "cross-env NODE_PATH=. mocha -r dotenv/config",
         "lint": "eslint --ext .js,.ts .",
         "lint:fix": "eslint --fix --ext .js,.ts ."

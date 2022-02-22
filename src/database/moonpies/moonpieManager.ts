@@ -1,5 +1,5 @@
-import { Logger } from "winston";
-import * as database from "../database";
+import type { Logger } from "winston";
+import * as database from "../core";
 
 /** Errors that can happen during moonpie entry creations */
 export enum CreateError {
@@ -341,7 +341,7 @@ export interface GetMoonpieLeaderboardOut {
  */
 export const getMoonpieLeaderboard = async (
   databasePath: string,
-  limit: number,
+  limit: number | undefined,
   logger: Logger
 ): Promise<GetMoonpieLeaderboardOut[]> => {
   const runResult = await database.requests.getAll<GetMoonpieLeaderboardDbOut>(

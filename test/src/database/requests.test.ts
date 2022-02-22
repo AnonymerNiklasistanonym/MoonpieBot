@@ -1,16 +1,13 @@
-import * as database from "src/database";
+import * as database from "../../../src/database/core";
 import chai from "chai";
 import { describe } from "mocha";
-import winston from "winston";
+import { getTestLogger } from "../logger";
 import { itAllowFail } from "../allowFail";
 import path from "path";
 
 export default (databaseDirPath: string): Mocha.Suite => {
   return describe("requests", () => {
-    const logger = winston.createLogger({
-      level: "warn",
-      transports: [new winston.transports.Console()],
-    });
+    const logger = getTestLogger("Requests");
 
     const tableName = "test";
     const tableColumns: database.queries.CreateTableColumn[] = [

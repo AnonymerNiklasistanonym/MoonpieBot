@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { client as tmiClient, Client } from "tmi.js";
-import { Logger } from "winston";
+import type { Logger } from "winston";
 
 export const createTwitchClient = (
   twitchName: string,

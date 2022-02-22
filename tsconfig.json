@@ -14,5 +14,5 @@
         "noUnusedParameters": true,
         "noUnusedLocals": true
     },
-    "include": ["src/**/*", "tests/**/*"]
+    "include": ["src/**/*"]
 }

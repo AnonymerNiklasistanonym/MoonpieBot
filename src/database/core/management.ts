@@ -3,7 +3,7 @@ import * as sqlite from "sqlite3";
 
 import { ErrorCodePostRequest } from "./requests";
 import { promises as fs } from "fs";
-import { Logger } from "winston";
+import type { Logger } from "winston";
 
 const sqlite3 = sqlite.verbose();
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { moonpieBotVersion } from "src/version";
+import { moonpieBotVersion } from "../version";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
@@ -13,7 +13,7 @@ import {
   getMoonpieName,
   existsName,
   removeName,
-} from "../moonpiedb/moonpieManager";
+} from "../database/moonpies/moonpieManager";
 
 const secondsToString = (seconds: number) => {
   // The input should never be higher than 24 hours

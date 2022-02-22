@@ -1,5 +1,5 @@
-import { Logger } from "winston";
-import * as database from "../database";
+import type { Logger } from "winston";
+import * as database from "../core";
 import * as moonpie from "./moonpieManager";
 
 /**
