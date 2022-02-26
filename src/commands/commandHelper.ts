@@ -32,7 +32,7 @@ export const loggerCommandError = (
 };
 
 export enum CommandErrorCode {
-  MESSADE_ID_UNDEFINED = "MESSADE_ID_UNDEFINED",
+  MESSAGE_ID_UNDEFINED = "MESSADE_ID_UNDEFINED",
 }
 
 export interface CommandError extends Error {
@@ -43,6 +43,6 @@ export const errorMessageIdUndefined = () => {
   const error: CommandError = Error(
     "Unable to reply to message! (messageId is undefined)"
   );
-  error.code = CommandErrorCode.MESSADE_ID_UNDEFINED;
+  error.code = CommandErrorCode.MESSAGE_ID_UNDEFINED;
   return error;
 };
