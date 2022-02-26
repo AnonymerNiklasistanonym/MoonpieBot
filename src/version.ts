@@ -2,11 +2,14 @@
  * Version handling
  */
 
-export const moonpieBotVersion = {
+export const version = {
   major: 1,
   minor: 0,
   patch: 1,
+  beta: true,
 };
 
 export const getVersion = () =>
-  `v${moonpieBotVersion.major}.${moonpieBotVersion.minor}.${moonpieBotVersion.patch}`;
+  `v${version.major}.${version.minor}.${version.patch}${
+    version.beta ? "b" : ""
+  }`;

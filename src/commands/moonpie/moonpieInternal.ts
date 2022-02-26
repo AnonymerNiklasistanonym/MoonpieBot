@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { moonpieBotVersion } from "../../version";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
@@ -118,26 +117,6 @@ export const commandMoonpie = async (
   );
 };
 
-export const commandMoonpieAbout = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
-  }
-
-  const message = `MoonpieBot v${moonpieBotVersion.major}.${moonpieBotVersion.minor}.${moonpieBotVersion.patch} (https://github.com/AnonymerNiklasistanonym/MoonpieBot)`;
-
-  const sentMessage = await client.say(channel, message);
-  logger.info(
-    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
-      sentMessage
-    )}`
-  );
-};
-
 export const commandMoonpieTop15 = async (
   client: Client,
   channel: string,
@@ -184,34 +163,6 @@ export const commandMoonpieCommands = async (
     channel,
     "The following commands are supported: " + commands.join(", ")
   );
-  logger.info(
-    `Successfully replied to message ${messageId} with: '${JSON.stringify(
-      sentMessage
-    )}'`
-  );
-};
-
-export const commandMoonpieLeaderboard = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  moonpieDbPath: string,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
-  }
-
-  const moonpieEntries = await moonpieDb.getMoonpieLeaderboard(
-    moonpieDbPath,
-    15,
-    logger
-  );
-  const message = moonpieEntries
-    .map((a) => `${a.rank}. ${a.name}: ${a.count}`)
-    .join(", ");
-
-  const sentMessage = await client.say(channel, message);
   logger.info(
     `Successfully replied to message ${messageId} with: '${JSON.stringify(
       sentMessage

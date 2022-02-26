@@ -5,6 +5,7 @@ import {
   format,
 } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
+import { name } from "./info";
 
 export const createLogger = (
   logDir = "./logs",
@@ -15,7 +16,7 @@ export const createLogger = (
     transports: [
       new DailyRotateFile({
         dirname: logDir,
-        filename: "moonpiebot-%DATE%.log",
+        filename: `${name.toLowerCase()}-%DATE%.log`,
         datePattern: "YYYY-MM-DD-HH",
         zippedArchive: false,
         maxSize: "100m",
@@ -39,7 +40,7 @@ export const createLogger = (
       )
     ),
     defaultMeta: {
-      service: "MoonpieBot",
+      service: `${name}`,
     },
   });
 };

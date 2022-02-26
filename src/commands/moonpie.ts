@@ -5,13 +5,13 @@ import {
   commandMoonpie,
   commandMoonpieCommands,
   commandMoonpieGetUser,
-  commandMoonpieLeaderboard,
   commandMoonpieSetUserCount,
   commandMoonpieAddUserCount,
   commandMoonpieRemoveUserCount,
   commandMoonpieDeleteUser,
-  commandMoonpieAbout,
 } from "./moonpie/moonpieInternal";
+import { commandAbout } from "./moonpie/about";
+import { commandLeaderboard } from "./moonpie/leaderboard";
 
 const logDetectedCommand = (
   logger: Logger,
@@ -56,19 +56,13 @@ export const moonpieChatHandler = async (
     // > !moonpie leaderboard
     if (message.match(regexMoonpieLeaderboard)) {
       logDetectedCommand(logger, tags, "!moonpie leaderboard");
-      await commandMoonpieLeaderboard(
-        client,
-        channel,
-        tags.id,
-        databasePath,
-        logger
-      );
+      await commandLeaderboard(client, channel, tags.id, databasePath, logger);
       return;
     }
     // > !moonpie about
     if (message.match(regexMoonpieAbout)) {
       logDetectedCommand(logger, tags, "!moonpie about");
-      await commandMoonpieAbout(client, channel, tags.id, logger);
+      await commandAbout(client, channel, tags.id, logger);
       return;
     }
     // > !moonpie delete $USER

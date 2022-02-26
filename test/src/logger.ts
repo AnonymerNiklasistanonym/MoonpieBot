@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import winston, { format } from "winston";
+import { name } from "../../src/info";
 
 export const getTestLogger = (testName: string) =>
   winston.createLogger({
@@ -20,6 +21,6 @@ export const getTestLogger = (testName: string) =>
       )
     ),
     defaultMeta: {
-      service: `MoonpieBotTest${testName}`,
+      service: `${name}Test${testName}`,
     },
   });

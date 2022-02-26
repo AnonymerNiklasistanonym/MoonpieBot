@@ -12,6 +12,7 @@ import { createTwitchClient } from "./twitch";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import * as path from "path";
 import { moonpieChatHandler } from "./commands/moonpie";
+import { name } from "./info";
 import { getVersion } from "./version";
 import {
   CliVariable,
@@ -19,12 +20,13 @@ import {
   getCliVariableValueDefault,
   printCliVariablesToConsole,
 } from "./cli";
+// Type imports
 import type { Logger } from "winston";
 
 const pathToRoot = path.join(__dirname, "..", "..");
 
 const main = async (logger: Logger, logDir: string) => {
-  logger.info(`Start MoonpieBot ${getVersion()} (logs directory: '${logDir}')`);
+  logger.info(`Start ${name} ${getVersion()} (logs directory: '${logDir}')`);
 
   const databasePath = getCliVariableValueDefault(
     CliVariable.DB_FILEPATH,
@@ -44,22 +46,20 @@ const main = async (logger: Logger, logDir: string) => {
 
   // Get when connecting to chat
   client.on("connecting", (address, port) => {
-    logger.info(`MoonpieBot connecting to Twitch: ${address}:${port}`);
+    logger.info(`Connecting to Twitch: ${address}:${port}`);
   });
   // Get when connected to chat
   client.on("connected", (address, port) => {
-    logger.info(`MoonpieBot connected to Twitch: ${address}:${port}`);
+    logger.info(`Connected to Twitch: ${address}:${port}`);
   });
   // Get when disconnected from chat
   client.on("disconnected", (reason) => {
-    logger.info(`MoonpieBot disconnected from Twitch: ${reason}`);
+    logger.info(`Disconnected from Twitch: ${reason}`);
   });
   // Get when someone joins the chat
   client.on("join", (channel, username, self) => {
     if (self) {
-      logger.info(
-        `MoonpieBot joined the Twitch channel "${channel}" as "${username}"`
-      );
+      logger.info(`Joined the Twitch channel "${channel}" as "${username}"`);
     }
   });
   // Get when a message is being written in chat
