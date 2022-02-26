@@ -69,9 +69,9 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
    If you want you can now also remove all development dependencies that were installed to the `node_modules` directory and only necessary to build the program but not for running it:
 
    ```sh
-   # Keep in mind that if you want to update the bot after the source code was updated you need to run
-   # > npm install
-   # to get the development dependencies again
+   # Keep in mind that if you want to update the bot after the source code
+   # changes you need to run `npm install` again to reacquire the development
+   # dependencies
    npm prune --production
    ```
 
