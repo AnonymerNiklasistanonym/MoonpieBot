@@ -31,8 +31,21 @@ export const printCliVariablesToConsole = () => {
   }
 };
 
-export const getCliVariableValue = (cliVariable: CliVariable) => {
+export const getCliVariableValue = (
+  cliVariable: CliVariable
+): string | undefined => {
   return process.env[getCliVariableName(cliVariable)];
+};
+
+export const getCliVariableValueDefault = <T>(
+  cliVariable: CliVariable,
+  defaultValue: T
+): string | T => {
+  const value = process.env[getCliVariableName(cliVariable)];
+  if (value === undefined || value.trim().length === 0) {
+    return defaultValue;
+  }
+  return value;
 };
 
 export const getCliVariableName = (cliVariable: CliVariable): string => {

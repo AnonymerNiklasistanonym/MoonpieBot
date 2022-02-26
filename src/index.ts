@@ -7,11 +7,7 @@ dotenv.config();
 
 // connections
 import { createLogger } from "./logging";
-import {
-  createTwitchClient,
-  CreateTwitchClientError,
-  CreateTwitchClientErrorCode,
-} from "./twitch";
+import { createTwitchClient } from "./twitch";
 // commands
 import { setupTables } from "./database/moonpies/setupDatabase";
 //import { setupInitialData } from "./moonpiedb/setupDatabase";
@@ -22,6 +18,7 @@ import { getVersion } from "./version";
 import {
   CliVariable,
   getCliVariableValue,
+  getCliVariableValueDefault,
   printCliVariablesToConsole,
 } from "./cli";
 
@@ -51,16 +48,15 @@ try {
           JSON.stringify(connectionInfo)
       );
 
-      // Check if database exists and create it if not
-      const databasePath =
-        process.env.MOONPIE_CONFIG_DB_FILEPATH !== undefined
-          ? process.env.MOONPIE_CONFIG_DB_FILEPATH
-          : path.join(__dirname, "..", "..", "moonpie.db");
+      const databasePath = getCliVariableValueDefault(
+        CliVariable.DB_FILEPATH,
+        path.join(__dirname, "..", "..", "moonpie.db")
+      );
       try {
         await setupTables(databasePath, logger);
         //await setupInitialData(databasePath, logger);
       } catch (err) {
-        if (err === ErrorCodeOpen.SQLITE_CANTOPEN) {
+        if ((err as Error).name === ErrorCodeOpen.SQLITE_CANTOPEN) {
           logger.error(`The database '${databasePath}' could not be opened`);
           throw err;
         }
@@ -88,8 +84,7 @@ try {
       });
     })
     .catch((err) => {
-      logger.error(err);
-      process.exit(1);
+      throw err;
     });
 } catch (err) {
   logger.error(err);
