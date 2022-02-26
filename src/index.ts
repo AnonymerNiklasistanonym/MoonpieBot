@@ -82,6 +82,8 @@ const main = async (logger: Logger, logDir: string) => {
     });
   });
 
+  //await backupTables(databasePath, logger);
+
   process.on("SIGINT", () => {
     logger.info("SIGINT was detected");
     process.exit();
