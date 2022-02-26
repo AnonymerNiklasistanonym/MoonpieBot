@@ -12,6 +12,7 @@
         "prebuild": "rimraf ./dist/*",
         "build": "tsc",
         "test": "cross-env NODE_PATH=. nyc mocha -- \"test/**/*.test.ts\"",
+        "docs": "typedoc --tsconfig tsconfig.json",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",
         "build:dev": "tsc --sourceMap --removeComments false --pretty",
         "mocha": "cross-env NODE_PATH=. mocha -r dotenv/config",
@@ -53,6 +54,7 @@
         "rimraf": "^3.0.2",
         "source-map-support": "^0.5.21",
         "ts-node": "^10.5.0",
+        "typedoc": "^0.22.12",
         "typescript": "^4.5.5"
     },
     "dependencies": {

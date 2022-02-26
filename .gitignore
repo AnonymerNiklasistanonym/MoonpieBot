@@ -171,3 +171,6 @@ tmp/
 src/moonpiedb.ts
 *.db
 *.db-journal
+
+# Documentation
+docs

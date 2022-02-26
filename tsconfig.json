@@ -14,5 +14,30 @@
         "noUnusedParameters": true,
         "noUnusedLocals": true
     },
-    "include": ["src/**/*"]
+    "include": [
+        "src/**/*"
+    ],
+    "typedocOptions": {
+        "entryPoints": [
+            "src/cli.ts",
+            "src/index.ts",
+            "src/info.ts",
+            "src/logging.ts",
+            "src/twitch.ts",
+            "src/version.ts",
+            "src/commands/commandHelper.ts",
+            "src/commands/moonpie.ts",
+            "src/commands/moonpie/about.ts",
+            "src/commands/moonpie/leaderboard.ts",
+            "src/commands/moonpie/moonpieInternal.ts",
+            "src/database/core.ts",
+            "src/database/core/management.ts",
+            "src/database/core/queries.ts",
+            "src/database/core/requests.ts",
+            "src/database/moonpie/moonpieManager.ts",
+            "src/database/moonpie/setupDatabase.ts",
+            "src/database/moonpieDb.ts"
+        ],
+        "out": "docs"
+    }
 }
