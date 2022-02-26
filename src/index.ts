@@ -10,9 +10,7 @@ import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
 // commands
 import { setupTables } from "./database/moonpies/setupDatabase";
-//import { setupInitialData } from "./moonpiedb/setupDatabase";
 import * as path from "path";
-import { ErrorCodeOpen } from "./database/core";
 import { moonpieChatHandler } from "./moonpieChatHandler";
 import { getVersion } from "./version";
 import {
@@ -21,16 +19,20 @@ import {
   getCliVariableValueDefault,
   printCliVariablesToConsole,
 } from "./cli";
+import type { Logger } from "winston";
 
-printCliVariablesToConsole();
+const pathToRoot = path.join(__dirname, "..", "..");
 
-const logDir = getCliVariableValue(CliVariable.DIR_LOGS);
-const logger = createLogger(logDir);
-logger.info(
-  `Start MoonpieBot v${getVersion()} (logs will be written to '${logDir}')`
-);
+const main = async (logger: Logger, logDir: string) => {
+  logger.info(`Start MoonpieBot ${getVersion()} (logs directory: '${logDir}')`);
 
-try {
+  const databasePath = getCliVariableValueDefault(
+    CliVariable.DB_FILEPATH,
+    path.join(pathToRoot, "moonpie.db")
+  );
+
+  await setupTables(databasePath, logger);
+
   const client = createTwitchClient(
     getCliVariableValue(CliVariable.TWITCH_NAME),
     getCliVariableValue(CliVariable.TWITCH_OAUTH_TOKEN),
@@ -40,53 +42,64 @@ try {
     logger
   );
 
-  client
-    .connect()
-    .then(async (connectionInfo): Promise<void> => {
+  // Get when connecting to chat
+  client.on("connecting", (address, port) => {
+    logger.info(`MoonpieBot connecting to Twitch: ${address}:${port}`);
+  });
+  // Get when connected to chat
+  client.on("connected", (address, port) => {
+    logger.info(`MoonpieBot connected to Twitch: ${address}:${port}`);
+  });
+  // Get when disconnected from chat
+  client.on("disconnected", (reason) => {
+    logger.info(`MoonpieBot disconnected from Twitch: ${reason}`);
+  });
+  // Get when someone joins the chat
+  client.on("join", (channel, username, self) => {
+    if (self) {
       logger.info(
-        "Successfully connected MoonpieBot to Twitch: " +
-          JSON.stringify(connectionInfo)
+        `MoonpieBot joined the Twitch channel "${channel}" as "${username}"`
       );
-
-      const databasePath = getCliVariableValueDefault(
-        CliVariable.DB_FILEPATH,
-        path.join(__dirname, "..", "..", "moonpie.db")
-      );
-      try {
-        await setupTables(databasePath, logger);
-        //await setupInitialData(databasePath, logger);
-      } catch (err) {
-        if ((err as Error).name === ErrorCodeOpen.SQLITE_CANTOPEN) {
-          logger.error(`The database '${databasePath}' could not be opened`);
-          throw err;
-        }
-      }
-
-      // Read all messages
-      client.on("message", (channel, tags, message, self) => {
-        // Ignore echoed messages.
-        if (self) return;
-
-        // Handle moonpie messages
-        moonpieChatHandler(
-          client,
-          channel,
-          tags,
-          message,
-          databasePath,
-          logger
-        ).catch((err) => {
-          logger.error(err);
-          client
-            .say(channel, `@${tags.username} Error: ${(err as Error).message}`)
-            .catch(logger.error);
-        });
-      });
-    })
-    .catch((err) => {
-      throw err;
+    }
+  });
+  // Get when a message is being written in chat
+  client.on("message", (channel, tags, message, self) => {
+    // Ignore messages written by the bot
+    if (self) return;
+    // Handle !moonpie commands
+    moonpieChatHandler(
+      client,
+      channel,
+      tags,
+      message,
+      databasePath,
+      logger
+    ).catch((err) => {
+      logger.error(err);
+      client
+        .say(channel, `@${tags.username} Error: ${(err as Error).message}`)
+        .catch(logger.error);
     });
+  });
+
+  // Connect to Twitch
+  await client.connect();
+};
+
+try {
+  printCliVariablesToConsole();
+
+  const logDir = getCliVariableValueDefault(
+    CliVariable.DIR_LOGS,
+    path.join(pathToRoot, "logs")
+  );
+  const logger = createLogger(logDir);
+
+  main(logger, logDir).catch((err) => {
+    logger.error(err);
+    throw err;
+  });
 } catch (err) {
-  logger.error(err);
+  console.error(err);
   process.exit(1);
 }

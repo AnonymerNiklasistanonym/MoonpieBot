@@ -9,4 +9,4 @@ export const moonpieBotVersion = {
 };
 
 export const getVersion = () =>
-  `${moonpieBotVersion.major}.${moonpieBotVersion.minor}.${moonpieBotVersion.patch}`;
+  `v${moonpieBotVersion.major}.${moonpieBotVersion.minor}.${moonpieBotVersion.patch}`;
