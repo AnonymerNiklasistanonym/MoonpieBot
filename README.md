@@ -77,36 +77,10 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
 
 6. Provide the necessary environment variables or a `.env` file in the source code directory with the following information:
 
-   ---
-
    You can copy the [`.env.example`](./.env.example) file, rename it to `.env` and then edit the "variables" in there.
+   The file contains also the information about what variables need to be set.
 
-   ---
-
-   Logging information:
-
-   ```sh
-   # error, warn, info, debug
-   MOONPIE_CONFIG_CONSOLE_LOG_LEVEL=info
-   MOONPIE_CONFIG_FILE_LOG_LEVEL=debug
-   ```
-
-   Twitch account information:
-
-   ```sh
-   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
-   # Get a token from: https://twitchapps.com/tmi/
-   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
-   MOONPIE_CONFIG_TWITCH_CHANNEL=moonpiechannel
-   ```
-
-   Database location:
-
-   ```sh
-   MOONPIE_CONFIG_DB_FILEPATH=./database.db
-   ```
-
-   - Get Twitch OAuth token:
+   - Detailed list of steps to get a Twitch OAuth token:
 
      1. Log into your twitch account (or better the account of the bot) in the browser
      2. Visit the webpage https://twitchapps.com/tmi/
