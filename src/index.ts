@@ -11,7 +11,7 @@ import { createTwitchClient } from "./twitch";
 // commands
 import { setupTables } from "./database/moonpies/setupDatabase";
 import * as path from "path";
-import { moonpieChatHandler } from "./moonpieChatHandler";
+import { moonpieChatHandler } from "./commands/moonpie";
 import { getVersion } from "./version";
 import {
   CliVariable,
