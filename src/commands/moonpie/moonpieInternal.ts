@@ -3,17 +3,7 @@ import { moonpieBotVersion } from "../../version";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
-import {
-  create,
-  exists,
-  getMoonpie,
-  update,
-  getMoonpieLeaderboard,
-  getMoonpieLeaderboardEntry,
-  getMoonpieName,
-  existsName,
-  removeName,
-} from "../../database/moonpies/moonpieManager";
+import { moonpieDb } from "../../database/moonpieDb";
 
 const secondsToString = (seconds: number) => {
   // The input should never be higher than 24 hours
@@ -61,8 +51,13 @@ export const commandMoonpie = async (
   let millisecondsSinceLastClaim = 0;
   let alreadyClaimedAMoonpie = false;
   let newTimestamp = new Date().getTime();
-  if (await exists(moonpieDbPath, userId, logger)) {
-    const moonpieEntry = await getMoonpie(moonpieDbPath, userId, logger);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  if (await moonpieDb.exists(moonpieDbPath, userId, logger)) {
+    const moonpieEntry = await moonpieDb.getMoonpie(
+      moonpieDbPath,
+      userId,
+      logger
+    );
 
     // If a moonpie entry already exists check if a moonpie was redeemed in the last 24 hours
     const currentTimestamp = new Date().getTime();
@@ -82,9 +77,13 @@ export const commandMoonpie = async (
       newTimestamp = moonpieEntry.timestamp;
     }
   } else {
-    await create(moonpieDbPath, { id: userId, name: username }, logger);
+    await moonpieDb.create(
+      moonpieDbPath,
+      { id: userId, name: username },
+      logger
+    );
   }
-  await update(
+  await moonpieDb.update(
     moonpieDbPath,
     {
       id: userId,
@@ -95,11 +94,8 @@ export const commandMoonpie = async (
     logger
   );
 
-  const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
-    moonpieDbPath,
-    userId,
-    logger
-  );
+  const currentMoonpieLeaderboardEntry =
+    await moonpieDb.getMoonpieLeaderboardEntry(moonpieDbPath, userId, logger);
 
   let message = `@${username} You just claimed a moonpie! You have now ${newMoonpieCount} moonpie${
     newMoonpieCount > 1 ? "s" : ""
@@ -153,7 +149,11 @@ export const commandMoonpieTop15 = async (
     throw Error(`Unable to reply to message since ${messageId} is undefined!`);
   }
 
-  const moonpieEntries = await getMoonpieLeaderboard(moonpieDbPath, 15, logger);
+  const moonpieEntries = await moonpieDb.getMoonpieLeaderboard(
+    moonpieDbPath,
+    15,
+    logger
+  );
   const message = moonpieEntries
     .map((a) => `${a.rank}. ${a.name} (${a.count})`)
     .join(", ");
@@ -202,7 +202,11 @@ export const commandMoonpieLeaderboard = async (
     throw Error(`Unable to reply to message since ${messageId} is undefined!`);
   }
 
-  const moonpieEntries = await getMoonpieLeaderboard(moonpieDbPath, 15, logger);
+  const moonpieEntries = await moonpieDb.getMoonpieLeaderboard(
+    moonpieDbPath,
+    15,
+    logger
+  );
   const message = moonpieEntries
     .map((a) => `${a.rank}. ${a.name}: ${a.count}`)
     .join(", ");
@@ -241,18 +245,19 @@ export const commandMoonpieGetUser = async (
 
   let message = "";
 
-  if (await existsName(moonpieDbPath, usernameMoonpieEntry, logger)) {
-    const moonpieEntry = await getMoonpieName(
+  if (await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger)) {
+    const moonpieEntry = await moonpieDb.getMoonpieName(
       moonpieDbPath,
       usernameMoonpieEntry,
       logger
     );
 
-    const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
-      moonpieDbPath,
-      moonpieEntry.id,
-      logger
-    );
+    const currentMoonpieLeaderboardEntry =
+      await moonpieDb.getMoonpieLeaderboardEntry(
+        moonpieDbPath,
+        moonpieEntry.id,
+        logger
+      );
     message = `@${username} The user ${usernameMoonpieEntry} has ${
       currentMoonpieLeaderboardEntry.count
     } moonpie${
@@ -302,18 +307,20 @@ export const commandMoonpieSetUserCount = async (
   }
 
   // Check if a moonpie entry already exists
-  if (!(await existsName(moonpieDbPath, usernameMoonpieEntry, logger))) {
+  if (
+    !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
+  ) {
     throw Error(
       `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be changed`
     );
   }
 
-  const moonpieEntry = await getMoonpieName(
+  const moonpieEntry = await moonpieDb.getMoonpieName(
     moonpieDbPath,
     usernameMoonpieEntry,
     logger
   );
-  await update(
+  await moonpieDb.update(
     moonpieDbPath,
     {
       id: moonpieEntry.id,
@@ -324,11 +331,12 @@ export const commandMoonpieSetUserCount = async (
     logger
   );
 
-  const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
-    moonpieDbPath,
-    moonpieEntry.id,
-    logger
-  );
+  const currentMoonpieLeaderboardEntry =
+    await moonpieDb.getMoonpieLeaderboardEntry(
+      moonpieDbPath,
+      moonpieEntry.id,
+      logger
+    );
 
   const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${countMoonpies} moonpie${
     countMoonpies > 1 ? "s" : ""
@@ -376,18 +384,20 @@ export const commandMoonpieAddUserCount = async (
     );
   }
   // Check if a moonpie entry already exists
-  if (!(await existsName(moonpieDbPath, usernameMoonpieEntry, logger))) {
+  if (
+    !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
+  ) {
     throw Error(
       `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be changed`
     );
   }
 
-  const moonpieEntry = await getMoonpieName(
+  const moonpieEntry = await moonpieDb.getMoonpieName(
     moonpieDbPath,
     usernameMoonpieEntry,
     logger
   );
-  await update(
+  await moonpieDb.update(
     moonpieDbPath,
     {
       id: moonpieEntry.id,
@@ -398,11 +408,12 @@ export const commandMoonpieAddUserCount = async (
     logger
   );
 
-  const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
-    moonpieDbPath,
-    moonpieEntry.id,
-    logger
-  );
+  const currentMoonpieLeaderboardEntry =
+    await moonpieDb.getMoonpieLeaderboardEntry(
+      moonpieDbPath,
+      moonpieEntry.id,
+      logger
+    );
 
   const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${
     currentMoonpieLeaderboardEntry.count
@@ -453,18 +464,20 @@ export const commandMoonpieRemoveUserCount = async (
   }
 
   // Check if a moonpie entry already exists
-  if (!(await existsName(moonpieDbPath, usernameMoonpieEntry, logger))) {
+  if (
+    !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
+  ) {
     throw Error(
       `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be changed`
     );
   }
 
-  const moonpieEntry = await getMoonpieName(
+  const moonpieEntry = await moonpieDb.getMoonpieName(
     moonpieDbPath,
     usernameMoonpieEntry,
     logger
   );
-  await update(
+  await moonpieDb.update(
     moonpieDbPath,
     {
       id: moonpieEntry.id,
@@ -475,11 +488,12 @@ export const commandMoonpieRemoveUserCount = async (
     logger
   );
 
-  const currentMoonpieLeaderboardEntry = await getMoonpieLeaderboardEntry(
-    moonpieDbPath,
-    moonpieEntry.id,
-    logger
-  );
+  const currentMoonpieLeaderboardEntry =
+    await moonpieDb.getMoonpieLeaderboardEntry(
+      moonpieDbPath,
+      moonpieEntry.id,
+      logger
+    );
 
   const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${
     currentMoonpieLeaderboardEntry.count
@@ -529,13 +543,15 @@ export const commandMoonpieDeleteUser = async (
   }
 
   // Check if a moonpie entry already exists
-  if (!(await existsName(moonpieDbPath, usernameMoonpieEntry, logger))) {
+  if (
+    !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
+  ) {
     throw Error(
       `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be deleted`
     );
   }
 
-  await removeName(moonpieDbPath, usernameMoonpieEntry, logger);
+  await moonpieDb.removeName(moonpieDbPath, usernameMoonpieEntry, logger);
 
   const message = `@${username} You deleted the entry of the user ${usernameMoonpieEntry}`;
 

@@ -7,7 +7,7 @@ import {
   regexMoonpieLeaderboard,
   regexMoonpieRemove,
   regexMoonpieSet,
-} from "../../src/moonpieChatHandler";
+} from "../../src/commands/moonpie";
 
 describe("regex", () => {
   context("!moonpie commands", () => {

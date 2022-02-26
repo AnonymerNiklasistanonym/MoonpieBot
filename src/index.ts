@@ -9,7 +9,7 @@ dotenv.config();
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
 // commands
-import { setupTables } from "./database/moonpies/setupDatabase";
+import { moonpieDbSetupTables } from "./database/moonpieDb";
 import * as path from "path";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { getVersion } from "./version";
@@ -31,7 +31,7 @@ const main = async (logger: Logger, logDir: string) => {
     path.join(pathToRoot, "moonpie.db")
   );
 
-  await setupTables(databasePath, logger);
+  await moonpieDbSetupTables(databasePath, logger);
 
   const client = createTwitchClient(
     getCliVariableValue(CliVariable.TWITCH_NAME),
