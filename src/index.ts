@@ -82,6 +82,11 @@ const main = async (logger: Logger, logDir: string) => {
     });
   });
 
+  process.on("SIGINT", () => {
+    logger.info("SIGINT was detected");
+    process.exit();
+  });
+
   // Connect to Twitch
   await client.connect();
 };
