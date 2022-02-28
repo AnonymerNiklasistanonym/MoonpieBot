@@ -5,7 +5,7 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
 /**
- * About leaderboard: Send the moonpie count leaderboard list (top 15)
+ * Leaderboard: Send the moonpie count leaderboard list (top 15)
  *
  * @param client Twitch client (used to send messages)
  * @param channel Twitch channel where the message should be sent to

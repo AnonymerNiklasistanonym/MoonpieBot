@@ -2,7 +2,6 @@
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 import {
-  commandMoonpie,
   commandMoonpieCommands,
   commandMoonpieGetUser,
   commandMoonpieSetUserCount,
@@ -12,6 +11,7 @@ import {
 } from "./moonpie/moonpieInternal";
 import { commandAbout } from "./moonpie/about";
 import { commandLeaderboard } from "./moonpie/leaderboard";
+import { commandClaim } from "./moonpie/claim";
 
 const logDetectedCommand = (
   logger: Logger,
@@ -185,12 +185,12 @@ export const moonpieChatHandler = async (
     // > !moonpie ($MESSAGE)
     if (message.match(regexMoonpieClaim)) {
       logDetectedCommand(logger, tags, "!moonpie ($MESSAGE)");
-      await commandMoonpie(
+      await commandClaim(
         client,
         channel,
+        tags.id,
         tags.username,
         tags["user-id"],
-        tags.id,
         databasePath,
         logger
       );
