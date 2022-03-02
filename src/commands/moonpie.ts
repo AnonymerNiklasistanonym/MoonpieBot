@@ -128,7 +128,7 @@ export const moonpieChatHandler = async (
         );
       } else {
         logger.error(
-          `User was not found for !moonpie get $USER in message '${message}'`
+          `User/NewCount was not found for !moonpie set $USER in message '${message}'`
         );
       }
       return;
@@ -153,7 +153,7 @@ export const moonpieChatHandler = async (
         );
       } else {
         logger.error(
-          `User was not found for !moonpie get $USER in message '${message}'`
+          `User/CountToAdd was not found for !moonpie add $USER in message '${message}'`
         );
       }
       return;
@@ -178,7 +178,7 @@ export const moonpieChatHandler = async (
         );
       } else {
         logger.error(
-          `User was not found for !moonpie get $USER in message '${message}'`
+          `User/CountToRemove was not found for !moonpie remove $USER in message '${message}'`
         );
       }
       return;
