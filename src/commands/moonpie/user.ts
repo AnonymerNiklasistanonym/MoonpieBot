@@ -68,6 +68,7 @@ export const commandUserSetCount = async (
   userId: string | undefined,
   usernameMoonpieEntry: string,
   countMoonpies: number,
+  operation: "+" | "-" | "=" = "=",
   isBroadcaster: boolean,
   moonpieDbPath: string,
   logger: Logger
@@ -90,6 +91,9 @@ export const commandUserSetCount = async (
       `The user ${username} is not a broadcaster and thus is not allowed to use this command`
     );
   }
+  if (!Number.isInteger(countMoonpies)) {
+    throw Error(`The given moonpie count ${countMoonpies} is not an integer`);
+  }
 
   // Check if a moonpie entry already exists
   if (
@@ -105,12 +109,27 @@ export const commandUserSetCount = async (
     usernameMoonpieEntry,
     logger
   );
+  let newCount = moonpieEntry.count;
+  switch (operation) {
+    case "+":
+      newCount += countMoonpies;
+      break;
+    case "-":
+      newCount -= countMoonpies;
+      break;
+    case "=":
+      newCount = countMoonpies;
+      break;
+  }
+  if (newCount < 0) {
+    newCount = 0;
+  }
   await moonpieDb.update(
     moonpieDbPath,
     {
       id: moonpieEntry.id,
       name: moonpieEntry.name,
-      count: countMoonpies,
+      count: newCount,
       timestamp: moonpieEntry.timestamp,
     },
     logger
@@ -125,166 +144,7 @@ export const commandUserSetCount = async (
 
   const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${countMoonpies} moonpie${
     countMoonpies > 1 ? "s" : ""
-  } and they are now rank ${
-    currentMoonpieLeaderboardEntry.rank
-  } on the leaderboard!`;
-
-  const sentMessage = await client.say(channel, message);
-  logger.info(
-    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
-      sentMessage
-    )}`
-  );
-};
-
-export const commandUserAddCount = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  username: string | undefined,
-  userId: string | undefined,
-  usernameMoonpieEntry: string,
-  countMoonpies: number,
-  isBroadcaster: boolean,
-  moonpieDbPath: string,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
-  }
-  if (username === undefined) {
-    throw Error(
-      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
-    );
-  }
-  if (userId === undefined) {
-    throw Error(
-      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
-    );
-  }
-
-  if (!isBroadcaster) {
-    throw Error(
-      `The user ${username} is not a broadcaster and thus is not allowed to use this command`
-    );
-  }
-  // Check if a moonpie entry already exists
-  if (
-    !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
-  ) {
-    throw Error(
-      `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be changed`
-    );
-  }
-
-  const moonpieEntry = await moonpieDb.getMoonpieName(
-    moonpieDbPath,
-    usernameMoonpieEntry,
-    logger
-  );
-  await moonpieDb.update(
-    moonpieDbPath,
-    {
-      id: moonpieEntry.id,
-      name: moonpieEntry.name,
-      count: Math.max(moonpieEntry.count + countMoonpies, 0),
-      timestamp: moonpieEntry.timestamp,
-    },
-    logger
-  );
-
-  const currentMoonpieLeaderboardEntry =
-    await moonpieDb.getMoonpieLeaderboardEntry(
-      moonpieDbPath,
-      moonpieEntry.id,
-      logger
-    );
-
-  const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${
-    currentMoonpieLeaderboardEntry.count
-  } moonpie${
-    currentMoonpieLeaderboardEntry.count > 1 ? "s" : ""
-  } and they are now rank ${
-    currentMoonpieLeaderboardEntry.rank
-  } on the leaderboard!`;
-
-  const sentMessage = await client.say(channel, message);
-  logger.info(
-    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
-      sentMessage
-    )}`
-  );
-};
-
-export const commandUserRemoveCount = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  username: string | undefined,
-  userId: string | undefined,
-  usernameMoonpieEntry: string,
-  countMoonpies: number,
-  isBroadcaster: boolean,
-  moonpieDbPath: string,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
-  }
-  if (username === undefined) {
-    throw Error(
-      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
-    );
-  }
-  if (userId === undefined) {
-    throw Error(
-      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
-    );
-  }
-
-  if (!isBroadcaster) {
-    throw Error(
-      `The user ${username} is not a broadcaster and thus is not allowed to use this command`
-    );
-  }
-
-  // Check if a moonpie entry already exists
-  if (
-    !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
-  ) {
-    throw Error(
-      `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be changed`
-    );
-  }
-
-  const moonpieEntry = await moonpieDb.getMoonpieName(
-    moonpieDbPath,
-    usernameMoonpieEntry,
-    logger
-  );
-  await moonpieDb.update(
-    moonpieDbPath,
-    {
-      id: moonpieEntry.id,
-      name: moonpieEntry.name,
-      count: Math.max(moonpieEntry.count - countMoonpies, 0),
-      timestamp: moonpieEntry.timestamp,
-    },
-    logger
-  );
-
-  const currentMoonpieLeaderboardEntry =
-    await moonpieDb.getMoonpieLeaderboardEntry(
-      moonpieDbPath,
-      moonpieEntry.id,
-      logger
-    );
-
-  const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${
-    currentMoonpieLeaderboardEntry.count
-  } moonpie${
-    currentMoonpieLeaderboardEntry.count > 1 ? "s" : ""
-  } and they are now rank ${
+  } (${operation}${countMoonpies}) and they are now rank ${
     currentMoonpieLeaderboardEntry.rank
   } on the leaderboard!`;
 

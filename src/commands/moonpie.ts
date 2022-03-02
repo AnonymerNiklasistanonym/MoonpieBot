@@ -4,8 +4,6 @@ import type { Logger } from "winston";
 import {
   commandUserGet,
   commandUserSetCount,
-  commandUserAddCount,
-  commandUserRemoveCount,
   commandUserDelete,
 } from "./moonpie/user";
 import { commandCommands } from "./moonpie/commands";
@@ -123,6 +121,7 @@ export const moonpieChatHandler = async (
           tags["user-id"],
           match[1],
           parseInt(match[2]),
+          "=",
           tags?.badges?.broadcaster === "1",
           databasePath,
           logger
@@ -139,7 +138,7 @@ export const moonpieChatHandler = async (
       logDetectedCommand(logger, tags, "!moonpie add $USER $COUNT");
       const match = regexMoonpieAdd.exec(message);
       if (match && match.length >= 3) {
-        await commandUserAddCount(
+        await commandUserSetCount(
           client,
           channel,
           tags.id,
@@ -147,6 +146,7 @@ export const moonpieChatHandler = async (
           tags["user-id"],
           match[1],
           parseInt(match[2]),
+          "+",
           tags?.badges?.broadcaster === "1",
           databasePath,
           logger
@@ -163,7 +163,7 @@ export const moonpieChatHandler = async (
       logDetectedCommand(logger, tags, "!moonpie remove $USER $COUNT");
       const match = regexMoonpieRemove.exec(message);
       if (match && match.length >= 3) {
-        await commandUserRemoveCount(
+        await commandUserSetCount(
           client,
           channel,
           tags.id,
@@ -171,6 +171,7 @@ export const moonpieChatHandler = async (
           tags["user-id"],
           match[1],
           parseInt(match[2]),
+          "-",
           tags?.badges?.broadcaster === "1",
           databasePath,
           logger
