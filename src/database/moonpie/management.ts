@@ -1,13 +1,13 @@
 import type { Logger } from "winston";
 import * as database from "../core";
-import * as moonpie from "./moonpieManager";
+import * as moonpie from "./requests";
 
 /**
  * Create tables if not existing.
  *
  * @param databasePath Path to database.
  */
-export const setupTables = async (
+export const createAndSetupTables = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {

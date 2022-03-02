@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import * as database from "../../../src/database/core";
+import * as database from "../../../../src/database/core";
 import chai from "chai";
 import { describe } from "mocha";
-import { getTestLogger } from "../logger";
-import { itAllowFail } from "../allowFail";
+import { getTestLogger } from "../../logger";
+import { itAllowFail } from "../../allowFail";
 import path from "path";
 
 export default (databaseDirPath: string): Mocha.Suite => {

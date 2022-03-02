@@ -410,7 +410,7 @@ export interface UpdateInput {
   id: string;
   name: string;
   count: number;
-  timestamp: number;
+  timestamp?: number;
 }
 
 /**
@@ -437,7 +437,12 @@ export const update = async (
     table.column.moonpieCount,
     table.column.date,
   ];
-  const values = [input.name, input.count, input.timestamp, input.id];
+  const values = [
+    input.name,
+    input.count,
+    input.timestamp !== undefined ? input.timestamp : new Date().getTime(),
+    input.id,
+  ];
   const postResult = await database.requests.post(
     databasePath,
     database.queries.update(table.name, columns, table.column.twitchId),

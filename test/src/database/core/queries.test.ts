@@ -1,4 +1,4 @@
-import * as database from "../../../src/database/core";
+import * as database from "../../../../src/database/core";
 import chai from "chai";
 import { describe } from "mocha";
 

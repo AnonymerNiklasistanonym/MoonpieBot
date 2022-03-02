@@ -1,6 +1,6 @@
-import databaseManagement from "./database/management.test";
-import databaseQueries from "./database/queries.test";
-import databaseRequests from "./database/requests.test";
+import core from "./database/core.test";
+import moonpie from "./database/moonpie.test";
+
 import { describe } from "mocha";
 import os from "os";
 import path from "path";
@@ -11,7 +11,6 @@ describe("database", () => {
   rm(databaseDirPath, { recursive: true, force: true });
   mkdirSync(databaseDirPath, { recursive: true });
 
-  databaseManagement(databaseDirPath);
-  databaseQueries();
-  databaseRequests(databaseDirPath);
+  core(databaseDirPath);
+  moonpie(databaseDirPath);
 });

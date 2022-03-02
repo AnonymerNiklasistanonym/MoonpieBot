@@ -4,43 +4,12 @@ import type { Logger } from "winston";
 
 import { moonpieDb } from "../../database/moonpieDb";
 
-export const commandMoonpieCommands = async (
+export const commandUserGet = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
-  }
-
-  const commands = [
-    "!moonpie [claim one moonepie per day]",
-    "!moonpie commands [get all available commands]",
-    "!moonpie leaderboard [get the top moonpie holder]",
-    "!moonpie get $USER [get the moonpie count of a user]",
-    "!moonpie set $USER [set moonpies of a user]",
-    "!moonpie add $USER [add moonpies to a user]",
-    "!moonpie remove $USER $COUNT [remove moonpies of a user]",
-    "!moonpie delete $USER [remove a user from the database]",
-  ];
-  const sentMessage = await client.say(
-    channel,
-    "The following commands are supported: " + commands.join(", ")
-  );
-  logger.info(
-    `Successfully replied to message ${messageId} with: '${JSON.stringify(
-      sentMessage
-    )}'`
-  );
-};
-
-export const commandMoonpieGetUser = async (
-  client: Client,
-  channel: string,
   username: string | undefined,
   userId: string | undefined,
-  messageId: string | undefined,
   usernameMoonpieEntry: string,
   moonpieDbPath: string,
   logger: Logger
@@ -91,12 +60,12 @@ export const commandMoonpieGetUser = async (
   );
 };
 
-export const commandMoonpieSetUserCount = async (
+export const commandUserSetCount = async (
   client: Client,
   channel: string,
+  messageId: string | undefined,
   username: string | undefined,
   userId: string | undefined,
-  messageId: string | undefined,
   usernameMoonpieEntry: string,
   countMoonpies: number,
   isBroadcaster: boolean,
@@ -168,12 +137,12 @@ export const commandMoonpieSetUserCount = async (
   );
 };
 
-export const commandMoonpieAddUserCount = async (
+export const commandUserAddCount = async (
   client: Client,
   channel: string,
+  messageId: string | undefined,
   username: string | undefined,
   userId: string | undefined,
-  messageId: string | undefined,
   usernameMoonpieEntry: string,
   countMoonpies: number,
   isBroadcaster: boolean,
@@ -247,12 +216,12 @@ export const commandMoonpieAddUserCount = async (
   );
 };
 
-export const commandMoonpieRemoveUserCount = async (
+export const commandUserRemoveCount = async (
   client: Client,
   channel: string,
+  messageId: string | undefined,
   username: string | undefined,
   userId: string | undefined,
-  messageId: string | undefined,
   usernameMoonpieEntry: string,
   countMoonpies: number,
   isBroadcaster: boolean,
@@ -327,12 +296,12 @@ export const commandMoonpieRemoveUserCount = async (
   );
 };
 
-export const commandMoonpieDeleteUser = async (
+export const commandUserDelete = async (
   client: Client,
   channel: string,
+  messageId: string | undefined,
   username: string | undefined,
   userId: string | undefined,
-  messageId: string | undefined,
   usernameMoonpieEntry: string,
   isBroadcaster: boolean,
   moonpieDbPath: string,

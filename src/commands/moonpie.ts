@@ -2,13 +2,13 @@
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 import {
-  commandMoonpieCommands,
-  commandMoonpieGetUser,
-  commandMoonpieSetUserCount,
-  commandMoonpieAddUserCount,
-  commandMoonpieRemoveUserCount,
-  commandMoonpieDeleteUser,
-} from "./moonpie/moonpieInternal";
+  commandUserGet,
+  commandUserSetCount,
+  commandUserAddCount,
+  commandUserRemoveCount,
+  commandUserDelete,
+} from "./moonpie/user";
+import { commandCommands } from "./moonpie/commands";
 import { commandAbout } from "./moonpie/about";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { commandClaim } from "./moonpie/claim";
@@ -50,7 +50,7 @@ export const moonpieChatHandler = async (
     // > !moonpie commands
     if (message.match(regexMoonpieCommands)) {
       logDetectedCommand(logger, tags, "!moonpie commands");
-      await commandMoonpieCommands(client, channel, tags.id, logger);
+      await commandCommands(client, channel, tags.id, logger);
       return;
     }
     // > !moonpie leaderboard
@@ -70,12 +70,12 @@ export const moonpieChatHandler = async (
       logDetectedCommand(logger, tags, "!moonpie delete $USER");
       const match = regexMoonpieDelete.exec(message);
       if (match && match.length >= 2) {
-        await commandMoonpieDeleteUser(
+        await commandUserDelete(
           client,
           channel,
+          tags.id,
           tags.username,
           tags["user-id"],
-          tags.id,
           match[1],
           tags?.badges?.broadcaster === "1",
           databasePath,
@@ -93,12 +93,12 @@ export const moonpieChatHandler = async (
       logDetectedCommand(logger, tags, "!moonpie get $USER");
       const match = regexMoonpieGet.exec(message);
       if (match && match.length >= 2) {
-        await commandMoonpieGetUser(
+        await commandUserGet(
           client,
           channel,
+          tags.id,
           tags.username,
           tags["user-id"],
-          tags.id,
           match[1],
           databasePath,
           logger
@@ -115,12 +115,12 @@ export const moonpieChatHandler = async (
       logDetectedCommand(logger, tags, "!moonpie set $USER $COUNT");
       const match = regexMoonpieSet.exec(message);
       if (match && match.length >= 3) {
-        await commandMoonpieSetUserCount(
+        await commandUserSetCount(
           client,
           channel,
+          tags.id,
           tags.username,
           tags["user-id"],
-          tags.id,
           match[1],
           parseInt(match[2]),
           tags?.badges?.broadcaster === "1",
@@ -139,12 +139,12 @@ export const moonpieChatHandler = async (
       logDetectedCommand(logger, tags, "!moonpie add $USER $COUNT");
       const match = regexMoonpieAdd.exec(message);
       if (match && match.length >= 3) {
-        await commandMoonpieAddUserCount(
+        await commandUserAddCount(
           client,
           channel,
+          tags.id,
           tags.username,
           tags["user-id"],
-          tags.id,
           match[1],
           parseInt(match[2]),
           tags?.badges?.broadcaster === "1",
@@ -163,12 +163,12 @@ export const moonpieChatHandler = async (
       logDetectedCommand(logger, tags, "!moonpie remove $USER $COUNT");
       const match = regexMoonpieRemove.exec(message);
       if (match && match.length >= 3) {
-        await commandMoonpieRemoveUserCount(
+        await commandUserRemoveCount(
           client,
           channel,
+          tags.id,
           tags.username,
           tags["user-id"],
-          tags.id,
           match[1],
           parseInt(match[2]),
           tags?.badges?.broadcaster === "1",

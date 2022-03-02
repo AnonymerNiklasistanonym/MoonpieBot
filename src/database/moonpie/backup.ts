@@ -1,6 +1,6 @@
 import type { Logger } from "winston";
 import * as database from "../core";
-import * as moonpie from "./moonpieManager";
+import * as moonpie from "./requests";
 import { promises as fs } from "fs";
 
 /**

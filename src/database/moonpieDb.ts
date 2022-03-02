@@ -1,5 +1,5 @@
-import { setupTables as moonpieDbSetupTables } from "./moonpie/setupDatabase";
-import * as moonpieDb from "./moonpie/moonpieManager";
-import { backupTables as moonpieDbBackupTables } from "./moonpie/backupDatabase";
+import { createAndSetupTables as moonpieDbSetupTables } from "./moonpie/management";
+import * as moonpieDb from "./moonpie/requests";
+import { backupTables as moonpieDbBackupTables } from "./moonpie/backup";
 
 export { moonpieDb, moonpieDbSetupTables, moonpieDbBackupTables };
