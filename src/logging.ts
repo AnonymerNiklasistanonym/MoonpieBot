@@ -8,9 +8,9 @@ import DailyRotateFile from "winston-daily-rotate-file";
 import { name } from "./info";
 
 export const createLogger = (
-  logDir = "./logs",
-  logLevelConsole = "info",
-  logLevelFile = "debug"
+  logDir: string,
+  logLevelConsole: "error" | "warn" | "debug" | "info" = "info",
+  logLevelFile: "error" | "warn" | "debug" | "info" = "debug"
 ) => {
   return createWinstonLogger({
     transports: [
