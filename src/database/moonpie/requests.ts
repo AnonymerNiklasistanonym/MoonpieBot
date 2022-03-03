@@ -379,6 +379,12 @@ export const getMoonpieLeaderboardEntry = async (
   twitchId: string,
   logger: Logger
 ): Promise<GetMoonpieLeaderboardOut> => {
+  // Special validations for DB entry request
+  // > Check if entry already exists
+  if ((await exists(databasePath, twitchId, logger)) === false) {
+    throw Error(GeneralError.NOT_EXISTING);
+  }
+
   const runResult = await database.requests.getEach<GetMoonpieLeaderboardDbOut>(
     databasePath,
     database.queries.select(

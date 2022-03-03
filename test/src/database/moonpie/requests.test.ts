@@ -5,6 +5,10 @@ import { getTestLogger } from "../../logger";
 import { itAllowFail } from "../../allowFail";
 import path from "path";
 import { createAndSetupTables } from "../../../../src/database/moonpie/management";
+import {
+  CreateError,
+  GeneralError,
+} from "../../../../src/database/moonpie/requests";
 
 export default (databaseDirPath: string): Mocha.Suite => {
   return describe("moonpieDb", () => {
@@ -33,6 +37,22 @@ export default (databaseDirPath: string): Mocha.Suite => {
         logger
       );
       chai.expect(id2).to.be.a("number");
+
+      try {
+        await moonpieDb.create(
+          databasePath,
+          {
+            id: "3",
+            name: "four",
+          },
+          logger
+        );
+        chai.expect(false);
+      } catch (err) {
+        chai
+          .expect((err as Error).message)
+          .to.equal(CreateError.ALREADY_EXISTS);
+      }
     });
     itAllowFail("exists", process.platform === "win32", async () => {
       const databasePath = path.join(databaseDirPath, "moonpieDb_exists.db");
@@ -104,7 +124,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         await moonpieDb.getMoonpie(databasePath, "3", logger);
         chai.expect(false);
       } catch (err) {
-        chai.expect((err as Error).message).to.equal("MOONPIE_NOT_EXISTING");
+        chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
       }
 
       await moonpieDb.create(
@@ -125,6 +145,13 @@ export default (databaseDirPath: string): Mocha.Suite => {
       chai.expect(moonpieInfo1.name).to.be.equal("four");
       chai.expect(moonpieInfo1.count).to.be.equal(0);
       chai.expect(moonpieInfo1.timestamp).to.be.a("number");
+
+      try {
+        await moonpieDb.getMoonpie(databasePath, "7", logger);
+        chai.expect(false);
+      } catch (err) {
+        chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
+      }
     });
     itAllowFail("getMoonpieName", process.platform === "win32", async () => {
       const databasePath = path.join(
@@ -137,7 +164,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         await moonpieDb.getMoonpieName(databasePath, "four", logger);
         chai.expect(false);
       } catch (err) {
-        chai.expect((err as Error).message).to.equal("MOONPIE_NOT_EXISTING");
+        chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
       }
 
       await moonpieDb.create(
@@ -158,6 +185,13 @@ export default (databaseDirPath: string): Mocha.Suite => {
       chai.expect(moonpieInfo1.name).to.be.equal("four");
       chai.expect(moonpieInfo1.count).to.be.equal(0);
       chai.expect(moonpieInfo1.timestamp).to.be.a("number");
+
+      try {
+        await moonpieDb.getMoonpieName(databasePath, "seven", logger);
+        chai.expect(false);
+      } catch (err) {
+        chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
+      }
     });
     itAllowFail("update", process.platform === "win32", async () => {
       const databasePath = path.join(databaseDirPath, "moonpieDb_update.db");
@@ -175,7 +209,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         );
         chai.expect(false);
       } catch (err) {
-        chai.expect((err as Error).message).to.equal("MOONPIE_NOT_EXISTING");
+        chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
       }
 
       await moonpieDb.create(
@@ -205,6 +239,27 @@ export default (databaseDirPath: string): Mocha.Suite => {
       chai.expect(moonpieInfo1.name).to.be.equal("four");
       chai.expect(moonpieInfo1.count).to.be.equal(10);
       chai.expect(moonpieInfo1.timestamp).to.be.a("number");
+
+      await moonpieDb.update(
+        databasePath,
+        {
+          id: "3",
+          name: "five",
+          count: 11,
+          timestamp: 111,
+        },
+        logger
+      );
+
+      const moonpieInfo2 = await moonpieDb.getMoonpie(
+        databasePath,
+        "3",
+        logger
+      );
+      chai.expect(moonpieInfo2.id).to.be.equal("3");
+      chai.expect(moonpieInfo2.name).to.be.equal("five");
+      chai.expect(moonpieInfo2.count).to.be.equal(11);
+      chai.expect(moonpieInfo2.timestamp).to.be.equal(111);
     });
     itAllowFail(
       "getMoonpieLeaderboard",
@@ -313,5 +368,158 @@ export default (databaseDirPath: string): Mocha.Suite => {
         chai.expect(leaderboard4[2].rank).to.be.equal(3);
       }
     );
+    itAllowFail(
+      "getMoonpieLeaderboardEntry",
+      process.platform === "win32",
+      async () => {
+        const databasePath = path.join(
+          databaseDirPath,
+          "moonpieDb_getMoonpieLeaderboardEntry.db"
+        );
+        await createAndSetupTables(databasePath, logger);
+
+        try {
+          await moonpieDb.getMoonpieLeaderboardEntry(databasePath, "1", logger);
+          chai.expect(false);
+        } catch (err) {
+          chai
+            .expect((err as Error).message)
+            .to.equal(GeneralError.NOT_EXISTING);
+        }
+
+        await moonpieDb.create(
+          databasePath,
+          {
+            id: "1",
+            name: "one",
+          },
+          logger
+        );
+
+        const leaderboard1 = await moonpieDb.getMoonpieLeaderboardEntry(
+          databasePath,
+          "1",
+          logger
+        );
+        chai.expect(leaderboard1.count).to.be.equal(0);
+        chai.expect(leaderboard1.name).to.be.equal("one");
+        chai.expect(leaderboard1.rank).to.be.equal(1);
+
+        await moonpieDb.create(
+          databasePath,
+          {
+            id: "4",
+            name: "four",
+          },
+          logger
+        );
+        await moonpieDb.update(
+          databasePath,
+          {
+            id: "4",
+            name: "four",
+            count: 5,
+          },
+          logger
+        );
+
+        const leaderboard2 = await moonpieDb.getMoonpieLeaderboardEntry(
+          databasePath,
+          "1",
+          logger
+        );
+        chai.expect(leaderboard2.count).to.be.equal(0);
+        chai.expect(leaderboard2.name).to.be.equal("one");
+        chai.expect(leaderboard2.rank).to.be.equal(2);
+
+        await moonpieDb.update(
+          databasePath,
+          {
+            id: "1",
+            name: "one",
+            count: 10,
+          },
+          logger
+        );
+
+        const leaderboard3 = await moonpieDb.getMoonpieLeaderboardEntry(
+          databasePath,
+          "1",
+          logger
+        );
+        chai.expect(leaderboard3.count).to.be.equal(10);
+        chai.expect(leaderboard3.name).to.be.equal("one");
+        chai.expect(leaderboard3.rank).to.be.equal(1);
+      }
+    );
+    itAllowFail("remove", process.platform === "win32", async () => {
+      const databasePath = path.join(databaseDirPath, "moonpieDb_remove.db");
+      await createAndSetupTables(databasePath, logger);
+
+      try {
+        await moonpieDb.remove(databasePath, "1", logger);
+        chai.expect(false);
+      } catch (err) {
+        chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
+      }
+
+      await moonpieDb.create(
+        databasePath,
+        {
+          id: "1",
+          name: "one",
+        },
+        logger
+      );
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const exists1 = await moonpieDb.exists(databasePath, "1", logger);
+      chai.expect(exists1).to.be.equal(true);
+
+      const remove1 = await moonpieDb.remove(databasePath, "1", logger);
+      chai.expect(remove1).to.be.equal(true);
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const notExists1 = await moonpieDb.exists(databasePath, "1", logger);
+      chai.expect(notExists1).to.be.equal(false);
+    });
+    itAllowFail("removeName", process.platform === "win32", async () => {
+      const databasePath = path.join(
+        databaseDirPath,
+        "moonpieDb_removeName.db"
+      );
+      await createAndSetupTables(databasePath, logger);
+
+      try {
+        await moonpieDb.removeName(databasePath, "one", logger);
+        chai.expect(false);
+      } catch (err) {
+        chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
+      }
+
+      await moonpieDb.create(
+        databasePath,
+        {
+          id: "1",
+          name: "one",
+        },
+        logger
+      );
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const exists1 = await moonpieDb.existsName(databasePath, "one", logger);
+      chai.expect(exists1).to.be.equal(true);
+
+      const remove1 = await moonpieDb.removeName(databasePath, "one", logger);
+      chai.expect(remove1).to.be.equal(true);
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const notExists1 = await moonpieDb.existsName(
+        databasePath,
+        "one",
+        logger
+      );
+      chai.expect(notExists1).to.be.equal(false);
+    });
   });
 };
