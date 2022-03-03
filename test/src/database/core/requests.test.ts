@@ -129,7 +129,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
           .to.equal(database.requests.ErrorCodePostRequest.SQLITE_CONSTRAINT);
       }
       chai.expect(throwsException2).to.equal(true);
-    });
+    }).timeout(2000);
     itAllowFail("get each", process.platform === "win32", async () => {
       const databasePath = path.join(databaseDirPath, "getEach.db");
       await database.remove(databasePath, logger);
@@ -237,7 +237,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
       } else {
         chai.assert(false);
       }
-    });
+    }).timeout(2000);
     itAllowFail("get all", process.platform === "win32", async () => {
       const databasePath = path.join(databaseDirPath, "getAll.db");
       await database.remove(databasePath, logger);
@@ -337,6 +337,6 @@ export default (databaseDirPath: string): Mocha.Suite => {
       chai
         .expect(getResultSelectLastColumn3[0].unique_text_and_not_null)
         .to.equal("unique1");
-    });
+    }).timeout(2000);
   });
 };
