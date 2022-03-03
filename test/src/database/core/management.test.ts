@@ -6,6 +6,8 @@ import { getTestLogger } from "../../logger";
 import { itAllowFail } from "../../allowFail";
 import path from "path";
 
+const githubCiMaxTimeout = 4000;
+
 export default (databaseDirPath: string): Mocha.Suite => {
   return describe("management", () => {
     const logger = getTestLogger("Management");
@@ -78,6 +80,6 @@ export default (databaseDirPath: string): Mocha.Suite => {
           .to.deep.equal(database.ErrorCodeOpen.SQLITE_CANTOPEN);
       }
       chai.expect(throwsException2).to.equal(true);
-    });
+    }).timeout(githubCiMaxTimeout);
   });
 };

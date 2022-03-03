@@ -10,6 +10,8 @@ import {
   GeneralError,
 } from "../../../../src/database/moonpie/requests";
 
+const githubCiMaxTimeout = 4000;
+
 export default (databaseDirPath: string): Mocha.Suite => {
   return describe("requests", () => {
     const logger = getTestLogger("Requests");
@@ -53,7 +55,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
           .expect((err as Error).message)
           .to.equal(CreateError.ALREADY_EXISTS);
       }
-    }).timeout(2000);
+    }).timeout(githubCiMaxTimeout);
     itAllowFail("exists", process.platform === "win32", async () => {
       const databasePath = path.join(databaseDirPath, "moonpieDb_exists.db");
       await createAndSetupTables(databasePath, logger);
@@ -77,7 +79,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const exists1 = await moonpieDb.exists(databasePath, "3", logger);
       chai.expect(exists1).to.be.equal(true);
-    }).timeout(2000);
+    }).timeout(githubCiMaxTimeout);
     itAllowFail("existsName", process.platform === "win32", async () => {
       const databasePath = path.join(
         databaseDirPath,
@@ -112,7 +114,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const exists1 = await moonpieDb.existsName(databasePath, "four", logger);
       chai.expect(exists1).to.be.equal(true);
-    }).timeout(2000);
+    }).timeout(githubCiMaxTimeout);
     itAllowFail("getMoonpie", process.platform === "win32", async () => {
       const databasePath = path.join(
         databaseDirPath,
@@ -152,7 +154,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
       } catch (err) {
         chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
       }
-    }).timeout(2000);
+    }).timeout(githubCiMaxTimeout);
     itAllowFail("getMoonpieName", process.platform === "win32", async () => {
       const databasePath = path.join(
         databaseDirPath,
@@ -192,7 +194,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
       } catch (err) {
         chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
       }
-    }).timeout(2000);
+    }).timeout(githubCiMaxTimeout);
     itAllowFail("update", process.platform === "win32", async () => {
       const databasePath = path.join(databaseDirPath, "moonpieDb_update.db");
       await createAndSetupTables(databasePath, logger);
@@ -260,7 +262,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
       chai.expect(moonpieInfo2.name).to.be.equal("five");
       chai.expect(moonpieInfo2.count).to.be.equal(11);
       chai.expect(moonpieInfo2.timestamp).to.be.equal(111);
-    }).timeout(2000);
+    }).timeout(githubCiMaxTimeout);
     itAllowFail(
       "getMoonpieLeaderboard",
       process.platform === "win32",
@@ -367,7 +369,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         chai.expect(leaderboard4[2].name).to.be.equal("four");
         chai.expect(leaderboard4[2].rank).to.be.equal(3);
       }
-    ).timeout(2000);
+    ).timeout(githubCiMaxTimeout);
     itAllowFail(
       "getMoonpieLeaderboardEntry",
       process.platform === "win32",
@@ -451,7 +453,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         chai.expect(leaderboard3.name).to.be.equal("one");
         chai.expect(leaderboard3.rank).to.be.equal(1);
       }
-    ).timeout(2000);
+    ).timeout(githubCiMaxTimeout);
     itAllowFail("remove", process.platform === "win32", async () => {
       const databasePath = path.join(databaseDirPath, "moonpieDb_remove.db");
       await createAndSetupTables(databasePath, logger);
@@ -482,7 +484,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const notExists1 = await moonpieDb.exists(databasePath, "1", logger);
       chai.expect(notExists1).to.be.equal(false);
-    }).timeout(2000);
+    }).timeout(githubCiMaxTimeout);
     itAllowFail("removeName", process.platform === "win32", async () => {
       const databasePath = path.join(
         databaseDirPath,
@@ -520,6 +522,6 @@ export default (databaseDirPath: string): Mocha.Suite => {
         logger
       );
       chai.expect(notExists1).to.be.equal(false);
-    }).timeout(2000);
+    }).timeout(githubCiMaxTimeout);
   });
 };
