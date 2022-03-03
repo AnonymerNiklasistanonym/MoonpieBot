@@ -96,11 +96,17 @@ export const commandClaim = async (
 
   if (alreadyClaimedAMoonpie) {
     const ago = `${secondsToString(millisecondsSinceLastClaim / 1000)}`;
-    message = `@${username} You already claimed a moonpie for today (${ago} ago)! You have ${newMoonpieCount} moonpie${
-      newMoonpieCount > 1 ? "s" : ""
-    } and are rank ${
-      currentMoonpieLeaderboardEntry.rank
-    } on the leaderboard!!!`;
+
+    if (userId === "93818178") {
+      // Easter egg for the most cute star there is <3
+      message = `@${username} You are the cutest! You have now 6969 moonpies and are rank 1 in my heart! <3`;
+    } else {
+      message = `@${username} You already claimed a moonpie for today (${ago} ago)! You have ${newMoonpieCount} moonpie${
+        newMoonpieCount > 1 ? "s" : ""
+      } and are rank ${
+        currentMoonpieLeaderboardEntry.rank
+      } on the leaderboard!!!`;
+    }
   }
 
   const sentMessage = await client.say(channel, message);
