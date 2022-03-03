@@ -1,17 +1,23 @@
 import type { Logger } from "winston";
 import * as database from "../core";
 import * as moonpie from "./requests";
-import { promises as fs } from "fs";
+
+export interface DatabaseStructure {
+  id: string;
+  name: string;
+  count: number;
+  timestamp: number;
+}
 
 /**
  * Create tables if not existing.
  *
  * @param databasePath Path to database.
  */
-export const backupTables = async (
+export const exportMoonpieCountTableToJson = async (
   databasePath: string,
   logger: Logger
-): Promise<void> => {
+): Promise<DatabaseStructure[]> => {
   logger.info("Backup database..");
 
   // Create database
@@ -19,14 +25,14 @@ export const backupTables = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   if (!(await database.exists(databasePath, logger))) {
     logger.info("Database not found");
-    return;
+    throw Error(moonpie.GeneralError.NOT_EXISTING);
   }
   // The warning makes literally no sense
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await database.open(databasePath, logger);
 
   // Moonpie table
-  const moonpieData = await database.requests.getAll(
+  const moonpieData = await database.requests.getAll<DatabaseStructure>(
     databasePath,
     database.queries.select(
       moonpie.table.name,
@@ -41,6 +47,5 @@ export const backupTables = async (
     undefined,
     logger
   );
-  await fs.writeFile("test.json", JSON.stringify(moonpieData));
-  logger.info(`> Database tables were backed up from '${databasePath}'`);
+  return moonpieData;
 };

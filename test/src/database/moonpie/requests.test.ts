@@ -11,7 +11,7 @@ import {
 } from "../../../../src/database/moonpie/requests";
 
 export default (databaseDirPath: string): Mocha.Suite => {
-  return describe("moonpieDb", () => {
+  return describe("requests", () => {
     const logger = getTestLogger("Requests");
 
     itAllowFail("create", process.platform === "win32", async () => {

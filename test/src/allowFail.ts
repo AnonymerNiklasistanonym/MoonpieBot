@@ -2,7 +2,7 @@ export const itAllowFail = (
   title: string,
   allowFailure: boolean,
   callback: () => Promise<void>
-): Mocha.Test => {
+) => {
   if (!allowFailure) {
     return it(title, callback);
   }
