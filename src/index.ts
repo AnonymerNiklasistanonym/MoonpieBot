@@ -19,6 +19,7 @@ import {
 } from "./cli";
 // Type imports
 import type { Logger } from "winston";
+import { osuChatHandler } from "./commands/osu";
 
 /** Path to the root directory of the source code */
 const pathToRootDir = path.join(__dirname, "..", "..");
@@ -88,7 +89,24 @@ const main = async (logger: Logger, logDir: string) => {
       logger.error(err);
       // When the chat handler throws an error write the error message in chat
       twitchClient
-        .say(channel, `@${tags?.username} Error: ${(err as Error).message}`)
+        .say(
+          channel,
+          `@${tags?.username} Moonpie Error: ${(err as Error).message}`
+        )
+        .catch(logger.error);
+    });
+    osuChatHandler(
+      twitchClient,
+      channel,
+      tags,
+      message,
+      databasePath,
+      logger
+    ).catch((err) => {
+      logger.error(err);
+      // When the chat handler throws an error write the error message in chat
+      twitchClient
+        .say(channel, `@${tags?.username} Osu Error: ${(err as Error).message}`)
         .catch(logger.error);
     });
   });
