@@ -20,6 +20,7 @@ const logDetectedCommand = (
     level: "debug",
     message: `Detected command '${command}' by ${tags?.username} in message ${tags?.id}`,
     section: "twitchClient",
+    subsection: "moonpieChatHandler",
   });
 };
 

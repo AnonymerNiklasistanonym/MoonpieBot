@@ -36,6 +36,26 @@ const main = async (logger: Logger, logDir: string) => {
     path.join(pathToRootDir, "moonpie.db")
   );
 
+  const osuClientId = getCliVariableValueDefault(
+    CliVariable.OSU_CLIENT_ID,
+    undefined
+  );
+  const osuClientSecret = getCliVariableValueDefault(
+    CliVariable.OSU_CLIENT_SECRET,
+    undefined
+  );
+  const osuDefaultId = getCliVariableValueDefault(
+    CliVariable.OSU_DEFAULT_ID,
+    undefined
+  );
+  const enableOsu =
+    osuClientId !== undefined &&
+    osuClientSecret !== undefined &&
+    osuDefaultId !== undefined;
+  if (!enableOsu) {
+    logger.info("Osu features are disabled since not all variables were set");
+  }
+
   await moonpieDbSetupTables(databasePath, logger);
 
   // Create TwitchClient and listen to certain events
@@ -96,26 +116,33 @@ const main = async (logger: Logger, logDir: string) => {
         )
         .catch(logger.error);
     });
-    osuChatHandler(
-      twitchClient,
-      channel,
-      tags,
-      message,
-      databasePath,
-      logger
-    ).catch((err) => {
-      logger.error(err);
-      // When the chat handler throws an error write the error message in chat
-      const errorInfo = err as ErrorWithCode;
-      twitchClient
-        .say(
-          channel,
-          `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
-            errorInfo.message
-          }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
-        )
-        .catch(logger.error);
-    });
+
+    if (enableOsu) {
+      osuChatHandler(
+        twitchClient,
+        channel,
+        tags,
+        message,
+        {
+          clientId: parseInt(osuClientId),
+          clientSecret: osuClientSecret,
+        },
+        parseInt(osuDefaultId),
+        logger
+      ).catch((err) => {
+        logger.error(err);
+        // When the chat handler throws an error write the error message in chat
+        const errorInfo = err as ErrorWithCode;
+        twitchClient
+          .say(
+            channel,
+            `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
+              errorInfo.message
+            }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
+          )
+          .catch(logger.error);
+      });
+    }
   });
 
   process.on("SIGINT", () => {

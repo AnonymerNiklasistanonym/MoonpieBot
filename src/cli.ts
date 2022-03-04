@@ -12,6 +12,9 @@ export enum CliVariable {
   CONSOLE_LOG_LEVEL = "CONSOLE_LOG_LEVEL",
   FILE_LOG_LEVEL = "FILE_LOG_LEVEL",
   DB_FILEPATH = "DB_FILEPATH",
+  OSU_CLIENT_ID = "OSU_CLIENT_ID",
+  OSU_CLIENT_SECRET = "OSU_CLIENT_SECRET",
+  OSU_DEFAULT_ID = "OSU_DEFAULT_ID",
 }
 
 export const printCliVariablesToConsole = () => {

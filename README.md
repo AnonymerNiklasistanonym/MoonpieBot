@@ -19,6 +19,15 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
   | `!moonpie set $USER $COUNT` | broadcaster badge | Set moonpie `$COUNT` to `$USER` if found in database |
   | `!moonpie delete $USER` | broadcaster badge | Delete a `$USER` from the database if found in database |
 
+### Optional: Osu
+
+Given an Osu OAuth client ID/secret and a default (streamer) Osu ID the bot can additionally fetch some Osu related information.
+
+| Command | Permissions | Description |
+| ------ | -- | -------- |
+| `!rp ($OSU_ID)` | everyone | Get the most recent play of the streamer or of the given Osu player ID |
+| `!pp ($OSU_ID)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given Osu player ID |
+
 ## Setup
 
 1. Install a recent version of [Node.js](https://nodejs.org/en/download/) so the `node` and `npm` command are available
@@ -54,7 +63,7 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
 
    ---
 
-   To install all depdencies always run:
+   To install all dependencies always run:
 
    ```sh
    npm install
