@@ -66,11 +66,15 @@ const mapUserToStr = (user: User) => {
 };
 
 /**
- * NP (now playing) command: Send the map that is currently playing in osu
+ * PP (from performance points) command: Get performance/general information
+ * of an Osu account
  *
  * @param client Twitch client (used to send messages)
  * @param channel Twitch channel where the message should be sent to
  * @param messageId Twitch message ID of the request (used for logging)
+ * @param osuApiV2Credentials Osu API (v2) credentials
+ * @param defaultOsuId The default Osu account ID that should be fetched
+ * @param customOsuId If a custom Osu account ID is provided fetch this instead
  * @param logger Logger (used for logging)
  */
 export const commandPp = async (
@@ -104,6 +108,6 @@ export const commandPp = async (
     `Successfully replied to message ${messageId}: '${JSON.stringify(
       sentMessage
     )}'`,
-    { commandId: "osuNp" }
+    { commandId: "osuPp" }
   );
 };
