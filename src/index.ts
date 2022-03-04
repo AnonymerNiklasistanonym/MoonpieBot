@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 //export const app = process.env.LOG_LEVEL;
 
-// Load local environment variables from `.env` file
+// Package imports
 import dotenv from "dotenv";
-dotenv.config();
-
-// connections
+import * as path from "path";
+// Local imports
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
-// commands
 import { moonpieDbSetupTables } from "./database/moonpieDb";
-import * as path from "path";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { name } from "./info";
 import { getVersion } from "./version";
@@ -23,19 +20,27 @@ import {
 // Type imports
 import type { Logger } from "winston";
 
-const pathToRoot = path.join(__dirname, "..", "..");
+/** Path to the root directory of the source code */
+const pathToRootDir = path.join(__dirname, "..", "..");
 
+/**
+ * Main method that runs the bot
+ *
+ * @param logger The global logger
+ * @param logDir The directory in which the logs should be saved
+ */
 const main = async (logger: Logger, logDir: string) => {
   logger.info(`Start ${name} ${getVersion()} (logs directory: '${logDir}')`);
 
   const databasePath = getCliVariableValueDefault(
     CliVariable.DB_FILEPATH,
-    path.join(pathToRoot, "moonpie.db")
+    path.join(pathToRootDir, "moonpie.db")
   );
 
   await moonpieDbSetupTables(databasePath, logger);
 
-  const client = createTwitchClient(
+  // Create TwitchClient and listen to certain events
+  const twitchClient = createTwitchClient(
     getCliVariableValue(CliVariable.TWITCH_NAME),
     getCliVariableValue(CliVariable.TWITCH_OAUTH_TOKEN),
     getCliVariableValue(CliVariable.TWITCH_CHANNELS)
@@ -43,32 +48,37 @@ const main = async (logger: Logger, logDir: string) => {
       .filter((a) => a.trim().length !== 0),
     logger
   );
-
-  // Get when connecting to chat
-  client.on("connecting", (address, port) => {
+  twitchClient.on("connecting", (address, port) => {
+    // Triggers when the client is connecting to Twitch
     logger.info(`Connecting to Twitch: ${address}:${port}`);
   });
-  // Get when connected to chat
-  client.on("connected", (address, port) => {
+  twitchClient.on("connected", (address, port) => {
+    // Triggers when the client successfully connected to Twitch
     logger.info(`Connected to Twitch: ${address}:${port}`);
   });
-  // Get when disconnected from chat
-  client.on("disconnected", (reason) => {
+  twitchClient.on("disconnected", (reason) => {
+    // Triggers when the client was disconnected from Twitch
     logger.info(`Disconnected from Twitch: ${reason}`);
   });
-  // Get when someone joins the chat
-  client.on("join", (channel, username, self) => {
+  twitchClient.on("join", (channel, username, self) => {
+    // Triggers when a new user joins a Twitch channel that is being listened to
     if (self) {
+      // Only catch when the Twitch client itself joins a Twitch channel
       logger.info(`Joined the Twitch channel "${channel}" as "${username}"`);
     }
   });
-  // Get when a message is being written in chat
-  client.on("message", (channel, tags, message, self) => {
-    // Ignore messages written by the bot
-    if (self) return;
-    // Handle !moonpie commands
+  twitchClient.on("message", (channel, tags, message, self) => {
+    // Triggers when a new message is being sent in a Twitch channel that is
+    // being listened to
+
+    if (self) {
+      // Ignore messages written by the Twitch client
+      return;
+    }
+
+    // Handle all bot commands
     moonpieChatHandler(
-      client,
+      twitchClient,
       channel,
       tags,
       message,
@@ -76,37 +86,46 @@ const main = async (logger: Logger, logDir: string) => {
       logger
     ).catch((err) => {
       logger.error(err);
-      client
-        .say(channel, `@${tags.username} Error: ${(err as Error).message}`)
+      // When the chat handler throws an error write the error message in chat
+      twitchClient
+        .say(channel, `@${tags?.username} Error: ${(err as Error).message}`)
         .catch(logger.error);
     });
   });
 
-  //await backupTables(databasePath, logger);
-
   process.on("SIGINT", () => {
+    // When the process is being force closed catch that and close safely
     logger.info("SIGINT was detected");
     process.exit();
   });
 
-  // Connect to Twitch
-  await client.connect();
+  // Connect Twitch client to Twitch
+  await twitchClient.connect();
 };
 
-try {
-  printCliVariablesToConsole();
+// Check if this file is the entry point, otherwise don't run the main method
+const isEntryPoint = () => require.main === module;
+if (isEntryPoint()) {
+  try {
+    // Load environment variables if existing from the .env file
+    dotenv.config();
+    // Print for debugging the (private/secret) environment values to the console
+    printCliVariablesToConsole();
 
-  const logDir = getCliVariableValueDefault(
-    CliVariable.DIR_LOGS,
-    path.join(pathToRoot, "logs")
-  );
-  const logger = createLogger(logDir);
+    // Create logger
+    const logDir = getCliVariableValueDefault(
+      CliVariable.DIR_LOGS,
+      path.join(pathToRootDir, "logs")
+    );
+    const logger = createLogger(logDir);
 
-  main(logger, logDir).catch((err) => {
-    logger.error(err);
-    throw err;
-  });
-} catch (err) {
-  console.error(err);
-  process.exit(1);
+    // Call main method
+    main(logger, logDir).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
 }
