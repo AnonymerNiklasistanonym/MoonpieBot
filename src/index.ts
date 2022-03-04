@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-//export const app = process.env.LOG_LEVEL;
-
 // Package imports
 import dotenv from "dotenv";
 import * as path from "path";
@@ -9,6 +6,7 @@ import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { moonpieChatHandler } from "./commands/moonpie";
+import { osuChatHandler } from "./commands/osu";
 import { name } from "./info";
 import { getVersion } from "./version";
 import {
@@ -19,7 +17,7 @@ import {
 } from "./cli";
 // Type imports
 import type { Logger } from "winston";
-import { osuChatHandler } from "./commands/osu";
+import type { ErrorWithCode } from "./error";
 
 /** Path to the root directory of the source code */
 const pathToRootDir = path.join(__dirname, "..", "..");
@@ -88,10 +86,13 @@ const main = async (logger: Logger, logDir: string) => {
     ).catch((err) => {
       logger.error(err);
       // When the chat handler throws an error write the error message in chat
+      const errorInfo = err as ErrorWithCode;
       twitchClient
         .say(
           channel,
-          `@${tags?.username} Moonpie Error: ${(err as Error).message}`
+          `${tags.username ? "@" + tags.username + " " : ""}Moonpie Error: ${
+            errorInfo.message
+          }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
         )
         .catch(logger.error);
     });
@@ -105,8 +106,14 @@ const main = async (logger: Logger, logDir: string) => {
     ).catch((err) => {
       logger.error(err);
       // When the chat handler throws an error write the error message in chat
+      const errorInfo = err as ErrorWithCode;
       twitchClient
-        .say(channel, `@${tags?.username} Osu Error: ${(err as Error).message}`)
+        .say(
+          channel,
+          `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
+            errorInfo.message
+          }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
+        )
         .catch(logger.error);
     });
   });

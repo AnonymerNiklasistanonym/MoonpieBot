@@ -5,6 +5,6 @@
 /** Program name */
 export const name = "MoonpieBot";
 
-/** Source code url */
+/** Source Code URL */
 export const sourceCodeUrl =
   "https://github.com/AnonymerNiklasistanonym/MoonpieBot";

@@ -20,6 +20,7 @@
     "typedocOptions": {
         "entryPoints": [
             "src/cli.ts",
+            "src/error.ts",
             "src/index.ts",
             "src/info.ts",
             "src/logging.ts",
@@ -32,6 +33,8 @@
             "src/commands/moonpie/commands.ts",
             "src/commands/moonpie/leaderboard.ts",
             "src/commands/moonpie/user.ts",
+            "src/commands/osu.ts",
+            "src/commands/osu/np.ts",
             "src/database/core.ts",
             "src/database/core/management.ts",
             "src/database/core/queries.ts",

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import {
   createLogger as createWinstonLogger,
   transports,
@@ -6,6 +5,15 @@ import {
 } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 import { name } from "./info";
+
+export interface LoggerInformation {
+  level: string;
+  message: string;
+  timestamp?: string;
+  service?: string;
+  section?: string;
+  subsection?: string;
+}
 
 export const createLogger = (
   logDir: string,
@@ -29,13 +37,19 @@ export const createLogger = (
       format.timestamp(),
       format.printf(
         ({ timestamp, level, message, service, section, subsection }) => {
-          if (section !== undefined) {
-            if (subsection !== undefined) {
-              return `[${timestamp}] ${service}#${section}#${subsection} ${level}: ${message}`;
+          if (timestamp !== undefined && service !== undefined) {
+            if (section !== undefined) {
+              if (subsection !== undefined) {
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                return `[${timestamp}] ${service}#${section}#${subsection} ${level}: ${message}`;
+              }
+              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+              return `[${timestamp}] ${service}#${section} ${level}: ${message}`;
             }
-            return `[${timestamp}] ${service}#${section} ${level}: ${message}`;
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            return `[${timestamp}] ${service} ${level}: ${message}`;
           }
-          return `[${timestamp}] ${service} ${level}: ${message}`;
+          return `${level}: ${message}`;
         }
       )
     ),
