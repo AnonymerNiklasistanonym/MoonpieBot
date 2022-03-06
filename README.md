@@ -156,14 +156,20 @@ To inspect the SQLite database manually and edit it or run custom queries (for e
 - `npm run build:dev` - build typescript with source maps and comments in code are kept
 - `npm run mocha` - a helper npm script for running customised mocha command e.g. test a single file `npm run mocha -- file-name-or-pattern`
 
-Configuration files:
+### Configuration files
 
-- ESLint: `.eslintrc.json`, `.eslintignore`
-- Mocha: `.mocharc.json`
-- Istanbul: `.nycrc`
-- Nodemon: `nodemon.json`
-- Typescript: `tsconfig.json`
-- Prettier: `.prettierrc`
+- TypeScript: `.tsconfig.json`, `.tsconfig.eslint` (special script for linting tests)
+- ESLint (linting): `.eslintrc.json`, `.eslintignore`
+- Mocha (testing): `.mocharc.json`
+- Istanbul (code coverage): `.nycrc`
+- Nodemon (automatically recompile project on changes): `nodemon.json`
+
+### How to handle versions
+
+For releases set the version in [`src/version.ts`](src/version.ts) to `beta: false` and then run `npm version patch`/`minor`/`major`.
+When working on the code after that change set the version in [`src/version.ts`](src/version.ts) to `beta: true` and the version to what is expected to be the next version.
+
+To push the git tag created by `npm` run `git push origin <tag_name>`.
 
 ## Credits
 

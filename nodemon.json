@@ -1,7 +1,8 @@
 {
   "watch": [
     "src",
-    "tests"
+    "tests",
+    ".env"
   ],
   "ext": "ts,js,json",
   "exec": "npm run build:dev && node -r dotenv/config ."
