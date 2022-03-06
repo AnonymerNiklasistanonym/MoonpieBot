@@ -221,15 +221,24 @@ The file contains also the information about what variables need to be set.</p>
 <li><code>npm run build:dev</code> - build typescript with source maps and comments in code are kept</li>
 <li><code>npm run mocha</code> - a helper npm script for running customised mocha command e.g. test a single file <code>npm run mocha -- file-name-or-pattern</code></li>
 </ul>
-<p>Configuration files:</p>
+
+<a href="#configuration-files" id="configuration-files" style="color: inherit; text-decoration: none;">
+  <h3>Configuration files</h3>
+</a>
 <ul>
-<li>ESLint: <code>.eslintrc.json</code>, <code>.eslintignore</code></li>
-<li>Mocha: <code>.mocharc.json</code></li>
-<li>Istanbul: <code>.nycrc</code></li>
-<li>Nodemon: <code>nodemon.json</code></li>
-<li>Typescript: <code>tsconfig.json</code></li>
-<li>Prettier: <code>.prettierrc</code></li>
+<li>TypeScript: <code>.tsconfig.json</code>, <code>.tsconfig.eslint</code> (special script for linting tests)</li>
+<li>ESLint (linting): <code>.eslintrc.json</code>, <code>.eslintignore</code></li>
+<li>Mocha (testing): <code>.mocharc.json</code></li>
+<li>Istanbul (code coverage): <code>.nycrc</code></li>
+<li>Nodemon (automatically recompile project on changes): <code>nodemon.json</code></li>
 </ul>
+
+<a href="#how-to-handle-versions" id="how-to-handle-versions" style="color: inherit; text-decoration: none;">
+  <h3>How to handle versions</h3>
+</a>
+<p>For releases set the version in <a href="src/version.ts"><code>src/version.ts</code></a> to <code>beta: false</code> and then run <code>npm version patch</code>/<code>minor</code>/<code>major</code>.
+When working on the code after that change set the version in <a href="src/version.ts"><code>src/version.ts</code></a> to <code>beta: true</code> and the version to what is expected to be the next version.</p>
+<p>To push the git tag created by <code>npm</code> run <code>git push origin &lt;tag_name&gt;</code>.</p>
 
 <a href="#credits" id="credits" style="color: inherit; text-decoration: none;">
   <h2>Credits</h2>
