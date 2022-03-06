@@ -24,7 +24,7 @@ const monthNames = [
 
 const mapUserToStr = (user: User) => {
   let finalString = "";
-  const joinDate = new Date();
+  const joinDate = new Date(user.join_date);
   const joinDateMonth = joinDate.getMonth();
   const joinDateYear = joinDate.getFullYear();
 
@@ -35,9 +35,9 @@ const mapUserToStr = (user: User) => {
     monthNames[joinDateMonth]
   } ${joinDateYear}`;
   if (user.statistics) {
-    finalString += ` has the global rank #${
+    finalString += ` and reached the global rank #${
       user.statistics.global_rank
-    } and country rank #${user.statistics.country_rank} with ${
+    } [country rank #${user.statistics.country_rank}] with ${
       Math.round(user.statistics.pp * 100) / 100
     }pp, ${
       Math.round(user.statistics.hit_accuracy * 100) / 100
