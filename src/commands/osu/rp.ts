@@ -1,72 +1,13 @@
 // Package imports
-import osuApiV2, { GameMode, RankedStatus, Score } from "osu-api-v2";
+import osuApiV2, { GameMode } from "osu-api-v2";
+import { ScoresType } from "osu-api-v2/lib/users/scores";
 // Local imports
 import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
+import { mapScoreToStr } from "../../other/osuStringBuilder";
+import { OsuApiV2Credentials } from "../osu";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import { ScoresType } from "osu-api-v2/lib/users/scores";
-import { OsuApiV2Credentials } from "../osu";
-import { secondsToString } from "../../other/timePeriodToString";
-
-export const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
-  switch (rankedStatus) {
-    case RankedStatus.approved:
-      return "Approved";
-    case RankedStatus.graveyard:
-      return "Graveyard";
-    case RankedStatus.loved:
-      return "Loved";
-    case RankedStatus.pending:
-      return "Pending";
-    case RankedStatus.qualified:
-      return "Qualified";
-    case RankedStatus.ranked:
-      return "Ranked";
-    case RankedStatus.wip:
-      return "WIP";
-  }
-};
-
-export const mapScoreToStr = (score: Score) => {
-  let finalString = "";
-  if (score.user) {
-    finalString += `${score.user.username} (https://osu.ppy.sh/users/${score.user.id})`;
-  } else {
-    finalString += "[Error: User not found]";
-  }
-  if (score.passed) {
-    finalString += ` achieved a ${score.rank}${score.perfect ? " (FC)" : ""}`;
-    if (score.pp != null) {
-      finalString += ` with ${score.pp}pp`;
-    }
-  } else {
-    finalString += ` failed`;
-  }
-  finalString += ` (${score.statistics.count_300}/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss})`;
-  finalString += ` [max-combo=${score.max_combo},acc=${
-    Math.round((score.accuracy * 100 + Number.EPSILON) * 100) / 100
-  }%]`;
-
-  if (score.beatmap !== undefined && score.beatmapset !== undefined) {
-    finalString += ` on ${score.beatmapset.title} '${score.beatmap.version}' [${
-      Math.round(score.beatmap.difficulty_rating * 100 + Number.EPSILON) / 100
-    }* ${secondsToString(score.beatmap.total_length)} ${mapRankedStatusToStr(
-      score.beatmap.ranked
-    )}] by ${score.beatmapset.artist}`;
-    if (score.mods.length > 0) {
-      finalString += ` using ${score.mods.join(",")}`;
-    }
-    finalString += ` {CS=${score.beatmap.cs}, DRAIN=${score.beatmap.drain}, ACC=${score.beatmap.accuracy}, AR=${score.beatmap.ar}, BPM=${score.beatmap.bpm}}`;
-    finalString += ` (${score.beatmap.url})`;
-  } else {
-    finalString += " [Error: Beatmap/-set not found]";
-  }
-  if (score.replay) {
-    finalString += ` {replay available}`;
-  }
-  return finalString;
-};
 
 /**
  * RP (recently played) command: Send the map that was most recently played

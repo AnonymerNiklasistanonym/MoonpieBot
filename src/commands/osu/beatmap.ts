@@ -1,48 +1,12 @@
 // Package imports
-import osuApiV2, { Beatmap, RankedStatus } from "osu-api-v2";
+import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
 import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
+import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
+import { OsuApiV2Credentials } from "../osu";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import { OsuApiV2Credentials } from "../osu";
-import { secondsToString } from "../../other/timePeriodToString";
-
-export const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
-  switch (rankedStatus) {
-    case RankedStatus.approved:
-      return "Approved";
-    case RankedStatus.graveyard:
-      return "Graveyard";
-    case RankedStatus.loved:
-      return "Loved";
-    case RankedStatus.pending:
-      return "Pending";
-    case RankedStatus.qualified:
-      return "Qualified";
-    case RankedStatus.ranked:
-      return "Ranked";
-    case RankedStatus.wip:
-      return "WIP";
-  }
-};
-
-export const mapToStr = (beatmap: Beatmap) => {
-  let finalString = "";
-
-  if (beatmap.beatmapset !== undefined && beatmap.beatmapset != null) {
-    finalString += `${beatmap.beatmapset.title} '${beatmap.version}' [${
-      Math.round(beatmap.difficulty_rating * 100 + Number.EPSILON) / 100
-    }* ${secondsToString(beatmap.total_length)} ${mapRankedStatusToStr(
-      beatmap.ranked
-    )}] by ${beatmap.beatmapset.artist}`;
-    finalString += ` {CS=${beatmap.cs}, DRAIN=${beatmap.drain}, ACC=${beatmap.accuracy}, AR=${beatmap.ar}, BPM=${beatmap.bpm}}`;
-    finalString += ` (${beatmap.url})`;
-  } else {
-    finalString += " [Error: Beatmapset not found]";
-  }
-  return finalString;
-};
 
 /**
  * RP (recently played) command: Send the map that was most recently played
@@ -77,7 +41,19 @@ export const commandBeatmap = async (
   console.log("Check for score of user", defaultOsuId);
 
   const beatmap = await osuApiV2.beatmaps.lookup(oauthAccessToken, beatmapId);
-  const message = mapToStr(beatmap);
+  let message = mapToStr(beatmap);
+  try {
+    const score = await osuApiV2.beatmaps.scores.users(
+      oauthAccessToken,
+      beatmapId,
+      defaultOsuId,
+      GameMode.osu,
+      undefined
+    );
+    message += ` - The current top score is ${mapUserScoreToStr(score)}`;
+  } catch (err) {
+    message += ` No existing score found`;
+  }
   const sentMessage = await client.say(channel, message);
 
   loggerCommand(
