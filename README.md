@@ -28,6 +28,8 @@ Given an Osu OAuth client ID/secret and a default (streamer) Osu ID the bot can 
 | `!rp ($OSU_ID)` | everyone | Get the most recent play of the streamer or of the given Osu player ID |
 | `!pp ($OSU_ID)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given Osu player ID |
 
+It also can recognize beatmap links in chat and print map information to the chat.
+
 ## Setup
 
 1. Install a recent version of [Node.js](https://nodejs.org/en/download/) so the `node` and `npm` command are available

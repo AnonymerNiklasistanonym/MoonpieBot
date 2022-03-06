@@ -13,6 +13,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
+import { commandBeatmap } from "./osu/beatmap";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
 
@@ -35,6 +36,14 @@ export const regexRpCustomId = /^\s*!rp\s+([0-9]+)\s*.*$/i;
 export const regexPp = /^\s*!pp(\s*|\s.*)$/i;
 export const regexPpCustomId = /^\s*!pp\s+([0-9]+)\s*.*$/i;
 
+/**
+ * Regex that matches the following 2 kinds of URLs in any message:
+ * - https://osu.ppy.sh/beatmapsets/1228734#osu/2554945
+ * - https://osu.ppy.sh/beatmaps/2587891
+ */
+export const regexBeatmapUrl =
+  /(?:^|.*?\s)https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))(?:(?:\s|,).*?|$)/gi;
+
 export interface OsuApiV2Credentials {
   clientId: number;
   clientSecret: string;
@@ -47,6 +56,7 @@ export const osuChatHandler = async (
   message: string,
   osuApiV2Credentials: OsuApiV2Credentials,
   osuDefaultId: number,
+  enableOsuBeatmapRecognition: undefined | boolean,
   logger: Logger
 ): Promise<void> => {
   // > !rp
@@ -78,5 +88,23 @@ export const osuChatHandler = async (
       logger
     );
     return;
+  }
+  // > Any beatmap link
+  if (enableOsuBeatmapRecognition) {
+    if (message.match(regexBeatmapUrl)) {
+      logDetectedCommand(logger, tags, "beatmap");
+      for (const match of [...message.matchAll(regexBeatmapUrl)]) {
+        await commandBeatmap(
+          client,
+          channel,
+          tags.id,
+          osuApiV2Credentials,
+          osuDefaultId,
+          match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
+          logger
+        );
+      }
+      return;
+    }
   }
 };

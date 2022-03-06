@@ -52,6 +52,9 @@ const main = async (logger: Logger, logDir: string) => {
     osuClientId !== undefined &&
     osuClientSecret !== undefined &&
     osuDefaultId !== undefined;
+  const enableOsuBeatmapRecognition =
+    getCliVariableValueDefault(CliVariable.OSU_RECOGNIZE_MAPS, undefined) ===
+    "ON";
   if (!enableOsu) {
     logger.info("Osu features are disabled since not all variables were set");
   }
@@ -84,6 +87,22 @@ const main = async (logger: Logger, logDir: string) => {
     if (self) {
       // Only catch when the Twitch client itself joins a Twitch channel
       logger.info(`Joined the Twitch channel "${channel}" as "${username}"`);
+      // Easter Egg: Spam pyramids on joining the channel
+      const channelToSpam = "#ztalx_";
+      const emoteToSpam = " ztalxWow ";
+      const pyramidHeight = 10;
+      if (channel === channelToSpam) {
+        for (let i = 0; i < pyramidHeight - 1; i++) {
+          twitchClient
+            .say(channel, emoteToSpam.repeat(i + 1))
+            .catch(console.error);
+        }
+        for (let i = 0; i < pyramidHeight; i++) {
+          twitchClient
+            .say(channel, emoteToSpam.repeat(pyramidHeight - i))
+            .catch(console.error);
+        }
+      }
     }
   });
   twitchClient.on("message", (channel, tags, message, self) => {
@@ -128,6 +147,7 @@ const main = async (logger: Logger, logDir: string) => {
           clientSecret: osuClientSecret,
         },
         parseInt(osuDefaultId),
+        enableOsuBeatmapRecognition,
         logger
       ).catch((err) => {
         logger.error(err);

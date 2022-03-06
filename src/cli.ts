@@ -15,6 +15,7 @@ export enum CliVariable {
   OSU_CLIENT_ID = "OSU_CLIENT_ID",
   OSU_CLIENT_SECRET = "OSU_CLIENT_SECRET",
   OSU_DEFAULT_ID = "OSU_DEFAULT_ID",
+  OSU_RECOGNIZE_MAPS = "OSU_RECOGNIZE_MAPS",
 }
 
 export const printCliVariablesToConsole = () => {

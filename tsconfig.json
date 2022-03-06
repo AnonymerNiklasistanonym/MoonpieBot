@@ -34,6 +34,7 @@
             "src/commands/moonpie/leaderboard.ts",
             "src/commands/moonpie/user.ts",
             "src/commands/osu.ts",
+            "src/commands/osu/beatmap.ts",
             "src/commands/osu/pp.ts",
             "src/commands/osu/rp.ts",
             "src/database/core.ts",
