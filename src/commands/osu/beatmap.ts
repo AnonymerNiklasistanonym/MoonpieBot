@@ -9,8 +9,7 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
 /**
- * RP (recently played) command: Send the map that was most recently played
- * in osu (via the web api)
+ * Post information about a map and if existing the top score in the chat
  *
  * @param client Twitch client (used to send messages)
  * @param channel Twitch channel where the message should be sent to
@@ -37,8 +36,6 @@ export const commandBeatmap = async (
     osuApiV2Credentials.clientId,
     osuApiV2Credentials.clientSecret
   );
-
-  console.log("Check for score of user", defaultOsuId);
 
   const beatmap = await osuApiV2.beatmaps.lookup(oauthAccessToken, beatmapId);
   let message = mapToStr(beatmap);

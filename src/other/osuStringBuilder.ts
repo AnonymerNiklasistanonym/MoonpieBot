@@ -1,5 +1,6 @@
 import {
   Beatmap,
+  Beatmapset,
   BeatmapUserScore,
   RankedStatus,
   Score,
@@ -65,20 +66,28 @@ export const mapUserToStr = (user: User) => {
   return finalString;
 };
 
-export const mapToStr = (beatmap: Beatmap) => {
+export const generalBeatmapToStr = (
+  beatmap: Beatmap,
+  beatmapset?: Beatmapset | null
+) => {
   let finalString = "";
-
-  if (beatmap.beatmapset !== undefined && beatmap.beatmapset != null) {
-    finalString += `${beatmap.beatmapset.title} '${beatmap.version}' [${
+  if (beatmapset != null) {
+    finalString += `${beatmapset.title} '${beatmap.version}' [${
       Math.round(beatmap.difficulty_rating * 100 + Number.EPSILON) / 100
     }* ${secondsToString(beatmap.total_length)} ${mapRankedStatusToStr(
       beatmap.ranked
-    )}] by ${beatmap.beatmapset.artist}`;
+    )}] by ${beatmapset.artist}`;
     finalString += ` {CS=${beatmap.cs}, DRAIN=${beatmap.drain}, ACC=${beatmap.accuracy}, AR=${beatmap.ar}, BPM=${beatmap.bpm}}`;
     finalString += ` (${beatmap.url})`;
   } else {
-    finalString += " [Error: Beatmapset not found]";
+    finalString += "[Error: Beatmapset not found]";
   }
+  return finalString;
+};
+
+export const mapToStr = (beatmap: Beatmap) => {
+  let finalString = "";
+  finalString += generalBeatmapToStr(beatmap, beatmap.beatmapset);
   return finalString;
 };
 
@@ -101,6 +110,28 @@ export const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
   }
 };
 
+export const generalScoreToStr = (score: Score) => {
+  let finalString = "";
+  if (score.passed) {
+    finalString += `${score.rank}${score.perfect ? " (FC)" : ""}`;
+    if (score.pp != null) {
+      finalString += ` with ${
+        Math.round(score.pp * 100 + Number.EPSILON) / 100
+      }pp`;
+    }
+  } else {
+    finalString += ` fail`;
+  }
+  if (score.mods.length > 0) {
+    finalString += ` using ${score.mods.join(" ")}`;
+  }
+  finalString += ` (${score.statistics.count_300}/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss})`;
+  finalString += ` [max-combo=${score.max_combo},acc=${
+    Math.round((score.accuracy * 100 + Number.EPSILON) * 100) / 100
+  }%]`;
+  return finalString;
+};
+
 export const mapScoreToStr = (score: Score) => {
   let finalString = "";
   if (score.user) {
@@ -108,34 +139,14 @@ export const mapScoreToStr = (score: Score) => {
   } else {
     finalString += "[Error: User not found]";
   }
-  if (score.passed) {
-    finalString += ` achieved a ${score.rank}${score.perfect ? " (FC)" : ""}`;
-    if (score.pp != null) {
-      finalString += ` with ${
-        Math.round(score.pp * 100 + Number.EPSILON) / 100
-      }pp`;
-    }
+  finalString += ` has a ${generalScoreToStr(score)}`;
+  if (score.beatmap) {
+    finalString += ` on ${generalBeatmapToStr(
+      score.beatmap,
+      score.beatmapset
+    )}`;
   } else {
-    finalString += ` failed`;
-  }
-  finalString += ` (${score.statistics.count_300}/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss})`;
-  finalString += ` [max-combo=${score.max_combo},acc=${
-    Math.round((score.accuracy * 100 + Number.EPSILON) * 100) / 100
-  }%]`;
-
-  if (score.beatmap !== undefined && score.beatmapset !== undefined) {
-    finalString += ` on ${score.beatmapset.title} '${score.beatmap.version}' [${
-      Math.round(score.beatmap.difficulty_rating * 100 + Number.EPSILON) / 100
-    }* ${secondsToString(score.beatmap.total_length)} ${mapRankedStatusToStr(
-      score.beatmap.ranked
-    )}] by ${score.beatmapset.artist}`;
-    if (score.mods.length > 0) {
-      finalString += ` using ${score.mods.join(",")}`;
-    }
-    finalString += ` {CS=${score.beatmap.cs}, DRAIN=${score.beatmap.drain}, ACC=${score.beatmap.accuracy}, AR=${score.beatmap.ar}, BPM=${score.beatmap.bpm}}`;
-    finalString += ` (${score.beatmap.url})`;
-  } else {
-    finalString += " [Error: Beatmap/-set not found]";
+    finalString += "[Error: Beatmap not found]";
   }
   if (score.replay) {
     finalString += ` {replay available}`;
@@ -148,24 +159,7 @@ export const mapUserScoreToStr = (score: BeatmapUserScore) => {
   if (score.position === undefined || score.position === -1) {
     return "[Error: No score was found]";
   }
-  if (score.score.passed) {
-    finalString += ` ${score.score.rank}${score.score.perfect ? " (FC)" : ""}`;
-    if (score.score.pp != null) {
-      finalString += ` with ${
-        Math.round(score.score.pp * 100 + Number.EPSILON) / 100
-      }pp`;
-    }
-  } else {
-    finalString += ` fail`;
-  }
-  if (score.score.mods.length > 0) {
-    finalString += ` using ${score.score.mods.join(" ")}`;
-  }
-  finalString += ` (${score.score.statistics.count_300}/${score.score.statistics.count_100}/${score.score.statistics.count_50}/${score.score.statistics.count_miss})`;
-  finalString += ` [max-combo=${score.score.max_combo},acc=${
-    Math.round((score.score.accuracy * 100 + Number.EPSILON) * 100) / 100
-  }%]`;
-
+  finalString += ` ${generalScoreToStr(score.score)}`;
   if (score.score.replay) {
     finalString += ` {replay available}`;
   }
