@@ -7,6 +7,7 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import { ScoresType } from "osu-api-v2/lib/users/scores";
 import { OsuApiV2Credentials } from "../osu";
+import { secondsToString } from "../../other/timePeriodToString";
 
 export const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
   switch (rankedStatus) {
@@ -48,14 +49,15 @@ export const mapScoreToStr = (score: Score) => {
   }%]`;
 
   if (score.beatmap !== undefined && score.beatmapset !== undefined) {
-    finalString += ` on ${score.beatmapset.title} '${
-      score.beatmap.version
-    }' [${mapRankedStatusToStr(score.beatmap.ranked)}] by ${
-      score.beatmapset.artist
-    }`;
+    finalString += ` on ${score.beatmapset.title} '${score.beatmap.version}' [${
+      Math.round(score.beatmap.difficulty_rating * 100 + Number.EPSILON) / 100
+    }* ${secondsToString(score.beatmap.total_length)} ${mapRankedStatusToStr(
+      score.beatmap.ranked
+    )}] by ${score.beatmapset.artist}`;
     if (score.mods.length > 0) {
       finalString += ` using ${score.mods.join(",")}`;
     }
+    finalString += ` {CS=${score.beatmap.cs}, DRAIN=${score.beatmap.drain}, ACC=${score.beatmap.accuracy}, AR=${score.beatmap.ar}, BPM=${score.beatmap.bpm}}`;
     finalString += ` (${score.beatmap.url})`;
   } else {
     finalString += " [Error: Beatmap/-set not found]";
