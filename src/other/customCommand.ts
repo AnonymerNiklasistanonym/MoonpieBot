@@ -1,4 +1,7 @@
-import { loggerCommand } from "../commands/commandHelper";
+import {
+  errorMessageIdUndefined,
+  loggerCommand,
+} from "../commands/commandHelper";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 import { parseMessage } from "./parseMessage";
@@ -30,6 +33,15 @@ export const checkCustomCommand = async (
   commandCount: number,
   logger: Logger
 ): Promise<boolean> => {
+  if (tags.id === undefined) {
+    throw errorMessageIdUndefined();
+  }
+  if (tags.username === undefined) {
+    throw Error(
+      `Unable to parse message ${tags.id} since the username is undefined!`
+    );
+  }
+
   if (userLevel === "vip") {
     return false;
   }
@@ -49,7 +61,7 @@ export const checkCustomCommand = async (
   if (channels.find((a) => a === channel)) {
     const sentMessage = await client.say(
       channel,
-      parseMessage(messageCommand, commandCount, match)
+      parseMessage(messageCommand, match, commandCount, tags.username)
     );
     loggerCommand(
       logger,

@@ -19,7 +19,7 @@ export const registerTimer = (
     logger.debug(`Timer triggered ${cronString}: "${message}"`);
     for (const channel of channels) {
       client
-        .say(channel, parseMessage(message, 0, []))
+        .say(channel, parseMessage(message, [message], 0, "<not_available>"))
         .then((sentMessage) => {
           loggerCommand(
             logger,

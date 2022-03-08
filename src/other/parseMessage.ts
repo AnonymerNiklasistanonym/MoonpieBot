@@ -8,8 +8,9 @@ export const getMacroArgs = (macroContent: string) => {
 
 export const parseMessage = (
   message: string,
+  regexGroups: RegExpMatchArray,
   count: number,
-  regexGroups: RegExpMatchArray
+  userName: string
 ): string => {
   return message.replace(/\$\((.*?)\)/g, (macroContent, ...groups) => {
     if (groups[0] !== undefined && typeof groups[0] === "string") {
@@ -41,6 +42,9 @@ export const parseMessage = (
           return `${regexGroups[parseInt(macroArgs[0])]}`;
         }
         return "[ERROR: <group> More than 1 argument detected]";
+      }
+      if (groups[0] === "user") {
+        return userName;
       }
       return `[ERROR: <${groups[0]}> detected but not supported]`;
     }

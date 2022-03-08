@@ -1,22 +1,42 @@
 [
     {
-        "name": "Custom command 1",
+        "name": "Custom command 1 > Basic",
         "channels": [
             "#salk1n616"
         ],
-        "message": "Test $(count) times detected",
-        "regexString": "!test",
+        "message": "Test command was called $(count) times (1-10=$(random-1-10))",
+        "regexString": "!testBasic",
         "count": 0,
         "userLevel": "everyone"
     },
     {
-        "name": "Custom command 2",
+        "name": "Custom command 2 > RegEx groups",
         "channels": [
             "#salk1n616"
         ],
-        "message": "Advanced $(count) times test detected: '$(group-1)'",
-        "regexString": "!test\\s(.*)",
+        "message": "Test command query is: '$(group-1)'",
+        "regexString": "!test(?:\\s*(.*?)\\s*$)?",
         "count": 20,
+        "userLevel": "everyone"
+    },
+    {
+        "name": "Custom command 3 > Reply to user",
+        "channels": [
+            "#salk1n616"
+        ],
+        "message": "@$(user) pong",
+        "regexString": "!ping",
+        "count": 0,
+        "userLevel": "everyone"
+    },
+    {
+        "name": "Custom command 4 > Shoutout",
+        "channels": [
+            "#salk1n616"
+        ],
+        "message": "Go check out $(group-1) at https://www.twitch.tv/$(group-1) <3",
+        "regexString": "!so\\s+(.+?)\\s*$",
+        "count": 3,
         "userLevel": "everyone"
     }
 ]
