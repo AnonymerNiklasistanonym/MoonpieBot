@@ -2,7 +2,9 @@
   "watch": [
     "src",
     "tests",
-    ".env"
+    ".env",
+    "customTimers.json",
+    "customCommands.json"
   ],
   "ext": "ts,js,json",
   "exec": "npm run build:dev && node -r dotenv/config ."

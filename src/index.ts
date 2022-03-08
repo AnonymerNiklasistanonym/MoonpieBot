@@ -1,6 +1,7 @@
 // Package imports
 import dotenv from "dotenv";
 import * as path from "path";
+import { promises as fs } from "fs";
 // Local imports
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
@@ -15,12 +16,23 @@ import {
   getCliVariableValueDefault,
   printCliVariablesToConsole,
 } from "./cli";
+import { registerTimer } from "./other/timerTest";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 
 /** Path to the root directory of the source code */
 const pathToRootDir = path.join(__dirname, "..", "..");
+
+const pathCustomTimersFile = path.join(__dirname, "..", "customTimers.json");
+const fileExists = async (path: string) =>
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  !!(await fs.stat(path).catch(() => false));
+interface CustomTimerJson {
+  channels: string[];
+  message: string;
+  cronString: string;
+}
 
 /**
  * Main method that runs the bot
@@ -173,6 +185,26 @@ const main = async (logger: Logger, logDir: string) => {
 
   // Connect Twitch client to Twitch
   await twitchClient.connect();
+
+  // Register custom timers
+  try {
+    if (await fileExists(pathCustomTimersFile)) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const content = await fs.readFile(pathCustomTimersFile);
+      const customTimers = JSON.parse(content.toString()) as CustomTimerJson[];
+      for (const customTimer of customTimers) {
+        registerTimer(
+          twitchClient,
+          customTimer.channels,
+          customTimer.message,
+          customTimer.cronString,
+          logger
+        );
+      }
+    }
+  } catch (err) {
+    logger.error(err);
+  }
 };
 
 // Check if this file is the entry point, otherwise don't run the main method

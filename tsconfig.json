@@ -46,7 +46,8 @@
             "src/database/moonpie/requests.ts",
             "src/database/moonpieDb.ts",
             "src/other/osuStringBuilder.ts",
-            "src/other/timePeriodToString.ts"
+            "src/other/timePeriodToString.ts",
+            "src/other/timerTest.ts"
         ],
         "out": "docs"
     }

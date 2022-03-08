@@ -1,0 +1,16 @@
+[
+    {
+        "channels": [
+            "#salk1n616"
+        ],
+        "message": "Test every 10 seconds",
+        "cronString": "*/10 * * * * *"
+    },
+    {
+        "channels": [
+            "#salk1n616"
+        ],
+        "message": "Test every 30 seconds",
+        "cronString": "*/30 * * * * *"
+    }
+]

@@ -171,6 +171,8 @@ tmp/
 src/moonpiedb.ts
 *.db
 *.db-journal
+customTimers.json
+customCommands.json
 
 # Documentation
 docs
