@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Custom command 1",
+        "channels": [
+            "#salk1n616"
+        ],
+        "message": "Test $(count) times detected",
+        "regexString": "!test",
+        "count": 0,
+        "userLevel": "everyone"
+    },
+    {
+        "name": "Custom command 2",
+        "channels": [
+            "#salk1n616"
+        ],
+        "message": "Advanced $(count) times test detected: '$(group-1)'",
+        "regexString": "!test\\s(.*)",
+        "count": 20,
+        "userLevel": "everyone"
+    }
+]

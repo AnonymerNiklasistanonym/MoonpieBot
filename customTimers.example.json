@@ -1,5 +1,6 @@
 [
     {
+        "name": "Custom timer 1",
         "channels": [
             "#salk1n616"
         ],
@@ -7,6 +8,7 @@
         "cronString": "*/10 * * * * *"
     },
     {
+        "name": "Custom timer 1",
         "channels": [
             "#salk1n616"
         ],

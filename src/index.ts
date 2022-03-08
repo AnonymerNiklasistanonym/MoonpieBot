@@ -16,7 +16,8 @@ import {
   getCliVariableValueDefault,
   printCliVariablesToConsole,
 } from "./cli";
-import { registerTimer } from "./other/timerTest";
+import { checkCustomCommand } from "./other/customCommand";
+import { registerTimer } from "./other/customTimer";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
@@ -24,14 +25,25 @@ import type { ErrorWithCode } from "./error";
 /** Path to the root directory of the source code */
 const pathToRootDir = path.join(__dirname, "..", "..");
 
-const pathCustomTimersFile = path.join(__dirname, "..", "customTimers.json");
+// TODO Move to database tables so they can be changed on the fly
+const pathCustomTimers = path.join(__dirname, "..", "customTimers.json");
+const pathCustomCommands = path.join(__dirname, "..", "customCommands.json");
 const fileExists = async (path: string) =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   !!(await fs.stat(path).catch(() => false));
 interface CustomTimerJson {
+  name?: string;
   channels: string[];
   message: string;
   cronString: string;
+}
+interface CustomCommandJson {
+  name?: string;
+  channels: string[];
+  message: string;
+  regexString: string;
+  count?: number;
+  userLevel?: "broadcaster" | "mod" | "vip" | "everyone";
 }
 
 /**
@@ -69,6 +81,34 @@ const main = async (logger: Logger, logDir: string) => {
     "ON";
   if (!enableOsu) {
     logger.info("Osu features are disabled since not all variables were set");
+  }
+
+  // Load custom commands
+  const customCommands: CustomCommandJson[] = [];
+  try {
+    if (await fileExists(pathCustomCommands)) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const content = await fs.readFile(pathCustomCommands);
+      customCommands.push(
+        ...(JSON.parse(content.toString()) as CustomCommandJson[])
+      );
+    }
+  } catch (err) {
+    logger.error(err);
+  }
+
+  // Load custom timers
+  const customTimers: CustomTimerJson[] = [];
+  try {
+    if (await fileExists(pathCustomTimers)) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const content = await fs.readFile(pathCustomTimers);
+      customTimers.push(
+        ...(JSON.parse(content.toString()) as CustomTimerJson[])
+      );
+    }
+  } catch (err) {
+    logger.error(err);
   }
 
   await moonpieDbSetupTables(databasePath, logger);
@@ -175,6 +215,46 @@ const main = async (logger: Logger, logDir: string) => {
           .catch(logger.error);
       });
     }
+
+    // Check custom commands
+    try {
+      for (const customCommand of customCommands) {
+        checkCustomCommand(
+          twitchClient,
+          channel,
+          tags,
+          message,
+          customCommand.channels,
+          customCommand.message,
+          customCommand.regexString,
+          customCommand.userLevel,
+          customCommand.name,
+          logger
+        )
+          .then((commandExecuted) => {
+            if (commandExecuted) {
+              if (customCommand.count === undefined) {
+                customCommand.count = 1;
+              } else {
+                customCommand.count += 1;
+              }
+              // Save custom command counts to files
+              // eslint-disable-next-line security/detect-non-literal-fs-filename
+              fs.writeFile(
+                pathCustomCommands,
+                JSON.stringify(customCommands, undefined, 4)
+              )
+                .then(() => {
+                  logger.info("Custom commands were saved");
+                })
+                .catch(logger.error);
+            }
+          })
+          .catch(logger.error);
+      }
+    } catch (err) {
+      logger.error(err);
+    }
   });
 
   process.on("SIGINT", () => {
@@ -188,19 +268,14 @@ const main = async (logger: Logger, logDir: string) => {
 
   // Register custom timers
   try {
-    if (await fileExists(pathCustomTimersFile)) {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      const content = await fs.readFile(pathCustomTimersFile);
-      const customTimers = JSON.parse(content.toString()) as CustomTimerJson[];
-      for (const customTimer of customTimers) {
-        registerTimer(
-          twitchClient,
-          customTimer.channels,
-          customTimer.message,
-          customTimer.cronString,
-          logger
-        );
-      }
+    for (const customTimer of customTimers) {
+      registerTimer(
+        twitchClient,
+        customTimer.channels,
+        customTimer.message,
+        customTimer.cronString,
+        logger
+      );
     }
   } catch (err) {
     logger.error(err);
