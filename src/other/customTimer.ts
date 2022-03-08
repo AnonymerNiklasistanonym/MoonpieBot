@@ -2,6 +2,7 @@ import cron from "node-cron";
 import { loggerCommand } from "../commands/commandHelper";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import { parseMessage } from "./parseMessage";
 
 export const registerTimer = (
   client: Client,
@@ -18,7 +19,7 @@ export const registerTimer = (
     logger.debug(`Timer triggered ${cronString}: "${message}"`);
     for (const channel of channels) {
       client
-        .say(channel, message)
+        .say(channel, parseMessage(message, 0, []))
         .then((sentMessage) => {
           loggerCommand(
             logger,

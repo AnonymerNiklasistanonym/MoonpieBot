@@ -4,7 +4,7 @@
         "channels": [
             "#salk1n616"
         ],
-        "message": "Test every 10 seconds",
+        "message": "Test every 10 seconds: $(random)%",
         "cronString": "*/10 * * * * *"
     },
     {

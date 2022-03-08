@@ -229,6 +229,7 @@ const main = async (logger: Logger, logDir: string) => {
           customCommand.regexString,
           customCommand.userLevel,
           customCommand.name,
+          customCommand.count ? customCommand.count + 1 : 1,
           logger
         )
           .then((commandExecuted) => {
