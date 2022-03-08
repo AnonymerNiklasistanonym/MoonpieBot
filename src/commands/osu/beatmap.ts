@@ -47,7 +47,7 @@ export const commandBeatmap = async (
       GameMode.osu,
       undefined
     );
-    message += ` - The current top score is ${mapUserScoreToStr(score)}`;
+    message += ` - Current top score is ${mapUserScoreToStr(score)}`;
   } catch (err) {
     message += ` No existing score found`;
   }

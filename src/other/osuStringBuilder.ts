@@ -77,7 +77,11 @@ export const generalBeatmapToStr = (
     }* ${secondsToString(beatmap.total_length)} ${mapRankedStatusToStr(
       beatmap.ranked
     )}] by ${beatmapset.artist}`;
-    finalString += ` {CS=${beatmap.cs}, DRAIN=${beatmap.drain}, ACC=${beatmap.accuracy}, AR=${beatmap.ar}, BPM=${beatmap.bpm}}`;
+    const beatmapUpdate = new Date(beatmap.last_updated);
+    finalString += ` from ${
+      monthNames[beatmapUpdate.getMonth()]
+    } ${beatmapUpdate.getFullYear()}`;
+    finalString += ` {CS=${beatmap.cs}, DRAIN=${beatmap.drain}, ACC=${beatmap.accuracy}, AR=${beatmap.ar}, BPM=${beatmap.bpm}, CC=${beatmap.count_circles}, SLC=${beatmap.count_sliders}, SPC=${beatmap.count_spinners}}`;
     finalString += ` (${beatmap.url})`;
   } else {
     finalString += "[Error: Beatmapset not found]";
@@ -120,15 +124,24 @@ export const generalScoreToStr = (score: Score) => {
       }pp`;
     }
   } else {
-    finalString += ` fail`;
+    finalString += " fail";
   }
   if (score.mods.length > 0) {
     finalString += ` using ${score.mods.join(" ")}`;
   }
   finalString += ` (${score.statistics.count_300}/${score.statistics.count_100}/${score.statistics.count_50}/${score.statistics.count_miss})`;
-  finalString += ` [max-combo=${score.max_combo},acc=${
+  finalString += ` [mc=${score.max_combo}, acc=${
     Math.round((score.accuracy * 100 + Number.EPSILON) * 100) / 100
   }%]`;
+  const scoreDate = new Date(score.created_at);
+  const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
+  if (scoreDateRangeMs < 1000 * 60 * 60 * 24) {
+    finalString += ` from ${secondsToString(scoreDateRangeMs / 1000)} ago`;
+  } else {
+    finalString += ` from ${
+      monthNames[scoreDate.getMonth()]
+    } ${scoreDate.getFullYear()}`;
+  }
   return finalString;
 };
 
