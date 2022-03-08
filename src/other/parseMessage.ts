@@ -5,7 +5,11 @@ const randomIntFromInterval = (min: number, max: number) => {
 };
 
 export const getMacroArgs = (macroContent: string) => {
-  return [...macroContent.matchAll(/-([^-]+)/g)].map((a) => a[1]);
+  // eslint-disable-next-line security/detect-unsafe-regex
+  return [...macroContent.matchAll(/-([^-=]+)(?:=([^=]+))?/g)].map((a) => ({
+    name: a[1],
+    value: a[2],
+  }));
 };
 
 export const parseMessage = async (
@@ -13,18 +17,27 @@ export const parseMessage = async (
   regexGroups: RegExpMatchArray,
   count: number,
   userName: string,
-  twitchApiClient: ApiClient | undefined
+  twitchApiClient: ApiClient | undefined,
+  depth = 0
 ): Promise<string> => {
+  if (depth > 1) {
+    return "Stop parsing message because a recursion was detected";
+  }
   // First calculate all the replace data
+  const regexMacro = /\$\(((\S*?)=(?:\$\(\S*?\)).*?|(?:\S*?))\)/g;
   const replaceData: Promise<string>[] = [];
-  message.replace(/\$\((.*?)\)/g, (macroContent, ...groups) => {
-    if (groups[0] !== undefined && typeof groups[0] === "string") {
-      const macroArgs = getMacroArgs(groups[0]);
-      if (groups[0] === "count") {
+  message.replace(regexMacro, (macroContent, ...groups) => {
+    const macroString =
+      groups[0] !== undefined && typeof groups[0] === "string"
+        ? groups[0]
+        : undefined;
+    if (macroString !== undefined) {
+      const macroArgs = getMacroArgs(macroString);
+      if (macroString === "count") {
         replaceData.push(Promise.resolve(`${count}`));
         return "<bad>";
       }
-      if (groups[0].startsWith("random")) {
+      if (macroString.startsWith("random")) {
         if (macroArgs.length === 0) {
           replaceData.push(Promise.resolve(`${randomIntFromInterval(0, 100)}`));
           return "<bad>";
@@ -32,7 +45,7 @@ export const parseMessage = async (
         if (macroArgs.length === 1) {
           replaceData.push(
             Promise.resolve(
-              `${randomIntFromInterval(0, parseInt(macroArgs[0]))}`
+              `${randomIntFromInterval(0, parseInt(macroArgs[0].name))}`
             )
           );
           return "<bad>";
@@ -41,8 +54,8 @@ export const parseMessage = async (
           replaceData.push(
             Promise.resolve(
               `${randomIntFromInterval(
-                parseInt(macroArgs[0]),
-                parseInt(macroArgs[1])
+                parseInt(macroArgs[0].name),
+                parseInt(macroArgs[1].name)
               )}`
             )
           );
@@ -53,7 +66,7 @@ export const parseMessage = async (
         );
         return "<bad>";
       }
-      if (groups[0].startsWith("group")) {
+      if (macroString.startsWith("group")) {
         if (macroArgs.length === 0) {
           replaceData.push(
             Promise.resolve("[ERROR: <group> No arguments detected]")
@@ -62,7 +75,7 @@ export const parseMessage = async (
         }
         if (macroArgs.length === 1) {
           replaceData.push(
-            Promise.resolve(`${regexGroups[parseInt(macroArgs[0])]}`)
+            Promise.resolve(`${regexGroups[parseInt(macroArgs[0].name)]}`)
           );
           return "<bad>";
         }
@@ -71,47 +84,64 @@ export const parseMessage = async (
         );
         return "<bad>";
       }
-      if (groups[0] === "user") {
+      if (macroString === "user") {
         return userName;
       }
-      if (groups[0] === "twitch") {
+      if (macroString.startsWith("twitch")) {
         if (twitchApiClient === undefined) {
           replaceData.push(
             Promise.resolve(
-              `[ERROR: <${groups[0]}> twitch api client undefined]`
+              `[ERROR: <${macroString}> twitch api client undefined]`
             )
           );
           return "<bad>";
         }
-        replaceData.push(
-          twitchApiClient.users
-            .getUserByName(userName)
-            .then((user) => {
-              if (user !== null) {
-                return twitchApiClient.channels.getChannelInfo(user.id);
-              } else {
-                throw Error(`twitch request for user information failed`);
-              }
-            })
-            .then((channel) => {
-              if (!channel) {
+        if (macroArgs[0].name === "channel_game") {
+          replaceData.push(
+            parseMessage(
+              macroArgs[0].value,
+              regexGroups,
+              count,
+              userName,
+              twitchApiClient,
+              depth + 1
+            )
+              .then((parsedMessage) =>
+                twitchApiClient.users.getUserByName(parsedMessage)
+              )
+              .then((user) => {
+                if (user !== null) {
+                  return twitchApiClient.channels.getChannelInfo(user.id);
+                } else {
+                  throw Error(`twitch request for user information failed`);
+                }
+              })
+              .then((channel) => {
+                if (!channel) {
+                  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                  return `[ERROR: <${macroString}> twitch request failed]`;
+                }
+                return `${channel.gameName} `;
+              })
+              .catch((err) => {
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                return `[ERROR: <${groups[0]}> twitch request failed]`;
-              }
-              return `They were last playing ${channel.gameName}`;
-            })
-            .catch((err) => {
-              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              return `[ERROR: <${groups[0]}> twitch request failed: ${
-                (err as Error).message
-              }]`;
-            })
+                return `[ERROR: <${macroString}> twitch request failed: ${
+                  (err as Error).message
+                }]`;
+              })
+          );
+          return "<bad>";
+        }
+        replaceData.push(
+          Promise.resolve(
+            `[ERROR: <${macroString}> but unsupported argument ${macroArgs[0].name}]`
+          )
         );
         return "<bad>";
       }
 
       replaceData.push(
-        Promise.resolve(`[ERROR: <${groups[0]}> detected but not supported]`)
+        Promise.resolve(`[ERROR: <${macroString}> detected but not supported]`)
       );
       return "<bad>";
     }
@@ -126,7 +156,7 @@ export const parseMessage = async (
 
   const strings = await Promise.all(replaceData);
   let index = 0;
-  return message.replace(/\$\((.*?)\)/g, () => {
+  return message.replace(regexMacro, () => {
     return strings[index++];
   });
 };
