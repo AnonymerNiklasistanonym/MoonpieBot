@@ -2,9 +2,10 @@ import {
   errorMessageIdUndefined,
   loggerCommand,
 } from "../commands/commandHelper";
+import { parseMessage } from "./parseMessage";
+import type { ApiClient } from "@twurple/api";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
-import { parseMessage } from "./parseMessage";
 
 const logDetectedCommand = (
   logger: Logger,
@@ -31,6 +32,7 @@ export const checkCustomCommand = async (
   userLevel: "broadcaster" | "mod" | "vip" | "everyone" | undefined,
   commandName: string | undefined,
   commandCount: number,
+  twitchApiClient: ApiClient | undefined,
   logger: Logger
 ): Promise<boolean> => {
   if (tags.id === undefined) {
@@ -59,10 +61,14 @@ export const checkCustomCommand = async (
     `!customCommand ${commandName ? commandName : regex}`
   );
   if (channels.find((a) => a === channel)) {
-    const sentMessage = await client.say(
-      channel,
-      parseMessage(messageCommand, match, commandCount, tags.username)
+    const parsedMessage = await parseMessage(
+      messageCommand,
+      match,
+      commandCount,
+      tags.username,
+      twitchApiClient
     );
+    const sentMessage = await client.say(channel, parsedMessage);
     loggerCommand(
       logger,
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

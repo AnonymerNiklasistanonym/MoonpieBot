@@ -21,6 +21,8 @@ import { registerTimer } from "./other/customTimer";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
+import { ApiClient } from "@twurple/api";
+import { ClientCredentialsAuthProvider } from "@twurple/auth";
 
 /** Path to the root directory of the source code */
 const pathToRootDir = path.join(__dirname, "..", "..");
@@ -112,6 +114,31 @@ const main = async (logger: Logger, logDir: string) => {
   }
 
   await moonpieDbSetupTables(databasePath, logger);
+
+  const twitchClientId = getCliVariableValueDefault(
+    CliVariable.TWITCH_CLIENT_ID,
+    undefined
+  );
+  const twitchClientSecret = getCliVariableValueDefault(
+    CliVariable.TWITCH_CLIENT_SECRET,
+    undefined
+  );
+  const enableTwitchApiCalls =
+    twitchClientId !== undefined && twitchClientSecret !== undefined;
+  let twitchApiClient: ApiClient | undefined = undefined;
+  if (!enableTwitchApiCalls) {
+    logger.info(
+      "Twitch API features are disabled since not all variables were set"
+    );
+  } else {
+    const authProvider = new ClientCredentialsAuthProvider(
+      twitchClientId,
+      twitchClientSecret
+    );
+    twitchApiClient = new ApiClient({
+      authProvider,
+    });
+  }
 
   // Create TwitchClient and listen to certain events
   const twitchClient = createTwitchClient(
@@ -230,6 +257,7 @@ const main = async (logger: Logger, logDir: string) => {
           customCommand.userLevel,
           customCommand.name,
           customCommand.count ? customCommand.count + 1 : 1,
+          twitchApiClient,
           logger
         )
           .then((commandExecuted) => {
@@ -275,6 +303,7 @@ const main = async (logger: Logger, logDir: string) => {
         customTimer.channels,
         customTimer.message,
         customTimer.cronString,
+        twitchApiClient,
         logger
       );
     }
