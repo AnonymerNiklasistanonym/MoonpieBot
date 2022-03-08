@@ -106,6 +106,14 @@ It also can recognize beatmap links in chat and print map information (and if ex
 
    If there are errors you can probably find advanced log messages in the log files in the directory `logs` that is created while running the bot.
 
+## Helping Resources
+
+To add custom commands a regex needs to be created.
+For easily testing a custom regex you can use https://regex101.com/.
+
+To add custom timers a cron string needs to be created.
+For easily seeing to what a cron string resolves to you can use https://crontab.cronhub.io/.
+
 ## TODOs
 
 Things that need to be added before it can be released:
