@@ -283,6 +283,7 @@ const main = async (logger: Logger, logDir: string) => {
         parseInt(osuDefaultId),
         enableOsuBeatmapRecognition,
         osuIrcBot,
+        osuIrcRequestTarget,
         logger
       ).catch((err) => {
         logger.error(err);

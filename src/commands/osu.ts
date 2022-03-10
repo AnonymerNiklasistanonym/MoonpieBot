@@ -59,6 +59,7 @@ export const osuChatHandler = async (
   osuDefaultId: number,
   enableOsuBeatmapRecognition: undefined | boolean,
   osuIrcBot: undefined | IrcClient,
+  osuIrcRequestTarget: undefined | string,
   logger: Logger
 ): Promise<void> => {
   // > !rp
@@ -105,6 +106,7 @@ export const osuChatHandler = async (
           osuDefaultId,
           match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
           osuIrcBot,
+          osuIrcRequestTarget,
           logger
         );
       }

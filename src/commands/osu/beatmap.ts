@@ -29,6 +29,7 @@ export const commandBeatmap = async (
   defaultOsuId: number,
   beatmapId: number,
   osuIrcBot: undefined | IrcClient,
+  osuIrcRequestTarget: undefined | string,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -41,9 +42,9 @@ export const commandBeatmap = async (
   );
 
   const beatmap = await osuApiV2.beatmaps.lookup(oauthAccessToken, beatmapId);
-  if (osuIrcBot) {
+  if (osuIrcBot && osuIrcRequestTarget) {
     osuIrcBot.say(
-      "Ztalx",
+      osuIrcRequestTarget,
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       `${userName} requested [${beatmap.url} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`
     );
