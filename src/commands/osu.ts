@@ -11,6 +11,7 @@
 //       Detect beatmap links and send them to a user
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+import type { Client as IrcClient } from "irc";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 import { commandBeatmap } from "./osu/beatmap";
@@ -57,6 +58,7 @@ export const osuChatHandler = async (
   osuApiV2Credentials: OsuApiV2Credentials,
   osuDefaultId: number,
   enableOsuBeatmapRecognition: undefined | boolean,
+  osuIrcBot: undefined | IrcClient,
   logger: Logger
 ): Promise<void> => {
   // > !rp
@@ -98,9 +100,11 @@ export const osuChatHandler = async (
           client,
           channel,
           tags.id,
+          tags.username,
           osuApiV2Credentials,
           osuDefaultId,
           match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
+          osuIrcBot,
           logger
         );
       }

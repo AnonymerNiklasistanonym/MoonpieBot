@@ -23,6 +23,7 @@ import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import { ApiClient } from "@twurple/api";
 import { ClientCredentialsAuthProvider } from "@twurple/auth";
+import irc from "irc";
 
 /** Path to the root directory of the source code */
 const pathToRootDir = path.join(__dirname, "..", "..");
@@ -81,8 +82,62 @@ const main = async (logger: Logger, logDir: string) => {
   const enableOsuBeatmapRecognition =
     getCliVariableValueDefault(CliVariable.OSU_RECOGNIZE_MAPS, undefined) ===
     "ON";
+  const osuIrcPassword = getCliVariableValueDefault(
+    CliVariable.OSU_IRC_PASSWORD,
+    undefined
+  );
+  const osuIrcUsername = getCliVariableValueDefault(
+    CliVariable.OSU_IRC_USERNAME,
+    undefined
+  );
+  const osuIrcRequestTarget = getCliVariableValueDefault(
+    CliVariable.OSU_IRC_REQUEST_TARGET,
+    undefined
+  );
+  const enableOsuIrc =
+    osuIrcPassword !== undefined &&
+    osuIrcUsername !== undefined &&
+    osuIrcRequestTarget !== undefined;
+
+  let osuIrcBot: irc.Client | undefined = undefined;
+  if (enableOsu && enableOsuBeatmapRecognition && enableOsuIrc) {
+    // TODO Handle authentication errors
+    osuIrcBot = new irc.Client("irc.ppy.sh", osuIrcUsername, {
+      channels: [
+        /*"#osu"*/
+      ],
+      password: osuIrcPassword,
+      port: 6667,
+    });
+    osuIrcBot.addListener(
+      "message",
+      (from: string, to: string, text: string, message: string) => {
+        logger.info("message: " + JSON.stringify({ from, to, text, message }));
+      }
+    );
+    osuIrcBot.addListener(
+      "pm",
+      (from: string, to: string, text: string, message: string) => {
+        logger.info("pm: " + JSON.stringify({ from, to, text, message }));
+      }
+    );
+    osuIrcBot.addListener("error", (message: string) => {
+      logger.info(`IRC error: ${JSON.stringify(message)}`);
+    });
+    osuIrcBot.addListener("registered", (info: string) => {
+      logger.info(`Registered: ${JSON.stringify(info)}`);
+    });
+  }
   if (!enableOsu) {
     logger.info("Osu features are disabled since not all variables were set");
+  } else if (!enableOsuBeatmapRecognition) {
+    logger.info(
+      "Osu beatmap recognition features are disabled since not all variables were set"
+    );
+  } else if (!enableOsuIrc) {
+    logger.info(
+      "Osu IRC features are disabled since not all variables were set"
+    );
   }
 
   // Load custom commands
@@ -227,6 +282,7 @@ const main = async (logger: Logger, logDir: string) => {
         },
         parseInt(osuDefaultId),
         enableOsuBeatmapRecognition,
+        osuIrcBot,
         logger
       ).catch((err) => {
         logger.error(err);

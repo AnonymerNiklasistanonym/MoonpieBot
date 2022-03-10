@@ -5,6 +5,7 @@ import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
 import { OsuApiV2Credentials } from "../osu";
 // Type imports
+import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
@@ -23,9 +24,11 @@ export const commandBeatmap = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
+  userName: string | undefined,
   osuApiV2Credentials: OsuApiV2Credentials,
   defaultOsuId: number,
   beatmapId: number,
+  osuIrcBot: undefined | IrcClient,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -38,6 +41,13 @@ export const commandBeatmap = async (
   );
 
   const beatmap = await osuApiV2.beatmaps.lookup(oauthAccessToken, beatmapId);
+  if (osuIrcBot) {
+    osuIrcBot.say(
+      "Ztalx",
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      `${userName} requested [${beatmap.url} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`
+    );
+  }
   let message = mapToStr(beatmap);
   try {
     const score = await osuApiV2.beatmaps.scores.users(
