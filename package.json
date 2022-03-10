@@ -64,7 +64,7 @@
         "@twurple/api": "^5.0.18",
         "@twurple/auth": "^5.0.18",
         "dotenv": "^16.0.0",
-        "irc": "^0.5.2",
+        "irc": "https://github.com/AnonymerNiklasistanonym/node-irc/tarball/91abd899ec35dbec6f90787f67ce8fa8fc1aeadc",
         "node-cron": "^3.0.0",
         "osu-api-v2": "^0.0.13",
         "sqlite3": "^4.2.0",

@@ -99,16 +99,18 @@ const main = async (logger: Logger, logDir: string) => {
     osuIrcUsername !== undefined &&
     osuIrcRequestTarget !== undefined;
 
-  let osuIrcBot: irc.Client | undefined = undefined;
+  let osuIrcBot: (() => irc.Client) | undefined = undefined;
   if (enableOsu && enableOsuBeatmapRecognition && enableOsuIrc) {
     // TODO Handle authentication errors
-    osuIrcBot = new irc.Client("irc.ppy.sh", osuIrcUsername, {
-      channels: [
-        /*"#osu"*/
-      ],
-      password: osuIrcPassword,
-      port: 6667,
-    });
+    osuIrcBot = () =>
+      new irc.Client("irc.ppy.sh", osuIrcUsername, {
+        channels: [
+          /*"#osu"*/
+        ],
+        password: osuIrcPassword,
+        port: 6667,
+      });
+    /*
     osuIrcBot.addListener(
       "message",
       (from: string, to: string, text: string, message: string) => {
@@ -127,6 +129,7 @@ const main = async (logger: Logger, logDir: string) => {
     osuIrcBot.addListener("registered", (info: string) => {
       logger.info(`Registered: ${JSON.stringify(info)}`);
     });
+    */
   }
   if (!enableOsu) {
     logger.info("Osu features are disabled since not all variables were set");

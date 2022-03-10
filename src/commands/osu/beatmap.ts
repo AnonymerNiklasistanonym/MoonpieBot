@@ -8,6 +8,48 @@ import { OsuApiV2Credentials } from "../osu";
 import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import { exec } from "child_process";
+
+export async function isProcessRunning(processName: string): Promise<boolean> {
+  let cmd = "";
+  switch (process.platform) {
+    case "win32":
+      cmd = `tasklist`;
+      break;
+    case "darwin":
+      cmd = `ps -ax | grep ${processName}`;
+      break;
+    case "linux":
+      cmd = `ps -A`;
+      break;
+  }
+
+  if (cmd === "") {
+    return false;
+  }
+
+  return new Promise((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    exec(cmd, (err, stdout, _stderr) => {
+      if (err) reject(err);
+
+      resolve(stdout.toLowerCase().indexOf(processName.toLowerCase()) > -1);
+    });
+  });
+}
+
+/*
+export const osuIsConnectedApi = async (
+  oauthAccessToken: OAuthAccessToken,
+  defaultOsuId: number
+) => {
+  const user = await osuApiV2.users.id(oauthAccessToken, defaultOsuId);
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  console.log(`user[${defaultOsuId}].is_online=${user.is_online}`);
+  // TODO: The new API only accounts for lazer or the website...
+  return false;
+};
+*/
 
 /**
  * Post information about a map and if existing the top score in the chat
@@ -28,7 +70,7 @@ export const commandBeatmap = async (
   osuApiV2Credentials: OsuApiV2Credentials,
   defaultOsuId: number,
   beatmapId: number,
-  osuIrcBot: undefined | IrcClient,
+  osuIrcBot: (() => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
   logger: Logger
 ): Promise<void> => {
@@ -42,13 +84,6 @@ export const commandBeatmap = async (
   );
 
   const beatmap = await osuApiV2.beatmaps.lookup(oauthAccessToken, beatmapId);
-  if (osuIrcBot && osuIrcRequestTarget) {
-    osuIrcBot.say(
-      osuIrcRequestTarget,
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      `${userName} requested [https://osu.ppy.sh/beatmapsets/${beatmap.beatmapset?.id}#osu/${beatmap.id} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`
-    );
-  }
   let message = mapToStr(beatmap);
   try {
     const score = await osuApiV2.beatmaps.scores.users(
@@ -62,13 +97,57 @@ export const commandBeatmap = async (
   } catch (err) {
     message += ` No existing score found`;
   }
-  const sentMessage = await client.say(channel, message);
-
-  loggerCommand(
-    logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { commandId: "osuRp" }
-  );
+  await Promise.all([
+    client.say(channel, message).then((sentMessage) => {
+      loggerCommand(
+        logger,
+        `Successfully replied to message ${messageId}: '${JSON.stringify(
+          sentMessage
+        )}'`,
+        { commandId: "osuRp" }
+      );
+    }),
+    isProcessRunning("osu").then(
+      (osuIsRunning) =>
+        new Promise<void>((resolve, reject) => {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          logger.info(`Osu is connected: ${osuIsRunning}`);
+          if (
+            osuIrcRequestTarget !== undefined &&
+            osuIrcBot !== undefined &&
+            osuIsRunning
+          ) {
+            logger.info("Create IRC connection 1");
+            try {
+              let osuIrcBotInstance: undefined | IrcClient = osuIrcBot();
+              logger.info("Create IRC connection 2");
+              osuIrcBotInstance.connect(2, () => {
+                logger.info("Osu IRC was connected");
+                osuIrcBotInstance?.say(
+                  osuIrcRequestTarget,
+                  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                  `${userName} requested [https://osu.ppy.sh/beatmapsets/${beatmap.beatmapset?.id}#osu/${beatmap.id} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`
+                );
+                osuIrcBotInstance?.say(osuIrcRequestTarget, `${message}`);
+                osuIrcBotInstance?.disconnect("", () => {
+                  osuIrcBotInstance?.conn.end();
+                  osuIrcBotInstance = undefined;
+                  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                  logger.info(
+                    `Osu IRC was disconnected: ${JSON.stringify(
+                      osuIrcBotInstance
+                    )}`
+                  );
+                  resolve();
+                });
+              });
+            } catch (err) {
+              reject();
+            }
+          } else {
+            resolve();
+          }
+        })
+    ),
+  ]);
 };

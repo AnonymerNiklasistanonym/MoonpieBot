@@ -58,7 +58,7 @@ export const osuChatHandler = async (
   osuApiV2Credentials: OsuApiV2Credentials,
   osuDefaultId: number,
   enableOsuBeatmapRecognition: undefined | boolean,
-  osuIrcBot: undefined | IrcClient,
+  osuIrcBot: (() => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
   logger: Logger
 ): Promise<void> => {
