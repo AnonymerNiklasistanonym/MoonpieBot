@@ -26,11 +26,11 @@ import { ClientCredentialsAuthProvider } from "@twurple/auth";
 import irc from "irc";
 
 /** Path to the root directory of the source code */
-const pathToRootDir = path.join(__dirname, "..", "..");
+const pathToRootDir = path.join(__dirname, "..");
 
 // TODO Move to database tables so they can be changed on the fly
-const pathCustomTimers = path.join(__dirname, "..", "customTimers.json");
-const pathCustomCommands = path.join(__dirname, "..", "customCommands.json");
+const pathCustomTimers = path.join(pathToRootDir, "customTimers.json");
+const pathCustomCommands = path.join(pathToRootDir, "customCommands.json");
 const fileExists = async (path: string) =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   !!(await fs.stat(path).catch(() => false));
