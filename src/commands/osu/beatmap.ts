@@ -46,7 +46,7 @@ export const commandBeatmap = async (
     osuIrcBot.say(
       osuIrcRequestTarget,
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      `${userName} requested [${beatmap.url} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`
+      `${userName} requested [https://osu.ppy.sh/beatmapsets/${beatmap.beatmapset?.id}#osu/${beatmap.id} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`
     );
   }
   let message = mapToStr(beatmap);
