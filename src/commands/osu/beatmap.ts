@@ -1,5 +1,5 @@
 // Package imports
-import osuApiV2, { GameMode } from "osu-api-v2";
+import osuApiV2, { GameMode, RankedStatus } from "osu-api-v2";
 // Local imports
 import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
@@ -85,17 +85,23 @@ export const commandBeatmap = async (
 
   const beatmap = await osuApiV2.beatmaps.lookup(oauthAccessToken, beatmapId);
   let message = mapToStr(beatmap);
-  try {
-    const score = await osuApiV2.beatmaps.scores.users(
-      oauthAccessToken,
-      beatmapId,
-      defaultOsuId,
-      GameMode.osu,
-      undefined
-    );
-    message += ` - Current top score is ${mapUserScoreToStr(score)}`;
-  } catch (err) {
-    message += ` No existing score found`;
+  if (
+    beatmap.ranked === RankedStatus.loved ||
+    beatmap.ranked === RankedStatus.qualified ||
+    beatmap.ranked === RankedStatus.ranked
+  ) {
+    try {
+      const score = await osuApiV2.beatmaps.scores.users(
+        oauthAccessToken,
+        beatmapId,
+        defaultOsuId,
+        GameMode.osu,
+        undefined
+      );
+      message += ` Current top score is ${mapUserScoreToStr(score)}`;
+    } catch (err) {
+      message += ` No score found`;
+    }
   }
   await Promise.all([
     client.say(channel, message).then((sentMessage) => {
