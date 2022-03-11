@@ -102,34 +102,43 @@ const main = async (logger: Logger, logDir: string) => {
   let osuIrcBot: (() => irc.Client) | undefined = undefined;
   if (enableOsu && enableOsuBeatmapRecognition && enableOsuIrc) {
     // TODO Handle authentication errors
-    osuIrcBot = () =>
-      new irc.Client("irc.ppy.sh", osuIrcUsername, {
+    osuIrcBot = () => {
+      const creationDate = new Date().toISOString();
+      const osuIrcBotInstance = new irc.Client("irc.ppy.sh", osuIrcUsername, {
         channels: [
           /*"#osu"*/
         ],
         password: osuIrcPassword,
         port: 6667,
       });
-    /*
-    osuIrcBot.addListener(
-      "message",
-      (from: string, to: string, text: string, message: string) => {
-        logger.info("message: " + JSON.stringify({ from, to, text, message }));
-      }
-    );
-    osuIrcBot.addListener(
-      "pm",
-      (from: string, to: string, text: string, message: string) => {
-        logger.info("pm: " + JSON.stringify({ from, to, text, message }));
-      }
-    );
-    osuIrcBot.addListener("error", (message: string) => {
-      logger.info(`IRC error: ${JSON.stringify(message)}`);
-    });
-    osuIrcBot.addListener("registered", (info: string) => {
-      logger.info(`Registered: ${JSON.stringify(info)}`);
-    });
-    */
+      osuIrcBotInstance.addListener(
+        "message",
+        (from: string, to: string, text: string, message: string) => {
+          logger.info(
+            "message: " +
+              JSON.stringify({ creationDate, from, to, text, message })
+          );
+        }
+      );
+      osuIrcBotInstance.addListener(
+        "pm",
+        (from: string, to: string, text: string, message: string) => {
+          logger.info(
+            `pm: ${JSON.stringify({ creationDate, from, to, text, message })}`
+          );
+        }
+      );
+      osuIrcBotInstance.addListener("error", (message: string) => {
+        logger.info(`IRC error: ${JSON.stringify({ creationDate, message })}`);
+      });
+      osuIrcBotInstance.addListener("registered", (info: string) => {
+        logger.info(`Registered: ${JSON.stringify({ creationDate, info })}`);
+      });
+      osuIrcBotInstance.addListener("selfMessage", (info: string) => {
+        logger.info(`Message sent: ${JSON.stringify({ creationDate, info })}`);
+      });
+      return osuIrcBotInstance;
+    };
   }
   if (!enableOsu) {
     logger.info("Osu features are disabled since not all variables were set");

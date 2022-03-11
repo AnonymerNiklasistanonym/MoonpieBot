@@ -1,11 +1,11 @@
-import {
+import type {
   Beatmap,
   Beatmapset,
   BeatmapUserScore,
-  RankedStatus,
   Score,
   User,
 } from "osu-api-v2";
+import { RankedStatus } from "osu-api-v2";
 import { secondsToString } from "./timePeriodToString";
 
 const monthNames = [
@@ -81,7 +81,12 @@ export const generalBeatmapToStr = (
     finalString += ` from ${
       monthNames[beatmapUpdate.getMonth()]
     } ${beatmapUpdate.getFullYear()}`;
-    finalString += ` {CS=${beatmap.cs}, DRAIN=${beatmap.drain}, ACC=${beatmap.accuracy}, AR=${beatmap.ar}, BPM=${beatmap.bpm}, CC=${beatmap.count_circles}, SLC=${beatmap.count_sliders}, SPC=${beatmap.count_spinners}}`;
+    if (beatmap.max_combo !== undefined) {
+      finalString += ` {FC=${beatmap.max_combo}, CS=${beatmap.cs}, DRAIN=${beatmap.drain}, ACC=${beatmap.accuracy}, AR=${beatmap.ar}, BPM=${beatmap.bpm}, CC=${beatmap.count_circles}, SLC=${beatmap.count_sliders}, SPC=${beatmap.count_spinners}}`;
+    } else {
+      // Scores don't have max combo
+      finalString += ` {CS=${beatmap.cs}, DRAIN=${beatmap.drain}, ACC=${beatmap.accuracy}, AR=${beatmap.ar}, BPM=${beatmap.bpm}, CC=${beatmap.count_circles}, SLC=${beatmap.count_sliders}, SPC=${beatmap.count_spinners}}`;
+    }
     finalString += ` (${beatmap.url})`;
   } else {
     finalString += "[Error: Beatmapset not found]";
