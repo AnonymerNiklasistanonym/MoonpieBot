@@ -8,35 +8,7 @@ import { OsuApiV2Credentials } from "../osu";
 import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import { exec } from "child_process";
-
-export async function isProcessRunning(processName: string): Promise<boolean> {
-  let cmd = "";
-  switch (process.platform) {
-    case "win32":
-      cmd = `tasklist`;
-      break;
-    case "darwin":
-      cmd = `ps -ax | grep ${processName}`;
-      break;
-    case "linux":
-      cmd = `ps -A`;
-      break;
-  }
-
-  if (cmd === "") {
-    return false;
-  }
-
-  return new Promise((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    exec(cmd, (err, stdout, _stderr) => {
-      if (err) reject(err);
-
-      resolve(stdout.toLowerCase().indexOf(processName.toLowerCase()) > -1);
-    });
-  });
-}
+import { isProcessRunning } from "../../other/processInformation";
 
 /*
 export const osuIsConnectedApi = async (

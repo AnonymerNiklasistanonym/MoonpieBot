@@ -15,6 +15,7 @@ import type { Client as IrcClient } from "irc";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 import { commandBeatmap } from "./osu/beatmap";
+import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
 
@@ -30,6 +31,8 @@ const logDetectedCommand = (
     subsection: "osuChatHandler",
   });
 };
+
+export const regexNp = /^\s*!np(\s*|\s.*)$/i;
 
 export const regexRp = /^\s*!rp(\s*|\s.*)$/i;
 export const regexRpCustomId = /^\s*!rp\s+([0-9]+)\s*.*$/i;
@@ -62,6 +65,19 @@ export const osuChatHandler = async (
   osuIrcRequestTarget: undefined | string,
   logger: Logger
 ): Promise<void> => {
+  // > !np
+  if (message.match(regexNp)) {
+    logDetectedCommand(logger, tags, "!np");
+    await commandNp(
+      client,
+      channel,
+      tags.id,
+      osuApiV2Credentials,
+      osuDefaultId,
+      logger
+    );
+    return;
+  }
   // > !rp
   if (message.match(regexRp)) {
     logDetectedCommand(logger, tags, "!rp");

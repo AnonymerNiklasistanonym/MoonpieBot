@@ -35,6 +35,7 @@
             "src/commands/moonpie/user.ts",
             "src/commands/osu.ts",
             "src/commands/osu/beatmap.ts",
+            "src/commands/osu/np.ts",
             "src/commands/osu/pp.ts",
             "src/commands/osu/rp.ts",
             "src/database/core.ts",
@@ -48,6 +49,7 @@
             "src/other/customCommand.ts",
             "src/other/customTimer.ts",
             "src/other/osuStringBuilder.ts",
+            "src/other/processInformation.ts",
             "src/other/timePeriodToString.ts"
         ],
         "out": "docs"
