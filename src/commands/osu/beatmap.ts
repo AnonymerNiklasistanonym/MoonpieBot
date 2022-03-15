@@ -63,7 +63,7 @@ export const commandBeatmap = async (
   let message = "";
   let messageIrc = "";
   try {
-    const beatmap = await osuApiV2.beatmaps.lookup(oauthAccessToken, beatmapId);
+    const beatmap = await osuApiV2.beatmaps.get(oauthAccessToken, beatmapId);
     tryToSendBeatmapToTarget = true;
     message = mapToStr(beatmap);
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

@@ -5,8 +5,10 @@ import { OsuApiV2Credentials } from "../osu";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import { getProcessWindowTitle } from "../../other/processInformation";
+import osuApiV2 from "osu-api-v2";
 
-export const regexNowPlaying = /^(?:.*?)-\s*(.*)\s*-\s*(.*)\s\[(.*)\]$/;
+export const regexNowPlaying =
+  /^(?:.*?)\s-\s\s*(.*?)\s*\s-\s\s*(.*?)\s*\[\s*(.*)\s*\]$/;
 
 /**
  * NP (now playing) command: Send the map that is currently being played in osu
@@ -39,6 +41,53 @@ export const commandNp = async (
     const match = windowTitle.match(regexNowPlaying);
     if (match != null) {
       message = `Currently playing '${match[2]}' from '${match[1]}' [${match[3]}]`;
+      try {
+        const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
+          osuApiV2Credentials.clientId,
+          osuApiV2Credentials.clientSecret
+        );
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const searchResult = await osuApiV2.beatmapsets.search(
+          oauthAccessToken,
+          `title='${match[2]}' artist='${match[1]}'`,
+          false
+        );
+        if (
+          searchResult.beatmapsets !== undefined &&
+          Array.isArray(searchResult.beatmapsets) &&
+          searchResult.beatmapsets.length >= 1
+        ) {
+          const exactMatch = searchResult.beatmapsets.find((a) => {
+            const titleIsTheSame =
+              a.title.trim().toLocaleLowerCase() ===
+              match[2].trim().toLocaleLowerCase();
+            const diffNameCanBeFound = a.beatmaps?.find(
+              (b) =>
+                b.version.trim().toLocaleLowerCase() ===
+                match[3].trim().toLocaleLowerCase()
+            );
+            return titleIsTheSame && diffNameCanBeFound;
+          });
+          console.log(searchResult.beatmapsets);
+          if (exactMatch) {
+            const exactBeatmapDiff = exactMatch.beatmaps?.find(
+              (a) =>
+                a.version.trim().toLocaleLowerCase() ===
+                match[3].trim().toLocaleLowerCase()
+            );
+            if (exactBeatmapDiff) {
+              message += ` (should be: https://osu.ppy.sh/beatmaps/${exactBeatmapDiff.id})`;
+            } else {
+              message += ` (most likely: https://osu.ppy.sh/beatmapsets/${exactMatch.id})`;
+            }
+          } else {
+            message += ` (probably: https://osu.ppy.sh/beatmapsets/${searchResult.beatmapsets[0].id})`;
+          }
+        }
+      } catch (err) {
+        logger.warn(err);
+      }
     }
   }
   const sentMessage = await client.say(channel, message);
