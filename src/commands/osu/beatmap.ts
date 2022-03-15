@@ -1,5 +1,9 @@
 // Package imports
-import osuApiV2, { GameMode, RankedStatus } from "osu-api-v2";
+import osuApiV2, {
+  GameMode,
+  OsuApiV2WebRequestError,
+  RankedStatus,
+} from "osu-api-v2";
 // Local imports
 import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
@@ -55,26 +59,42 @@ export const commandBeatmap = async (
     osuApiV2Credentials.clientSecret
   );
 
-  const beatmap = await osuApiV2.beatmaps.lookup(oauthAccessToken, beatmapId);
-  let message = mapToStr(beatmap);
-  if (
-    beatmap.ranked === RankedStatus.loved ||
-    beatmap.ranked === RankedStatus.qualified ||
-    beatmap.ranked === RankedStatus.ranked
-  ) {
-    try {
-      const score = await osuApiV2.beatmaps.scores.users(
-        oauthAccessToken,
-        beatmapId,
-        defaultOsuId,
-        GameMode.osu,
-        undefined
-      );
-      message += ` Current top score is ${mapUserScoreToStr(score)}`;
-    } catch (err) {
-      message += ` No score found`;
+  let tryToSendBeatmapToTarget = false;
+  let message = "";
+  let messageIrc = "";
+  try {
+    const beatmap = await osuApiV2.beatmaps.lookup(oauthAccessToken, beatmapId);
+    tryToSendBeatmapToTarget = true;
+    message = mapToStr(beatmap);
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    messageIrc = `${userName} requested [https://osu.ppy.sh/beatmapsets/${beatmap.beatmapset?.id}#osu/${beatmap.id} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`;
+    if (
+      beatmap.ranked === RankedStatus.loved ||
+      beatmap.ranked === RankedStatus.qualified ||
+      beatmap.ranked === RankedStatus.ranked
+    ) {
+      try {
+        const score = await osuApiV2.beatmaps.scores.users(
+          oauthAccessToken,
+          beatmapId,
+          defaultOsuId,
+          GameMode.osu,
+          undefined
+        );
+        message += ` Current top score is ${mapUserScoreToStr(score)}`;
+      } catch (err) {
+        message += ` No score found`;
+      }
+    }
+  } catch (err) {
+    if ((err as OsuApiV2WebRequestError).statusCode === 404) {
+      logger.warn(err);
+      throw Error("Beatmap was not found");
+    } else {
+      throw err;
     }
   }
+
   await Promise.all([
     client.say(channel, message).then((sentMessage) => {
       loggerCommand(
@@ -88,6 +108,9 @@ export const commandBeatmap = async (
     isProcessRunning("osu").then(
       (osuIsRunning) =>
         new Promise<void>((resolve, reject) => {
+          if (!tryToSendBeatmapToTarget) {
+            return resolve();
+          }
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           logger.info(`Osu is connected: ${osuIsRunning}`);
           if (
@@ -101,11 +124,7 @@ export const commandBeatmap = async (
               logger.info("Create IRC connection 2");
               osuIrcBotInstance.connect(2, () => {
                 logger.info("Osu IRC was connected");
-                osuIrcBotInstance?.say(
-                  osuIrcRequestTarget,
-                  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                  `${userName} requested [https://osu.ppy.sh/beatmapsets/${beatmap.beatmapset?.id}#osu/${beatmap.id} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`
-                );
+                osuIrcBotInstance?.say(osuIrcRequestTarget, messageIrc);
                 osuIrcBotInstance?.say(osuIrcRequestTarget, `${message}`);
                 osuIrcBotInstance?.disconnect("", () => {
                   osuIrcBotInstance?.conn.end();
