@@ -6,6 +6,8 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import { getProcessWindowTitle } from "../../other/processInformation";
 
+export const regexNowPlaying = /^(?:.*?)-\s*(.*)\s*-\s*(.*)\s\[(.*)\]$/;
+
 /**
  * NP (now playing) command: Send the map that is currently being played in osu
  * (via the window title because the web api is not supporting it)
@@ -31,11 +33,14 @@ export const commandNp = async (
   console.log(osuApiV2Credentials !== undefined && defaultOsuId !== undefined);
 
   const windowTitle = await getProcessWindowTitle("osu");
-  const message =
-    windowTitle === undefined || windowTitle === "osu!"
-      ? "No map is currently being played, try !rp to get the most recent play"
-      : windowTitle.replace(/^osu!\s*/, "");
-  console.log({ message, windowTitle });
+  let message =
+    "No map is currently being played, try !rp to get the most recent play";
+  if (windowTitle !== undefined && windowTitle !== "osu!") {
+    const match = windowTitle.match(regexNowPlaying);
+    if (match != null) {
+      message = `Currently playing '${match[2]}' from '${match[1]}' [${match[3]}]`;
+    }
+  }
   const sentMessage = await client.say(channel, message);
 
   loggerCommand(
