@@ -5,6 +5,7 @@ import {
   errorMessageUserNameUndefined,
   errorMessageUserIdUndefined,
 } from "../commandHelper";
+import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -70,7 +71,7 @@ export const commandUserSetCount = async (
   usernameMoonpieEntry: string,
   countMoonpies: number,
   operation: "+" | "-" | "=" = "=",
-  isBroadcaster: boolean,
+  twitchBadgeLevel: TwitchBadgeLevels,
   moonpieDbPath: string,
   logger: Logger
 ): Promise<void> => {
@@ -84,7 +85,7 @@ export const commandUserSetCount = async (
     throw errorMessageUserIdUndefined();
   }
 
-  if (!isBroadcaster) {
+  if (twitchBadgeLevel != TwitchBadgeLevels.BROADCASTER) {
     throw Error(
       `The user ${userName} is not a broadcaster and thus is not allowed to use this command`
     );
@@ -161,7 +162,7 @@ export const commandUserDelete = async (
   userName: string | undefined,
   userId: string | undefined,
   usernameMoonpieEntry: string,
-  isBroadcaster: boolean,
+  twitchBadgeLevel: TwitchBadgeLevels,
   moonpieDbPath: string,
   logger: Logger
 ): Promise<void> => {
@@ -175,7 +176,7 @@ export const commandUserDelete = async (
     throw errorMessageUserIdUndefined();
   }
 
-  if (!isBroadcaster) {
+  if (twitchBadgeLevel != TwitchBadgeLevels.BROADCASTER) {
     throw Error(
       `The user ${userName} is not a broadcaster and thus is not allowed to use this command`
     );

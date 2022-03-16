@@ -9,6 +9,7 @@ import { commandCommands } from "./moonpie/commands";
 import { commandAbout } from "./moonpie/about";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { commandClaim } from "./moonpie/claim";
+import { parseTwitchBadgeLevel } from "src/other/twitchBadgeParser";
 
 const logDetectedCommand = (
   logger: Logger,
@@ -76,7 +77,7 @@ export const moonpieChatHandler = async (
           tags.username,
           tags["user-id"],
           match[1],
-          tags?.badges?.broadcaster === "1",
+          parseTwitchBadgeLevel(tags),
           databasePath,
           logger
         );
@@ -123,7 +124,7 @@ export const moonpieChatHandler = async (
           match[1],
           parseInt(match[2]),
           "=",
-          tags?.badges?.broadcaster === "1",
+          parseTwitchBadgeLevel(tags),
           databasePath,
           logger
         );
@@ -148,7 +149,7 @@ export const moonpieChatHandler = async (
           match[1],
           parseInt(match[2]),
           "+",
-          tags?.badges?.broadcaster === "1",
+          parseTwitchBadgeLevel(tags),
           databasePath,
           logger
         );
@@ -173,7 +174,7 @@ export const moonpieChatHandler = async (
           match[1],
           parseInt(match[2]),
           "-",
-          tags?.badges?.broadcaster === "1",
+          parseTwitchBadgeLevel(tags),
           databasePath,
           logger
         );
