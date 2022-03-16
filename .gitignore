@@ -163,17 +163,23 @@ $RECYCLE.BIN/
 lib/
 data/
 
+# Dist/Build directories
 dist/
-.env
-config/local*
+
+# Cache files
 tmp/
 .eslintcache
-src/moonpiedb.ts
-*.db
-*.db-journal
+
+# Private secret files
+.env
 customTimers.json
 customCommands.json
+*.db
+*.db-journal
 
 # Documentation
 docs
 test.json
+
+# IDE files
+.vscode

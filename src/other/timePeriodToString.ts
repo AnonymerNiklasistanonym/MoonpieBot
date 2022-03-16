@@ -4,10 +4,10 @@ const dayInSeconds = hourInSeconds * 24;
 const yearInSeconds = dayInSeconds * 365;
 
 /**
- * Convert a time period in seconds to a human readable string
+ * Convert a time period in seconds to a human readable string.
  *
- * @param seconds length of the time period in seconds
- * @returns Human readable string representation of time period
+ * @param seconds The length of the time period in seconds.
+ * @returns Human readable string representation of time period.
  */
 export const secondsToString = (seconds: number) => {
   const yearsNumber = Math.floor(seconds / yearInSeconds);

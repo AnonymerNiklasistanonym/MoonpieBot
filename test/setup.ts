@@ -1,5 +1,5 @@
 /**
- * test setup file
+ * Test setup file.
  */
 
 console.info("test setup file");

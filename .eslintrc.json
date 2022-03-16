@@ -1,24 +1,38 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:security/recommended",
-    "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "plugin:prettier/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jsdoc/recommended",
+    "plugin:prettier/recommended",
+    "plugin:security/recommended"
   ],
   "env": {
     "es6": true,
-    "node": true,
-    "mocha": true
+    "mocha": true,
+    "node": true
   },
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "security", "prettier"],
+  "plugins": [
+    "@typescript-eslint",
+    "jsdoc",
+    "prettier",
+    "security"
+  ],
   "parserOptions": {
     "ecmaVersion": 8,
     "project": "./tsconfig.eslint.json"
   },
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "jsdoc/require-param-type": "off",
+    "jsdoc/require-returns-type": "off",
+    "jsdoc/require-description-complete-sentence": "warn",
+    "jsdoc/check-param-names": "error",
+    "jsdoc/no-types": "error",
+    "jsdoc/no-defaults": "error",
+    "jsdoc/check-indentation": "error",
+    "jsdoc/check-line-alignment": "error"
   }
 }

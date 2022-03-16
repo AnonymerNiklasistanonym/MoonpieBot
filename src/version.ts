@@ -3,7 +3,7 @@
  */
 
 /**
- * The Version structure
+ * The Version structure.
  */
 export interface Version {
   major: number;
@@ -13,7 +13,7 @@ export interface Version {
 }
 
 /**
- * The version of the program
+ * The version of the program.
  */
 export const version: Version = {
   major: 1,
@@ -23,9 +23,10 @@ export const version: Version = {
 };
 
 /**
- * Get a version string
- * @param version The version that should be used
- * @returns "1.2.3b" or "1.2.3" if not in beta
+ * Get a version string.
+ *
+ * @param version The version that should be used.
+ * @returns "1.2.3b" or "1.2.3" if not in beta.
  */
 export const getVersionFromObject = (version: Version) =>
   `v${version.major}.${version.minor}.${version.patch}${
@@ -33,7 +34,8 @@ export const getVersionFromObject = (version: Version) =>
   }`;
 
 /**
- * Get a version string of the current program version
- * @returns "1.2.3b" or "1.2.3" if not in beta
+ * Get a version string of the current program version.
+ *
+ * @returns "1.2.3b" or "1.2.3" if not in beta.
  */
 export const getVersion = () => getVersionFromObject(version);

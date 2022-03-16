@@ -5,13 +5,13 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
 /**
- * Leaderboard: Send the moonpie count leaderboard list (top 15)
+ * Leaderboard command: Reply with the moonpie count leaderboard list (top 15).
  *
- * @param client Twitch client (used to send messages)
- * @param channel Twitch channel where the message should be sent to
- * @param messageId Twitch message ID of the request (used for logging)
- * @param moonpieDbPath Database file path of the moonpie database
- * @param logger Logger (used for logging)
+ * @param client Twitch client (used to send messages).
+ * @param channel Twitch channel (where the response should be sent to).
+ * @param messageId Twitch message ID of the request (used for logging).
+ * @param moonpieDbPath Database file path of the moonpie database.
+ * @param logger Logger (used for global logs).
  */
 export const commandLeaderboard = async (
   client: Client,

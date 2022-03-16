@@ -1,5 +1,6 @@
 /**
- * Create `DELETE` query
+ * Create `DELETE` query.
+ *
  * ```sql
  * DELETE FROM tableName: string WHERE whereColumn=?;
  * ```
@@ -13,7 +14,8 @@ export const remove = (tableName: string, whereColumnName = "id"): string => {
 };
 
 /**
- * Create `INSERT INTO` query
+ * Create `INSERT INTO` query.
+ *
  * ```sql
  * INSERT INTO tableName: string(column_0, column_i, column_n) VALUES(?, ?, ?);
  * ```
@@ -35,7 +37,8 @@ export interface ExistsDbOut {
 }
 
 /**
- * Create `EXISTS` query
+ * Create `EXISTS` query.
+ *
  * ```sql
  * SELECT EXISTS(SELECT 1 FROM tableName: string WHERE column=? AS exists_value;
  * ```
@@ -50,20 +53,22 @@ export const exists = (tableName: string, whereColumnName = "id"): string => {
 
 export interface SelectQueryInnerJoin {
   /**
-   * Name of linked table
+   * Name of linked table.
    */
   otherTableName: string;
   /**
-   * Name of linked column of linked table
+   * Name of linked column of linked table.
    */
   otherColumn: string;
   /**
-   * Name of column that it should be linked to
+   * Name of column that it should be linked to.
    */
   thisColumn: string;
 }
 
 /**
+ * Order by interface for select queries.
+ *
  * ```sql
  * ORDER BY
  * column_1 ASC,
@@ -72,11 +77,11 @@ export interface SelectQueryInnerJoin {
  */
 export interface SelectQueryOrderBy {
   /**
-   * Name of the column that should be sorted
+   * Name of the column that should be sorted.
    */
   column: string;
   /**
-   * True if ascending sort, false if descending
+   * True if ascending sort, false if descending.
    */
   ascending: boolean;
 }
@@ -88,26 +93,26 @@ export interface SelectWhereColumn {
 
 export interface SelectQueryOptions {
   /**
-   * Inner join descriptions
+   * Inner join descriptions.
    */
   innerJoins?: SelectQueryInnerJoin[];
   limit?: number;
   offset?: number;
   /**
    * Describe a specification of which value a row needs to have to be included
-   * `WHERE column = ?`
+   * `WHERE column = ?`.
    */
   whereColumn?: string | SelectWhereColumn;
   /**
-   * Describe a complicated where information: overwrites whereColumn if defined
+   * Describe a complicated where information: overwrites whereColumn if defined.
    */
   whereCustom?: string;
   /**
-   * Only get back unique results
+   * Only get back unique results.
    */
   unique?: boolean;
   /**
-   * Additionally order the results by some columns
+   * Additionally order the results by some columns.
    */
   orderBy?: SelectQueryOrderBy[];
 }
@@ -119,7 +124,8 @@ export interface SelectColumn {
 }
 
 /**
- * Create `SELECT` query
+ * Create `SELECT` query.
+ *
  * ```sql
  * SELECT column_0, column_i, column_n FROM tableName: string;
  * SELECT column_i FROM tableName: string WHERE whereColumn=?;
@@ -208,6 +214,8 @@ export const select = (
 };
 
 /**
+ * Enum for table column types.
+ *
  * <table><tr><th>Expression Affinity</th><th>Column Declared Type</th>
  * </tr><tr><td>TEXT                       </td><td>"TEXT"
  * </td></tr><tr><td>NUMERIC               </td><td>"NUM"
@@ -215,7 +223,7 @@ export const select = (
  * </td></tr><tr><td>REAL                  </td><td>"REAL"
  * </td></tr><tr><td>BLOB (a.k.a "NONE")   </td><td>"" (empty string)
  * </td></tr></table>
- * Source: {@link https://www.sqlite.org/lang_createtable.html}
+ * Source: {@link https://www.sqlite.org/lang_createtable.html}.
  */
 export enum CreateTableColumnType {
   TEXT = "TEXT",
@@ -233,40 +241,41 @@ export interface CreateTableColumnOptions {
 
 export interface CreateTableColumn {
   /**
-   * Column name
+   * Column name.
    */
   name: string;
   /**
-   * Column type (`INTEGER`, `TEXT`)
+   * Column type (`INTEGER`, `TEXT`).
    */
   type: CreateTableColumnType;
   /**
-   * Column options (`NOT NULL`, `UNIQUE`, `PRIMARY KEY`)
+   * Column options (`NOT NULL`, `UNIQUE`, `PRIMARY KEY`).
    */
   options?: CreateTableColumnOptions;
   /**
-   * Foreign key options
+   * Foreign key options.
    */
   foreign?: CreateTableColumnForeign;
 }
 
 export interface CreateTableColumnForeign {
   /**
-   * Foreign key table name
+   * Foreign key table name.
    */
   tableName: string;
   /**
-   * Foreign key table column name
+   * Foreign key table column name.
    */
   column: string;
   /**
-   * Options for foreign key (`ON DELETE CASCADE ON UPDATE NO ACTION`)
+   * Options for foreign key (`ON DELETE CASCADE ON UPDATE NO ACTION`).
    */
   options?: string[];
 }
 
 /**
- * Create database table
+ * Create database table.
+ *
  * ```sql
  * CREATE TABLE IF NOT EXISTS contacts (
  * contact_id INTEGER PRIMARY KEY,
@@ -277,17 +286,16 @@ export interface CreateTableColumnForeign {
  * );
  * ```
  *
- * @returns Query
- * @param tableName
- * @param columns
- * @param ifNotExists
+ * @param tableName The name of the table.
+ * @param columns The columns of the table.
+ * @param ifNotExists Create table if not already existing.
+ * @returns SQLite Query.
  */
 export const createTable = (
   tableName: string,
   columns: CreateTableColumn[],
   ifNotExists = false
 ): string => {
-  // eslint-disable-next-line complexity
   const columnOptionsToString = (
     columnOptions?: CreateTableColumnOptions
   ): string => {
@@ -335,22 +343,24 @@ export const createTable = (
 };
 
 /**
- * Delete a database table
+ * Delete a database table.
+ *
  * ```sql
  * DROP TABLE contacts;
  * DROP TABLE IF EXISTS contacts;
  * ```
  *
- * @param tableName
- * @param ifExists Only remove table if it exists
- * @returns Query
+ * @param tableName Name of the table to delete.
+ * @param ifExists Only remove table if it exists.
+ * @returns SQLite query.
  */
 export const dropTable = (tableName: string, ifExists = false): string => {
   return `DROP TABLE ${ifExists ? "IF EXISTS " : ""}${tableName};`;
 };
 
 /**
- * Create database view
+ * Create database view.
+ *
  * ```sql
  * CREATE VIEW IF NOT EXISTS leaderboard
  * AS
@@ -364,10 +374,12 @@ export const dropTable = (tableName: string, ifExists = false): string => {
  * );
  * ```
  *
- * @returns Query
- * @param viewName
- * @param columns
- * @param ifNotExists
+ * @param viewName Name of the view to create.
+ * @param tableName Name of the table that the view is based on.
+ * @param columns View columns.
+ * @param options View creation options.
+ * @param ifNotExists Create view if not already existing.
+ * @returns SQLite Query.
  */
 export const createView = (
   viewName: string,
@@ -384,22 +396,24 @@ export const createView = (
 };
 
 /**
- * Delete a database view
+ * Delete a database view.
+ *
  * ```sql
  * DROP VIEW leaderboard;
  * DROP VIEW IF EXISTS leaderboard;
  * ```
  *
- * @param viewName
- * @param ifExists Only remove view if it exists
- * @returns Query
+ * @param viewName Name of the view to delete.
+ * @param ifExists Only remove view if it exists.
+ * @returns SQLite Query.
  */
 export const dropView = (viewName: string, ifExists = false): string => {
   return `DROP VIEW ${ifExists ? "IF EXISTS " : ""}${viewName};`;
 };
 
 /**
- * Update database table row values
+ * Update database table row values.
+ *
  * ```sql
  * UPDATE employees
  * SET lastname = 'Smith', firstname = 'Jo'
@@ -407,10 +421,10 @@ export const dropView = (viewName: string, ifExists = false): string => {
  * employeeid = 3
  * ```
  *
- * @param values Values that should be updated
- * @param tableName
- * @param whereColumn Column where the row changes should be made
- * @returns Query
+ * @param tableName Name of the table.
+ * @param values Values that should be updated.
+ * @param whereColumn Column where the row changes should be made.
+ * @returns SQLite Query.
  */
 export const update = (
   tableName: string,

@@ -45,7 +45,7 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
 /**
  * Regex that matches the following 2 kinds of URLs in any message:
  * - https://osu.ppy.sh/beatmapsets/1228734#osu/2554945
- * - https://osu.ppy.sh/beatmaps/2587891
+ * - https://osu.ppy.sh/beatmaps/2587891.
  */
 export const regexBeatmapUrl =
   /(?:^|.*?\s)https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))(?:(?:\s|,).*?|$)/gi;
@@ -74,6 +74,7 @@ export const osuChatHandler = async (
       client,
       channel,
       tags.id,
+      tags.username,
       osuApiV2Credentials,
       osuDefaultId,
       logger

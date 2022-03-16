@@ -6,6 +6,7 @@ import * as moonpie from "./requests";
  * Create tables if not existing.
  *
  * @param databasePath Path to database.
+ * @param logger Logger (for global logs).
  */
 export const createAndSetupTables = async (
   databasePath: string,
@@ -111,6 +112,7 @@ export const createAndSetupTables = async (
  * Create tables if not existing.
  *
  * @param databasePath Path to database.
+ * @param logger
  */
 export const setupInitialData = async (
   databasePath: string,

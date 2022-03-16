@@ -3,29 +3,30 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 
 import { moonpieDb } from "../../database/moonpieDb";
+import {
+  errorMessageIdUndefined,
+  errorMessageUserNameUndefined,
+  errorMessageUserIdUndefined,
+} from "../commandHelper";
 
 export const commandUserGet = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
-  username: string | undefined,
+  userName: string | undefined,
   userId: string | undefined,
   usernameMoonpieEntry: string,
   moonpieDbPath: string,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+    throw errorMessageIdUndefined();
   }
-  if (username === undefined) {
-    throw Error(
-      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
-    );
+  if (userName === undefined) {
+    throw errorMessageUserNameUndefined();
   }
   if (userId === undefined) {
-    throw Error(
-      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
-    );
+    throw errorMessageUserIdUndefined();
   }
 
   let message = "";
@@ -43,13 +44,13 @@ export const commandUserGet = async (
         moonpieEntry.id,
         logger
       );
-    message = `@${username} The user ${usernameMoonpieEntry} has ${
+    message = `@${userName} The user ${usernameMoonpieEntry} has ${
       currentMoonpieLeaderboardEntry.count
     } moonpie${
       currentMoonpieLeaderboardEntry.count > 1 ? "s" : ""
     } and is rank ${currentMoonpieLeaderboardEntry.rank} on the leaderboard!`;
   } else {
-    message = `@${username} The user ${usernameMoonpieEntry} has never claimed a moonpie!`;
+    message = `@${userName} The user ${usernameMoonpieEntry} has never claimed a moonpie!`;
   }
 
   const sentMessage = await client.say(channel, message);
@@ -64,7 +65,7 @@ export const commandUserSetCount = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
-  username: string | undefined,
+  userName: string | undefined,
   userId: string | undefined,
   usernameMoonpieEntry: string,
   countMoonpies: number,
@@ -74,21 +75,18 @@ export const commandUserSetCount = async (
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+    throw errorMessageIdUndefined();
   }
-  if (username === undefined) {
-    throw Error(
-      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
-    );
+  if (userName === undefined) {
+    throw errorMessageUserNameUndefined();
   }
   if (userId === undefined) {
-    throw Error(
-      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
-    );
+    throw errorMessageUserIdUndefined();
   }
+
   if (!isBroadcaster) {
     throw Error(
-      `The user ${username} is not a broadcaster and thus is not allowed to use this command`
+      `The user ${userName} is not a broadcaster and thus is not allowed to use this command`
     );
   }
   if (!Number.isInteger(countMoonpies)) {
@@ -142,7 +140,7 @@ export const commandUserSetCount = async (
       logger
     );
 
-  const message = `@${username} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${countMoonpies} moonpie${
+  const message = `@${userName} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${countMoonpies} moonpie${
     countMoonpies > 1 ? "s" : ""
   } (${operation}${countMoonpies}) and they are now rank ${
     currentMoonpieLeaderboardEntry.rank
@@ -160,7 +158,7 @@ export const commandUserDelete = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
-  username: string | undefined,
+  userName: string | undefined,
   userId: string | undefined,
   usernameMoonpieEntry: string,
   isBroadcaster: boolean,
@@ -168,22 +166,18 @@ export const commandUserDelete = async (
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
-    throw Error(`Unable to reply to message since ${messageId} is undefined!`);
+    throw errorMessageIdUndefined();
   }
-  if (username === undefined) {
-    throw Error(
-      `Unable to claim Moonpie to message ${messageId} since the username is undefined!`
-    );
+  if (userName === undefined) {
+    throw errorMessageUserNameUndefined();
   }
   if (userId === undefined) {
-    throw Error(
-      `Unable to claim Moonpie of ${username} to message ${messageId} since the userId is undefined!`
-    );
+    throw errorMessageUserIdUndefined();
   }
 
   if (!isBroadcaster) {
     throw Error(
-      `The user ${username} is not a broadcaster and thus is not allowed to use this command`
+      `The user ${userName} is not a broadcaster and thus is not allowed to use this command`
     );
   }
 
@@ -198,7 +192,7 @@ export const commandUserDelete = async (
 
   await moonpieDb.removeName(moonpieDbPath, usernameMoonpieEntry, logger);
 
-  const message = `@${username} You deleted the entry of the user ${usernameMoonpieEntry}`;
+  const message = `@${userName} You deleted the entry of the user ${usernameMoonpieEntry}`;
 
   const sentMessage = await client.say(channel, message);
   logger.info(

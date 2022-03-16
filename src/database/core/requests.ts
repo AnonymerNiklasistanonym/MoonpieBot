@@ -5,7 +5,7 @@ import { SqliteInternalError } from "./management";
 import type { Logger } from "winston";
 
 /**
- * List of errors that can happen during a post request
+ * List of errors that can happen during a post request.
  */
 export enum ErrorCodePostRequest {
   /** Some column specification/constraint was violated */
@@ -17,8 +17,8 @@ export enum ErrorCodePostRequest {
 /**
  * Check if an error is a database error.
  *
- * @param error A possible database error
- * @returns True if database error
+ * @param error A possible database error.
+ * @returns True if database error.
  */
 export const isDatabaseError = (error: unknown): boolean => {
   if (
@@ -74,10 +74,11 @@ const loggerDatabaseError = (
 /**
  * Get one result from the database.
  *
- * @param databasePath Path to database
- * @param query The database query that should be run
- * @param parameters Optional values that are inserted for query `?` symbols
- * @returns Either undefined when no result or the found result
+ * @param databasePath Path to database.
+ * @param query The database query that should be run.
+ * @param parameters Optional values that are inserted for query `?` symbols.
+ * @param logger
+ * @returns Either undefined when no result or the found result.
  */
 // Disable eslint warning because never/unknown make it impossible to use types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -140,10 +141,11 @@ export const getEach = async <DB_OUT extends { [key: string]: any }>(
 /**
  * Get a list of results from the database.
  *
- * @param databasePath Path to database
- * @param query The database query that should be run
- * @param parameters Optional values that are inserted for query `?` symbols
- * @returns Either an empty list when no result or the found results
+ * @param databasePath Path to database.
+ * @param query The database query that should be run.
+ * @param parameters Optional values that are inserted for query `?` symbols.
+ * @param logger
+ * @returns Either an empty list when no result or the found results.
  */
 // Disable eslint warning because never/unknown make it impossible to use types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -189,10 +191,11 @@ export const getAll = async <DB_OUT extends { [key: string]: any }>(
 /**
  * Update something in database.
  *
- * @param databasePath Path to database
- * @param query The database query that should be run
- * @param parameters Optional values that are inserted for query `?` symbols
- * @returns Database update info
+ * @param databasePath Path to database.
+ * @param query The database query that should be run.
+ * @param parameters Optional values that are inserted for query `?` symbols.
+ * @param logger
+ * @returns Database update info.
  */
 export const post = async (
   databasePath: string,

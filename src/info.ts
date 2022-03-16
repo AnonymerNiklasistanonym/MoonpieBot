@@ -2,9 +2,9 @@
  * MoonpieBot general information
  */
 
-/** Program name */
+/** Name of the program. */
 export const name = "MoonpieBot";
 
-/** Source Code URL */
+/** Source code URL. */
 export const sourceCodeUrl =
   "https://github.com/AnonymerNiklasistanonym/MoonpieBot";

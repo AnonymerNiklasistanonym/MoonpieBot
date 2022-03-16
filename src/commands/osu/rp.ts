@@ -11,15 +11,19 @@ import type { Logger } from "winston";
 
 /**
  * RP (recently played) command: Send the map that was most recently played
- * in osu (via the web api)
+ * in osu (via the web api).
  *
- * @param client Twitch client (used to send messages)
- * @param channel Twitch channel where the message should be sent to
- * @param messageId Twitch message ID of the request (used for logging)
- * @param osuApiV2Credentials Osu API (v2) credentials
- * @param defaultOsuId The default Osu account ID that should be fetched
- * @param customOsuId If a custom Osu account ID is provided fetch this instead
- * @param logger Logger (used for logging)
+ * @param client Twitch client (used to send messages).
+ * @param channel Twitch channel (where the response should be sent to).
+ * @param messageId Twitch message ID of the request (used for logging).
+ * @param osuApiV2Credentials The osu! API (v2) credentials.
+ * @param defaultOsuId Default osu! Account ID (used for checking for existing
+ * scores).
+ * @param customOsuId Custom osu! account ID (use this over the default osu!
+ * account ID and over the not undefined custom osu! name if not undefined).
+ * @param customOsuName osu! account name (use this over the default osu!
+ * account ID if not undefined).
+ * @param logger Logger (used for logging).
  */
 export const commandRp = async (
   client: Client,

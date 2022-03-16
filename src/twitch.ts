@@ -1,6 +1,9 @@
 import { client as tmiClient, Client } from "tmi.js";
 import type { Logger } from "winston";
 
+/**
+ * Errorcodes that can be attached to @CreateTwitchClientError.
+ */
 export enum CreateTwitchClientErrorCode {
   TWITCH_NAME_UNDEFINED = "TWITCH_NAME_UNDEFINED",
   TWITCH_OAUTH_TOKEN_UNDEFINED = "TWITCH_OAUTH_TOKEN_UNDEFINED",
@@ -8,6 +11,9 @@ export enum CreateTwitchClientErrorCode {
   TWITCH_CHANNELS_EMPTY = "TWITCH_CHANNELS_EMPTY",
 }
 
+/**
+ * Error that is thrown if something wents wrong with creating the Twitch client.
+ */
 export interface CreateTwitchClientError extends Error {
   code?: CreateTwitchClientErrorCode;
 }

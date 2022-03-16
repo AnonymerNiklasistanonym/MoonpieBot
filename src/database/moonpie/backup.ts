@@ -13,6 +13,7 @@ export interface DatabaseStructure {
  * Create tables if not existing.
  *
  * @param databasePath Path to database.
+ * @param logger Logger (for global logs).
  */
 export const exportMoonpieCountTableToJson = async (
   databasePath: string,

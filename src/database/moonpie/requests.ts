@@ -54,9 +54,10 @@ export const viewLeaderboard = {
 /**
  * Check if moonpie entry exists given a Twitch ID.
  *
- * @param databasePath Path to database
- * @param id Twitch ID
- * @returns True if the moonpie entry exists
+ * @param databasePath Path to database.
+ * @param twitchId Twitch ID.
+ * @param logger
+ * @returns True if the moonpie entry exists.
  */
 export const exists = async (
   databasePath: string,
@@ -86,9 +87,10 @@ export const exists = async (
 /**
  * Check if moonpie entry exists given a Twitch name.
  *
- * @param databasePath Path to database
- * @param twitchName Twitch name
- * @returns True if the moonpie entry exists
+ * @param databasePath Path to database.
+ * @param twitchName Twitch name.
+ * @param logger
+ * @returns True if the moonpie entry exists.
  */
 export const existsName = async (
   databasePath: string,
@@ -131,10 +133,11 @@ export interface CreateInput {
 /**
  * Create moonpie entry.
  *
- * @param databasePath Path to database
- * @param input Moonpie info
- * @throws When not able to create moonpie or database fails
- * @returns ID of the created entry
+ * @param databasePath Path to database.
+ * @param input Moonpie info.
+ * @param logger
+ * @throws When not able to create moonpie or database fails.
+ * @returns ID of the created entry.
  */
 export const create = async (
   databasePath: string,
@@ -167,10 +170,11 @@ export const create = async (
 /**
  * Remove moonpie entry.
  *
- * @param databasePath Path to database
- * @param twitchId Twitch ID
- * @throws When not able to remove moonpie entry or database fails
- * @returns True if the moonpie entry was removed or already doesn't exist
+ * @param databasePath Path to database.
+ * @param twitchId Twitch ID.
+ * @param logger
+ * @throws When not able to remove moonpie entry or database fails.
+ * @returns True if the moonpie entry was removed or already doesn't exist.
  */
 export const remove = async (
   databasePath: string,
@@ -193,10 +197,11 @@ export const remove = async (
 /**
  * Remove moonpie entry.
  *
- * @param databasePath Path to database
- * @param twitchName Twitch ID
- * @throws When not able to remove moonpie entry or database fails
- * @returns True if the moonpie entry was removed or already doesn't exist
+ * @param databasePath Path to database.
+ * @param twitchName Twitch ID.
+ * @param logger
+ * @throws When not able to remove moonpie entry or database fails.
+ * @returns True if the moonpie entry was removed or already doesn't exist.
  */
 export const removeName = async (
   databasePath: string,
@@ -236,10 +241,11 @@ export interface GetMoonpieOut {
 /**
  * Get the moonpie count of a Twitch user.
  *
- * @param databasePath Path to database
- * @param twitchId Twitch ID
- * @throws When not able to get the moonpie count or database fails
- * @returns The moonpie count of the Twitch ID user
+ * @param databasePath Path to database.
+ * @param twitchId Twitch ID.
+ * @param logger
+ * @throws When not able to get the moonpie count or database fails.
+ * @returns The moonpie count of the Twitch ID user.
  */
 export const getMoonpie = async (
   databasePath: string,
@@ -278,10 +284,11 @@ export const getMoonpie = async (
 /**
  * Get the moonpie count of a Twitch user.
  *
- * @param databasePath Path to database
- * @param twitchName Twitch name
- * @throws When not able to get the moonpie count or database fails
- * @returns The moonpie count of the Twitch name user
+ * @param databasePath Path to database.
+ * @param twitchName Twitch name.
+ * @param logger
+ * @throws When not able to get the moonpie count or database fails.
+ * @returns The moonpie count of the Twitch name user.
  */
 export const getMoonpieName = async (
   databasePath: string,
@@ -335,9 +342,11 @@ export interface GetMoonpieLeaderboardOut {
 /**
  * Get the moonpie count of a Twitch user.
  *
- * @param databasePath Path to database
- * @throws When not able to get the moonpie count or database fails
- * @returns The moonpie count of the Twitch ID user
+ * @param databasePath Path to database.
+ * @param limit
+ * @param logger
+ * @throws When not able to get the moonpie count or database fails.
+ * @returns The moonpie count of the Twitch ID user.
  */
 export const getMoonpieLeaderboard = async (
   databasePath: string,
@@ -369,10 +378,11 @@ export const getMoonpieLeaderboard = async (
 /**
  * Get the moonpie count of a Twitch user.
  *
- * @param databasePath Path to database
- * @param twitchId Twitch ID
- * @throws When not able to get the moonpie count or database fails
- * @returns The moonpie count of the Twitch ID user
+ * @param databasePath Path to database.
+ * @param twitchId Twitch ID.
+ * @param logger
+ * @throws When not able to get the moonpie count or database fails.
+ * @returns The moonpie count of the Twitch ID user.
  */
 export const getMoonpieLeaderboardEntry = async (
   databasePath: string,
@@ -420,12 +430,12 @@ export interface UpdateInput {
 }
 
 /**
- * Update account.
+ * Update entry.
  *
- * @param databasePath Path to database
- * @param accountId ID of account that wants to do this action
- * @param input New account info
- * @throws When not able to update account or database fails
+ * @param databasePath Path to database.
+ * @param input New account info.
+ * @param logger
+ * @throws When not able to update account or database fails.
  */
 export const update = async (
   databasePath: string,

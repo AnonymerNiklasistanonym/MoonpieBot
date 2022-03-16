@@ -2,6 +2,7 @@
 import dotenv from "dotenv";
 import * as path from "path";
 import { promises as fs } from "fs";
+import irc from "irc";
 // Local imports
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
@@ -23,9 +24,8 @@ import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import { ApiClient } from "@twurple/api";
 import { ClientCredentialsAuthProvider } from "@twurple/auth";
-import irc from "irc";
 
-/** Path to the root directory of the source code */
+/** Path to the root directory of the source code. */
 const pathToRootDir = path.join(__dirname, "..");
 
 // TODO Move to database tables so they can be changed on the fly
@@ -50,10 +50,10 @@ interface CustomCommandJson {
 }
 
 /**
- * Main method that runs the bot
+ * Main method that runs the bot.
  *
- * @param logger The global logger
- * @param logDir The directory in which the logs should be saved
+ * @param logger Logger (used for global logs).
+ * @param logDir The directory in which the logs should be saved.
  */
 const main = async (logger: Logger, logDir: string) => {
   logger.info(`Start ${name} ${getVersion()} (logs directory: '${logDir}')`);
@@ -110,6 +110,7 @@ const main = async (logger: Logger, logDir: string) => {
         ],
         password: osuIrcPassword,
         port: 6667,
+        autoConnect: false,
       });
       osuIrcBotInstance.addListener(
         "message",

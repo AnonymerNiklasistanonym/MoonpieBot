@@ -1,5 +1,5 @@
 /**
- * Command line interface handling
+ * Command line interface handling.
  */
 
 export const CliVariablePrefix = "MOONPIE_CONFIG_";
