@@ -1,50 +1,49 @@
 import type { Logger } from "winston";
 import * as database from "../core";
 
-/** Errors that can happen during moonpie entry creations */
+/** Errors that can happen during moonpie entry creations. */
 export enum CreateError {
   ALREADY_EXISTS = "MOONPIE_ALREADY_EXISTS",
 }
 
-/** Errors that can happen during moonpie requests */
-
+/** Errors that can happen during moonpie requests. */
 export enum GeneralError {
   NO_ACCESS = "MOONPIE_NO_ACCESS",
   NOT_EXISTING = "MOONPIE_NOT_EXISTING",
   NOT_FOUND = "NOT_FOUND",
 }
 
-/** Information about the SQlite table for moonpies */
+/** Information about the SQlite table for moonpies. */
 export const table = {
-  /** SQlite column names for moonpie table */
+  /** SQlite column names for moonpie table. */
   column: {
-    /** The *unique* Twitch ID */
+    /** The *unique* Twitch ID. */
     twitchId: "id",
-    /** The *current* Twitch account name at the last time of the claim (for the leaderboard) */
+    /** The *current* Twitch account name at the last time of the claim (for the leaderboard). */
     twitchName: "name",
-    /** The timestamp at the last time of the claim (for time based claims) */
+    /** The timestamp at the last time of the claim (for time based claims). */
     date: "timestamp",
-    /** The current number of moonpies */
+    /** The current number of moonpies. */
     moonpieCount: "count",
   },
-  /** SQlite table name for moonpies */
+  /** SQlite table name for moonpies. */
   name: "moonpie",
 } as const;
 
-/** Information about the SQlite table for moonpies */
+/** Information about the SQlite table for moonpies. */
 export const viewLeaderboard = {
-  /** SQlite column names for moonpie table */
+  /** SQlite column names for moonpie table. */
   column: {
-    /** The *unique* Twitch ID */
+    /** The *unique* Twitch ID. */
     twitchId: "id",
-    /** The *current* Twitch account name at the last time of the claim (for the leaderboard) */
+    /** The *current* Twitch account name at the last time of the claim (for the leaderboard). */
     twitchName: "name",
-    /** The current number of moonpies */
+    /** The current number of moonpies. */
     moonpieCount: "count",
-    /** The current rank on the leaderboard */
+    /** The current rank on the leaderboard. */
     rank: "rank",
   },
-  /** SQlite table name for moonpies */
+  /** SQlite table name for moonpies. */
   name: "moonpieleaderboard",
 } as const;
 
@@ -56,7 +55,7 @@ export const viewLeaderboard = {
  *
  * @param databasePath Path to database.
  * @param twitchId Twitch ID.
- * @param logger
+ * @param logger Logger (used for logging).
  * @returns True if the moonpie entry exists.
  */
 export const exists = async (
@@ -89,7 +88,7 @@ export const exists = async (
  *
  * @param databasePath Path to database.
  * @param twitchName Twitch name.
- * @param logger
+ * @param logger Logger (used for logging).
  * @returns True if the moonpie entry exists.
  */
 export const existsName = async (
@@ -124,9 +123,9 @@ export const existsName = async (
 // -----------------------------------------------------------------------------
 
 export interface CreateInput {
-  /** Twitch ID */
+  /** Twitch ID. */
   id: string;
-  /** Current Twitch name */
+  /** Current Twitch name. */
   name: string;
 }
 
@@ -135,7 +134,7 @@ export interface CreateInput {
  *
  * @param databasePath Path to database.
  * @param input Moonpie info.
- * @param logger
+ * @param logger Logger (used for logging).
  * @throws When not able to create moonpie or database fails.
  * @returns ID of the created entry.
  */
@@ -172,7 +171,7 @@ export const create = async (
  *
  * @param databasePath Path to database.
  * @param twitchId Twitch ID.
- * @param logger
+ * @param logger Logger (used for logging).
  * @throws When not able to remove moonpie entry or database fails.
  * @returns True if the moonpie entry was removed or already doesn't exist.
  */
@@ -199,7 +198,7 @@ export const remove = async (
  *
  * @param databasePath Path to database.
  * @param twitchName Twitch ID.
- * @param logger
+ * @param logger Logger (used for logging).
  * @throws When not able to remove moonpie entry or database fails.
  * @returns True if the moonpie entry was removed or already doesn't exist.
  */
@@ -243,7 +242,7 @@ export interface GetMoonpieOut {
  *
  * @param databasePath Path to database.
  * @param twitchId Twitch ID.
- * @param logger
+ * @param logger Logger (used for logging).
  * @throws When not able to get the moonpie count or database fails.
  * @returns The moonpie count of the Twitch ID user.
  */
@@ -286,7 +285,7 @@ export const getMoonpie = async (
  *
  * @param databasePath Path to database.
  * @param twitchName Twitch name.
- * @param logger
+ * @param logger Logger (used for logging).
  * @throws When not able to get the moonpie count or database fails.
  * @returns The moonpie count of the Twitch name user.
  */
@@ -343,8 +342,8 @@ export interface GetMoonpieLeaderboardOut {
  * Get the moonpie count of a Twitch user.
  *
  * @param databasePath Path to database.
- * @param limit
- * @param logger
+ * @param limit Limit the number of results.
+ * @param logger Logger (used for logging).
  * @throws When not able to get the moonpie count or database fails.
  * @returns The moonpie count of the Twitch ID user.
  */
@@ -380,7 +379,7 @@ export const getMoonpieLeaderboard = async (
  *
  * @param databasePath Path to database.
  * @param twitchId Twitch ID.
- * @param logger
+ * @param logger Logger (used for logging).
  * @throws When not able to get the moonpie count or database fails.
  * @returns The moonpie count of the Twitch ID user.
  */
@@ -434,7 +433,7 @@ export interface UpdateInput {
  *
  * @param databasePath Path to database.
  * @param input New account info.
- * @param logger
+ * @param logger Logger (used for logging).
  * @throws When not able to update account or database fails.
  */
 export const update = async (
@@ -467,5 +466,3 @@ export const update = async (
   );
   return postResult.changes > 0;
 };
-
-// TODO Get leaderboard position

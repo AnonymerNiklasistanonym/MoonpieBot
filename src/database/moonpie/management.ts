@@ -112,7 +112,7 @@ export const createAndSetupTables = async (
  * Create tables if not existing.
  *
  * @param databasePath Path to database.
- * @param logger
+ * @param logger Logger (used for logging).
  */
 export const setupInitialData = async (
   databasePath: string,

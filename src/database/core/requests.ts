@@ -8,9 +8,9 @@ import type { Logger } from "winston";
  * List of errors that can happen during a post request.
  */
 export enum ErrorCodePostRequest {
-  /** Some column specification/constraint was violated */
+  /** Some column specification/constraint was violated. */
   SQLITE_CONSTRAINT = "SQLITE_CONSTRAINT",
-  /** Hard query error like a duplicated column or non existing column */
+  /** Hard query error like a duplicated column or non existing column. */
   SQLITE_ERROR = "SQLITE_ERROR",
 }
 
@@ -77,7 +77,7 @@ const loggerDatabaseError = (
  * @param databasePath Path to database.
  * @param query The database query that should be run.
  * @param parameters Optional values that are inserted for query `?` symbols.
- * @param logger
+ * @param logger Logger (used for logging).
  * @returns Either undefined when no result or the found result.
  */
 // Disable eslint warning because never/unknown make it impossible to use types
@@ -144,7 +144,7 @@ export const getEach = async <DB_OUT extends { [key: string]: any }>(
  * @param databasePath Path to database.
  * @param query The database query that should be run.
  * @param parameters Optional values that are inserted for query `?` symbols.
- * @param logger
+ * @param logger Logger (used for logging).
  * @returns Either an empty list when no result or the found results.
  */
 // Disable eslint warning because never/unknown make it impossible to use types
@@ -194,7 +194,7 @@ export const getAll = async <DB_OUT extends { [key: string]: any }>(
  * @param databasePath Path to database.
  * @param query The database query that should be run.
  * @param parameters Optional values that are inserted for query `?` symbols.
- * @param logger
+ * @param logger Logger (used for logging).
  * @returns Database update info.
  */
 export const post = async (

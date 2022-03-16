@@ -1,13 +1,13 @@
 /**
  * Create `DELETE` query.
  *
- * ```sql
+ * @param tableName Sanitized table name.
+ * @param whereColumnName Sanitized column on which value a row should be
+ * removed.
+ * @returns SQLite query.
+ * @example ```sql
  * DELETE FROM tableName: string WHERE whereColumn=?;
  * ```
- *
- * @param tableName Sanitized table name
- * @param whereColumnName Sanitized column on which value a row should be removed
- * @returns Query
  */
 export const remove = (tableName: string, whereColumnName = "id"): string => {
   return `DELETE FROM ${tableName} WHERE ${whereColumnName}=?;`;
@@ -16,13 +16,13 @@ export const remove = (tableName: string, whereColumnName = "id"): string => {
 /**
  * Create `INSERT INTO` query.
  *
- * ```sql
+ * @param tableName Sanitized table name.
+ * @param columnNames Sanitized column names that should be overwritten with
+ * new values.
+ * @returns SQLite query.
+ * @example ```sql
  * INSERT INTO tableName: string(column_0, column_i, column_n) VALUES(?, ?, ?);
  * ```
- *
- * @param tableName Sanitized table name
- * @param columnNames Sanitized column names that should be overwritten with new values
- * @returns Query
  */
 export const insert = (tableName: string, columnNames: string[]): string => {
   return (
@@ -39,13 +39,13 @@ export interface ExistsDbOut {
 /**
  * Create `EXISTS` query.
  *
- * ```sql
+ * @param tableName Sanitized table name.
+ * @param whereColumnName Sanitized column name which is checked for existing
+ * with query value.
+ * @returns SQLite query.
+ * @example ```sql
  * SELECT EXISTS(SELECT 1 FROM tableName: string WHERE column=? AS exists_value;
  * ```
- *
- * @param tableName Sanitized table name
- * @param whereColumnName Sanitized column name which is checked for existing with query value
- * @returns Query
  */
 export const exists = (tableName: string, whereColumnName = "id"): string => {
   return `SELECT EXISTS(SELECT 1 FROM ${tableName} WHERE ${whereColumnName}=?) AS exists_value;`;
@@ -69,7 +69,7 @@ export interface SelectQueryInnerJoin {
 /**
  * Order by interface for select queries.
  *
- * ```sql
+ * @example ```sql
  * ORDER BY
  * column_1 ASC,
  * column_2 DESC;
@@ -126,20 +126,18 @@ export interface SelectColumn {
 /**
  * Create `SELECT` query.
  *
- * ```sql
+ * @param tableName Name of the table where values should be inserted.
+ * @param columns Name of the columns where values should be inserted.
+ * @param options Select options.
+ * @returns SQLite query.
+ * @example ```sql
  * SELECT column_0, column_i, column_n FROM tableName: string;
  * SELECT column_i FROM tableName: string WHERE whereColumn=?;
  * SELECT column FROM table INNER JOIN otherTable_i ON otherCol_i=thisCol_i;
  * SELECT DISTINCT column_0 FROM tableName: string;
  * SELECT column_0 FROM tableName: string ORDER BY column_0 ASC;
  * ```
- *
- * @param tableName
- * @param columns
- * @param options
- * @returns Query
  */
-// eslint-disable-next-line complexity
 export const select = (
   tableName: string,
   columns: (string | SelectColumn)[],
@@ -276,7 +274,11 @@ export interface CreateTableColumnForeign {
 /**
  * Create database table.
  *
- * ```sql
+ * @param tableName The name of the table.
+ * @param columns The columns of the table.
+ * @param ifNotExists Create table if not already existing.
+ * @returns SQLite query.
+ * @example ```sql
  * CREATE TABLE IF NOT EXISTS contacts (
  * contact_id INTEGER PRIMARY KEY,
  * first_name TEXT NOT NULL,
@@ -285,11 +287,6 @@ export interface CreateTableColumnForeign {
  * phone text NOT NULL UNIQUE
  * );
  * ```
- *
- * @param tableName The name of the table.
- * @param columns The columns of the table.
- * @param ifNotExists Create table if not already existing.
- * @returns SQLite Query.
  */
 export const createTable = (
   tableName: string,
@@ -345,14 +342,13 @@ export const createTable = (
 /**
  * Delete a database table.
  *
- * ```sql
- * DROP TABLE contacts;
- * DROP TABLE IF EXISTS contacts;
- * ```
- *
  * @param tableName Name of the table to delete.
  * @param ifExists Only remove table if it exists.
  * @returns SQLite query.
+ * @example ```sql
+ * DROP TABLE contacts;
+ * DROP TABLE IF EXISTS contacts;
+ * ```
  */
 export const dropTable = (tableName: string, ifExists = false): string => {
   return `DROP TABLE ${ifExists ? "IF EXISTS " : ""}${tableName};`;
@@ -361,7 +357,13 @@ export const dropTable = (tableName: string, ifExists = false): string => {
 /**
  * Create database view.
  *
- * ```sql
+ * @param viewName Name of the view to create.
+ * @param tableName Name of the table that the view is based on.
+ * @param columns View columns.
+ * @param options View creation options.
+ * @param ifNotExists Create view if not already existing.
+ * @returns SQLite query.
+ * @example ```sql
  * CREATE VIEW IF NOT EXISTS leaderboard
  * AS
  * SELECT
@@ -373,13 +375,6 @@ export const dropTable = (tableName: string, ifExists = false): string => {
  *     contacts.count DESC
  * );
  * ```
- *
- * @param viewName Name of the view to create.
- * @param tableName Name of the table that the view is based on.
- * @param columns View columns.
- * @param options View creation options.
- * @param ifNotExists Create view if not already existing.
- * @returns SQLite Query.
  */
 export const createView = (
   viewName: string,
@@ -398,14 +393,13 @@ export const createView = (
 /**
  * Delete a database view.
  *
- * ```sql
+ * @param viewName Name of the view to delete.
+ * @param ifExists Only remove view if it exists.
+ * @returns SQLite query.
+ * @example ```sql
  * DROP VIEW leaderboard;
  * DROP VIEW IF EXISTS leaderboard;
  * ```
- *
- * @param viewName Name of the view to delete.
- * @param ifExists Only remove view if it exists.
- * @returns SQLite Query.
  */
 export const dropView = (viewName: string, ifExists = false): string => {
   return `DROP VIEW ${ifExists ? "IF EXISTS " : ""}${viewName};`;
@@ -414,17 +408,16 @@ export const dropView = (viewName: string, ifExists = false): string => {
 /**
  * Update database table row values.
  *
- * ```sql
+ * @param tableName Name of the table.
+ * @param values Values that should be updated.
+ * @param whereColumn Column where the row changes should be made.
+ * @returns SQLite query.
+ * @example ```sql
  * UPDATE employees
  * SET lastname = 'Smith', firstname = 'Jo'
  * WHERE
  * employeeid = 3
  * ```
- *
- * @param tableName Name of the table.
- * @param values Values that should be updated.
- * @param whereColumn Column where the row changes should be made.
- * @returns SQLite Query.
  */
 export const update = (
   tableName: string,

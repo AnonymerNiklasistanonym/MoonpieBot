@@ -19,20 +19,20 @@ import type { Logger } from "winston";
 import { isProcessRunning } from "../../other/processInformation";
 
 /**
- * Post information about a osu! Beatmap in the chat and if existing also show
- * the current top score of the default osu! User in the chat.
+ * Post information about a osu Beatmap in the chat and if existing also show
+ * the current top score of the default osu User in the chat.
  *
  * @param client Twitch client (used to send messages).
  * @param channel Twitch channel (where the response should be sent to).
  * @param messageId Twitch message ID of the request (used for logging).
  * @param userName Twitch user name of the requester.
- * @param osuApiV2Credentials The osu! API (v2) credentials.
- * @param defaultOsuId Default osu! account ID (used for checking for existing
+ * @param osuApiV2Credentials The osu API (v2) credentials.
+ * @param defaultOsuId Default osu account ID (used for checking for existing
  * scores).
- * @param beatmapId The recognized osu! beatmap ID.
- * @param osuIrcBot The osu! IRC instance (used for sending requests to osu!
+ * @param beatmapId The recognized osu beatmap ID.
+ * @param osuIrcBot The osu IRC instance (used for sending requests to osu
  * client using IRC).
- * @param osuIrcRequestTarget The osu! account ID to whom the IRC request should
+ * @param osuIrcRequestTarget The osu account ID to whom the IRC request should
  * be sent to.
  * @param logger Logger (used for global logs).
  */
@@ -92,7 +92,7 @@ export const commandBeatmap = async (
   } catch (err) {
     if ((err as OsuApiV2WebRequestError).statusCode === 404) {
       logger.warn(err);
-      throw Error("Beatmap was not found");
+      throw Error("osu! beatmap was not found");
     } else {
       throw err;
     }
@@ -129,10 +129,10 @@ export const commandBeatmap = async (
             osuIrcBot !== undefined &&
             osuIsRunning
           ) {
-            logger.info("Try to create an osu! IRC connection");
+            logger.info("Try to create an osu IRC connection");
             try {
               let osuIrcBotInstance: undefined | IrcClient = osuIrcBot();
-              logger.info("Try to connect to osu! IRC channel");
+              logger.info("Try to connect to osu IRC channel");
               osuIrcBotInstance.connect(2, () => {
                 logger.info("osu! IRC connection was established");
                 osuIrcBotInstance?.say(osuIrcRequestTarget, messageIrc);

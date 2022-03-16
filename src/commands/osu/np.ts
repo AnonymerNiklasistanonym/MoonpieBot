@@ -15,15 +15,15 @@ export const regexNowPlaying =
   /^(?:.*?)\s-\s\s*(.*?)\s*\s-\s\s*(.*?)\s*\[\s*(.*)\s*\]$/;
 
 /**
- * NP (now playing) command: Send the map that is currently being played in osu!
+ * NP (now playing) command: Send the map that is currently being played in osu
  * (via the window title because the web api is not supporting it).
  *
  * @param client Twitch client (used to send messages).
  * @param channel Twitch channel (where the response should be sent to).
  * @param messageId Twitch message ID of the request (used for logging).
  * @param userName Twitch user name of the requester.
- * @param osuApiV2Credentials The osu! API (v2) credentials.
- * @param defaultOsuId Default osu! Account ID (used for checking for existing
+ * @param osuApiV2Credentials The osu API (v2) credentials.
+ * @param defaultOsuId Default osu Account ID (used for checking for existing
  * scores).
  * @param logger Logger (used for logging).
  */

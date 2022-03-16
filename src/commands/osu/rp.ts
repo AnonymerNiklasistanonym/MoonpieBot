@@ -16,12 +16,12 @@ import type { Logger } from "winston";
  * @param client Twitch client (used to send messages).
  * @param channel Twitch channel (where the response should be sent to).
  * @param messageId Twitch message ID of the request (used for logging).
- * @param osuApiV2Credentials The osu! API (v2) credentials.
- * @param defaultOsuId Default osu! Account ID (used for checking for existing
+ * @param osuApiV2Credentials The osu API (v2) credentials.
+ * @param defaultOsuId Default osu Account ID (used for checking for existing
  * scores).
- * @param customOsuId Custom osu! account ID (use this over the default osu!
- * account ID and over the not undefined custom osu! name if not undefined).
- * @param customOsuName osu! account name (use this over the default osu!
+ * @param customOsuId Custom osu account ID (use this over the default osu
+ * account ID and over the not undefined custom osu name if not undefined).
+ * @param customOsuName The osu account name (use this over the default osu
  * account ID if not undefined).
  * @param logger Logger (used for logging).
  */
