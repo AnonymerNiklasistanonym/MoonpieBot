@@ -1,18 +1,21 @@
-[
-    {
-        "name": "Custom timer 1",
-        "channels": [
-            "#salk1n616"
-        ],
-        "message": "Test every 10 seconds: $(random)%",
-        "cronString": "*/10 * * * * *"
-    },
-    {
-        "name": "Custom timer 1",
-        "channels": [
-            "#salk1n616"
-        ],
-        "message": "Test every 30 seconds",
-        "cronString": "*/30 * * * * *"
-    }
-]
+{
+    "$schema": "./customTimers.schema.json",
+    "timers": [
+        {
+            "name": "Custom timer 1",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "Test every 10 seconds: $(random)%",
+            "cronString": "*/10 * * * * *"
+        },
+        {
+            "name": "Custom timer 1",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "Test every 30 seconds",
+            "cronString": "*/30 * * * * *"
+        }
+    ]
+}

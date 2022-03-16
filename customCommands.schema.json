@@ -1,0 +1,73 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "additionalProperties": false,
+    "definitions": {
+        "customCommand": {
+            "additionalProperties": false,
+            "description": "Represents a custom command",
+            "properties": {
+                "name": {
+                    "description": "Name of the command",
+                    "type": "string"
+                },
+                "channels": {
+                    "description": "The channels where the timer should be active",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "message": {
+                    "description": "The message that should be sent",
+                    "type": "string"
+                },
+                "regexString": {
+                    "description": "The regex string that is used to check for the command",
+                    "type": "string"
+                },
+                "userLevel": {
+                    "description": "The allowed user level",
+                    "type": "string",
+                    "enum":[
+                        "broadcaster",
+                        "mod",
+                        "vip",
+                        "everyone"
+                    ]
+                },
+                "count": {
+                    "description": "The number of times the command got called",
+                    "type": "integer",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "name",
+                "channels",
+                "message",
+                "regexString"
+            ],
+            "title": "Custom command",
+            "type": "object"
+        }
+    },
+    "description": "Structured data object that can contain all information about custom timers",
+    "properties": {
+        "$schema": {
+            "description": "Pointer to the schema against which this document should be validated (Schema URL/path)",
+            "type": "string"
+        },
+        "commands": {
+            "description": "All custom commands",
+            "items": {
+                "$ref": "#/definitions/customCommand"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "commands"
+    ],
+    "title": "Custom Command Data",
+    "type": "object"
+}

@@ -25,6 +25,7 @@ import { isProcessRunning } from "./other/processInformation";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
+import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
 
 /** Path to the root directory of the source code. */
 const pathToRootDir = path.join(__dirname, "..");
@@ -41,6 +42,9 @@ interface CustomTimerJson {
   message: string;
   cronString: string;
 }
+interface CustomTimerDataJson {
+  timers: CustomTimerJson[];
+}
 interface CustomCommandJson {
   name?: string;
   channels: string[];
@@ -48,6 +52,9 @@ interface CustomCommandJson {
   regexString: string;
   count?: number;
   userLevel?: "broadcaster" | "mod" | "vip" | "everyone";
+}
+interface CustomCommandDataJson {
+  commands: CustomCommandJson[];
 }
 
 /**
@@ -161,7 +168,7 @@ const main = async (logger: Logger, logDir: string) => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const content = await fs.readFile(pathCustomCommands);
       customCommands.push(
-        ...(JSON.parse(content.toString()) as CustomCommandJson[])
+        ...(JSON.parse(content.toString()) as CustomCommandDataJson).commands
       );
     }
   } catch (err) {
@@ -175,7 +182,7 @@ const main = async (logger: Logger, logDir: string) => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const content = await fs.readFile(pathCustomTimers);
       customTimers.push(
-        ...(JSON.parse(content.toString()) as CustomTimerJson[])
+        ...(JSON.parse(content.toString()) as CustomTimerDataJson).timers
       );
     }
   } catch (err) {
@@ -322,6 +329,7 @@ const main = async (logger: Logger, logDir: string) => {
           channel,
           tags,
           message,
+          parseTwitchBadgeLevel(tags),
           customCommand.channels,
           customCommand.message,
           customCommand.regexString,

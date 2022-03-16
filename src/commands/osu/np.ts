@@ -17,7 +17,7 @@ import type { Logger } from "winston";
  * The first capture group is the artist, the second the title and the third
  * the name of the difficulty.
  *
- * @example ```txt
+ * @example ```
  * osu! - Artist - Title [Difficulty]
  * ```
  */

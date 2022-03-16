@@ -9,7 +9,7 @@ import { commandCommands } from "./moonpie/commands";
 import { commandAbout } from "./moonpie/about";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { commandClaim } from "./moonpie/claim";
-import { parseTwitchBadgeLevel } from "src/other/twitchBadgeParser";
+import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 
 const logDetectedCommand = (
   logger: Logger,

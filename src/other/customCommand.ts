@@ -1,8 +1,12 @@
+// Local imports
 import {
   errorMessageIdUndefined,
+  errorMessageUserNameUndefined,
   loggerCommand,
 } from "../commands/commandHelper";
 import { parseMessage } from "./parseMessage";
+import { TwitchBadgeLevels } from "./twitchBadgeParser";
+// Type imports
 import type { ApiClient } from "@twurple/api";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -26,6 +30,7 @@ export const checkCustomCommand = async (
   channel: string,
   tags: ChatUserstate,
   message: string,
+  twitchBadgeLevel: TwitchBadgeLevels,
   channels: string[],
   messageCommand: string,
   regexString: string,
@@ -39,13 +44,33 @@ export const checkCustomCommand = async (
     throw errorMessageIdUndefined();
   }
   if (tags.username === undefined) {
-    throw Error(
-      `Unable to parse message ${tags.id} since the username is undefined!`
-    );
+    throw errorMessageUserNameUndefined();
   }
 
-  if (userLevel === "vip") {
-    return false;
+  if (userLevel !== undefined) {
+    switch (twitchBadgeLevel) {
+      case TwitchBadgeLevels.BROADCASTER:
+        break;
+      case TwitchBadgeLevels.MODERATOR:
+        if (userLevel === "broadcaster") {
+          return false;
+        }
+        break;
+      case TwitchBadgeLevels.VIP:
+        if (userLevel === "broadcaster" || userLevel === "mod") {
+          return false;
+        }
+        break;
+      case TwitchBadgeLevels.NONE:
+        if (
+          userLevel === "broadcaster" ||
+          userLevel === "mod" ||
+          userLevel === "vip"
+        ) {
+          return false;
+        }
+        break;
+    }
   }
   // eslint-disable-next-line security/detect-non-literal-regexp
   const regex = new RegExp(regexString);

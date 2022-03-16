@@ -50,7 +50,8 @@
             "src/other/customTimer.ts",
             "src/other/osuStringBuilder.ts",
             "src/other/processInformation.ts",
-            "src/other/timePeriodToString.ts"
+            "src/other/timePeriodToString.ts",
+            "src/other/twitchBadgeParser.ts"
         ],
         "out": "docs"
     }
