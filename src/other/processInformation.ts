@@ -35,8 +35,7 @@ export const getProcessWindowTitle = async (
   }
 
   return new Promise((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    exec(cmd, (err, stdout, _stderr) => {
+    exec(cmd, (err, stdout /*, _stderr*/) => {
       if (err) return reject(err);
 
       const s = new Readable();
@@ -97,8 +96,7 @@ export const isProcessRunning = async (
   }
 
   return new Promise((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    exec(cmd, (err, stdout, _stderr) => {
+    exec(cmd, (err, stdout /*, _stderr*/) => {
       if (err) reject(err);
 
       resolve(stdout.toLowerCase().indexOf(processName.toLowerCase()) > -1);

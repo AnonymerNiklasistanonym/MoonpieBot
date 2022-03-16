@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 import {
@@ -18,6 +17,7 @@ const logDetectedCommand = (
 ) => {
   logger.log({
     level: "debug",
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     message: `Detected command '${command}' by ${tags?.username} in message ${tags?.id}`,
     section: "twitchClient",
     subsection: "moonpieChatHandler",

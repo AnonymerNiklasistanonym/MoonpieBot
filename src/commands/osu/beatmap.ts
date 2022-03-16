@@ -12,11 +12,11 @@ import {
 } from "../commandHelper";
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
 import { OsuApiV2Credentials } from "../osu";
+import { isProcessRunning } from "../../other/processInformation";
 // Type imports
 import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import { isProcessRunning } from "../../other/processInformation";
 
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
@@ -140,7 +140,6 @@ export const commandBeatmap = async (
                 osuIrcBotInstance?.disconnect("", () => {
                   osuIrcBotInstance?.conn.end();
                   osuIrcBotInstance = undefined;
-                  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                   logger.info(
                     `osu! IRC connection was closed": ${JSON.stringify(
                       osuIrcBotInstance

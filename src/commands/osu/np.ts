@@ -1,3 +1,5 @@
+// Package imports
+import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
   errorMessageIdUndefined,
@@ -5,12 +7,20 @@ import {
   loggerCommand,
 } from "../commandHelper";
 import { OsuApiV2Credentials } from "../osu";
+import { getProcessWindowTitle } from "../../other/processInformation";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import { getProcessWindowTitle } from "../../other/processInformation";
-import osuApiV2 from "osu-api-v2";
 
+/**
+ * Regex to parse the now playing window title on Windows.
+ * The first capture group is the artist, the second the title and the third
+ * the name of the difficulty.
+ *
+ * @example ```txt
+ * osu! - Artist - Title [Difficulty]
+ * ```
+ */
 export const regexNowPlaying =
   /^(?:.*?)\s-\s\s*(.*?)\s*\s-\s\s*(.*?)\s*\[\s*(.*)\s*\]$/;
 
@@ -46,13 +56,10 @@ export const commandNp = async (
   console.log(osuApiV2Credentials !== undefined && defaultOsuId !== undefined);
 
   const windowTitle = await getProcessWindowTitle("osu");
-  let message =
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    `${userName} No map is currently being played, try !rp to get the most recent play`;
+  let message = `${userName} No map is currently being played, try !rp to get the most recent play`;
   if (windowTitle !== undefined && windowTitle !== "osu!") {
     const match = windowTitle.match(regexNowPlaying);
     if (match != null) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message = `${userName} Currently playing '${match[2]}' from '${match[1]}' [${match[3]}]`;
       try {
         const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
@@ -60,7 +67,6 @@ export const commandNp = async (
           osuApiV2Credentials.clientSecret
         );
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const searchResult = await osuApiV2.beatmapsets.search(
           oauthAccessToken,
           `title='${match[2]}' artist='${match[1]}'`,

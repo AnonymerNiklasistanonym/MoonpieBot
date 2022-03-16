@@ -383,7 +383,6 @@ export const createView = (
   options?: SelectQueryOptions,
   ifNotExists = false
 ): string => {
-  // eslint-disable-next-line complexity
   return (
     `CREATE VIEW ${ifNotExists ? "IF NOT EXISTS " : ""}${viewName} AS ` +
     `${select(tableName, columns, options)}`

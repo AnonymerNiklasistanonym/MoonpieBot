@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-import * as database from "../../../../src/database/core";
+// Package imports
+import path from "path";
 import chai from "chai";
 import { describe } from "mocha";
+// Local imports
+import * as database from "../../../../src/database/core";
 import { getTestLogger } from "../../logger";
 import { itAllowFail } from "../../allowFail";
-import path from "path";
 
 const githubCiMaxTimeout = 4000;
 

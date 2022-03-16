@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
-
+// Local imports
 import { moonpieDb } from "../../database/moonpieDb";
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
   errorMessageUserIdUndefined,
 } from "../commandHelper";
+// Type imports
+import type { Client } from "tmi.js";
+import type { Logger } from "winston";
 
 export const commandUserGet = async (
   client: Client,

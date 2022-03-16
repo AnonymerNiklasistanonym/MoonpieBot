@@ -57,8 +57,7 @@ export const checkCustomCommand = async (
   logDetectedCommand(
     logger,
     tags,
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    `!customCommand ${commandName ? commandName : regex}`
+    `!customCommand ${commandName ? commandName : regex.toString()}`
   );
   if (channels.find((a) => a === channel)) {
     const parsedMessage = await parseMessage(
@@ -71,12 +70,13 @@ export const checkCustomCommand = async (
     const sentMessage = await client.say(channel, parsedMessage);
     loggerCommand(
       logger,
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       `Successfully replied to message ${tags.id}: '${JSON.stringify(
         sentMessage
       )}'`,
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      { commandId: "!customCommand#" + (commandName ? commandName : regex) }
+      {
+        commandId:
+          "!customCommand#" + (commandName ? commandName : regex.toString()),
+      }
     );
   }
   return true;

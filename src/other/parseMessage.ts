@@ -118,13 +118,11 @@ export const parseMessage = async (
               })
               .then((channel) => {
                 if (!channel) {
-                  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                   return `[ERROR: <${macroString}> twitch request failed]`;
                 }
                 return `${channel.gameName} `;
               })
               .catch((err) => {
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 return `[ERROR: <${macroString}> twitch request failed: ${
                   (err as Error).message
                 }]`;
