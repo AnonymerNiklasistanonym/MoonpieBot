@@ -28,16 +28,33 @@ export const commandRp = async (
   osuApiV2Credentials: OsuApiV2Credentials,
   defaultOsuId: number,
   customOsuId: undefined | number,
+  customOsuName: undefined | string,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
     throw errorMessageIdUndefined();
   }
 
+  console.log(customOsuId, customOsuName);
+
   const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
     osuApiV2Credentials.clientId,
     osuApiV2Credentials.clientSecret
   );
+
+  if (customOsuId === undefined && customOsuName !== undefined) {
+    const userSearchResult = await osuApiV2.search.user(
+      oauthAccessToken,
+      customOsuName
+    );
+    if (
+      userSearchResult?.user?.data !== undefined &&
+      Array.isArray(userSearchResult.user.data) &&
+      userSearchResult.user.data.length > 0
+    ) {
+      customOsuId = userSearchResult.user.data[0].id;
+    }
+  }
 
   const lastPlay = await osuApiV2.users.scores(
     oauthAccessToken,

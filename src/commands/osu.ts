@@ -36,9 +36,11 @@ export const regexNp = /^\s*!np(\s*|\s.*)$/i;
 
 export const regexRp = /^\s*!rp(\s*|\s.*)$/i;
 export const regexRpCustomId = /^\s*!rp\s+([0-9]+)\s*.*$/i;
+export const regexRpCustomName = /^\s*!rp\s+(\S+)\s*.*$/i;
 
 export const regexPp = /^\s*!pp(\s*|\s.*)$/i;
 export const regexPpCustomId = /^\s*!pp\s+([0-9]+)\s*.*$/i;
+export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
 
 /**
  * Regex that matches the following 2 kinds of URLs in any message:
@@ -81,14 +83,17 @@ export const osuChatHandler = async (
   // > !rp
   if (message.match(regexRp)) {
     logDetectedCommand(logger, tags, "!rp");
-    const match = regexRpCustomId.exec(message);
+    const matchId = regexRpCustomId.exec(message);
+    const matchName = regexRpCustomName.exec(message);
+    console.log(matchId, matchName);
     await commandRp(
       client,
       channel,
       tags.id,
       osuApiV2Credentials,
       osuDefaultId,
-      match && match.length >= 2 ? parseInt(match[1]) : undefined,
+      matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
+      matchName && matchName.length >= 2 ? matchName[1] : undefined,
       logger
     );
     return;
@@ -96,14 +101,17 @@ export const osuChatHandler = async (
   // > !pp
   if (message.match(regexPp)) {
     logDetectedCommand(logger, tags, "!pp");
-    const match = regexPpCustomId.exec(message);
+    const matchId = regexPpCustomId.exec(message);
+    const matchName = regexPpCustomName.exec(message);
+    console.log(matchId, matchName);
     await commandPp(
       client,
       channel,
       tags.id,
       osuApiV2Credentials,
       osuDefaultId,
-      match && match.length >= 2 ? parseInt(match[1]) : undefined,
+      matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
+      matchName && matchName.length >= 2 ? matchName[1] : undefined,
       logger
     );
     return;

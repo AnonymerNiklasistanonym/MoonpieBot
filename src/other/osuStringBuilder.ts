@@ -29,9 +29,11 @@ export const mapUserToStr = (user: User) => {
   const joinDateMonth = joinDate.getMonth();
   const joinDateYear = joinDate.getFullYear();
 
-  finalString += `${user.username} (https://osu.ppy.sh/users/${user.id}) from ${
-    user.country.name
-  } plays with ${user.playstyle.join(", ")} since ${
+  finalString += `${user.username} (https://osu.ppy.sh/users/${user.id}) from ${user.country.name} plays`;
+  if (user.playstyle) {
+    finalString += ` with ${user.playstyle.join(", ")}`;
+  }
+  finalString += ` since ${
     // eslint-disable-next-line security/detect-object-injection
     monthNames[joinDateMonth]
   } ${joinDateYear}`;
