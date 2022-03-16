@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import * as path from "path";
 import { promises as fs } from "fs";
 import irc from "irc";
+import { ApiClient } from "@twurple/api";
+import { ClientCredentialsAuthProvider } from "@twurple/auth";
 // Local imports
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
@@ -19,11 +21,10 @@ import {
 } from "./cli";
 import { checkCustomCommand } from "./other/customCommand";
 import { registerTimer } from "./other/customTimer";
+import { isProcessRunning } from "./other/processInformation";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
-import { ApiClient } from "@twurple/api";
-import { ClientCredentialsAuthProvider } from "@twurple/auth";
 
 /** Path to the root directory of the source code. */
 const pathToRootDir = path.join(__dirname, "..");
@@ -379,6 +380,39 @@ const main = async (logger: Logger, logDir: string) => {
     }
   } catch (err) {
     logger.error(err);
+  }
+
+  // Check if IRC bot is working
+  if (
+    enableOsu &&
+    osuIrcBot &&
+    osuIrcRequestTarget &&
+    (await isProcessRunning("osu"))
+  ) {
+    try {
+      let osuIrcBotInstance: undefined | irc.Client = osuIrcBot();
+      logger.info("Try to connect to osu IRC channel");
+      osuIrcBotInstance.connect(2, () => {
+        logger.info("osu! IRC connection was established");
+        osuIrcBotInstance?.say(osuIrcRequestTarget, "UwU");
+        osuIrcBotInstance?.disconnect("", () => {
+          osuIrcBotInstance?.conn.end();
+          osuIrcBotInstance = undefined;
+          logger.info(
+            `osu! IRC connection was closed": ${JSON.stringify(
+              osuIrcBotInstance
+            )}`
+          );
+        });
+      });
+    } catch (err) {
+      logger.error(
+        `osu! IRC connection could not be established": ${
+          (err as Error).message
+        }`
+      );
+      logger.error(err);
+    }
   }
 };
 
