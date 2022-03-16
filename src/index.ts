@@ -394,7 +394,10 @@ const main = async (logger: Logger, logDir: string) => {
       logger.info("Try to connect to osu IRC channel");
       osuIrcBotInstance.connect(2, () => {
         logger.info("osu! IRC connection was established");
-        osuIrcBotInstance?.say(osuIrcRequestTarget, "UwU");
+        osuIrcBotInstance?.say(
+          osuIrcRequestTarget,
+          `UwU (${name} ${getVersion()})`
+        );
         osuIrcBotInstance?.disconnect("", () => {
           osuIrcBotInstance?.conn.end();
           osuIrcBotInstance = undefined;
