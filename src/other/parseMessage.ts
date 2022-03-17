@@ -85,7 +85,8 @@ export const parseMessage = async (
         return "<bad>";
       }
       if (macroString === "user") {
-        return userName;
+        replaceData.push(Promise.resolve(userName));
+        return "<bad>";
       }
       if (macroString.startsWith("twitch")) {
         if (twitchApiClient === undefined) {
