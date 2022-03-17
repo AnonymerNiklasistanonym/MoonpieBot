@@ -22,10 +22,10 @@ import {
 import { checkCustomCommand } from "./other/customCommand";
 import { registerTimer } from "./other/customTimer";
 import { isProcessRunning } from "./other/processInformation";
+import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
-import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
 
 /** Path to the root directory of the source code. */
 const pathToRootDir = path.join(__dirname, "..");
@@ -438,6 +438,8 @@ const main = async (logger: Logger, logDir: string) => {
 const isEntryPoint = () => require.main === module;
 if (isEntryPoint()) {
   try {
+    process.title = `${name} ${getVersion()}`;
+
     // Load environment variables if existing from the .env file
     dotenv.config();
     // Print for debugging the (private/secret) environment values to the console
