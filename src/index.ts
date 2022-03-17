@@ -350,7 +350,14 @@ const main = async (logger: Logger, logDir: string) => {
               // eslint-disable-next-line security/detect-non-literal-fs-filename
               fs.writeFile(
                 pathCustomCommands,
-                JSON.stringify(customCommands, undefined, 4)
+                JSON.stringify(
+                  {
+                    $schema: "./customCommands.schema.json",
+                    commands: customCommands,
+                  },
+                  undefined,
+                  4
+                )
               )
                 .then(() => {
                   logger.info("Custom commands were saved");
