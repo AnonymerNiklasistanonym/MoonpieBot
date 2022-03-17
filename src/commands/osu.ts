@@ -139,7 +139,6 @@ export const osuChatHandler = async (
       tags.id,
       tags.username,
       osuApiV2Credentials,
-      osuDefaultId,
       logger
     );
     return;

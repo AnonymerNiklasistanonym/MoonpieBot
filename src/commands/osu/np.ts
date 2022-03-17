@@ -33,8 +33,6 @@ export const regexNowPlaying =
  * @param messageId Twitch message ID of the request (used for logging).
  * @param userName Twitch user name of the requester.
  * @param osuApiV2Credentials The osu API (v2) credentials.
- * @param defaultOsuId Default osu Account ID (used for checking for existing
- * scores).
  * @param logger Logger (used for logging).
  */
 export const commandNp = async (
@@ -43,7 +41,6 @@ export const commandNp = async (
   messageId: string | undefined,
   userName: string | undefined,
   osuApiV2Credentials: OsuApiV2Credentials,
-  defaultOsuId: number,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
