@@ -53,14 +53,12 @@ export const commandNp = async (
     throw errorMessageUserNameUndefined();
   }
 
-  console.log(osuApiV2Credentials !== undefined && defaultOsuId !== undefined);
-
   const windowTitle = await getProcessWindowTitle("osu");
-  let message = `${userName} No map is currently being played, try !rp to get the most recent play`;
+  let message = `@${userName} No map is currently being played, try !rp to get the most recent play`;
   if (windowTitle !== undefined && windowTitle !== "osu!") {
     const match = windowTitle.match(regexNowPlaying);
     if (match != null) {
-      message = `${userName} Currently playing '${match[2]}' from '${match[1]}' [${match[3]}]`;
+      message = `@${userName} Currently playing '${match[2]}' from '${match[1]}' [${match[3]}]`;
       try {
         const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
           osuApiV2Credentials.clientId,
