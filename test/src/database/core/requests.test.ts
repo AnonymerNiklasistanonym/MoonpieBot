@@ -5,7 +5,7 @@ import { getTestLogger } from "../../logger";
 import { itAllowFail } from "../../allowFail";
 import path from "path";
 
-const githubCiMaxTimeout = 4000;
+const githubCiMaxTimeout = 8000;
 
 export default (databaseDirPath: string): Mocha.Suite => {
   return describe("requests", () => {

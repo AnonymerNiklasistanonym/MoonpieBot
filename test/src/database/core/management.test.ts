@@ -7,7 +7,7 @@ import * as database from "../../../../src/database/core";
 import { getTestLogger } from "../../logger";
 import { itAllowFail } from "../../allowFail";
 
-const githubCiMaxTimeout = 4000;
+const githubCiMaxTimeout = 8000;
 
 export default (databaseDirPath: string): Mocha.Suite => {
   return describe("management", () => {
