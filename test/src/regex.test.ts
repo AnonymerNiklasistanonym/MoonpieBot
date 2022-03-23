@@ -8,6 +8,7 @@ import {
   regexMoonpieRemove,
   regexMoonpieSet,
 } from "../../src/commands/moonpie";
+import { regexNowPlaying } from "../../src/commands/osu/np";
 
 describe("regex", () => {
   context("!moonpie commands", () => {
@@ -272,6 +273,40 @@ describe("regex", () => {
       const message9 = "!moonpie add username 100";
       const matches9 = message9.match(regexMoonpieSet);
       expect(matches9).to.be.null;
+    });
+  });
+
+  context("osu commands", () => {
+    it("now playing window", () => {
+      const message0 = "osu! - Artist Title [Difficulty]";
+      const matches0 = message0.match(regexNowPlaying);
+      expect(matches0).to.be.null;
+
+      const message1 = "osu! - Artist - Title";
+      const matches1 = message1.match(regexNowPlaying);
+      expect(matches1).to.be.null;
+
+      const message2 = "Title - Artist [Difficulty]";
+      const matches2 = message2.match(regexNowPlaying);
+      expect(matches2).to.be.null;
+
+      const message3 = "osu! - Artist - Title [Difficulty]";
+      const matches3 = message3.match(regexNowPlaying);
+      expect(matches3).to.be.not.null;
+      if (matches3 != null) {
+        expect(matches3[1]).to.be.equal("Artist");
+        expect(matches3[2]).to.be.equal("Title");
+        expect(matches3[3]).to.be.equal("Difficulty");
+      }
+
+      const message4 = "osu! - Artist - Title [TV Size] [Difficulty]";
+      const matches4 = message4.match(regexNowPlaying);
+      expect(matches4).to.be.not.null;
+      if (matches4 != null) {
+        expect(matches4[1]).to.be.equal("Artist");
+        expect(matches4[2]).to.be.equal("Title [TV Size]");
+        expect(matches4[3]).to.be.equal("Difficulty");
+      }
     });
   });
 });

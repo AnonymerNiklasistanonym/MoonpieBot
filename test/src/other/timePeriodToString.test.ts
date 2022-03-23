@@ -9,7 +9,7 @@ const yearS = dayS * 365;
 
 export default (): Mocha.Suite => {
   return describe("timePeriodToString", () => {
-    it("secondsToString", () => {
+    it("basics", () => {
       chai.expect(secondsToString(0)).to.be.equal("0 seconds");
       chai.expect(secondsToString(1)).to.be.equal("1 second");
       chai.expect(secondsToString(2)).to.be.equal("2 seconds");

@@ -90,7 +90,9 @@ export const checkCustomCommand = async (
       match,
       commandCount,
       tags.username,
-      twitchApiClient
+      twitchApiClient,
+      tags["user-id"],
+      channel
     );
     const sentMessage = await client.say(channel, parsedMessage);
     loggerCommand(

@@ -20,9 +20,12 @@ import type { Logger } from "winston";
  * @example ```
  * osu! - Artist - Title [Difficulty]
  * ```
+ * @example ```
+ * osu! - Artist - Title [TV Size] [Difficulty]
+ * ```
  */
 export const regexNowPlaying =
-  /^(?:.*?)\s-\s\s*(.*?)\s*\s-\s\s*(.*?)\s*\[\s*(.*)\s*\]$/;
+  /^(?:.+?)\s-\s\s*(.+?)\s*\s-\s\s*(.+?)\s*\[\s*([^\s[\]]+?)\s*\]$/;
 
 /**
  * NP (now playing) command: Send the map that is currently being played in osu
@@ -81,9 +84,19 @@ export const commandNp = async (
                 b.version.trim().toLocaleLowerCase() ===
                 match[3].trim().toLocaleLowerCase()
             );
+            /*console.log({
+              titleIsTheSame,
+              diffNameCanBeFound,
+              titleIsTheSameComp1: a.title.trim().toLocaleLowerCase(),
+              titleIsTheSameComp2: match[2].trim().toLocaleLowerCase(),
+              diffNameCanBeFound1: a.beatmaps?.map((b) =>
+                b.version.trim().toLocaleLowerCase()
+              ),
+              diffNameCanBeFound2: match[3].trim().toLocaleLowerCase(),
+            });*/
             return titleIsTheSame && diffNameCanBeFound;
           });
-          console.log(searchResult.beatmapsets);
+          //console.log(searchResult.beatmapsets);
           if (exactMatch) {
             const exactBeatmapDiff = exactMatch.beatmaps?.find(
               (a) =>
@@ -91,12 +104,19 @@ export const commandNp = async (
                 match[3].trim().toLocaleLowerCase()
             );
             if (exactBeatmapDiff) {
-              message += ` (should be: https://osu.ppy.sh/beatmaps/${exactBeatmapDiff.id})`;
+              message += ` (https://osu.ppy.sh/beatmaps/${exactBeatmapDiff.id})`;
             } else {
-              message += ` (most likely: https://osu.ppy.sh/beatmapsets/${exactMatch.id})`;
+              /*console.log(
+                exactMatch,
+                exactMatch.beatmaps?.map((a) =>
+                  a.version.trim().toLocaleLowerCase()
+                ),
+                match[3].trim().toLocaleLowerCase()
+              );*/
+              //message += ` (most likely: https://osu.ppy.sh/beatmapsets/${exactMatch.id})`;
             }
           } else {
-            message += ` (probably: https://osu.ppy.sh/beatmapsets/${searchResult.beatmapsets[0].id})`;
+            //message += ` (probably: https://osu.ppy.sh/beatmapsets/${searchResult.beatmapsets[0].id})`;
           }
         }
       } catch (err) {

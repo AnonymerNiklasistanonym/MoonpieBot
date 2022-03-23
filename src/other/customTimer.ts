@@ -20,7 +20,15 @@ export const registerTimer = (
   return cron.schedule(cronString, () => {
     logger.debug(`Timer triggered ${cronString}: "${message}"`);
     for (const channel of channels) {
-      parseMessage(message, [message], 0, "<not_available>", twitchApiClient)
+      parseMessage(
+        message,
+        [message],
+        0,
+        "<not_available>",
+        twitchApiClient,
+        undefined,
+        channel
+      )
         .then((parsedMessage) => client.say(channel, parsedMessage))
         .then((sentMessage) => {
           loggerCommand(

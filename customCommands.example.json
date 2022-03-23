@@ -32,7 +32,7 @@
             "userLevel": "everyone"
         },
         {
-            "name": "Custom command 4 > Using the twitch api",
+            "name": "Custom command 4.1 > Using the Twitch api > get game",
             "channels": [
                 "#salk1n616"
             ],
@@ -40,6 +40,36 @@
             "regexString": "^!so\\s+@?(\\S+)\\s*(?:.*)$",
             "count": 3,
             "userLevel": "mod"
+        },
+        {
+            "name": "Custom command 4.2 > Using the Twitch api > get follow age",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "@$(user) You followed the channel since $(twitch-follow_age)",
+            "regexString": "!followage",
+            "count": 0,
+            "userLevel": "everyone"
+        },
+        {
+            "name": "Custom command 4.3 > Using the Twitch api > set title [TODO:scopes]",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "@$(user) You updated the title to $(twitch-set_title=$(group-1))",
+            "regexString": "^!settitle\\s+(.*?)\\s*$",
+            "count": 0,
+            "userLevel": "everyone"
+        },
+        {
+            "name": "Custom command 4.4 > Using the Twitch api > set game [TODO:scopes]",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "@$(user) You updated the game to $(twitch-set_title=$(group-1))",
+            "regexString": "^!setgame\\s+(.*?)\\s*$",
+            "count": 0,
+            "userLevel": "everyone"
         }
     ]
 }
