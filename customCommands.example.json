@@ -59,7 +59,7 @@
             "message": "@$(user) You updated the title to $(twitch-set_title=$(group-1))",
             "regexString": "^!settitle\\s+(.*?)\\s*$",
             "count": 0,
-            "userLevel": "everyone"
+            "userLevel": "mod"
         },
         {
             "name": "Custom command 4.4 > Using the Twitch api > set game [TODO:scopes]",
@@ -69,7 +69,7 @@
             "message": "@$(user) You updated the game to $(twitch-set_title=$(group-1))",
             "regexString": "^!setgame\\s+(.*?)\\s*$",
             "count": 0,
-            "userLevel": "everyone"
+            "userLevel": "mod"
         }
     ]
 }
