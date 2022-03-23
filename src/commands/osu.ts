@@ -35,7 +35,8 @@ const logDetectedCommand = (
 /**
  * Regex to recognize the !np command.
  *
- * @example ```
+ * @example
+ * ```
  * !np $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
@@ -44,7 +45,8 @@ export const regexNp = /^\s*!np(\s*|\s.*)$/i;
 /**
  * Regex to recognize the !rp command.
  *
- * @example ```
+ * @example
+ * ```
  * !rp $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
@@ -54,7 +56,8 @@ export const regexRp = /^\s*!rp(\s*|\s.*)$/i;
  * Regex to recognize the !rp command with a custom supplied osu ID.
  * The first group is the custom osu ID (number).
  *
- * @example ```
+ * @example
+ * ```
  * !rp 12345 $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
@@ -64,7 +67,8 @@ export const regexRpCustomId = /^\s*!rp\s+([0-9]+)\s*.*$/i;
  * Regex to recognize the !rp command with a custom supplied osu name.
  * The first group is the custom osu name (string without spaces).
  *
- * @example ```
+ * @example
+ * ```
  * !rp osuName $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
@@ -73,7 +77,8 @@ export const regexRpCustomName = /^\s*!rp\s+(\S+)\s*.*$/i;
 /**
  * Regex to recognize the !pp command.
  *
- * @example ```
+ * @example
+ * ```
  * !pp $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
@@ -83,7 +88,8 @@ export const regexPp = /^\s*!pp(\s*|\s.*)$/i;
  * Regex to recognize the !pp command with a custom supplied osu ID.
  * The first group is the custom osu ID (number).
  *
- * @example ```
+ * @example
+ * ```
  * !pp 12345 $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
@@ -93,7 +99,8 @@ export const regexPpCustomId = /^\s*!pp\s+([0-9]+)\s*.*$/i;
  * Regex to recognize the !pp command with a custom supplied osu name.
  * The first group is the custom osu name (string without spaces).
  *
- * @example ```
+ * @example
+ * ```
  * !pp osuName $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
@@ -103,10 +110,12 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
  * Regex that matches osu beatmap URLs in any message.
  * The first group is the osu beatmap ID.
  *
- * @example ```
+ * @example
+ * ```
  * $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES
  * ```
- * @example ```
+ * @example
+ * ```
  * $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587891 $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
