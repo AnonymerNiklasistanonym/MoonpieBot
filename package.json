@@ -69,7 +69,7 @@
         "irc": "https://github.com/AnonymerNiklasistanonym/node-irc/tarball/91abd899ec35dbec6f90787f67ce8fa8fc1aeadc",
         "node-cron": "^3.0.0",
         "osu-api-v2": "^0.0.16",
-        "sqlite3": "^4.2.0",
+        "sqlite3": "github:mapbox/node-sqlite3#8fd29bc",
         "tmi.js": "^1.8.5",
         "winston": "^3.6.0",
         "winston-daily-rotate-file": "^4.6.1"

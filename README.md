@@ -54,19 +54,6 @@ It also can recognize beatmap links in chat and print map information (and if ex
    - Linux: xfce-terminal/...
 4. Install all dependencies
 
-   ---
-
-   On Windows you can install a special dependency first so the dependency [`sqlite3`](https://www.npmjs.com/package/sqlite3) can be installed without having its build tools (Python, Visual Studio with C++ environment, ...) installed which is also much faster:
-
-   ```sh
-   # source: https://www.npmjs.com/package/sqlite3#installing
-   npm install https://github.com/mapbox/node-sqlite3/tarball/master
-   ```
-
-   ---
-
-   To install all dependencies always run:
-
    ```sh
    npm install
    ```

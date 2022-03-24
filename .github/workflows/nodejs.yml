@@ -77,12 +77,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies
-      run: |
-        # This speeds up the installation and also
-        # doesn't need Python, Visual Studio, etc.
-        npm install https://github.com/mapbox/node-sqlite3/tarball/master
-        # Install the package.json dependencies
-        npm ci
+      run: npm ci
     - name: Run tests and see code coverage
       run: npm run test
     - name: Build the bot
