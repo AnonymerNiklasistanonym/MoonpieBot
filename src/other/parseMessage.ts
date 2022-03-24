@@ -18,19 +18,19 @@ export const getMacroArgs = (macroContent: string) => {
  * A regex to match macros in messages:
  *
  * @example
- * ```
+ * ```text
  * Go check out $(macro1Name-macro1Arg1)
  * ```
  * @example
- * ```
+ * ```text
  * $(macro1Name-macro1Arg1=macro1Arg1Value)
  * ```
  * @example
- * ```
+ * ```text
  * $(macro1Name-macro1Arg1=$(macro2Name-macro2Arg2))
  * ```
  * @example
- * ```
+ * ```text
  * Go check out $(group-1) at https://www.twitch.tv/$(group-1) <3 They were last playing $(twitch-channel_game=$(group-1))
  * ```
  */

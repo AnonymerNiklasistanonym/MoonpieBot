@@ -18,11 +18,11 @@ import type { Logger } from "winston";
  * the name of the difficulty.
  *
  * @example
- * ```
+ * ```text
  * osu! - Artist - Title [Difficulty]
  * ```
  * @example
- * ```
+ * ```text
  * osu! - Artist - Title [TV Size] [Difficulty]
  * ```
  */
