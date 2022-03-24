@@ -38,8 +38,6 @@ export const commandPp = async (
     throw errorMessageIdUndefined();
   }
 
-  console.log(customOsuId, customOsuName);
-
   const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
     osuApiV2Credentials.clientId,
     osuApiV2Credentials.clientSecret

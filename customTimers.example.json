@@ -10,12 +10,20 @@
             "cronString": "*/30 * * * * *"
         },
         {
-            "name": "Custom timer 1",
+            "name": "Custom timer 2",
             "channels": [
                 "#salk1n616"
             ],
-            "message": "Test every 60 seconds",
-            "cronString": "*/60 * * * * *"
+            "message": "Test every 15 minutes",
+            "cronString": "*/15 * * * *"
+        },
+        {
+            "name": "Custom timer 3",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "Test every hour",
+            "cronString": "0 */1 * * *"
         }
     ]
 }
