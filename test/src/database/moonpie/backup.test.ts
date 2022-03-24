@@ -7,6 +7,8 @@ import path from "path";
 import { createAndSetupTables } from "../../../../src/database/moonpie/management";
 import { GeneralError } from "../../../../src/database/moonpie/requests";
 
+const githubCiMaxTimeout = 8000;
+
 export default (databaseDirPath: string): Mocha.Suite => {
   return describe("backup", () => {
     const logger = getTestLogger("Backup");
@@ -84,6 +86,6 @@ export default (databaseDirPath: string): Mocha.Suite => {
       } catch (err) {
         chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
       }
-    }).timeout(2000);
+    }).timeout(githubCiMaxTimeout);
   });
 };
