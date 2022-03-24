@@ -17,7 +17,7 @@
                 "#salk1n616"
             ],
             "message": "Test command query is: '$(group-1)'",
-            "regexString": "!test(?:\\s*(.*?)\\s*$)?",
+            "regexString": "!test\\s+(.*?)\\s*$",
             "count": 20,
             "userLevel": "everyone"
         },
