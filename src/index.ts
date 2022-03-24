@@ -416,11 +416,7 @@ const main = async (logger: Logger, logDir: string) => {
         osuIrcBotInstance?.disconnect("", () => {
           osuIrcBotInstance?.conn.end();
           osuIrcBotInstance = undefined;
-          logger.info(
-            `osu! IRC connection was closed": ${JSON.stringify(
-              osuIrcBotInstance
-            )}`
-          );
+          logger.info("osu! IRC connection was closed");
         });
       });
     } catch (err) {

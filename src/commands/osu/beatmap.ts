@@ -140,11 +140,7 @@ export const commandBeatmap = async (
                 osuIrcBotInstance?.disconnect("", () => {
                   osuIrcBotInstance?.conn.end();
                   osuIrcBotInstance = undefined;
-                  logger.info(
-                    `osu! IRC connection was closed": ${JSON.stringify(
-                      osuIrcBotInstance
-                    )}`
-                  );
+                  logger.info("osu! IRC connection was closed");
                   return resolve();
                 });
               });
