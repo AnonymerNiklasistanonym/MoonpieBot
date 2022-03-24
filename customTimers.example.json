@@ -6,16 +6,16 @@
             "channels": [
                 "#salk1n616"
             ],
-            "message": "Test every 10 seconds: $(random)%",
-            "cronString": "*/10 * * * * *"
+            "message": "Test every 30 seconds: $(random)%",
+            "cronString": "*/30 * * * * *"
         },
         {
             "name": "Custom timer 1",
             "channels": [
                 "#salk1n616"
             ],
-            "message": "Test every 30 seconds",
-            "cronString": "*/30 * * * * *"
+            "message": "Test every 60 seconds",
+            "cronString": "*/60 * * * * *"
         }
     ]
 }

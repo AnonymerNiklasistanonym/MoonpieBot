@@ -52,21 +52,21 @@
             "userLevel": "everyone"
         },
         {
-            "name": "Custom command 4.3 > Using the Twitch api > set title [TODO:scopes]",
+            "name": "Custom command 4.3 > Using the Twitch api > set title [user:edit:broadcast]",
             "channels": [
                 "#salk1n616"
             ],
-            "message": "@$(user) You updated the title to $(twitch-set_title=$(group-1))",
+            "message": "@$(user) You updated the title to '$(twitch-set_title=$(group-1))'",
             "regexString": "^!settitle\\s+(.*?)\\s*$",
             "count": 0,
             "userLevel": "mod"
         },
         {
-            "name": "Custom command 4.4 > Using the Twitch api > set game [TODO:scopes]",
+            "name": "Custom command 4.4 > Using the Twitch api > set game [user:edit:broadcast]",
             "channels": [
                 "#salk1n616"
             ],
-            "message": "@$(user) You updated the game to $(twitch-set_title=$(group-1))",
+            "message": "@$(user) You updated the game to '$(twitch-set_game=$(group-1))'",
             "regexString": "^!setgame\\s+(.*?)\\s*$",
             "count": 0,
             "userLevel": "mod"

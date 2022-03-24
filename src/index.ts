@@ -4,7 +4,7 @@ import * as path from "path";
 import { promises as fs } from "fs";
 import irc from "irc";
 import { ApiClient } from "@twurple/api";
-import { ClientCredentialsAuthProvider } from "@twurple/auth";
+import { StaticAuthProvider } from "@twurple/auth";
 // Local imports
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
@@ -191,28 +191,28 @@ const main = async (logger: Logger, logDir: string) => {
 
   await moonpieDbSetupTables(databasePath, logger);
 
-  const twitchClientId = getCliVariableValueDefault(
-    CliVariable.TWITCH_CLIENT_ID,
+  const twitchApiClientId = getCliVariableValueDefault(
+    CliVariable.TWITCH_API_CLIENT_ID,
     undefined
   );
-  const twitchClientSecret = getCliVariableValueDefault(
-    CliVariable.TWITCH_CLIENT_SECRET,
+  const twitchApiAccessToken = getCliVariableValueDefault(
+    CliVariable.TWITCH_API_ACCESS_TOKEN,
     undefined
   );
   const enableTwitchApiCalls =
-    twitchClientId !== undefined && twitchClientSecret !== undefined;
+    twitchApiClientId !== undefined && twitchApiAccessToken !== undefined;
   let twitchApiClient: ApiClient | undefined = undefined;
   if (!enableTwitchApiCalls) {
     logger.info(
       "Twitch API features are disabled since not all variables were set"
     );
   } else {
-    const authProvider = new ClientCredentialsAuthProvider(
-      twitchClientId,
-      twitchClientSecret
+    const authProviderScopes = new StaticAuthProvider(
+      twitchApiClientId,
+      twitchApiAccessToken
     );
     twitchApiClient = new ApiClient({
-      authProvider,
+      authProvider: authProviderScopes,
     });
   }
 

@@ -112,7 +112,7 @@ export const parseMessage = async (
             return `[ERROR: <${macroString}> twitch api client undefined]`;
           }
           if (macroArgs[0].name === "channel_game") {
-            const parsedMessage = await parseMessage(
+            const channelName = await parseMessage(
               macroArgs[0].value,
               regexGroups,
               count,
@@ -122,9 +122,7 @@ export const parseMessage = async (
               twitchChannelName,
               depth + 1
             );
-            const user = await twitchApiClient.users.getUserByName(
-              parsedMessage
-            );
+            const user = await twitchApiClient.users.getUserByName(channelName);
             if (user !== null) {
               const channel = await twitchApiClient.channels.getChannelInfo(
                 user.id
@@ -140,11 +138,21 @@ export const parseMessage = async (
             if (twitchUserId === undefined) {
               return `[ERROR: <${macroString}> twitch api user ID was undefined]`;
             }
+            const newTitle = await parseMessage(
+              macroArgs[0].value,
+              regexGroups,
+              count,
+              userName,
+              twitchApiClient,
+              twitchUserId,
+              twitchChannelName,
+              depth + 1
+            );
             try {
               await twitchApiClient.channels.updateChannelInfo(twitchUserId, {
-                title: macroArgs[0].value,
+                title: newTitle,
               });
-              return `Title was updated to ${macroArgs[0].value}`;
+              return `${newTitle}`;
             } catch (err) {
               return `[ERROR: Title could not be updated ${
                 (err as Error).message
@@ -154,9 +162,19 @@ export const parseMessage = async (
             if (twitchUserId === undefined) {
               return `[ERROR: <${macroString}> twitch api user ID was undefined]`;
             }
+            const newGame = await parseMessage(
+              macroArgs[0].value,
+              regexGroups,
+              count,
+              userName,
+              twitchApiClient,
+              twitchUserId,
+              twitchChannelName,
+              depth + 1
+            );
             try {
               const gameName = await twitchApiClient.games.getGameByName(
-                macroArgs[0].value
+                newGame
               );
               if (gameName == null || gameName?.id === undefined) {
                 return `[ERROR: <${macroString}> twitch api game ID was undefined]`;
@@ -164,14 +182,13 @@ export const parseMessage = async (
               await twitchApiClient.channels.updateChannelInfo(twitchUserId, {
                 gameId: gameName.id,
               });
-              return `Game was updated to ${gameName.name}`;
+              return `${gameName.name}`;
             } catch (err) {
-              return `[ERROR: Title could not be updated ${
+              return `[ERROR: Game could not be updated ${
                 (err as Error).message
               }]`;
             }
           } else if (macroArgs[0].name === "follow_age") {
-            //// TODO
             if (twitchUserId === undefined) {
               return `[ERROR: <${macroString}> twitch api user ID was undefined]`;
             }
