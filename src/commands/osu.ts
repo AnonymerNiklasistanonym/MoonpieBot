@@ -12,6 +12,7 @@
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import type { Client as IrcClient } from "irc";
+import type { StreamCompanionData } from "../index";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 import { commandBeatmap } from "./osu/beatmap";
@@ -137,6 +138,9 @@ export const osuChatHandler = async (
   enableOsuBeatmapRecognition: undefined | boolean,
   osuIrcBot: (() => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
+  osuStreamCompanionCurrentMapData:
+    | (() => StreamCompanionData | undefined)
+    | undefined,
   logger: Logger
 ): Promise<void> => {
   // > !np
@@ -148,6 +152,7 @@ export const osuChatHandler = async (
       tags.id,
       tags.username,
       osuApiV2Credentials,
+      osuStreamCompanionCurrentMapData,
       logger
     );
     return;

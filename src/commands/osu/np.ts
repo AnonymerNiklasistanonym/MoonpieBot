@@ -11,6 +11,7 @@ import { getProcessWindowTitle } from "../../other/processInformation";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { StreamCompanionData } from "../../index";
 
 /**
  * Regex to parse the now playing window title on Windows.
@@ -38,6 +39,7 @@ export const regexNowPlaying =
  * @param messageId Twitch message ID of the request (used for logging).
  * @param userName Twitch user name of the requester.
  * @param osuApiV2Credentials The osu API (v2) credentials.
+ * @param osuStreamCompanionCurrentMapData If available get the current map data using StreamCompanion.
  * @param logger Logger (used for logging).
  */
 export const commandNp = async (
@@ -46,6 +48,10 @@ export const commandNp = async (
   messageId: string | undefined,
   userName: string | undefined,
   osuApiV2Credentials: OsuApiV2Credentials,
+  osuStreamCompanionCurrentMapData:
+    | (() => StreamCompanionData | undefined)
+    | undefined,
+
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -54,75 +60,85 @@ export const commandNp = async (
   if (userName === undefined) {
     throw errorMessageUserNameUndefined();
   }
-
-  const windowTitle = await getProcessWindowTitle("osu");
   let message = `@${userName} No map is currently being played, try !rp to get the most recent play`;
-  if (windowTitle !== undefined && windowTitle !== "osu!") {
-    const match = windowTitle.match(regexNowPlaying);
-    if (match != null) {
-      message = `@${userName} Currently playing '${match[2]}' from '${match[1]}' [${match[3]}]`;
-      try {
-        const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
-          osuApiV2Credentials.clientId,
-          osuApiV2Credentials.clientSecret
-        );
 
-        const searchResult = await osuApiV2.beatmapsets.search(
-          oauthAccessToken,
-          `title='${match[2]}' artist='${match[1]}'`,
-          false
-        );
-        if (
-          searchResult.beatmapsets !== undefined &&
-          Array.isArray(searchResult.beatmapsets) &&
-          searchResult.beatmapsets.length >= 1
-        ) {
-          const exactMatch = searchResult.beatmapsets.find((a) => {
-            const titleIsTheSame =
-              a.title.trim().toLocaleLowerCase() ===
-              match[2].trim().toLocaleLowerCase();
-            const diffNameCanBeFound = a.beatmaps?.find(
-              (b) =>
-                b.version.trim().toLocaleLowerCase() ===
-                match[3].trim().toLocaleLowerCase()
-            );
-            /*console.log({
-              titleIsTheSame,
-              diffNameCanBeFound,
-              titleIsTheSameComp1: a.title.trim().toLocaleLowerCase(),
-              titleIsTheSameComp2: match[2].trim().toLocaleLowerCase(),
-              diffNameCanBeFound1: a.beatmaps?.map((b) =>
-                b.version.trim().toLocaleLowerCase()
-              ),
-              diffNameCanBeFound2: match[3].trim().toLocaleLowerCase(),
-            });*/
-            return titleIsTheSame && diffNameCanBeFound;
-          });
-          //console.log(searchResult.beatmapsets);
-          if (exactMatch) {
-            const exactBeatmapDiff = exactMatch.beatmaps?.find(
-              (a) =>
-                a.version.trim().toLocaleLowerCase() ===
-                match[3].trim().toLocaleLowerCase()
-            );
-            if (exactBeatmapDiff) {
-              message += ` (https://osu.ppy.sh/beatmaps/${exactBeatmapDiff.id})`;
-            } else {
-              /*console.log(
-                exactMatch,
-                exactMatch.beatmaps?.map((a) =>
-                  a.version.trim().toLocaleLowerCase()
+  if (osuStreamCompanionCurrentMapData !== undefined) {
+    const currentMapData = osuStreamCompanionCurrentMapData();
+    if (currentMapData !== undefined && currentMapData.mapid !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      message = `@${userName} Currently playing '${currentMapData.titleRoman}' from '${currentMapData.artistRoman}' [${currentMapData.diffName}] (https://osu.ppy.sh/beatmaps/${currentMapData.mapid} - StreamCompanion)`;
+    } else {
+      message += " (StreamCompanion was configured but not found running!)";
+    }
+  } else {
+    const windowTitle = await getProcessWindowTitle("osu");
+    if (windowTitle !== undefined && windowTitle !== "osu!") {
+      const match = windowTitle.match(regexNowPlaying);
+      if (match != null) {
+        message = `@${userName} Currently playing '${match[2]}' from '${match[1]}' [${match[3]}]`;
+        try {
+          const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
+            osuApiV2Credentials.clientId,
+            osuApiV2Credentials.clientSecret
+          );
+
+          const searchResult = await osuApiV2.beatmapsets.search(
+            oauthAccessToken,
+            `title='${match[2]}' artist='${match[1]}'`,
+            false
+          );
+          if (
+            searchResult.beatmapsets !== undefined &&
+            Array.isArray(searchResult.beatmapsets) &&
+            searchResult.beatmapsets.length >= 1
+          ) {
+            const exactMatch = searchResult.beatmapsets.find((a) => {
+              const titleIsTheSame =
+                a.title.trim().toLocaleLowerCase() ===
+                match[2].trim().toLocaleLowerCase();
+              const diffNameCanBeFound = a.beatmaps?.find(
+                (b) =>
+                  b.version.trim().toLocaleLowerCase() ===
+                  match[3].trim().toLocaleLowerCase()
+              );
+              /*console.log({
+                titleIsTheSame,
+                diffNameCanBeFound,
+                titleIsTheSameComp1: a.title.trim().toLocaleLowerCase(),
+                titleIsTheSameComp2: match[2].trim().toLocaleLowerCase(),
+                diffNameCanBeFound1: a.beatmaps?.map((b) =>
+                  b.version.trim().toLocaleLowerCase()
                 ),
-                match[3].trim().toLocaleLowerCase()
-              );*/
-              //message += ` (most likely: https://osu.ppy.sh/beatmapsets/${exactMatch.id})`;
+                diffNameCanBeFound2: match[3].trim().toLocaleLowerCase(),
+              });*/
+              return titleIsTheSame && diffNameCanBeFound;
+            });
+            //console.log(searchResult.beatmapsets);
+            if (exactMatch) {
+              const exactBeatmapDiff = exactMatch.beatmaps?.find(
+                (a) =>
+                  a.version.trim().toLocaleLowerCase() ===
+                  match[3].trim().toLocaleLowerCase()
+              );
+              if (exactBeatmapDiff) {
+                message += ` (https://osu.ppy.sh/beatmaps/${exactBeatmapDiff.id})`;
+              } else {
+                /*console.log(
+                  exactMatch,
+                  exactMatch.beatmaps?.map((a) =>
+                    a.version.trim().toLocaleLowerCase()
+                  ),
+                  match[3].trim().toLocaleLowerCase()
+                );*/
+                //message += ` (most likely: https://osu.ppy.sh/beatmapsets/${exactMatch.id})`;
+              }
+            } else {
+              //message += ` (probably: https://osu.ppy.sh/beatmapsets/${searchResult.beatmapsets[0].id})`;
             }
-          } else {
-            //message += ` (probably: https://osu.ppy.sh/beatmapsets/${searchResult.beatmapsets[0].id})`;
           }
+        } catch (err) {
+          logger.warn(err);
         }
-      } catch (err) {
-        logger.warn(err);
       }
     }
   }

@@ -23,6 +23,8 @@ import { checkCustomCommand } from "./other/customCommand";
 import { registerTimer } from "./other/customTimer";
 import { isProcessRunning } from "./other/processInformation";
 import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
+import ReconnectingWebSocket from "reconnecting-websocket";
+import WebSocket from "ws";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
@@ -55,6 +57,14 @@ interface CustomCommandJson {
 }
 interface CustomCommandDataJson {
   commands: CustomCommandJson[];
+}
+
+export interface StreamCompanionData {
+  titleRoman?: string;
+  artistRoman?: string;
+  diffName?: string;
+  mapid?: number;
+  mapsetid?: number;
 }
 
 /**
@@ -149,16 +159,76 @@ const main = async (logger: Logger, logDir: string) => {
       return osuIrcBotInstance;
     };
   }
+  const osuStreamCompanionUrl = getCliVariableValueDefault(
+    CliVariable.OSU_STREAM_COMPANION_URL,
+    undefined
+  );
+  let osuStreamCompanionCurrentMapData:
+    | (() => StreamCompanionData | undefined)
+    | undefined = undefined;
+  if (enableOsu && osuStreamCompanionUrl !== undefined) {
+    // Automatically reconnect on loss of connection - this means StreamCompanion
+    // does not need to be run all the time but only when needed
+    let connectedToStreamCompanion = false;
+    const ws = new ReconnectingWebSocket(
+      `ws://${osuStreamCompanionUrl}/tokens`,
+      [],
+      {
+        WebSocket: WebSocket,
+        connectionTimeout: 10 * 1000,
+      }
+    );
+    ws.onopen = () => {
+      connectedToStreamCompanion = true;
+      logger.info("StreamCompanion socket was opened");
+      //send token names with should be watched for value changes
+      ws.send(
+        JSON.stringify([
+          "titleRoman",
+          "artistRoman",
+          "diffName",
+          "mapid",
+          "mapsetid",
+        ])
+      );
+    };
+    const cache: StreamCompanionData = {};
+    ws.onmessage = (wsEvent) => {
+      Object.assign(
+        cache,
+        JSON.parse(wsEvent.data as string) as StreamCompanionData
+      );
+      logger.info(`New StreamCompanion data: '${wsEvent.data as string}'`);
+    };
+    ws.onclose = () => {
+      connectedToStreamCompanion = false;
+
+      logger.info("StreamCompanion socket was closed");
+    };
+    ws.onerror = (err) => {
+      connectedToStreamCompanion = false;
+      logger.debug(err);
+    };
+    osuStreamCompanionCurrentMapData = () =>
+      connectedToStreamCompanion ? cache : undefined;
+  }
   if (!enableOsu) {
     logger.info("Osu features are disabled since not all variables were set");
-  } else if (!enableOsuBeatmapRecognition) {
-    logger.info(
-      "Osu beatmap recognition features are disabled since not all variables were set"
-    );
-  } else if (!enableOsuIrc) {
-    logger.info(
-      "Osu IRC features are disabled since not all variables were set"
-    );
+  } else {
+    if (!enableOsuBeatmapRecognition) {
+      logger.info(
+        "Osu beatmap recognition features are disabled since not all variables were set"
+      );
+    } else if (!enableOsuIrc) {
+      logger.info(
+        "Osu IRC features are disabled since not all variables were set"
+      );
+    }
+    if (osuStreamCompanionCurrentMapData === undefined) {
+      logger.info(
+        "Osu StreamCompanion beatmap recognition features are disabled since not all variables were set"
+      );
+    }
   }
 
   // Load custom commands
@@ -305,6 +375,7 @@ const main = async (logger: Logger, logDir: string) => {
         enableOsuBeatmapRecognition,
         osuIrcBot,
         osuIrcRequestTarget,
+        osuStreamCompanionCurrentMapData,
         logger
       ).catch((err) => {
         logger.error(err);
@@ -337,6 +408,8 @@ const main = async (logger: Logger, logDir: string) => {
           customCommand.name,
           customCommand.count ? customCommand.count + 1 : 1,
           twitchApiClient,
+          // TODO Add macro for StreamCompanion
+          // osuStreamCompanionCurrentMapData,
           logger
         )
           .then((commandExecuted) => {
@@ -390,6 +463,8 @@ const main = async (logger: Logger, logDir: string) => {
         customTimer.message,
         customTimer.cronString,
         twitchApiClient,
+        // TODO Add macro for StreamCompanion
+        //osuStreamCompanionCurrentMapData,
         logger
       );
     }
