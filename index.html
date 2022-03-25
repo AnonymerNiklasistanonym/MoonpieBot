@@ -63,9 +63,9 @@
 </ul>
 
 <a href="#optional-osu" id="optional-osu" style="color: inherit; text-decoration: none;">
-  <h3>Optional: Osu</h3>
+  <h3>Optional: osu!</h3>
 </a>
-<p>Given an Osu OAuth client ID/secret and a default (streamer) Osu ID the bot can additionally fetch some Osu related information.</p>
+<p>Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can additionally fetch some osu! related information.</p>
 <table>
 <thead>
 <tr>
@@ -75,17 +75,36 @@
 </tr>
 </thead>
 <tbody><tr>
-<td><code>!rp ($OSU_ID)</code></td>
+<td>`!rp ($OSU_ID</td>
+<td>$OSU_NAME)`</td>
 <td>everyone</td>
-<td>Get the most recent play of the streamer or of the given Osu player ID</td>
 </tr>
 <tr>
-<td><code>!pp ($OSU_ID)</code></td>
+<td>`!pp ($OSU_ID</td>
+<td>$OSU_NAME)`</td>
 <td>everyone</td>
-<td>Get general account information (pp, rank, country, ...) of the streamer or of the given Osu player ID</td>
+</tr>
+<tr>
+<td><code>!np</code></td>
+<td>everyone</td>
+<td>Get a link to the currently being played map (this only works if the computer that runs this bot is the one running the osu! client since it needs the window title)</td>
 </tr>
 </tbody></table>
-<p>It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat but this part can also be disabled.</p>
+<p>It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat but this part can also be disabled.
+Given an osu! IRC login it can even send beatmap links to the osu! client that were pasted in chat.</p>
+
+<a href="#optional-custom-commandstimers" id="optional-custom-commandstimers" style="color: inherit; text-decoration: none;">
+  <h3>Optional: Custom commands/timers</h3>
+</a>
+<p>A file called <code>customCommands.json</code> can be provided that enables to write custom commands of the style:</p>
+<pre><code class="language-json"><span class="hl-0">{</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;name&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;Command name&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;channels&quot;</span><span class="hl-0">: [</span><br/><span class="hl-0">        </span><span class="hl-2">&quot;#channelName&quot;</span><br/><span class="hl-0">    ],</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;message&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;Text $(macroName) $(macroName-macroArg-macroArg=macroValue)&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;regexString&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;!regexExpression&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;count&quot;</span><span class="hl-0">: </span><span class="hl-3">2</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;userLevel&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;everyone&quot;</span><br/><span class="hl-0">}</span>
+</code></pre>
+<p>An example file for this is <a href="./customCommands.example.json"><code>customCommands.example.json</code></a>.</p>
+<p>A file called <code>customTimers.json</code> can be provided that enables to write custom timers of the style:</p>
+<pre><code class="language-json"><span class="hl-0">{</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;name&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;Timer name&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;channels&quot;</span><span class="hl-0">: [</span><br/><span class="hl-0">        </span><span class="hl-2">&quot;#channelName&quot;</span><br/><span class="hl-0">    ],</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;message&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;Text $(macroName) $(macroName-macroArg-macroArg=macroValue)&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">    </span><span class="hl-1">&quot;cronString&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;*/30 * * * * *&quot;</span><br/><span class="hl-0">}</span>
+</code></pre>
+<p>An example file for this is <a href="./customTimers.example.json"><code>customTimers.example.json</code></a>.</p>
+<p>For some macros to work (like Twitch API connections for <code>!so</code>/<code>!followage</code>/<code>!settitle</code>/<code>!setgame</code>) additional Twitch API credentials need to be provided.</p>
 
 <a href="#setup" id="setup" style="color: inherit; text-decoration: none;">
   <h2>Setup</h2>
@@ -99,7 +118,7 @@
 <li><p>Install <a href="https://git-scm.com/downloads">git</a></p>
 </li>
 <li><p>Open the console/terminal in the directory where you want to have the source code and run:</p>
-<pre><code class="language-sh"><span class="hl-0"># cd path/to/dir</span><br/><span class="hl-1">git clone </span><span class="hl-2">&quot;https://github.com/AnonymerNiklasistanonym/MoonpieBot.git&quot;</span>
+<pre><code class="language-sh"><span class="hl-4"># cd path/to/dir</span><br/><span class="hl-0">git clone </span><span class="hl-2">&quot;https://github.com/AnonymerNiklasistanonym/MoonpieBot.git&quot;</span>
 </code></pre>
 </li>
 </ul>
@@ -115,14 +134,14 @@
 </ul>
 </li>
 <li><p>Install all dependencies</p>
-<pre><code class="language-sh"><span class="hl-1">npm install</span>
+<pre><code class="language-sh"><span class="hl-0">npm install</span>
 </code></pre>
 </li>
 <li><p>Build the bot (it needs to be compiled from TypeScript to JavaScript so it can be run via <code>node</code>)</p>
-<pre><code class="language-sh"><span class="hl-1">npm run build</span>
+<pre><code class="language-sh"><span class="hl-0">npm run build</span>
 </code></pre>
 <p>If you want you can now also remove all development dependencies that were installed to the <code>node_modules</code> directory and only necessary to build the program but not for running it:</p>
-<pre><code class="language-sh"><span class="hl-0"># Keep in mind that if you want to update the bot after the source code</span><br/><span class="hl-0"># changes you need to run `npm install` again to reacquire the development</span><br/><span class="hl-0"># dependencies</span><br/><span class="hl-1">npm prune --production</span>
+<pre><code class="language-sh"><span class="hl-4"># Keep in mind that if you want to update the bot after the source code</span><br/><span class="hl-4"># changes you need to run `npm install` again to reacquire the development</span><br/><span class="hl-4"># dependencies</span><br/><span class="hl-0">npm prune --production</span>
 </code></pre>
 </li>
 <li><p>Provide the necessary environment variables or a <code>.env</code> file in the source code directory with the following information:</p>
@@ -140,7 +159,7 @@ The file contains also the information about what variables need to be set.</p>
 </ul>
 </li>
 <li><p>Run the bot</p>
-<pre><code class="language-sh"><span class="hl-1">npm run start</span>
+<pre><code class="language-sh"><span class="hl-0">npm run start</span>
 </code></pre>
 <p>If there are errors you can probably find advanced log messages in the log files in the directory <code>logs</code> that is created while running the bot.</p>
 </li>
