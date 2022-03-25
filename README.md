@@ -19,16 +19,54 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
   | `!moonpie set $USER $COUNT` | broadcaster badge | Set moonpie `$COUNT` to `$USER` if found in database |
   | `!moonpie delete $USER` | broadcaster badge | Delete a `$USER` from the database if found in database |
 
-### Optional: Osu
+### Optional: osu!
 
-Given an Osu OAuth client ID/secret and a default (streamer) Osu ID the bot can additionally fetch some Osu related information.
+Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can additionally fetch some osu! related information.
 
 | Command | Permissions | Description |
 | ------ | -- | -------- |
-| `!rp ($OSU_ID)` | everyone | Get the most recent play of the streamer or of the given Osu player ID |
-| `!pp ($OSU_ID)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given Osu player ID |
+| `!rp ($OSU_ID | $OSU_NAME)` | everyone | Get the most recent play of the streamer or of the given osu! player ID |
+| `!pp ($OSU_ID | $OSU_NAME)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given osu! player ID |
+| `!np` | everyone | Get a link to the currently being played map (this only works if the computer that runs this bot is the one running the osu! client since it needs the window title) |
 
 It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat but this part can also be disabled.
+Given an osu! IRC login it can even send beatmap links to the osu! client that were pasted in chat.
+
+### Optional: Custom commands/timers
+
+A file called `customCommands.json` can be provided that enables to write custom commands of the style:
+
+```json
+{
+    "name": "Command name",
+    "channels": [
+        "#channelName"
+    ],
+    "message": "Text $(macroName) $(macroName-macroArg-macroArg=macroValue)",
+    "regexString": "!regexExpression",
+    "count": 2,
+    "userLevel": "everyone"
+}
+```
+
+An example file for this is [`customCommands.example.json`](./customCommands.example.json).
+
+A file called `customTimers.json` can be provided that enables to write custom timers of the style:
+
+```json
+{
+    "name": "Timer name",
+    "channels": [
+        "#channelName"
+    ],
+    "message": "Text $(macroName) $(macroName-macroArg-macroArg=macroValue)",
+    "cronString": "*/30 * * * * *"
+}
+```
+
+An example file for this is [`customTimers.example.json`](./customTimers.example.json).
+
+For some macros to work (like Twitch API connections for `!so`/`!followage`/`!settitle`/`!setgame`) additional Twitch API credentials need to be provided.
 
 ## Setup
 
