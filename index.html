@@ -206,17 +206,28 @@ For easily seeing to what a cron string resolves to you can use <a href="https:/
 <li>Typescript</li>
 <li>Node.js dependencies:<ul>
 <li>Production:<ul>
+<li>Non optional features:<ul>
 <li><code>dotenv</code> (for reading in environment variables config)</li>
-<li><code>tmi.js</code> (for the Twitch connection)</li>
 <li><code>sqlite3</code> (for a persistent database)</li>
+<li><code>tmi.js</code> (for the Twitch chat connection)</li>
 <li><code>winston</code> (for logging to a file)</li>
 </ul>
 </li>
+<li>Optional features:<ul>
+<li><code>@twurple/api</code>/<code>@twurple/auth</code> (Twitch API connection for message macros)</li>
+<li><code>csv-parser</code> (Windows window title output parsing)</li>
+<li><code>irc</code> (connect to osu! client via IRC protocol)</li>
+<li><code>node-cron</code> (run timers based on cron strings)</li>
+<li><code>osu-api-v2</code> (connect to the osu! API v2)</li>
+</ul>
+</li>
+</ul>
+</li>
 <li>Development:<ul>
-<li><code>nodemon</code> (live restart of bot after changes have been made)</li>
-<li><code>mocha</code> (for tests)</li>
-<li><code>nyc</code> (for code coverage)</li>
 <li><code>eslint</code> (for code format and linting)</li>
+<li><code>mocha</code> (for tests)</li>
+<li><code>nodemon</code> (live restart of bot after changes have been made)</li>
+<li><code>nyc</code> (for code coverage)</li>
 <li><code>prettier</code> (for code format)</li>
 </ul>
 </li>
