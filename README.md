@@ -163,15 +163,22 @@ Not every detail but the big components on which this bot is made of:
 - Typescript
 - Node.js dependencies:
   - Production:
-    - `dotenv` (for reading in environment variables config)
-    - `tmi.js` (for the Twitch connection)
-    - `sqlite3` (for a persistent database)
-    - `winston` (for logging to a file)
+    - Non optional features:
+      - `dotenv` (for reading in environment variables config)
+      - `sqlite3` (for a persistent database)
+      - `tmi.js` (for the Twitch chat connection)
+      - `winston` (for logging to a file)
+    - Optional features:
+      - `@twurple/api`/`@twurple/auth` (Twitch API connection for message macros)
+      - `csv-parser` (Windows window title output parsing)
+      - `irc` (connect to osu! client via IRC protocol)
+      - `node-cron` (run timers based on cron strings)
+      - `osu-api-v2` (connect to the osu! API v2)
   - Development:
-    - `nodemon` (live restart of bot after changes have been made)
-    - `mocha` (for tests)
-    - `nyc` (for code coverage)
     - `eslint` (for code format and linting)
+    - `mocha` (for tests)
+    - `nodemon` (live restart of bot after changes have been made)
+    - `nyc` (for code coverage)
     - `prettier` (for code format)
 
 ## Inspect Database
