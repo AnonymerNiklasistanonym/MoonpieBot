@@ -196,6 +196,15 @@ To inspect the SQLite database manually and edit it or run custom queries (for e
 - `npm run build:dev` - build typescript with source maps and comments in code are kept
 - `npm run mocha` - a helper npm script for running customised mocha command e.g. test a single file `npm run mocha -- file-name-or-pattern`
 
+### Tests
+
+If you only want to run one specific test suite and not all of them you can specify the test suite file:
+
+```sh
+# This will only run the test suite in the file "test/src/database.test.ts"
+cross-env NODE_PATH=. nyc mocha -- "test/src/database.test.ts"
+```
+
 ### Configuration files
 
 - TypeScript: `.tsconfig.json`, `.tsconfig.eslint` (special script for linting tests)
