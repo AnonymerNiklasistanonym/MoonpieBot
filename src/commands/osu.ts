@@ -141,10 +141,14 @@ export const osuChatHandler = async (
   osuStreamCompanionCurrentMapData:
     | (() => StreamCompanionData | undefined)
     | undefined,
+  enabled: undefined | string[],
   logger: Logger
 ): Promise<void> => {
+  if (enabled === undefined) {
+    enabled = ["np", "pp", "rp"];
+  }
   // > !np
-  if (message.match(regexNp)) {
+  if (message.match(regexNp) && enabled?.includes("np")) {
     logDetectedCommand(logger, tags, "!np");
     await commandNp(
       client,
@@ -158,7 +162,7 @@ export const osuChatHandler = async (
     return;
   }
   // > !rp
-  if (message.match(regexRp)) {
+  if (message.match(regexRp) && enabled?.includes("rp")) {
     logDetectedCommand(logger, tags, "!rp");
     const matchId = regexRpCustomId.exec(message);
     const matchName = regexRpCustomName.exec(message);
@@ -176,7 +180,7 @@ export const osuChatHandler = async (
     return;
   }
   // > !pp
-  if (message.match(regexPp)) {
+  if (message.match(regexPp) && enabled?.includes("pp")) {
     logDetectedCommand(logger, tags, "!pp");
     const matchId = regexPpCustomId.exec(message);
     const matchName = regexPpCustomName.exec(message);

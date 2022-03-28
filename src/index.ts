@@ -346,6 +346,9 @@ const main = async (logger: Logger, logDir: string) => {
       tags,
       message,
       databasePath,
+      getCliVariableValueDefault(CliVariable.ENABLE_COMMANDS, undefined)?.split(
+        ","
+      ),
       logger
     ).catch((err) => {
       logger.error(err);
@@ -376,6 +379,10 @@ const main = async (logger: Logger, logDir: string) => {
         osuIrcBot,
         osuIrcRequestTarget,
         osuStreamCompanionCurrentMapData,
+        getCliVariableValueDefault(
+          CliVariable.OSU_ENABLE_COMMANDS,
+          undefined
+        )?.split(","),
         logger
       ).catch((err) => {
         logger.error(err);
