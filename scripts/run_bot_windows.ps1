@@ -5,8 +5,8 @@
 
 Write-Host "---------------------------------------------------------"
 Write-Host "Run [Windows]:"
-Write-Host "(make sure that you that the necessary dependencies are"
-Write-Host " already installed and the program already built)"
+Write-Host "(make sure that the necessary dependencies are already"
+Write-Host " installed and the program already built)"
 Write-Host "---------------------------------------------------------"
 
 # Display node version

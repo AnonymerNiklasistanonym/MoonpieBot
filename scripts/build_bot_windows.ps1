@@ -4,7 +4,7 @@
 # - Node.js
 
 Write-Host "---------------------------------------------------------"
-Write-Host "Install and Build [Windows]:"
+Write-Host "Build [Windows]:"
 Write-Host "---------------------------------------------------------"
 
 # Display node/npm version
@@ -22,8 +22,7 @@ Set-Location $PSScriptRoot
 Set-Location ..
 
 # Install all dependencies and build the bot
-Remove-Item "node_modulesa" -Recurse -ErrorAction Ignore
-npm install "https://github.com/mapbox/node-sqlite3/tarball/master"
+Remove-Item "node_modules" -Recurse -ErrorAction Ignore
 npm install
 npm run build
 npm prune --production
