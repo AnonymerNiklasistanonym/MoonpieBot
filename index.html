@@ -254,6 +254,13 @@ For easily seeing to what a cron string resolves to you can use <a href="https:/
 <li><code>npm run mocha</code> - a helper npm script for running customised mocha command e.g. test a single file <code>npm run mocha -- file-name-or-pattern</code></li>
 </ul>
 
+<a href="#tests" id="tests" style="color: inherit; text-decoration: none;">
+  <h3>Tests</h3>
+</a>
+<p>If you only want to run one specific test suite and not all of them you can specify the test suite file:</p>
+<pre><code class="language-sh"><span class="hl-4"># This will only run the test suite in the file &quot;test/src/database.test.ts&quot;</span><br/><span class="hl-0">cross-env NODE_PATH=. nyc mocha -- </span><span class="hl-2">&quot;test/src/database.test.ts&quot;</span>
+</code></pre>
+
 <a href="#configuration-files" id="configuration-files" style="color: inherit; text-decoration: none;">
   <h3>Configuration files</h3>
 </a>
