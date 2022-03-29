@@ -33,8 +33,8 @@ Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can
 
 Every command can be optionally disabled.
 
-It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat but this part can also be disabled.
-Given an osu! IRC login it can even send beatmap links to the osu! client that were pasted in chat.
+It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat if enabled.
+Given an osu! IRC login it can even send these beatmap links to the osu! client.
 
 ### Optional: Custom commands/timers
 
