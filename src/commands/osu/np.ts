@@ -91,7 +91,18 @@ export const commandNp = async (
       }, ${roundToOneDecimalPlace(
         currentMapData.maxCombo
       )}x ${roundToOneDecimalPlace(currentMapData.mStars)}*`;
-      message += ` (https://osu.ppy.sh/beatmaps/${currentMapData.mapid} - StreamCompanion)`;
+      if (currentMapData.mapid === undefined || currentMapData.mapid === 0) {
+        if (
+          currentMapData.mapsetid === undefined ||
+          currentMapData.mapsetid === 0
+        ) {
+          message += " (StreamCompanion)";
+        } else {
+          message += ` (https://osu.ppy.sh/beatmapsets/${currentMapData.mapsetid} - StreamCompanion)`;
+        }
+      } else {
+        message += ` (https://osu.ppy.sh/beatmaps/${currentMapData.mapid} - StreamCompanion)`;
+      }
     } else {
       message += " (StreamCompanion was configured but not found running!)";
     }
