@@ -6,12 +6,13 @@ import {
   errorMessageUserNameUndefined,
   loggerCommand,
 } from "../commandHelper";
-import { OsuApiV2Credentials } from "../osu";
+import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { getProcessWindowTitle } from "../../other/processInformation";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { StreamCompanionData } from "../../index";
+import type { OsuApiV2Credentials } from "../osu";
 
 /**
  * Regex to parse the now playing window title on Windows.
@@ -54,11 +55,10 @@ export const commandNp = async (
   channel: string,
   messageId: string | undefined,
   userName: string | undefined,
-  osuApiV2Credentials: OsuApiV2Credentials,
+  osuApiV2Credentials: OsuApiV2Credentials | undefined,
   osuStreamCompanionCurrentMapData:
     | (() => StreamCompanionData | undefined)
     | undefined,
-
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -67,7 +67,7 @@ export const commandNp = async (
   if (userName === undefined) {
     throw errorMessageUserNameUndefined();
   }
-  let message = `@${userName} No map is currently being played, try !rp to get the most recent play`;
+  let message = `@${userName} No map is currently being played`;
 
   if (osuStreamCompanionCurrentMapData !== undefined) {
     const currentMapData = osuStreamCompanionCurrentMapData();
@@ -107,6 +107,9 @@ export const commandNp = async (
       message += " (StreamCompanion was configured but not found running!)";
     }
   } else {
+    if (osuApiV2Credentials === undefined) {
+      throw errorMessageOsuApiCredentialsUndefined();
+    }
     const windowTitle = await getProcessWindowTitle("osu");
     if (windowTitle !== undefined && windowTitle !== "osu!") {
       const match = windowTitle.match(regexNowPlaying);
@@ -137,19 +140,8 @@ export const commandNp = async (
                   b.version.trim().toLocaleLowerCase() ===
                   match[3].trim().toLocaleLowerCase()
               );
-              /*console.log({
-                titleIsTheSame,
-                diffNameCanBeFound,
-                titleIsTheSameComp1: a.title.trim().toLocaleLowerCase(),
-                titleIsTheSameComp2: match[2].trim().toLocaleLowerCase(),
-                diffNameCanBeFound1: a.beatmaps?.map((b) =>
-                  b.version.trim().toLocaleLowerCase()
-                ),
-                diffNameCanBeFound2: match[3].trim().toLocaleLowerCase(),
-              });*/
               return titleIsTheSame && diffNameCanBeFound;
             });
-            //console.log(searchResult.beatmapsets);
             if (exactMatch) {
               const exactBeatmapDiff = exactMatch.beatmaps?.find(
                 (a) =>
@@ -158,18 +150,7 @@ export const commandNp = async (
               );
               if (exactBeatmapDiff) {
                 message += ` (https://osu.ppy.sh/beatmaps/${exactBeatmapDiff.id})`;
-              } else {
-                /*console.log(
-                  exactMatch,
-                  exactMatch.beatmaps?.map((a) =>
-                    a.version.trim().toLocaleLowerCase()
-                  ),
-                  match[3].trim().toLocaleLowerCase()
-                );*/
-                //message += ` (most likely: https://osu.ppy.sh/beatmapsets/${exactMatch.id})`;
               }
-            } else {
-              //message += ` (probably: https://osu.ppy.sh/beatmapsets/${searchResult.beatmapsets[0].id})`;
             }
           }
         } catch (err) {

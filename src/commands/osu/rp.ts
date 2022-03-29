@@ -4,10 +4,11 @@ import { ScoresType } from "osu-api-v2/lib/users/scores";
 // Local imports
 import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
 import { mapScoreToStr } from "../../other/osuStringBuilder";
-import { OsuApiV2Credentials } from "../osu";
+import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { OsuApiV2Credentials } from "../osu";
 
 /**
  * RP (recently played) command: Send the map that was most recently played
@@ -29,7 +30,7 @@ export const commandRp = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
-  osuApiV2Credentials: OsuApiV2Credentials,
+  osuApiV2Credentials: OsuApiV2Credentials | undefined,
   defaultOsuId: number,
   customOsuId: undefined | number,
   customOsuName: undefined | string,
@@ -37,6 +38,9 @@ export const commandRp = async (
 ): Promise<void> => {
   if (messageId === undefined) {
     throw errorMessageIdUndefined();
+  }
+  if (osuApiV2Credentials === undefined) {
+    throw errorMessageOsuApiCredentialsUndefined();
   }
 
   const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(

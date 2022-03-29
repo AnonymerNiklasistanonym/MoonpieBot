@@ -33,6 +33,22 @@ const logDetectedCommand = (
   });
 };
 
+export enum OsuCommandErrorCode {
+  OSU_API_V2_CREDENTIALS_UNDEFINED = "OSU_API_V2_CREDENTIALS_UNDEFINED",
+}
+
+export interface OsuCommandError extends Error {
+  code?: OsuCommandErrorCode;
+}
+
+export const errorMessageOsuApiCredentialsUndefined = () => {
+  const error: OsuCommandError = Error(
+    "Unable to reply to message! (osuApiV2Credentials is undefined)"
+  );
+  error.code = OsuCommandErrorCode.OSU_API_V2_CREDENTIALS_UNDEFINED;
+  return error;
+};
+
 /**
  * Regex to recognize the !np command.
  *
@@ -133,7 +149,7 @@ export const osuChatHandler = async (
   channel: string,
   tags: ChatUserstate,
   message: string,
-  osuApiV2Credentials: OsuApiV2Credentials,
+  osuApiV2Credentials: OsuApiV2Credentials | undefined,
   osuDefaultId: number,
   enableOsuBeatmapRecognition: undefined | boolean,
   osuIrcBot: (() => IrcClient) | undefined,

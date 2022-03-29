@@ -3,10 +3,11 @@ import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
 import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
 import { mapUserToStr } from "../../other/osuStringBuilder";
-import { OsuApiV2Credentials } from "../osu";
+import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { OsuApiV2Credentials } from "../osu";
 
 /**
  * PP (from performance points) command: Get performance/general information
@@ -28,7 +29,7 @@ export const commandPp = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
-  osuApiV2Credentials: OsuApiV2Credentials,
+  osuApiV2Credentials: OsuApiV2Credentials | undefined,
   defaultOsuId: number,
   customOsuId: undefined | number,
   customOsuName: undefined | string,
@@ -36,6 +37,9 @@ export const commandPp = async (
 ): Promise<void> => {
   if (messageId === undefined) {
     throw errorMessageIdUndefined();
+  }
+  if (osuApiV2Credentials === undefined) {
+    throw errorMessageOsuApiCredentialsUndefined();
   }
 
   const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(

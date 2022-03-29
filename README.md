@@ -36,6 +36,8 @@ Every command can be optionally disabled.
 It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat if enabled.
 Given an osu! IRC login it can even send these beatmap links to the osu! client.
 
+It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) can be found in the configuration even if no other osu! related configurations is set.
+
 ### Optional: Custom commands/timers
 
 A file called `customCommands.json` can be provided that enables to write custom commands of the style:

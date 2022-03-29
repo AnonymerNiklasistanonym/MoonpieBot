@@ -11,12 +11,13 @@ import {
   loggerCommand,
 } from "../commandHelper";
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
-import { OsuApiV2Credentials } from "../osu";
+import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { isProcessRunning } from "../../other/processInformation";
 // Type imports
 import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { OsuApiV2Credentials } from "../osu";
 
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
@@ -41,7 +42,7 @@ export const commandBeatmap = async (
   channel: string,
   messageId: string | undefined,
   userName: string | undefined,
-  osuApiV2Credentials: OsuApiV2Credentials,
+  osuApiV2Credentials: OsuApiV2Credentials | undefined,
   defaultOsuId: number,
   beatmapId: number,
   osuIrcBot: (() => IrcClient) | undefined,
@@ -53,6 +54,9 @@ export const commandBeatmap = async (
   }
   if (userName === undefined) {
     throw errorMessageUserNameUndefined();
+  }
+  if (osuApiV2Credentials === undefined) {
+    throw errorMessageOsuApiCredentialsUndefined();
   }
 
   const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(

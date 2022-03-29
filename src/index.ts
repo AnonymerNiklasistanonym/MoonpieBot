@@ -174,7 +174,7 @@ const main = async (logger: Logger, logDir: string) => {
   let osuStreamCompanionCurrentMapData:
     | (() => StreamCompanionData | undefined)
     | undefined = undefined;
-  if (enableOsu && osuStreamCompanionUrl !== undefined) {
+  if (osuStreamCompanionUrl !== undefined) {
     // Automatically reconnect on loss of connection - this means StreamCompanion
     // does not need to be run all the time but only when needed
     let connectedToStreamCompanion = false;
@@ -229,7 +229,11 @@ const main = async (logger: Logger, logDir: string) => {
     osuStreamCompanionCurrentMapData = () =>
       connectedToStreamCompanion ? cache : undefined;
   }
-  if (!enableOsu) {
+  if (!enableOsu && osuStreamCompanionCurrentMapData !== undefined) {
+    logger.info(
+      "Osu features besides the StreamCompanion integration are disabled since not all variables were set"
+    );
+  } else if (!enableOsu) {
     logger.info("Osu features are disabled since not all variables were set");
   } else {
     if (!enableOsuBeatmapRecognition) {
@@ -411,6 +415,43 @@ const main = async (logger: Logger, logDir: string) => {
             `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
               errorInfo.message
             }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
+          )
+          .catch(logger.error);
+      });
+    } else if (osuStreamCompanionCurrentMapData !== undefined) {
+      // Dirty solution to enable !np bot functionality only without any other
+      // osu! tokens or credentials, refactor that better in the future
+      const enableCommands = getCliVariableValueDefault(
+        CliVariable.OSU_ENABLE_COMMANDS,
+        undefined
+      )?.split(",");
+      osuChatHandler(
+        twitchClient,
+        channel,
+        tags,
+        message,
+        undefined,
+        0,
+        false,
+        undefined,
+        undefined,
+        osuStreamCompanionCurrentMapData,
+        enableCommands === undefined
+          ? ["np"]
+          : enableCommands.filter((a) => a === "np"),
+        logger
+      ).catch((err) => {
+        logger.error(err);
+        // When the chat handler throws an error write the error message in chat
+        const errorInfo = err as ErrorWithCode;
+        twitchClient
+          .say(
+            channel,
+            `${
+              tags.username ? "@" + tags.username + " " : ""
+            }Osu StreamCompanion Error: ${errorInfo.message}${
+              errorInfo.code ? " (" + errorInfo.code + ")" : ""
+            }`
           )
           .catch(logger.error);
       });
