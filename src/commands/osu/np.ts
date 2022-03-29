@@ -30,6 +30,13 @@ import type { StreamCompanionData } from "../../index";
 export const regexNowPlaying =
   /^(?:.+?)\s-\s\s*(.+?)\s*\s-\s\s*(.+?)\s*\[\s*([^\s[\]]+?)\s*\]$/;
 
+export const roundToOneDecimalPlace = (num: undefined | number) => {
+  if (num === undefined) {
+    return 0;
+  }
+  return Math.round(num * 10) / 10;
+};
+
 /**
  * NP (now playing) command: Send the map that is currently being played in osu
  * (via the window title because the web api is not supporting it).
@@ -66,7 +73,25 @@ export const commandNp = async (
     const currentMapData = osuStreamCompanionCurrentMapData();
     if (currentMapData !== undefined && currentMapData.mapid !== undefined) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      message = `@${userName} Currently playing '${currentMapData.titleRoman}' from '${currentMapData.artistRoman}' [${currentMapData.diffName}] (https://osu.ppy.sh/beatmaps/${currentMapData.mapid} - StreamCompanion)`;
+      message = `@${userName} Currently playing '${currentMapData.titleRoman}' from '${currentMapData.artistRoman}' [${currentMapData.diffName}]`;
+      if (
+        currentMapData.mods !== undefined &&
+        currentMapData?.mods !== "None"
+      ) {
+        message += ` with ${currentMapData.mods}`;
+      }
+      message += ` - CS ${roundToOneDecimalPlace(
+        currentMapData.mCS
+      )}, AR ${roundToOneDecimalPlace(
+        currentMapData.mAR
+      )}, OD ${roundToOneDecimalPlace(
+        currentMapData.mOD
+      )}, HP ${roundToOneDecimalPlace(currentMapData.mHP)}, BPM ${
+        currentMapData.mBpm === undefined ? 0 : currentMapData.mBpm
+      }, ${roundToOneDecimalPlace(
+        currentMapData.maxCombo
+      )}x ${roundToOneDecimalPlace(currentMapData.mStars)}*`;
+      message += ` (https://osu.ppy.sh/beatmaps/${currentMapData.mapid} - StreamCompanion)`;
     } else {
       message += " (StreamCompanion was configured but not found running!)";
     }

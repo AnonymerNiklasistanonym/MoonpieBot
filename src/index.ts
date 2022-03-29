@@ -65,6 +65,14 @@ export interface StreamCompanionData {
   diffName?: string;
   mapid?: number;
   mapsetid?: number;
+  maxCombo?: number;
+  mods?: string;
+  mAR?: number;
+  mCS?: number;
+  mOD?: number;
+  mHP?: number;
+  mStars?: number;
+  mBpm?: string;
 }
 
 /**
@@ -181,7 +189,9 @@ const main = async (logger: Logger, logDir: string) => {
     ws.onopen = () => {
       connectedToStreamCompanion = true;
       logger.info("StreamCompanion socket was opened");
-      //send token names with should be watched for value changes
+      // Send token names which should be watched for value changes
+      // https://piotrekol.github.io/StreamCompanion/development/SC/api.html#json
+      // TODO: Check what happens for invalid/custom maps
       ws.send(
         JSON.stringify([
           "titleRoman",
@@ -189,6 +199,14 @@ const main = async (logger: Logger, logDir: string) => {
           "diffName",
           "mapid",
           "mapsetid",
+          "maxCombo",
+          "mods",
+          "mAR",
+          "mCS",
+          "mOD",
+          "mHP",
+          "mStars",
+          "mBpm",
         ])
       );
     };
@@ -198,11 +216,10 @@ const main = async (logger: Logger, logDir: string) => {
         cache,
         JSON.parse(wsEvent.data as string) as StreamCompanionData
       );
-      logger.info(`New StreamCompanion data: '${wsEvent.data as string}'`);
+      logger.debug(`New StreamCompanion data: '${wsEvent.data as string}'`);
     };
     ws.onclose = () => {
       connectedToStreamCompanion = false;
-
       logger.info("StreamCompanion socket was closed");
     };
     ws.onerror = (err) => {
