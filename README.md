@@ -19,6 +19,8 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
   | `!moonpie set $USER $COUNT` | broadcaster badge | Set moonpie `$COUNT` to `$USER` if found in database |
   | `!moonpie delete $USER` | broadcaster badge | Delete a `$USER` from the database if found in database |
 
+Every command can be optionally disabled.
+
 ### Optional: osu!
 
 Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can additionally fetch some osu! related information.
@@ -28,6 +30,8 @@ Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can
 | `!rp ($OSU_ID/$OSU_NAME)` | everyone | Get the most recent play of the streamer or of the given osu! player ID |
 | `!pp ($OSU_ID/$OSU_NAME)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given osu! player ID |
 | `!np` | everyone | Get a link to the currently being played map (this only works if the computer that runs this bot is the one running the osu! client since it needs the window title) |
+
+Every command can be optionally disabled.
 
 It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat but this part can also be disabled.
 Given an osu! IRC login it can even send beatmap links to the osu! client that were pasted in chat.
