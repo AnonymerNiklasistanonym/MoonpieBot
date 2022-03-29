@@ -29,7 +29,7 @@ Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can
 | ------ | -- | -------- |
 | `!rp ($OSU_ID/$OSU_NAME)` | everyone | Get the most recent play of the streamer or of the given osu! player ID |
 | `!pp ($OSU_ID/$OSU_NAME)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given osu! player ID |
-| `!np` | everyone | Get a link to the currently being played map (this only works if the computer that runs this bot is the one running the osu! client since it needs the window title) |
+| `!np` | everyone | Get a link to the currently being played map (this can be either done by using the osu! window text [default, slow and only works if the map is being played] or if [StreamCompanion](https://github.com/Piotrekol/StreamCompanion) is configured and running it can use this information instead which works always, is very fast and contains detailed information even regarding the current selected mods) |
 
 Every command can be optionally disabled.
 
