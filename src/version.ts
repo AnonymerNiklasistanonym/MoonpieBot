@@ -18,8 +18,8 @@ export interface Version {
 export const version: Version = {
   major: 1,
   minor: 0,
-  patch: 5,
-  beta: false,
+  patch: 6,
+  beta: true,
 };
 
 /**
