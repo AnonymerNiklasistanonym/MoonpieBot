@@ -169,6 +169,33 @@ The file contains also the information about what variables need to be set.</p>
 </li>
 </ol>
 
+<a href="#migrate-to-a-new-version" id="migrate-to-a-new-version" style="color: inherit; text-decoration: none;">
+  <h2>Migrate to a new version</h2>
+</a>
+<hr>
+<p><strong>IMOPRTANT:</strong></p>
+<p>Migrating to a new version CAN break the database, custom commands, etc.
+This means you should always backup (or don&#39;t overwrite) your old configuration file (<code>.env</code>), database file (<code>moonpie.db</code>) and custom commands/timers (<code>customCommands/Timers.json</code>).
+In case of a bug or error this means you can always go back to how it was before and lose nothing.</p>
+<p>In case there will be a dabase change I will try to migrate that on the software side but even if this is not happening it should be listed in this section what the breaking change was.</p>
+<hr>
+<ol>
+<li><p>In case of new dependencies always rerun:</p>
+<pre><code class="language-sh"><span class="hl-0">npm install</span>
+</code></pre>
+</li>
+<li><p>Then you need to rebuild the program:</p>
+<pre><code class="language-sh"><span class="hl-0">npm run build</span>
+</code></pre>
+</li>
+<li><p>You need to check if there were any breaking changes that require an update of the configuration file (<code>.env</code>), break the database structure or break custom commands/timers (<code>customCommands/Timers.json</code>).</p>
+</li>
+<li><p>If everything checks out you can start it just like before:</p>
+<pre><code class="language-sh"><span class="hl-0">npm run start</span>
+</code></pre>
+</li>
+</ol>
+
 <a href="#helping-resources" id="helping-resources" style="color: inherit; text-decoration: none;">
   <h2>Helping Resources</h2>
 </a>
