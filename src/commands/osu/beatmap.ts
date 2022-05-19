@@ -117,7 +117,7 @@ export const commandBeatmap = async (
   if (detailedBeatmapInformation) {
     message += ` ${messageRequestDetailed}`;
   }
-  message += ` ${messageRequestTopScore}`;
+  message += ` - ${messageRequestTopScore}`;
 
   // Send response to Twitch channel and if found to IRC channel
   await Promise.all([
@@ -159,8 +159,14 @@ export const commandBeatmap = async (
                 osuIrcBotInstance?.say(osuIrcRequestTarget, messageRequestIrc);
                 osuIrcBotInstance?.say(
                   osuIrcRequestTarget,
-                  `${messageRequestDetailedIrc} ${messageRequestTopScore}`
+                  messageRequestDetailedIrc
                 );
+                if (messageRequestTopScore !== "") {
+                  osuIrcBotInstance?.say(
+                    osuIrcRequestTarget,
+                    messageRequestTopScore
+                  );
+                }
                 osuIrcBotInstance?.disconnect("", () => {
                   osuIrcBotInstance?.conn.end();
                   osuIrcBotInstance = undefined;
