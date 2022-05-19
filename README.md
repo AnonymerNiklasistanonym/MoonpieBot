@@ -139,6 +139,39 @@ For some macros to work (like Twitch API connections for `!so`/`!followage`/`!se
 
    If there are errors you can probably find advanced log messages in the log files in the directory `logs` that is created while running the bot.
 
+## Migrate to a new version
+
+---
+
+**IMOPRTANT:**
+
+Migrating to a new version CAN break the database, custom commands, etc.
+This means you should always backup (or don't overwrite) your old configuration file (`.env`), database file (`moonpie.db`) and custom commands/timers (`customCommands/Timers.json`).
+In case of a bug or error this means you can always go back to how it was before and lose nothing.
+
+In case there will be a dabase change I will try to migrate that on the software side but even if this is not happening it should be listed in this section what the breaking change was.
+
+---
+
+1. In case of new dependencies always rerun:
+
+   ```sh
+   npm install
+   ```
+
+2. Then you need to rebuild the program:
+
+   ```sh
+   npm run build
+   ```
+
+3. You need to check if there were any breaking changes that require an update of the configuration file (`.env`), break the database structure or break custom commands/timers (`customCommands/Timers.json`).
+4. If everything checks out you can start it just like before:
+
+   ```sh
+   npm run start
+   ```
+
 ## Helping Resources
 
 To add custom commands a regex needs to be created.
