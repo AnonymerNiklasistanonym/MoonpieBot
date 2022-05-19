@@ -63,7 +63,7 @@ export const moonpieChatHandler = async (
     // > !moonpie commands
     if (message.match(regexMoonpieCommands) && enabled.includes("commands")) {
       logDetectedCommand(logger, tags, "!moonpie commands");
-      await commandCommands(client, channel, tags.id, logger);
+      await commandCommands(client, channel, tags.id, enabled, logger);
       return;
     }
     // > !moonpie leaderboard
