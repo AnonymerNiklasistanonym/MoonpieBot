@@ -47,6 +47,7 @@ export const moonpieChatHandler = async (
   logger: Logger
 ): Promise<void> => {
   if (enabled === undefined) {
+    // per default enable all options
     enabled = [
       "about",
       "claim",
@@ -54,6 +55,7 @@ export const moonpieChatHandler = async (
       "delete",
       "get",
       "leaderboard",
+      "add",
       "remove",
       "set",
     ];
