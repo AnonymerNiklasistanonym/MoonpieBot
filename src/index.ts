@@ -241,8 +241,7 @@ const main = async (logger: Logger, logDir: string) => {
     };
     ws.onerror = (err) => {
       connectedToStreamCompanion = false;
-      logger.info(`StreamCompanion socket error: ${err.message}`);
-      logger.error(err.error);
+      logger.error(`StreamCompanion socket error: ${err.message}`);
     };
     osuStreamCompanionCurrentMapData = () =>
       connectedToStreamCompanion ? cache : undefined;
