@@ -75,6 +75,11 @@ export interface StreamCompanionData {
   mBpm?: string;
 }
 
+/** Interface which helps to get the hidden websocket URL. */
+interface ReconnectingWebSocketHelper {
+  _url: string;
+}
+
 /**
  * Main method that runs the bot.
  *
@@ -185,13 +190,16 @@ const main = async (logger: Logger, logDir: string) => {
     // Automatically reconnect on loss of connection - this means StreamCompanion
     // does not need to be run all the time but only when needed
     let connectedToStreamCompanion = false;
-    const ws = new ReconnectingWebSocket(
-      `ws://${osuStreamCompanionUrl}/tokens`,
-      [],
-      {
-        WebSocket: WebSocket,
-        connectionTimeout: 10 * 1000,
-      }
+    const websocketUrl = `ws://${osuStreamCompanionUrl}/tokens`;
+    const websocketReconnectTimeoutInS = 10;
+    const ws = new ReconnectingWebSocket(websocketUrl, [], {
+      WebSocket: WebSocket,
+      connectionTimeout: websocketReconnectTimeoutInS * 1000,
+    });
+    logger.info(
+      `Try to connect to StreamCompanion via '${
+        (ws as unknown as ReconnectingWebSocketHelper)._url
+      }' (url=${websocketUrl}, timeout=${websocketReconnectTimeoutInS}s)`
     );
     ws.onopen = () => {
       connectedToStreamCompanion = true;
@@ -226,12 +234,15 @@ const main = async (logger: Logger, logDir: string) => {
       logger.debug(`New StreamCompanion data: '${wsEvent.data as string}'`);
     };
     ws.onclose = () => {
-      connectedToStreamCompanion = false;
-      logger.info("StreamCompanion socket was closed");
+      if (connectedToStreamCompanion) {
+        connectedToStreamCompanion = false;
+        logger.info("StreamCompanion socket was closed");
+      }
     };
     ws.onerror = (err) => {
       connectedToStreamCompanion = false;
-      logger.debug(err);
+      logger.info(`StreamCompanion socket error: ${err.message}`);
+      logger.error(err.error);
     };
     osuStreamCompanionCurrentMapData = () =>
       connectedToStreamCompanion ? cache : undefined;
