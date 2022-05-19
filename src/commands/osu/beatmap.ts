@@ -31,6 +31,7 @@ import type { OsuApiV2Credentials } from "../osu";
  * @param defaultOsuId Default osu account ID (used for checking for existing
  * scores).
  * @param beatmapId The recognized osu beatmap ID.
+ * @param detailedBeatmapInformation Print detailed beatmap information.
  * @param osuIrcBot The osu IRC instance (used for sending requests to osu
  * client using IRC).
  * @param osuIrcRequestTarget The osu account ID to whom the IRC request should
@@ -45,6 +46,7 @@ export const commandBeatmap = async (
   osuApiV2Credentials: OsuApiV2Credentials | undefined,
   defaultOsuId: number,
   beatmapId: number,
+  detailedBeatmapInformation: undefined | boolean,
   osuIrcBot: (() => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
   logger: Logger
@@ -67,14 +69,21 @@ export const commandBeatmap = async (
   // Get beatmap and if found the current top score and convert them into a
   // message for Twitch and IRC channel
   let beatmapInformationWasFound = false;
-  let message = "";
-  let messageIrc = "";
+  let messageRequest = "";
+  let messageRequestIrc = "";
+  let messageRequestDetailed = "";
+  let messageRequestDetailedIrc = "";
+  let messageRequestTopScore = "";
   try {
     const beatmap = await osuApiV2.beatmaps.get(oauthAccessToken, beatmapId);
     beatmapInformationWasFound = true;
-    message = mapToStr(beatmap);
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    messageIrc = `${userName} requested [https://osu.ppy.sh/beatmapsets/${beatmap.beatmapset?.id}#osu/${beatmap.id} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`;
+    messageRequest = `${userName} requested ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}`;
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    messageRequestIrc = `${userName} requested [https://osu.ppy.sh/beatmapsets/${beatmap.beatmapset?.id}#osu/${beatmap.id} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`;
+    messageRequestDetailed = mapToStr(beatmap, true, true);
+    messageRequestDetailedIrc = mapToStr(beatmap);
+    // Check for user score
     if (
       beatmap.ranked === RankedStatus.loved ||
       beatmap.ranked === RankedStatus.qualified ||
@@ -88,9 +97,11 @@ export const commandBeatmap = async (
           GameMode.osu,
           undefined
         );
-        message += ` Current top score is ${mapUserScoreToStr(score)}`;
+        messageRequestTopScore = `Current top score is ${mapUserScoreToStr(
+          score
+        )}`;
       } catch (err) {
-        message += ` No score found`;
+        messageRequestTopScore = `No score found`;
       }
     }
   } catch (err) {
@@ -101,6 +112,12 @@ export const commandBeatmap = async (
       throw err;
     }
   }
+
+  let message = messageRequest;
+  if (detailedBeatmapInformation) {
+    message += ` ${messageRequestDetailed}`;
+  }
+  message += ` ${messageRequestTopScore}`;
 
   // Send response to Twitch channel and if found to IRC channel
   await Promise.all([
@@ -139,8 +156,11 @@ export const commandBeatmap = async (
               logger.info("Try to connect to osu IRC channel");
               osuIrcBotInstance.connect(2, () => {
                 logger.info("osu! IRC connection was established");
-                osuIrcBotInstance?.say(osuIrcRequestTarget, messageIrc);
-                osuIrcBotInstance?.say(osuIrcRequestTarget, `${message}`);
+                osuIrcBotInstance?.say(osuIrcRequestTarget, messageRequestIrc);
+                osuIrcBotInstance?.say(
+                  osuIrcRequestTarget,
+                  `${messageRequestDetailedIrc} ${messageRequestTopScore}`
+                );
                 osuIrcBotInstance?.disconnect("", () => {
                   osuIrcBotInstance?.conn.end();
                   osuIrcBotInstance = undefined;

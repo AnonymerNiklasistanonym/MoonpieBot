@@ -70,15 +70,20 @@ export const mapUserToStr = (user: User) => {
 
 export const generalBeatmapToStr = (
   beatmap: Beatmap,
-  beatmapset?: Beatmapset | null
+  beatmapset?: Beatmapset | null,
+  hideTitleDifficultyArtist = false,
+  hideUrl = false
 ) => {
   let finalString = "";
   if (beatmapset != null) {
-    finalString += `${beatmapset.title} '${beatmap.version}' [${
+    if (!hideTitleDifficultyArtist) {
+      finalString += `${beatmapset.title} by ${beatmapset.artist} '${beatmap.version}' `;
+    }
+    finalString += `[${
       Math.round(beatmap.difficulty_rating * 100 + Number.EPSILON) / 100
     }* ${secondsToString(beatmap.total_length)} ${mapRankedStatusToStr(
       beatmap.ranked
-    )}] by ${beatmapset.artist}`;
+    )}]`;
     const beatmapUpdate = new Date(beatmap.last_updated);
     finalString += ` from ${
       monthNames[beatmapUpdate.getMonth()]
@@ -89,16 +94,27 @@ export const generalBeatmapToStr = (
       // Scores don't have max combo
       finalString += ` {CS=${beatmap.cs}, DRAIN=${beatmap.drain}, ACC=${beatmap.accuracy}, AR=${beatmap.ar}, BPM=${beatmap.bpm}, CC=${beatmap.count_circles}, SLC=${beatmap.count_sliders}, SPC=${beatmap.count_spinners}}`;
     }
-    finalString += ` (${beatmap.url})`;
+    if (!hideUrl) {
+      finalString += ` (${beatmap.url})`;
+    }
   } else {
     finalString += "[Error: Beatmapset not found]";
   }
   return finalString;
 };
 
-export const mapToStr = (beatmap: Beatmap) => {
+export const mapToStr = (
+  beatmap: Beatmap,
+  hideTitleDifficultyArtist = false,
+  hideUrl = false
+) => {
   let finalString = "";
-  finalString += generalBeatmapToStr(beatmap, beatmap.beatmapset);
+  finalString += generalBeatmapToStr(
+    beatmap,
+    beatmap.beatmapset,
+    hideTitleDifficultyArtist,
+    hideUrl
+  );
   return finalString;
 };
 

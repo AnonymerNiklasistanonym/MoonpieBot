@@ -151,7 +151,8 @@ export const osuChatHandler = async (
   message: string,
   osuApiV2Credentials: OsuApiV2Credentials | undefined,
   osuDefaultId: number,
-  enableOsuBeatmapRecognition: undefined | boolean,
+  enableOsuBeatmapRequests: undefined | boolean,
+  enableOsuBeatmapRequestsDetailed: undefined | boolean,
   osuIrcBot: (() => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
   osuStreamCompanionCurrentMapData:
@@ -214,7 +215,7 @@ export const osuChatHandler = async (
     return;
   }
   // > Any beatmap link
-  if (enableOsuBeatmapRecognition) {
+  if (enableOsuBeatmapRequests) {
     if (message.match(regexBeatmapUrl)) {
       logDetectedCommand(logger, tags, "beatmap");
       for (const match of [...message.matchAll(regexBeatmapUrl)]) {
@@ -226,6 +227,7 @@ export const osuChatHandler = async (
           osuApiV2Credentials,
           osuDefaultId,
           match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
+          enableOsuBeatmapRequestsDetailed,
           osuIrcBot,
           osuIrcRequestTarget,
           logger

@@ -38,6 +38,8 @@ Given an osu! IRC login it can even send these beatmap links to the osu! client.
 
 It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) can be found in the configuration even if no other osu! related configurations is set.
 
+*Everything is currently optimized and written for osu! standard which means you need to open an issue if you need other behaviour!*
+
 ### Optional: Custom commands/timers
 
 A file called `customCommands.json` can be provided that enables to write custom commands of the style:

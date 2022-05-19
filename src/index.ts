@@ -105,9 +105,16 @@ const main = async (logger: Logger, logDir: string) => {
     osuClientId !== undefined &&
     osuClientSecret !== undefined &&
     osuDefaultId !== undefined;
-  const enableOsuBeatmapRecognition =
-    getCliVariableValueDefault(CliVariable.OSU_RECOGNIZE_MAPS, undefined) ===
-    "ON";
+  const enableOsuBeatmapRequests =
+    getCliVariableValueDefault(
+      CliVariable.OSU_RECOGNIZE_MAP_REQUESTS,
+      undefined
+    ) === "ON";
+  const enableOsuBeatmapRequestsDetailed =
+    getCliVariableValueDefault(
+      CliVariable.OSU_RECOGNIZE_MAP_REQUESTS_DETAILED,
+      undefined
+    ) === "ON";
   const osuIrcPassword = getCliVariableValueDefault(
     CliVariable.OSU_IRC_PASSWORD,
     undefined
@@ -126,7 +133,7 @@ const main = async (logger: Logger, logDir: string) => {
     osuIrcRequestTarget !== undefined;
 
   let osuIrcBot: (() => irc.Client) | undefined = undefined;
-  if (enableOsu && enableOsuBeatmapRecognition && enableOsuIrc) {
+  if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
     // TODO Handle authentication errors
     osuIrcBot = () => {
       const creationDate = new Date().toISOString();
@@ -236,7 +243,7 @@ const main = async (logger: Logger, logDir: string) => {
   } else if (!enableOsu) {
     logger.info("Osu features are disabled since not all variables were set");
   } else {
-    if (!enableOsuBeatmapRecognition) {
+    if (!enableOsuBeatmapRequests) {
       logger.info(
         "Osu beatmap recognition features are disabled since not all variables were set"
       );
@@ -396,7 +403,8 @@ const main = async (logger: Logger, logDir: string) => {
           clientSecret: osuClientSecret,
         },
         parseInt(osuDefaultId),
-        enableOsuBeatmapRecognition,
+        enableOsuBeatmapRequests,
+        enableOsuBeatmapRequestsDetailed,
         osuIrcBot,
         osuIrcRequestTarget,
         osuStreamCompanionCurrentMapData,
@@ -432,6 +440,7 @@ const main = async (logger: Logger, logDir: string) => {
         message,
         undefined,
         0,
+        false,
         false,
         undefined,
         undefined,
