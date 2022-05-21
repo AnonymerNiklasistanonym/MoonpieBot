@@ -204,6 +204,97 @@ For easily testing a custom regex you can use <a href="https://regex101.com/">ht
 <p>To add custom timers a cron string needs to be created.
 For easily seeing to what a cron string resolves to you can use <a href="https://crontab.cronhub.io/">https://crontab.cronhub.io/</a>.</p>
 
+<a href="#examples" id="examples" style="color: inherit; text-decoration: none;">
+  <h2>Examples</h2>
+</a>
+<p>In the following there is a list of some possible configurations (<code>.env</code> files):</p>
+<p><strong>For more details about the options check the example file <a href="./.env.example"><code>.env.example</code></a></strong></p>
+<ol>
+<li><p>Default <em>Moonpie commands</em> bot configuration:</p>
+<pre><code class="language-txt"># Variables necessary for the Twitch chat (read/write) connection
+MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+</code></pre>
+<ul>
+<li>Supports all moonpie commands</li>
+<li>Supports simple custom commands/timers that don&#39;t need special APIs in their messages</li>
+</ul>
+</li>
+<li><p>Osu StreamCompanion <em>Now Playing</em> bot configuration:</p>
+<pre><code class="language-txt"># Variables necessary for the Twitch chat (read/write) connection
+MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+
+# Variable necessary for the StreamCompanion connection
+MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727
+
+# Disable default moonpie commands
+MOONPIE_CONFIG_ENABLE_COMMANDS=none
+# Only enable the !np osu command
+MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=np
+</code></pre>
+<ul>
+<li>Disables default moonpie commands</li>
+<li>Supports the now playing &quot;!np&quot; command which will use the StreamCompanion information</li>
+<li>Supports simple custom commands/timers that don&#39;t need special APIs in their messages</li>
+</ul>
+</li>
+<li><p>Default <em>Moonpie commands and osu! commands</em> bot configuration:</p>
+<pre><code class="language-txt"># Variables necessary for the Twitch chat (read/write) connection
+MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+
+# Variables necessary to use the osu! API
+MOONPIE_CONFIG_OSU_CLIENT_ID=1234
+MOONPIE_CONFIG_OSU_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
+# Variable of the user that should be checked for top scores
+MOONPIE_CONFIG_OSU_DEFAULT_ID=1185432
+# Variables that enables osu beatmap requests (with detailed map information)
+MOONPIE_CONFIG_OSU_RECOGNIZE_MAP_REQUESTS=ON
+MOONPIE_CONFIG_OSU_RECOGNIZE_MAP_REQUESTS_DETAILED=ON
+
+# Variables necessary to send recognized beatmaps to the osu! client via IRC
+MOONPIE_CONFIG_OSU_IRC_PASSWORD=senderServerPassword
+MOONPIE_CONFIG_OSU_IRC_USERNAME=senderUserName
+MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET=receiverUserName
+
+# Variable necessary for the StreamCompanion connection
+MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727
+
+# Only enable the !np osu command
+MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=np,rp
+</code></pre>
+<ul>
+<li>Supports all moonpie commands</li>
+<li>Supports beatmap requests in chat which will use the osu! API</li>
+<li>Supports the now playing &quot;!np&quot; command which will use the StreamCompanion information</li>
+<li>Supports the most recent play &quot;!rp&quot; command which will use the osu! API</li>
+<li>Supports simple custom commands/timers that don&#39;t need special APIs in their messages</li>
+</ul>
+</li>
+<li><p>Simple bot that can recognize custom programmed commands configuration:</p>
+<pre><code class="language-txt"># Variables necessary for the Twitch chat (read/write) connection
+MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+
+# Disable default moonpie commands
+MOONPIE_CONFIG_ENABLE_COMMANDS=none
+
+# Enable admin twitch commands to set a game/title
+MOONPIE_CONFIG_TWITCH_API_CLIENT_ID=abcdefghijklmnop
+MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN=abcdefghijklmnop
+</code></pre>
+<ul>
+<li>Disables default moonpie commands</li>
+<li>Supports advanced custom commands/timers that need access to a special Twitch API in their messages (set/get a game/title or the follow-age)</li>
+</ul>
+</li>
+</ol>
+
 <a href="#todos" id="todos" style="color: inherit; text-decoration: none;">
   <h2>TODOs</h2>
 </a>
