@@ -120,8 +120,8 @@ const main = async (logger: Logger, logDir: string) => {
 
   let osuIrcBot: (() => irc.Client) | undefined = undefined;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
-    // TODO Handle authentication errors
-    osuIrcBot = createOsuIrcConnection(osuIrcUsername, osuIrcPassword, logger);
+    osuIrcBot = () =>
+      createOsuIrcConnection(osuIrcUsername, osuIrcPassword, logger);
   }
   const osuStreamCompanionUrl = getCliVariableValueDefault(
     CliVariable.OSU_STREAM_COMPANION_URL,
