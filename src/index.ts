@@ -480,7 +480,7 @@ if (isEntryPoint()) {
 
     // Create logger
     const logDir = getCliVariableValueOrDefault(
-      CliVariable.LOGGING_DIR_LOGS_PATH
+      CliVariable.LOGGING_DIRECTORY_PATH
     );
     const logger = createLogger(logDir);
 

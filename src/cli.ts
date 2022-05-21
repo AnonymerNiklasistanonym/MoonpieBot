@@ -12,7 +12,7 @@ export const CliVariablePrefix = "MOONPIE_CONFIG_";
 
 export enum CliVariable {
   LOGGING_CONSOLE_LOG_LEVEL = "LOGGING_CONSOLE_LOG_LEVEL",
-  LOGGING_DIR_LOGS_PATH = "LOGGING_DIR_LOGS_PATH",
+  LOGGING_DIRECTORY_PATH = "LOGGING_DIRECTORY_PATH",
   LOGGING_FILE_LOG_LEVEL = "LOGGING_FILE_LOG_LEVEL",
   TWITCH_CHANNELS = "TWITCH_CHANNELS",
   TWITCH_NAME = "TWITCH_NAME",
@@ -116,7 +116,7 @@ export const getCliVariableValueInformation = (
         supportedValues: ["error", "warn", "debug", "info"],
         block: CliVariableBlocks.LOGGING,
       };
-    case CliVariable.LOGGING_DIR_LOGS_PATH:
+    case CliVariable.LOGGING_DIRECTORY_PATH:
       return {
         default: path.relative(pathToRootDir, path.join(pathToRootDir, "logs")),
         description: "The directory file path of the log files",
