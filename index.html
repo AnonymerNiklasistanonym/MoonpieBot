@@ -3,6 +3,27 @@
   <h1>MoonpieBot</h1>
 </a>
 <p>A custom Twitch chat bot.</p>
+<ul>
+<li><a href="#features">Features</a><ul>
+<li><a href="#optional-osu">Optional: osu!</a></li>
+<li><a href="#optional-custom-commandstimers">Optional: Custom commands/timers</a></li>
+</ul>
+</li>
+<li><a href="#setup">Setup</a></li>
+<li><a href="#migrate-to-a-new-version">Migrate to a new version</a></li>
+<li><a href="#helping-resources">Helping Resources</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#todos">TODOs</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#inspect-database">Inspect Database</a></li>
+<li><a href="#development">Development</a><ul>
+<li><a href="#tests">Tests</a></li>
+<li><a href="#configuration-files">Configuration files</a></li>
+<li><a href="#how-to-handle-versions">How to handle versions</a></li>
+</ul>
+</li>
+<li><a href="#credits">Credits</a></li>
+</ul>
 
 <a href="#features" id="features" style="color: inherit; text-decoration: none;">
   <h2>Features</h2>
@@ -239,7 +260,7 @@ For easily seeing to what a cron string resolves to you can use <a href="https:/
 </ul>
 </li>
 <li><p>Simple bot that can recognize advanced custom commands configuration:</p>
-<pre><code class="language-sh"><span class="hl-4"># Variables necessary for the Twitch chat (read/write) connection</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_NAME=moonpiebot</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel</span><br/><br/><span class="hl-4"># Disable default moonpie commands</span><br/><span class="hl-0">MOONPIE_CONFIG_ENABLE_COMMANDS=none</span><br/><br/><span class="hl-4"># Enable admin twitch commands to set a game/title</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_API_CLIENT_ID=abcdefghijklmnop</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN=abcdefghijklmnop</span>
+<pre><code class="language-sh"><span class="hl-4"># Variables necessary for the Twitch chat (read/write) connection</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_NAME=moonpiebot</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel</span><br/><br/><span class="hl-4"># Disable default moonpie commands</span><br/><span class="hl-0">MOONPIE_CONFIG_ENABLE_COMMANDS=none</span><br/><br/><span class="hl-4"># Enable custom commands to make use of some Twitch API connections</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_API_CLIENT_ID=abcdefghijklmnop</span><br/><span class="hl-0">MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN=abcdefghijklmnop</span>
 </code></pre>
 <ul>
 <li>Disables default moonpie commands</li>
