@@ -180,6 +180,99 @@ For easily testing a custom regex you can use https://regex101.com/.
 To add custom timers a cron string needs to be created.
 For easily seeing to what a cron string resolves to you can use https://crontab.cronhub.io/.
 
+## Examples
+
+In the following there is a list of some possible configurations (`.env` files):
+
+**For more details about the options check the example file [`.env.example`](./.env.example)**
+
+1. Default *Moonpie commands* bot configuration:
+
+   ```txt
+   # Variables necessary for the Twitch chat (read/write) connection
+   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+   ```
+
+   - Supports all moonpie commands
+   - Supports simple custom commands/timers that don't need special APIs in their messages
+
+2. Osu StreamCompanion *Now Playing* bot configuration:
+
+   ```txt
+   # Variables necessary for the Twitch chat (read/write) connection
+   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+
+   # Variable necessary for the StreamCompanion connection
+   MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727
+
+   # Disable default moonpie commands
+   MOONPIE_CONFIG_ENABLE_COMMANDS=none
+   # Only enable the !np osu command
+   MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=np
+   ```
+
+   - Disables default moonpie commands
+   - Supports the now playing "!np" command which will use the StreamCompanion information
+   - Supports simple custom commands/timers that don't need special APIs in their messages
+
+3. Default *Moonpie commands and osu! commands* bot configuration:
+
+   ```txt
+   # Variables necessary for the Twitch chat (read/write) connection
+   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+
+   # Variables necessary to use the osu! API
+   MOONPIE_CONFIG_OSU_CLIENT_ID=1234
+   MOONPIE_CONFIG_OSU_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
+   # Variable of the user that should be checked for top scores
+   MOONPIE_CONFIG_OSU_DEFAULT_ID=1185432
+   # Variables that enables osu beatmap requests (with detailed map information)
+   MOONPIE_CONFIG_OSU_RECOGNIZE_MAP_REQUESTS=ON
+   MOONPIE_CONFIG_OSU_RECOGNIZE_MAP_REQUESTS_DETAILED=ON
+
+   # Variables necessary to send recognized beatmaps to the osu! client via IRC
+   MOONPIE_CONFIG_OSU_IRC_PASSWORD=senderServerPassword
+   MOONPIE_CONFIG_OSU_IRC_USERNAME=senderUserName
+   MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET=receiverUserName
+
+   # Variable necessary for the StreamCompanion connection
+   MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727
+
+   # Only enable the !np osu command
+   MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=np,rp
+   ```
+
+   - Supports all moonpie commands
+   - Supports beatmap requests in chat which will use the osu! API
+   - Supports the now playing "!np" command which will use the StreamCompanion information
+   - Supports the most recent play "!rp" command which will use the osu! API
+   - Supports simple custom commands/timers that don't need special APIs in their messages
+
+4. Simple bot that can recognize custom programmed commands configuration:
+
+   ```txt
+   # Variables necessary for the Twitch chat (read/write) connection
+   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+
+   # Disable default moonpie commands
+   MOONPIE_CONFIG_ENABLE_COMMANDS=none
+
+   # Enable admin twitch commands to set a game/title
+   MOONPIE_CONFIG_TWITCH_API_CLIENT_ID=abcdefghijklmnop
+   MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN=abcdefghijklmnop
+   ```
+
+   - Disables default moonpie commands
+   - Supports advanced custom commands/timers that need access to a special Twitch API in their messages (set/get a game/title or the follow-age)
+
 ## TODOs
 
 Things that need to be added before it can be released:
