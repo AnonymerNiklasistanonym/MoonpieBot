@@ -188,7 +188,7 @@ In the following there is a list of some possible configurations (`.env` files):
 
 1. Default *Moonpie commands* bot configuration:
 
-   ```txt
+   ```sh
    # Variables necessary for the Twitch chat (read/write) connection
    MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
    MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
@@ -198,9 +198,9 @@ In the following there is a list of some possible configurations (`.env` files):
    - Supports all moonpie commands
    - Supports simple custom commands/timers that don't need special APIs in their messages
 
-2. Osu StreamCompanion *Now Playing* bot configuration:
+2. osu! StreamCompanion *Now Playing* bot configuration:
 
-   ```txt
+   ```sh
    # Variables necessary for the Twitch chat (read/write) connection
    MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
    MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
@@ -216,12 +216,12 @@ In the following there is a list of some possible configurations (`.env` files):
    ```
 
    - Disables default moonpie commands
-   - Supports the now playing "!np" command which will use the StreamCompanion information
+   - Supports the osu! related now playing "!np" command which will use the StreamCompanion information
    - Supports simple custom commands/timers that don't need special APIs in their messages
 
 3. Default *Moonpie commands and osu! commands* bot configuration:
 
-   ```txt
+   ```sh
    # Variables necessary for the Twitch chat (read/write) connection
    MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
    MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
@@ -250,13 +250,13 @@ In the following there is a list of some possible configurations (`.env` files):
 
    - Supports all moonpie commands
    - Supports beatmap requests in chat which will use the osu! API
-   - Supports the now playing "!np" command which will use the StreamCompanion information
-   - Supports the most recent play "!rp" command which will use the osu! API
+   - Supports the osu! related now playing "!np" command which will use the StreamCompanion information
+   - Supports the osu! related most recent play "!rp" command which will use the osu! API
    - Supports simple custom commands/timers that don't need special APIs in their messages
 
-4. Simple bot that can recognize custom programmed commands configuration:
+4. Simple bot that can recognize advanced custom commands configuration:
 
-   ```txt
+   ```sh
    # Variables necessary for the Twitch chat (read/write) connection
    MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
    MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
