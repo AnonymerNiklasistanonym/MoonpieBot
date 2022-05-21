@@ -2,7 +2,7 @@ import {
   CliVariable,
   getCliVariableName,
   getCliVariableValue,
-  getCliVariableValueDefault,
+  getCliVariableValueOrCustomDefault,
   printCliVariablesToConsole,
 } from "../../src/cli";
 import { describe } from "mocha";
@@ -21,13 +21,13 @@ describe("cli", () => {
   beforeEach(() => {
     sinon.stub(console, "log");
     sandbox.stub(process, "env").value({
-      MOONPIE_CONFIG_DIR_LOGS: "logs_expected",
-      MOONPIE_CONFIG_CONSOLE_LOG_LEVEL: "console_info_expected",
-      MOONPIE_CONFIG_FILE_LOG_LEVEL: "file_info_expected",
+      MOONPIE_CONFIG_LOGGING_DIR_LOGS_PATH: "logs_expected",
+      MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL: "console_info_expected",
+      MOONPIE_CONFIG_LOGGING_FILE_LOG_LEVEL: "file_info_expected",
       MOONPIE_CONFIG_TWITCH_NAME: "twitchName_expected",
       MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN: "twitchOAuthToken_expected",
       MOONPIE_CONFIG_TWITCH_CHANNELS: "twitchChannels_expected",
-      MOONPIE_CONFIG_DB_FILEPATH: "dbFilepath_expected",
+      MOONPIE_CONFIG_MOONPIE_DATABASE_PATH: "dbFilepath_expected",
     });
   });
 
@@ -43,11 +43,11 @@ describe("cli", () => {
 
   it("getCliVariableName", () => {
     chai
-      .expect(getCliVariableName(CliVariable.DIR_LOGS))
-      .to.be.equal("MOONPIE_CONFIG_DIR_LOGS");
+      .expect(getCliVariableName(CliVariable.LOGGING_DIR_LOGS_PATH))
+      .to.be.equal("MOONPIE_CONFIG_LOGGING_DIR_LOGS_PATH");
     chai
-      .expect(getCliVariableName(CliVariable.CONSOLE_LOG_LEVEL))
-      .to.be.equal("MOONPIE_CONFIG_CONSOLE_LOG_LEVEL");
+      .expect(getCliVariableName(CliVariable.LOGGING_CONSOLE_LOG_LEVEL))
+      .to.be.equal("MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL");
     chai
       .expect(getCliVariableName(CliVariable.TWITCH_CHANNELS))
       .to.be.equal("MOONPIE_CONFIG_TWITCH_CHANNELS");
@@ -61,19 +61,19 @@ describe("cli", () => {
       .expect(getCliVariableName(CliVariable.TWITCH_CHANNELS))
       .to.be.equal("MOONPIE_CONFIG_TWITCH_CHANNELS");
     chai
-      .expect(getCliVariableName(CliVariable.DB_FILEPATH))
-      .to.be.equal("MOONPIE_CONFIG_DB_FILEPATH");
+      .expect(getCliVariableName(CliVariable.MOONPIE_DATABASE_PATH))
+      .to.be.equal("MOONPIE_CONFIG_MOONPIE_DATABASE_PATH");
   });
 
   it("getCliVariableValue", () => {
     chai
-      .expect(getCliVariableValue(CliVariable.DIR_LOGS))
+      .expect(getCliVariableValue(CliVariable.LOGGING_DIR_LOGS_PATH))
       .to.be.equal("logs_expected");
     chai
-      .expect(getCliVariableValue(CliVariable.CONSOLE_LOG_LEVEL))
+      .expect(getCliVariableValue(CliVariable.LOGGING_CONSOLE_LOG_LEVEL))
       .to.be.equal("console_info_expected");
     chai
-      .expect(getCliVariableValue(CliVariable.FILE_LOG_LEVEL))
+      .expect(getCliVariableValue(CliVariable.LOGGING_FILE_LOG_LEVEL))
       .to.be.equal("file_info_expected");
     chai
       .expect(getCliVariableValue(CliVariable.TWITCH_NAME))
@@ -85,11 +85,11 @@ describe("cli", () => {
       .expect(getCliVariableValue(CliVariable.TWITCH_CHANNELS))
       .to.be.equal("twitchChannels_expected");
     chai
-      .expect(getCliVariableValue(CliVariable.DB_FILEPATH))
+      .expect(getCliVariableValue(CliVariable.MOONPIE_DATABASE_PATH))
       .to.be.equal("dbFilepath_expected");
 
     sandbox.stub(process, "env").value({
-      MOONPIE_CONFIG_DIR_LOGS: "logs_expected",
+      MOONPIE_CONFIG_LOGGING_DIR_LOGS_PATH: "logs_expected",
     });
 
     chai
@@ -97,19 +97,27 @@ describe("cli", () => {
       .to.be.equal(undefined);
   });
 
-  it("getCliVariableValueDefault", () => {
+  it("getCliVariableValueOrCustomDefault", () => {
     sandbox.stub(process, "env").value({
-      MOONPIE_CONFIG_DIR_LOGS: "logs_expected",
+      MOONPIE_CONFIG_LOGGING_DIR_LOGS_PATH: "logs_expected",
     });
 
     chai
       .expect(
-        getCliVariableValueDefault(CliVariable.TWITCH_CHANNELS, "default_value")
+        getCliVariableValueOrCustomDefault(
+          CliVariable.TWITCH_CHANNELS,
+          "default_value"
+        )
       )
       .to.be.equal("default_value");
 
     chai
-      .expect(getCliVariableValueDefault(CliVariable.DIR_LOGS, "default_value"))
+      .expect(
+        getCliVariableValueOrCustomDefault(
+          CliVariable.LOGGING_DIR_LOGS_PATH,
+          "default_value"
+        )
+      )
       .to.be.equal("logs_expected");
   });
 });

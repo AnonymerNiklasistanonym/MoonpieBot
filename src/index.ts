@@ -16,8 +16,10 @@ import { getVersion } from "./version";
 import {
   CliVariable,
   getCliVariableValue,
-  getCliVariableValueDefault,
+  getCliVariableValueOrDefault,
+  getCliVariableValueOrCustomDefault,
   printCliVariablesToConsole,
+  writeCliVariableDocumentation,
 } from "./cli";
 import { checkCustomCommand } from "./other/customCommand";
 import { registerTimer } from "./other/customTimer";
@@ -70,46 +72,44 @@ interface CustomCommandDataJson {
 const main = async (logger: Logger, logDir: string) => {
   logger.info(`Start ${name} ${getVersion()} (logs directory: '${logDir}')`);
 
-  const databasePath = getCliVariableValueDefault(
-    CliVariable.DB_FILEPATH,
-    path.join(pathToRootDir, "moonpie.db")
+  await writeCliVariableDocumentation(path.join(pathToRootDir, ".env.example"));
+
+  const databasePath = getCliVariableValueOrDefault(
+    CliVariable.MOONPIE_DATABASE_PATH
   );
 
-  const osuClientId = getCliVariableValueDefault(
-    CliVariable.OSU_CLIENT_ID,
+  const osuApiClientId = getCliVariableValueOrCustomDefault(
+    CliVariable.OSU_API_CLIENT_ID,
     undefined
   );
-  const osuClientSecret = getCliVariableValueDefault(
-    CliVariable.OSU_CLIENT_SECRET,
+  const osuApiClientSecret = getCliVariableValueOrCustomDefault(
+    CliVariable.OSU_API_CLIENT_SECRET,
     undefined
   );
-  const osuDefaultId = getCliVariableValueDefault(
-    CliVariable.OSU_DEFAULT_ID,
+  const osuApiDefaultId = getCliVariableValueOrCustomDefault(
+    CliVariable.OSU_API_DEFAULT_ID,
     undefined
   );
   const enableOsu =
-    osuClientId !== undefined &&
-    osuClientSecret !== undefined &&
-    osuDefaultId !== undefined;
+    osuApiClientId !== undefined &&
+    osuApiClientSecret !== undefined &&
+    osuApiDefaultId !== undefined;
   const enableOsuBeatmapRequests =
-    getCliVariableValueDefault(
-      CliVariable.OSU_RECOGNIZE_MAP_REQUESTS,
-      undefined
-    ) === "ON";
+    getCliVariableValueOrDefault(CliVariable.OSU_API_RECOGNIZE_MAP_REQUESTS) ===
+    "ON";
   const enableOsuBeatmapRequestsDetailed =
-    getCliVariableValueDefault(
-      CliVariable.OSU_RECOGNIZE_MAP_REQUESTS_DETAILED,
-      undefined
+    getCliVariableValueOrDefault(
+      CliVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED
     ) === "ON";
-  const osuIrcPassword = getCliVariableValueDefault(
+  const osuIrcPassword = getCliVariableValueOrCustomDefault(
     CliVariable.OSU_IRC_PASSWORD,
     undefined
   );
-  const osuIrcUsername = getCliVariableValueDefault(
+  const osuIrcUsername = getCliVariableValueOrCustomDefault(
     CliVariable.OSU_IRC_USERNAME,
     undefined
   );
-  const osuIrcRequestTarget = getCliVariableValueDefault(
+  const osuIrcRequestTarget = getCliVariableValueOrCustomDefault(
     CliVariable.OSU_IRC_REQUEST_TARGET,
     undefined
   );
@@ -123,7 +123,7 @@ const main = async (logger: Logger, logDir: string) => {
     osuIrcBot = () =>
       createOsuIrcConnection(osuIrcUsername, osuIrcPassword, logger);
   }
-  const osuStreamCompanionUrl = getCliVariableValueDefault(
+  const osuStreamCompanionUrl = getCliVariableValueOrCustomDefault(
     CliVariable.OSU_STREAM_COMPANION_URL,
     undefined
   );
@@ -189,11 +189,11 @@ const main = async (logger: Logger, logDir: string) => {
 
   await moonpieDbSetupTables(databasePath, logger);
 
-  const twitchApiClientId = getCliVariableValueDefault(
+  const twitchApiClientId = getCliVariableValueOrCustomDefault(
     CliVariable.TWITCH_API_CLIENT_ID,
     undefined
   );
-  const twitchApiAccessToken = getCliVariableValueDefault(
+  const twitchApiAccessToken = getCliVariableValueOrCustomDefault(
     CliVariable.TWITCH_API_ACCESS_TOKEN,
     undefined
   );
@@ -264,7 +264,7 @@ const main = async (logger: Logger, logDir: string) => {
       tags,
       message,
       databasePath,
-      getCliVariableValueDefault(CliVariable.ENABLE_COMMANDS, undefined)?.split(
+      getCliVariableValueOrDefault(CliVariable.MOONPIE_ENABLE_COMMANDS)?.split(
         ","
       ),
       logger
@@ -289,19 +289,18 @@ const main = async (logger: Logger, logDir: string) => {
         tags,
         message,
         {
-          clientId: parseInt(osuClientId),
-          clientSecret: osuClientSecret,
+          clientId: parseInt(osuApiClientId),
+          clientSecret: osuApiClientSecret,
         },
-        parseInt(osuDefaultId),
+        parseInt(osuApiDefaultId),
         enableOsuBeatmapRequests,
         enableOsuBeatmapRequestsDetailed,
         osuIrcBot,
         osuIrcRequestTarget,
         osuStreamCompanionCurrentMapData,
-        getCliVariableValueDefault(
-          CliVariable.OSU_ENABLE_COMMANDS,
-          undefined
-        )?.split(","),
+        getCliVariableValueOrDefault(CliVariable.OSU_ENABLE_COMMANDS)?.split(
+          ","
+        ),
         logger
       ).catch((err) => {
         logger.error(err);
@@ -319,9 +318,8 @@ const main = async (logger: Logger, logDir: string) => {
     } else if (osuStreamCompanionCurrentMapData !== undefined) {
       // Dirty solution to enable !np bot functionality only without any other
       // osu! tokens or credentials, refactor that better in the future
-      const enableCommands = getCliVariableValueDefault(
-        CliVariable.OSU_ENABLE_COMMANDS,
-        undefined
+      const enableCommands = getCliVariableValueOrDefault(
+        CliVariable.OSU_ENABLE_COMMANDS
       )?.split(",");
       osuChatHandler(
         twitchClient,
@@ -481,9 +479,8 @@ if (isEntryPoint()) {
     printCliVariablesToConsole();
 
     // Create logger
-    const logDir = getCliVariableValueDefault(
-      CliVariable.DIR_LOGS,
-      path.join(pathToRootDir, "logs")
+    const logDir = getCliVariableValueOrDefault(
+      CliVariable.LOGGING_DIR_LOGS_PATH
     );
     const logger = createLogger(logDir);
 
