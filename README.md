@@ -260,7 +260,7 @@ In the following there is a list of some possible configurations (`.env` files):
    # Variable necessary for the StreamCompanion connection
    MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727
 
-   # Only enable the !np osu command
+   # Only enable the !np and !rp osu command
    MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=np,rp
    ```
 
