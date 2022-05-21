@@ -2,6 +2,22 @@
 
 A custom Twitch chat bot.
 
+- [Features](#features)
+  - [Optional: osu!](#optional-osu)
+  - [Optional: Custom commands/timers](#optional-custom-commandstimers)
+- [Setup](#setup)
+- [Migrate to a new version](#migrate-to-a-new-version)
+- [Helping Resources](#helping-resources)
+- [Examples](#examples)
+- [TODOs](#todos)
+- [Implementation](#implementation)
+- [Inspect Database](#inspect-database)
+- [Development](#development)
+  - [Tests](#tests)
+  - [Configuration files](#configuration-files)
+  - [How to handle versions](#how-to-handle-versions)
+- [Credits](#credits)
+
 ## Features
 
 Given a Twitch account name, a connected OAuth token and the channel name where the bot should be deployed will imitate the given account in the given channel.
@@ -265,7 +281,7 @@ In the following there is a list of some possible configurations (`.env` files):
    # Disable default moonpie commands
    MOONPIE_CONFIG_ENABLE_COMMANDS=none
 
-   # Enable admin twitch commands to set a game/title
+   # Enable custom commands to make use of some Twitch API connections
    MOONPIE_CONFIG_TWITCH_API_CLIENT_ID=abcdefghijklmnop
    MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN=abcdefghijklmnop
    ```
