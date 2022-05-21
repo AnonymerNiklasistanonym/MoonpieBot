@@ -28,6 +28,7 @@ import WebSocket from "ws";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
+import { pyramidSpammer } from "./other/pyramidSpammer";
 
 /** Path to the root directory of the source code. */
 const pathToRootDir = path.join(__dirname, "..");
@@ -351,20 +352,10 @@ const main = async (logger: Logger, logDir: string) => {
       // Only catch when the Twitch client itself joins a Twitch channel
       logger.info(`Joined the Twitch channel "${channel}" as "${username}"`);
       // Easter Egg: Spam pyramids on joining the channel
-      const channelToSpam = "#ztalx_";
-      const emoteToSpam = " ztalxWow ";
-      const pyramidHeight = 10;
-      if (channel === channelToSpam) {
-        for (let i = 0; i < pyramidHeight - 1; i++) {
-          twitchClient
-            .say(channel, emoteToSpam.repeat(i + 1))
-            .catch(console.error);
-        }
-        for (let i = 0; i < pyramidHeight; i++) {
-          twitchClient
-            .say(channel, emoteToSpam.repeat(pyramidHeight - i))
-            .catch(console.error);
-        }
+      if (channel === "#ztalx_") {
+        pyramidSpammer(twitchClient, channel, "ztalxWow", 10).catch(
+          logger.error
+        );
       }
     }
   });
