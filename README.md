@@ -226,7 +226,7 @@ In the following there is a list of some possible configurations (`.env` files):
    MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727
 
    # Disable default moonpie commands
-   MOONPIE_CONFIG_ENABLE_COMMANDS=none
+   MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS=none
    # Only enable the !np osu command
    MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=np
    ```
@@ -235,7 +235,7 @@ In the following there is a list of some possible configurations (`.env` files):
    - Supports the osu! related now playing "!np" command which will use the StreamCompanion information
    - Supports simple custom commands/timers that don't need special APIs in their messages
 
-3. Default *Moonpie commands and osu! commands* bot configuration:
+3. Default *Moonpie commands and osu! commands* bot configuration: (***lune***)
 
    ```sh
    # Variables necessary for the Twitch chat (read/write) connection
@@ -244,13 +244,13 @@ In the following there is a list of some possible configurations (`.env` files):
    MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
 
    # Variables necessary to use the osu! API
-   MOONPIE_CONFIG_OSU_CLIENT_ID=1234
-   MOONPIE_CONFIG_OSU_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
+   MOONPIE_CONFIG_OSU_API_CLIENT_ID=1234
+   MOONPIE_CONFIG_OSU_API_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
    # Variable of the user that should be checked for top scores
-   MOONPIE_CONFIG_OSU_DEFAULT_ID=1185432
+   MOONPIE_CONFIG_OSU_API_DEFAULT_ID=1185432
    # Variables that enables osu beatmap requests (with detailed map information)
-   MOONPIE_CONFIG_OSU_RECOGNIZE_MAP_REQUESTS=ON
-   MOONPIE_CONFIG_OSU_RECOGNIZE_MAP_REQUESTS_DETAILED=ON
+   MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON
+   MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED=ON
 
    # Variables necessary to send recognized beatmaps to the osu! client via IRC
    MOONPIE_CONFIG_OSU_IRC_PASSWORD=senderServerPassword
@@ -279,7 +279,7 @@ In the following there is a list of some possible configurations (`.env` files):
    MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
 
    # Disable default moonpie commands
-   MOONPIE_CONFIG_ENABLE_COMMANDS=none
+   MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS=none
 
    # Enable custom commands to make use of some Twitch API connections
    MOONPIE_CONFIG_TWITCH_API_CLIENT_ID=abcdefghijklmnop
@@ -288,6 +288,39 @@ In the following there is a list of some possible configurations (`.env` files):
 
    - Disables default moonpie commands
    - Supports advanced custom commands/timers that need access to a special Twitch API in their messages (set/get a game/title or the follow-age)
+
+5. osu! map request and recent play bot configuration: (***geo***)
+
+   ```sh
+   # Variables necessary for the Twitch chat (read/write) connection
+   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
+   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+
+   # Disable default moonpie commands
+   MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS=none
+   # Only enable the !rp osu command
+   MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=rp
+
+   # Variables necessary to use the osu! API
+   MOONPIE_CONFIG_OSU_API_CLIENT_ID=1234
+   MOONPIE_CONFIG_OSU_API_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
+   # Variable of the user that should be checked for top scores
+   MOONPIE_CONFIG_OSU_API_DEFAULT_ID=1185432
+   # Variables that enables osu beatmap requests (with detailed map information)
+   MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON
+   MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED=ON
+
+   # Variables necessary to send recognized beatmaps to the osu! client via IRC
+   MOONPIE_CONFIG_OSU_IRC_PASSWORD=senderServerPassword
+   MOONPIE_CONFIG_OSU_IRC_USERNAME=senderUserName
+   MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET=receiverUserName
+   ```
+
+   - Disables default moonpie commands
+   - Supports beatmap requests in chat which will use the osu! API
+   - Supports the osu! related most recent play "!rp" command which will use the osu! API
+   - Supports simple custom commands/timers that don't need special APIs in their messages
 
 ## TODOs
 
