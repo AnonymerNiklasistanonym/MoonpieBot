@@ -71,7 +71,11 @@ export const commandNp = async (
 
   if (osuStreamCompanionCurrentMapData !== undefined) {
     const currentMapData = osuStreamCompanionCurrentMapData();
-    if (currentMapData !== undefined && currentMapData.mapid !== undefined) {
+    if (
+      currentMapData !== undefined &&
+      currentMapData.mapid !== undefined &&
+      currentMapData.mapid !== 0
+    ) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       message = `@${userName} Currently playing '${currentMapData.titleRoman}' from '${currentMapData.artistRoman}' [${currentMapData.diffName}]`;
       if (
@@ -103,6 +107,13 @@ export const commandNp = async (
       } else {
         message += ` (https://osu.ppy.sh/beatmaps/${currentMapData.mapid} - StreamCompanion)`;
       }
+    } else if (
+      currentMapData !== undefined &&
+      currentMapData.mapid !== undefined &&
+      currentMapData.mapid === 0
+    ) {
+      message +=
+        " (Please wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)";
     } else {
       message += " (StreamCompanion was configured but not found running!)";
     }
