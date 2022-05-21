@@ -82,7 +82,7 @@ export const commandBeatmap = async (
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     messageRequestIrc = `${userName} requested [https://osu.ppy.sh/beatmapsets/${beatmap.beatmapset?.id}#osu/${beatmap.id} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`;
     messageRequestDetailed = mapToStr(beatmap, true, true);
-    messageRequestDetailedIrc = mapToStr(beatmap);
+    messageRequestDetailedIrc = mapToStr(beatmap, true);
     // Check for user score
     if (
       beatmap.ranked === RankedStatus.loved ||
@@ -159,12 +159,12 @@ export const commandBeatmap = async (
                 osuIrcBotInstance?.say(osuIrcRequestTarget, messageRequestIrc);
                 osuIrcBotInstance?.say(
                   osuIrcRequestTarget,
-                  messageRequestDetailedIrc
+                  `> ${messageRequestDetailedIrc}`
                 );
                 if (messageRequestTopScore !== "") {
                   osuIrcBotInstance?.say(
                     osuIrcRequestTarget,
-                    messageRequestTopScore
+                    `> ${messageRequestTopScore}`
                   );
                 }
                 osuIrcBotInstance?.disconnect("", () => {
