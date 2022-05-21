@@ -12,7 +12,7 @@
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import type { Client as IrcClient } from "irc";
-import type { StreamCompanionData } from "../index";
+import type { StreamCompanionData } from "../streamcompanion";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 import { commandBeatmap } from "./osu/beatmap";

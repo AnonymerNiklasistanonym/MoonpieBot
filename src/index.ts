@@ -23,12 +23,13 @@ import { checkCustomCommand } from "./other/customCommand";
 import { registerTimer } from "./other/customTimer";
 import { isProcessRunning } from "./other/processInformation";
 import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
-import ReconnectingWebSocket from "reconnecting-websocket";
-import WebSocket from "ws";
+import { pyramidSpammer } from "./other/pyramidSpammer";
+import { createStreamCompanionConnection } from "./streamcompanion";
+import { createOsuIrcConnection } from "./osuirc";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
-import { pyramidSpammer } from "./other/pyramidSpammer";
+import type { StreamCompanionData } from "./streamcompanion";
 
 /** Path to the root directory of the source code. */
 const pathToRootDir = path.join(__dirname, "..");
@@ -58,27 +59,6 @@ interface CustomCommandJson {
 }
 interface CustomCommandDataJson {
   commands: CustomCommandJson[];
-}
-
-export interface StreamCompanionData {
-  titleRoman?: string;
-  artistRoman?: string;
-  diffName?: string;
-  mapid?: number;
-  mapsetid?: number;
-  maxCombo?: number;
-  mods?: string;
-  mAR?: number;
-  mCS?: number;
-  mOD?: number;
-  mHP?: number;
-  mStars?: number;
-  mBpm?: string;
-}
-
-/** Interface which helps to get the hidden websocket URL. */
-interface ReconnectingWebSocketHelper {
-  _url: string;
 }
 
 /**
@@ -141,44 +121,7 @@ const main = async (logger: Logger, logDir: string) => {
   let osuIrcBot: (() => irc.Client) | undefined = undefined;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
     // TODO Handle authentication errors
-    osuIrcBot = () => {
-      const creationDate = new Date().toISOString();
-      const osuIrcBotInstance = new irc.Client("irc.ppy.sh", osuIrcUsername, {
-        channels: [
-          /*"#osu"*/
-        ],
-        password: osuIrcPassword,
-        port: 6667,
-        autoConnect: false,
-      });
-      osuIrcBotInstance.addListener(
-        "message",
-        (from: string, to: string, text: string, message: string) => {
-          logger.info(
-            "message: " +
-              JSON.stringify({ creationDate, from, to, text, message })
-          );
-        }
-      );
-      osuIrcBotInstance.addListener(
-        "pm",
-        (from: string, to: string, text: string, message: string) => {
-          logger.info(
-            `pm: ${JSON.stringify({ creationDate, from, to, text, message })}`
-          );
-        }
-      );
-      osuIrcBotInstance.addListener("error", (message: string) => {
-        logger.info(`IRC error: ${JSON.stringify({ creationDate, message })}`);
-      });
-      osuIrcBotInstance.addListener("registered", (info: string) => {
-        logger.info(`Registered: ${JSON.stringify({ creationDate, info })}`);
-      });
-      osuIrcBotInstance.addListener("selfMessage", (info: string) => {
-        logger.info(`Message sent: ${JSON.stringify({ creationDate, info })}`);
-      });
-      return osuIrcBotInstance;
-    };
+    osuIrcBot = createOsuIrcConnection(osuIrcUsername, osuIrcPassword, logger);
   }
   const osuStreamCompanionUrl = getCliVariableValueDefault(
     CliVariable.OSU_STREAM_COMPANION_URL,
@@ -188,64 +131,10 @@ const main = async (logger: Logger, logDir: string) => {
     | (() => StreamCompanionData | undefined)
     | undefined = undefined;
   if (osuStreamCompanionUrl !== undefined) {
-    // Automatically reconnect on loss of connection - this means StreamCompanion
-    // does not need to be run all the time but only when needed
-    let connectedToStreamCompanion = false;
-    const websocketUrl = `ws://${osuStreamCompanionUrl}/tokens`;
-    const websocketReconnectTimeoutInS = 10;
-    const ws = new ReconnectingWebSocket(websocketUrl, [], {
-      WebSocket: WebSocket,
-      connectionTimeout: websocketReconnectTimeoutInS * 1000,
-    });
-    logger.info(
-      `Try to connect to StreamCompanion via '${
-        (ws as unknown as ReconnectingWebSocketHelper)._url
-      }' (url=${websocketUrl}, timeout=${websocketReconnectTimeoutInS}s)`
+    osuStreamCompanionCurrentMapData = createStreamCompanionConnection(
+      osuStreamCompanionUrl,
+      logger
     );
-    ws.onopen = () => {
-      connectedToStreamCompanion = true;
-      logger.info("StreamCompanion socket was opened");
-      // Send token names which should be watched for value changes
-      // https://piotrekol.github.io/StreamCompanion/development/SC/api.html#json
-      // TODO: Check what happens for invalid/custom maps
-      ws.send(
-        JSON.stringify([
-          "titleRoman",
-          "artistRoman",
-          "diffName",
-          "mapid",
-          "mapsetid",
-          "maxCombo",
-          "mods",
-          "mAR",
-          "mCS",
-          "mOD",
-          "mHP",
-          "mStars",
-          "mBpm",
-        ])
-      );
-    };
-    const cache: StreamCompanionData = {};
-    ws.onmessage = (wsEvent) => {
-      Object.assign(
-        cache,
-        JSON.parse(wsEvent.data as string) as StreamCompanionData
-      );
-      logger.debug(`New StreamCompanion data: '${wsEvent.data as string}'`);
-    };
-    ws.onclose = () => {
-      if (connectedToStreamCompanion) {
-        connectedToStreamCompanion = false;
-        logger.info("StreamCompanion socket was closed");
-      }
-    };
-    ws.onerror = (err) => {
-      connectedToStreamCompanion = false;
-      logger.error(`StreamCompanion socket error: ${err.message}`);
-    };
-    osuStreamCompanionCurrentMapData = () =>
-      connectedToStreamCompanion ? cache : undefined;
   }
   if (!enableOsu && osuStreamCompanionCurrentMapData !== undefined) {
     logger.info(

@@ -11,7 +11,7 @@ import { getProcessWindowTitle } from "../../other/processInformation";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import type { StreamCompanionData } from "../../index";
+import type { StreamCompanionData } from "../../streamcompanion";
 import type { OsuApiV2Credentials } from "../osu";
 
 /**
