@@ -5,7 +5,11 @@
     "main": "dist",
     "bin": "dist/index.js",
     "pkg": {
-        "scripts": [ "dist/**/*.js", "node_modules/es-get-iterator/node.js" ],
+        "scripts": [
+            "dist/**/*.js",
+            "node_modules/es-get-iterator/node.js",
+            "node_modules/sqlite3/lib/binding/**/*.node"
+        ],
         "assets": [],
         "targets": [ "node18-linux-x64", "node18-win-x64" ],
         "outputPath": "./bin"
