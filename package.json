@@ -11,7 +11,6 @@
             "node_modules/sqlite3/lib/binding/**/*.node"
         ],
         "assets": [],
-        "targets": [ "node18-linux-x64", "node18-win-x64" ],
         "outputPath": "./bin"
     },
     "directories": {
@@ -22,7 +21,8 @@
         "start:dev": "cross-env NODE_PATH=./dist NODE_ENV=production node .",
         "prebuild": "rimraf ./dist/*",
         "build": "tsc",
-        "package": "pkg .",
+        "package:win": "pkg --debug --target node18-win-x64 .",
+        "package:linux": "pkg --debug --target node18-linux-x64 .",
         "test": "cross-env NODE_PATH=. nyc mocha -- \"test/**/*.test.ts\"",
         "docs": "typedoc --tsconfig tsconfig.json",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",

@@ -34,8 +34,15 @@ jobs:
       run: npm run lint
     - name: Create documentation
       run: npm run docs
-    - name: Create binary releases
-      run: npm run package
+    - name: Create binary release
+      run: npm run package:linux
+    - name: Save binary artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: binary-linux-node${{ matrix.node-version }}
+        path: bin/moonpiebot
+        retention-days: 14
+        if-no-files-found: error
 
 
   build-windows:
@@ -62,8 +69,15 @@ jobs:
       run: npm run lint
     - name: Create documentation
       run: npm run docs
-    - name: Create binary releases
-      run: npm run package
+    - name: Create binary release
+      run: npm run package:win
+    - name: Save binary artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: binary-windows-node${{ matrix.node-version }}
+        path: bin/moonpiebot.exe
+        retention-days: 14
+        if-no-files-found: error
 
 
   update-documentation:
@@ -91,32 +105,3 @@ jobs:
       with:
         branch: gh-pages # The branch the action should deploy to.
         folder: ./docs # The folder the action should deploy.
-
-
-  create-binaries:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Install dependencies
-      run: npm ci
-    - name: Build
-      run: npm run build
-    - name: Create binaries
-      run: npm run package
-    - name: Save binary artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: binaries
-        path: bin/*
-        retention-days: 14
-        if-no-files-found: error
