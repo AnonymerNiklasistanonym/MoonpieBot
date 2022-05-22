@@ -34,11 +34,13 @@ import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
 
 /** Path to the root directory of the source code. */
-const pathToRootDir = path.join(__dirname, "..");
+//const pathToRootDir = path.join(__dirname, "..");
+/** Path to the directory where the bot is executed from. */
+const pathToCwdDir = process.cwd();
 
 // TODO Move to database tables so they can be changed on the fly
-const pathCustomTimers = path.join(pathToRootDir, "customTimers.json");
-const pathCustomCommands = path.join(pathToRootDir, "customCommands.json");
+const pathCustomTimers = path.join(pathToCwdDir, "customTimers.json");
+const pathCustomCommands = path.join(pathToCwdDir, "customCommands.json");
 const fileExists = async (path: string) =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   !!(await fs.stat(path).catch(() => false));
@@ -72,7 +74,7 @@ interface CustomCommandDataJson {
 const main = async (logger: Logger, logDir: string) => {
   logger.info(`Start ${name} ${getVersion()} (logs directory: '${logDir}')`);
 
-  await writeCliVariableDocumentation(path.join(pathToRootDir, ".env.example"));
+  await writeCliVariableDocumentation(path.join(pathToCwdDir, ".env.example"));
 
   const databasePath = getCliVariableValueOrDefault(
     CliVariable.MOONPIE_DATABASE_PATH
@@ -163,11 +165,20 @@ const main = async (logger: Logger, logDir: string) => {
   const customCommands: CustomCommandJson[] = [];
   try {
     if (await fileExists(pathCustomCommands)) {
+      logger.info("Found custom command file");
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const content = await fs.readFile(pathCustomCommands);
-      customCommands.push(
-        ...(JSON.parse(content.toString()) as CustomCommandDataJson).commands
-      );
+      const newCustomCommands = (
+        JSON.parse(content.toString()) as CustomCommandDataJson
+      ).commands;
+      for (const newCustomCommand of newCustomCommands) {
+        logger.info(
+          `Add custom command ${
+            newCustomCommand.name ? newCustomCommand.name : "no-name"
+          }: ${newCustomCommand.regexString} => ${newCustomCommand.message}`
+        );
+      }
+      customCommands.push(...newCustomCommands);
     }
   } catch (err) {
     logger.error(err);
@@ -177,11 +188,20 @@ const main = async (logger: Logger, logDir: string) => {
   const customTimers: CustomTimerJson[] = [];
   try {
     if (await fileExists(pathCustomTimers)) {
+      logger.info("Found custom timers file");
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const content = await fs.readFile(pathCustomTimers);
-      customTimers.push(
-        ...(JSON.parse(content.toString()) as CustomTimerDataJson).timers
-      );
+      const newCustomTimers = (
+        JSON.parse(content.toString()) as CustomTimerDataJson
+      ).timers;
+      for (const newCustomTimer of newCustomTimers) {
+        logger.info(
+          `Add custom command ${
+            newCustomTimer.name ? newCustomTimer.name : "no-name"
+          }: ${newCustomTimer.message} [${newCustomTimer.cronString}]`
+        );
+      }
+      customTimers.push(...newCustomTimers);
     }
   } catch (err) {
     logger.error(err);
@@ -477,6 +497,11 @@ if (isEntryPoint()) {
     // $ npm run start -- --argument
     // $ node . --no-censoring
     const commandLineArgs = process.argv.slice(2);
+
+    if (commandLineArgs.includes("--version")) {
+      console.log(getVersion());
+      process.exit(0);
+    }
 
     // Load environment variables if existing from the .env file
     dotenv.config();

@@ -183,3 +183,6 @@ test.json
 
 # IDE files
 .vscode
+
+# Binary builds
+bin

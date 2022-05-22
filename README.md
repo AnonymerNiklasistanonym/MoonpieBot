@@ -166,6 +166,21 @@ For some macros to work (like Twitch API connections for `!so`/`!followage`/`!se
    node . --no-censoring
    ```
 
+---
+
+**[BETA] Binary Release**:
+
+There is now a way to use the program without needing to install anything or building anything.
+You can download the binary for your operating system and then just run it instead of `npm run start`/`node .`:
+
+```sh
+./moonpiebot-linux
+```
+
+```pws
+.\moonpiebot-win.exe
+```
+
 ## Migrate to a new version
 
 ---

@@ -3,6 +3,13 @@
     "version": "1.0.6",
     "description": "A custom twitch bot",
     "main": "dist",
+    "bin": "dist/index.js",
+    "pkg": {
+        "scripts": [ "dist/**/*.js", "node_modules/es-get-iterator/node.js" ],
+        "assets": [],
+        "targets": [ "node18-linux-x64", "node18-win-x64" ],
+        "outputPath": "./bin"
+    },
     "directories": {
         "test": "test"
     },
@@ -11,6 +18,7 @@
         "start:dev": "cross-env NODE_PATH=./dist NODE_ENV=production node .",
         "prebuild": "rimraf ./dist/*",
         "build": "tsc",
+        "package": "pkg .",
         "test": "cross-env NODE_PATH=. nyc mocha -- \"test/**/*.test.ts\"",
         "docs": "typedoc --tsconfig tsconfig.json",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",
@@ -53,6 +61,7 @@
         "mocha": "^10.0.0",
         "nodemon": "^2.0.16",
         "nyc": "^15.1.0",
+        "pkg": "^5.7.0",
         "prettier": "^2.6.2",
         "rimraf": "^3.0.2",
         "sinon": "^14.0.0",
