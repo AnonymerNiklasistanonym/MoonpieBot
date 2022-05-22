@@ -94,6 +94,8 @@ For some macros to work (like Twitch API connections for `!so`/`!followage`/`!se
 
 ## Setup
 
+### Build it yourself
+
 1. Install a recent version of [Node.js](https://nodejs.org/en/download/) so the `node` and `npm` command are available
 2. Get the source code of the bot
 
@@ -166,20 +168,21 @@ For some macros to work (like Twitch API connections for `!so`/`!followage`/`!se
    node . --no-censoring
    ```
 
----
+### Binary release
 
-**[BETA] Binary Release**:
-
-There is now a way to use the program without needing to install anything or building anything.
-You can download the binary for your operating system and then just run it instead of `npm run start`/`node .`:
+There is now a way to use the program without needing to install or build anything.
+You can download a binary for your operating system from the [latest release](https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases) and then just run it instead of for example `npm run start`:
 
 ```sh
 ./moonpiebot-linux
 ```
 
-```pws
+```ps1
 .\moonpiebot-win.exe
 ```
+
+All other rules from the previous section still apply, it's just that you don't have to install or build anything.
+You still need to have environment variables or a `.env` file in the same directory etc.
 
 ## Migrate to a new version
 

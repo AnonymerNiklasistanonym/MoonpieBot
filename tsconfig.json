@@ -24,6 +24,8 @@
             "src/index.ts",
             "src/info.ts",
             "src/logging.ts",
+            "src/osuirc.ts",
+            "src/streamcompanion.ts",
             "src/twitch.ts",
             "src/version.ts",
             "src/commands/commandHelper.ts",
@@ -50,6 +52,7 @@
             "src/other/customTimer.ts",
             "src/other/osuStringBuilder.ts",
             "src/other/processInformation.ts",
+            "src/other/pyramidSpammer.ts",
             "src/other/timePeriodToString.ts",
             "src/other/twitchBadgeParser.ts"
         ],

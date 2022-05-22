@@ -7,7 +7,7 @@ import type { Client } from "tmi.js";
  * @param channel Twitch channel in which messages should be sent.
  * @param emote The name of the emote.
  * @param pyramidWidth The maximum width of the pyramid.
- * @example ```txt
+ * @example ```
  * a
  * a a
  * a a a (pyramidWidth = 3)
