@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 17.x]
+        node-version: [16.x, 18.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -34,6 +34,36 @@ jobs:
       run: npm run lint
     - name: Create documentation
       run: npm run docs
+    - name: Create binary releases
+      run: npm run package
+
+
+  build-windows:
+
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install dependencies
+      run: npm ci
+    - name: Run tests and see code coverage
+      run: npm run test
+    - name: Build the bot
+      run: npm run build
+    - name: Lint the code
+      run: npm run lint
+    - name: Create documentation
+      run: npm run docs
+    - name: Create binary releases
+      run: npm run package
 
 
   update-documentation:
@@ -42,7 +72,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [17.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -62,13 +92,14 @@ jobs:
         branch: gh-pages # The branch the action should deploy to.
         folder: ./docs # The folder the action should deploy.
 
-  build-windows:
 
-    runs-on: windows-latest
+  create-binaries:
+
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [16.x, 17.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -78,11 +109,14 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies
       run: npm ci
-    - name: Run tests and see code coverage
-      run: npm run test
-    - name: Build the bot
+    - name: Build
       run: npm run build
-    - name: Lint the code
-      run: npm run lint
-    - name: Create documentation
-      run: npm run docs
+    - name: Create binaries
+      run: npm run package
+    - name: Save binary artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: binaries
+        path: bin/*
+        retention-days: 14
+        if-no-files-found: error
