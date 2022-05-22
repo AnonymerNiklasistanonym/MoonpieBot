@@ -473,10 +473,16 @@ if (isEntryPoint()) {
   try {
     process.title = `${name} ${getVersion()}`;
 
+    // Get additional command line arguments
+    // $ npm run start -- --argument
+    // $ node . --no-censoring
+    const commandLineArgs = process.argv.slice(2);
+
     // Load environment variables if existing from the .env file
     dotenv.config();
     // Print for debugging the (private/secret) environment values to the console
-    printCliVariablesToConsole();
+    // (censor critical variables if not explicitly enabled)
+    printCliVariablesToConsole(!commandLineArgs.includes("--no-censoring"));
 
     // Create logger
     const logDir = getCliVariableValueOrDefault(

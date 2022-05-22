@@ -151,9 +151,20 @@ For some macros to work (like Twitch API connections for `!so`/`!followage`/`!se
 
    ```sh
    npm run start
+   # or
+   node .
    ```
 
    If there are errors you can probably find advanced log messages in the log files in the directory `logs` that is created while running the bot.
+
+   Per default critical values like for example the Twitch OAuth-token will be censored so screenshots or screen-sharing can't leak this information.
+   This censoring can be disabled by passing an additional command line argument which can be helpful in case of debugging:
+
+   ```sh
+   npm run start -- --no-censoring
+   # or
+   node . --no-censoring
+   ```
 
 ## Migrate to a new version
 
