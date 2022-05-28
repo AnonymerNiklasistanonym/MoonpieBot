@@ -1,6 +1,11 @@
 # MoonpieBot
 
+[![github release](https://img.shields.io/github/release/AnonymerNiklasistanonym/MoonpieBot.svg?label=current+release)](https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases)
+[![CI](https://github.com/AnonymerNiklasistanonym/MoonpieBot/actions/workflows/nodejs.yml/badge.svg)](https://github.com/AnonymerNiklasistanonym/MoonpieBot/actions/workflows/nodejs.yml)
+
 A custom Twitch chat bot.
+
+![MoonpieBot icon](res/icons/moonpiebot_128.png)
 
 - [Features](#features)
   - [Optional: osu!](#optional-osu)
