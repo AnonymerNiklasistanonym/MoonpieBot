@@ -1,10 +1,10 @@
 import {
-  CliVariable,
-  getCliVariableName,
-  getCliVariableValue,
-  getCliVariableValueOrCustomDefault,
-  printCliVariablesToConsole,
-} from "../../src/cli";
+  EnvVariable,
+  getEnvVariableName,
+  getEnvVariableValue,
+  getEnvVariableValueOrCustomDefault,
+  printEnvVariablesToConsole,
+} from "../../src/env";
 import { describe } from "mocha";
 import chai from "chai";
 import sinon from "sinon";
@@ -37,55 +37,55 @@ describe("cli", () => {
   });
 
   it("printCliVariablesToConsole", () => {
-    printCliVariablesToConsole();
+    printEnvVariablesToConsole();
     chai.expect(console.log).to.be.called;
   });
 
   it("getCliVariableName", () => {
     chai
-      .expect(getCliVariableName(CliVariable.LOGGING_DIRECTORY_PATH))
+      .expect(getEnvVariableName(EnvVariable.LOGGING_DIRECTORY_PATH))
       .to.be.equal("MOONPIE_CONFIG_LOGGING_DIRECTORY_PATH");
     chai
-      .expect(getCliVariableName(CliVariable.LOGGING_CONSOLE_LOG_LEVEL))
+      .expect(getEnvVariableName(EnvVariable.LOGGING_CONSOLE_LOG_LEVEL))
       .to.be.equal("MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL");
     chai
-      .expect(getCliVariableName(CliVariable.TWITCH_CHANNELS))
+      .expect(getEnvVariableName(EnvVariable.TWITCH_CHANNELS))
       .to.be.equal("MOONPIE_CONFIG_TWITCH_CHANNELS");
     chai
-      .expect(getCliVariableName(CliVariable.TWITCH_NAME))
+      .expect(getEnvVariableName(EnvVariable.TWITCH_NAME))
       .to.be.equal("MOONPIE_CONFIG_TWITCH_NAME");
     chai
-      .expect(getCliVariableName(CliVariable.TWITCH_OAUTH_TOKEN))
+      .expect(getEnvVariableName(EnvVariable.TWITCH_OAUTH_TOKEN))
       .to.be.equal("MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN");
     chai
-      .expect(getCliVariableName(CliVariable.TWITCH_CHANNELS))
+      .expect(getEnvVariableName(EnvVariable.TWITCH_CHANNELS))
       .to.be.equal("MOONPIE_CONFIG_TWITCH_CHANNELS");
     chai
-      .expect(getCliVariableName(CliVariable.MOONPIE_DATABASE_PATH))
+      .expect(getEnvVariableName(EnvVariable.MOONPIE_DATABASE_PATH))
       .to.be.equal("MOONPIE_CONFIG_MOONPIE_DATABASE_PATH");
   });
 
   it("getCliVariableValue", () => {
     chai
-      .expect(getCliVariableValue(CliVariable.LOGGING_DIRECTORY_PATH))
+      .expect(getEnvVariableValue(EnvVariable.LOGGING_DIRECTORY_PATH))
       .to.be.equal("logs_expected");
     chai
-      .expect(getCliVariableValue(CliVariable.LOGGING_CONSOLE_LOG_LEVEL))
+      .expect(getEnvVariableValue(EnvVariable.LOGGING_CONSOLE_LOG_LEVEL))
       .to.be.equal("console_info_expected");
     chai
-      .expect(getCliVariableValue(CliVariable.LOGGING_FILE_LOG_LEVEL))
+      .expect(getEnvVariableValue(EnvVariable.LOGGING_FILE_LOG_LEVEL))
       .to.be.equal("file_info_expected");
     chai
-      .expect(getCliVariableValue(CliVariable.TWITCH_NAME))
+      .expect(getEnvVariableValue(EnvVariable.TWITCH_NAME))
       .to.be.equal("twitchName_expected");
     chai
-      .expect(getCliVariableValue(CliVariable.TWITCH_OAUTH_TOKEN))
+      .expect(getEnvVariableValue(EnvVariable.TWITCH_OAUTH_TOKEN))
       .to.be.equal("twitchOAuthToken_expected");
     chai
-      .expect(getCliVariableValue(CliVariable.TWITCH_CHANNELS))
+      .expect(getEnvVariableValue(EnvVariable.TWITCH_CHANNELS))
       .to.be.equal("twitchChannels_expected");
     chai
-      .expect(getCliVariableValue(CliVariable.MOONPIE_DATABASE_PATH))
+      .expect(getEnvVariableValue(EnvVariable.MOONPIE_DATABASE_PATH))
       .to.be.equal("dbFilepath_expected");
 
     sandbox.stub(process, "env").value({
@@ -93,7 +93,7 @@ describe("cli", () => {
     });
 
     chai
-      .expect(getCliVariableValue(CliVariable.TWITCH_CHANNELS))
+      .expect(getEnvVariableValue(EnvVariable.TWITCH_CHANNELS))
       .to.be.equal(undefined);
   });
 
@@ -104,8 +104,8 @@ describe("cli", () => {
 
     chai
       .expect(
-        getCliVariableValueOrCustomDefault(
-          CliVariable.TWITCH_CHANNELS,
+        getEnvVariableValueOrCustomDefault(
+          EnvVariable.TWITCH_CHANNELS,
           "default_value"
         )
       )
@@ -113,8 +113,8 @@ describe("cli", () => {
 
     chai
       .expect(
-        getCliVariableValueOrCustomDefault(
-          CliVariable.LOGGING_DIRECTORY_PATH,
+        getEnvVariableValueOrCustomDefault(
+          EnvVariable.LOGGING_DIRECTORY_PATH,
           "default_value"
         )
       )
