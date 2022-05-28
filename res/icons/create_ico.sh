@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Prerequisites:
-# `imagemagick` 7.0+ (https://imagemagick.org/index.php)
+# `imagemagick` 7.1.0 (https://imagemagick.org/index.php)
 
 INPUT_SVG=moonpiebot.svg
 OUTPUT_ICO=moonpiebot.ico

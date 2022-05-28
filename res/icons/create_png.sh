@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Prerequisites:
-# `inkscape` 1.0+ (https://inkscape.org/)
+# `inkscape` 1.2 (https://inkscape.org/)
 
 INPUT_SVG=moonpiebot.svg
 OUTPUT_PNG_BASENAME=moonpiebot_
