@@ -5,12 +5,18 @@ import * as path from "path";
 const pathToRootDir = path.join(__dirname, "..");
 
 /**
- * Command line interface handling.
+ * Environment variable handling.
  */
 
-export const CliVariablePrefix = "MOONPIE_CONFIG_";
+/**
+ * Environment variable prefix.
+ */
+export const envVariablePrefix = "MOONPIE_CONFIG_";
 
-export enum CliVariable {
+/**
+ * Environment variables.
+ */
+export enum EnvVariable {
   LOGGING_CONSOLE_LOG_LEVEL = "LOGGING_CONSOLE_LOG_LEVEL",
   LOGGING_DIRECTORY_PATH = "LOGGING_DIRECTORY_PATH",
   LOGGING_FILE_LOG_LEVEL = "LOGGING_FILE_LOG_LEVEL",
@@ -33,7 +39,11 @@ export enum CliVariable {
   TWITCH_API_ACCESS_TOKEN = "TWITCH_API_ACCESS_TOKEN",
 }
 
-export enum CliVariableBlocks {
+/**
+ * Environment variables are grouped in blocks.
+ * The order is important.
+ */
+export enum EnvVariableBlocks {
   LOGGING = "LOGGING",
   TWITCH = "TWITCH",
   MOONPIE = "MOONPIE",
@@ -44,119 +54,119 @@ export enum CliVariableBlocks {
   TWITCH_API = "TWITCH_API",
 }
 
-export const printCliVariablesToConsole = (censor = true) => {
-  for (const cliVariable in CliVariable) {
-    const cliVariableName = `${CliVariablePrefix}${cliVariable.toString()}`;
+export const printEnvVariablesToConsole = (censor = true) => {
+  for (const envVariable in EnvVariable) {
+    const envVariableName = `${envVariablePrefix}${envVariable.toString()}`;
     // eslint-disable-next-line security/detect-object-injection
-    const cliVariableValue = process.env[cliVariableName];
+    const envVariableValue = process.env[envVariableName];
 
-    const cliVariableInformation = getCliVariableValueInformation(cliVariable);
-    let cliVariableValueString = "Not found!";
-    if (cliVariableValue !== undefined) {
-      cliVariableValueString = `"${cliVariableValue}"`;
-      if (censor && cliVariableInformation.censor) {
+    const envVariableInformation = getEnvVariableValueInformation(envVariable);
+    let envVariableValueString = "Not found!";
+    if (envVariableValue !== undefined) {
+      envVariableValueString = `"${envVariableValue}"`;
+      if (censor && envVariableInformation.censor) {
         // Censor secret variables per default
-        cliVariableValueString = "*******[secret]********";
+        envVariableValueString = "*******[secret]********";
       }
-      if (cliVariableValue.length === 0) {
-        cliVariableValueString = "Empty string!";
+      if (envVariableValue.length === 0) {
+        envVariableValueString = "Empty string!";
       }
-    } else if (cliVariableInformation.default !== undefined) {
-      cliVariableValueString += ` (default="${cliVariableInformation.default}")`;
-    } else if (cliVariableInformation.example !== undefined) {
-      cliVariableValueString += ` (example="${cliVariableInformation.example}")`;
+    } else if (envVariableInformation.default !== undefined) {
+      envVariableValueString += ` (default="${envVariableInformation.default}")`;
+    } else if (envVariableInformation.example !== undefined) {
+      envVariableValueString += ` (example="${envVariableInformation.example}")`;
     }
 
-    if (cliVariableInformation.necessary) {
-      cliVariableValueString += " (NECESSARY!)";
+    if (envVariableInformation.necessary) {
+      envVariableValueString += " (NECESSARY!)";
     }
 
     console.log(
-      `${CliVariablePrefix}${cliVariable.toString()}=${cliVariableValueString}`
+      `${envVariablePrefix}${envVariable.toString()}=${envVariableValueString}`
     );
   }
 };
 
-export const getCliVariableValue = (
-  cliVariable: CliVariable
+export const getEnvVariableValue = (
+  envVariable: EnvVariable
 ): string | undefined => {
-  return process.env[getCliVariableName(cliVariable)];
+  return process.env[getEnvVariableName(envVariable)];
 };
 
-export const getCliVariableValueOrCustomDefault = <T>(
-  cliVariable: CliVariable,
+export const getEnvVariableValueOrCustomDefault = <T>(
+  envVariable: EnvVariable,
   defaultValue: T
 ): string | T => {
-  const value = process.env[getCliVariableName(cliVariable)];
+  const value = process.env[getEnvVariableName(envVariable)];
   if (value === undefined || value.trim().length === 0) {
     return defaultValue;
   }
   return value;
 };
 
-export interface CliVariableValueInformation {
+export interface EnvVariableValueInformation {
   default?: string;
   example?: string;
   description: string;
   supportedValues?: string[];
-  block: CliVariableBlocks;
+  block: EnvVariableBlocks;
   necessary?: boolean;
   censor?: boolean;
 }
 
-export const getCliVariableValueInformation = (
-  cliVariable: CliVariable | string
-): CliVariableValueInformation => {
-  switch (cliVariable) {
-    case CliVariable.LOGGING_CONSOLE_LOG_LEVEL:
+export const getEnvVariableValueInformation = (
+  envVariable: EnvVariable | string
+): EnvVariableValueInformation => {
+  switch (envVariable) {
+    case EnvVariable.LOGGING_CONSOLE_LOG_LEVEL:
       return {
         default: "info",
         description:
           "The log level of the log messages that are printed to the console.",
         supportedValues: ["error", "warn", "debug", "info"],
-        block: CliVariableBlocks.LOGGING,
+        block: EnvVariableBlocks.LOGGING,
       };
-    case CliVariable.LOGGING_DIRECTORY_PATH:
+    case EnvVariable.LOGGING_DIRECTORY_PATH:
       return {
         default: path.relative(pathToRootDir, path.join(pathToRootDir, "logs")),
         description: "The directory file path of the log files",
-        block: CliVariableBlocks.LOGGING,
+        block: EnvVariableBlocks.LOGGING,
       };
-    case CliVariable.LOGGING_FILE_LOG_LEVEL:
+    case EnvVariable.LOGGING_FILE_LOG_LEVEL:
       return {
         default: "debug",
         description:
           "The log level of the log messages that are written to the log files.",
         supportedValues: ["error", "warn", "debug", "info"],
-        block: CliVariableBlocks.LOGGING,
+        block: EnvVariableBlocks.LOGGING,
       };
 
-    case CliVariable.TWITCH_CHANNELS:
+    case EnvVariable.TWITCH_CHANNELS:
       return {
         example: "twitch_channel_name another_twitch_channel_name",
         description:
           "A with a space separated list of all the channels the bot should be active.",
-        block: CliVariableBlocks.TWITCH,
+        block: EnvVariableBlocks.TWITCH,
         necessary: true,
       };
-    case CliVariable.TWITCH_NAME:
+    case EnvVariable.TWITCH_NAME:
       return {
         example: "twitch_channel_name",
         description: "The name of the twitch account that should be imitated.",
-        block: CliVariableBlocks.TWITCH,
+        block: EnvVariableBlocks.TWITCH,
         necessary: true,
       };
-    case CliVariable.TWITCH_OAUTH_TOKEN:
+    case EnvVariable.TWITCH_OAUTH_TOKEN:
       return {
         example: "oauth:abcdefghijklmnop",
         description:
           "An Twitch OAuth token (get it from: https://twitchapps.com/tmi/).",
-        block: CliVariableBlocks.TWITCH,
+        block: EnvVariableBlocks.TWITCH,
         necessary: true,
         censor: true,
       };
 
-    case CliVariable.MOONPIE_ENABLE_COMMANDS:
+    case EnvVariable.MOONPIE_ENABLE_COMMANDS:
       return {
         default: "about,claim,commands,delete,get,leaderboard,remove,set",
         supportedValues: [
@@ -172,9 +182,9 @@ export const getCliVariableValueInformation = (
         ],
         description:
           "You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).",
-        block: CliVariableBlocks.MOONPIE,
+        block: EnvVariableBlocks.MOONPIE,
       };
-    case CliVariable.MOONPIE_DATABASE_PATH:
+    case EnvVariable.MOONPIE_DATABASE_PATH:
       return {
         default: path.relative(
           pathToRootDir,
@@ -182,136 +192,136 @@ export const getCliVariableValueInformation = (
         ),
         description:
           "The database file path that contains the persistent moonpie data.",
-        block: CliVariableBlocks.MOONPIE,
+        block: EnvVariableBlocks.MOONPIE,
       };
 
-    case CliVariable.OSU_ENABLE_COMMANDS:
+    case EnvVariable.OSU_ENABLE_COMMANDS:
       return {
         default: "np,pp,rp",
         supportedValues: ["np", "pp", "rp", "none"],
         description:
           "You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!",
-        block: CliVariableBlocks.OSU,
+        block: EnvVariableBlocks.OSU,
       };
 
-    case CliVariable.OSU_API_CLIENT_ID:
+    case EnvVariable.OSU_API_CLIENT_ID:
       return {
         example: "1234",
         description:
           "The osu! client ID (and client secret) to use the osu! api v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).",
-        block: CliVariableBlocks.OSU_API,
+        block: EnvVariableBlocks.OSU_API,
         censor: true,
       };
-    case CliVariable.OSU_API_CLIENT_SECRET:
+    case EnvVariable.OSU_API_CLIENT_SECRET:
       return {
         example: "dadasfsafsafdsadffasfsafasfa",
-        description: `Check the description of ${CliVariablePrefix}${CliVariable.OSU_API_CLIENT_ID}.`,
-        block: CliVariableBlocks.OSU_API,
+        description: `Check the description of ${envVariablePrefix}${EnvVariable.OSU_API_CLIENT_ID}.`,
+        block: EnvVariableBlocks.OSU_API,
         censor: true,
       };
-    case CliVariable.OSU_API_DEFAULT_ID:
+    case EnvVariable.OSU_API_DEFAULT_ID:
       return {
         example: "1185432",
         description:
           "The default osu! account ID used to check for recent play or a top play on a map.",
-        block: CliVariableBlocks.OSU_API,
+        block: EnvVariableBlocks.OSU_API,
       };
-    case CliVariable.OSU_API_RECOGNIZE_MAP_REQUESTS:
+    case EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS:
       return {
         default: "OFF",
         supportedValues: ["ON", "OFF"],
         description:
           "Automatically recognize beatmap links (=requests) in chat.",
-        block: CliVariableBlocks.OSU_API,
+        block: EnvVariableBlocks.OSU_API,
       };
-    case CliVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED:
+    case EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED:
       return {
         default: "OFF",
         supportedValues: ["ON", "OFF"],
-        description: `If recognizing is enabled (${CliVariablePrefix}${CliVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=ON) additionally output more detailed information about the map in the chat.`,
-        block: CliVariableBlocks.OSU_API,
+        description: `If recognizing is enabled (${envVariablePrefix}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=ON) additionally output more detailed information about the map in the chat.`,
+        block: EnvVariableBlocks.OSU_API,
       };
 
-    case CliVariable.OSU_IRC_PASSWORD:
+    case EnvVariable.OSU_IRC_PASSWORD:
       return {
         example: "senderServerPassword",
         supportedValues: ["ON", "OFF"],
         description:
           "The osu! irc server password and senderUserName. To get them go to https://osu.ppy.sh/p/irc and login (in case that clicking the 'Begin Email Verification' button does not reveal a text input refresh the page and click the button again -> this also means you get a new code!)",
-        block: CliVariableBlocks.OSU_IRC,
+        block: EnvVariableBlocks.OSU_IRC,
         censor: true,
       };
-    case CliVariable.OSU_IRC_USERNAME:
+    case EnvVariable.OSU_IRC_USERNAME:
       return {
         example: "senderUserName",
         supportedValues: ["ON", "OFF"],
-        description: `Check the description of ${CliVariablePrefix}${CliVariable.OSU_IRC_PASSWORD}.`,
-        block: CliVariableBlocks.OSU_IRC,
+        description: `Check the description of ${envVariablePrefix}${EnvVariable.OSU_IRC_PASSWORD}.`,
+        block: EnvVariableBlocks.OSU_IRC,
       };
-    case CliVariable.OSU_IRC_REQUEST_TARGET:
+    case EnvVariable.OSU_IRC_REQUEST_TARGET:
       return {
         example: "receiverUserName",
         description:
           "The osu! account name that should receive the requests (can be the same account as the sender!).",
-        block: CliVariableBlocks.OSU_IRC,
+        block: EnvVariableBlocks.OSU_IRC,
       };
 
-    case CliVariable.OSU_STREAM_COMPANION_URL:
+    case EnvVariable.OSU_STREAM_COMPANION_URL:
       return {
         example: "localhost:20727",
         description:
           "osu! StreamCompanion URL to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods.",
-        block: CliVariableBlocks.OSU_STREAM_COMPANION,
+        block: EnvVariableBlocks.OSU_STREAM_COMPANION,
       };
 
-    case CliVariable.TWITCH_API_CLIENT_ID:
+    case EnvVariable.TWITCH_API_CLIENT_ID:
       return {
         example: "abcdefghijklmnop",
         description:
           "Provide client id/access token to enable Twitch api calls in commands (get them by using https://twitchtokengenerator.com with the scopes you want to have). The recommended scopes are: `user:edit:broadcast` to edit stream title/game, `user:read:broadcast`, `chat:read`, `chat:edit`.",
-        block: CliVariableBlocks.TWITCH_API,
+        block: EnvVariableBlocks.TWITCH_API,
         censor: true,
       };
-    case CliVariable.TWITCH_API_ACCESS_TOKEN:
+    case EnvVariable.TWITCH_API_ACCESS_TOKEN:
       return {
         example: "abcdefghijklmnop",
-        description: `Check the description of ${CliVariablePrefix}${CliVariable.TWITCH_API_CLIENT_ID}.`,
-        block: CliVariableBlocks.TWITCH_API,
+        description: `Check the description of ${envVariablePrefix}${EnvVariable.TWITCH_API_CLIENT_ID}.`,
+        block: EnvVariableBlocks.TWITCH_API,
         censor: true,
       };
   }
-  throw Error(`The Cli variable ${cliVariable} has no information`);
+  throw Error(`The Cli variable ${envVariable} has no information`);
 };
 
-export const getCliVariableValueOrDefault = (cliVariable: CliVariable) => {
-  const value = process.env[getCliVariableName(cliVariable)];
+export const getEnvVariableValueOrDefault = (envVariable: EnvVariable) => {
+  const value = process.env[getEnvVariableName(envVariable)];
   if (value === undefined || value.trim().length === 0) {
-    const variableInformation = getCliVariableValueInformation(cliVariable);
+    const variableInformation = getEnvVariableValueInformation(envVariable);
     if (variableInformation.default !== undefined) {
       return variableInformation.default;
     }
-    throw Error(`The Cli variable ${cliVariable} has no default`);
+    throw Error(`The environment variable ${envVariable} has no default`);
   }
   return value;
 };
 
-export const getCliVariableName = (cliVariable: CliVariable): string => {
-  return `${CliVariablePrefix}${cliVariable.toString()}`;
+export const getEnvVariableName = (envVariable: EnvVariable): string => {
+  return `${envVariablePrefix}${envVariable.toString()}`;
 };
 
-export interface CliVariableStructureTextBlock {
+export interface EnvVariableStructureTextBlock {
   name: string;
   content: string;
 }
-export interface CliVariableStructureVariablesBlock {
-  block: CliVariableBlocks;
+export interface EnvVariableStructureVariablesBlock {
+  block: EnvVariableBlocks;
   name: string;
   description: string;
 }
 
-export const cliVariableStructure: (
-  | CliVariableStructureTextBlock
-  | CliVariableStructureVariablesBlock
+export const envVariableStructure: (
+  | EnvVariableStructureTextBlock
+  | EnvVariableStructureVariablesBlock
 )[] = [
   {
     name: "File description",
@@ -325,44 +335,44 @@ export const cliVariableStructure: (
   },
   {
     name: "How to edit file",
-    content: `If a line that starts with '${CliVariablePrefix}' has the symbol '#' in front of it that means it will be ignored as a comment. This means you can add custom comments and easily enable/disable any '${CliVariablePrefix}' option by adding or removing that symbol.`,
+    content: `If a line that starts with '${envVariablePrefix}' has the symbol '#' in front of it that means it will be ignored as a comment. This means you can add custom comments and easily enable/disable any '${envVariablePrefix}' option by adding or removing that symbol.`,
   },
   {
-    block: CliVariableBlocks.LOGGING,
+    block: EnvVariableBlocks.LOGGING,
     name: "LOGGING",
     description: "Customize how much and where should be logged.",
   },
   {
-    block: CliVariableBlocks.TWITCH,
+    block: EnvVariableBlocks.TWITCH,
     name: "TWITCH",
     description:
       "Necessary variables that need to be set for ANY configuration to connect to Twitch chat.",
   },
   {
-    block: CliVariableBlocks.MOONPIE,
+    block: EnvVariableBlocks.MOONPIE,
     name: "MOONPIE",
     description:
       "Customize the moonpie functionality that is enabled per default.",
   },
   {
-    block: CliVariableBlocks.OSU,
+    block: EnvVariableBlocks.OSU,
     name: "OSU",
     description: "Optional osu! commands that can be enabled.",
   },
   {
-    block: CliVariableBlocks.OSU_API,
+    block: EnvVariableBlocks.OSU_API,
     name: "OSU API",
     description:
       "Optional osu! API connection that can be enabled to use more osu! commands or detect beatmap requests.",
   },
   {
-    block: CliVariableBlocks.OSU_STREAM_COMPANION,
+    block: EnvVariableBlocks.OSU_STREAM_COMPANION,
     name: "OSU STREAM COMPANION",
     description:
       "Optional osu! StreamCompanion connection that can be enabled for a much better !np command.",
   },
   {
-    block: CliVariableBlocks.TWITCH_API,
+    block: EnvVariableBlocks.TWITCH_API,
     name: "Twitch API",
     description:
       "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
@@ -384,14 +394,14 @@ export const splitTextAtLength = (textInput: string, splitLength: number) => {
   return out;
 };
 
-export const writeCliVariableDocumentation = async (path: string) => {
+export const writeEnvVariableDocumentation = async (path: string) => {
   let data = "";
   const maxLineLength = 78;
 
-  for (const structurePart of cliVariableStructure) {
-    if (!(structurePart as CliVariableStructureVariablesBlock)?.block) {
+  for (const structurePart of envVariableStructure) {
+    if (!(structurePart as EnvVariableStructureVariablesBlock)?.block) {
       // Just a text block
-      const structurePartText = structurePart as CliVariableStructureTextBlock;
+      const structurePartText = structurePart as EnvVariableStructureTextBlock;
       const textData = splitTextAtLength(
         structurePartText.content,
         maxLineLength
@@ -402,7 +412,7 @@ export const writeCliVariableDocumentation = async (path: string) => {
     } else {
       // Variable documentation block
       const structurePartVariables =
-        structurePart as CliVariableStructureVariablesBlock;
+        structurePart as EnvVariableStructureVariablesBlock;
       data += `${"#".repeat(maxLineLength + 2)}\n`;
       data += `# ${structurePartVariables.name}\n`;
       data += `# ${"-".repeat(structurePartVariables.name.length)}\n`;
@@ -415,11 +425,11 @@ export const writeCliVariableDocumentation = async (path: string) => {
       }
       data += `${"#".repeat(maxLineLength + 2)}\n`;
       // Now add for each variable of the block the documentation
-      for (const cliVariable in CliVariable) {
-        const cliVariableInfo = getCliVariableValueInformation(cliVariable);
-        if (cliVariableInfo?.block === structurePartVariables.block) {
+      for (const envVariable in EnvVariable) {
+        const envVariableInfo = getEnvVariableValueInformation(envVariable);
+        if (envVariableInfo?.block === structurePartVariables.block) {
           const variableDescriptionData = splitTextAtLength(
-            cliVariableInfo.description,
+            envVariableInfo.description,
             maxLineLength - 2
           );
           let first = true;
@@ -427,9 +437,9 @@ export const writeCliVariableDocumentation = async (path: string) => {
             data += `# ${first ? ">" : " "} ${variableDescriptionDataPart}\n`;
             first = false;
           }
-          if (cliVariableInfo.supportedValues) {
+          if (envVariableInfo.supportedValues) {
             const supportedValuesText = splitTextAtLength(
-              `Supported values are: ${cliVariableInfo.supportedValues.join(
+              `Supported values are: ${envVariableInfo.supportedValues.join(
                 ", "
               )})`,
               maxLineLength - 2
@@ -440,18 +450,18 @@ export const writeCliVariableDocumentation = async (path: string) => {
               first = false;
             }
           }
-          if (cliVariableInfo.censor) {
+          if (envVariableInfo.censor) {
             data += `#   [KEEP THIS VARIABLE PRIVATE!]\n`;
           }
-          if (cliVariableInfo.default) {
+          if (envVariableInfo.default) {
             data += `${
-              cliVariableInfo.necessary ? "" : "#"
-            }${CliVariablePrefix}${cliVariable}=${cliVariableInfo.default}\n`;
-          } else if (cliVariableInfo.example) {
+              envVariableInfo.necessary ? "" : "#"
+            }${envVariablePrefix}${envVariable}=${envVariableInfo.default}\n`;
+          } else if (envVariableInfo.example) {
             data += `#   (The following line is only an example!)\n`;
             data += `${
-              cliVariableInfo.necessary ? "" : "#"
-            }${CliVariablePrefix}${cliVariable}=${cliVariableInfo.example}\n`;
+              envVariableInfo.necessary ? "" : "#"
+            }${envVariablePrefix}${envVariable}=${envVariableInfo.example}\n`;
           } else {
             data += "# ERROR\n";
           }

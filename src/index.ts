@@ -14,12 +14,12 @@ import { osuChatHandler } from "./commands/osu";
 import { name } from "./info";
 import { getVersion } from "./version";
 import {
-  CliVariable,
-  getCliVariableValue,
-  getCliVariableValueOrDefault,
-  getCliVariableValueOrCustomDefault,
-  printCliVariablesToConsole,
-  writeCliVariableDocumentation,
+  EnvVariable,
+  getEnvVariableValue,
+  getEnvVariableValueOrDefault,
+  getEnvVariableValueOrCustomDefault,
+  printEnvVariablesToConsole,
+  writeEnvVariableDocumentation,
 } from "./cli";
 import { checkCustomCommand } from "./other/customCommand";
 import { registerTimer } from "./other/customTimer";
@@ -74,22 +74,22 @@ interface CustomCommandDataJson {
 const main = async (logger: Logger, logDir: string) => {
   logger.info(`Start ${name} ${getVersion()} (logs directory: '${logDir}')`);
 
-  await writeCliVariableDocumentation(path.join(pathToCwdDir, ".env.example"));
+  await writeEnvVariableDocumentation(path.join(pathToCwdDir, ".env.example"));
 
-  const databasePath = getCliVariableValueOrDefault(
-    CliVariable.MOONPIE_DATABASE_PATH
+  const databasePath = getEnvVariableValueOrDefault(
+    EnvVariable.MOONPIE_DATABASE_PATH
   );
 
-  const osuApiClientId = getCliVariableValueOrCustomDefault(
-    CliVariable.OSU_API_CLIENT_ID,
+  const osuApiClientId = getEnvVariableValueOrCustomDefault(
+    EnvVariable.OSU_API_CLIENT_ID,
     undefined
   );
-  const osuApiClientSecret = getCliVariableValueOrCustomDefault(
-    CliVariable.OSU_API_CLIENT_SECRET,
+  const osuApiClientSecret = getEnvVariableValueOrCustomDefault(
+    EnvVariable.OSU_API_CLIENT_SECRET,
     undefined
   );
-  const osuApiDefaultId = getCliVariableValueOrCustomDefault(
-    CliVariable.OSU_API_DEFAULT_ID,
+  const osuApiDefaultId = getEnvVariableValueOrCustomDefault(
+    EnvVariable.OSU_API_DEFAULT_ID,
     undefined
   );
   const enableOsu =
@@ -97,22 +97,22 @@ const main = async (logger: Logger, logDir: string) => {
     osuApiClientSecret !== undefined &&
     osuApiDefaultId !== undefined;
   const enableOsuBeatmapRequests =
-    getCliVariableValueOrDefault(CliVariable.OSU_API_RECOGNIZE_MAP_REQUESTS) ===
+    getEnvVariableValueOrDefault(EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS) ===
     "ON";
   const enableOsuBeatmapRequestsDetailed =
-    getCliVariableValueOrDefault(
-      CliVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED
+    getEnvVariableValueOrDefault(
+      EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED
     ) === "ON";
-  const osuIrcPassword = getCliVariableValueOrCustomDefault(
-    CliVariable.OSU_IRC_PASSWORD,
+  const osuIrcPassword = getEnvVariableValueOrCustomDefault(
+    EnvVariable.OSU_IRC_PASSWORD,
     undefined
   );
-  const osuIrcUsername = getCliVariableValueOrCustomDefault(
-    CliVariable.OSU_IRC_USERNAME,
+  const osuIrcUsername = getEnvVariableValueOrCustomDefault(
+    EnvVariable.OSU_IRC_USERNAME,
     undefined
   );
-  const osuIrcRequestTarget = getCliVariableValueOrCustomDefault(
-    CliVariable.OSU_IRC_REQUEST_TARGET,
+  const osuIrcRequestTarget = getEnvVariableValueOrCustomDefault(
+    EnvVariable.OSU_IRC_REQUEST_TARGET,
     undefined
   );
   const enableOsuIrc =
@@ -125,8 +125,8 @@ const main = async (logger: Logger, logDir: string) => {
     osuIrcBot = () =>
       createOsuIrcConnection(osuIrcUsername, osuIrcPassword, logger);
   }
-  const osuStreamCompanionUrl = getCliVariableValueOrCustomDefault(
-    CliVariable.OSU_STREAM_COMPANION_URL,
+  const osuStreamCompanionUrl = getEnvVariableValueOrCustomDefault(
+    EnvVariable.OSU_STREAM_COMPANION_URL,
     undefined
   );
   let osuStreamCompanionCurrentMapData:
@@ -209,12 +209,12 @@ const main = async (logger: Logger, logDir: string) => {
 
   await moonpieDbSetupTables(databasePath, logger);
 
-  const twitchApiClientId = getCliVariableValueOrCustomDefault(
-    CliVariable.TWITCH_API_CLIENT_ID,
+  const twitchApiClientId = getEnvVariableValueOrCustomDefault(
+    EnvVariable.TWITCH_API_CLIENT_ID,
     undefined
   );
-  const twitchApiAccessToken = getCliVariableValueOrCustomDefault(
-    CliVariable.TWITCH_API_ACCESS_TOKEN,
+  const twitchApiAccessToken = getEnvVariableValueOrCustomDefault(
+    EnvVariable.TWITCH_API_ACCESS_TOKEN,
     undefined
   );
   const enableTwitchApiCalls =
@@ -236,9 +236,9 @@ const main = async (logger: Logger, logDir: string) => {
 
   // Create TwitchClient and listen to certain events
   const twitchClient = createTwitchClient(
-    getCliVariableValue(CliVariable.TWITCH_NAME),
-    getCliVariableValue(CliVariable.TWITCH_OAUTH_TOKEN),
-    getCliVariableValue(CliVariable.TWITCH_CHANNELS)
+    getEnvVariableValue(EnvVariable.TWITCH_NAME),
+    getEnvVariableValue(EnvVariable.TWITCH_OAUTH_TOKEN),
+    getEnvVariableValue(EnvVariable.TWITCH_CHANNELS)
       ?.split(" ")
       .filter((a) => a.trim().length !== 0),
     logger
@@ -284,7 +284,7 @@ const main = async (logger: Logger, logDir: string) => {
       tags,
       message,
       databasePath,
-      getCliVariableValueOrDefault(CliVariable.MOONPIE_ENABLE_COMMANDS)?.split(
+      getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS)?.split(
         ","
       ),
       logger
@@ -318,7 +318,7 @@ const main = async (logger: Logger, logDir: string) => {
         osuIrcBot,
         osuIrcRequestTarget,
         osuStreamCompanionCurrentMapData,
-        getCliVariableValueOrDefault(CliVariable.OSU_ENABLE_COMMANDS)?.split(
+        getEnvVariableValueOrDefault(EnvVariable.OSU_ENABLE_COMMANDS)?.split(
           ","
         ),
         logger
@@ -338,8 +338,8 @@ const main = async (logger: Logger, logDir: string) => {
     } else if (osuStreamCompanionCurrentMapData !== undefined) {
       // Dirty solution to enable !np bot functionality only without any other
       // osu! tokens or credentials, refactor that better in the future
-      const enableCommands = getCliVariableValueOrDefault(
-        CliVariable.OSU_ENABLE_COMMANDS
+      const enableCommands = getEnvVariableValueOrDefault(
+        EnvVariable.OSU_ENABLE_COMMANDS
       )?.split(",");
       osuChatHandler(
         twitchClient,
@@ -507,11 +507,11 @@ if (isEntryPoint()) {
     dotenv.config();
     // Print for debugging the (private/secret) environment values to the console
     // (censor critical variables if not explicitly enabled)
-    printCliVariablesToConsole(!commandLineArgs.includes("--no-censoring"));
+    printEnvVariablesToConsole(!commandLineArgs.includes("--no-censoring"));
 
     // Create logger
-    const logDir = getCliVariableValueOrDefault(
-      CliVariable.LOGGING_DIRECTORY_PATH
+    const logDir = getEnvVariableValueOrDefault(
+      EnvVariable.LOGGING_DIRECTORY_PATH
     );
     const logger = createLogger(logDir);
 
