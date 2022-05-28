@@ -19,7 +19,7 @@
     ],
     "typedocOptions": {
         "entryPoints": [
-            "src/cli.ts",
+            "src/env.ts",
             "src/error.ts",
             "src/index.ts",
             "src/info.ts",

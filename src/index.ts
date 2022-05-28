@@ -20,7 +20,7 @@ import {
   getEnvVariableValueOrCustomDefault,
   printEnvVariablesToConsole,
   writeEnvVariableDocumentation,
-} from "./cli";
+} from "./env";
 import { checkCustomCommand } from "./other/customCommand";
 import { registerTimer } from "./other/customTimer";
 import { isProcessRunning } from "./other/processInformation";
