@@ -186,3 +186,6 @@ test.json
 
 # Binary builds
 bin
+
+# makepkg builds
+installer/moonpiebot*

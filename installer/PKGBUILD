@@ -1,31 +1,28 @@
 # Maintainer: AnonymerNiklasistanonym <niklas.mikeler@gmail.com>
 _applicationname=moonpiebot
 pkgname="$_applicationname"
-pkgver=1.0.8
+pkgver=1.0.7
 pkgrel=1
 pkgdesc='A custom Twitch chat bot'
 arch=('x86_64')
 url='https://github.com/AnonymerNiklasistanonym/MoonpieBot'
 license=('MIT')
-depends=('node')
+depends=('nodejs')
 provides=("$pkgname")
-conflicts=("$_applicationname", "$_applicationname-bin", "$_applicationname-git")
+conflicts=("$_applicationname" "$_applicationname-bin" "$_applicationname-git")
 _gitname="$_applicationname.git"
+# Save for git version
 source=("$_gitname::git+$url#branch=main")
+#source=("$_gitname::git+$url#tag=v$pkgver")
 sha1sums=('SKIP')
 _installdir="/opt/$_applicationname"
-_installdirpkgdir="$pkgdir$_installdir"
-_installdirbinpkgdir="$pkgdir/usr/bin"
+_installdirbin="/usr/bin"
 _installdirdesktop="/usr/share/applications"
-_installdirdesktoppkgdir="$pkgdir$_installdirdesktop"
-_defaultconfigdir="~/.local/share/$_applicationname"
+_defaultconfigdir="\$HOME/.local/share/$_applicationname"
 
 # Create all files necessary for installation
 build() {
   cd "$_gitname"
-  # Remove previous build data
-  rm -rf node_modules
-  rm -rf dist
   # Install (all - normal and build) dependencies
   npm install
   # Compile application
@@ -38,34 +35,34 @@ build() {
 package() {
   cd "$_gitname"
   # Create a directory in /opt that contains all resources
-  install -Dd "$_installdirpkgdir"
+  install -Dd "$pkgdir$_installdir"
   # Copy all necessary node dependencies to there
-  find node_modules -exec install -D {} "$_installdirpkgdir"{} \;
+  find node_modules -not -path "*/__pycache__/*" -exec install -D {} "$pkgdir$_installdir/"{} \;
   # Copy the compiled application files
-  find dist -exec install -D {} "$_installdirpkgdir"{} \;
+  find dist -exec install -D {} "$pkgdir$_installdir/"{} \;
   # Copy the package.json file
-  install -D package.json "$_installdirpkgdir"
+  install -D package.json "$pkgdir$_installdir"
   # Copy the application icon file
-  install -Dm 644 "res/icons/moonpiebot.svg" "$_installdirpkgdir/$_applicationname.svg"
+  install -Dm 644 "res/icons/$_applicationname.svg" "$pkgdir$_installdir/$_applicationname.svg"
 
   # Create a bash file for the /usr/bin directory
   echo -e "\
 #!/usr/bin/env bash\n\
 node \"$_installdir\" --config-dir \"$_defaultconfigdir\" \$@\n" > "$_applicationname"
 
-  install -Dd "$_installdirbinpkgdir"
-  install -Dm 777 "$_applicationname" "$_installdirbinpkgdir"
+  install -Dd "$pkgdir$_installdirbin"
+  install -Dm 777 "$_applicationname" "$pkgdir$_installdirbin"
 
-  install -Dd "$_installdirdesktoppkgdir"
+  install -Dd "$pkgdir$_installdirdesktop"
 
   echo -e "\
 [Desktop Entry]\n\
 Version=1.0\n\
 Type=Application\n\
 Terminal=true\n\
-Exec=$pkgname\n\
+Exec=$pkgname; read -n1 -p \"Press any key to exit.\"\n\
 Name=$_applicationname\n\
 Comment=$pkgdesc\n\
 Icon=$_installdir/$_applicationname.svg" > "$_applicationname.desktop"
-  install -Dm 644 "$_applicationname.desktop" "$_installdirdesktoppkgdir"
+  install -Dm 644 "$_applicationname.desktop" "$pkgdir$_installdirdesktop"
 }

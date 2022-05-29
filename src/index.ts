@@ -73,7 +73,7 @@ const main = async (logger: Logger, configDir: string) => {
 
   const databasePath = path.resolve(
     configDir,
-    getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH)
+    getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
 
   const osuApiClientId = getEnvVariableValueOrCustomDefault(
