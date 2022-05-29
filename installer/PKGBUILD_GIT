@@ -1,1 +1,73 @@
-# TODO
+# Maintainer: AnonymerNiklasistanonym <niklas.mikeler@gmail.com>
+_applicationname=moonpiebot
+pkgname="$_applicationname"
+pkgver=v1.0.7.r11.ga8b0ef7
+pkgrel=1
+pkgdesc='A custom Twitch chat bot'
+arch=('x86_64')
+url='https://github.com/AnonymerNiklasistanonym/MoonpieBot'
+license=('MIT')
+depends=('nodejs')
+provides=("$pkgname")
+conflicts=("$_applicationname" "$_applicationname-bin" "$_applicationname-git")
+_gitname="$_applicationname.git"
+source=("$_gitname::git+$url#branch=main")
+#source=("$_gitname::git+$url#tag=v$pkgver")
+sha1sums=('SKIP')
+_installdir="/opt/$_applicationname"
+_installdirbin="/usr/bin"
+_installdirdesktop="/usr/share/applications"
+_defaultconfigdir="\$HOME/.local/share/$_applicationname"
+
+# Detailed version information (only necessary for git version of the package)
+pkgver() {
+  cd "$srcdir/$_gitname"
+  git describe --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+# Create all files necessary for installation
+build() {
+  cd "$srcdir/$_gitname"
+  # Install (all - normal and build) dependencies
+  npm install
+  # Compile application
+  npm run build
+  # Remove (build) dependencies
+  npm prune --production
+}
+
+# Define all files that should be installed
+package() {
+  cd "$srcdir/$_gitname"
+  # Create a directory in /opt that contains all resources
+  install -Dd "$pkgdir$_installdir"
+  # Copy all necessary node dependencies to there
+  find node_modules -not -path "*/__pycache__/*" -exec install -D {} "$pkgdir$_installdir/"{} \;
+  # Copy the compiled application files
+  find dist -exec install -D {} "$pkgdir$_installdir/"{} \;
+  # Copy the package.json file
+  install -D package.json "$pkgdir$_installdir"
+  # Copy the application icon file
+  install -Dm 644 "res/icons/$_applicationname.svg" "$pkgdir$_installdir/$_applicationname.svg"
+
+  # Create a bash file for the /usr/bin directory
+  echo -e "\
+#!/usr/bin/env bash\n\
+node \"$_installdir\" --config-dir \"$_defaultconfigdir\" \$@\n" > "$_applicationname"
+
+  install -Dd "$pkgdir$_installdirbin"
+  install -Dm 777 "$_applicationname" "$pkgdir$_installdirbin"
+
+  install -Dd "$pkgdir$_installdirdesktop"
+
+  echo -e "\
+[Desktop Entry]\n\
+Version=1.0\n\
+Type=Application\n\
+Terminal=true\n\
+Exec=$pkgname; read -n1 -p \"Press any key to exit.\"\n\
+Name=$_applicationname\n\
+Comment=$pkgdesc\n\
+Icon=$_installdir/$_applicationname.svg" > "$_applicationname.desktop"
+  install -Dm 644 "$_applicationname.desktop" "$pkgdir$_installdirdesktop"
+}
