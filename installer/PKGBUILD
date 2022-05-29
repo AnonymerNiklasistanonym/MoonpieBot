@@ -48,7 +48,7 @@ package() {
   # Copy the package.json file
   install -D package.json "$pkgdir$_installdir"
   # Copy the application icon file
-  install -Dm 644 "res/icons/$_applicationname.svg" "$pkgdir$_installdir/$_applicationname.svg"
+  install -Dm 644 "res/icons/$_applicationname.svg" "$pkgdir$_installdir"
 
   # Create a bash file for the /usr/bin directory
   echo -e "\
@@ -65,7 +65,7 @@ node \"$_installdir\" --config-dir \"$_defaultconfigdir\" \$@\n" > "$_applicatio
 Version=1.0\n\
 Type=Application\n\
 Terminal=true\n\
-Exec=$pkgname; read -n1 -p \"Press any key to exit.\"\n\
+Exec=$_applicationname; read -n1 -p \"Press any key to exit.\"\n\
 Name=$_applicationname\n\
 Comment=$pkgdesc\n\
 Icon=$_installdir/$_applicationname.svg" > "$_applicationname.desktop"
