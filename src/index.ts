@@ -63,21 +63,17 @@ interface CustomCommandDataJson {
  * Main method that runs the bot.
  *
  * @param logger Logger (used for global logs).
- * @param logDir The directory in which the logs should be saved.
  * @param configDir The directory in which all configurations are contained.
  */
-const main = async (logger: Logger, logDir: string, configDir: string) => {
-  logger.info(
-    `Start ${name} ${getVersion()} (logs directory: '${logDir}', config directory: '${configDir}')`
-  );
-
+const main = async (logger: Logger, configDir: string) => {
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 
   await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
 
-  const databasePath = getEnvVariableValueOrDefault(
-    EnvVariable.MOONPIE_DATABASE_PATH
+  const databasePath = path.resolve(
+    configDir,
+    getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH)
   );
 
   const osuApiClientId = getEnvVariableValueOrCustomDefault(
@@ -490,74 +486,83 @@ const main = async (logger: Logger, logDir: string, configDir: string) => {
 // Check if this file is the entry point, otherwise don't run the main method
 const isEntryPoint = () => require.main === module;
 if (isEntryPoint()) {
-  try {
-    process.title = `${name} ${getVersion()}`;
+  void (async () => {
+    try {
+      // Change the title of the process/terminal
+      process.title = `${name} ${getVersion()}`;
 
-    // Get additional command line arguments
-    // $ npm run start -- --argument
-    // $ node . --no-censoring
-    const commandLineArgs = process.argv.slice(2);
+      // Get additional command line arguments
+      // $ npm run start -- --argument
+      // $ node . --argument
+      const commandLineArgs = process.argv.slice(2);
 
-    if (commandLineArgs.includes(CliVariable.VERSION)) {
-      console.log(getVersion());
-      process.exit(0);
-    }
-
-    if (commandLineArgs.includes(CliVariable.HELP)) {
-      console.log(
-        `moonpiebot [OPTIONS]\n\nOptions:\n${getCliVariableDocumentation()}`
-      );
-      process.exit(0);
-    }
-
-    let configDir = process.cwd();
-    if (commandLineArgs.includes(CliVariable.CONFIG_DIRECTORY)) {
-      const indexOfConfigDir =
-        commandLineArgs.indexOf(CliVariable.CONFIG_DIRECTORY) + 1;
-      if (indexOfConfigDir >= commandLineArgs.length) {
-        console.error("ERROR: Config directory argument is missing");
-        process.exit(1);
+      // Catch CLI version request
+      if (commandLineArgs.includes(CliVariable.VERSION)) {
+        console.log(getVersion());
+        process.exit(0);
       }
-      // eslint-disable-next-line security/detect-object-injection
-      configDir = commandLineArgs[indexOfConfigDir];
-      // Create config directory if it doesn't exist
-      mkdirSync(configDir, { recursive: true });
-    }
 
-    // Load environment variables if existing from the .env file
-    dotenv.config({
-      path: path.join(configDir, ".env"),
-    });
-    // Print for debugging the (private/secret) environment values to the console
-    // (censor critical variables if not explicitly enabled)
-    printEnvVariablesToConsole(
-      !commandLineArgs.includes(CliVariable.DISABLE_CENSORING)
-    );
+      // Catch CLI help request
+      if (commandLineArgs.includes(CliVariable.HELP)) {
+        console.log(
+          `moonpiebot [OPTIONS]\n\nOptions:\n${getCliVariableDocumentation()}`
+        );
+        process.exit(0);
+      }
 
-    // Create logger
-    const logDir = getEnvVariableValueOrDefault(
-      EnvVariable.LOGGING_DIRECTORY_PATH,
-      configDir
-    );
-    const logger = createLogger(logDir);
+      // Catch custom config directory
+      let configDir = process.cwd();
+      if (commandLineArgs.includes(CliVariable.CONFIG_DIRECTORY)) {
+        const lastIndexOfConfigDir =
+          commandLineArgs.lastIndexOf(CliVariable.CONFIG_DIRECTORY) + 1;
+        if (lastIndexOfConfigDir >= commandLineArgs.length) {
+          throw Error(
+            `${CliVariable.CONFIG_DIRECTORY} > Config directory argument is missing`
+          );
+        }
+        // eslint-disable-next-line security/detect-object-injection
+        configDir = commandLineArgs[lastIndexOfConfigDir];
+        // Create config directory if it doesn't exist
+        mkdirSync(configDir, { recursive: true });
+      }
 
-    // Call main method
-    main(logger, logDir, configDir)
-      .then(() => {
-        logger.info("Application was closed", undefined, () => {
-          // Use callback in order to flush logs
-        });
-      })
-      .catch((err) => {
-        logger.error((err as Error).message, undefined, () => {
-          // Use callback in order to flush logs
-          // TODO: Convert everything to async so that errors can be thrown again
-          console.error(err);
-          process.exit(1);
-        });
+      // Load environment variables if existing from the .env file
+      dotenv.config({
+        path: path.join(configDir, ".env"),
       });
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
-  }
+
+      // Print for debugging the (private/secret) environment values to the console
+      // (censor critical variables if not explicitly enabled)
+      printEnvVariablesToConsole(
+        !commandLineArgs.includes(CliVariable.DISABLE_CENSORING)
+      );
+
+      // Create logger
+      const logDir = path.resolve(
+        configDir,
+        getEnvVariableValueOrDefault(
+          EnvVariable.LOGGING_DIRECTORY_PATH,
+          configDir
+        )
+      );
+      const logger = createLogger(logDir);
+
+      // Call main method
+      try {
+        logger.info(`${name} ${getVersion()} was started (logs: '${logDir}')`);
+        logger.debug(`Config directory: '${configDir}'`);
+        await main(logger, configDir);
+        logger.debug(`${name} was closed`);
+      } catch (err) {
+        logger.error(err);
+        logger.debug(`${name} was closed after unexpected error`);
+        throw err;
+      }
+    } catch (err) {
+      console.error(err);
+      console.log("Application was terminated because of a run time error");
+      console.log("For more detailed information check the log files");
+      process.exit(1);
+    }
+  })();
 }
