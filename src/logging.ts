@@ -21,6 +21,7 @@ export const createLogger = (
   logLevelFile: "error" | "warn" | "debug" | "info" = "debug"
 ) => {
   return createWinstonLogger({
+    exitOnError: false,
     transports: [
       new DailyRotateFile({
         dirname: logDir,

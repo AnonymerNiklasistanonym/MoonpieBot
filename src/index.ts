@@ -1,7 +1,7 @@
 // Package imports
 import dotenv from "dotenv";
 import * as path from "path";
-import { promises as fs } from "fs";
+import { mkdirSync, promises as fs } from "fs";
 import irc from "irc";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
@@ -28,19 +28,13 @@ import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
 import { pyramidSpammer } from "./other/pyramidSpammer";
 import { createStreamCompanionConnection } from "./streamcompanion";
 import { createOsuIrcConnection } from "./osuirc";
+import { CliVariable, getCliVariableDocumentation } from "./cli";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
 
-/** Path to the root directory of the source code. */
-//const pathToRootDir = path.join(__dirname, "..");
-/** Path to the directory where the bot is executed from. */
-const pathToCwdDir = process.cwd();
-
 // TODO Move to database tables so they can be changed on the fly
-const pathCustomTimers = path.join(pathToCwdDir, "customTimers.json");
-const pathCustomCommands = path.join(pathToCwdDir, "customCommands.json");
 const fileExists = async (path: string) =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   !!(await fs.stat(path).catch(() => false));
@@ -70,11 +64,17 @@ interface CustomCommandDataJson {
  *
  * @param logger Logger (used for global logs).
  * @param logDir The directory in which the logs should be saved.
+ * @param configDir The directory in which all configurations are contained.
  */
-const main = async (logger: Logger, logDir: string) => {
-  logger.info(`Start ${name} ${getVersion()} (logs directory: '${logDir}')`);
+const main = async (logger: Logger, logDir: string, configDir: string) => {
+  logger.info(
+    `Start ${name} ${getVersion()} (logs directory: '${logDir}', config directory: '${configDir}')`
+  );
 
-  await writeEnvVariableDocumentation(path.join(pathToCwdDir, ".env.example"));
+  const pathCustomTimers = path.join(configDir, "customTimers.json");
+  const pathCustomCommands = path.join(configDir, "customCommands.json");
+
+  await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
 
   const databasePath = getEnvVariableValueOrDefault(
     EnvVariable.MOONPIE_DATABASE_PATH
@@ -498,28 +498,64 @@ if (isEntryPoint()) {
     // $ node . --no-censoring
     const commandLineArgs = process.argv.slice(2);
 
-    if (commandLineArgs.includes("--version")) {
+    if (commandLineArgs.includes(CliVariable.VERSION)) {
       console.log(getVersion());
       process.exit(0);
     }
 
+    if (commandLineArgs.includes(CliVariable.HELP)) {
+      console.log(
+        `moonpiebot [OPTIONS]\n\nOptions:\n${getCliVariableDocumentation()}`
+      );
+      process.exit(0);
+    }
+
+    let configDir = process.cwd();
+    if (commandLineArgs.includes(CliVariable.CONFIG_DIRECTORY)) {
+      const indexOfConfigDir =
+        commandLineArgs.indexOf(CliVariable.CONFIG_DIRECTORY) + 1;
+      if (indexOfConfigDir >= commandLineArgs.length) {
+        console.error("ERROR: Config directory argument is missing");
+        process.exit(1);
+      }
+      // eslint-disable-next-line security/detect-object-injection
+      configDir = commandLineArgs[indexOfConfigDir];
+      // Create config directory if it doesn't exist
+      mkdirSync(configDir, { recursive: true });
+    }
+
     // Load environment variables if existing from the .env file
-    dotenv.config();
+    dotenv.config({
+      path: path.join(configDir, ".env"),
+    });
     // Print for debugging the (private/secret) environment values to the console
     // (censor critical variables if not explicitly enabled)
-    printEnvVariablesToConsole(!commandLineArgs.includes("--no-censoring"));
+    printEnvVariablesToConsole(
+      !commandLineArgs.includes(CliVariable.DISABLE_CENSORING)
+    );
 
     // Create logger
     const logDir = getEnvVariableValueOrDefault(
-      EnvVariable.LOGGING_DIRECTORY_PATH
+      EnvVariable.LOGGING_DIRECTORY_PATH,
+      configDir
     );
     const logger = createLogger(logDir);
 
     // Call main method
-    main(logger, logDir).catch((err) => {
-      logger.error(err);
-      throw err;
-    });
+    main(logger, logDir, configDir)
+      .then(() => {
+        logger.info("Application was closed", undefined, () => {
+          // Use callback in order to flush logs
+        });
+      })
+      .catch((err) => {
+        logger.error((err as Error).message, undefined, () => {
+          // Use callback in order to flush logs
+          // TODO: Convert everything to async so that errors can be thrown again
+          console.error(err);
+          process.exit(1);
+        });
+      });
   } catch (err) {
     console.error(err);
     process.exit(1);

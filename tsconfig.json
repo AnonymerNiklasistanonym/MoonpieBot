@@ -19,6 +19,7 @@
     ],
     "typedocOptions": {
         "entryPoints": [
+            "src/cli.ts",
             "src/env.ts",
             "src/error.ts",
             "src/index.ts",
@@ -48,11 +49,14 @@
             "src/database/moonpie/management.ts",
             "src/database/moonpie/requests.ts",
             "src/database/moonpieDb.ts",
+            "src/other/asyncReplace.ts",
             "src/other/customCommand.ts",
             "src/other/customTimer.ts",
             "src/other/osuStringBuilder.ts",
+            "src/other/parseMessage.ts",
             "src/other/processInformation.ts",
             "src/other/pyramidSpammer.ts",
+            "src/other/splitTextAtLength.ts",
             "src/other/timePeriodToString.ts",
             "src/other/twitchBadgeParser.ts"
         ],

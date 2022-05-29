@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import * as path from "path";
+import { splitTextAtLength } from "./other/splitTextAtLength";
 
 /** Path to the root directory of the source code. */
 const pathToRootDir = path.join(__dirname, "..");
@@ -106,6 +107,7 @@ export const getEnvVariableValueOrCustomDefault = <T>(
 
 export interface EnvVariableValueInformation {
   default?: string;
+  defaultValue?: string;
   example?: string;
   description: string;
   supportedValues?: string[];
@@ -115,7 +117,8 @@ export interface EnvVariableValueInformation {
 }
 
 export const getEnvVariableValueInformation = (
-  envVariable: EnvVariable | string
+  envVariable: EnvVariable | string,
+  configDir?: string
 ): EnvVariableValueInformation => {
   switch (envVariable) {
     case EnvVariable.LOGGING_CONSOLE_LOG_LEVEL:
@@ -128,7 +131,14 @@ export const getEnvVariableValueInformation = (
       };
     case EnvVariable.LOGGING_DIRECTORY_PATH:
       return {
-        default: path.relative(pathToRootDir, path.join(pathToRootDir, "logs")),
+        default: path.relative(
+          configDir ? configDir : pathToRootDir,
+          path.join(configDir ? configDir : pathToRootDir, "logs")
+        ),
+        defaultValue: path.resolve(
+          configDir ? configDir : pathToRootDir,
+          "logs"
+        ),
         description: "The directory file path of the log files",
         block: EnvVariableBlocks.LOGGING,
       };
@@ -187,8 +197,11 @@ export const getEnvVariableValueInformation = (
     case EnvVariable.MOONPIE_DATABASE_PATH:
       return {
         default: path.relative(
-          pathToRootDir,
-          path.join(pathToRootDir, "moonpie.db")
+          configDir ? configDir : pathToRootDir,
+          path.join(configDir ? configDir : pathToRootDir, "moonpie.db")
+        ),
+        defaultValue: path.resolve(
+          path.join(configDir ? configDir : pathToRootDir, "moonpie.db")
         ),
         description:
           "The database file path that contains the persistent moonpie data.",
@@ -293,10 +306,19 @@ export const getEnvVariableValueInformation = (
   throw Error(`The Cli variable ${envVariable} has no information`);
 };
 
-export const getEnvVariableValueOrDefault = (envVariable: EnvVariable) => {
+export const getEnvVariableValueOrDefault = (
+  envVariable: EnvVariable,
+  configDir?: string
+) => {
   const value = process.env[getEnvVariableName(envVariable)];
   if (value === undefined || value.trim().length === 0) {
-    const variableInformation = getEnvVariableValueInformation(envVariable);
+    const variableInformation = getEnvVariableValueInformation(
+      envVariable,
+      configDir
+    );
+    if (variableInformation.defaultValue !== undefined) {
+      return variableInformation.defaultValue;
+    }
     if (variableInformation.default !== undefined) {
       return variableInformation.default;
     }
@@ -378,21 +400,6 @@ export const envVariableStructure: (
       "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
   },
 ];
-
-export const splitTextAtLength = (textInput: string, splitLength: number) => {
-  const allWords = textInput.split(" ");
-  const out = [""];
-  let first = true;
-  for (const word of allWords) {
-    if (out[out.length - 1].length + 1 + word.length > splitLength) {
-      out.push(word);
-    } else {
-      out[out.length - 1] += `${first ? "" : " "}${word}`;
-      first = false;
-    }
-  }
-  return out;
-};
 
 export const writeEnvVariableDocumentation = async (path: string) => {
   let data = "";
