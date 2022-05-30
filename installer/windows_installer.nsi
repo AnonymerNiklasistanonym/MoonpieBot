@@ -203,3 +203,13 @@ Section "Uninstall"
   RmDir  "$SMPROGRAMS\${PRODUCT}"
 
 SectionEnd
+
+;--------------------------------
+;After Installation Function
+
+Function .onInstSuccess
+
+  ;Open configuration directory after the installation
+  ExecShell "open" "$AppData\${PRODUCT}"
+
+FunctionEnd
