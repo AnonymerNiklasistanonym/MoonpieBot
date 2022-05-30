@@ -189,3 +189,6 @@ bin
 
 # makepkg builds
 installer/moonpiebot*
+
+# Installer files
+!installer/*.bat

@@ -71,14 +71,23 @@ jobs:
       run: npm run docs
     - name: Create binary release
       run: npm run package:win
-    - name: Save binary artifact
+    - name: Save binary artifact [standalone]
       uses: actions/upload-artifact@v3
       with:
         name: moonpiebot-${{ github.ref_name }}-windows-node-${{ matrix.node-version }}
         path: bin/moonpiebot.exe
         retention-days: 14
         if-no-files-found: error
-
+    - name: Create installer
+      run: makensis .\windows_installer.nsi
+      working-directory: .\installer
+    - name: Save binary artifact [installer]
+      uses: actions/upload-artifact@v3
+      with:
+        name: moonpiebot-installer-${{ github.ref_name }}-windows-node-${{ matrix.node-version }}
+        path: bin/moonpiebot_setup.exe
+        retention-days: 14
+        if-no-files-found: error
 
   update-documentation:
 
