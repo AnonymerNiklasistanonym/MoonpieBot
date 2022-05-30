@@ -1,7 +1,7 @@
 # Maintainer: AnonymerNiklasistanonym <niklas.mikeler@gmail.com>
 _applicationname=moonpiebot
 pkgname="$_applicationname-bin"
-pkgver=1.0.7
+pkgver=1.0.8
 pkgrel=1
 pkgdesc='A custom Twitch chat bot'
 arch=('x86_64')
