@@ -17,4 +17,13 @@ You can add `--install` to instantly install the built package.
 
 ## NSIS
 
-TODO
+To create a Windows installer install Nullsoft Scriptable Install System from their official site: http://nsis.sourceforge.net/Download
+Then after installing add the install directory to your environment path so that you can use the command `makensis`.
+
+```ps1
+npm install
+npm run build
+npm run package:win
+cd installer
+makensis windows_installer.nsi
+```
