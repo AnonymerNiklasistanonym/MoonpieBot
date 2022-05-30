@@ -43,6 +43,18 @@ jobs:
         path: bin/moonpiebot
         retention-days: 14
         if-no-files-found: error
+    - name: Install pacman
+      run: sudo apt -y install pacman
+    - name: Create pacman package
+      run: makepkg -p PKGBUILD_GIT --log --clean --syncdeps --rmdeps
+      working-directory: installer
+    - name: Save pacman package
+      uses: actions/upload-artifact@v3
+      with:
+        name: moonpiebot-pacman-pkg-${{ github.ref_name }}-linux-node-${{ matrix.node-version }}
+        path: installer/moonpiebot*.pkg.*
+        retention-days: 14
+        if-no-files-found: error
 
 
   build-windows:
@@ -88,6 +100,7 @@ jobs:
         path: bin/moonpiebot_setup.exe
         retention-days: 14
         if-no-files-found: error
+
 
   update-documentation:
 
