@@ -2,7 +2,7 @@
 :: - Node.js
 
 @echo ---------------------------------------------------------
-@echo Build [Windows]:
+@echo Build [Windows]:  <BATCH>
 @echo ---------------------------------------------------------
 
 :: Display node/npm version

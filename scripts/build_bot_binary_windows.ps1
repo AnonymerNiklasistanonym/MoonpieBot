@@ -1,17 +1,28 @@
 #!/usr/bin/env pwsh
 
+$ErrorActionPreference = "Stop"
+
 # Install the following things first:
 # - Node.js
+# - NSIS
 
 Write-Host "---------------------------------------------------------"
-Write-Host "Build [Windows]:"
+Write-Host "Build Binary [Windows]:  <Powershell>"
 Write-Host "---------------------------------------------------------"
 
-# Display node/npm version
+# Display node/npm/makensis version
 Write-Host "node:"
 node --version
 Write-Host "npm:"
 npm --version
+Write-Host "makensis:"
+$makensisWasFound = [bool] (Get-Command -ErrorAction Ignore -Type Application openssl)
+if ($makensisWasFound) {
+    makensis -VERSION
+    Write-Host ""
+} else {
+    Write-Host "WARNING: makensis was not found, installer will not be created"
+}
 
 # Get the current directory
 $CallDir = $pwd
@@ -25,7 +36,14 @@ Set-Location ..
 Remove-Item "node_modules" -Recurse -ErrorAction Ignore
 npm install
 npm run build
-npm prune --production
+npm run package:win
+
+# Create the windows installer
+if ($makensisWasFound) {
+    cd installer
+    makensis windows_installer.nsi
+    cd ..
+}
 
 # Go back to the call directory
 Set-Location $CallDir

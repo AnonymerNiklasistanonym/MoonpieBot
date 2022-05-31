@@ -30,7 +30,7 @@ _defaultconfigdir="\$HOME/.local/share/$_applicationname"
 # Detailed version information (only necessary for git version of the package)
 pkgver() {
   cd "$srcdir/$_gitname"
-  git describe --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+  git describe --tags | grep '^v' | sed 's/\([^-]*-g\)/r\1/;s/-/./g' | cut -c2-
 }
 
 # Create all files necessary for installation (not necessary for bin version of the package)

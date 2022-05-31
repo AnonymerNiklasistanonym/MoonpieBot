@@ -192,3 +192,5 @@ installer/moonpiebot*
 
 # Installer files
 !installer/*.bat
+installer/pkg
+installer/src

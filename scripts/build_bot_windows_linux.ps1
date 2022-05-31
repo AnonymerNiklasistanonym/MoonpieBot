@@ -1,15 +1,19 @@
 #!/usr/bin/env pwsh
 
+$ErrorActionPreference = "Stop"
+
 # Install the following things first:
-# - Git
+# - Node.js
 
 Write-Host "---------------------------------------------------------"
-Write-Host "Update source code [Windows]:"
+Write-Host "Build [Windows/Linux]:  <Powershell>"
 Write-Host "---------------------------------------------------------"
 
-# Display git version
-Write-Host "git:"
-git --version
+# Display node/npm version
+Write-Host "node:"
+node --version
+Write-Host "npm:"
+npm --version
 
 # Get the current directory
 $CallDir = $pwd
@@ -19,11 +23,11 @@ Set-Location $PSScriptRoot
 # Go to the root directory of this repository
 Set-Location ..
 
-# Reset package.json files
-git checkout main -- "package.json"
-git checkout main -- "package-lock.json"
-# Update git repository
-git pull
+# Install all dependencies and build the bot
+Remove-Item "node_modules" -Recurse -ErrorAction Ignore
+npm install
+npm run build
+npm prune --production
 
 # Go back to the call directory
 Set-Location $CallDir
