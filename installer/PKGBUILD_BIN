@@ -17,6 +17,7 @@ source=("$_applicationname.bin::$url/releases/download/v$pkgver/$_applicationnam
         "$_applicationname.svg::$url/releases/download/v$pkgver/$_applicationname.svg")
 sha1sums=('SKIP'
           'SKIP')
+options=(!strip)
 _installdir="/opt/$_applicationname"
 _installdirbin="/usr/bin"
 _installdirdesktop="/usr/share/applications"
