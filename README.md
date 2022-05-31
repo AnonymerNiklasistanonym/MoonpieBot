@@ -174,10 +174,10 @@ For some macros to work (like Twitch API connections for `!so`/`!followage`/`!se
    node . --no-censoring
    ```
 
-### Binary release
+### Binary releases
 
 There is now a way to use the program without needing to install or build anything.
-You can download a binary for your operating system from the [latest release](https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases) and then just run it instead of for example `npm run start`:
+You can download a binary for your operating system from the [latest release](https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases) and then just run it:
 
 ```sh
 ./moonpiebot-linux
@@ -189,6 +189,14 @@ You can download a binary for your operating system from the [latest release](ht
 
 All other rules from the previous section still apply, it's just that you don't have to install or build anything.
 You still need to have environment variables or a `.env` file in the same directory etc.
+
+For Windows there is also an installer with which the program can be easily installed.
+The installation contains an uninstaller and a start menu/desktop shortcut so no terminal usage is necessary.
+
+### Package manager releases
+
+On Linux systems with `pamcan` as their package manager (like Arch/Manjaro Linux) there is a way to install the program by using a `PKGBUILD` file.
+For more information check the [installer `README.md`](./installer/README.md).
 
 ## Migrate to a new version
 
