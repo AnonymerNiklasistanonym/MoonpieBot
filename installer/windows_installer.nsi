@@ -6,7 +6,7 @@
   !include "MUI2.nsh"
 
 ;--------------------------------
-;Include External Config File
+;Include External Config File (that contains name, version, ...)
 
   !include "windows_installer_config.nsi"
 
@@ -16,7 +16,7 @@
   !include "windows_installer_run_previous_uninstaller.nsi"
 
 ;--------------------------------
-;General
+;General Settings
 
   ;Properly display all languages
   Unicode true
@@ -25,17 +25,17 @@
   ShowInstDetails "show"
   ShowUninstDetails "show"
 
-  ;Name and file
+  ;Set name and output file
   Name "${PRODUCT}"
   OutFile "..\bin\${PRODUCT_LOWERCASE}_setup.exe"
 
-  ;Default installation folder
+  ;Set the default installation directory
   InstallDir "$PROGRAMFILES64\${PRODUCT}"
 
-  ;Get installation folder from registry if available
+  ;Overwrite $InstallDir value when a previous installation directory was found
   InstallDirRegKey HKLM "Software\${PRODUCT}" ""
 
-  ;Request application admin
+  ;Request admin prvilidges to install to the program files directory
   RequestExecutionLevel admin
 
 ;--------------------------------
@@ -50,136 +50,107 @@
   ;Show all languages, despite user's codepage
   !define MUI_LANGDLL_ALLLANGUAGES
 
-  ;Use the custom own icon
+  ;Use a custom (un-)install icon
   !define MUI_ICON "..\res\icons\${PRODUCT_LOWERCASE}.ico"
   !define MUI_UNICON "..\res\icons\${PRODUCT_LOWERCASE}_greyscale.ico"
-  !define MUI_HEADERIMAGE_RIGHT
-  ;!define MUI_WELCOMEFINISHPAGE_BITMAP "pictures\picture_left_installer.bmp"
-  ;!define MUI_UNWELCOMEFINISHPAGE_BITMAP "pictures\picture_left_uninstaller.bmp"
+
+  ;Use custom image files for the (un-)installer
+  ;!define MUI_HEADERIMAGE_RIGHT
+  ;!define MUI_WELCOMEFINISHPAGE_BITMAP "..\res\installer\picture_left_installer.bmp"
+  ;!define MUI_UNWELCOMEFINISHPAGE_BITMAP "..\res\installer\picture_left_uninstaller.bmp"
+
+  ;Add a Desktop shortcut if the user wants to enable it on the finish page
+  ;(https://stackoverflow.com/a/1517851)
+  !define MUI_FINISHPAGE_SHOWREADME ""
+  !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
+  !define MUI_FINISHPAGE_SHOWREADME_TEXT $(LangStringCreateDesktopShortcut)
+  !define MUI_FINISHPAGE_SHOWREADME_FUNCTION createDesktopShortcut
 
 ;--------------------------------
 ;Pages
 
-  ;For the installer
+  ;For the installer:
+  ;------------------------------
+  ;Welcome page with name and version
   !insertmacro MUI_PAGE_WELCOME
+  ;License page
   !insertmacro MUI_PAGE_LICENSE "..\LICENSE"
-  ;!insertmacro MUI_COMPONENTSPAGE_NODESC
+  ;Component selector
+  ;!insertmacro MUI_PAGE_COMPONENTS
+  ;Set install directory
+  !insertmacro MUI_PAGE_DIRECTORY
+  ;Show progress while installing/copying the files
   !insertmacro MUI_PAGE_INSTFILES
+  ;Show final finish page
   !insertmacro MUI_PAGE_FINISH
 
-  ;For the uninstaller
+  ;For the uninstaller:
+  ;------------------------------
+  ;Welcome page to uninstaller
   !insertmacro MUI_UNPAGE_WELCOME
+  ;Confirm the uninstall with the install directory shown
   !insertmacro MUI_UNPAGE_CONFIRM
+  ;Show progress while uninstalling/removing the files
   !insertmacro MUI_UNPAGE_INSTFILES
+  ;Show final finish page
   !insertmacro MUI_UNPAGE_FINISH
 
 ;--------------------------------
-;Languages
+;Include External Languages File
 
-  ;At start will be searched if the current system language is in this list,
-  ;if not the first language in this list will be chosen as language
-  !insertmacro MUI_LANGUAGE "English"
-  !insertmacro MUI_LANGUAGE "French"
-  !insertmacro MUI_LANGUAGE "German"
-  !insertmacro MUI_LANGUAGE "Spanish"
-  !insertmacro MUI_LANGUAGE "SpanishInternational"
-  !insertmacro MUI_LANGUAGE "SimpChinese"
-  !insertmacro MUI_LANGUAGE "TradChinese"
-  !insertmacro MUI_LANGUAGE "Japanese"
-  !insertmacro MUI_LANGUAGE "Korean"
-  !insertmacro MUI_LANGUAGE "Italian"
-  !insertmacro MUI_LANGUAGE "Dutch"
-  !insertmacro MUI_LANGUAGE "Danish"
-  !insertmacro MUI_LANGUAGE "Swedish"
-  !insertmacro MUI_LANGUAGE "Norwegian"
-  !insertmacro MUI_LANGUAGE "NorwegianNynorsk"
-  !insertmacro MUI_LANGUAGE "Finnish"
-  !insertmacro MUI_LANGUAGE "Greek"
-  !insertmacro MUI_LANGUAGE "Russian"
-  !insertmacro MUI_LANGUAGE "Portuguese"
-  !insertmacro MUI_LANGUAGE "PortugueseBR"
-  !insertmacro MUI_LANGUAGE "Polish"
-  !insertmacro MUI_LANGUAGE "Ukrainian"
-  !insertmacro MUI_LANGUAGE "Czech"
-  !insertmacro MUI_LANGUAGE "Slovak"
-  !insertmacro MUI_LANGUAGE "Croatian"
-  !insertmacro MUI_LANGUAGE "Bulgarian"
-  !insertmacro MUI_LANGUAGE "Hungarian"
-  !insertmacro MUI_LANGUAGE "Thai"
-  !insertmacro MUI_LANGUAGE "Romanian"
-  !insertmacro MUI_LANGUAGE "Latvian"
-  !insertmacro MUI_LANGUAGE "Macedonian"
-  !insertmacro MUI_LANGUAGE "Estonian"
-  !insertmacro MUI_LANGUAGE "Turkish"
-  !insertmacro MUI_LANGUAGE "Lithuanian"
-  !insertmacro MUI_LANGUAGE "Slovenian"
-  !insertmacro MUI_LANGUAGE "Serbian"
-  !insertmacro MUI_LANGUAGE "SerbianLatin"
-  !insertmacro MUI_LANGUAGE "Arabic"
-  !insertmacro MUI_LANGUAGE "Farsi"
-  !insertmacro MUI_LANGUAGE "Hebrew"
-  !insertmacro MUI_LANGUAGE "Indonesian"
-  !insertmacro MUI_LANGUAGE "Mongolian"
-  !insertmacro MUI_LANGUAGE "Luxembourgish"
-  !insertmacro MUI_LANGUAGE "Albanian"
-  !insertmacro MUI_LANGUAGE "Breton"
-  !insertmacro MUI_LANGUAGE "Belarusian"
-  !insertmacro MUI_LANGUAGE "Icelandic"
-  !insertmacro MUI_LANGUAGE "Malay"
-  !insertmacro MUI_LANGUAGE "Bosnian"
-  !insertmacro MUI_LANGUAGE "Kurdish"
-  !insertmacro MUI_LANGUAGE "Irish"
-  !insertmacro MUI_LANGUAGE "Uzbek"
-  !insertmacro MUI_LANGUAGE "Galician"
-  !insertmacro MUI_LANGUAGE "Afrikaans"
-  !insertmacro MUI_LANGUAGE "Catalan"
-  !insertmacro MUI_LANGUAGE "Esperanto"
-  !insertmacro MUI_LANGUAGE "Asturian"
-  !insertmacro MUI_LANGUAGE "Basque"
-  !insertmacro MUI_LANGUAGE "Pashto"
-  !insertmacro MUI_LANGUAGE "Georgian"
-  !insertmacro MUI_LANGUAGE "Vietnamese"
-  !insertmacro MUI_LANGUAGE "Welsh"
-  !insertmacro MUI_LANGUAGE "Armenian"
-  !insertmacro MUI_LANGUAGE "Corsican"
+  !include "windows_installer_languages.nsi"
 
 ;--------------------------------
 ;Before Installer Section
 
 Function .onInit
-ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString"
-ReadRegStr $1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName"
-${If} $0 != ""
-${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Uninstall the currently installed $1 before installing ${PRODUCT} ${PRODUCT_VERSION}?" /SD IDYES IDYES`
-	!insertmacro UninstallExisting $0 $0
-	${If} $0 <> 0
-		MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
-			Abort
-	${EndIf}
-${EndIf}
+
+  ;Get the uninstall information and the name (and thus also the version) of the
+  ;previous installation
+  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString"
+  ReadRegStr $1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName"
+  ;If a previous installation was found ask the user via a popup if they want to
+  ;uninstall it before running the installer
+  ${If} $0 != ""
+  ${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "$(LangStrUninstallTheCurrentlyInstalled1)$1$(LangStrUninstallTheCurrentlyInstalled2)${PRODUCT} ${PRODUCT_VERSION}$(LangStrUninstallTheCurrentlyInstalled3)" /SD IDYES IDYES`
+    ;Use the included macro to uninstall the existing installation if the user
+    ;selected yes
+    !insertmacro UninstallExisting $0 $0
+    ;If the uninstall failed show an additional popup window asking if the
+    ;installation should be aborted or not
+    ${If} $0 <> 0
+      MessageBox MB_YESNO|MB_ICONSTOP "$(LangStrFailedToUninstallContinue)" /SD IDYES IDYES +2
+        Abort
+    ${EndIf}
+  ${EndIf}
+
 FunctionEnd
 
 ;--------------------------------
-;Installer Section
+;Installer Section > Main Component
 
-Section "${PRODUCT} (Required)"
-  SectionIn RO # Just means if in component mode this is locked
+Section "${PRODUCT} ($(LangStrRequired))" Section1
 
-  ;Set output path to the installation directory and list the files that should be put into it
+  ;This will prevent this component from being disabled on the selection page
+  SectionIn RO
+
+  ;Set output path to the installation directory and list the files that should
+  ;be put into it
   SetOutPath "$INSTDIR"
   File "..\bin\${PRODUCT_LOWERCASE}.exe"
   File ".\${PRODUCT_LOWERCASE}.bat"
   File "..\res\icons\${PRODUCT_LOWERCASE}.ico"
 
-  ;Store installation folder in registry
+  ;Store installation folder in registry for future installs
   WriteRegStr HKLM "Software\${PRODUCT}" "" "$INSTDIR"
 
-  ;Registry information for add/remove programs (https://nsis.sourceforge.io/Add_uninstall_information_to_Add/Remove_Programs)
+  ;Registry information for add/remove programs
+  ;(https://nsis.sourceforge.io/Add_uninstall_information_to_Add/Remove_Programs)
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT} ${PRODUCT_VERSION}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$\"$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe$\""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "QuietUninstallString" "$\"$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe$\" /S"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "URLInfoAbout" "$\"${ABOUTURL}$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "URLInfoAbout" "$\"${PRODUCT_URL}$\""
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "NoRepair" 1
 
@@ -188,17 +159,15 @@ Section "${PRODUCT} (Required)"
 
   ;Create start menu shortcut for program, config directory and uninstaller
   CreateDirectory "$SMPROGRAMS\${PRODUCT}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT_SHORTCUT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT_SHORTCUT} Configuration.lnk" "$AppData\${PRODUCT}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\Uninstall ${PRODUCT_SHORTCUT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" "" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" 0
-
-  ;Create desktop shortcut
-  CreateShortCut "$DESKTOP\${PRODUCT_SHORTCUT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrConfiguration1)${PRODUCT}$(LangStrConfiguration2).lnk" "$AppData\${PRODUCT}"
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrUninstall) ${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" "" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" 0
 
   ;Create uninstaller
   WriteUninstaller "${PRODUCT_LOWERCASE}_uninstaller.exe"
 
-  ;Set output path to the config directory and list the files that should be put into it
+  ;Set output path to the config directory and list the files that should be put
+  ;into it
   SetOutPath "$AppData\${PRODUCT}"
   File "..\.env.example"
   File "..\customCommands.example.json"
@@ -209,6 +178,13 @@ Section "${PRODUCT} (Required)"
 SectionEnd
 
 ;--------------------------------
+;Component Descriptions
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${Section1} $(LangStrRequired)
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+;--------------------------------
 ;Uninstaller Section
 
 Section "Uninstall"
@@ -217,22 +193,36 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
   DeleteRegKey HKLM "Software\${PRODUCT}"
 
-  ;Delete the installation directory + files
+  ;Remove the installation directory and all files within it
   RMDir /r "$INSTDIR\*.*"
   RMDir "$INSTDIR"
 
-  ;Delete Start Menu Shortcuts
+  ;Remove the start menu directory and all shortcuts within it
   Delete "$SMPROGRAMS\${PRODUCT}\*.*"
   RmDir  "$SMPROGRAMS\${PRODUCT}"
 
 SectionEnd
 
 ;--------------------------------
-;After Installation Function
+;After Installation Function (is triggered after a successful installation)
 
 Function .onInstSuccess
 
-  ;Open configuration directory after the installation
+  ;Open the configuration directory
   ExecShell "open" "$AppData\${PRODUCT}"
+
+FunctionEnd
+
+;--------------------------------
+;Custom Function To Create A Desktop Shortcut
+
+Function createDesktopShortcut
+
+  ;Reset output file path to installation directory because CreateShortCut needs
+  ;that information (https://nsis-dev.github.io/NSIS-Forums/html/t-299421.html)
+  SetOutPath $INSTDIR
+
+  ;Create Desktop shortcut to main component
+  CreateShortCut "$DESKTOP\${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
 
 FunctionEnd
