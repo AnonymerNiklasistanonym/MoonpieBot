@@ -1,7 +1,9 @@
 # Maintainer: AnonymerNiklasistanonym <niklas.mikeler@gmail.com>
 _applicationname=moonpiebot
-pkgname="$_applicationname"
-pkgver=v1.0.8
+#pkgname="$_applicationname"
+pkgname="$_applicationname-git"
+#pkgname="$_applicationname-bin"
+pkgver=1.0.8
 pkgrel=1
 pkgdesc='A custom Twitch chat bot'
 arch=('x86_64')
@@ -11,9 +13,14 @@ depends=('nodejs')
 provides=("$pkgname")
 conflicts=("$_applicationname" "$_applicationname-bin" "$_applicationname-git")
 _gitname="$_applicationname.git"
-source=("$_gitname::git+$url#branch=main")
 #source=("$_gitname::git+$url#tag=v$pkgver")
+source=("$_gitname::git+$url#branch=main")
+#source=("$_applicationname.bin::$url/releases/download/v$pkgver/$_applicationname-v$pkgver-linux64-node-18"
+#        "$_applicationname.svg::$url/releases/download/v$pkgver/$_applicationname.svg")
 sha1sums=('SKIP')
+#sha1sums=('SKIP'
+#          'SKIP')
+#options=(!strip)
 _installdir="/opt/$_applicationname"
 _installdirbin="/usr/bin"
 _installdirdesktop="/usr/share/applications"
@@ -25,7 +32,7 @@ pkgver() {
   git describe --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
-# Create all files necessary for installation
+# Create all files necessary for installation (not necessary for bin version of the package)
 build() {
   cd "$srcdir/$_gitname"
   # Install (all - normal and build) dependencies
@@ -38,7 +45,10 @@ build() {
 
 # Define all files that should be installed
 package() {
-  cd "$srcdir/$_gitname"
+  # Go to the source directory
+  cd "$srcdir"
+  # Go to the cloned git directory inside the source directory
+  cd "$_gitname"
   # Create a directory in /opt that contains all resources
   install -Dd "$pkgdir$_installdir"
   # Copy all necessary node dependencies to there
@@ -47,19 +57,25 @@ package() {
   find dist -exec install -D {} "$pkgdir$_installdir/"{} \;
   # Copy the package.json file
   install -D package.json "$pkgdir$_installdir"
+  ## Copy the downloaded binary file (only necessary for bin version of the package)
+  #install -Dm 755 "$_applicationname.bin" "$pkgdir$_installdir"
   # Copy the application icon file
   install -Dm 644 "res/icons/$_applicationname.svg" "$pkgdir$_installdir"
+  #install -Dm 644 "$_applicationname.svg" "$pkgdir$_installdir"
 
   # Create a bash file for the /usr/bin directory
   echo -e "\
 #!/usr/bin/env bash\n\
 node \"$_installdir\" --config-dir \"$_defaultconfigdir\" \$@\n" > "$_applicationname"
+#\"$_installdir/$_applicationname.bin\" --config-dir \"$_defaultconfigdir\" \$@\n" > "$_applicationname"
 
+  # Copy the bash file to the /usr/bin directory
   install -Dd "$pkgdir$_installdirbin"
-  install -Dm 777 "$_applicationname" "$pkgdir$_installdirbin"
+  install -Dm 755 "$_applicationname" "$pkgdir$_installdirbin"
 
+  # Create a directory for the .desktop files
   install -Dd "$pkgdir$_installdirdesktop"
-
+  # Create a desktop file to the bash file
   echo -e "\
 [Desktop Entry]\n\
 Version=1.0\n\
