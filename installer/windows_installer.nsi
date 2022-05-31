@@ -25,7 +25,7 @@
   OutFile "..\bin\${PRODUCT_LOWERCASE}_setup.exe"
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\${PRODUCT}"
+  InstallDir "$PROGRAMFILES64\${PRODUCT}"
 
   ;Get installation folder from registry if available
   InstallDirRegKey HKLM "Software\${PRODUCT}" ""
