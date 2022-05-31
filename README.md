@@ -55,6 +55,7 @@ Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can
 Every command can be optionally disabled.
 
 It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat if enabled.
+(This can be temporarily turned off/on with the commands `!osu requests on`/`!osu requests off [Optional reason]`)
 Given an osu! IRC login it can even send these beatmap links to the osu! client.
 
 It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) can be found in the configuration even if no other osu! related configurations is set.

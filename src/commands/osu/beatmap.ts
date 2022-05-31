@@ -13,6 +13,7 @@ import {
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
 import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { isProcessRunning } from "../../other/processInformation";
+import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
 import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
@@ -117,7 +118,9 @@ export const commandBeatmap = async (
   if (detailedBeatmapInformation) {
     message += ` ${messageRequestDetailed}`;
   }
-  message += ` - ${messageRequestTopScore}`;
+  if (messageRequestTopScore !== "") {
+    message += ` - ${messageRequestTopScore}`;
+  }
 
   // Send response to Twitch channel and if found to IRC channel
   await Promise.all([
@@ -184,4 +187,99 @@ export const commandBeatmap = async (
         .catch(reject);
     }),
   ]);
+};
+
+/**
+ * Enable or disable beatmap requests.
+ *
+ * @param client Twitch client (used to send messages).
+ * @param channel Twitch channel (where the response should be sent to).
+ * @param messageId Twitch message ID of the request (used for logging).
+ * @param userName Twitch user name of the requester.
+ * @param twitchBadgeLevel The Twitch badge level (used for permission control).
+ * @param enable If true enable requests, otherwise disable requests.
+ * @param customDisableMessage A custom disable message.
+ * @param logger Logger (used for global logs).
+ */
+export const commandSetBeatmapRequests = async (
+  client: Client,
+  channel: string,
+  messageId: string | undefined,
+  userName: string | undefined,
+  twitchBadgeLevel: TwitchBadgeLevels,
+  enable: boolean,
+  customDisableMessage: string | undefined,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw errorMessageIdUndefined();
+  }
+  if (userName === undefined) {
+    throw errorMessageUserNameUndefined();
+  }
+
+  if (twitchBadgeLevel != TwitchBadgeLevels.BROADCASTER) {
+    throw Error(
+      `The user ${userName} is not a broadcaster and thus is not allowed to use this command`
+    );
+  }
+
+  let message = "";
+  if (enable) {
+    message = "Beatmap requests: On";
+  } else {
+    message = "Beatmap requests: Off";
+    if (customDisableMessage) {
+      message += ` (${customDisableMessage})`;
+    }
+  }
+
+  const sentMessage = await client.say(channel, message);
+  loggerCommand(
+    logger,
+    `Successfully replied to message ${messageId}: '${JSON.stringify(
+      sentMessage
+    )}'`,
+    { commandId: "osuBeatmapSet" }
+  );
+};
+
+/**
+ * Error message when beatmap requests are disabled.
+ *
+ * @param client Twitch client (used to send messages).
+ * @param channel Twitch channel (where the response should be sent to).
+ * @param messageId Twitch message ID of the request (used for logging).
+ * @param userName Twitch user name of the requester.
+ * @param customDisableMessage A custom disable message.
+ * @param logger Logger (used for global logs).
+ */
+export const commandBeatmapWhenDisabled = async (
+  client: Client,
+  channel: string,
+  messageId: string | undefined,
+  userName: string | undefined,
+  customDisableMessage: string | undefined,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw errorMessageIdUndefined();
+  }
+  if (userName === undefined) {
+    throw errorMessageUserNameUndefined();
+  }
+
+  let message = `@${userName} Beatmap requests are currently off`;
+  if (customDisableMessage) {
+    message += ` (${customDisableMessage})`;
+  }
+
+  const sentMessage = await client.say(channel, message);
+  loggerCommand(
+    logger,
+    `Successfully replied to message ${messageId}: '${JSON.stringify(
+      sentMessage
+    )}'`,
+    { commandId: "osuBeatmapWhenDisabled" }
+  );
 };

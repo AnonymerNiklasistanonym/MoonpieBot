@@ -15,10 +15,15 @@ import type { Client as IrcClient } from "irc";
 import type { StreamCompanionData } from "../streamcompanion";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
-import { commandBeatmap } from "./osu/beatmap";
+import {
+  commandBeatmap,
+  commandBeatmapWhenDisabled,
+  commandSetBeatmapRequests,
+} from "./osu/beatmap";
 import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
+import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 
 const logDetectedCommand = (
   logger: Logger,
@@ -139,10 +144,37 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
 export const regexBeatmapUrl =
   /(?:^|.*?\s)https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))(?:(?:\s|,).*?|$)/gi;
 
+/**
+ * Regex to recognize the !osu requests enable command.
+ *
+ * @example
+ * ```text
+ * !osu requests on
+ * ```
+ */
+export const regexEnableBeatmapRequests =
+  /^\s*!osu\s+requests\s+on(?:\s*|\s+.*)$/i;
+
+/**
+ * Regex to recognize the !osu requests disable command.
+ *
+ * @example
+ * ```text
+ * !osu requests off $OPTIONAL_TEXT
+ * ```
+ */
+export const regexDisableBeatmapRequests =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!osu\s+requests\s+off\s*?(?:\s+(.*?)\s*)?$/i;
+
 export interface OsuApiV2Credentials {
   clientId: number;
   clientSecret: string;
 }
+
+let runtimeToggleEnableBeatmapRequests = true;
+let runtimeToggleDisableBeatmapRequestsCustomMessage: string | undefined =
+  undefined;
 
 export const osuChatHandler = async (
   client: Client,
@@ -216,22 +248,62 @@ export const osuChatHandler = async (
   }
   // > Any beatmap link
   if (enableOsuBeatmapRequests) {
+    if (
+      message.match(regexEnableBeatmapRequests) ||
+      message.match(regexDisableBeatmapRequests)
+    ) {
+      const matchEnable = message.match(regexEnableBeatmapRequests);
+      const matchDisable = message.match(regexDisableBeatmapRequests);
+      if (matchEnable) {
+        logDetectedCommand(logger, tags, "enableBeatmapRequests");
+        runtimeToggleEnableBeatmapRequests = true;
+      } else {
+        logDetectedCommand(logger, tags, "disableBeatmapRequests");
+        runtimeToggleEnableBeatmapRequests = false;
+        if (matchDisable != null && matchDisable.length >= 2) {
+          runtimeToggleDisableBeatmapRequestsCustomMessage = matchDisable[1];
+        }
+      }
+      await commandSetBeatmapRequests(
+        client,
+        channel,
+        tags.id,
+        tags.username,
+        parseTwitchBadgeLevel(tags),
+        runtimeToggleEnableBeatmapRequests,
+        runtimeToggleDisableBeatmapRequestsCustomMessage,
+        logger
+      );
+      return;
+    }
+
     if (message.match(regexBeatmapUrl)) {
       logDetectedCommand(logger, tags, "beatmap");
-      for (const match of [...message.matchAll(regexBeatmapUrl)]) {
-        await commandBeatmap(
+      if (!runtimeToggleEnableBeatmapRequests) {
+        await commandBeatmapWhenDisabled(
           client,
           channel,
           tags.id,
           tags.username,
-          osuApiV2Credentials,
-          osuDefaultId,
-          match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
-          enableOsuBeatmapRequestsDetailed,
-          osuIrcBot,
-          osuIrcRequestTarget,
+          runtimeToggleDisableBeatmapRequestsCustomMessage,
           logger
         );
+      } else {
+        for (const match of [...message.matchAll(regexBeatmapUrl)]) {
+          await commandBeatmap(
+            client,
+            channel,
+            tags.id,
+            tags.username,
+            osuApiV2Credentials,
+            osuDefaultId,
+            match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
+            enableOsuBeatmapRequestsDetailed,
+            osuIrcBot,
+            osuIrcRequestTarget,
+            logger
+          );
+        }
       }
       return;
     }
