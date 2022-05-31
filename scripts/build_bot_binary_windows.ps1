@@ -16,12 +16,12 @@ node --version
 Write-Host "npm:"
 npm --version
 Write-Host "makensis:"
-$makensisWasFound = [bool] (Get-Command -ErrorAction Ignore -Type Application openssl)
+$makensisWasFound = [bool] (Get-Command -ErrorAction Ignore -Type Application makensis)
 if ($makensisWasFound) {
     makensis -VERSION
     Write-Host ""
 } else {
-    Write-Host "WARNING: makensis was not found, installer will not be created"
+    Write-Host "WARNING: makensis was not found, Windows installer will not be created"
 }
 
 # Get the current directory

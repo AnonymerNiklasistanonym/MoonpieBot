@@ -1,4 +1,6 @@
-; Source: https://nsis.sourceforge.io/Auto-uninstall_old_before_installing_new
+;Script that contains a function that can detect a previous installation and
+;then run the uninstaller of that previous installation
+;(https://nsis.sourceforge.io/Auto-uninstall_old_before_installing_new)
 
 !include LogicLib.nsh
 
