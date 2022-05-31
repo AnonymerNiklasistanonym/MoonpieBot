@@ -11,6 +11,11 @@
   !include "windows_installer_config.nsi"
 
 ;--------------------------------
+;Include External Logic File To Run Previous Uninstaller If Detected
+
+  !include "windows_installer_run_previous_uninstaller.nsi"
+
+;--------------------------------
 ;General
 
   ;Properly display all languages
@@ -136,6 +141,21 @@
   !insertmacro MUI_LANGUAGE "Corsican"
 
 ;--------------------------------
+;Before Installer Section
+
+Function .onInit
+ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString"
+${If} $0 != ""
+${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Uninstall previous version?" /SD IDYES IDYES`
+	!insertmacro UninstallExisting $0 $0
+	${If} $0 <> 0
+		MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
+			Abort
+	${EndIf}
+${EndIf}
+FunctionEnd
+
+;--------------------------------
 ;Installer Section
 
 Section "${PRODUCT} (Required)"
@@ -150,9 +170,11 @@ Section "${PRODUCT} (Required)"
   ;Store installation folder in registry
   WriteRegStr HKLM "Software\${PRODUCT}" "" "$INSTDIR"
 
-  ;Registry information for add/remove programs
+  ;Registry information for add/remove programs (https://nsis.sourceforge.io/Add_uninstall_information_to_Add/Remove_Programs)
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$INSTDIR\${PRODUCT}_uninstaller.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$\"$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "QuietUninstallString" "$\"$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe$\" /S"
+
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "URLInfoAbout" "$\"${ABOUTURL}$\""
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "NoRepair" 1
@@ -194,9 +216,6 @@ Section "Uninstall"
   ;Delete the installation directory + files
   RMDir /r "$INSTDIR\*.*"
   RMDir "$INSTDIR"
-  IfFileExists "${DOCDIR}" 0 +3
-  RMDir /r "${DOCDIR}\*.*"
-  RMDir "${DOCDIR}"
 
   ;Delete Start Menu Shortcuts
   Delete "$SMPROGRAMS\${PRODUCT}\*.*"
