@@ -10,6 +10,7 @@ arch=('x86_64')
 url='https://github.com/AnonymerNiklasistanonym/MoonpieBot'
 license=('MIT')
 depends=('nodejs')
+#depends=()
 provides=("$pkgname")
 conflicts=("$_applicationname" "$_applicationname-bin" "$_applicationname-git")
 _gitname="$_applicationname.git"
