@@ -44,7 +44,7 @@
 
   ;Use the custom own icon
   !define MUI_ICON "..\res\icons\${PRODUCT_LOWERCASE}.ico"
-  ;!define MUI_UNICON "..\res\icons\moonpiebot.ico"
+  !define MUI_UNICON "..\res\icons\${PRODUCT_LOWERCASE}_greyscale.ico"
   !define MUI_HEADERIMAGE_RIGHT
   ;!define MUI_WELCOMEFINISHPAGE_BITMAP "pictures\picture_left_installer.bmp"
   ;!define MUI_UNWELCOMEFINISHPAGE_BITMAP "pictures\picture_left_uninstaller.bmp"

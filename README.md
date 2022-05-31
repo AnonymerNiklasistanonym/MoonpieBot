@@ -5,7 +5,7 @@
 
 A custom Twitch chat bot.
 
-![MoonpieBot icon](res/icons/moonpiebot_128.png)
+![MoonpieBot icon](res/icons/moonpiebot.png)
 
 - [Features](#features)
   - [Optional: osu!](#optional-osu)
