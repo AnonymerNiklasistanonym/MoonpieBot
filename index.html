@@ -202,17 +202,25 @@ This censoring can be disabled by passing an additional command line argument wh
 </li>
 </ol>
 
-<a href="#binary-release" id="binary-release" style="color: inherit; text-decoration: none;">
-  <h3>Binary release</h3>
+<a href="#binary-releases" id="binary-releases" style="color: inherit; text-decoration: none;">
+  <h3>Binary releases</h3>
 </a>
 <p>There is now a way to use the program without needing to install or build anything.
-You can download a binary for your operating system from the <a href="https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases">latest release</a> and then just run it instead of for example <code>npm run start</code>:</p>
+You can download a binary for your operating system from the <a href="https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases">latest release</a> and then just run it:</p>
 <pre><code class="language-sh"><span class="hl-0">./moonpiebot-linux</span>
 </code></pre>
 <pre><code class="language-ps1"><span class="hl-0">.\</span><span class="hl-5">moonpiebot-win.exe</span>
 </code></pre>
 <p>All other rules from the previous section still apply, it&#39;s just that you don&#39;t have to install or build anything.
 You still need to have environment variables or a <code>.env</code> file in the same directory etc.</p>
+<p>For Windows there is also an installer with which the program can be easily installed.
+The installation contains an uninstaller and a start menu/desktop shortcut so no terminal usage is necessary.</p>
+
+<a href="#package-manager-releases" id="package-manager-releases" style="color: inherit; text-decoration: none;">
+  <h3>Package manager releases</h3>
+</a>
+<p>On Linux systems with <code>pamcan</code> as their package manager (like Arch/Manjaro Linux) there is a way to install the program by using a <code>PKGBUILD</code> file.
+For more information check the <a href="./installer/README.md">installer <code>README.md</code></a>.</p>
 
 <a href="#migrate-to-a-new-version" id="migrate-to-a-new-version" style="color: inherit; text-decoration: none;">
   <h2>Migrate to a new version</h2>
