@@ -148,8 +148,9 @@
 
 Function .onInit
 ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString"
+ReadRegStr $1 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName"
 ${If} $0 != ""
-${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Uninstall previous version?" /SD IDYES IDYES`
+${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Uninstall the currently installed $1 before installing ${PRODUCT} ${PRODUCT_VERSION}?" /SD IDYES IDYES`
 	!insertmacro UninstallExisting $0 $0
 	${If} $0 <> 0
 		MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
