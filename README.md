@@ -11,6 +11,9 @@ A custom Twitch chat bot.
   - [Optional: osu!](#optional-osu)
   - [Optional: Custom commands/timers](#optional-custom-commandstimers)
 - [Setup](#setup)
+  - [Build it yourself](#build-it-yourself)
+  - [Binary releases](#binary-releases)
+  - [Package managers](#package-managers)
 - [Migrate to a new version](#migrate-to-a-new-version)
 - [Helping Resources](#helping-resources)
 - [Examples](#examples)
@@ -177,24 +180,36 @@ For some macros to work (like Twitch API connections for `!so`/`!followage`/`!se
 ### Binary releases
 
 There is now a way to use the program without needing to install or build anything.
-You can download a binary for your operating system from the [latest release](https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases) and then just run it:
+You can download a binary for your operating system from the [latest release](https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases) and then just run it.
+
+All other rules from the previous section still apply, it's just that you don't have to install or build anything.
+You still need to have environment variables or a `.env` file in the same directory etc.
+
+#### Linux
+
+**Binary standalone file (has no dependencies):**
 
 ```sh
 ./moonpiebot-linux
 ```
 
+#### Windows
+
+**Binary standalone file (has no dependencies):**
+
 ```ps1
 .\moonpiebot-win.exe
 ```
 
-All other rules from the previous section still apply, it's just that you don't have to install or build anything.
-You still need to have environment variables or a `.env` file in the same directory etc.
+**Binary installer (has no dependencies):**
 
 For Windows there is also an installer with which the program can be easily installed.
 The installation contains an uninstaller and a start menu/desktop shortcut so no terminal usage is necessary.
 The default location of the configuration/database/etc. files is `%APPDATA%\MoonpieBot`.
 
-### Package manager releases
+### Package managers
+
+#### Pacman
 
 On Linux systems with `pacman` as their package manager (like Arch/Manjaro Linux) there is a way to install the program by using a `PKGBUILD` file.
 For more information check the [installer `README.md`](./installer/README.md).
