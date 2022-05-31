@@ -192,11 +192,13 @@ You still need to have environment variables or a `.env` file in the same direct
 
 For Windows there is also an installer with which the program can be easily installed.
 The installation contains an uninstaller and a start menu/desktop shortcut so no terminal usage is necessary.
+The default location of the configuration/database/etc. files is `%APPDATA%\MoonpieBot`.
 
 ### Package manager releases
 
-On Linux systems with `pamcan` as their package manager (like Arch/Manjaro Linux) there is a way to install the program by using a `PKGBUILD` file.
+On Linux systems with `pacman` as their package manager (like Arch/Manjaro Linux) there is a way to install the program by using a `PKGBUILD` file.
 For more information check the [installer `README.md`](./installer/README.md).
+The default location of the configuration/database/etc. files is `$HOME/.local/share/moonpiebot`.
 
 ## Migrate to a new version
 
