@@ -19,8 +19,10 @@ source=("$_gitname::git+$url#branch=main")
 #source=("$_applicationname.bin::$url/releases/download/v$pkgver/$_applicationname-v$pkgver-linux64-node-18"
 #        "$_applicationname.svg::$url/releases/download/v$pkgver/$_applicationname.svg")
 sha1sums=('SKIP')
-#sha1sums=('SKIP'
-#          'SKIP')
+# Run the command 'sha1sum filename' to update them
+#sha1sums=('e49f1d23c634477f37969e671e5d445711c7dfdb'
+#          'edf7e74e76a630f853a3bf81b6eae96dcdf5b294')
+# Don't strip the symbols from the downloaded binary file since this breaks it
 #options=(!strip)
 _installdir="/opt/$_applicationname"
 _installdirbin="/usr/bin"

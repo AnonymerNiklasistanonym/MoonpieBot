@@ -24,8 +24,11 @@ cd ..
 # Go to installer directory and create the normal, git and binary package
 cd installer
 makepkg -p PKGBUILD     --log --clean -f --syncdeps --rmdeps
+makepkg -p PKGBUILD     --printsrcinfo > .SRCINFO
 makepkg -p PKGBUILD_GIT --log --clean -f --syncdeps --rmdeps
+makepkg -p PKGBUILD_GIT --printsrcinfo > .SRCINFO_GIT
 makepkg -p PKGBUILD_BIN --log --clean -f --syncdeps --rmdeps
+makepkg -p PKGBUILD_BIN --printsrcinfo > .SRCINFO_BIN
 
 # Go back to the call directory
 cd "$CALL_DIR"
