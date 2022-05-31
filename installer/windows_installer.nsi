@@ -41,6 +41,9 @@
 ;--------------------------------
 ;Interface Settings
 
+  ;Use a custom welcome page title
+  !define MUI_WELCOMEPAGE_TITLE "${PRODUCT} ${PRODUCT_VERSION}"
+
   ;Show warning if user wants to abort
   !define MUI_ABORTWARNING
 
@@ -171,7 +174,7 @@ Section "${PRODUCT} (Required)"
   WriteRegStr HKLM "Software\${PRODUCT}" "" "$INSTDIR"
 
   ;Registry information for add/remove programs (https://nsis.sourceforge.io/Add_uninstall_information_to_Add/Remove_Programs)
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT} ${PRODUCT_VERSION}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$\"$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe$\""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "QuietUninstallString" "$\"$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe$\" /S"
 
@@ -184,12 +187,12 @@ Section "${PRODUCT} (Required)"
 
   ;Create start menu shortcut for program, config directory and uninstaller
   CreateDirectory "$SMPROGRAMS\${PRODUCT}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT_SHORTCUT}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT_SHORTCUT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
   CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT_SHORTCUT} Configuration.lnk" "$AppData\${PRODUCT}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\Uninstall ${PRODUCT_SHORTCUT}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" "" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\Uninstall ${PRODUCT_SHORTCUT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" "" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" 0
 
   ;Create desktop shortcut
-  CreateShortCut "$DESKTOP\${PRODUCT_SHORTCUT}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
+  CreateShortCut "$DESKTOP\${PRODUCT_SHORTCUT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
 
   ;Create uninstaller
   WriteUninstaller "${PRODUCT_LOWERCASE}_uninstaller.exe"
