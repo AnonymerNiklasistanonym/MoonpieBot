@@ -180,9 +180,9 @@ SectionEnd
 ;--------------------------------
 ;Component Descriptions
 
-!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${Section1} $(LangStrRequired)
-!insertmacro MUI_FUNCTION_DESCRIPTION_END
+;!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+;  !insertmacro MUI_DESCRIPTION_TEXT ${Section1} $(LangStrRequired)
+;!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------
 ;Uninstaller Section
