@@ -12,7 +12,12 @@
 <li><a href="#optional-custom-commandstimers">Optional: Custom commands/timers</a></li>
 </ul>
 </li>
-<li><a href="#setup">Setup</a></li>
+<li><a href="#setup">Setup</a><ul>
+<li><a href="#build-it-yourself">Build it yourself</a></li>
+<li><a href="#binary-releases">Binary releases</a></li>
+<li><a href="#package-managers">Package managers</a></li>
+</ul>
+</li>
 <li><a href="#migrate-to-a-new-version">Migrate to a new version</a></li>
 <li><a href="#helping-resources">Helping Resources</a></li>
 <li><a href="#examples">Examples</a></li>
@@ -206,19 +211,34 @@ This censoring can be disabled by passing an additional command line argument wh
   <h3>Binary releases</h3>
 </a>
 <p>There is now a way to use the program without needing to install or build anything.
-You can download a binary for your operating system from the <a href="https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases">latest release</a> and then just run it:</p>
-<pre><code class="language-sh"><span class="hl-0">./moonpiebot-linux</span>
-</code></pre>
-<pre><code class="language-ps1"><span class="hl-0">.\</span><span class="hl-5">moonpiebot-win.exe</span>
-</code></pre>
+You can download a binary for your operating system from the <a href="https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases">latest release</a> and then just run it.</p>
 <p>All other rules from the previous section still apply, it&#39;s just that you don&#39;t have to install or build anything.
 You still need to have environment variables or a <code>.env</code> file in the same directory etc.</p>
+
+<a href="#linux" id="linux" style="color: inherit; text-decoration: none;">
+  <h4>Linux</h4>
+</a>
+<p><strong>Binary standalone file (has no dependencies):</strong></p>
+<pre><code class="language-sh"><span class="hl-0">./moonpiebot-linux</span>
+</code></pre>
+
+<a href="#windows" id="windows" style="color: inherit; text-decoration: none;">
+  <h4>Windows</h4>
+</a>
+<p><strong>Binary standalone file (has no dependencies):</strong></p>
+<pre><code class="language-ps1"><span class="hl-0">.\</span><span class="hl-5">moonpiebot-win.exe</span>
+</code></pre>
+<p><strong>Binary installer (has no dependencies):</strong></p>
 <p>For Windows there is also an installer with which the program can be easily installed.
 The installation contains an uninstaller and a start menu/desktop shortcut so no terminal usage is necessary.
 The default location of the configuration/database/etc. files is <code>%APPDATA%\MoonpieBot</code>.</p>
 
-<a href="#package-manager-releases" id="package-manager-releases" style="color: inherit; text-decoration: none;">
-  <h3>Package manager releases</h3>
+<a href="#package-managers" id="package-managers" style="color: inherit; text-decoration: none;">
+  <h3>Package managers</h3>
+</a>
+
+<a href="#pacman" id="pacman" style="color: inherit; text-decoration: none;">
+  <h4>Pacman</h4>
 </a>
 <p>On Linux systems with <code>pacman</code> as their package manager (like Arch/Manjaro Linux) there is a way to install the program by using a <code>PKGBUILD</code> file.
 For more information check the <a href="./installer/README.md">installer <code>README.md</code></a>.
