@@ -25,6 +25,7 @@ A custom Twitch chat bot.
   - [Tests](#tests)
   - [Configuration files](#configuration-files)
   - [How to handle versions](#how-to-handle-versions)
+  - [Documentation](#documentation)
 - [Credits](#credits)
 
 ## Features
@@ -463,6 +464,27 @@ For releases set the version in [`src/version.ts`](src/version.ts) to `beta: fal
 When working on the code after that change set the version in [`src/version.ts`](src/version.ts) to `beta: true` and the version to what is expected to be the next version.
 
 To push the git tag created by `npm` run `git push origin <tag_name>`.
+
+### Documentation
+
+For documentation purposes several plugins can be used:
+
+- UML class diagrams for interfaces/classes
+- Mermaid diagrams in comments:
+
+  ```ts
+  /**
+   * Documentation comment with mermaid block.
+   *
+   * ```mermaid
+   * graph TB
+   *   mermaid.js --> TypeDoc;
+   * ```
+   *
+   * @param a A
+   */
+  export const name
+  ```
 
 ## Credits
 

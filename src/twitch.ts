@@ -31,6 +31,18 @@ export interface CreateTwitchClientError extends Error {
 /**
  * Create a Twitch client/connection.
  *
+ * The twitch client can then listen to multiple events.
+ *
+ * ```mermaid
+ * graph LR
+ *   twitchClient -- on --> connecting & connected & disconnected & join & message;
+ *   connecting --> a["client is connecting to Twitch<br>(address, port) => {}"];
+ *   connected --> b["client is connecting to Twitch<br>(address, port) => {}"];
+ *   disconnected --> c["client was disconnected from Twitch<br>(reason) => {}"];
+ *   join --> d["client joined a channel on Twitch<br>(channel, username, self) => {}"];
+ *   message --> e["a new message is being sent in a joined Twitch channel<br>(channel, tags, message, self) => {}"];
+ * ```
+ *
  * @param twitchName Name of the Twitch account that should be connected.
  * @param twitchOAuthToken The authorization token to the Twitch account.
  * @param twitchChannels The Twitch channels that should be connected to.
