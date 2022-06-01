@@ -5,7 +5,7 @@ import {
   errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { MoonpieCommands, MOONPIE_COMMAND_ID } from "../moonpie";
+import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 import { secondsToString } from "../../other/timePeriodToString";
 // Type imports
 import type { Client } from "tmi.js";
@@ -118,7 +118,7 @@ export const commandClaim = async (
     logger,
     messageId,
     sentMessage,
-    MOONPIE_COMMAND_ID,
+    LOG_ID_COMMAND_MOONPIE,
     MoonpieCommands.CLAIM
   );
 };

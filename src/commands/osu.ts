@@ -13,7 +13,10 @@ import type { StreamCompanionData } from "../streamcompanion";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 
-export const OSU_COMMAND_ID = "osu";
+/**
+ * The logging ID of this command.
+ */
+export const LOG_ID_COMMAND_OSU = "osu";
 
 export enum OsuCommands {
   PP = "pp",

@@ -9,7 +9,7 @@ import {
 import {
   errorMessageOsuApiCredentialsUndefined,
   OsuCommands,
-  OSU_COMMAND_ID,
+  LOG_ID_COMMAND_OSU,
 } from "../osu";
 import { getProcessWindowTitle } from "../../other/processInformation";
 // Type imports
@@ -180,7 +180,7 @@ export const commandNp = async (
     logger,
     messageId,
     sentMessage,
-    OSU_COMMAND_ID,
+    LOG_ID_COMMAND_OSU,
     OsuCommands.NP
   );
 };

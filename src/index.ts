@@ -62,7 +62,7 @@ interface CustomCommandDataJson {
 /**
  * Main method that runs the bot.
  *
- * @param logger Logger (used for global logs).
+ * @param logger Logger (used for logging).
  * @param configDir The directory in which all configurations are contained.
  */
 const main = async (logger: Logger, configDir: string) => {

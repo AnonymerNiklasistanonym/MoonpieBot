@@ -10,7 +10,7 @@ import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import { MoonpieCommands, MOONPIE_COMMAND_ID } from "../moonpie";
+import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 
 export const commandUserGet = async (
   client: Client,
@@ -62,7 +62,7 @@ export const commandUserGet = async (
     logger,
     messageId,
     sentMessage,
-    MOONPIE_COMMAND_ID,
+    LOG_ID_COMMAND_MOONPIE,
     MoonpieCommands.GET
   );
 };
@@ -162,7 +162,7 @@ export const commandUserSetCount = async (
     logger,
     messageId,
     sentMessage,
-    MOONPIE_COMMAND_ID,
+    LOG_ID_COMMAND_MOONPIE,
     moonpieCommandId
   );
 };
@@ -213,7 +213,7 @@ export const commandUserDelete = async (
     logger,
     messageId,
     sentMessage,
-    MOONPIE_COMMAND_ID,
+    LOG_ID_COMMAND_MOONPIE,
     MoonpieCommands.DELETE
   );
 };

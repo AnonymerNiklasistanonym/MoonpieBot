@@ -1,5 +1,15 @@
+/*
+ * Twitch Client/Connection
+ */
+
 import { client as tmiClient, Client } from "tmi.js";
+// Type import
 import type { Logger } from "winston";
+
+/**
+ * The logging ID of this module.
+ */
+const LOG_ID_TWITCH = "twitch";
 
 /**
  * Errorcodes that can be attached to @CreateTwitchClientError.
@@ -12,12 +22,21 @@ export enum CreateTwitchClientErrorCode {
 }
 
 /**
- * Error that is thrown if something wents wrong with creating the Twitch client.
+ * Error that is thrown if something goes wrong with creating the Twitch client.
  */
 export interface CreateTwitchClientError extends Error {
   code?: CreateTwitchClientErrorCode;
 }
 
+/**
+ * Create a Twitch client/connection.
+ *
+ * @param twitchName Name of the Twitch account that should be connected.
+ * @param twitchOAuthToken The authorization token to the Twitch account.
+ * @param twitchChannels The Twitch channels that should be connected to.
+ * @param logger Logger (used for logging).
+ * @returns Twitch client.
+ */
 export const createTwitchClient = (
   twitchName: string | undefined,
   twitchOAuthToken: string | undefined,
@@ -30,9 +49,8 @@ export const createTwitchClient = (
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_NAME_UNDEFINED;
     logger.error({
-      level: "error",
       message: error.message,
-      section: "twitch",
+      section: LOG_ID_TWITCH,
     });
     throw error;
   }
@@ -42,9 +60,8 @@ export const createTwitchClient = (
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_OAUTH_TOKEN_UNDEFINED;
     logger.error({
-      level: "error",
       message: error.message,
-      section: "twitch",
+      section: LOG_ID_TWITCH,
     });
     throw error;
   }
@@ -54,9 +71,8 @@ export const createTwitchClient = (
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_CHANNELS_UNDEFINED;
     logger.error({
-      level: "error",
       message: error.message,
-      section: "twitch",
+      section: LOG_ID_TWITCH,
     });
     throw error;
   }
@@ -66,19 +82,17 @@ export const createTwitchClient = (
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_CHANNELS_EMPTY;
     logger.error({
-      level: "error",
       message: error.message,
-      section: "twitch",
+      section: LOG_ID_TWITCH,
     });
     throw error;
   }
 
-  logger.log({
-    level: "info",
+  logger.info({
     message: `Create Twitch client for the account "${twitchName}" in the channels: ${twitchChannels
       .map((a) => '"' + a + '"')
       .join(",")}`,
-    section: "twitch",
+    section: LOG_ID_TWITCH,
   });
 
   const client: Client = new tmiClient({

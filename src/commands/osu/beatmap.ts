@@ -11,7 +11,7 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
-import { errorMessageOsuApiCredentialsUndefined, OSU_COMMAND_ID } from "../osu";
+import { errorMessageOsuApiCredentialsUndefined, LOG_ID_COMMAND_OSU } from "../osu";
 import { isProcessRunning } from "../../other/processInformation";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
@@ -129,7 +129,7 @@ export const commandBeatmap = async (
         logger,
         messageId,
         sentMessage,
-        OSU_COMMAND_ID,
+        LOG_ID_COMMAND_OSU,
         "beatmap"
       );
     }),
@@ -243,7 +243,7 @@ export const commandSetBeatmapRequests = async (
     logger,
     messageId,
     sentMessage,
-    OSU_COMMAND_ID,
+    LOG_ID_COMMAND_OSU,
     osuCommandId
   );
 };
@@ -283,7 +283,7 @@ export const commandBeatmapWhenDisabled = async (
     logger,
     messageId,
     sentMessage,
-    OSU_COMMAND_ID,
+    LOG_ID_COMMAND_OSU,
     "beatmap_requests_disabled"
   );
 };

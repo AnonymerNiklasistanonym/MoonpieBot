@@ -6,7 +6,7 @@ import { mapUserToStr } from "../../other/osuStringBuilder";
 import {
   errorMessageOsuApiCredentialsUndefined,
   OsuCommands,
-  OSU_COMMAND_ID,
+  LOG_ID_COMMAND_OSU,
 } from "../osu";
 // Type imports
 import type { Client } from "tmi.js";
@@ -77,7 +77,7 @@ export const commandPp = async (
     logger,
     messageId,
     sentMessage,
-    OSU_COMMAND_ID,
+    LOG_ID_COMMAND_OSU,
     OsuCommands.PP
   );
 };
