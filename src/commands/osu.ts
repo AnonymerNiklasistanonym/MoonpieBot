@@ -7,6 +7,7 @@ import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
+import { logTwitchMessageCommandDetected } from "../commands";
 // Type imports
 import type { Client as IrcClient } from "irc";
 import type { StreamCompanionData } from "../streamcompanion";
@@ -18,25 +19,16 @@ import type { Logger } from "winston";
  */
 export const LOG_ID_COMMAND_OSU = "osu";
 
+/**
+ * The logging ID of this module.
+ */
+export const LOG_ID_MODULE_OSU = "osu";
+
 export enum OsuCommands {
   PP = "pp",
   NP = "np",
   RP = "rp",
 }
-
-const logDetectedCommand = (
-  logger: Logger,
-  tags: ChatUserstate,
-  command: string
-) => {
-  logger.log({
-    level: "debug",
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    message: `Detected command '${command}' by ${tags?.username} in message ${tags?.id}`,
-    section: "twitchClient",
-    subsection: "osuChatHandler",
-  });
-};
 
 export enum OsuCommandErrorCode {
   OSU_API_V2_CREDENTIALS_UNDEFINED = "OSU_API_V2_CREDENTIALS_UNDEFINED",
@@ -198,7 +190,14 @@ export const osuChatHandler = async (
   }
   // > !np
   if (message.match(regexNp) && enabled?.includes(OsuCommands.NP)) {
-    logDetectedCommand(logger, tags, `!${OsuCommands.NP}`);
+    logTwitchMessageCommandDetected(
+      logger,
+      tags.id,
+      [tags.username ? `#${tags.username}` : "undefined", message],
+      LOG_ID_COMMAND_OSU,
+      OsuCommands.NP,
+      LOG_ID_MODULE_OSU
+    );
     await commandNp(
       client,
       channel,
@@ -212,10 +211,16 @@ export const osuChatHandler = async (
   }
   // > !rp
   if (message.match(regexRp) && enabled?.includes(OsuCommands.RP)) {
-    logDetectedCommand(logger, tags, `!${OsuCommands.RP}`);
+    logTwitchMessageCommandDetected(
+      logger,
+      tags.id,
+      [tags.username ? `#${tags.username}` : "undefined", message],
+      LOG_ID_COMMAND_OSU,
+      OsuCommands.RP,
+      LOG_ID_MODULE_OSU
+    );
     const matchId = regexRpCustomId.exec(message);
     const matchName = regexRpCustomName.exec(message);
-    console.log(matchId, matchName);
     await commandRp(
       client,
       channel,
@@ -230,10 +235,16 @@ export const osuChatHandler = async (
   }
   // > !pp
   if (message.match(regexPp) && enabled?.includes(OsuCommands.PP)) {
-    logDetectedCommand(logger, tags, `!${OsuCommands.PP}`);
+    logTwitchMessageCommandDetected(
+      logger,
+      tags.id,
+      [tags.username ? `#${tags.username}` : "undefined", message],
+      LOG_ID_COMMAND_OSU,
+      OsuCommands.PP,
+      LOG_ID_MODULE_OSU
+    );
     const matchId = regexPpCustomId.exec(message);
     const matchName = regexPpCustomName.exec(message);
-    console.log(matchId, matchName);
     await commandPp(
       client,
       channel,
@@ -255,10 +266,24 @@ export const osuChatHandler = async (
       const matchEnable = message.match(regexEnableBeatmapRequests);
       const matchDisable = message.match(regexDisableBeatmapRequests);
       if (matchEnable) {
-        logDetectedCommand(logger, tags, "enableBeatmapRequests");
+        logTwitchMessageCommandDetected(
+          logger,
+          tags.id,
+          [tags.username ? `#${tags.username}` : "undefined", message],
+          LOG_ID_COMMAND_OSU,
+          "enable_beatmap_requests",
+          LOG_ID_MODULE_OSU
+        );
         runtimeToggleEnableBeatmapRequests = true;
       } else {
-        logDetectedCommand(logger, tags, "disableBeatmapRequests");
+        logTwitchMessageCommandDetected(
+          logger,
+          tags.id,
+          [tags.username ? `#${tags.username}` : "undefined", message],
+          LOG_ID_COMMAND_OSU,
+          "disable_beatmap_requests",
+          LOG_ID_MODULE_OSU
+        );
         runtimeToggleEnableBeatmapRequests = false;
         if (matchDisable != null && matchDisable.length >= 2) {
           runtimeToggleDisableBeatmapRequestsCustomMessage = matchDisable[1];
@@ -278,7 +303,14 @@ export const osuChatHandler = async (
     }
 
     if (message.match(regexBeatmapUrl)) {
-      logDetectedCommand(logger, tags, "beatmap");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_OSU,
+        "beatmap_detected",
+        LOG_ID_MODULE_OSU
+      );
       if (!runtimeToggleEnableBeatmapRequests) {
         await commandBeatmapWhenDisabled(
           client,

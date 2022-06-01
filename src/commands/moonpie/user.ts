@@ -150,8 +150,8 @@ export const commandUserSetCount = async (
       logger
     );
 
-  const message = `@${userName} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${countMoonpies} moonpie${
-    countMoonpies > 1 ? "s" : ""
+  const message = `@${userName} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${newCount} moonpie${
+    newCount > 1 ? "s" : ""
   } (${operation}${countMoonpies}) and they are now rank ${
     currentMoonpieLeaderboardEntry.rank
   } on the leaderboard!`;

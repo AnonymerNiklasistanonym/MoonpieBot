@@ -8,6 +8,7 @@ import { commandAbout } from "./moonpie/about";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { commandClaim } from "./moonpie/claim";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
+import { logTwitchMessageCommandDetected } from "../commands";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -16,6 +17,10 @@ import type { Logger } from "winston";
  * The logging ID of this command.
  */
 export const LOG_ID_COMMAND_MOONPIE = "moonpie";
+/**
+ * The logging ID of this module.
+ */
+export const LOG_ID_MODULE_MOONPIE = "moonpie";
 
 export enum MoonpieCommands {
   ABOUT = "about",
@@ -28,20 +33,6 @@ export enum MoonpieCommands {
   REMOVE = "remove",
   SET = "set",
 }
-
-const logDetectedCommand = (
-  logger: Logger,
-  tags: ChatUserstate,
-  command: string
-) => {
-  logger.log({
-    level: "debug",
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    message: `Detected command '${command}' by ${tags?.username} in message ${tags?.id}`,
-    section: "twitchClient",
-    subsection: "moonpieChatHandler",
-  });
-};
 
 export const regexMoonpie = /^\s*!moonpie(\s*|\s.*)$/i;
 export const regexMoonpieClaim = /^\s*!moonpie(\s*|\s.*)$/i;
@@ -79,13 +70,19 @@ export const moonpieChatHandler = async (
     ];
   }
   if (message.match(regexMoonpie)) {
-    logDetectedCommand(logger, tags, "!moonpie");
     // > !moonpie commands
     if (
       message.match(regexMoonpieCommands) &&
       enabled.includes(MoonpieCommands.COMMANDS)
     ) {
-      logDetectedCommand(logger, tags, "!moonpie commands");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_MOONPIE,
+        MoonpieCommands.COMMANDS,
+        LOG_ID_MODULE_MOONPIE
+      );
       await commandCommands(client, channel, tags.id, enabled, logger);
       return;
     }
@@ -94,7 +91,14 @@ export const moonpieChatHandler = async (
       message.match(regexMoonpieLeaderboard) &&
       enabled.includes(MoonpieCommands.LEADERBOARD)
     ) {
-      logDetectedCommand(logger, tags, "!moonpie leaderboard");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_MOONPIE,
+        MoonpieCommands.LEADERBOARD,
+        LOG_ID_MODULE_MOONPIE
+      );
       await commandLeaderboard(client, channel, tags.id, databasePath, logger);
       return;
     }
@@ -103,7 +107,14 @@ export const moonpieChatHandler = async (
       message.match(regexMoonpieAbout) &&
       enabled.includes(MoonpieCommands.ABOUT)
     ) {
-      logDetectedCommand(logger, tags, "!moonpie about");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_MOONPIE,
+        MoonpieCommands.ABOUT,
+        LOG_ID_MODULE_MOONPIE
+      );
       await commandAbout(client, channel, tags.id, logger);
       return;
     }
@@ -112,7 +123,14 @@ export const moonpieChatHandler = async (
       message.match(regexMoonpieDelete) &&
       enabled.includes(MoonpieCommands.DELETE)
     ) {
-      logDetectedCommand(logger, tags, "!moonpie delete $USER");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_MOONPIE,
+        MoonpieCommands.DELETE,
+        LOG_ID_MODULE_MOONPIE
+      );
       const match = regexMoonpieDelete.exec(message);
       if (match && match.length >= 2) {
         await commandUserDelete(
@@ -138,7 +156,14 @@ export const moonpieChatHandler = async (
       message.match(regexMoonpieGet) &&
       enabled.includes(MoonpieCommands.GET)
     ) {
-      logDetectedCommand(logger, tags, "!moonpie get $USER");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_MOONPIE,
+        MoonpieCommands.GET,
+        LOG_ID_MODULE_MOONPIE
+      );
       const match = regexMoonpieGet.exec(message);
       if (match && match.length >= 2) {
         await commandUserGet(
@@ -163,7 +188,14 @@ export const moonpieChatHandler = async (
       message.match(regexMoonpieSet) &&
       enabled.includes(MoonpieCommands.SET)
     ) {
-      logDetectedCommand(logger, tags, "!moonpie set $USER $COUNT");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_MOONPIE,
+        MoonpieCommands.SET,
+        LOG_ID_MODULE_MOONPIE
+      );
       const match = regexMoonpieSet.exec(message);
       if (match && match.length >= 3) {
         await commandUserSetCount(
@@ -191,7 +223,14 @@ export const moonpieChatHandler = async (
       message.match(regexMoonpieAdd) &&
       enabled.includes(MoonpieCommands.ADD)
     ) {
-      logDetectedCommand(logger, tags, "!moonpie add $USER $COUNT");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_MOONPIE,
+        MoonpieCommands.ADD,
+        LOG_ID_MODULE_MOONPIE
+      );
       const match = regexMoonpieAdd.exec(message);
       if (match && match.length >= 3) {
         await commandUserSetCount(
@@ -219,7 +258,14 @@ export const moonpieChatHandler = async (
       message.match(regexMoonpieRemove) &&
       enabled.includes(MoonpieCommands.REMOVE)
     ) {
-      logDetectedCommand(logger, tags, "!moonpie remove $USER $COUNT");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_MOONPIE,
+        MoonpieCommands.REMOVE,
+        LOG_ID_MODULE_MOONPIE
+      );
       const match = regexMoonpieRemove.exec(message);
       if (match && match.length >= 3) {
         await commandUserSetCount(
@@ -247,7 +293,14 @@ export const moonpieChatHandler = async (
       message.match(regexMoonpieClaim) &&
       enabled.includes(MoonpieCommands.CLAIM)
     ) {
-      logDetectedCommand(logger, tags, "!moonpie ($MESSAGE)");
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_MOONPIE,
+        MoonpieCommands.CLAIM,
+        LOG_ID_MODULE_MOONPIE
+      );
       await commandClaim(
         client,
         channel,

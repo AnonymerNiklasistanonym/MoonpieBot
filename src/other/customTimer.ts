@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { parseMessage } from "./parseMessage";
-import { logTwitchMessageBroadcast } from "../../src/logging";
+import { logTwitchMessageBroadcast } from "../logging";
 // Type imports
 import type { ApiClient } from "@twurple/api";
 import type { Client } from "tmi.js";

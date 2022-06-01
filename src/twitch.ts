@@ -9,7 +9,7 @@ import type { Logger } from "winston";
 /**
  * The logging ID of this module.
  */
-const LOG_ID_TWITCH = "twitch";
+const LOG_ID_MODULE_TWITCH = "twitch";
 
 /**
  * Errorcodes that can be attached to @CreateTwitchClientError.
@@ -50,7 +50,7 @@ export const createTwitchClient = (
     error.code = CreateTwitchClientErrorCode.TWITCH_NAME_UNDEFINED;
     logger.error({
       message: error.message,
-      section: LOG_ID_TWITCH,
+      section: LOG_ID_MODULE_TWITCH,
     });
     throw error;
   }
@@ -61,7 +61,7 @@ export const createTwitchClient = (
     error.code = CreateTwitchClientErrorCode.TWITCH_OAUTH_TOKEN_UNDEFINED;
     logger.error({
       message: error.message,
-      section: LOG_ID_TWITCH,
+      section: LOG_ID_MODULE_TWITCH,
     });
     throw error;
   }
@@ -72,7 +72,7 @@ export const createTwitchClient = (
     error.code = CreateTwitchClientErrorCode.TWITCH_CHANNELS_UNDEFINED;
     logger.error({
       message: error.message,
-      section: LOG_ID_TWITCH,
+      section: LOG_ID_MODULE_TWITCH,
     });
     throw error;
   }
@@ -83,7 +83,7 @@ export const createTwitchClient = (
     error.code = CreateTwitchClientErrorCode.TWITCH_CHANNELS_EMPTY;
     logger.error({
       message: error.message,
-      section: LOG_ID_TWITCH,
+      section: LOG_ID_MODULE_TWITCH,
     });
     throw error;
   }
@@ -92,7 +92,7 @@ export const createTwitchClient = (
     message: `Create Twitch client for the account "${twitchName}" in the channels: ${twitchChannels
       .map((a) => '"' + a + '"')
       .join(",")}`,
-    section: LOG_ID_TWITCH,
+    section: LOG_ID_MODULE_TWITCH,
   });
 
   const client: Client = new tmiClient({

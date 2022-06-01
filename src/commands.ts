@@ -1,5 +1,6 @@
+import { logTwitchMessageDetected, logTwitchMessageReply } from "./logging";
+// Type imports
 import type { Logger } from "winston";
-import { logTwitchMessageReply } from "./logging";
 
 export const logTwitchMessageCommandReply = (
   logger: Logger,
@@ -13,6 +14,23 @@ export const logTwitchMessageCommandReply = (
     messageId,
     sentMessage,
     `${commandId}:${subcommandId}`
+  );
+};
+
+export const logTwitchMessageCommandDetected = (
+  logger: Logger,
+  messageId: string | undefined,
+  message: string[],
+  commandId: string,
+  subcommandId: string,
+  detectorId: string
+) => {
+  logTwitchMessageDetected(
+    logger,
+    messageId === undefined ? "ERROR:UNDEFINED" : messageId,
+    message,
+    `${commandId}:${subcommandId}`,
+    detectorId
   );
 };
 

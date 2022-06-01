@@ -16,10 +16,11 @@ export interface LoggerInformation {
   subsection?: string;
 }
 
+// "error" | "warn" | "debug" | "info"
 export const createLogger = (
   logDir: string,
-  logLevelConsole: "error" | "warn" | "debug" | "info" = "info",
-  logLevelFile: "error" | "warn" | "debug" | "info" = "debug"
+  logLevelConsole = "info",
+  logLevelFile = "debug"
 ) => {
   return createWinstonLogger({
     exitOnError: false,
@@ -100,9 +101,24 @@ export const logTwitchMessageBroadcast = (
 ) => {
   logTwitchMessage(
     logger,
-    `Successfully sent: '${JSON.stringify(sentMessage)}'`,
+    `Successfully broadcasted: '${JSON.stringify(sentMessage)}'`,
     {
       subsection: sourceId,
     }
+  );
+};
+export const logTwitchMessageDetected = (
+  logger: Logger,
+  messageId: string,
+  message: string[],
+  detectionReason: string,
+  detectorId: string
+) => {
+  logTwitchMessage(
+    logger,
+    `Detected ${detectionReason} in message ${messageId}: ${JSON.stringify(
+      message
+    )}`,
+    { subsection: detectorId }
   );
 };

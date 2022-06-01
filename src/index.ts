@@ -545,7 +545,11 @@ if (isEntryPoint()) {
           configDir
         )
       );
-      const logger = createLogger(logDir);
+      const logger = createLogger(
+        logDir,
+        getEnvVariableValueOrDefault(EnvVariable.LOGGING_CONSOLE_LOG_LEVEL),
+        getEnvVariableValueOrDefault(EnvVariable.LOGGING_FILE_LOG_LEVEL)
+      );
 
       // Call main method
       try {
