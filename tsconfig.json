@@ -60,6 +60,11 @@
             "src/other/timePeriodToString.ts",
             "src/other/twitchBadgeParser.ts"
         ],
-        "out": "docs"
+        "out": "docs",
+        "umlClassDiagram": {
+            "type": "detailed",
+            "location": "local",
+            "format": "svg"
+        }
     }
 }
