@@ -17,6 +17,21 @@ export const loggerCommand = (
   });
 };
 
+export const loggerCommandReply = (
+  logger: Logger,
+  messageId: string,
+  sentMessage: string[],
+  commandId: string
+) => {
+  loggerCommand(
+    logger,
+    `Successfully replied to message ${messageId}: '${JSON.stringify(
+      sentMessage
+    )}'`,
+    { commandId }
+  );
+};
+
 export const loggerCommandError = (
   logger: Logger,
   message: string,

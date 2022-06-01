@@ -4,9 +4,9 @@ import osuApiV2 from "osu-api-v2";
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
-  loggerCommand,
+  loggerCommandReply,
 } from "../commandHelper";
-import { errorMessageOsuApiCredentialsUndefined } from "../osu";
+import { errorMessageOsuApiCredentialsUndefined, OsuCommands } from "../osu";
 import { getProcessWindowTitle } from "../../other/processInformation";
 // Type imports
 import type { Client } from "tmi.js";
@@ -172,11 +172,5 @@ export const commandNp = async (
   }
   const sentMessage = await client.say(channel, message);
 
-  loggerCommand(
-    logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { commandId: "osuNp" }
-  );
+  loggerCommandReply(logger, messageId, sentMessage, `osu:${OsuCommands.NP}`);
 };

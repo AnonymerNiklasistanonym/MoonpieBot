@@ -1,5 +1,3 @@
-import type { ChatUserstate, Client } from "tmi.js";
-import type { Logger } from "winston";
 import {
   commandUserGet,
   commandUserSetCount,
@@ -10,6 +8,21 @@ import { commandAbout } from "./moonpie/about";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { commandClaim } from "./moonpie/claim";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
+// Type imports
+import type { ChatUserstate, Client } from "tmi.js";
+import type { Logger } from "winston";
+
+export enum MoonpieCommands {
+  ABOUT = "about",
+  ADD = "add",
+  CLAIM = "claim",
+  COMMANDS = "commands",
+  DELETE = "delete",
+  GET = "get",
+  LEADERBOARD = "leaderboard",
+  REMOVE = "remove",
+  SET = "set",
+}
 
 const logDetectedCommand = (
   logger: Logger,
@@ -49,21 +62,24 @@ export const moonpieChatHandler = async (
   if (enabled === undefined) {
     // per default enable all options
     enabled = [
-      "about",
-      "claim",
-      "commands",
-      "delete",
-      "get",
-      "leaderboard",
-      "add",
-      "remove",
-      "set",
+      MoonpieCommands.ABOUT,
+      MoonpieCommands.ADD,
+      MoonpieCommands.CLAIM,
+      MoonpieCommands.COMMANDS,
+      MoonpieCommands.DELETE,
+      MoonpieCommands.GET,
+      MoonpieCommands.LEADERBOARD,
+      MoonpieCommands.REMOVE,
+      MoonpieCommands.SET,
     ];
   }
   if (message.match(regexMoonpie)) {
     logDetectedCommand(logger, tags, "!moonpie");
     // > !moonpie commands
-    if (message.match(regexMoonpieCommands) && enabled.includes("commands")) {
+    if (
+      message.match(regexMoonpieCommands) &&
+      enabled.includes(MoonpieCommands.COMMANDS)
+    ) {
       logDetectedCommand(logger, tags, "!moonpie commands");
       await commandCommands(client, channel, tags.id, enabled, logger);
       return;
@@ -71,20 +87,26 @@ export const moonpieChatHandler = async (
     // > !moonpie leaderboard
     if (
       message.match(regexMoonpieLeaderboard) &&
-      enabled.includes("leaderboard")
+      enabled.includes(MoonpieCommands.LEADERBOARD)
     ) {
       logDetectedCommand(logger, tags, "!moonpie leaderboard");
       await commandLeaderboard(client, channel, tags.id, databasePath, logger);
       return;
     }
     // > !moonpie about
-    if (message.match(regexMoonpieAbout) && enabled.includes("about")) {
+    if (
+      message.match(regexMoonpieAbout) &&
+      enabled.includes(MoonpieCommands.ABOUT)
+    ) {
       logDetectedCommand(logger, tags, "!moonpie about");
       await commandAbout(client, channel, tags.id, logger);
       return;
     }
     // > !moonpie delete $USER
-    if (message.match(regexMoonpieDelete) && enabled.includes("delete")) {
+    if (
+      message.match(regexMoonpieDelete) &&
+      enabled.includes(MoonpieCommands.DELETE)
+    ) {
       logDetectedCommand(logger, tags, "!moonpie delete $USER");
       const match = regexMoonpieDelete.exec(message);
       if (match && match.length >= 2) {
@@ -107,7 +129,10 @@ export const moonpieChatHandler = async (
       return;
     }
     // > !moonpie get $USER
-    if (message.match(regexMoonpieGet) && enabled.includes("get")) {
+    if (
+      message.match(regexMoonpieGet) &&
+      enabled.includes(MoonpieCommands.GET)
+    ) {
       logDetectedCommand(logger, tags, "!moonpie get $USER");
       const match = regexMoonpieGet.exec(message);
       if (match && match.length >= 2) {
@@ -129,7 +154,10 @@ export const moonpieChatHandler = async (
       return;
     }
     // > !moonpie set $USER (only broadcaster badge)
-    if (message.match(regexMoonpieSet) && enabled.includes("set")) {
+    if (
+      message.match(regexMoonpieSet) &&
+      enabled.includes(MoonpieCommands.SET)
+    ) {
       logDetectedCommand(logger, tags, "!moonpie set $USER $COUNT");
       const match = regexMoonpieSet.exec(message);
       if (match && match.length >= 3) {
@@ -154,7 +182,10 @@ export const moonpieChatHandler = async (
       return;
     }
     // > !moonpie add $USER $COUNT (only broadcaster badge)
-    if (message.match(regexMoonpieAdd) && enabled.includes("add")) {
+    if (
+      message.match(regexMoonpieAdd) &&
+      enabled.includes(MoonpieCommands.ADD)
+    ) {
       logDetectedCommand(logger, tags, "!moonpie add $USER $COUNT");
       const match = regexMoonpieAdd.exec(message);
       if (match && match.length >= 3) {
@@ -179,7 +210,10 @@ export const moonpieChatHandler = async (
       return;
     }
     // > !moonpie remove $USER $COUNT (only broadcaster badge)
-    if (message.match(regexMoonpieRemove) && enabled.includes("remove")) {
+    if (
+      message.match(regexMoonpieRemove) &&
+      enabled.includes(MoonpieCommands.REMOVE)
+    ) {
       logDetectedCommand(logger, tags, "!moonpie remove $USER $COUNT");
       const match = regexMoonpieRemove.exec(message);
       if (match && match.length >= 3) {
@@ -204,7 +238,10 @@ export const moonpieChatHandler = async (
       return;
     }
     // > !moonpie ($MESSAGE)
-    if (message.match(regexMoonpieClaim) && enabled.includes("claim")) {
+    if (
+      message.match(regexMoonpieClaim) &&
+      enabled.includes(MoonpieCommands.CLAIM)
+    ) {
       logDetectedCommand(logger, tags, "!moonpie ($MESSAGE)");
       await commandClaim(
         client,

@@ -1,5 +1,7 @@
 import { promises as fs } from "fs";
 import * as path from "path";
+import { MoonpieCommands } from "./commands/moonpie";
+import { OsuCommands } from "./commands/osu";
 import { splitTextAtLength } from "./other/splitTextAtLength";
 
 /** Path to the root directory of the source code. */
@@ -116,6 +118,8 @@ export interface EnvVariableValueInformation {
   censor?: boolean;
 }
 
+export const EMPTY_OPTION_LIST_VALUE_NONE = "none";
+
 export const getEnvVariableValueInformation = (
   envVariable: EnvVariable | string,
   configDir?: string
@@ -178,20 +182,20 @@ export const getEnvVariableValueInformation = (
 
     case EnvVariable.MOONPIE_ENABLE_COMMANDS:
       return {
-        default: "about,claim,commands,delete,get,leaderboard,remove,set",
+        default: `${MoonpieCommands.ABOUT},${MoonpieCommands.ADD},${MoonpieCommands.CLAIM},${MoonpieCommands.COMMANDS},${MoonpieCommands.DELETE},${MoonpieCommands.GET},${MoonpieCommands.LEADERBOARD},${MoonpieCommands.REMOVE},${MoonpieCommands.SET}`,
         supportedValues: [
-          "about",
-          "claim",
-          "commands",
-          "delete",
-          "get",
-          "leaderboard",
-          "remove",
-          "set",
-          "none",
+          MoonpieCommands.ABOUT,
+          MoonpieCommands.ADD,
+          MoonpieCommands.CLAIM,
+          MoonpieCommands.COMMANDS,
+          MoonpieCommands.DELETE,
+          MoonpieCommands.GET,
+          MoonpieCommands.LEADERBOARD,
+          MoonpieCommands.REMOVE,
+          MoonpieCommands.SET,
+          EMPTY_OPTION_LIST_VALUE_NONE,
         ],
-        description:
-          "You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).",
+        description: `You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to '${EMPTY_OPTION_LIST_VALUE_NONE}' if no commands should be enabled).`,
         block: EnvVariableBlocks.MOONPIE,
       };
     case EnvVariable.MOONPIE_DATABASE_PATH:
@@ -210,10 +214,14 @@ export const getEnvVariableValueInformation = (
 
     case EnvVariable.OSU_ENABLE_COMMANDS:
       return {
-        default: "np,pp,rp",
-        supportedValues: ["np", "pp", "rp", "none"],
-        description:
-          "You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!",
+        default: `${OsuCommands.NP},${OsuCommands.PP},${OsuCommands.RP}`,
+        supportedValues: [
+          OsuCommands.NP,
+          OsuCommands.PP,
+          OsuCommands.RP,
+          EMPTY_OPTION_LIST_VALUE_NONE,
+        ],
+        description: `You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to '${EMPTY_OPTION_LIST_VALUE_NONE}' if no commands should be enabled). If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!`,
         block: EnvVariableBlocks.OSU,
       };
 

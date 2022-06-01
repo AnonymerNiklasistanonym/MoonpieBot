@@ -4,11 +4,13 @@ import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
   errorMessageUserIdUndefined,
+  loggerCommandReply,
 } from "../commandHelper";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import { MoonpieCommands } from "../moonpie";
 
 export const commandUserGet = async (
   client: Client,
@@ -55,10 +57,12 @@ export const commandUserGet = async (
   }
 
   const sentMessage = await client.say(channel, message);
-  logger.info(
-    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
-      sentMessage
-    )}`
+
+  loggerCommandReply(
+    logger,
+    messageId,
+    sentMessage,
+    `moonpie:${MoonpieCommands.GET}`
   );
 };
 
@@ -109,15 +113,19 @@ export const commandUserSetCount = async (
     logger
   );
   let newCount = moonpieEntry.count;
+  let moonpieCommandId;
   switch (operation) {
     case "+":
       newCount += countMoonpies;
+      moonpieCommandId = MoonpieCommands.ADD;
       break;
     case "-":
       newCount -= countMoonpies;
+      moonpieCommandId = MoonpieCommands.REMOVE;
       break;
     case "=":
       newCount = countMoonpies;
+      moonpieCommandId = MoonpieCommands.SET;
       break;
   }
   if (newCount < 0) {
@@ -148,10 +156,12 @@ export const commandUserSetCount = async (
   } on the leaderboard!`;
 
   const sentMessage = await client.say(channel, message);
-  logger.info(
-    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
-      sentMessage
-    )}`
+
+  loggerCommandReply(
+    logger,
+    messageId,
+    sentMessage,
+    `moonpie:${moonpieCommandId}`
   );
 };
 
@@ -196,9 +206,11 @@ export const commandUserDelete = async (
   const message = `@${userName} You deleted the entry of the user ${usernameMoonpieEntry}`;
 
   const sentMessage = await client.say(channel, message);
-  logger.info(
-    `!moonpie: Successfully replied to message ${messageId}: ${JSON.stringify(
-      sentMessage
-    )}`
+
+  loggerCommandReply(
+    logger,
+    messageId,
+    sentMessage,
+    `moonpie:${MoonpieCommands.DELETE}`
   );
 };

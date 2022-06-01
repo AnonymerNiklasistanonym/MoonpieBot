@@ -3,8 +3,9 @@ import {
   errorMessageIdUndefined,
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
-  loggerCommand,
+  loggerCommandReply,
 } from "../commandHelper";
+import { MoonpieCommands } from "../moonpie";
 import { secondsToString } from "../../other/timePeriodToString";
 // Type imports
 import type { Client } from "tmi.js";
@@ -113,11 +114,10 @@ export const commandClaim = async (
 
   const sentMessage = await client.say(channel, message);
 
-  loggerCommand(
+  loggerCommandReply(
     logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { commandId: "moonpieClaim" }
+    messageId,
+    sentMessage,
+    `moonpie:${MoonpieCommands.CLAIM}`
   );
 };

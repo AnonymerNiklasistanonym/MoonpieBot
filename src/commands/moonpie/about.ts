@@ -1,6 +1,7 @@
 import { getVersion } from "../../version";
 import { name, sourceCodeUrl } from "../../info";
-import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
+import { errorMessageIdUndefined, loggerCommandReply } from "../commandHelper";
+import { MoonpieCommands } from "../moonpie";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -26,11 +27,10 @@ export const commandAbout = async (
   const message = `${name} ${getVersion()} (${sourceCodeUrl})`;
   const sentMessage = await client.say(channel, message);
 
-  loggerCommand(
+  loggerCommandReply(
     logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { commandId: "moonpieAbout" }
+    messageId,
+    sentMessage,
+    `moonpie:${MoonpieCommands.ABOUT}`
   );
 };

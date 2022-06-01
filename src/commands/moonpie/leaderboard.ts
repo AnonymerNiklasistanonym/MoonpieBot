@@ -1,5 +1,6 @@
 import { moonpieDb } from "../../database/moonpieDb";
-import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
+import { errorMessageIdUndefined, loggerCommandReply } from "../commandHelper";
+import { MoonpieCommands } from "../moonpie";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -39,11 +40,10 @@ export const commandLeaderboard = async (
       : messageLeaderboard;
   const sentMessage = await client.say(channel, message);
 
-  loggerCommand(
+  loggerCommandReply(
     logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { commandId: "moonpieLeaderboard" }
+    messageId,
+    sentMessage,
+    `moonpie:${MoonpieCommands.LEADERBOARD}`
   );
 };

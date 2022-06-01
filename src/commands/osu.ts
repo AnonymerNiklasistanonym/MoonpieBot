@@ -1,20 +1,3 @@
-/*
- * TODO Feature idea: Enable adding osu functionality
- */
-
-// TODO: Get current pp
-//       Get current pp from a given account
-// TODO: Get recent play
-//       Get recent play from a given account
-
-// TODO: Detect beatmaps
-//       Detect beatmap links and send them to a user
-
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-import type { Client as IrcClient } from "irc";
-import type { StreamCompanionData } from "../streamcompanion";
-import type { ChatUserstate, Client } from "tmi.js";
-import type { Logger } from "winston";
 import {
   commandBeatmap,
   commandBeatmapWhenDisabled,
@@ -24,6 +7,17 @@ import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
+// Type imports
+import type { Client as IrcClient } from "irc";
+import type { StreamCompanionData } from "../streamcompanion";
+import type { ChatUserstate, Client } from "tmi.js";
+import type { Logger } from "winston";
+
+export enum OsuCommands {
+  PP = "pp",
+  NP = "np",
+  RP = "rp",
+}
 
 const logDetectedCommand = (
   logger: Logger,
@@ -32,6 +26,7 @@ const logDetectedCommand = (
 ) => {
   logger.log({
     level: "debug",
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     message: `Detected command '${command}' by ${tags?.username} in message ${tags?.id}`,
     section: "twitchClient",
     subsection: "osuChatHandler",
@@ -194,11 +189,11 @@ export const osuChatHandler = async (
   logger: Logger
 ): Promise<void> => {
   if (enabled === undefined) {
-    enabled = ["np", "pp", "rp"];
+    enabled = [OsuCommands.NP, OsuCommands.PP, OsuCommands.RP];
   }
   // > !np
-  if (message.match(regexNp) && enabled?.includes("np")) {
-    logDetectedCommand(logger, tags, "!np");
+  if (message.match(regexNp) && enabled?.includes(OsuCommands.NP)) {
+    logDetectedCommand(logger, tags, `!${OsuCommands.NP}`);
     await commandNp(
       client,
       channel,
@@ -211,8 +206,8 @@ export const osuChatHandler = async (
     return;
   }
   // > !rp
-  if (message.match(regexRp) && enabled?.includes("rp")) {
-    logDetectedCommand(logger, tags, "!rp");
+  if (message.match(regexRp) && enabled?.includes(OsuCommands.RP)) {
+    logDetectedCommand(logger, tags, `!${OsuCommands.RP}`);
     const matchId = regexRpCustomId.exec(message);
     const matchName = regexRpCustomName.exec(message);
     console.log(matchId, matchName);
@@ -229,8 +224,8 @@ export const osuChatHandler = async (
     return;
   }
   // > !pp
-  if (message.match(regexPp) && enabled?.includes("pp")) {
-    logDetectedCommand(logger, tags, "!pp");
+  if (message.match(regexPp) && enabled?.includes(OsuCommands.PP)) {
+    logDetectedCommand(logger, tags, `!${OsuCommands.PP}`);
     const matchId = regexPpCustomId.exec(message);
     const matchName = regexPpCustomName.exec(message);
     console.log(matchId, matchName);

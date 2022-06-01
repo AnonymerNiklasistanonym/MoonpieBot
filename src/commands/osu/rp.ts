@@ -2,9 +2,9 @@
 import osuApiV2, { GameMode } from "osu-api-v2";
 import { ScoresType } from "osu-api-v2/lib/users/scores";
 // Local imports
-import { errorMessageIdUndefined, loggerCommand } from "../commandHelper";
+import { errorMessageIdUndefined, loggerCommandReply } from "../commandHelper";
 import { mapScoreToStr } from "../../other/osuStringBuilder";
-import { errorMessageOsuApiCredentialsUndefined } from "../osu";
+import { errorMessageOsuApiCredentialsUndefined, OsuCommands } from "../osu";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -77,11 +77,5 @@ export const commandRp = async (
       : "No recent play found";
   const sentMessage = await client.say(channel, message);
 
-  loggerCommand(
-    logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { commandId: "osuRp" }
-  );
+  loggerCommandReply(logger, messageId, sentMessage, `osu:${OsuCommands.RP}`);
 };
