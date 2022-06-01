@@ -1,7 +1,7 @@
 import { getVersion } from "../../version";
 import { name, sourceCodeUrl } from "../../info";
 import { errorMessageIdUndefined, loggerCommandReply } from "../commandHelper";
-import { MoonpieCommands } from "../moonpie";
+import { MoonpieCommands, MOONPIE_COMMAND_ID } from "../moonpie";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -31,6 +31,7 @@ export const commandAbout = async (
     logger,
     messageId,
     sentMessage,
-    `moonpie:${MoonpieCommands.ABOUT}`
+    MOONPIE_COMMAND_ID,
+    MoonpieCommands.ABOUT
   );
 };

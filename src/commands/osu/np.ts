@@ -6,7 +6,11 @@ import {
   errorMessageUserNameUndefined,
   loggerCommandReply,
 } from "../commandHelper";
-import { errorMessageOsuApiCredentialsUndefined, OsuCommands } from "../osu";
+import {
+  errorMessageOsuApiCredentialsUndefined,
+  OsuCommands,
+  OSU_COMMAND_ID,
+} from "../osu";
 import { getProcessWindowTitle } from "../../other/processInformation";
 // Type imports
 import type { Client } from "tmi.js";
@@ -172,5 +176,11 @@ export const commandNp = async (
   }
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(logger, messageId, sentMessage, `osu:${OsuCommands.NP}`);
+  loggerCommandReply(
+    logger,
+    messageId,
+    sentMessage,
+    OSU_COMMAND_ID,
+    OsuCommands.NP
+  );
 };

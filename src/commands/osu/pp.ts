@@ -3,7 +3,11 @@ import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
 import { errorMessageIdUndefined, loggerCommandReply } from "../commandHelper";
 import { mapUserToStr } from "../../other/osuStringBuilder";
-import { errorMessageOsuApiCredentialsUndefined, OsuCommands } from "../osu";
+import {
+  errorMessageOsuApiCredentialsUndefined,
+  OsuCommands,
+  OSU_COMMAND_ID,
+} from "../osu";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -69,5 +73,11 @@ export const commandPp = async (
   const message = mapUserToStr(user);
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(logger, messageId, sentMessage, `osu:${OsuCommands.PP}`);
+  loggerCommandReply(
+    logger,
+    messageId,
+    sentMessage,
+    OSU_COMMAND_ID,
+    OsuCommands.PP
+  );
 };

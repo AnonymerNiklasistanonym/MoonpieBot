@@ -12,6 +12,8 @@ import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 
+export const MOONPIE_COMMAND_ID = "moonpie";
+
 export enum MoonpieCommands {
   ABOUT = "about",
   ADD = "add",

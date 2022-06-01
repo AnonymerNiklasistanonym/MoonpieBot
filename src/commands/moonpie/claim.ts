@@ -5,7 +5,7 @@ import {
   errorMessageUserNameUndefined,
   loggerCommandReply,
 } from "../commandHelper";
-import { MoonpieCommands } from "../moonpie";
+import { MoonpieCommands, MOONPIE_COMMAND_ID } from "../moonpie";
 import { secondsToString } from "../../other/timePeriodToString";
 // Type imports
 import type { Client } from "tmi.js";
@@ -118,6 +118,7 @@ export const commandClaim = async (
     logger,
     messageId,
     sentMessage,
-    `moonpie:${MoonpieCommands.CLAIM}`
+    MOONPIE_COMMAND_ID,
+    MoonpieCommands.CLAIM
   );
 };
