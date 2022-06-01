@@ -11,7 +11,10 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
-import { errorMessageOsuApiCredentialsUndefined, LOG_ID_COMMAND_OSU } from "../osu";
+import {
+  errorMessageOsuApiCredentialsUndefined,
+  LOG_ID_COMMAND_OSU,
+} from "../osu";
 import { isProcessRunning } from "../../other/processInformation";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports

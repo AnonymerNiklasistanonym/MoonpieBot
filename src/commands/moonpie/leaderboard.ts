@@ -1,5 +1,8 @@
 import { moonpieDb } from "../../database/moonpieDb";
-import { errorMessageIdUndefined, logTwitchMessageCommandReply } from "../../commands";
+import {
+  errorMessageIdUndefined,
+  logTwitchMessageCommandReply,
+} from "../../commands";
 import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 // Type imports
 import type { Client } from "tmi.js";
