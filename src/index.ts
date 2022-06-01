@@ -38,16 +38,16 @@ import type { StreamCompanionData } from "./streamcompanion";
 const fileExists = async (path: string) =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   !!(await fs.stat(path).catch(() => false));
-interface CustomTimerJson {
+export interface CustomTimerJson {
   name?: string;
   channels: string[];
   message: string;
   cronString: string;
 }
-interface CustomTimerDataJson {
+export interface CustomTimerDataJson {
   timers: CustomTimerJson[];
 }
-interface CustomCommandJson {
+export interface CustomCommandJson {
   name?: string;
   channels: string[];
   message: string;
@@ -55,7 +55,7 @@ interface CustomCommandJson {
   count?: number;
   userLevel?: "broadcaster" | "mod" | "vip" | "everyone";
 }
-interface CustomCommandDataJson {
+export interface CustomCommandDataJson {
   commands: CustomCommandJson[];
 }
 
@@ -65,7 +65,7 @@ interface CustomCommandDataJson {
  * @param logger Logger (used for logging).
  * @param configDir The directory in which all configurations are contained.
  */
-const main = async (logger: Logger, configDir: string) => {
+export const main = async (logger: Logger, configDir: string) => {
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 
