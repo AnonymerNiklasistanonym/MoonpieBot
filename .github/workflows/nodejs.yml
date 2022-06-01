@@ -111,6 +111,9 @@ jobs:
       run: npm ci
     - name: Create documentation
       run: npm run docs
+    - run: |
+        mkdir -p ./docs/res/icons
+        cp res/icons/moonpiebot.png ./docs/res/icons/
     - name: Deploy to GitHub Pages
       # Only deploy the website when pushing on the main branch
       if: github.ref == 'refs/heads/main'
