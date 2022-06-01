@@ -2,6 +2,7 @@
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
+  logTwitchMessageCommandDetected,
   logTwitchMessageCommandReply,
 } from "../commands";
 import { parseMessage } from "./parseMessage";
@@ -11,19 +12,15 @@ import type { ApiClient } from "@twurple/api";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 
-const logDetectedCommand = (
-  logger: Logger,
-  tags: ChatUserstate,
-  command: string
-) => {
-  logger.log({
-    level: "debug",
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    message: `Detected command '${command}' by ${tags?.username} in message ${tags?.id}`,
-    section: "twitchClient",
-    subsection: "customCommand",
-  });
-};
+/**
+ * The logging ID of this command.
+ */
+const LOG_ID_COMMAND_CUSTOM_COMMAND = "custom_command";
+
+/**
+ * The logging ID of this module.
+ */
+const LOG_ID_MODULE_CUSTOM_COMMAND = "custom_command";
 
 export const checkCustomCommand = async (
   client: Client,
@@ -79,11 +76,15 @@ export const checkCustomCommand = async (
     return false;
   }
 
-  logDetectedCommand(
+  logTwitchMessageCommandDetected(
     logger,
-    tags,
-    `!customCommand ${commandName ? commandName : regex.toString()}`
+    tags.id,
+    [tags.username ? `#${tags.username}` : "undefined", message],
+    LOG_ID_COMMAND_CUSTOM_COMMAND,
+    commandName ? commandName : regex.toString(),
+    LOG_ID_MODULE_CUSTOM_COMMAND
   );
+
   if (channels.find((a) => a === channel)) {
     const parsedMessage = await parseMessage(
       messageCommand,
