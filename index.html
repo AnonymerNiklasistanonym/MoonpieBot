@@ -29,6 +29,7 @@
 <li><a href="#tests">Tests</a></li>
 <li><a href="#configuration-files">Configuration files</a></li>
 <li><a href="#how-to-handle-versions">How to handle versions</a></li>
+<li><a href="#documentation">Documentation</a></li>
 </ul>
 </li>
 <li><a href="#credits">Credits</a></li>
@@ -439,6 +440,19 @@ For easily seeing to what a cron string resolves to you can use <a href="https:/
 <p>For releases set the version in <a href="src/version.ts"><code>src/version.ts</code></a> to <code>beta: false</code> and then run <code>npm version patch</code>/<code>minor</code>/<code>major</code>.
 When working on the code after that change set the version in <a href="src/version.ts"><code>src/version.ts</code></a> to <code>beta: true</code> and the version to what is expected to be the next version.</p>
 <p>To push the git tag created by <code>npm</code> run <code>git push origin &lt;tag_name&gt;</code>.</p>
+
+<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
+  <h3>Documentation</h3>
+</a>
+<p>For documentation purposes several plugins can be used:</p>
+<ul>
+<li><p>UML class diagrams for interfaces/classes</p>
+</li>
+<li><p>Mermaid diagrams in comments:</p>
+<pre><code class="language-ts"><span class="hl-4">/**</span><br/><span class="hl-4"> * Documentation comment with mermaid block.</span><br/><span class="hl-4"> *</span><br/><span class="hl-4"> * ```mermaid</span><br/><span class="hl-4"> * graph TB</span><br/><span class="hl-4"> *   mermaid.js --&gt; TypeDoc;</span><br/><span class="hl-4"> * ```</span><br/><span class="hl-4"> *</span><br/><span class="hl-4"> * </span><span class="hl-6">@param</span><span class="hl-4"> </span><span class="hl-7">a</span><span class="hl-4"> A</span><br/><span class="hl-4"> */</span><br/><span class="hl-8">export</span><span class="hl-0"> </span><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-9">name</span>
+</code></pre>
+</li>
+</ul>
 
 <a href="#credits" id="credits" style="color: inherit; text-decoration: none;">
   <h2>Credits</h2>
