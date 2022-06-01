@@ -5,7 +5,7 @@ import {
   errorMessageUserNameUndefined,
   errorMessageUserIdUndefined,
   loggerCommandReply,
-} from "../commandHelper";
+} from "../../commands";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
 import type { Client } from "tmi.js";

@@ -3,7 +3,7 @@ import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
   loggerCommand,
-} from "../commands/commandHelper";
+} from "../commands";
 import { parseMessage } from "./parseMessage";
 import { TwitchBadgeLevels } from "./twitchBadgeParser";
 // Type imports

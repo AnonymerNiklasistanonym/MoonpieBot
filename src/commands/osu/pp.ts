@@ -1,7 +1,7 @@
 // Package imports
 import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
-import { errorMessageIdUndefined, loggerCommandReply } from "../commandHelper";
+import { errorMessageIdUndefined, loggerCommandReply } from "../../commands";
 import { mapUserToStr } from "../../other/osuStringBuilder";
 import {
   errorMessageOsuApiCredentialsUndefined,

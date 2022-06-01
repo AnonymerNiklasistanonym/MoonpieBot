@@ -4,7 +4,7 @@ import {
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
   loggerCommandReply,
-} from "../commandHelper";
+} from "../../commands";
 import { MoonpieCommands, MOONPIE_COMMAND_ID } from "../moonpie";
 import { secondsToString } from "../../other/timePeriodToString";
 // Type imports

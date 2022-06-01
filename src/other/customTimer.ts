@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import { loggerCommand } from "../commands/commandHelper";
+import { loggerCommand } from "../commands";
 import { parseMessage } from "./parseMessage";
 import type { ApiClient } from "@twurple/api";
 import type { Client } from "tmi.js";

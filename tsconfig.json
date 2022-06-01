@@ -20,6 +20,7 @@
     "typedocOptions": {
         "entryPoints": [
             "src/cli.ts",
+            "src/commands.ts",
             "src/env.ts",
             "src/error.ts",
             "src/index.ts",
@@ -29,7 +30,6 @@
             "src/streamcompanion.ts",
             "src/twitch.ts",
             "src/version.ts",
-            "src/commands/commandHelper.ts",
             "src/commands/moonpie.ts",
             "src/commands/moonpie/about.ts",
             "src/commands/moonpie/claim.ts",

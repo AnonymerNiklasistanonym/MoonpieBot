@@ -9,7 +9,7 @@ import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
   loggerCommand,
-} from "../commandHelper";
+} from "../../commands";
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
 import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { isProcessRunning } from "../../other/processInformation";

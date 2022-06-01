@@ -2,7 +2,7 @@
 import osuApiV2, { GameMode } from "osu-api-v2";
 import { ScoresType } from "osu-api-v2/lib/users/scores";
 // Local imports
-import { errorMessageIdUndefined, loggerCommandReply } from "../commandHelper";
+import { errorMessageIdUndefined, loggerCommandReply } from "../../commands";
 import { mapScoreToStr } from "../../other/osuStringBuilder";
 import {
   errorMessageOsuApiCredentialsUndefined,

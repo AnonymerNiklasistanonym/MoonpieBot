@@ -5,7 +5,7 @@ import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
   loggerCommandReply,
-} from "../commandHelper";
+} from "../../commands";
 import {
   errorMessageOsuApiCredentialsUndefined,
   OsuCommands,
