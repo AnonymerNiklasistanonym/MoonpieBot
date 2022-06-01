@@ -2,7 +2,7 @@
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
-  loggerCommand,
+  logTwitchMessageCommandReply,
 } from "../commands";
 import { parseMessage } from "./parseMessage";
 import { TwitchBadgeLevels } from "./twitchBadgeParser";
@@ -95,15 +95,13 @@ export const checkCustomCommand = async (
       channel
     );
     const sentMessage = await client.say(channel, parsedMessage);
-    loggerCommand(
+
+    logTwitchMessageCommandReply(
       logger,
-      `Successfully replied to message ${tags.id}: '${JSON.stringify(
-        sentMessage
-      )}'`,
-      {
-        commandId:
-          "!customCommand#" + (commandName ? commandName : regex.toString()),
-      }
+      tags.id,
+      sentMessage,
+      "custom_command",
+      commandName ? commandName : regex.toString()
     );
   }
   return true;

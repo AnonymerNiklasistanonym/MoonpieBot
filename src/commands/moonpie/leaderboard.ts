@@ -1,5 +1,5 @@
 import { moonpieDb } from "../../database/moonpieDb";
-import { errorMessageIdUndefined, loggerCommandReply } from "../../commands";
+import { errorMessageIdUndefined, logTwitchMessageCommandReply } from "../../commands";
 import { MoonpieCommands, MOONPIE_COMMAND_ID } from "../moonpie";
 // Type imports
 import type { Client } from "tmi.js";
@@ -40,7 +40,7 @@ export const commandLeaderboard = async (
       : messageLeaderboard;
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,

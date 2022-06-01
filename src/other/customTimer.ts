@@ -1,6 +1,7 @@
 import cron from "node-cron";
-import { loggerCommand } from "../commands";
 import { parseMessage } from "./parseMessage";
+import { logTwitchMessageBroadcast } from "../../src/logging";
+// Type imports
 import type { ApiClient } from "@twurple/api";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -31,11 +32,7 @@ export const registerTimer = (
       )
         .then((parsedMessage) => client.say(channel, parsedMessage))
         .then((sentMessage) => {
-          loggerCommand(
-            logger,
-            `Successfully sent timer message: '${JSON.stringify(sentMessage)}'`,
-            { commandId: "!timer" }
-          );
+          logTwitchMessageBroadcast(logger, sentMessage, "timer");
         })
         .catch(logger.error);
     }

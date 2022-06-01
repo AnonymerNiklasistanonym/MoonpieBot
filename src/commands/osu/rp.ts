@@ -2,7 +2,7 @@
 import osuApiV2, { GameMode } from "osu-api-v2";
 import { ScoresType } from "osu-api-v2/lib/users/scores";
 // Local imports
-import { errorMessageIdUndefined, loggerCommandReply } from "../../commands";
+import { errorMessageIdUndefined, logTwitchMessageCommandReply } from "../../commands";
 import { mapScoreToStr } from "../../other/osuStringBuilder";
 import {
   errorMessageOsuApiCredentialsUndefined,
@@ -81,7 +81,7 @@ export const commandRp = async (
       : "No recent play found";
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,

@@ -4,7 +4,7 @@ import osuApiV2 from "osu-api-v2";
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
-  loggerCommandReply,
+  logTwitchMessageCommandReply,
 } from "../../commands";
 import {
   errorMessageOsuApiCredentialsUndefined,
@@ -176,7 +176,7 @@ export const commandNp = async (
   }
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,

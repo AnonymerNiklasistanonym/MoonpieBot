@@ -1,4 +1,4 @@
-import { errorMessageIdUndefined, loggerCommandReply } from "../../commands";
+import { errorMessageIdUndefined, logTwitchMessageCommandReply } from "../../commands";
 import { MoonpieCommands, MOONPIE_COMMAND_ID } from "../moonpie";
 // Type imports
 import type { Client } from "tmi.js";
@@ -51,7 +51,7 @@ export const commandCommands = async (
     "The following commands are supported: " + commands.join(", ")
   );
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,

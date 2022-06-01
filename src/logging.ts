@@ -2,6 +2,7 @@ import {
   createLogger as createWinstonLogger,
   transports,
   format,
+  Logger,
 } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 import { name } from "./info";
@@ -58,4 +59,50 @@ export const createLogger = (
       service: `${name}`,
     },
   });
+};
+
+export interface LogTwitchMessageOptions {
+  subsection?: string;
+}
+
+export const logTwitchMessage = (
+  logger: Logger,
+  message: string,
+  options?: LogTwitchMessageOptions
+) => {
+  logger.log({
+    level: "debug",
+    message: message,
+    section: "twitch_message",
+    subsection: options?.subsection,
+  });
+};
+
+export const logTwitchMessageReply = (
+  logger: Logger,
+  messageId: string,
+  sentMessage: string[],
+  replyId: string
+) => {
+  logTwitchMessage(
+    logger,
+    `Successfully replied to message ${messageId}: '${JSON.stringify(
+      sentMessage
+    )}'`,
+    { subsection: replyId }
+  );
+};
+
+export const logTwitchMessageBroadcast = (
+  logger: Logger,
+  sentMessage: string[],
+  sourceId: string
+) => {
+  logTwitchMessage(
+    logger,
+    `Successfully sent: '${JSON.stringify(sentMessage)}'`,
+    {
+      subsection: sourceId,
+    }
+  );
 };

@@ -1,7 +1,7 @@
 // Package imports
 import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
-import { errorMessageIdUndefined, loggerCommandReply } from "../../commands";
+import { errorMessageIdUndefined, logTwitchMessageCommandReply } from "../../commands";
 import { mapUserToStr } from "../../other/osuStringBuilder";
 import {
   errorMessageOsuApiCredentialsUndefined,
@@ -73,7 +73,7 @@ export const commandPp = async (
   const message = mapUserToStr(user);
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,

@@ -1,50 +1,19 @@
 import type { Logger } from "winston";
+import { logTwitchMessageReply } from "./logging";
 
-export interface LoggerDatabaseOptions {
-  commandId?: string;
-}
-
-export const loggerCommand = (
-  logger: Logger,
-  message: string,
-  options?: LoggerDatabaseOptions
-) => {
-  logger.log({
-    level: "debug",
-    message: message,
-    section: "command",
-    subsection: options?.commandId,
-  });
-};
-
-export const loggerCommandReply = (
+export const logTwitchMessageCommandReply = (
   logger: Logger,
   messageId: string,
   sentMessage: string[],
   commandId: string,
   subcommandId: string
 ) => {
-  loggerCommand(
+  logTwitchMessageReply(
     logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { commandId: `${commandId}:${subcommandId}` }
+    messageId,
+    sentMessage,
+    `${commandId}:${subcommandId}`
   );
-};
-
-export const loggerCommandError = (
-  logger: Logger,
-  message: string,
-  error: Error,
-  options?: LoggerDatabaseOptions
-) => {
-  logger.log({
-    level: "error",
-    message: `${message}: ${error.message}`,
-    section: "command",
-    subsection: options?.commandId,
-  });
 };
 
 export enum CommandErrorCode {

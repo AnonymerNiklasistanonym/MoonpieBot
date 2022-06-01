@@ -8,10 +8,10 @@ import osuApiV2, {
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
-  loggerCommand,
+  logTwitchMessageCommandReply,
 } from "../../commands";
 import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
-import { errorMessageOsuApiCredentialsUndefined } from "../osu";
+import { errorMessageOsuApiCredentialsUndefined, OSU_COMMAND_ID } from "../osu";
 import { isProcessRunning } from "../../other/processInformation";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
@@ -125,12 +125,12 @@ export const commandBeatmap = async (
   // Send response to Twitch channel and if found to IRC channel
   await Promise.all([
     client.say(channel, message).then((sentMessage) => {
-      loggerCommand(
+      logTwitchMessageCommandReply(
         logger,
-        `Successfully replied to message ${messageId}: '${JSON.stringify(
-          sentMessage
-        )}'`,
-        { commandId: "osuBeatmap" }
+        messageId,
+        sentMessage,
+        OSU_COMMAND_ID,
+        "beatmap"
       );
     }),
     new Promise<void>((resolve, reject) => {
@@ -225,22 +225,26 @@ export const commandSetBeatmapRequests = async (
   }
 
   let message = "";
+  let osuCommandId;
   if (enable) {
     message = "Beatmap requests: On";
+    osuCommandId = "beatmap_requests_on";
   } else {
     message = "Beatmap requests: Off";
+    osuCommandId = "beatmap_requests_off";
     if (customDisableMessage) {
       message += ` (${customDisableMessage})`;
     }
   }
 
   const sentMessage = await client.say(channel, message);
-  loggerCommand(
+
+  logTwitchMessageCommandReply(
     logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { commandId: "osuBeatmapSet" }
+    messageId,
+    sentMessage,
+    OSU_COMMAND_ID,
+    osuCommandId
   );
 };
 
@@ -275,11 +279,11 @@ export const commandBeatmapWhenDisabled = async (
   }
 
   const sentMessage = await client.say(channel, message);
-  loggerCommand(
+  logTwitchMessageCommandReply(
     logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { commandId: "osuBeatmapWhenDisabled" }
+    messageId,
+    sentMessage,
+    OSU_COMMAND_ID,
+    "beatmap_requests_disabled"
   );
 };

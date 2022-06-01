@@ -3,7 +3,7 @@ import {
   errorMessageIdUndefined,
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
-  loggerCommandReply,
+  logTwitchMessageCommandReply,
 } from "../../commands";
 import { MoonpieCommands, MOONPIE_COMMAND_ID } from "../moonpie";
 import { secondsToString } from "../../other/timePeriodToString";
@@ -114,7 +114,7 @@ export const commandClaim = async (
 
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,

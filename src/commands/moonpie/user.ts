@@ -4,7 +4,7 @@ import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
   errorMessageUserIdUndefined,
-  loggerCommandReply,
+  logTwitchMessageCommandReply,
 } from "../../commands";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
@@ -58,7 +58,7 @@ export const commandUserGet = async (
 
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,
@@ -158,7 +158,7 @@ export const commandUserSetCount = async (
 
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,
@@ -209,7 +209,7 @@ export const commandUserDelete = async (
 
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,

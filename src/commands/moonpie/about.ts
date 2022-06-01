@@ -1,6 +1,6 @@
 import { getVersion } from "../../version";
 import { name, sourceCodeUrl } from "../../info";
-import { errorMessageIdUndefined, loggerCommandReply } from "../../commands";
+import { errorMessageIdUndefined, logTwitchMessageCommandReply } from "../../commands";
 import { MoonpieCommands, MOONPIE_COMMAND_ID } from "../moonpie";
 // Type imports
 import type { Client } from "tmi.js";
@@ -27,7 +27,7 @@ export const commandAbout = async (
   const message = `${name} ${getVersion()} (${sourceCodeUrl})`;
   const sentMessage = await client.say(channel, message);
 
-  loggerCommandReply(
+  logTwitchMessageCommandReply(
     logger,
     messageId,
     sentMessage,
