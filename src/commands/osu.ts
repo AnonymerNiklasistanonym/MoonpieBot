@@ -47,28 +47,29 @@ export const errorMessageOsuApiCredentialsUndefined = () => {
 };
 
 /**
- * Regex to recognize the !np command.
+ * Regex to recognize the `!np` command.
  *
  * @example
  * ```text
  * !np $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
-export const regexNp = /^\s*!np(\s*|\s.*)$/i;
+export const regexNp = /^\s*!np(?:\s*|\s.*)$/i;
 
 /**
- * Regex to recognize the !rp command.
+ * Regex to recognize the `!rp` command.
  *
  * @example
  * ```text
  * !rp $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
-export const regexRp = /^\s*!rp(\s*|\s.*)$/i;
+export const regexRp = /^\s*!rp(?:\s*|\s.*)$/i;
 
 /**
- * Regex to recognize the !rp command with a custom supplied osu ID.
- * The first group is the custom osu ID (number).
+ * Regex to recognize the `!rp $OPTIONAL_OSU_USER_ID` command.
+ *
+ * - The first group is the custom osu user ID number.
  *
  * @example
  * ```text
@@ -78,8 +79,9 @@ export const regexRp = /^\s*!rp(\s*|\s.*)$/i;
 export const regexRpCustomId = /^\s*!rp\s+([0-9]+)\s*.*$/i;
 
 /**
- * Regex to recognize the !rp command with a custom supplied osu name.
- * The first group is the custom osu name (string without spaces).
+ * Regex to recognize the `!rp $OPTIONAL_OSU_USER_NAME` command.
+ *
+ * - The first group is the custom osu user name string.
  *
  * @example
  * ```text
@@ -89,18 +91,19 @@ export const regexRpCustomId = /^\s*!rp\s+([0-9]+)\s*.*$/i;
 export const regexRpCustomName = /^\s*!rp\s+(\S+)\s*.*$/i;
 
 /**
- * Regex to recognize the !pp command.
+ * Regex to recognize the `!pp` command.
  *
  * @example
  * ```text
  * !pp $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
-export const regexPp = /^\s*!pp(\s*|\s.*)$/i;
+export const regexPp = /^\s*!pp(?:\s*|\s.*)$/i;
 
 /**
- * Regex to recognize the !pp command with a custom supplied osu ID.
- * The first group is the custom osu ID (number).
+ * Regex to recognize the `!pp $OPTIONAL_OSU_USER_ID` command.
+ *
+ * - The first group is the custom osu ID number.
  *
  * @example
  * ```text
@@ -110,8 +113,9 @@ export const regexPp = /^\s*!pp(\s*|\s.*)$/i;
 export const regexPpCustomId = /^\s*!pp\s+([0-9]+)\s*.*$/i;
 
 /**
- * Regex to recognize the !pp command with a custom supplied osu name.
- * The first group is the custom osu name (string without spaces).
+ * Regex to recognize the `!pp $OPTIONAL_OSU_USER_NAME` command.
+ *
+ * - The first group is the custom osu user name string.
  *
  * @example
  * ```text
@@ -122,7 +126,8 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
 
 /**
  * Regex that matches osu beatmap URLs in any message.
- * The first group is the osu beatmap ID.
+ *
+ * - The first group is the osu beatmap ID number.
  *
  * @example
  * ```text
@@ -132,9 +137,13 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
  * ```text
  * $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587891 $OPTIONAL_TEXT_WITH_SPACES
  * ```
+ * @example
+ * ```text
+ * https://osu.ppy.sh/beatmaps/2587891 https://osu.ppy.sh/beatmaps/2587892 https://osu.ppy.sh/beatmaps/2587893
+ * ```
  */
 export const regexBeatmapUrl =
-  /(?:^|.*?\s)https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))(?:(?:\s|,).*?|$)/gi;
+  /(?:^|.*?\s*)https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))(?:(?:\s|,).*?|$)/gi;
 
 /**
  * Regex to recognize the !osu requests enable command.
