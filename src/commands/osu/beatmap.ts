@@ -35,6 +35,7 @@ import type { OsuApiV2Credentials } from "../osu";
  * @param defaultOsuId Default osu account ID (used for checking for existing
  * scores).
  * @param beatmapId The recognized osu beatmap ID.
+ * @param comment The recognized comment to the beatmap.
  * @param detailedBeatmapInformation Print detailed beatmap information.
  * @param osuIrcBot The osu IRC instance (used for sending requests to osu
  * client using IRC).
@@ -50,6 +51,7 @@ export const commandBeatmap = async (
   osuApiV2Credentials: OsuApiV2Credentials | undefined,
   defaultOsuId: number,
   beatmapId: number,
+  comment: string | undefined,
   detailedBeatmapInformation: undefined | boolean,
   osuIrcBot: (() => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
@@ -167,10 +169,16 @@ export const commandBeatmap = async (
                   osuIrcRequestTarget,
                   `> ${messageRequestDetailedIrc}`
                 );
+                if (comment && comment.trim().length > 0) {
+                  osuIrcBotInstance?.say(
+                    osuIrcRequestTarget,
+                    `> Comment: ${comment.trim()}`
+                  );
+                }
                 if (messageRequestTopScore !== "") {
                   osuIrcBotInstance?.say(
                     osuIrcRequestTarget,
-                    `> ${messageRequestTopScore}`
+                    `> Score: ${messageRequestTopScore}`
                   );
                 }
                 osuIrcBotInstance?.disconnect("", () => {

@@ -8,6 +8,7 @@ import {
   regexMoonpieRemove,
   regexMoonpieSet,
 } from "../../src/commands/moonpie";
+import { regexBeatmapUrl } from "../../src/commands/osu";
 import { regexNowPlaying } from "../../src/commands/osu/np";
 import {
   getMacroArgs,
@@ -312,6 +313,72 @@ describe("regex", () => {
         expect(matches4[1]).to.be.equal("Artist");
         expect(matches4[2]).to.be.equal("Title [TV Size]");
         expect(matches4[3]).to.be.equal("Difficulty");
+      }
+    });
+    it("beatmap detection", () => {
+      const message0 =
+        "https://osu.ppy.sh/beatmaps/2587891 $OPTIONAL_TEXT_WITH_SPACES";
+      const matches0 = message0.match(regexBeatmapUrl);
+      expect(matches0).to.be.not.null;
+      if (matches0 != null) {
+        expect(matches0[1]).to.be.equal("2587891");
+        expect(matches0[2]).to.be.equal(undefined);
+        expect(matches0[3]).to.be.equal("$OPTIONAL_TEXT_WITH_SPACES");
+      }
+      const message1 = "https://osu.ppy.sh/beatmaps/2587891";
+      const matches1 = message1.match(regexBeatmapUrl);
+      expect(matches1).to.be.not.null;
+      if (matches1 != null) {
+        expect(matches1[1]).to.be.equal("2587891");
+        expect(matches1[2]).to.be.equal(undefined);
+        expect(matches1[3]).to.be.equal(undefined);
+      }
+      const message2 = "https://osu.ppy.sh/beatmaps/2587891 ";
+      const matches2 = message2.match(regexBeatmapUrl);
+      expect(matches2).to.be.not.null;
+      if (matches2 != null) {
+        expect(matches2[1]).to.be.equal("2587891");
+        expect(matches2[2]).to.be.equal(undefined);
+        expect(matches2[3]).to.be.equal(undefined);
+      }
+      const message3 =
+        "$OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES";
+      const matches3 = message3.match(regexBeatmapUrl);
+      expect(matches3).to.be.not.null;
+      if (matches3 != null) {
+        expect(matches3[1]).to.be.equal(undefined);
+        expect(matches3[2]).to.be.equal("2554945");
+        expect(matches3[3]).to.be.equal("$OPTIONAL_TEXT_WITH_SPACES");
+      }
+      const message4 =
+        "https://osu.ppy.sh/beatmaps/2587891 https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587892 https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES";
+      const messages4 = message4.split("https").map((a) => `https${a}`);
+      expect(messages4.length).to.be.equal(5);
+      const matches4 = messages4.map((a) => a.match(regexBeatmapUrl));
+      expect(matches4).to.be.not.null;
+      const matches4Array = Array.from(matches4);
+      expect(matches4Array.length).to.be.equal(5);
+      expect(matches4Array[0]).to.be.null;
+      expect(matches4Array[1]).to.be.not.null;
+      if (matches4Array[1] != null) {
+        expect(matches4Array[1][1]).to.be.equal("2587891");
+        expect(matches4Array[1][2]).to.be.equal(undefined);
+        expect(matches4Array[1][3]).to.be.equal(undefined);
+      }
+      if (matches4Array[2] != null) {
+        expect(matches4Array[2][1]).to.be.equal(undefined);
+        expect(matches4Array[2][2]).to.be.equal("2554945");
+        expect(matches4Array[2][3]).to.be.equal("$OPTIONAL_TEXT_WITH_SPACES");
+      }
+      if (matches4Array[3] != null) {
+        expect(matches4Array[3][1]).to.be.equal("2587892");
+        expect(matches4Array[3][2]).to.be.equal(undefined);
+        expect(matches4Array[3][3]).to.be.equal(undefined);
+      }
+      if (matches4Array[4] != null) {
+        expect(matches4Array[4][1]).to.be.equal("2587893");
+        expect(matches4Array[4][2]).to.be.equal(undefined);
+        expect(matches4Array[4][3]).to.be.equal("$OPTIONAL TEXT WITH SPACES");
       }
     });
   });

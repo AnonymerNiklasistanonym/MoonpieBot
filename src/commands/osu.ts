@@ -127,7 +127,9 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
 /**
  * Regex that matches osu beatmap URLs in any message.
  *
- * - The first group is the osu beatmap ID number.
+ * - The first group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmaps/$ID`.
+ * - The second group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmapsets/MAPSETID#osu/$ID`.
+ * - The third group is the optional comment string.
  *
  * @example
  * ```text
@@ -137,13 +139,10 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
  * ```text
  * $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587891 $OPTIONAL_TEXT_WITH_SPACES
  * ```
- * @example
- * ```text
- * https://osu.ppy.sh/beatmaps/2587891 https://osu.ppy.sh/beatmaps/2587892 https://osu.ppy.sh/beatmaps/2587893
- * ```
  */
 export const regexBeatmapUrl =
-  /(?:^|.*?\s*)https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))(?:(?:\s|,).*?|$)/gi;
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))(?:\s+(.+?(?=\s*https|\s*$)))?/i;
 
 /**
  * Regex to recognize the !osu requests enable command.
@@ -311,7 +310,9 @@ export const osuChatHandler = async (
       return;
     }
 
-    if (message.match(regexBeatmapUrl)) {
+    // This match does not match all occurences but at least one
+    // Don't trigger this command when it's a response to someone
+    if (message.match(regexBeatmapUrl) && !message.startsWith("@")) {
       logTwitchMessageCommandDetected(
         logger,
         tags.id,
@@ -330,20 +331,28 @@ export const osuChatHandler = async (
           logger
         );
       } else {
-        for (const match of [...message.matchAll(regexBeatmapUrl)]) {
-          await commandBeatmap(
-            client,
-            channel,
-            tags.id,
-            tags.username,
-            osuApiV2Credentials,
-            osuDefaultId,
-            match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
-            enableOsuBeatmapRequestsDetailed,
-            osuIrcBot,
-            osuIrcRequestTarget,
-            logger
-          );
+        const osuBeatmapUrlBegin = "https://osu.ppy.sh/beatmaps";
+        const possibleBeatmapRequestsMatches = message
+          .split(osuBeatmapUrlBegin)
+          .map((a) => `${osuBeatmapUrlBegin}${a}`)
+          .map((a) => a.match(regexBeatmapUrl));
+        for (const match of [...possibleBeatmapRequestsMatches]) {
+          if (match != null) {
+            await commandBeatmap(
+              client,
+              channel,
+              tags.id,
+              tags.username,
+              osuApiV2Credentials,
+              osuDefaultId,
+              match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
+              match[3],
+              enableOsuBeatmapRequestsDetailed,
+              osuIrcBot,
+              osuIrcRequestTarget,
+              logger
+            );
+          }
         }
       }
       return;
