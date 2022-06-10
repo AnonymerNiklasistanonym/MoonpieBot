@@ -142,7 +142,7 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
  */
 export const regexBeatmapUrl =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))(?:\s+(.+?(?=\s*https|\s*$)))?/i;
+  /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))\s*(?:\s+(.+?))?\s*$/i;
 
 /**
  * Regex to recognize the !osu requests enable command.
