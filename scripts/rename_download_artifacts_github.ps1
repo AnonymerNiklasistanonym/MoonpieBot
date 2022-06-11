@@ -29,14 +29,14 @@ $ArtifactWindows16 = Join-Path $BinaryDir "$ApplicationName-$GitBranch-windows-n
 $ArtifactWindows18 = Join-Path $BinaryDir "$ApplicationName-$GitBranch-windows-node-18.x.zip"
 # Extract binary files from the downloaded artifacts
 $ArtifactWindowsInstallerBinary = Join-Path $BinaryDir "${ApplicationName}_setup.exe"
-$ArtifactWindowsInstaller16BinaryOut = "$ApplicationName-installer-v$CurrentVersion-win64-node16.exe"
-$ArtifactWindowsInstaller18BinaryOut = "$ApplicationName-installer-v$CurrentVersion-win64-node18.exe"
+$ArtifactWindowsInstaller16BinaryOut = "$ApplicationName-installer-v$CurrentVersion-win64-node-16.exe"
+$ArtifactWindowsInstaller18BinaryOut = "$ApplicationName-installer-v$CurrentVersion-win64-node-18.exe"
 $ArtifactWindowsBinary = Join-Path $BinaryDir "$ApplicationName.exe"
-$ArtifactWindows16BinaryOut = "$ApplicationName-v$CurrentVersion-win64-node16.exe"
-$ArtifactWindows18BinaryOut = "$ApplicationName-v$CurrentVersion-win64-node18.exe"
+$ArtifactWindows16BinaryOut = "$ApplicationName-v$CurrentVersion-win64-node-16.exe"
+$ArtifactWindows18BinaryOut = "$ApplicationName-v$CurrentVersion-win64-node-18.exe"
 $ArtifactLinuxBinary = Join-Path $BinaryDir "$ApplicationName"
-$ArtifactLinux16BinaryOut = "$ApplicationName-v$CurrentVersion-linux64-node16"
-$ArtifactLinux18BinaryOut = "$ApplicationName-v$CurrentVersion-linux64-node18"
+$ArtifactLinux16BinaryOut = "$ApplicationName-v$CurrentVersion-linux64-node-16"
+$ArtifactLinux18BinaryOut = "$ApplicationName-v$CurrentVersion-linux64-node-18"
 # Remove old binary files
 Remove-Item (Join-Path $BinaryDir $ArtifactWindowsInstaller16BinaryOut) -ErrorAction Ignore
 Remove-Item (Join-Path $BinaryDir $ArtifactWindowsInstaller18BinaryOut) -ErrorAction Ignore
