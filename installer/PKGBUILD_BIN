@@ -20,7 +20,7 @@ source=("$_applicationname.bin::$url/releases/download/v$pkgver/$_applicationnam
         "$_applicationname.svg::$url/releases/download/v$pkgver/$_applicationname.svg")
 #sha1sums=('SKIP')
 # Run the command 'sha1sum filename' to update them
-sha1sums=('0e4aa1f4ec8d6e3890f976297253711b33b0a8bc'
+sha1sums=('e49f1d23c634477f37969e671e5d445711c7dfdb'
           'edf7e74e76a630f853a3bf81b6eae96dcdf5b294')
 # Don't strip the symbols from the downloaded binary file since this breaks it
 options=(!strip)
