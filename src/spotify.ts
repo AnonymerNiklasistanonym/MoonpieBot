@@ -170,7 +170,9 @@ export const spotifyGetCurrentSongAndRecentlyPlayedSongs = async (
     }
 
     // Refresh the access token
-    await spotifyApi.refreshAccessToken();
+    const response = await spotifyApi.refreshAccessToken();
+    spotifyApi.setAccessToken(response.body.access_token);
+
     // Get the data from Spotify
     const currentlyPlaying = await spotifyApi.getMyCurrentPlayingTrack();
     const recentlyPlayedTracks = await spotifyApi.getMyRecentlyPlayedTracks();
