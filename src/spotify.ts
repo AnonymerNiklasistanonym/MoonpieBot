@@ -157,7 +157,7 @@ export const spotifyGetCurrentSongAndRecentlyPlayedSongs = async (
 ) => {
   try {
     if (spotifyApi.getAccessToken() === undefined) {
-      logger.info({
+      logger.error({
         message: "Spotify access token was undefined",
         section: LOG_ID_MODULE_SPOTIFY,
       });
@@ -170,7 +170,7 @@ export const spotifyGetCurrentSongAndRecentlyPlayedSongs = async (
     const currentlyPlaying = await spotifyApi.getMyCurrentPlayingTrack();
     const recentlyPlayedTracks = await spotifyApi.getMyRecentlyPlayedTracks();
 
-    logger.info({
+    logger.debug({
       message: "Spotify data was successfully acquired",
       section: LOG_ID_MODULE_SPOTIFY,
     });
