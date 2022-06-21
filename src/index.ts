@@ -33,6 +33,9 @@ import { CliVariable, getCliVariableDocumentation } from "./cli";
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
+import { setupSpotifyAuthentication } from "./spotify";
+import SpotifyWebApi from "spotify-web-api-node";
+import { spotifyChatHandler } from "./commands/spotify";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -75,6 +78,26 @@ export const main = async (logger: Logger, configDir: string) => {
     configDir,
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
+
+  const spotifyApiClientId = getEnvVariableValueOrCustomDefault(
+    EnvVariable.SPOTIFY_API_CLIENT_ID,
+    undefined
+  );
+  const spotifyApiClientSecret = getEnvVariableValueOrCustomDefault(
+    EnvVariable.SPOTIFY_API_CLIENT_SECRET,
+    undefined
+  );
+  let spotifyWebApi: undefined | SpotifyWebApi = undefined;
+  if (
+    spotifyApiClientId !== undefined &&
+    spotifyApiClientSecret !== undefined
+  ) {
+    spotifyWebApi = await setupSpotifyAuthentication(
+      spotifyApiClientId,
+      spotifyApiClientSecret,
+      logger
+    );
+  }
 
   const osuApiClientId = getEnvVariableValueOrCustomDefault(
     EnvVariable.OSU_API_CLIENT_ID,
@@ -365,6 +388,30 @@ export const main = async (logger: Logger, configDir: string) => {
             }Osu StreamCompanion Error: ${errorInfo.message}${
               errorInfo.code ? " (" + errorInfo.code + ")" : ""
             }`
+          )
+          .catch(logger.error);
+      });
+    }
+
+    if (spotifyWebApi !== undefined) {
+      spotifyChatHandler(
+        twitchClient,
+        channel,
+        tags,
+        message,
+        spotifyWebApi,
+        undefined,
+        logger
+      ).catch((err) => {
+        logger.error(err);
+        // When the chat handler throws an error write the error message in chat
+        const errorInfo = err as ErrorWithCode;
+        twitchClient
+          .say(
+            channel,
+            `${tags.username ? "@" + tags.username + " " : ""}Spotify Error: ${
+              errorInfo.message
+            }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
           )
           .catch(logger.error);
       });
