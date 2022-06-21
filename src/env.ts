@@ -335,7 +335,7 @@ export const getEnvVariableValueInformation = (
         censor: true,
       };
 
-    case EnvVariable.TWITCH_API_CLIENT_ID:
+    case EnvVariable.TWITCH_API_ACCESS_TOKEN:
       return {
         example: "abcdefghijklmnop",
         description:
@@ -343,10 +343,11 @@ export const getEnvVariableValueInformation = (
         block: EnvVariableBlocks.TWITCH_API,
         censor: true,
       };
-    case EnvVariable.TWITCH_API_ACCESS_TOKEN:
+    case EnvVariable.TWITCH_API_CLIENT_ID:
       return {
         example: "abcdefghijklmnop",
-        description: `Check the description of ${envVariablePrefix}${EnvVariable.TWITCH_API_CLIENT_ID}.`,
+        description: `Check the description of ${envVariablePrefix}${EnvVariable.TWITCH_API_ACCESS_TOKEN}.`,
+
         block: EnvVariableBlocks.TWITCH_API,
         censor: true,
       };
