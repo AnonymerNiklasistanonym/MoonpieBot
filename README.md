@@ -67,6 +67,18 @@ It is also possible that only the `!np` command is enabled when a StreamCompanio
 
 *Everything is currently optimized and written for osu! standard which means you need to open an issue if you need other behaviour!*
 
+### Optional: Spotify
+
+Given a Spotify client ID/secret the bot can additionally fetch some Spotify related information.
+
+After a successful authentication (the bot will automatically open a website for the authentication) you will be able to copy the access and refresh token so next time the authentication does not necessarily need to be repeated in the browser.
+
+| Command | Permissions | Description |
+| ------ | -- | -------- |
+| `!song` | everyone | Get the currently playing song title/artist and Album if not a single as well as the previous 2 songs |
+
+Every command can be optionally disabled.
+
 ### Optional: Custom commands/timers
 
 A file called `customCommands.json` can be provided that enables to write custom commands of the style:
