@@ -77,16 +77,21 @@ export const setupSpotifyAuthentication = async (
             })
             .then(() => {
               // Tell user that the page can now be closed and clear the private tokens from the URL
+              const accessToken = spotifyApi.getAccessToken();
+              const refreshToken = spotifyApi.getRefreshToken();
               res.writeHead(200);
               res.end(
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 `<html><style>.spoiler{
                   color: black;
                   background-color:black;
                 }
                 .spoiler:hover{
                   color: white;
-                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>To not authenticate again you can copy the following access and refresh token:</p><br><p>Access Token: <span class="spoiler">${spotifyApi.getAccessToken()}</span></p><br><p>Refresh Token: <span class="spoiler">${spotifyApi.getRefreshToken()}</span></p></body><script>window.history.replaceState({}, document.title, "/");</script></html>`
+                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>To not authenticate again you can copy the following access and refresh token:</p><br><p>Access Token: <span class="spoiler">${
+                  accessToken ? accessToken : "ERROR"
+                }</span></p><br><p>Refresh Token: <span class="spoiler">${
+                  refreshToken ? refreshToken : "ERROR"
+                }</span></p></body><script>window.history.replaceState({}, document.title, "/");</script></html>`
               );
               logger.info({
                 message: "Spotify API connection was successful",
