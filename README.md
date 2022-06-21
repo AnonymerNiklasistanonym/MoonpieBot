@@ -79,7 +79,7 @@ After a successful authentication (the bot will automatically open a website for
 
 | Command | Permissions | Description |
 | ------ | -- | -------- |
-| `!song` | everyone | Get the currently playing song title/artist and Album if not a single as well as the previous 2 songs |
+| `!song` | everyone | Get the currently playing song title/artist and album (if not a single) as well as the same information about the 2 previously played songs |
 
 Every command can be optionally disabled.
 

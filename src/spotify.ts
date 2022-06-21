@@ -88,7 +88,7 @@ export const setupSpotifyAuthentication = async (
                 }
                 .spoiler:hover{
                   color: white;
-                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>To not authenticate again you can copy the following access and refresh token:</p><br><p>Refresh Token: <span class="spoiler">${
+                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>For a permanent authentication you can copy the following refresh token:</p><br><p>Refresh Token: <span class="spoiler">${
                   refreshToken ? refreshToken : "ERROR"
                 }</span></p></body><script>window.history.replaceState({}, document.title, "/");</script></html>`
               );
