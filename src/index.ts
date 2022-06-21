@@ -87,6 +87,14 @@ export const main = async (logger: Logger, configDir: string) => {
     EnvVariable.SPOTIFY_API_CLIENT_SECRET,
     undefined
   );
+  const spotifyApiAccessToken = getEnvVariableValueOrCustomDefault(
+    EnvVariable.SPOTIFY_API_ACCESS_TOKEN,
+    undefined
+  );
+  const spotifyApiRefreshToken = getEnvVariableValueOrCustomDefault(
+    EnvVariable.SPOTIFY_API_REFRESH_TOKEN,
+    undefined
+  );
   let spotifyWebApi: undefined | SpotifyWebApi = undefined;
   if (
     spotifyApiClientId !== undefined &&
@@ -95,6 +103,8 @@ export const main = async (logger: Logger, configDir: string) => {
     spotifyWebApi = await setupSpotifyAuthentication(
       spotifyApiClientId,
       spotifyApiClientSecret,
+      spotifyApiAccessToken,
+      spotifyApiRefreshToken,
       logger
     );
   }

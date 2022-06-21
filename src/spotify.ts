@@ -9,27 +9,36 @@ import type { Logger } from "winston";
  */
 const LOG_ID_MODULE_SPOTIFY = "spotify";
 
+const REDIRECT_URL = "http://localhost";
+const REDIRECT_PORT = 8888;
+
 /**
  * Get current song and recently played songs on Spotify.
  *
  * @param spotifyClientId The Spotify client ID.
  * @param spotifyClientSecret The Spotify client secret.
+ * @param spotifyAccessToken The access token from a previous authentication.
+ * @param spotifyRefreshToken The refresh token from a previous authentication.
  * @param logger Used for logging.
  * @returns Currently playing and recently played songs data.
  */
 export const setupSpotifyAuthentication = async (
   spotifyClientId: string,
   spotifyClientSecret: string,
+  spotifyAccessToken: string | undefined,
+  spotifyRefreshToken: string | undefined,
   logger: Logger
 ) => {
-  //const redirectCode = "MQCbtKe23z7YzzS44KzZzZgjQa621hgSzHN";
-  const redirectPort = 8888;
-
   const spotifyApi = new SpotifyWebApi({
     clientId: spotifyClientId,
     clientSecret: spotifyClientSecret,
-    redirectUri: `http://localhost:${redirectPort}`,
+    redirectUri: `${REDIRECT_URL}:${REDIRECT_PORT}`,
   });
+
+  if (spotifyAccessToken !== undefined && spotifyRefreshToken !== undefined) {
+    spotifyApi.setAccessToken(spotifyAccessToken);
+    spotifyApi.setRefreshToken(spotifyRefreshToken);
+  }
 
   const server = http.createServer((req, res) => {
     logger.debug({
@@ -43,25 +52,16 @@ export const setupSpotifyAuthentication = async (
       section: LOG_ID_MODULE_SPOTIFY,
     });
     if (req.url && req.headers.host) {
-      res.writeHead(200);
       if (req.url.endsWith("/")) {
+        res.writeHead(200);
         res.end(
           `<html><body></body><script>window.location = window.location.href.replace('#', '?');</script></html>`
         );
       } else {
         const url = new URL(req.headers.host + req.url);
-        console.log(url, url.searchParams);
-        const accessToken = url.searchParams.get("access_token");
-        if (accessToken != null) {
-          logger.info({
-            message: "Spotify API redirect contained access token",
-            section: LOG_ID_MODULE_SPOTIFY,
-          });
-          spotifyApi.setAccessToken(accessToken);
-        }
         const codeToken = url.searchParams.get("code");
         if (codeToken != null) {
-          logger.info({
+          logger.debug({
             message: "Spotify API redirect contained code token",
             section: LOG_ID_MODULE_SPOTIFY,
           });
@@ -75,11 +75,38 @@ export const setupSpotifyAuthentication = async (
                 codeGrantAuthorization.body["refresh_token"]
               );
             })
-            .catch(console.error);
+            .then(() => {
+              // Tell user that the page can now be closed and clear the private tokens from the URL
+              res.writeHead(200);
+              res.end(
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                `<html><style>.spoiler{
+                  color: black;
+                  background-color:black;
+                }
+                .spoiler:hover{
+                  color: white;
+                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>To not authenticate again you can copy the following access and refresh token:</p><br><p>Access Token: <span class="spoiler">${spotifyApi.getAccessToken()}</span></p><br><p>Refresh Token: <span class="spoiler">${spotifyApi.getRefreshToken()}</span></p></body><script>window.history.replaceState({}, document.title, "/");</script></html>`
+              );
+              logger.info({
+                message: "Spotify API connection was successful",
+                section: LOG_ID_MODULE_SPOTIFY,
+              });
+            })
+            .catch((err) => {
+              res.writeHead(403);
+              res.end(
+                `<html><body>Spotify API connection was not successful: ${
+                  (err as Error).message
+                }</body></html>`
+              );
+            });
+        } else {
+          res.writeHead(403);
+          res.end(
+            `<html><body>Spotify API connection was not successful: Code was not found!</body></html>`
+          );
         }
-        res.end(
-          `<html><body>Spotify API connection was successful. You can now close this window.</body></html>`
-        );
       }
     } else {
       res.writeHead(403);
@@ -87,7 +114,7 @@ export const setupSpotifyAuthentication = async (
     }
   });
   await new Promise<void>((resolve) => {
-    server.listen(redirectPort, undefined, () => {
+    server.listen(REDIRECT_PORT, undefined, () => {
       logger.info({
         message: "Server started",
         section: LOG_ID_MODULE_SPOTIFY,
@@ -100,16 +127,18 @@ export const setupSpotifyAuthentication = async (
   let url = SPOTIFY_API_URL + "/authorize";
   url += "?response_type=code";
   url +=
-    "&redirect_uri=" + encodeURIComponent(`http://localhost:${redirectPort}`);
+    "&redirect_uri=" + encodeURIComponent(`${REDIRECT_URL}:${REDIRECT_PORT}`);
   url += "&client_id=" + encodeURIComponent(spotifyClientId);
   url +=
     "&scope=" +
     encodeURIComponent("user-read-currently-playing user-read-recently-played");
 
-  // Request authentication
-  const response = await fetch(url);
-  if (response.status === 200) {
-    await open(response.url);
+  // Request authentication if no access token is found
+  if (spotifyApi.getAccessToken() === undefined) {
+    const response = await fetch(url);
+    if (response.status === 200) {
+      await open(response.url);
+    }
   }
 
   return spotifyApi;

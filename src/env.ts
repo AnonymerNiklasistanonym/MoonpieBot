@@ -41,6 +41,8 @@ export enum EnvVariable {
   OSU_STREAM_COMPANION_URL = "OSU_STREAM_COMPANION_URL",
   SPOTIFY_API_CLIENT_ID = "SPOTIFY_API_CLIENT_ID",
   SPOTIFY_API_CLIENT_SECRET = "SPOTIFY_API_CLIENT_SECRET",
+  SPOTIFY_API_ACCESS_TOKEN = "SPOTIFY_API_ACCESS_TOKEN",
+  SPOTIFY_API_REFRESH_TOKEN = "SPOTIFY_API_REFRESH_TOKEN",
   SPOTIFY_ENABLE_COMMANDS = "SPOTIFY_ENABLE_COMMANDS",
   TWITCH_API_ACCESS_TOKEN = "TWITCH_API_ACCESS_TOKEN",
   TWITCH_API_CLIENT_ID = "TWITCH_API_CLIENT_ID",
@@ -323,6 +325,20 @@ export const getEnvVariableValueInformation = (
       return {
         example: "abcdefghijklmnop",
         description: `Check the description of ${envVariablePrefix}${EnvVariable.SPOTIFY_API_CLIENT_ID}.`,
+        block: EnvVariableBlocks.SPOTIFY_API,
+        censor: true,
+      };
+    case EnvVariable.SPOTIFY_API_ACCESS_TOKEN:
+      return {
+        example: "abcdefghijklmnop",
+        description: `You can get this token and the refresh token by authenticating once successfully using the ${envVariablePrefix}${EnvVariable.SPOTIFY_API_CLIENT_ID} and ${envVariablePrefix}${EnvVariable.SPOTIFY_API_CLIENT_SECRET}. After the successful authentication via a website that will open you can copy the access and refresh token from there.`,
+        block: EnvVariableBlocks.SPOTIFY_API,
+        censor: true,
+      };
+    case EnvVariable.SPOTIFY_API_REFRESH_TOKEN:
+      return {
+        example: "abcdefghijklmnop",
+        description: `Check the description of ${envVariablePrefix}${EnvVariable.SPOTIFY_API_ACCESS_TOKEN}.`,
         block: EnvVariableBlocks.SPOTIFY_API,
         censor: true,
       };
