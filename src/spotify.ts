@@ -17,7 +17,6 @@ const REDIRECT_PORT = 8888;
  *
  * @param spotifyClientId The Spotify client ID.
  * @param spotifyClientSecret The Spotify client secret.
- * @param spotifyAccessToken The access token from a previous authentication.
  * @param spotifyRefreshToken The refresh token from a previous authentication.
  * @param logger Used for logging.
  * @returns Currently playing and recently played songs data.
@@ -25,7 +24,6 @@ const REDIRECT_PORT = 8888;
 export const setupSpotifyAuthentication = async (
   spotifyClientId: string,
   spotifyClientSecret: string,
-  spotifyAccessToken: string | undefined,
   spotifyRefreshToken: string | undefined,
   logger: Logger
 ) => {
@@ -35,11 +33,15 @@ export const setupSpotifyAuthentication = async (
     redirectUri: `${REDIRECT_URL}:${REDIRECT_PORT}`,
   });
 
-  if (spotifyAccessToken !== undefined && spotifyRefreshToken !== undefined) {
-    spotifyApi.setAccessToken(spotifyAccessToken);
+  if (spotifyRefreshToken !== undefined) {
     spotifyApi.setRefreshToken(spotifyRefreshToken);
+    // Refresh the access token
+    const response = await spotifyApi.refreshAccessToken();
+    spotifyApi.setAccessToken(response.body.access_token);
+    return spotifyApi;
   }
 
+  // If no refresh token is found start authentication process
   const server = http.createServer((req, res) => {
     logger.debug({
       message: `Spotify API redirect was detected ${JSON.stringify({
@@ -77,7 +79,6 @@ export const setupSpotifyAuthentication = async (
             })
             .then(() => {
               // Tell user that the page can now be closed and clear the private tokens from the URL
-              const accessToken = spotifyApi.getAccessToken();
               const refreshToken = spotifyApi.getRefreshToken();
               res.writeHead(200);
               res.end(
@@ -87,9 +88,7 @@ export const setupSpotifyAuthentication = async (
                 }
                 .spoiler:hover{
                   color: white;
-                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>To not authenticate again you can copy the following access and refresh token:</p><br><p>Access Token: <span class="spoiler">${
-                  accessToken ? accessToken : "ERROR"
-                }</span></p><br><p>Refresh Token: <span class="spoiler">${
+                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>To not authenticate again you can copy the following access and refresh token:</p><br><p>Refresh Token: <span class="spoiler">${
                   refreshToken ? refreshToken : "ERROR"
                 }</span></p></body><script>window.history.replaceState({}, document.title, "/");</script></html>`
               );
@@ -138,8 +137,8 @@ export const setupSpotifyAuthentication = async (
     "&scope=" +
     encodeURIComponent("user-read-currently-playing user-read-recently-played");
 
-  // Request authentication if no access token is found
-  if (spotifyApi.getAccessToken() === undefined) {
+  // Request authentication if no refresh token is found
+  if (spotifyApi.getRefreshToken() === undefined) {
     const response = await fetch(url);
     if (response.status === 200) {
       await open(response.url);
@@ -161,9 +160,9 @@ export const spotifyGetCurrentSongAndRecentlyPlayedSongs = async (
   logger: Logger
 ) => {
   try {
-    if (spotifyApi.getAccessToken() === undefined) {
+    if (spotifyApi.getRefreshToken() === undefined) {
       logger.error({
-        message: "Spotify access token was undefined",
+        message: "Spotify refresh token was undefined",
         section: LOG_ID_MODULE_SPOTIFY,
       });
       return undefined;
@@ -172,6 +171,14 @@ export const spotifyGetCurrentSongAndRecentlyPlayedSongs = async (
     // Refresh the access token
     const response = await spotifyApi.refreshAccessToken();
     spotifyApi.setAccessToken(response.body.access_token);
+
+    if (spotifyApi.getAccessToken() === undefined) {
+      logger.error({
+        message: "Spotify access token was undefined",
+        section: LOG_ID_MODULE_SPOTIFY,
+      });
+      return undefined;
+    }
 
     // Get the data from Spotify
     const currentlyPlaying = await spotifyApi.getMyCurrentPlayingTrack();
