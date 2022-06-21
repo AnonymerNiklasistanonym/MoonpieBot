@@ -4,10 +4,16 @@
 name: Node.js CI
 
 on:
+  # Run CI when a new version tag is created
+  create:
+    tags:
+      - v*
+  # Run CI when a new commit is pushed
   push:
-    branches: [ main, binary-release ]
+    branches: [ main, dev ]
+  # Run CI when a new pull request is created
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   build-linux:
