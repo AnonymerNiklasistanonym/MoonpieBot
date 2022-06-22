@@ -46,6 +46,11 @@ describe("messageParser", () => {
       const message0 = "geo played on stream $(TWITCH_GAME=geo)";
       const output0 = await messageParser(message0, plugins, new Map());
       expect(output0).to.be.equal("geo played on stream osu!");
+
+      const macros: Macros = new Map([["USER", new Map([["NAME", "geo"]])]]);
+      const message1 = "geo played on stream $(TWITCH_GAME=%USER:NAME%)";
+      const output1 = await messageParser(message1, plugins, macros);
+      expect(output1).to.be.equal("geo played on stream osu!");
     });
     it("plugins that return macros", async () => {
       const plugins: Plugins = new Map();
