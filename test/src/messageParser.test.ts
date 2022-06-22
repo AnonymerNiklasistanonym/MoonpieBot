@@ -33,7 +33,7 @@ describe("messageParser", () => {
     });
   });
   context("plugins", () => {
-    it("simple plugins", async () => {
+    it("plugins that return text", async () => {
       const plugins: Plugins = new Map();
       // eslint-disable-next-line @typescript-eslint/require-await
       plugins.set("TWITCH_GAME", async (value?: string) => {
@@ -44,6 +44,21 @@ describe("messageParser", () => {
         }
       });
       const message0 = "geo played on stream $(TWITCH_GAME=geo)";
+      const output0 = await messageParser(message0, plugins, new Map());
+      expect(output0).to.be.equal("geo played on stream osu!");
+    });
+    it("plugins that return macros", async () => {
+      const plugins: Plugins = new Map();
+      // eslint-disable-next-line @typescript-eslint/require-await
+      plugins.set("TWITCH_GAME", async (value?: string) => {
+        if (value === "geo") {
+          return [["GEO", "osu!"]];
+        } else {
+          throw Error;
+        }
+      });
+      const message0 =
+        "geo played on stream $(TWITCH_GAME=geo|%TWITCH_GAME:GEO%)";
       const output0 = await messageParser(message0, plugins, new Map());
       expect(output0).to.be.equal("geo played on stream osu!");
     });

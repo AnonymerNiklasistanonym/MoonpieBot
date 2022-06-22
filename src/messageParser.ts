@@ -142,25 +142,60 @@ export const createParseTree = (messageString: string) => {
       case ParseStateHelper.NOTHING:
         break;
       case ParseStateHelper.MACRO_WAS_OPENED:
-        macroName = "";
-        macroValue = undefined;
-        macroContent = undefined;
-        // Add current content to root node
-        parseTreeNode.type = "children";
-        parseTreeNode.content = undefined;
-        if (parseTreeNode.children === undefined) {
-          // TODO What about the old content though
-          parseTreeNode.children = [];
+        parseStateHelper = ParseStateHelper.NOTHING;
+        // If a new macro is opened 2 things need to be done:
+        // 1. Determine if the macro was opened on depth 0
+        //    In that case we need to convert the root node to a children
+        //    node if not already and add the current content as child node
+        // 2. If the macro was not opened on depth 0 but higher
+        //    In that case we collect all content as macro content text and then
+        //    when we reach depth 0 again we recursively call this method with
+        //    that string again.
+        if (macroDepth === 1) {
+          if (
+            parseTreeNode.type === "text" &&
+            parseTreeNode.content !== undefined &&
+            parseTreeNode.content.length > 0
+          ) {
+            parseTreeNode.type = "children";
+            parseTreeNode.children = [
+              {
+                type: "text",
+                content: parseTreeNode.content,
+                originalString: parseTreeNode.originalString,
+              },
+            ];
+            parseTreeNode.content = undefined;
+          }
+          parseTreeNode.type = "children";
+          parseTreeNode.content = undefined;
+          if (parseTreeNode.children === undefined) {
+            parseTreeNode.children = [];
+          }
+          if (content.length > 0) {
+            parseTreeNode.children.push({
+              type: "text",
+              content,
+              originalString: originalString.slice(0, -2),
+            });
+            originalString = "$(";
+            content = "";
+          }
+        } else {
+          macroName = "";
+          macroValue = undefined;
         }
-        parseTreeNode.children.push({
-          type: "text",
-          content: `${content}`,
-          originalString: `${content}`,
-          children: [],
-        });
         break;
       case ParseStateHelper.MACRO_WAS_CLOSED:
         parseStateHelper = ParseStateHelper.NOTHING;
+        // If a macro is closed 2 things need to be done:
+        // 1. Determine if the macro was closed on depth 0
+        //    In that case we need to convert the root node to a children
+        //    node if not already and add the current macro as child node
+        // 2. If the macro was not closed on depth 0 but higher
+        //    In that case we collect all content as macro content text and then
+        //    when we reach depth 0 again we recursively call this method with
+        //    that string again.
         if (macroDepth === 0) {
           // If its not a macro inside macro content parse as text now
           parseState = ParseState.TEXT;
