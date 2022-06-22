@@ -306,9 +306,12 @@ export const parseTreeNode = async (
       if (treeNode.children === undefined) {
         throw Error(`Parse tree children were undefined`);
       }
-      return treeNode.children
-        .map((a) => parseTreeNode(a, plugins, macros))
-        .join("");
+      // eslint-disable-next-line no-case-declarations
+      let output = "";
+      for (const childNode of treeNode.children) {
+        output += await parseTreeNode(childNode, plugins, macros);
+      }
+      return output;
   }
 };
 
@@ -321,5 +324,5 @@ export const messageParser = async (
   const parseTreeNodeRoot = createParseTree(messageString);
   console.log(JSON.stringify(parseTreeNodeRoot));
   // 2. Parse parse tree from top down
-  return parseTreeNode(parseTreeNodeRoot, plugins, macros);
+  return await parseTreeNode(parseTreeNodeRoot, plugins, macros);
 };
