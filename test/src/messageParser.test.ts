@@ -51,6 +51,15 @@ describe("messageParser", () => {
       const message1 = "geo played on stream $(TWITCH_GAME=%USER:NAME%)";
       const output1 = await messageParser(message1, plugins, macros);
       expect(output1).to.be.equal("geo played on stream osu!");
+
+      const plugins2: Plugins = new Map();
+      // eslint-disable-next-line @typescript-eslint/require-await,@typescript-eslint/no-unused-vars
+      plugins2.set("COUNT", async (_value?: string) => {
+        return "10";
+      });
+      const message2 = "this command was called $(COUNT) times";
+      const output2 = await messageParser(message2, plugins2, new Map());
+      expect(output2).to.be.equal("this command was called 10 times");
     });
     it("plugins that return macros", async () => {
       const plugins: Plugins = new Map();
@@ -66,6 +75,25 @@ describe("messageParser", () => {
         "geo played on stream $(TWITCH_GAME=geo|%TWITCH_GAME:GEO%)";
       const output0 = await messageParser(message0, plugins, new Map());
       expect(output0).to.be.equal("geo played on stream osu!");
+    });
+    it("plugins within plugins", async () => {
+      const plugins: Plugins = new Map();
+      // eslint-disable-next-line @typescript-eslint/require-await
+      plugins.set("TWITCH_GAME", async (value?: string) => {
+        if (value === "geo") {
+          return [["GEO", "osu!"]];
+        } else if (value === "lune") {
+          return [["LUNE", "osu!"]];
+        } else {
+          throw Error;
+        }
+      });
+      const message0 =
+        "geo played on stream $(TWITCH_GAME=geo|%TWITCH_GAME:GEO% and lune played $(TWITCH_GAME=lune|%TWITCH_GAME:LUNE%))";
+      const output0 = await messageParser(message0, plugins, new Map());
+      expect(output0).to.be.equal(
+        "geo played on stream osu! and lune played osu!"
+      );
     });
   });
 });
