@@ -86,10 +86,10 @@ enum ParseStateHelper {
  * @returns Parse tree of the message string.
  */
 export const createParseTree = (messageString: string, pluginDepth = 0) => {
-  console.log(`Generate parse tree of '${messageString}'`);
-  if (pluginDepth > 0) {
-    console.log(`Early exit if a plugin close is found (${pluginDepth})`);
-  }
+  //console.log(`Generate parse tree of '${messageString}'`);
+  //if (pluginDepth > 0) {
+  //  console.log(`Early exit if a plugin close is found (${pluginDepth})`);
+  //}
   // Per default the root node is a children node to make the code much less
   // complex
   /**
@@ -140,7 +140,7 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
     // If for example a substring was read via a recursive call be able to
     // skip this substring while still adding it to the original string
     if (skipCharacterCount > 0) {
-      console.log(`Skip the character '${character}'`);
+      //console.log(`Skip the character '${character}'`);
       skipCharacterCount--;
       continue;
     }
@@ -158,9 +158,9 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
         } else if (character === ")" && pluginDepth > 0) {
           // 3. If the plugin close symbol is detected and this method call was
           //    a recursive call
-          console.log(
-            `Early exit parsing because the character '${character}' at depth ${pluginDepth} indicates the closing of a plugin content scope for '${currentChildNode.originalString}'`
-          );
+          //console.log(
+          //  `Early exit parsing because the character '${character}' at depth ${pluginDepth} indicates the closing of a plugin content scope for '${currentChildNode.originalString}'`
+          //);
           // Early exit parsing when text is inside a plugin that is closed
           earlyExitBecausePluginClosed = true;
         } else {
@@ -206,6 +206,7 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
         }
         break;
       case ParseState.PLUGIN_CONTENT:
+        //console.log(`Parse plugin Content '${character}'`);
         if (character === ")") {
           parseStateHelper = ParseStateHelper.PLUGIN_WAS_CLOSED;
         } else {
@@ -217,17 +218,17 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
         }
         break;
     }
-    console.log({
-      first: true,
-      character,
-      parseState,
-      parseStateHelper,
-      pluginDepth,
-      messageString,
-      rootNode: JSON.stringify(rootNode),
-      currentChildNode: JSON.stringify(currentChildNode),
-      earlyExitBecausePluginClosed,
-    });
+    //console.log({
+    //  first: true,
+    //  character,
+    //  parseState,
+    //  parseStateHelper,
+    //  pluginDepth,
+    //  messageString,
+    //  rootNode: JSON.stringify(rootNode),
+    //  currentChildNode: JSON.stringify(currentChildNode),
+    //  earlyExitBecausePluginClosed,
+    //});
     // Certain routines need to be done for multiple states which is why there
     // is an additional parse state helper
     switch (parseStateHelper) {
@@ -276,13 +277,13 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
           messageString.slice(lengthOfReadSubstring),
           pluginDepth
         );
-        console.log(
-          `Determined pluginContent from '${messageString.slice(
-            lengthOfReadSubstring
-          )}' as '${
-            currentChildNode.pluginContent.originalString
-          }': ${JSON.stringify(currentChildNode.pluginContent)}`
-        );
+        //console.log(
+        //  `Determined pluginContent from '${messageString.slice(
+        //    lengthOfReadSubstring
+        //  )}' as '${
+        //    currentChildNode.pluginContent.originalString
+        //  }': ${JSON.stringify(currentChildNode.pluginContent)}`
+        //);
         skipCharacterCount +=
           currentChildNode.pluginContent.originalString.length;
         parseState = ParseState.PLUGIN_CONTENT;
@@ -304,21 +305,21 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
         };
         break;
     }
-    console.log({
-      second: true,
-      character,
-      parseState,
-      parseStateHelper,
-      pluginDepth,
-      messageString,
-      rootNode: JSON.stringify(rootNode),
-      currentChildNode: JSON.stringify(currentChildNode),
-      earlyExitBecausePluginClosed,
-    });
+    //console.log({
+    //  second: true,
+    //  character,
+    //  parseState,
+    //  parseStateHelper,
+    //  pluginDepth,
+    //  messageString,
+    //  rootNode: JSON.stringify(rootNode),
+    //  currentChildNode: JSON.stringify(currentChildNode),
+    //  earlyExitBecausePluginClosed,
+    //});
     if (earlyExitBecausePluginClosed) {
-      console.log(
-        `Early exited parsing because of a plugin content scope close for '${currentChildNode.originalString}'`
-      );
+      //console.log(
+      //  `Early exited parsing because of a plugin content scope close for '${currentChildNode.originalString}'`
+      //);
       break;
     }
   }
@@ -345,6 +346,10 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
   if (rootNode.children?.length === 1) {
     return rootNode.children[0];
   }
+  // If the root node is returned in a recursive call fix the original string
+  if (earlyExitBecausePluginClosed) {
+    rootNode.originalString = messageString.slice(0, lengthOfReadSubstring - 1);
+  }
   return rootNode;
 };
 
@@ -352,7 +357,7 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
 // They output a tuple list of macro value and macro output or just a string
 export type PluginFunc = (
   value?: string
-) => Promise<[string, string][] | string>;
+) => Promise<[string, string][] | string> | [string, string][] | string;
 export type Plugins = Map<string, PluginFunc>;
 // A macro is a simple text replace dictionary
 export type MacroDictionary = Map<string, string>;
@@ -440,12 +445,12 @@ export const parseTreeNode = async (
 
 export const messageParser = async (
   messageString: string,
-  plugins: Plugins,
-  macros: Macros
+  plugins: Plugins = new Map(),
+  macros: Macros = new Map()
 ) => {
   // 1. Create parse tree
   const parseTreeNodeRoot = createParseTree(messageString);
-  console.log(JSON.stringify(parseTreeNodeRoot));
+  //console.log(JSON.stringify(parseTreeNodeRoot));
   // 2. Parse parse tree from top down
   return await parseTreeNode(parseTreeNodeRoot, plugins, macros);
 };
