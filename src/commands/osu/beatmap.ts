@@ -22,6 +22,7 @@ import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
+import { messageParser } from "src/messageParser";
 
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
@@ -41,6 +42,7 @@ import type { OsuApiV2Credentials } from "../osu";
  * client using IRC).
  * @param osuIrcRequestTarget The osu account ID to whom the IRC request should
  * be sent to.
+ * @param strings Map that contains all strings.
  * @param logger Logger (used for global logs).
  */
 export const commandBeatmap = async (
@@ -55,6 +57,7 @@ export const commandBeatmap = async (
   detailedBeatmapInformation: undefined | boolean,
   osuIrcBot: (() => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
+  strings: Map<string, string>,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -81,8 +84,20 @@ export const commandBeatmap = async (
   let messageRequestDetailedIrc = "";
   let messageRequestTopScore = "";
   try {
+    const messageRequestString = strings.get("OSU_BEATMAP_REQUEST");
+    if (messageRequestString === undefined) {
+      throw Error("messageRequestString was not found!");
+    }
+    messageRequest = await messageParser(
+      `$(OSU_BEATMAP=${beatmapId}|${messageRequestString})`
+    );
     const beatmap = await osuApiV2.beatmaps.get(oauthAccessToken, beatmapId);
     beatmapInformationWasFound = true;
+    /*
+     * MOONPIE_CONFIG_MESSAGE_OSU_BEATMAP_REQUEST_NOT_FOUND=$(user) osu! beatmap was not found
+     * MOONPIE_CONFIG_MESSAGE_OSU_BEATMAP_REQUEST=$(user) requested %OSU:BEATMAP_TITLE% '%OSU:BEATMAP_VERSION%' by '%OSU:BEATMAP_ARTIST%'$(IF_TRUE=%OSU:BEATMAP_SCORE_FOUND%| - Current top score is TODO)
+     * MOONPIE_CONFIG_MESSAGE_OSU_BEATMAP_REQUEST_IRC=$(user) requested [https://osu.ppy.sh/beatmapsets/%OSU:BEATMAPSET_ID%#osu/%OSU:BEATMAP_ID% %OSU:BEATMAP_TITLE% '%OSU:BEATMAP_VERSION%' by '%OSU:BEATMAP_ARTIST%']
+     */
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     messageRequest = `${userName} requested ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}`;
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

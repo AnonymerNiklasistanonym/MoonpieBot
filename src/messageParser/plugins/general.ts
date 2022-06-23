@@ -12,6 +12,70 @@ export const pluginShowIfNotEmpty: MessageParserPlugin = {
     content === undefined || content.trim().length === 0 ? "" : [],
 };
 
+export const pluginShowIfTrue: MessageParserPlugin = {
+  name: "SHOW_IF_TRUE",
+  func: (content?: string) =>
+    content !== undefined && content.trim() === "true" ? [] : "",
+};
+
+export const pluginShowIfNotTrue: MessageParserPlugin = {
+  name: "SHOW_IF_NOT_TRUE",
+  func: (content?: string) =>
+    content !== undefined && content.trim() === "true" ? "" : [],
+};
+
+export const pluginShowIfUndefined: MessageParserPlugin = {
+  name: "SHOW_IF_UNDEFINED",
+  func: (content?: string) =>
+    content !== undefined && content.trim() === "undefined" ? [] : "",
+};
+
+export const pluginShowIfNotUndefined: MessageParserPlugin = {
+  name: "SHOW_IF_NOT_UNDEFINED",
+  func: (content?: string) =>
+    content !== undefined && content.trim() === "undefined" ? "" : [],
+};
+
+export const pluginShowIfNumberBiggerThan: MessageParserPlugin = {
+  name: "SHOW_IF_NUMBER_BIGGER_THAN",
+  func: (aBiggerThanB?: string) => {
+    if (aBiggerThanB === undefined || aBiggerThanB.trim().length === 0) {
+      throw Error("No numbers were found!");
+    }
+    const givenNumbers = aBiggerThanB
+      .trim()
+      .split(">")
+      .map((a) => parseInt(a));
+    if (givenNumbers.length === 2) {
+      if (givenNumbers[0] > givenNumbers[1]) {
+        return [];
+      }
+      return "";
+    }
+    throw Error("More than 2 numbers were given!");
+  },
+};
+
+export const pluginShowIfNumberSmallerThan: MessageParserPlugin = {
+  name: "SHOW_IF_NUMBER_SMALLER_THAN",
+  func: (aSmallerThanB?: string) => {
+    if (aSmallerThanB === undefined || aSmallerThanB.trim().length === 0) {
+      throw Error("No numbers were found!");
+    }
+    const givenNumbers = aSmallerThanB
+      .trim()
+      .split("<")
+      .map((a) => parseInt(a));
+    if (givenNumbers.length === 2) {
+      if (givenNumbers[0] < givenNumbers[1]) {
+        return [];
+      }
+      return "";
+    }
+    throw Error("More than 2 numbers were given!");
+  },
+};
+
 export const pluginLowercase: MessageParserPlugin = {
   name: "LOWERCASE",
   func: (content?: string) =>

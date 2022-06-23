@@ -582,6 +582,9 @@ if (isEntryPoint()) {
       dotenv.config({
         path: path.join(configDir, ".env"),
       });
+      dotenv.config({
+        path: path.join(configDir, ".env.strings"),
+      });
 
       // Print for debugging the (private/secret) environment values to the console
       // (censor critical variables if not explicitly enabled)
