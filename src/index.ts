@@ -202,11 +202,20 @@ export const main = async (logger: Logger, configDir: string) => {
         JSON.parse(content.toString()) as CustomCommandDataJson
       ).commands;
       for (const newCustomCommand of newCustomCommands) {
-        logger.info(
-          `Add custom command ${
+        logger.debug({
+          message: `Add custom command ${
             newCustomCommand.name ? newCustomCommand.name : "no-name"
-          }: ${newCustomCommand.regexString} => ${newCustomCommand.message}`
-        );
+          }: ${newCustomCommand.regexString} => ${newCustomCommand.message}`,
+          section: "customCommands",
+        });
+      }
+      if (newCustomCommands.length > 0) {
+        logger.info({
+          message: `Added ${newCustomCommands.length} custom command${
+            newCustomCommands.length > 1 ? "s" : ""
+          }`,
+          section: "customCommands",
+        });
       }
       customCommands.push(...newCustomCommands);
     }
