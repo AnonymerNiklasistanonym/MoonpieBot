@@ -35,6 +35,7 @@ import { spotifyChatHandler } from "./commands/spotify";
 import {
   defaultStrings,
   updateStringsMapWithCustomEnvStrings,
+  writeStringsVariableDocumentation,
 } from "./strings";
 // Type imports
 import type { Logger } from "winston";
@@ -77,6 +78,9 @@ export const main = async (logger: Logger, configDir: string) => {
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 
   await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
+  await writeStringsVariableDocumentation(
+    path.join(configDir, ".env.strings.example")
+  );
 
   const databasePath = path.resolve(
     configDir,

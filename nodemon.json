@@ -3,6 +3,7 @@
     "src",
     "tests",
     ".env",
+    ".env.strings",
     "customTimers.json",
     "nodemon.json"
   ],
