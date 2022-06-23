@@ -158,6 +158,7 @@ export const moonpieChatHandler = async (
   message: string,
   databasePath: string,
   enabled: undefined | string[],
+  _strings: Map<string, string>,
   logger: Logger
 ): Promise<void> => {
   if (enabled === undefined) {

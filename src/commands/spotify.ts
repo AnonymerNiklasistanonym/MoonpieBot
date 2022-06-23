@@ -57,6 +57,7 @@ export const commandSong = async (
   messageId: string | undefined,
   userName: string | undefined,
   spotifyWebApi: SpotifyWebApi,
+  _strings: Map<string, string>,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -126,6 +127,7 @@ export const spotifyChatHandler = async (
   message: string,
   spotifyWebApi: SpotifyWebApi,
   enabled: undefined | string[],
+  _strings: Map<string, string>,
   logger: Logger
 ): Promise<void> => {
   if (enabled === undefined) {
@@ -147,6 +149,7 @@ export const spotifyChatHandler = async (
       tags.id,
       tags.username,
       spotifyWebApi,
+      _strings,
       logger
     );
     return;

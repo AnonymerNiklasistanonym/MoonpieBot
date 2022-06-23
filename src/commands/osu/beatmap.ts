@@ -17,12 +17,12 @@ import {
 } from "../osu";
 import { isProcessRunning } from "../../other/processInformation";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
+import { messageParser } from "../../messageParser";
 // Type imports
 import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
-import { messageParser } from "src/messageParser";
 
 /**
  * Post information about a osu Beatmap in the chat and if existing also show

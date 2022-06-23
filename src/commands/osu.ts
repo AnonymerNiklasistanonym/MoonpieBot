@@ -191,6 +191,7 @@ export const osuChatHandler = async (
     | (() => StreamCompanionData | undefined)
     | undefined,
   enabled: undefined | string[],
+  strings: Map<string, string>,
   logger: Logger
 ): Promise<void> => {
   if (enabled === undefined) {
@@ -350,6 +351,7 @@ export const osuChatHandler = async (
               enableOsuBeatmapRequestsDetailed,
               osuIrcBot,
               osuIrcRequestTarget,
+              strings,
               logger
             );
           }

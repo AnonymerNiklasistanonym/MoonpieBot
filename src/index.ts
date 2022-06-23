@@ -5,6 +5,7 @@ import { mkdirSync, promises as fs } from "fs";
 import irc from "irc";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
+import SpotifyWebApi from "spotify-web-api-node";
 // Local imports
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
@@ -29,13 +30,16 @@ import { pyramidSpammer } from "./other/pyramidSpammer";
 import { createStreamCompanionConnection } from "./streamcompanion";
 import { createOsuIrcConnection } from "./osuirc";
 import { CliVariable, getCliVariableDocumentation } from "./cli";
+import { setupSpotifyAuthentication } from "./spotify";
+import { spotifyChatHandler } from "./commands/spotify";
+import {
+  defaultStrings,
+  updateStringsMapWithCustomEnvStrings,
+} from "./strings";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
-import { setupSpotifyAuthentication } from "./spotify";
-import SpotifyWebApi from "spotify-web-api-node";
-import { spotifyChatHandler } from "./commands/spotify";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -78,6 +82,8 @@ export const main = async (logger: Logger, configDir: string) => {
     configDir,
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
+
+  const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
 
   const spotifyApiClientId = getEnvVariableValueOrCustomDefault(
     EnvVariable.SPOTIFY_API_CLIENT_ID,
@@ -311,6 +317,7 @@ export const main = async (logger: Logger, configDir: string) => {
       getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS)?.split(
         ","
       ),
+      strings,
       logger
     ).catch((err) => {
       logger.error(err);
@@ -345,6 +352,7 @@ export const main = async (logger: Logger, configDir: string) => {
         getEnvVariableValueOrDefault(EnvVariable.OSU_ENABLE_COMMANDS)?.split(
           ","
         ),
+        strings,
         logger
       ).catch((err) => {
         logger.error(err);
@@ -380,6 +388,7 @@ export const main = async (logger: Logger, configDir: string) => {
         enableCommands === undefined
           ? ["np"]
           : enableCommands.filter((a) => a === "np"),
+        strings,
         logger
       ).catch((err) => {
         logger.error(err);
@@ -406,6 +415,7 @@ export const main = async (logger: Logger, configDir: string) => {
         message,
         spotifyWebApi,
         undefined,
+        strings,
         logger
       ).catch((err) => {
         logger.error(err);
