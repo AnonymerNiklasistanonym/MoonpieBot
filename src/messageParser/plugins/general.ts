@@ -1,15 +1,15 @@
 import { MessageParserPlugin } from "../plugins";
 
-export const pluginIfEmpty: MessageParserPlugin = {
-  name: "IF_EMPTY",
-  func: (content?: string) =>
-    content === undefined || content.trim().length === 0 ? "" : [],
-};
-
-export const pluginIfNotEmpty: MessageParserPlugin = {
-  name: "IF_NOT_EMPTY",
+export const pluginShowIfEmpty: MessageParserPlugin = {
+  name: "SHOW_IF_EMPTY",
   func: (content?: string) =>
     content === undefined || content.trim().length === 0 ? [] : "",
+};
+
+export const pluginShowIfNotEmpty: MessageParserPlugin = {
+  name: "SHOW_IF_NOT_EMPTY",
+  func: (content?: string) =>
+    content === undefined || content.trim().length === 0 ? "" : [],
 };
 
 export const pluginLowercase: MessageParserPlugin = {

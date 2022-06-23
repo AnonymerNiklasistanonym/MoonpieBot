@@ -2,8 +2,8 @@ import { expect } from "chai";
 import { messageParser } from "../../src/messageParser";
 import type { Plugins, Macros } from "../../src/messageParser";
 import {
-  pluginIfEmpty,
-  pluginIfNotEmpty,
+  pluginShowIfEmpty,
+  pluginShowIfNotEmpty,
   pluginLowercase,
   pluginRandomNumber,
   pluginTimeInSToHumanReadableString,
@@ -117,8 +117,8 @@ describe("messageParser", () => {
         pluginTimeInSToHumanReadableString.name,
         pluginTimeInSToHumanReadableString.func
       );
-      plugins.set(pluginIfEmpty.name, pluginIfEmpty.func);
-      plugins.set(pluginIfNotEmpty.name, pluginIfNotEmpty.func);
+      plugins.set(pluginShowIfEmpty.name, pluginShowIfEmpty.func);
+      plugins.set(pluginShowIfNotEmpty.name, pluginShowIfNotEmpty.func);
 
       const message0 = "$(UPPERCASE=hello world)";
       const output0 = await messageParser(message0, plugins);
@@ -151,18 +151,18 @@ describe("messageParser", () => {
       const output8 = await messageParser(message8, plugins);
       expect(output8).to.be.equal("01:43:31 h");
 
-      const message9 = "$(IF_EMPTY=not empty|hi)";
+      const message9 = "$(SHOW_IF_EMPTY=not empty|hi)";
       const output9 = await messageParser(message9, plugins);
-      expect(output9).to.be.equal("hi");
-      const message10 = "$(IF_EMPTY=|hi)";
+      expect(output9).to.be.equal("");
+      const message10 = "$(SHOW_IF_EMPTY=|hi)";
       const output10 = await messageParser(message10, plugins);
-      expect(output10).to.be.equal("");
-      const message11 = "$(IF_NOT_EMPTY=not empty|hi)";
+      expect(output10).to.be.equal("hi");
+      const message11 = "$(SHOW_IF_NOT_EMPTY=not empty|hi)";
       const output11 = await messageParser(message11, plugins);
-      expect(output11).to.be.equal("");
-      const message12 = "$(IF_NOT_EMPTY=|hi)";
+      expect(output11).to.be.equal("hi");
+      const message12 = "$(SHOW_IF_NOT_EMPTY=|hi)";
       const output12 = await messageParser(message12, plugins);
-      expect(output12).to.be.equal("hi");
+      expect(output12).to.be.equal("");
     });
   });
 });
