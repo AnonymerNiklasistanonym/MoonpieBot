@@ -1,6 +1,5 @@
 import {
   errorMessageIdUndefined,
-  errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
 import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
@@ -18,7 +17,6 @@ import type { Macros, Plugins } from "../../messageParser";
  * @param client Twitch client (used to send messages).
  * @param channel Twitch channel (where the response should be sent to).
  * @param messageId Twitch message ID of the request (used for logging).
- * @param userName Twitch user name of the requester.
  * @param globalStrings Global message strings.
  * @param globalPlugins Global plugins.
  * @param globalMacros Global macros.
@@ -28,7 +26,6 @@ export const commandAbout = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
-  userName: string | undefined,
   globalStrings: Strings,
   globalPlugins: Plugins,
   globalMacros: Macros,
@@ -37,16 +34,10 @@ export const commandAbout = async (
   if (messageId === undefined) {
     throw errorMessageIdUndefined();
   }
-  if (userName === undefined) {
-    throw errorMessageUserNameUndefined();
-  }
-
-  const plugins: Plugins = new Map(globalPlugins);
-  plugins.set("USER", () => userName);
 
   const message = await messageParser(
     globalStrings.get(moonpieCommandReplyAbout.id),
-    plugins,
+    globalPlugins,
     globalMacros
   );
   const sentMessage = await client.say(channel, message);

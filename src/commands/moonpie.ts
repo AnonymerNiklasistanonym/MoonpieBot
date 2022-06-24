@@ -8,7 +8,7 @@ import { commandAbout } from "./moonpie/about";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { commandClaim } from "./moonpie/claim";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
-import { logTwitchMessageCommandDetected } from "../commands";
+import { errorMessageUserNameUndefined, logTwitchMessageCommandDetected } from "../commands";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -159,27 +159,31 @@ export const moonpieChatHandler = async (
   tags: ChatUserstate,
   message: string,
   databasePath: string,
-  enabled: undefined | string[],
+  enabled: string[] = [
+    MoonpieCommands.ABOUT,
+    MoonpieCommands.ADD,
+    MoonpieCommands.CLAIM,
+    MoonpieCommands.COMMANDS,
+    MoonpieCommands.DELETE,
+    MoonpieCommands.GET,
+    MoonpieCommands.LEADERBOARD,
+    MoonpieCommands.REMOVE,
+    MoonpieCommands.SET,
+  ],
   globalStrings: Strings,
   globalPlugins: Plugins,
   globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
-  if (enabled === undefined) {
-    // per default enable all options
-    enabled = [
-      MoonpieCommands.ABOUT,
-      MoonpieCommands.ADD,
-      MoonpieCommands.CLAIM,
-      MoonpieCommands.COMMANDS,
-      MoonpieCommands.DELETE,
-      MoonpieCommands.GET,
-      MoonpieCommands.LEADERBOARD,
-      MoonpieCommands.REMOVE,
-      MoonpieCommands.SET,
-    ];
-  }
   if (message.match(regexMoonpie)) {
+    // Update plugins/macros for message parser
+    const plugins = new Map(globalPlugins);
+    plugins.set("USER", () => {
+      if (tags.username === undefined) {
+        throw errorMessageUserNameUndefined();
+      }
+      return tags.username;
+    });
     // > !moonpie commands
     if (
       message.match(regexMoonpieCommands) &&
@@ -229,9 +233,8 @@ export const moonpieChatHandler = async (
         client,
         channel,
         tags.id,
-        tags.username,
         globalStrings,
-        globalPlugins,
+        plugins,
         globalMacros,
         logger
       );
