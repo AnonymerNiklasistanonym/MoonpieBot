@@ -8,12 +8,15 @@ import { commandAbout } from "./moonpie/about";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { commandClaim } from "./moonpie/claim";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
-import { errorMessageUserNameUndefined, logTwitchMessageCommandDetected } from "../commands";
+import {
+  errorMessageUserNameUndefined,
+  logTwitchMessageCommandDetected,
+} from "../commands";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
-import { Macros, Plugins } from "src/messageParser";
-import { Strings } from "src/strings";
+import { Macros, Plugins } from "../messageParser";
+import { Strings } from "../strings";
 
 /**
  * The logging ID of this command.
@@ -429,6 +432,9 @@ export const moonpieChatHandler = async (
         tags.id,
         tags.username,
         tags["user-id"],
+        globalStrings,
+        plugins,
+        globalMacros,
         databasePath,
         logger
       );

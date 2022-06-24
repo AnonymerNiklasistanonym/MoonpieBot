@@ -6,10 +6,16 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
-import { secondsToString } from "../../other/timePeriodToString";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import { Macros, messageParser, Plugins } from "../../messageParser";
+import type { Strings } from "../../strings";
+import {
+  moonpieCommandReplyAlreadyClaimed,
+  moonpieCommandReplyAlreadyClaimedStar,
+  moonpieCommandReplyClaim,
+} from "../../strings/moonpie/commandReply";
 
 /**
  * Claim command: Claim a moonpie if no moonpie was claimed in the last 24
@@ -20,6 +26,9 @@ import type { Logger } from "winston";
  * @param messageId Twitch message ID of the request (used for logging).
  * @param userName Twitch user name of the requester.
  * @param userId Twitch user ID (used for checking the database).
+ * @param globalStrings Global message strings.
+ * @param globalPlugins Global plugins.
+ * @param globalMacros Global macros.
  * @param moonpieDbPath Database file path of the moonpie database.
  * @param logger Logger (used for global logs).
  */
@@ -29,6 +38,9 @@ export const commandClaim = async (
   messageId: string | undefined,
   userName: string | undefined,
   userId: string | undefined,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   moonpieDbPath: string,
   logger: Logger
 ): Promise<void> => {
@@ -93,22 +105,36 @@ export const commandClaim = async (
   const currentMoonpieLeaderboardEntry =
     await moonpieDb.getMoonpieLeaderboardEntry(moonpieDbPath, userId, logger);
 
-  let message = `@${userName} You just claimed a moonpie! You have now ${newMoonpieCount} moonpie${
-    newMoonpieCount > 1 ? "s" : ""
-  } and are rank ${currentMoonpieLeaderboardEntry.rank} on the leaderboard!!!`;
+  const macros = new Map(globalMacros);
+  macros.set(
+    "MOONPIE",
+    new Map([
+      ["COUNT", `${newMoonpieCount}`],
+      ["TIME_SINCE_CLAIM_IN_S", `${millisecondsSinceLastClaim / 1000}`],
+      ["LEADERBOARD_RANK", `${currentMoonpieLeaderboardEntry.rank}`],
+    ])
+  );
+
+  let message = await messageParser(
+    globalStrings.get(moonpieCommandReplyClaim.id),
+    globalPlugins,
+    macros
+  );
 
   if (alreadyClaimedAMoonpie) {
-    const ago = `${secondsToString(millisecondsSinceLastClaim / 1000)}`;
-
     if (userId === "93818178") {
       // Easter egg for the most cute star there is <3
-      message = `@${userName} You are the cutest! You have now 6969 moonpies and are rank 1 in my heart! <3`;
+      message = await messageParser(
+        globalStrings.get(moonpieCommandReplyAlreadyClaimedStar.id),
+        globalPlugins,
+        macros
+      );
     } else {
-      message = `@${userName} You already claimed a moonpie for today (${ago} ago)! You have ${newMoonpieCount} moonpie${
-        newMoonpieCount > 1 ? "s" : ""
-      } and are rank ${
-        currentMoonpieLeaderboardEntry.rank
-      } on the leaderboard!!!`;
+      message = await messageParser(
+        globalStrings.get(moonpieCommandReplyAlreadyClaimed.id),
+        globalPlugins,
+        macros
+      );
     }
   }
 

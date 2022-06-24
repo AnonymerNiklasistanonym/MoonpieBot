@@ -7,19 +7,34 @@ export const moonpieCommandReplyAbout = {
   default: "@$(USER) %MOONPIEBOT:NAME% %MOONPIEBOT:VERSION% (%MOONPIEBOT:URL%)",
 };
 
+export const moonpieCommandReplyClaim = {
+  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIM`,
+  default:
+    "@$(USER) You just claimed a moonpie! You have now %MOONPIE:COUNT% moonpie$(SHOW_IF_NUMBER_BIGGER_THAN=%MOONPIE:COUNT%>1|s) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+};
+
+export const moonpieCommandReplyAlreadyClaimed = {
+  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED`,
+  default:
+    "@$(USER) You already claimed a moonpie for today ($(TIME_IN_S_TO_HUMAN_READABLE_STRING=%MOONPIE:TIME_SINCE_CLAIM_IN_S%) ago) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+};
+
+export const moonpieCommandReplyAlreadyClaimedStar = {
+  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_STAR`,
+  default:
+    "@$(USER) You are the cutest! You have now 6969 moonpies and are rank 1 in my heart! <3",
+};
+
 export const moonpieCommandReply: Iterable<readonly [string, string]> = [
   [moonpieCommandReplyAbout.id, moonpieCommandReplyAbout.default],
+  [moonpieCommandReplyClaim.id, moonpieCommandReplyClaim.default],
   [
-    `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIM`,
-    "@$(USER) You just claimed a moonpie! You have now %MOONPIE:COUNT% moonpie$(SHOW_IF_BIGGER_THAN=%MOONPIE:COUNT%>1|s) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+    moonpieCommandReplyAlreadyClaimed.id,
+    moonpieCommandReplyAlreadyClaimed.default,
   ],
   [
-    `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIMED`,
-    "@$(USER) You already claimed a moonpie for today ($(TIME_IN_S_TO_HUMAN_READABLE_STRING=%MOONPIE:TIME_SINCE_CLAIM_IN_S%) ago) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
-  ],
-  [
-    `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIMED_STAR`,
-    "@$(USER) You are the cutest! You have now 6969 moonpies and are rank 1 in my heart! <3",
+    moonpieCommandReplyAlreadyClaimedStar.id,
+    moonpieCommandReplyAlreadyClaimedStar.default,
   ],
   [`${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_PREFIX`, "@$(USER) "],
   [

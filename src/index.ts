@@ -43,6 +43,19 @@ import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
 import type { Macros, Plugins } from "./messageParser";
+import {
+  pluginLowercase,
+  pluginRandomNumber,
+  pluginShowIfEmpty,
+  pluginShowIfNotEmpty,
+  pluginShowIfNotUndefined,
+  pluginShowIfNumberBiggerThan,
+  pluginShowIfNumberSmallerThan,
+  pluginShowIfUndefined,
+  pluginTimeInSToHumanReadableString,
+  pluginTimeInSToStopwatchString,
+  pluginUppercase,
+} from "./messageParser/plugins/general";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -91,6 +104,29 @@ export const main = async (logger: Logger, configDir: string) => {
 
   const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
   const plugins: Plugins = new Map();
+  plugins.set(pluginLowercase.name, pluginLowercase.func);
+  plugins.set(pluginUppercase.name, pluginUppercase.func);
+  plugins.set(pluginRandomNumber.name, pluginRandomNumber.func);
+  plugins.set(pluginShowIfEmpty.name, pluginShowIfEmpty.func);
+  plugins.set(pluginShowIfNotEmpty.name, pluginShowIfNotEmpty.func);
+  plugins.set(pluginShowIfNotUndefined.name, pluginShowIfNotUndefined.func);
+  plugins.set(pluginShowIfUndefined.name, pluginShowIfUndefined.func);
+  plugins.set(
+    pluginShowIfNumberBiggerThan.name,
+    pluginShowIfNumberBiggerThan.func
+  );
+  plugins.set(
+    pluginShowIfNumberSmallerThan.name,
+    pluginShowIfNumberSmallerThan.func
+  );
+  plugins.set(
+    pluginTimeInSToHumanReadableString.name,
+    pluginTimeInSToHumanReadableString.func
+  );
+  plugins.set(
+    pluginTimeInSToStopwatchString.name,
+    pluginTimeInSToStopwatchString.func
+  );
   const macros: Macros = new Map();
   macros.set(macroMoonpieBot.name, macroMoonpieBot.values);
 
