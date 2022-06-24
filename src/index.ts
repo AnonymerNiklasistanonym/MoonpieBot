@@ -37,10 +37,12 @@ import {
   updateStringsMapWithCustomEnvStrings,
   writeStringsVariableDocumentation,
 } from "./strings";
+import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
+import type { Macros, Plugins } from "./messageParser";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -88,6 +90,9 @@ export const main = async (logger: Logger, configDir: string) => {
   );
 
   const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
+  const plugins: Plugins = new Map();
+  const macros: Macros = new Map();
+  macros.set(macroMoonpieBot.name, macroMoonpieBot.values);
 
   const spotifyApiClientId = getEnvVariableValueOrCustomDefault(
     EnvVariable.SPOTIFY_API_CLIENT_ID,
@@ -331,6 +336,8 @@ export const main = async (logger: Logger, configDir: string) => {
         ","
       ),
       strings,
+      plugins,
+      macros,
       logger
     ).catch((err) => {
       logger.error(err);

@@ -1,5 +1,5 @@
-import { name, sourceCodeUrl } from "src/info";
-import { getVersion } from "src/version";
+import { name, sourceCodeUrl } from "../../info";
+import { getVersion } from "../../version";
 import { MessageParserMacro } from "../macros";
 
 export const macroMoonpieBot: MessageParserMacro = {

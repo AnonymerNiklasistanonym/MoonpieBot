@@ -12,6 +12,8 @@ import { logTwitchMessageCommandDetected } from "../commands";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
+import { Macros, Plugins } from "src/messageParser";
+import { Strings } from "src/strings";
 
 /**
  * The logging ID of this command.
@@ -158,7 +160,9 @@ export const moonpieChatHandler = async (
   message: string,
   databasePath: string,
   enabled: undefined | string[],
-  _strings: Map<string, string>,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (enabled === undefined) {
@@ -221,7 +225,16 @@ export const moonpieChatHandler = async (
         MoonpieCommands.ABOUT,
         LOG_ID_MODULE_MOONPIE
       );
-      await commandAbout(client, channel, tags.id, logger);
+      await commandAbout(
+        client,
+        channel,
+        tags.id,
+        tags.username,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger
+      );
       return;
     }
     // > !moonpie delete $USER

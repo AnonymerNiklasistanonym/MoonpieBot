@@ -7,10 +7,12 @@ import { moonpieCommandReply } from "./strings/moonpie";
 import { osuBeatmapRequest } from "./strings/osu";
 import { promises as fs } from "fs";
 
+export type Strings = Map<string, string>;
+
 /**
  * The default values for all strings.
  */
-export const defaultStrings = new Map<string, string>([
+export const defaultStrings: Strings = new Map<string, string>([
   ...moonpieCommandReply,
   ...osuBeatmapRequest,
   [

@@ -444,10 +444,13 @@ export const parseTreeNode = async (
 };
 
 export const messageParser = async (
-  messageString: string,
+  messageString: undefined | string,
   plugins: Plugins = new Map(),
   macros: Macros = new Map()
 ) => {
+  if (messageString === undefined) {
+    throw Error("Message string could not be parsed because it's undefined!");
+  }
   // 1. Create parse tree
   const parseTreeNodeRoot = createParseTree(messageString);
   //console.log(JSON.stringify(parseTreeNodeRoot));
