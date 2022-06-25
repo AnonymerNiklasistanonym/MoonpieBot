@@ -1,7 +1,7 @@
 import { MessageParserMacro } from "./messageParser/macros";
 import { MessageParserPlugin } from "./messageParser/plugins";
 
-interface ParseTreeNode {
+export interface ParseTreeNode {
   originalString: string;
   type: "text" | "children" | "plugin";
   content?: string;
