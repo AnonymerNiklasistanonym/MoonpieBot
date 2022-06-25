@@ -1,6 +1,7 @@
 import { MacroDictionary } from "../messageParser";
 
 export interface MessageParserMacro {
-  name: string;
+  description?: string;
+  id: string;
   values: MacroDictionary;
 }

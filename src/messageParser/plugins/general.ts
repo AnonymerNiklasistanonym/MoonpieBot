@@ -1,43 +1,95 @@
 import { MessageParserPlugin } from "../plugins";
 
 export const pluginShowIfEmpty: MessageParserPlugin = {
-  name: "SHOW_IF_EMPTY",
+  id: "SHOW_IF_EMPTY",
   func: (content?: string) =>
     content === undefined || content.trim().length === 0 ? [] : "",
 };
 
 export const pluginShowIfNotEmpty: MessageParserPlugin = {
-  name: "SHOW_IF_NOT_EMPTY",
+  id: "SHOW_IF_NOT_EMPTY",
   func: (content?: string) =>
     content === undefined || content.trim().length === 0 ? "" : [],
 };
 
 export const pluginShowIfTrue: MessageParserPlugin = {
-  name: "SHOW_IF_TRUE",
+  id: "SHOW_IF_TRUE",
   func: (content?: string) =>
     content !== undefined && content.trim() === "true" ? [] : "",
 };
 
 export const pluginShowIfNotTrue: MessageParserPlugin = {
-  name: "SHOW_IF_NOT_TRUE",
+  id: "SHOW_IF_NOT_TRUE",
   func: (content?: string) =>
     content !== undefined && content.trim() === "true" ? "" : [],
 };
 
 export const pluginShowIfUndefined: MessageParserPlugin = {
-  name: "SHOW_IF_UNDEFINED",
+  id: "SHOW_IF_UNDEFINED",
   func: (content?: string) =>
     content !== undefined && content.trim() === "undefined" ? [] : "",
 };
 
 export const pluginShowIfNotUndefined: MessageParserPlugin = {
-  name: "SHOW_IF_NOT_UNDEFINED",
+  id: "SHOW_IF_NOT_UNDEFINED",
   func: (content?: string) =>
     content !== undefined && content.trim() === "undefined" ? "" : [],
 };
 
+export const pluginShowIfStringsTheSame: MessageParserPlugin = {
+  id: "SHOW_IF_STRINGS_THE_SAME",
+  description:
+    "Plugin that only displays text inside of its scope if the two supplied strings are the same",
+  examples: [
+    { argument: "hello===goodbye", scope: "Will not be shown" },
+    { argument: "hello===hello", scope: "Will be shown" },
+  ],
+  func: (aStringEqualsBString?: string) => {
+    if (
+      aStringEqualsBString === undefined ||
+      aStringEqualsBString.trim().length === 0
+    ) {
+      throw Error("No strings were found!");
+    }
+    const givenStrings = aStringEqualsBString.trim().split("===");
+    if (givenStrings.length === 2) {
+      if (givenStrings[0] === givenStrings[1]) {
+        return [];
+      }
+      return "";
+    }
+    throw Error("More than 2 strings were given!");
+  },
+};
+
+export const pluginShowIfStringsNotTheSame: MessageParserPlugin = {
+  id: "SHOW_IF_STRINGS_NOT_THE_SAME",
+  description:
+    "Plugin that only displays text inside of its scope if the two supplied strings are not the same",
+  examples: [
+    { before: "This", argument: "hello!==goodbye", scope: " will be shown" },
+    { before: "This", argument: "hello!==hello", scope: " will not be shown" },
+  ],
+  func: (aStringEqualsBString?: string) => {
+    if (
+      aStringEqualsBString === undefined ||
+      aStringEqualsBString.trim().length === 0
+    ) {
+      throw Error("No strings were found!");
+    }
+    const givenStrings = aStringEqualsBString.trim().split("!==");
+    if (givenStrings.length === 2) {
+      if (givenStrings[0] !== givenStrings[1]) {
+        return [];
+      }
+      return "";
+    }
+    throw Error("More than 2 strings were given!");
+  },
+};
+
 export const pluginShowIfNumberBiggerThan: MessageParserPlugin = {
-  name: "SHOW_IF_NUMBER_BIGGER_THAN",
+  id: "SHOW_IF_NUMBER_BIGGER_THAN",
   func: (aBiggerThanB?: string) => {
     if (aBiggerThanB === undefined || aBiggerThanB.trim().length === 0) {
       throw Error("No numbers were found!");
@@ -57,7 +109,7 @@ export const pluginShowIfNumberBiggerThan: MessageParserPlugin = {
 };
 
 export const pluginShowIfNumberSmallerThan: MessageParserPlugin = {
-  name: "SHOW_IF_NUMBER_SMALLER_THAN",
+  id: "SHOW_IF_NUMBER_SMALLER_THAN",
   func: (aSmallerThanB?: string) => {
     if (aSmallerThanB === undefined || aSmallerThanB.trim().length === 0) {
       throw Error("No numbers were found!");
@@ -77,13 +129,17 @@ export const pluginShowIfNumberSmallerThan: MessageParserPlugin = {
 };
 
 export const pluginLowercase: MessageParserPlugin = {
-  name: "LOWERCASE",
+  id: "LOWERCASE",
+  description: "Converts the plugin argument to lowercase letters",
+  examples: [{ argument: "Hello World!" }],
   func: (content?: string) =>
     content === undefined ? "" : content.toLowerCase(),
 };
 
 export const pluginUppercase: MessageParserPlugin = {
-  name: "UPPERCASE",
+  id: "UPPERCASE",
+  description: "Converts the plugin argument to uppercase letters",
+  examples: [{ argument: "Hello World!" }],
   func: (content?: string) =>
     content === undefined ? "" : content.toUpperCase(),
 };
@@ -93,7 +149,13 @@ const randomIntFromInterval = (min: number, max: number) => {
 };
 
 export const pluginRandomNumber: MessageParserPlugin = {
-  name: "RANDOM_NUMBER",
+  id: "RANDOM_NUMBER",
+  description: "Returns a random number between 1 and 100 or a custom range",
+  examples: [
+    { before: "Random number between 1 and 100: " },
+    { before: "Random number between 1 and 10: ", argument: "10" },
+    { before: "Random number between -100 and 0: ", argument: "-100<-->0" },
+  ],
   func: (interval?: string) => {
     // If no interval string is given assume number between 0 an 100
     if (interval === undefined || interval.trim().length === 0) {
@@ -153,7 +215,12 @@ const secondsToObject = (seconds: number) => {
 };
 
 export const pluginTimeInSToStopwatchString: MessageParserPlugin = {
-  name: "TIME_IN_S_TO_STOPWATCH_STRING",
+  id: "TIME_IN_S_TO_STOPWATCH_STRING",
+  description: "Converts a seconds number to a stopwatch like string",
+  examples: [
+    { before: "3600s will be converted to ", argument: "3600" },
+    { before: "62s will be converted to ", argument: "62" },
+  ],
   func: (timeInS?: string) => {
     if (timeInS === undefined) {
       throw Error("Time was undefined!");
@@ -183,7 +250,13 @@ export const pluginTimeInSToStopwatchString: MessageParserPlugin = {
 };
 
 export const pluginTimeInSToHumanReadableString: MessageParserPlugin = {
-  name: "TIME_IN_S_TO_HUMAN_READABLE_STRING",
+  id: "TIME_IN_S_TO_HUMAN_READABLE_STRING",
+  description: "Converts a seconds number to a human readable string",
+  examples: [
+    { before: "3600234s will be converted to ", argument: "3600234" },
+    { before: "3600s will be converted to ", argument: "3600" },
+    { before: "62s will be converted to ", argument: "62" },
+  ],
   func: (timeInS?: string) => {
     if (timeInS === undefined) {
       throw Error("Time was undefined!");

@@ -42,7 +42,7 @@ import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
-import type { Macros, Plugins } from "./messageParser";
+import { generatePluginsAndMacrosMap } from "./messageParser";
 import {
   pluginLowercase,
   pluginRandomNumber,
@@ -51,6 +51,8 @@ import {
   pluginShowIfNotUndefined,
   pluginShowIfNumberBiggerThan,
   pluginShowIfNumberSmallerThan,
+  pluginShowIfStringsNotTheSame,
+  pluginShowIfStringsTheSame,
   pluginShowIfUndefined,
   pluginTimeInSToHumanReadableString,
   pluginTimeInSToStopwatchString,
@@ -92,9 +94,28 @@ export const main = async (logger: Logger, configDir: string) => {
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 
+  const pluginsList = [
+    pluginLowercase,
+    pluginUppercase,
+    pluginRandomNumber,
+    pluginShowIfEmpty,
+    pluginShowIfNotEmpty,
+    pluginShowIfNotUndefined,
+    pluginShowIfUndefined,
+    pluginShowIfNumberBiggerThan,
+    pluginShowIfNumberSmallerThan,
+    pluginShowIfStringsTheSame,
+    pluginShowIfStringsNotTheSame,
+    pluginTimeInSToHumanReadableString,
+    pluginTimeInSToStopwatchString,
+  ];
+  const macrosList = [macroMoonpieBot];
+
   await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
   await writeStringsVariableDocumentation(
-    path.join(configDir, ".env.strings.example")
+    path.join(configDir, ".env.strings.example"),
+    pluginsList,
+    macrosList
   );
 
   const databasePath = path.resolve(
@@ -103,32 +124,12 @@ export const main = async (logger: Logger, configDir: string) => {
   );
 
   const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
-  const plugins: Plugins = new Map();
-  plugins.set(pluginLowercase.name, pluginLowercase.func);
-  plugins.set(pluginUppercase.name, pluginUppercase.func);
-  plugins.set(pluginRandomNumber.name, pluginRandomNumber.func);
-  plugins.set(pluginShowIfEmpty.name, pluginShowIfEmpty.func);
-  plugins.set(pluginShowIfNotEmpty.name, pluginShowIfNotEmpty.func);
-  plugins.set(pluginShowIfNotUndefined.name, pluginShowIfNotUndefined.func);
-  plugins.set(pluginShowIfUndefined.name, pluginShowIfUndefined.func);
-  plugins.set(
-    pluginShowIfNumberBiggerThan.name,
-    pluginShowIfNumberBiggerThan.func
+  const pluginsAndMacrosMap = generatePluginsAndMacrosMap(
+    pluginsList,
+    macrosList
   );
-  plugins.set(
-    pluginShowIfNumberSmallerThan.name,
-    pluginShowIfNumberSmallerThan.func
-  );
-  plugins.set(
-    pluginTimeInSToHumanReadableString.name,
-    pluginTimeInSToHumanReadableString.func
-  );
-  plugins.set(
-    pluginTimeInSToStopwatchString.name,
-    pluginTimeInSToStopwatchString.func
-  );
-  const macros: Macros = new Map();
-  macros.set(macroMoonpieBot.name, macroMoonpieBot.values);
+  const plugins = pluginsAndMacrosMap.pluginsMap;
+  const macros = pluginsAndMacrosMap.macrosMap;
 
   const spotifyApiClientId = getEnvVariableValueOrCustomDefault(
     EnvVariable.SPOTIFY_API_CLIENT_ID,

@@ -40,7 +40,7 @@ export const pluginOsuBeatmap = (
   oauthAccessToken: OAuthAccessToken
 ): MessageParserPlugin => {
   return {
-    name: "OSU_BEATMAP",
+    id: "OSU_BEATMAP",
     func: async (beatmapId?: string) => {
       if (beatmapId === undefined || beatmapId.trim().length === 0) {
         throw Error("osu! beatmap ID was empty!");
@@ -87,7 +87,7 @@ export const pluginOsuScore = (
   oauthAccessToken: OAuthAccessToken
 ): MessageParserPlugin => {
   return {
-    name: "OSU_SCORE",
+    id: "OSU_SCORE",
     func: async (beatmapIdAndUserId?: string) => {
       if (
         beatmapIdAndUserId === undefined ||

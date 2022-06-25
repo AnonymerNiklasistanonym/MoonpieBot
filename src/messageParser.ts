@@ -1,3 +1,6 @@
+import { MessageParserMacro } from "./messageParser/macros";
+import { MessageParserPlugin } from "./messageParser/plugins";
+
 interface ParseTreeNode {
   originalString: string;
   type: "text" | "children" | "plugin";
@@ -456,4 +459,88 @@ export const messageParser = async (
   //console.log(JSON.stringify(parseTreeNodeRoot));
   // 2. Parse parse tree from top down
   return await parseTreeNode(parseTreeNodeRoot, plugins, macros);
+};
+
+export const generatePluginsAndMacrosMap = (
+  plugins: MessageParserPlugin[],
+  macros: MessageParserMacro[]
+) => {
+  const pluginsMap: Plugins = new Map();
+  for (const plugin of plugins) {
+    pluginsMap.set(plugin.id, plugin.func);
+  }
+  const macrosMap: Macros = new Map();
+  for (const macro of macros) {
+    macrosMap.set(macro.id, macro.values);
+  }
+  return {
+    pluginsMap,
+    macrosMap,
+  };
+};
+
+export const generatePluginAndMacroDocumentation = async (
+  plugins: MessageParserPlugin[],
+  macros: MessageParserMacro[]
+) => {
+  const maps = generatePluginsAndMacrosMap(plugins, macros);
+  const pluginsMap = maps.pluginsMap;
+  const macrosMap = maps.macrosMap;
+  let output = `# ${"-".repeat(80)}\n# Supported Plugins:\n`;
+  if (plugins.length === 0) {
+    output += `# ${"-".repeat(80)}\n# None\n`;
+  }
+  for (const plugin of plugins) {
+    output += `# ${"-".repeat(80)}\n# $(${plugin.id})\n`;
+    if (plugin.description) {
+      output += `# > ${plugin.description}\n`;
+    }
+    if (plugin.examples && plugin.examples.length > 0) {
+      output += `# Examples:\n`;
+      for (const example of plugin.examples) {
+        let exampleString = "";
+        if (example.before) {
+          exampleString += example.before;
+        }
+        exampleString += `$(${plugin.id}`;
+        if (example.argument) {
+          exampleString += `=${example.argument}`;
+        }
+        if (example.scope) {
+          exampleString += `|${example.scope}`;
+        }
+        exampleString += ")";
+        if (example.after) {
+          exampleString += example.after;
+        }
+        const exampleStringOutput = await messageParser(
+          exampleString,
+          pluginsMap,
+          macrosMap
+        );
+        output += `# - "${exampleString}" => "${exampleStringOutput}"\n`;
+      }
+    }
+  }
+  output += `\n# ${"-".repeat(80)}\n# Supported Macros:\n`;
+  if (macros.length === 0) {
+    output += `# ${"-".repeat(80)}\n# None\n`;
+  }
+  for (const macro of macros) {
+    output += `# ${"-".repeat(80)}\n# %${macro.id}:KEY%\n`;
+    if (macro.description) {
+      output += `# > ${macro.description}\n`;
+    }
+    output += `# Keys:\n`;
+    for (const [key] of macro.values.entries()) {
+      const macroString = `%${macro.id}:${key}%`;
+      const macroStringOutput = await messageParser(
+        macroString,
+        pluginsMap,
+        macrosMap
+      );
+      output += `# - "${macroString}" => "${macroStringOutput}"\n`;
+    }
+  }
+  return output;
 };

@@ -6,8 +6,13 @@ import { Logger } from "winston";
 import { moonpieCommandReply } from "./strings/moonpie";
 import { osuBeatmapRequest } from "./strings/osu";
 import { promises as fs } from "fs";
+import { generatePluginAndMacroDocumentation } from "./messageParser";
+import { MessageParserPlugin } from "./messageParser/plugins";
+import { MessageParserMacro } from "./messageParser/macros";
 
 export type Strings = Map<string, string>;
+
+export const PREFIX_CUSTOM_STRING = "MOONPIE_CUSTOM_STRING_";
 
 /**
  * The default values for all strings.
@@ -27,7 +32,7 @@ export const updateStringsMapWithCustomEnvStrings = (
 ) => {
   let foundCustomStringsCounter = 0;
   for (const [key] of defaultStrings.entries()) {
-    const envValue = process.env[`MOONPIE_CUSTOM_STRING_${key}`];
+    const envValue = process.env[`${PREFIX_CUSTOM_STRING}${key}`];
     if (envValue !== undefined && envValue.trim().length > 0) {
       strings.set(key, envValue);
       foundCustomStringsCounter++;
@@ -48,15 +53,31 @@ export const updateStringsMapWithCustomEnvStrings = (
   return strings;
 };
 
-export const writeStringsVariableDocumentation = async (path: string) => {
+export const writeStringsVariableDocumentation = async (
+  path: string,
+  plugins: MessageParserPlugin[] = [],
+  macros: MessageParserMacro[] = []
+) => {
   let data =
-    "# This is a list of all possible custom strings that can be overridden:\n\n";
+    "# This program allows to customize certain strings listed in this file.\n";
+  data +=
+    "# To use a customized value instead of the default one uncomment the line.\n\n";
+  data +=
+    "# Additionally there are plugins and macros that help with adding logic to the string:\n\n";
+
+  const pluginsAndMacroDocumentation =
+    await generatePluginAndMacroDocumentation(plugins, macros);
+  data += `${pluginsAndMacroDocumentation}\n`;
+
+  data +=
+    "# To use a customized value instead of the default one uncomment the line.\n";
+  data += `# (The lines that start with ${PREFIX_CUSTOM_STRING})\n\n`;
 
   for (const [key, defaultValue] of defaultStrings.entries()) {
     if (defaultValue.endsWith(" ") || defaultValue.startsWith(" ")) {
-      data += `#MOONPIE_CUSTOM_STRING_${key}="${defaultValue}"`;
+      data += `#${PREFIX_CUSTOM_STRING}${key}="${defaultValue}"`;
     } else {
-      data += `#MOONPIE_CUSTOM_STRING_${key}=${defaultValue}`;
+      data += `#${PREFIX_CUSTOM_STRING}${key}=${defaultValue}`;
     }
     data += `\n`;
   }

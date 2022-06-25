@@ -25,6 +25,17 @@ export const moonpieCommandReplyAlreadyClaimedStar = {
     "@$(USER) You are the cutest! You have now 6969 moonpies and are rank 1 in my heart! <3",
 };
 
+export const moonpieCommandReplyLeaderboardPrefix = {
+  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_PREFIX`,
+  default: "@$(USER) ",
+};
+
+export const moonpieCommandReplyLeaderboardEntry = {
+  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_ENTRY`,
+  default:
+    "%MOONPIE_LEADERBOARD:RANK%. %MOONPIE_LEADERBOARD:NAME% (%MOONPIE_LEADERBOARD:COUNT%)",
+};
+
 export const moonpieCommandReply: Iterable<readonly [string, string]> = [
   [moonpieCommandReplyAbout.id, moonpieCommandReplyAbout.default],
   [moonpieCommandReplyClaim.id, moonpieCommandReplyClaim.default],
@@ -36,9 +47,12 @@ export const moonpieCommandReply: Iterable<readonly [string, string]> = [
     moonpieCommandReplyAlreadyClaimedStar.id,
     moonpieCommandReplyAlreadyClaimedStar.default,
   ],
-  [`${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_PREFIX`, "@$(USER) "],
   [
-    `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_ENTRY`,
-    "%MOONPIE_LEADERBOARD:RANK%. %MOONPIE_LEADERBOARD:NAME% (%MOONPIE_LEADERBOARD:COUNT%)",
+    moonpieCommandReplyLeaderboardPrefix.id,
+    moonpieCommandReplyLeaderboardPrefix.default,
+  ],
+  [
+    moonpieCommandReplyLeaderboardEntry.id,
+    moonpieCommandReplyLeaderboardEntry.default,
   ],
 ];
