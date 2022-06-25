@@ -375,6 +375,12 @@ export const main = async (logger: Logger, configDir: string) => {
         pluginsChannel.set(plugin.id, plugin.func);
       }
     }
+    pluginsChannel.set("USER", () => {
+      if (tags.username === undefined) {
+        throw errorMessageUserNameUndefined();
+      }
+      return `${tags.username}`;
+    });
 
     // Handle all bot commands
     moonpieChatHandler(
@@ -505,13 +511,7 @@ export const main = async (logger: Logger, configDir: string) => {
 
     // Check custom commands
     try {
-      const pluginsCustomCommands = new Map(plugins);
-      pluginsCustomCommands.set("USER", () => {
-        if (tags.username === undefined) {
-          throw errorMessageUserNameUndefined();
-        }
-        return `${tags.username}`;
-      });
+      const pluginsCustomCommands = new Map(pluginsChannel);
       for (const customCommand of customCommands) {
         pluginsCustomCommands.set(
           "COUNT",

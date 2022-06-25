@@ -8,10 +8,7 @@ import { commandAbout } from "./moonpie/about";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { commandClaim } from "./moonpie/claim";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
-import {
-  errorMessageUserNameUndefined,
-  logTwitchMessageCommandDetected,
-} from "../commands";
+import { logTwitchMessageCommandDetected } from "../commands";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -179,14 +176,6 @@ export const moonpieChatHandler = async (
   logger: Logger
 ): Promise<void> => {
   if (message.match(regexMoonpie)) {
-    // Update plugins/macros for message parser
-    const plugins = new Map(globalPlugins);
-    plugins.set("USER", () => {
-      if (tags.username === undefined) {
-        throw errorMessageUserNameUndefined();
-      }
-      return tags.username;
-    });
     // > !moonpie commands
     if (
       message.match(regexMoonpieCommands) &&
@@ -221,7 +210,7 @@ export const moonpieChatHandler = async (
         channel,
         tags.id,
         globalStrings,
-        plugins,
+        globalPlugins,
         globalMacros,
         databasePath,
         logger
@@ -246,7 +235,7 @@ export const moonpieChatHandler = async (
         channel,
         tags.id,
         globalStrings,
-        plugins,
+        globalPlugins,
         globalMacros,
         logger
       );
@@ -442,7 +431,7 @@ export const moonpieChatHandler = async (
         tags.username,
         tags["user-id"],
         globalStrings,
-        plugins,
+        globalPlugins,
         globalMacros,
         databasePath,
         logger

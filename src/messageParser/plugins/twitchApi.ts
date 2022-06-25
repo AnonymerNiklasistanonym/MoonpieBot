@@ -108,32 +108,39 @@ export const pluginTwitchApi: (
     },
     {
       id: `${TWITCH_API_PREFIX}GET_FOLLOW_AGE`,
-      func: async () => {
+      func: async (userName) => {
         try {
-          const broadcaster = await twitchApiClient.users.getUserByName(
-            channelName.slice(1)
-          );
-          if (broadcaster?.id === undefined) {
-            throw Error("Twitch API client request getUserByName failed");
-          }
           const channelUserInfo = await twitchApiClient.users.getUserByName(
             channelName.slice(1)
           );
           if (channelUserInfo?.id === undefined) {
             throw Error("Twitch API client request getUserByName failed");
           }
-          if (channelUserInfo.id === broadcaster.id) {
-            const currentTimestamp = Date.now();
-            const followStartTimestamp = broadcaster.creationDate.getTime();
-            return `${(currentTimestamp - followStartTimestamp) / 1000}`;
+          let userId;
+          if (userName !== undefined && userName.length > 0) {
+            const twitchUserInfo = await twitchApiClient.users.getUserByName(
+              userName
+            );
+            if (twitchUserInfo?.id === undefined) {
+              throw Error("Twitch API client request getUserByName failed");
+            }
+            userId = twitchUserInfo.id;
+          } else {
+            if (twitchUserId === undefined) {
+              throw errorMessageUserIdUndefined();
+            }
+            userId = twitchUserId;
           }
-          if (twitchUserId === undefined) {
-            throw errorMessageUserIdUndefined();
+          // Check if the user is the broadcaster
+          if (channelUserInfo.id === userId) {
+            const currentTimestamp = Date.now();
+            const followStartTimestamp = channelUserInfo.creationDate.getTime();
+            return `${(currentTimestamp - followStartTimestamp) / 1000}`;
           }
           const follow =
             await twitchApiClient.users.getFollowFromUserToBroadcaster(
-              twitchUserId,
-              broadcaster.id
+              channelUserInfo.id,
+              userId
             );
           if (follow?.followDate === undefined) {
             throw Error("User is not following the channel");
