@@ -216,7 +216,16 @@ export const moonpieChatHandler = async (
         MoonpieCommands.LEADERBOARD,
         LOG_ID_MODULE_MOONPIE
       );
-      await commandLeaderboard(client, channel, tags.id, databasePath, logger);
+      await commandLeaderboard(
+        client,
+        channel,
+        tags.id,
+        globalStrings,
+        plugins,
+        globalMacros,
+        databasePath,
+        logger
+      );
       return;
     }
     // > !moonpie about

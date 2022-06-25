@@ -33,7 +33,7 @@ export const moonpieCommandReplyLeaderboardPrefix = {
 export const moonpieCommandReplyLeaderboardEntry = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_ENTRY`,
   default:
-    "%MOONPIE_LEADERBOARD:RANK%. %MOONPIE_LEADERBOARD:NAME% (%MOONPIE_LEADERBOARD:COUNT%)",
+    "%MOONPIE_LEADERBOARD_ENTRY:RANK%. %MOONPIE_LEADERBOARD_ENTRY:NAME% (%MOONPIE_LEADERBOARD_ENTRY:COUNT%)",
 };
 
 export const moonpieCommandReply: Iterable<readonly [string, string]> = [
