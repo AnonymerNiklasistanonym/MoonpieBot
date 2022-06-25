@@ -132,7 +132,7 @@ export const commandBeatmap = async (
       osuBeatmapRequestMacros
     );
     messageRequestIrc = await messageParser(
-      globalStrings.get(osuBeatmapRequestIrc.id),
+      globalStrings.get(osuBeatmapRequestIrcDetailed.id),
       globalPlugins,
       osuBeatmapRequestMacros
     );
@@ -143,7 +143,7 @@ export const commandBeatmap = async (
       osuBeatmapRequestMacros
     );
     messageRequestIrc = await messageParser(
-      globalStrings.get(osuBeatmapRequestIrcDetailed.id),
+      globalStrings.get(osuBeatmapRequestIrc.id),
       globalPlugins,
       osuBeatmapRequestMacros
     );
