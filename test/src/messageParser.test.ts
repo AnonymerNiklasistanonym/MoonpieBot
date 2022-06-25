@@ -45,7 +45,7 @@ describe("messageParser", () => {
     it("plugins that return text", async () => {
       const plugins: Plugins = new Map();
       // eslint-disable-next-line @typescript-eslint/require-await
-      plugins.set("TWITCH_GAME", async (value?: string) => {
+      plugins.set("TWITCH_GAME", (value) => {
         if (value === "geo") {
           return "osu!";
         } else {
@@ -63,9 +63,7 @@ describe("messageParser", () => {
 
       const plugins2: Plugins = new Map();
       // eslint-disable-next-line @typescript-eslint/require-await,@typescript-eslint/no-unused-vars
-      plugins2.set("COUNT", async (_value?: string) => {
-        return "10";
-      });
+      plugins2.set("COUNT", () => "10");
       const message2 = "this command was called $(COUNT) times";
       const output2 = await messageParser(message2, plugins2, new Map());
       expect(output2).to.be.equal("this command was called 10 times");
@@ -73,7 +71,7 @@ describe("messageParser", () => {
     it("plugins that return macros", async () => {
       const plugins: Plugins = new Map();
       // eslint-disable-next-line @typescript-eslint/require-await
-      plugins.set("TWITCH_GAME", async (value?: string) => {
+      plugins.set("TWITCH_GAME", (value) => {
         if (value === "geo") {
           return [["GEO", "osu!"]];
         } else {
@@ -106,19 +104,19 @@ describe("messageParser", () => {
     });
     it("general plugins", async () => {
       const plugins: Plugins = new Map();
-      plugins.set(pluginLowercase.name, pluginLowercase.func);
-      plugins.set(pluginUppercase.name, pluginUppercase.func);
-      plugins.set(pluginRandomNumber.name, pluginRandomNumber.func);
+      plugins.set(pluginLowercase.id, pluginLowercase.func);
+      plugins.set(pluginUppercase.id, pluginUppercase.func);
+      plugins.set(pluginRandomNumber.id, pluginRandomNumber.func);
       plugins.set(
-        pluginTimeInSToStopwatchString.name,
+        pluginTimeInSToStopwatchString.id,
         pluginTimeInSToStopwatchString.func
       );
       plugins.set(
-        pluginTimeInSToHumanReadableString.name,
+        pluginTimeInSToHumanReadableString.id,
         pluginTimeInSToHumanReadableString.func
       );
-      plugins.set(pluginShowIfEmpty.name, pluginShowIfEmpty.func);
-      plugins.set(pluginShowIfNotEmpty.name, pluginShowIfNotEmpty.func);
+      plugins.set(pluginShowIfEmpty.id, pluginShowIfEmpty.func);
+      plugins.set(pluginShowIfNotEmpty.id, pluginShowIfNotEmpty.func);
 
       const message0 = "$(UPPERCASE=hello world)";
       const output0 = await messageParser(message0, plugins);

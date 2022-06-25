@@ -104,7 +104,11 @@ export const pluginShowIfNumberBiggerThan: MessageParserPlugin = {
       }
       return "";
     }
-    throw Error("More than 2 numbers were given!");
+    throw Error(
+      `More or less than 2 numbers were given ${aBiggerThanB}=[${givenNumbers.join(
+        ","
+      )}]!`
+    );
   },
 };
 

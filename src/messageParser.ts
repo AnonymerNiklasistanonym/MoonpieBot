@@ -6,7 +6,7 @@ interface ParseTreeNode {
   type: "text" | "children" | "plugin";
   content?: string;
   pluginName?: string;
-  pluginValue?: string;
+  pluginValue?: ParseTreeNode;
   pluginContent?: ParseTreeNode;
   children?: ParseTreeNode[];
 }
@@ -76,6 +76,10 @@ enum ParseStateHelper {
    * Subroutine if plugin content is detected.
    */
   PLUGIN_CONTENT_FOUND = "PLUGIN_CONTENT_FOUND",
+  /**
+   * Subroutine if plugin value is detected.
+   */
+  PLUGIN_VALUE_FOUND = "PLUGIN_VALUE_FOUND",
 }
 
 /**
@@ -86,9 +90,14 @@ enum ParseStateHelper {
  *
  * @param messageString The input string.
  * @param pluginDepth The depth of the plugin which is used for recursive calls.
+ * @param earlyExitBecausePluginValue If true this means a call was made to parse a plugin value so a special early exit is necessary.
  * @returns Parse tree of the message string.
  */
-export const createParseTree = (messageString: string, pluginDepth = 0) => {
+export const createParseTree = (
+  messageString: string,
+  pluginDepth = 0,
+  earlyExitBecausePluginValue = false
+) => {
   //console.log(`Generate parse tree of '${messageString}'`);
   //if (pluginDepth > 0) {
   //  console.log(`Early exit if a plugin close is found (${pluginDepth})`);
@@ -166,6 +175,16 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
           //);
           // Early exit parsing when text is inside a plugin that is closed
           earlyExitBecausePluginClosed = true;
+        } else if (
+          (character === ")" || character === "|") &&
+          pluginDepth > 0 &&
+          earlyExitBecausePluginValue
+        ) {
+          // 4. If the plugin close or content symbol is detected and this
+          // method call was a recursive call
+          // Early exit parsing when text is inside a plugin value that is
+          // closed or expects now a content scope
+          earlyExitBecausePluginClosed = true;
         } else {
           currentChildNode.content += character;
         }
@@ -190,7 +209,7 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
         break;
       case ParseState.PLUGIN_NAME:
         if (character === "=") {
-          parseState = ParseState.PLUGIN_VALUE;
+          parseStateHelper = ParseStateHelper.PLUGIN_VALUE_FOUND;
         } else if (character === "|") {
           parseStateHelper = ParseStateHelper.PLUGIN_CONTENT_FOUND;
         } else if (character === ")") {
@@ -200,16 +219,21 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
         }
         break;
       case ParseState.PLUGIN_VALUE:
+        //console.log(`Parse plugin value '${character}'`);
         if (character === "|") {
           parseStateHelper = ParseStateHelper.PLUGIN_CONTENT_FOUND;
         } else if (character === ")") {
           parseStateHelper = ParseStateHelper.PLUGIN_WAS_CLOSED;
         } else {
-          currentChildNode.pluginValue += character;
+          throw Error(
+            `Plugin value found that should not exist: '${character}' (${JSON.stringify(
+              currentChildNode.pluginValue
+            )})`
+          );
         }
         break;
       case ParseState.PLUGIN_CONTENT:
-        //console.log(`Parse plugin Content '${character}'`);
+        //console.log(`Parse plugin content '${character}'`);
         if (character === ")") {
           parseStateHelper = ParseStateHelper.PLUGIN_WAS_CLOSED;
         } else {
@@ -265,10 +289,31 @@ export const createParseTree = (messageString: string, pluginDepth = 0) => {
         currentChildNode = {
           type: "plugin",
           pluginName: "",
-          pluginValue: "",
           // Add the begin of the plugin scope open to the string
           originalString: "$(",
         };
+        break;
+      case ParseStateHelper.PLUGIN_VALUE_FOUND:
+        parseStateHelper = ParseStateHelper.NOTHING;
+        // If plugin value is found parse this content in a recursive call
+        // that stops parsing the content as soon as the plugin close indicator
+        // or content indicator is detected
+        currentChildNode.pluginValue = createParseTree(
+          // Remove the parsed substring from the input string
+          messageString.slice(lengthOfReadSubstring),
+          pluginDepth,
+          true
+        );
+        //console.log(
+        //  `Determined pluginValue from '${messageString.slice(
+        //    lengthOfReadSubstring
+        //  )}' as '${
+        //    currentChildNode.pluginValue.originalString
+        //  }': ${JSON.stringify(currentChildNode.pluginContent)}`
+        //);
+        skipCharacterCount +=
+          currentChildNode.pluginValue.originalString.length;
+        parseState = ParseState.PLUGIN_VALUE;
         break;
       case ParseStateHelper.PLUGIN_CONTENT_FOUND:
         parseStateHelper = ParseStateHelper.NOTHING;
@@ -412,11 +457,12 @@ export const parseTreeNode = async (
       }
       // eslint-disable-next-line no-case-declarations
       const pluginValue = treeNode.pluginValue;
-      if (pluginValue === undefined) {
-        throw Error(`Plugin value (${pluginName}) was not found`);
-      }
       // eslint-disable-next-line no-case-declarations
-      const pluginOutput = await plugin(replaceMacros(pluginValue, macros));
+      const pluginValueString = pluginValue
+        ? await parseTreeNode(pluginValue, plugins, macros)
+        : undefined;
+      // eslint-disable-next-line no-case-declarations
+      const pluginOutput = await plugin(pluginValueString);
       if (Array.isArray(pluginOutput)) {
         for (const macro of pluginOutput) {
           if (!macros.has(pluginName)) {

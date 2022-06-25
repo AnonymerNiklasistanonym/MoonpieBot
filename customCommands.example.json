@@ -6,7 +6,7 @@
             "channels": [
                 "#salk1n616"
             ],
-            "message": "Test command was called $(count) times (1-10=$(random-1-10))",
+            "message": "Test command was called $(COUNT) times $(RANDOM_NUMBER=1<->10)",
             "regexString": "!testBasic",
             "count": 0,
             "userLevel": "everyone"

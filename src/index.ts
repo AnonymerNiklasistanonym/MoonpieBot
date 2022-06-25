@@ -58,6 +58,8 @@ import {
   pluginTimeInSToStopwatchString,
   pluginUppercase,
 } from "./messageParser/plugins/general";
+import { errorMessageUserNameUndefined } from "./commands";
+import { pluginTwitchApi } from "./messageParser/plugins/twitchApi";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -94,42 +96,12 @@ export const main = async (logger: Logger, configDir: string) => {
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 
-  const pluginsList = [
-    pluginLowercase,
-    pluginUppercase,
-    pluginRandomNumber,
-    pluginShowIfEmpty,
-    pluginShowIfNotEmpty,
-    pluginShowIfNotUndefined,
-    pluginShowIfUndefined,
-    pluginShowIfNumberBiggerThan,
-    pluginShowIfNumberSmallerThan,
-    pluginShowIfStringsTheSame,
-    pluginShowIfStringsNotTheSame,
-    pluginTimeInSToHumanReadableString,
-    pluginTimeInSToStopwatchString,
-  ];
-  const macrosList = [macroMoonpieBot];
-
-  await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
-  await writeStringsVariableDocumentation(
-    path.join(configDir, ".env.strings.example"),
-    pluginsList,
-    macrosList
-  );
-
   const databasePath = path.resolve(
     configDir,
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
 
   const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
-  const pluginsAndMacrosMap = generatePluginsAndMacrosMap(
-    pluginsList,
-    macrosList
-  );
-  const plugins = pluginsAndMacrosMap.pluginsMap;
-  const macros = pluginsAndMacrosMap.macrosMap;
 
   const spotifyApiClientId = getEnvVariableValueOrCustomDefault(
     EnvVariable.SPOTIFY_API_CLIENT_ID,
@@ -319,6 +291,36 @@ export const main = async (logger: Logger, configDir: string) => {
     });
   }
 
+  // Setup message parser
+  const pluginsList = [
+    pluginLowercase,
+    pluginUppercase,
+    pluginRandomNumber,
+    pluginShowIfEmpty,
+    pluginShowIfNotEmpty,
+    pluginShowIfNotUndefined,
+    pluginShowIfUndefined,
+    pluginShowIfNumberBiggerThan,
+    pluginShowIfNumberSmallerThan,
+    pluginShowIfStringsTheSame,
+    pluginShowIfStringsNotTheSame,
+    pluginTimeInSToHumanReadableString,
+    pluginTimeInSToStopwatchString,
+  ];
+  const macrosList = [macroMoonpieBot];
+  await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
+  await writeStringsVariableDocumentation(
+    path.join(configDir, ".env.strings.example"),
+    pluginsList,
+    macrosList
+  );
+  const pluginsAndMacrosMap = generatePluginsAndMacrosMap(
+    pluginsList,
+    macrosList
+  );
+  const plugins = pluginsAndMacrosMap.pluginsMap;
+  const macros = pluginsAndMacrosMap.macrosMap;
+
   // Create TwitchClient and listen to certain events
   const twitchClient = createTwitchClient(
     getEnvVariableValue(EnvVariable.TWITCH_NAME),
@@ -362,6 +364,18 @@ export const main = async (logger: Logger, configDir: string) => {
       return;
     }
 
+    // TODO Think about how to document client dependent plugins
+    const pluginsChannel = new Map(plugins);
+    if (twitchApiClient) {
+      for (const plugin of pluginTwitchApi(
+        twitchApiClient,
+        channel,
+        tags["user-id"]
+      )) {
+        pluginsChannel.set(plugin.id, plugin.func);
+      }
+    }
+
     // Handle all bot commands
     moonpieChatHandler(
       twitchClient,
@@ -373,7 +387,7 @@ export const main = async (logger: Logger, configDir: string) => {
         ","
       ),
       strings,
-      plugins,
+      pluginsChannel,
       macros,
       logger
     ).catch((err) => {
@@ -491,7 +505,18 @@ export const main = async (logger: Logger, configDir: string) => {
 
     // Check custom commands
     try {
+      const pluginsCustomCommands = new Map(plugins);
+      pluginsCustomCommands.set("USER", () => {
+        if (tags.username === undefined) {
+          throw errorMessageUserNameUndefined();
+        }
+        return `${tags.username}`;
+      });
       for (const customCommand of customCommands) {
+        pluginsCustomCommands.set(
+          "COUNT",
+          () => `${customCommand.count ? customCommand.count + 1 : 1}`
+        );
         checkCustomCommand(
           twitchClient,
           channel,
@@ -503,10 +528,8 @@ export const main = async (logger: Logger, configDir: string) => {
           customCommand.regexString,
           customCommand.userLevel,
           customCommand.name,
-          customCommand.count ? customCommand.count + 1 : 1,
-          twitchApiClient,
-          // TODO Add macro for StreamCompanion
-          // osuStreamCompanionCurrentMapData,
+          pluginsCustomCommands,
+          macros,
           logger
         )
           .then((commandExecuted) => {
@@ -535,7 +558,21 @@ export const main = async (logger: Logger, configDir: string) => {
                 .catch(logger.error);
             }
           })
-          .catch(logger.error);
+          .catch((err) => {
+            logger.error(err);
+            // When the chat handler throws an error write the error message in chat
+            const errorInfo = err as ErrorWithCode;
+            twitchClient
+              .say(
+                channel,
+                `${
+                  tags.username ? "@" + tags.username + " " : ""
+                }Custom Command Error: ${errorInfo.message}${
+                  errorInfo.code ? " (" + errorInfo.code + ")" : ""
+                }`
+              )
+              .catch(logger.error);
+          });
       }
     } catch (err) {
       logger.error(err);
