@@ -63,6 +63,7 @@ import {
 import { errorMessageUserNameUndefined } from "./commands";
 import { pluginTwitchApi } from "./messageParser/plugins/twitchApi";
 import { pluginOsuBeatmap, pluginOsuScore } from "./messageParser/plugins/osu";
+import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -335,6 +336,12 @@ export const main = async (logger: Logger, configDir: string) => {
     });
     plugins.set(pluginOsuBeatmapReady.id, pluginOsuBeatmapReady.func);
     plugins.set(pluginOsuScoreReady.id, pluginOsuScoreReady.func);
+  }
+  if (osuStreamCompanionCurrentMapData !== undefined) {
+    const pluginStreamCompanionReady = pluginStreamCompanion(
+      osuStreamCompanionCurrentMapData
+    );
+    plugins.set(pluginStreamCompanionReady.id, pluginStreamCompanionReady.func);
   }
 
   // Create TwitchClient and listen to certain events

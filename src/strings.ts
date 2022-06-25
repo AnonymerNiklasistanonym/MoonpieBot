@@ -9,6 +9,7 @@ import { promises as fs } from "fs";
 import { generatePluginAndMacroDocumentation } from "./messageParser";
 import { MessageParserPlugin } from "./messageParser/plugins";
 import { MessageParserMacro } from "./messageParser/macros";
+import { osuCommandReply } from "./strings/osu/commandReply";
 
 export type Strings = Map<string, string>;
 
@@ -20,10 +21,7 @@ export const PREFIX_CUSTOM_STRING = "MOONPIE_CUSTOM_STRING_";
 export const defaultStrings: Strings = new Map<string, string>([
   ...moonpieCommandReply,
   ...osuBeatmapRequests,
-  //[
-  //  "OSU_NP_COMMAND_REPLY_STREAMCOMPANION",
-  //  "@$(USER) Currently playing '%OSU_STREAMCOMPANION:TITLE%' from '%OSU_STREAMCOMPANION:ARTIST%' ['%OSU_STREAMCOMPANION:VERSION%'] TODO",
-  //],
+  ...osuCommandReply,
 ]);
 
 export const updateStringsMapWithCustomEnvStrings = (
