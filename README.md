@@ -12,6 +12,7 @@ A custom Twitch chat bot.
   - [Optional: osu!](#optional-osu)
   - [Optional: Spotify](#optional-spotify)
   - [Optional: Custom commands/timers](#optional-custom-commandstimers)
+  - [Optional: Custom strings/messages](#optional-custom-stringsmessages)
 - [Setup](#setup)
   - [Build it yourself](#build-it-yourself)
   - [Binary releases](#binary-releases)
@@ -119,6 +120,14 @@ An example file for this is [`customTimers.example.json`](./customTimers.example
 
 For some macros to work (like Twitch API connections for `!so`/`!followage`/`!settitle`/`!setgame`) additional Twitch API credentials need to be provided.
 
+### Optional: Custom strings/messages
+
+Most messages can be customized to a high degree using a custom message parser that can also easily be extended consisting of plugins and macros.
+
+The idea is that instead of a final message (in English) there is a way to replace the default string with a custom one.
+Important variables and values will then at runtime be parsed and inserted into the string.
+
+Of course these overrides can be set in the `.env` file or via the command line but the recommended way of redefining the custom strings/messages is in a `.env.strings` file ([there is an example for the file](./.env.strings.example) where all the default values are listed and can be uncommented and edited).
 ## Setup
 
 ### Build it yourself
