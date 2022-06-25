@@ -10,7 +10,7 @@ export const moonpieCommandReplyAbout = {
 export const moonpieCommandReplyClaim = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIM`,
   default:
-    "@$(USER) You just claimed a moonpie! You have now %MOONPIE:COUNT% moonpie$(SHOW_IF_NUMBER_BIGGER_THAN=%MOONPIE:COUNT%>1|s) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+    "@$(USER) You just claimed a moonpie! You have now %MOONPIE:COUNT% moonpie$(SHOW_IF_NUMBER_GREATER_THAN=%MOONPIE:COUNT%>1|s) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
 };
 
 export const moonpieCommandReplyAlreadyClaimed = {

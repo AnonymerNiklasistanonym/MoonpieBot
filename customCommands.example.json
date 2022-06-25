@@ -6,7 +6,7 @@
             "channels": [
                 "#salk1n616"
             ],
-            "message": "Test command was called $(COUNT) time$(SHOW_IF_NUMBER_BIGGER_THAN=$(COUNT)>1|s) (random number between 1 and 10: $(RANDOM_NUMBER=1<->10))",
+            "message": "Test command was called $(COUNT) time$(SHOW_IF_NUMBER_GREATER_THAN=$(COUNT)>1|s) (random number between 1 and 10: $(RANDOM_NUMBER=1<->10))",
             "regexString": "!testBasic",
             "count": 0,
             "userLevel": "everyone"

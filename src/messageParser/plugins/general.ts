@@ -88,13 +88,13 @@ export const pluginShowIfStringsNotTheSame: MessageParserPlugin = {
   },
 };
 
-export const pluginShowIfNumberBiggerThan: MessageParserPlugin = {
-  id: "SHOW_IF_NUMBER_BIGGER_THAN",
-  func: (aBiggerThanB?: string) => {
-    if (aBiggerThanB === undefined || aBiggerThanB.trim().length === 0) {
+export const pluginShowIfNumberGreaterThan: MessageParserPlugin = {
+  id: "SHOW_IF_NUMBER_GREATER_THAN",
+  func: (aGreaterThanB?: string) => {
+    if (aGreaterThanB === undefined || aGreaterThanB.trim().length === 0) {
       throw Error("No numbers were found!");
     }
-    const givenNumbers = aBiggerThanB
+    const givenNumbers = aGreaterThanB
       .trim()
       .split(">")
       .map((a) => parseInt(a));
@@ -105,7 +105,31 @@ export const pluginShowIfNumberBiggerThan: MessageParserPlugin = {
       return "";
     }
     throw Error(
-      `More or less than 2 numbers were given ${aBiggerThanB}=[${givenNumbers.join(
+      `More or less than 2 numbers were given ${aGreaterThanB}=[${givenNumbers.join(
+        ","
+      )}]!`
+    );
+  },
+};
+
+export const pluginShowIfNumberNotGreaterThan: MessageParserPlugin = {
+  id: "SHOW_IF_NUMBER_NOT_GREATER_THAN",
+  func: (aGreaterThanB?: string) => {
+    if (aGreaterThanB === undefined || aGreaterThanB.trim().length === 0) {
+      throw Error("No numbers were found!");
+    }
+    const givenNumbers = aGreaterThanB
+      .trim()
+      .split(">")
+      .map((a) => parseInt(a));
+    if (givenNumbers.length === 2) {
+      if (givenNumbers[0] > givenNumbers[1]) {
+        return "";
+      }
+      return [];
+    }
+    throw Error(
+      `More or less than 2 numbers were given ${aGreaterThanB}=[${givenNumbers.join(
         ","
       )}]!`
     );
@@ -127,6 +151,26 @@ export const pluginShowIfNumberSmallerThan: MessageParserPlugin = {
         return [];
       }
       return "";
+    }
+    throw Error("More than 2 numbers were given!");
+  },
+};
+
+export const pluginShowIfNumberNotSmallerThan: MessageParserPlugin = {
+  id: "SHOW_IF_NUMBER_NOT_SMALLER_THAN",
+  func: (aSmallerThanB?: string) => {
+    if (aSmallerThanB === undefined || aSmallerThanB.trim().length === 0) {
+      throw Error("No numbers were found!");
+    }
+    const givenNumbers = aSmallerThanB
+      .trim()
+      .split("<")
+      .map((a) => parseInt(a));
+    if (givenNumbers.length === 2) {
+      if (givenNumbers[0] < givenNumbers[1]) {
+        return "";
+      }
+      return [];
     }
     throw Error("More than 2 numbers were given!");
   },
