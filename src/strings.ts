@@ -63,12 +63,16 @@ export const writeStringsVariableDocumentation = async (
   data +=
     "# To use a customized value instead of the default one uncomment the line.\n\n";
   data +=
-    "# Additionally there are plugins and macros that help with adding logic to the string:\n\n";
+    "# Additionally there are plugins and macros that help with adding logic:\n\n";
 
   const pluginsAndMacroDocumentation =
     await generatePluginAndMacroDocumentation(plugins, macros);
   data += `${pluginsAndMacroDocumentation}\n`;
 
+  data += "# Sometimes there are additional plugins/macros like $(USER).\n";
+  data += "# These plugins/macros can only be used when they are provided.\n";
+  data +=
+    "# So be sure to compare the default values plugins/macros for them.\n\n";
   data +=
     "# To use a customized value instead of the default one uncomment the line.\n";
   data += `# (The lines that start with ${PREFIX_CUSTOM_STRING})\n\n`;
