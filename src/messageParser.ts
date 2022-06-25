@@ -1,6 +1,18 @@
 import { MessageParserMacro } from "./messageParser/macros";
 import { MessageParserPlugin } from "./messageParser/plugins";
 
+/**
+ * A message parse tree node.
+ * Every parse tree node can be converted to a string (top to bottom).
+ * With that nested plugin or macro calls are only being evaluated if the plugin
+ * above them doesn't early exit. It also allows to create dynamically new
+ * macros in a plugin up in the parse tree for its children (pluginContent).
+ *
+ * There are 3 types of nodes:
+ * 1. text: Then content contains a pure string.
+ * 2. plugin: Then there is a plugin name, and optional a value or content
+ * 3. children: Then there is a list of child nodes
+ */
 export interface ParseTreeNode {
   originalString: string;
   type: "text" | "children" | "plugin";
@@ -73,11 +85,11 @@ enum ParseStateHelper {
    */
   PLUGIN_WAS_CLOSED = "PLUGIN_WAS_CLOSED",
   /**
-   * Subroutine if plugin content is detected.
+   * Subroutine if plugin content is detected since this requires a recursive call.
    */
   PLUGIN_CONTENT_FOUND = "PLUGIN_CONTENT_FOUND",
   /**
-   * Subroutine if plugin value is detected.
+   * Subroutine if plugin value is detected since this requires a recursive call.
    */
   PLUGIN_VALUE_FOUND = "PLUGIN_VALUE_FOUND",
 }
