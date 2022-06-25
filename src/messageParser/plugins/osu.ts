@@ -239,3 +239,90 @@ export const pluginOsuMostRecentPlay = (
     },
   };
 };
+
+export const pluginOsuUser = (
+  osuApiV2Credentials: OsuApiV2Credentials
+): MessageParserPlugin => {
+  return {
+    id: "OSU_USER",
+    func: async (userId?: string) => {
+      if (userId === undefined || userId.trim().length === 0) {
+        throw Error("osu! user ID was empty!");
+      }
+      const userIdNumber = parseInt(userId);
+      const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
+        osuApiV2Credentials.clientId,
+        osuApiV2Credentials.clientSecret
+      );
+      const user = await osuApiV2.users.id(
+        oauthAccessToken,
+        userIdNumber,
+        GameMode.osu
+      );
+      const joinDate = new Date(user.join_date);
+      const joinDateMonth = joinDate.getMonth();
+      const joinDateYear = joinDate.getFullYear();
+      const userAchievements = user.user_achievements;
+
+      return [
+        // eslint-disable-next-line security/detect-object-injection
+        ["JOIN_DATE_MONTH", `${monthNames[joinDateMonth]}`],
+        ["JOIN_DATE_YEAR", `${joinDateYear}`],
+        ["GLOBAL_RANK", `${user.statistics?.global_rank}`],
+        ["COUNTRY_RANK", `${user.statistics?.country_rank}`],
+        ["COUNTRY", `${user.country.name}`],
+        ["ID", `${user.id}`],
+        ["NAME", `${user.username}`],
+        [
+          "PLAYSTYLE",
+          `${
+            user.playstyle != null && user.playstyle.length > 0
+              ? user.playstyle.join(", ")
+              : undefined
+          }`,
+        ],
+        ["HAS_STATISTICS", `${user.statistics !== undefined}`],
+        [
+          "PP",
+          `${
+            user.statistics
+              ? Math.round(user.statistics.pp * 100) / 100
+              : undefined
+          }`,
+        ],
+        [
+          "ACC",
+          `${
+            user.statistics
+              ? Math.round(user.statistics.hit_accuracy * 100) / 100
+              : undefined
+          }`,
+        ],
+        ["MAX_COMBO", `${user.statistics?.maximum_combo}`],
+        ["COUNTS_SSH", `${user.statistics?.grade_counts.ssh}`],
+        ["COUNTS_SS", `${user.statistics?.grade_counts.ss}`],
+        ["COUNTS_SH", `${user.statistics?.grade_counts.sh}`],
+        ["COUNTS_S", `${user.statistics?.grade_counts.s}`],
+        ["COUNTS_A", `${user.statistics?.grade_counts.a}`],
+        [
+          "HAS_BUNNY",
+          `${
+            userAchievements !== undefined &&
+            userAchievements.find((a) => a.achievement_id === 6)
+              ? true
+              : false
+          }`,
+        ],
+        [
+          "HAS_TUTEL",
+          `${
+            userAchievements !== undefined &&
+            userAchievements?.find((a) => a.achievement_id === 151)
+              ? true
+              : false
+          }`,
+        ],
+      ];
+    },
+  };
+};

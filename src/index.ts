@@ -66,6 +66,7 @@ import {
   pluginOsuBeatmap,
   pluginOsuMostRecentPlay,
   pluginOsuScore,
+  pluginOsuUser,
 } from "./messageParser/plugins/osu";
 import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
 
@@ -345,12 +346,17 @@ export const main = async (logger: Logger, configDir: string) => {
       clientId: parseInt(osuApiClientId),
       clientSecret: osuApiClientSecret,
     });
+    const pluginOsuUserReady = pluginOsuUser({
+      clientId: parseInt(osuApiClientId),
+      clientSecret: osuApiClientSecret,
+    });
     plugins.set(pluginOsuBeatmapReady.id, pluginOsuBeatmapReady.func);
     plugins.set(pluginOsuScoreReady.id, pluginOsuScoreReady.func);
     plugins.set(
       pluginOsuMostRecentPlayReady.id,
       pluginOsuMostRecentPlayReady.func
     );
+    plugins.set(pluginOsuUserReady.id, pluginOsuUserReady.func);
   }
   if (osuStreamCompanionCurrentMapData !== undefined) {
     const pluginStreamCompanionReady = pluginStreamCompanion(

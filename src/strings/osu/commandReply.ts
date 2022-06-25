@@ -22,13 +22,13 @@ export const osuCommandReplyNpNoMap = {
 export const osuCommandReplyNpNoMapStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP_STREAMCOMPANION`,
   default:
-    "$(USER) No map is currently being played (This is either a custom map or you need to wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
+    "@$(USER) No map is currently being played (This is either a custom map or you need to wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
 };
 
 export const osuCommandReplyNpStreamCompanionNotRunning = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_NOT_RUNNING`,
   default:
-    "$(USER) No map is currently being played (StreamCompanion was configured but not found running!)",
+    "@$(USER) No map is currently being played (StreamCompanion was configured but not found running!)",
 };
 
 export const osuCommandReplyRp = {
@@ -44,9 +44,16 @@ export const osuCommandReplyRp = {
     "$(SHOW_IF_STRINGS_THE_SAME=%OSU_MOST_RECENT_PLAY:FOUND%===false|" +
     "No recent play was found))",
 };
+
 export const osuCommandReplyRpNotFound = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_RP_NOT_FOUND`,
-  default: "$(USER) No recent play was found",
+  default: "@$(USER) No recent play was found",
+};
+
+export const osuCommandReplyPp = {
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_PP`,
+  default:
+    "@$(USER) $(OSU_USER=%OSU_PP_REQUEST:ID%|%OSU_USER:NAME% \\(https://osu.ppy.sh/users/%OSU_USER:ID%\\) from %OSU_USER:COUNTRY% plays$(SHOW_IF_NOT_UNDEFINED=%OSU_USER:PLAYSTYLE%| with %OSU_USER:PLAYSTYLE%) since %OSU_USER:JOIN_DATE_MONTH% %OSU_USER:JOIN_DATE_YEAR%$(SHOW_IF_STRINGS_THE_SAME=%OSU_USER:HAS_STATISTICS%===true| and reached rank #%OSU_USER:GLOBAL_RANK% [country #%OSU_USER:COUNTRY_RANK%] with %OSU_USER:PP%pp, %OSU_USER:ACC%% accuracy, a max combo of  %OSU_USER:MAX_COMBO%, %OSU_USER:COUNTS_SSH% SSHs, %OSU_USER:COUNTS_SS% SSs, %OSU_USER:COUNTS_SH% SHs, %OSU_USER:COUNTS_S% Ss, %OSU_USER:COUNTS_A% As) - bunny=$(SHOW_IF_STRINGS_THE_SAME=%OSU_USER:HAS_BUNNY%===true|yes)$(SHOW_IF_STRINGS_THE_SAME=%OSU_USER:HAS_BUNNY%===false|no),tutel=$(SHOW_IF_STRINGS_THE_SAME=%OSU_USER:HAS_TUTEL%===true|yes)$(SHOW_IF_STRINGS_THE_SAME=%OSU_USER:HAS_TUTEL%===false|no))",
 };
 
 export const osuCommandReply: Iterable<readonly [string, string]> = [
@@ -66,4 +73,5 @@ export const osuCommandReply: Iterable<readonly [string, string]> = [
   ],
   [osuCommandReplyRp.id, osuCommandReplyRp.default],
   [osuCommandReplyRpNotFound.id, osuCommandReplyRpNotFound.default],
+  [osuCommandReplyPp.id, osuCommandReplyPp.default],
 ];
