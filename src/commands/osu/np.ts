@@ -17,6 +17,15 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { StreamCompanionData } from "../../streamcompanion";
 import type { OsuApiV2Credentials } from "../osu";
+import { Macros, messageParser, Plugins } from "../../messageParser";
+import type { Strings } from "../../strings";
+import {
+  osuCommandReplyNp,
+  osuCommandReplyNpNoMap,
+  osuCommandReplyNpNoMapStreamCompanion,
+  osuCommandReplyNpStreamCompanion,
+  osuCommandReplyNpStreamCompanionNotRunning,
+} from "../../strings/osu/commandReply";
 
 /**
  * Regex to parse the now playing window title on Windows.
@@ -52,6 +61,9 @@ export const roundToOneDecimalPlace = (num: undefined | number) => {
  * @param userName Twitch user name of the requester.
  * @param osuApiV2Credentials The osu API (v2) credentials.
  * @param osuStreamCompanionCurrentMapData If available get the current map data using StreamCompanion.
+ * @param globalStrings Global message strings.
+ * @param globalPlugins Global plugins.
+ * @param globalMacros Global macros.
  * @param logger Logger (used for logging).
  */
 export const commandNp = async (
@@ -63,6 +75,9 @@ export const commandNp = async (
   osuStreamCompanionCurrentMapData:
     | (() => StreamCompanionData | undefined)
     | undefined,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -71,7 +86,11 @@ export const commandNp = async (
   if (userName === undefined) {
     throw errorMessageUserNameUndefined();
   }
-  let message = `@${userName} No map is currently being played`;
+  let message = await messageParser(
+    globalStrings.get(osuCommandReplyNpNoMap.id),
+    globalPlugins,
+    globalMacros
+  );
 
   if (osuStreamCompanionCurrentMapData !== undefined) {
     const currentMapData = osuStreamCompanionCurrentMapData();
@@ -80,46 +99,27 @@ export const commandNp = async (
       currentMapData.mapid !== undefined &&
       currentMapData.mapid !== 0
     ) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      message = `@${userName} Currently playing '${currentMapData.titleRoman}' from '${currentMapData.artistRoman}' [${currentMapData.diffName}]`;
-      if (
-        currentMapData.mods !== undefined &&
-        currentMapData?.mods !== "None"
-      ) {
-        message += ` with ${currentMapData.mods}`;
-      }
-      message += ` - CS ${roundToOneDecimalPlace(
-        currentMapData.mCS
-      )}, AR ${roundToOneDecimalPlace(
-        currentMapData.mAR
-      )}, OD ${roundToOneDecimalPlace(
-        currentMapData.mOD
-      )}, HP ${roundToOneDecimalPlace(currentMapData.mHP)}, BPM ${
-        currentMapData.mBpm === undefined ? 0 : currentMapData.mBpm
-      }, ${roundToOneDecimalPlace(
-        currentMapData.maxCombo
-      )}x ${roundToOneDecimalPlace(currentMapData.mStars)}*`;
-      if (currentMapData.mapid === undefined || currentMapData.mapid === 0) {
-        if (
-          currentMapData.mapsetid === undefined ||
-          currentMapData.mapsetid === 0
-        ) {
-          message += " (StreamCompanion)";
-        } else {
-          message += ` (https://osu.ppy.sh/beatmapsets/${currentMapData.mapsetid} - StreamCompanion)`;
-        }
-      } else {
-        message += ` (https://osu.ppy.sh/beatmaps/${currentMapData.mapid} - StreamCompanion)`;
-      }
+      message = await messageParser(
+        globalStrings.get(osuCommandReplyNpStreamCompanion.id),
+        globalPlugins,
+        globalMacros
+      );
     } else if (
       currentMapData !== undefined &&
       currentMapData.mapid !== undefined &&
       currentMapData.mapid === 0
     ) {
-      message +=
-        " (Please wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)";
+      message = await messageParser(
+        globalStrings.get(osuCommandReplyNpNoMapStreamCompanion.id),
+        globalPlugins,
+        globalMacros
+      );
     } else {
-      message += " (StreamCompanion was configured but not found running!)";
+      message = await messageParser(
+        globalStrings.get(osuCommandReplyNpStreamCompanionNotRunning.id),
+        globalPlugins,
+        globalMacros
+      );
     }
   } else {
     if (osuApiV2Credentials === undefined) {
@@ -129,7 +129,7 @@ export const commandNp = async (
     if (windowTitle !== undefined && windowTitle !== "osu!") {
       const match = windowTitle.match(regexNowPlaying);
       if (match != null) {
-        message = `@${userName} Currently playing '${match[2]}' from '${match[1]}' [${match[3]}]`;
+        let mapId = undefined;
         try {
           const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
             osuApiV2Credentials.clientId,
@@ -164,13 +164,29 @@ export const commandNp = async (
                   match[3].trim().toLocaleLowerCase()
               );
               if (exactBeatmapDiff) {
-                message += ` (https://osu.ppy.sh/beatmaps/${exactBeatmapDiff.id})`;
+                mapId = exactBeatmapDiff.id;
               }
             }
           }
         } catch (err) {
           logger.warn(err);
         }
+        const customMacros = new Map(globalMacros);
+        customMacros.set(
+          "OSU_WINDOW_TITLE",
+          new Map([
+            ["TITLE", `${match[2]}`],
+            ["ARTIST", `${match[1]}`],
+            ["VERSION", `${match[3]}`],
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            ["MAP_ID_VIA_API", `${mapId}`],
+          ])
+        );
+        message = await messageParser(
+          globalStrings.get(osuCommandReplyNp.id),
+          globalPlugins,
+          customMacros
+        );
       }
     }
   }

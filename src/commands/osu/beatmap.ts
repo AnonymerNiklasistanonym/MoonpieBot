@@ -26,6 +26,7 @@ import {
   osuBeatmapRequestIrcDetailed,
   osuBeatmapRequestNotFound,
 } from "../../strings/osu/beatmapRequest";
+import type { Strings } from "../../strings";
 
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
@@ -62,7 +63,7 @@ export const commandBeatmap = async (
   detailedBeatmapInformation: undefined | boolean,
   osuIrcBot: (() => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
-  globalStrings: Map<string, string>,
+  globalStrings: Strings,
   globalPlugins: Plugins,
   globalMacros: Macros,
   logger: Logger

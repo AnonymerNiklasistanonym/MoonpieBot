@@ -218,6 +218,9 @@ export const osuChatHandler = async (
       tags.username,
       osuApiV2Credentials,
       osuStreamCompanionCurrentMapData,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
       logger
     );
     return;

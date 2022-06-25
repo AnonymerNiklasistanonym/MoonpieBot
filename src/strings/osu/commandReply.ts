@@ -5,7 +5,7 @@ export const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
 export const osuCommandReplyNp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP`,
   default:
-    "@$(USER) Currently playing '%OSU_WINDOW_TITLE:TITLE%' from '%OSU_WINDOW_TITLE:ARTIST%' [%OSU_WINDOW_TITLE:VERSION%]",
+    "@$(USER) Currently playing '%OSU_WINDOW_TITLE:TITLE%' from '%OSU_WINDOW_TITLE:ARTIST%' [%OSU_WINDOW_TITLE:VERSION%]$(SHOW_IF_NOT_UNDEFINED=%OSU_WINDOW_TITLE:MAP_ID_VIA_API%| \\(https://osu.ppy.sh/beatmaps/%OSU_WINDOW_TITLE:MAP_ID_VIA_API%\\))",
 };
 
 export const osuCommandReplyNpStreamCompanion = {
@@ -19,11 +19,31 @@ export const osuCommandReplyNpNoMap = {
   default: "$(USER) No map is currently being played",
 };
 
+export const osuCommandReplyNpNoMapStreamCompanion = {
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP_STREAMCOMPANION`,
+  default:
+    "$(USER) No map is currently being played (Please wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
+};
+
+export const osuCommandReplyNpStreamCompanionNotRunning = {
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_NOT_RUNNING`,
+  default:
+    "$(USER) No map is currently being played (StreamCompanion was configured but not found running!)",
+};
+
 export const osuCommandReply: Iterable<readonly [string, string]> = [
   [osuCommandReplyNp.id, osuCommandReplyNp.default],
   [osuCommandReplyNpNoMap.id, osuCommandReplyNpNoMap.default],
   [
     osuCommandReplyNpStreamCompanion.id,
     osuCommandReplyNpStreamCompanion.default,
+  ],
+  [
+    osuCommandReplyNpNoMapStreamCompanion.id,
+    osuCommandReplyNpNoMapStreamCompanion.default,
+  ],
+  [
+    osuCommandReplyNpStreamCompanionNotRunning.id,
+    osuCommandReplyNpStreamCompanionNotRunning.default,
   ],
 ];
