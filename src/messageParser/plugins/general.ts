@@ -1,48 +1,84 @@
 import { MessageParserPlugin } from "../plugins";
 
+const pluginShowIfEmptyLogic = (content?: string): boolean =>
+  content === undefined || content.trim().length === 0;
+
 export const pluginShowIfEmpty: MessageParserPlugin = {
   id: "SHOW_IF_EMPTY",
-  func: (content?: string) =>
-    content === undefined || content.trim().length === 0 ? [] : "",
+  description:
+    "Plugin that only displays text inside of its scope if the supplied value is empty",
+  examples: [
+    { argument: "not empty", scope: "Will not be shown" },
+    { argument: "", scope: "Will be shown" },
+  ],
+  func: (content?: string) => (pluginShowIfEmptyLogic(content) ? [] : ""),
 };
 
 export const pluginShowIfNotEmpty: MessageParserPlugin = {
   id: "SHOW_IF_NOT_EMPTY",
-  func: (content?: string) =>
-    content === undefined || content.trim().length === 0 ? "" : [],
+  description: `Opposite of ${pluginShowIfEmpty.id}`,
+  examples: [
+    { argument: "not empty", scope: "Will be shown" },
+    { argument: "", scope: "Will not be shown" },
+  ],
+  func: (content?: string) => (!pluginShowIfEmptyLogic(content) ? [] : ""),
 };
+
+const pluginShowIfTrueLogic = (content?: string): boolean =>
+  content !== undefined && content.trim().toLowerCase() === "true";
 
 export const pluginShowIfTrue: MessageParserPlugin = {
   id: "SHOW_IF_TRUE",
-  func: (content?: string) =>
-    content !== undefined && content.trim() === "true" ? [] : "",
+  examples: [
+    { argument: "true", scope: "Will be shown" },
+    { argument: "false", scope: "Will not be shown" },
+  ],
+  description:
+    "Plugin that only displays text inside of its scope if the supplied value is 'true'",
+  func: (content?: string) => (pluginShowIfTrueLogic(content) ? [] : ""),
 };
 
 export const pluginShowIfNotTrue: MessageParserPlugin = {
   id: "SHOW_IF_NOT_TRUE",
-  func: (content?: string) =>
-    content !== undefined && content.trim() === "true" ? "" : [],
+  description: `Opposite of ${pluginShowIfTrue.id}`,
+  examples: [
+    { argument: "true", scope: "Will not be shown" },
+    { argument: "false", scope: "Will be shown" },
+  ],
+  func: (content?: string) => (!pluginShowIfTrueLogic(content) ? [] : ""),
 };
+
+const pluginShowIfUndefinedLogic = (content?: string): boolean =>
+  content === undefined || content.trim().toLowerCase() === "undefined";
 
 export const pluginShowIfUndefined: MessageParserPlugin = {
   id: "SHOW_IF_UNDEFINED",
-  func: (content?: string) =>
-    content !== undefined && content.trim() === "undefined" ? [] : "",
+  description:
+    "Plugin that only displays text inside of its scope if the supplied value is 'undefined'",
+  examples: [
+    { argument: "undefined", scope: "Will be shown" },
+    { argument: "abc", scope: "Will not be shown" },
+  ],
+  func: (content?: string) => (pluginShowIfUndefinedLogic(content) ? [] : ""),
 };
 
 export const pluginShowIfNotUndefined: MessageParserPlugin = {
   id: "SHOW_IF_NOT_UNDEFINED",
-  func: (content?: string) =>
-    content !== undefined && content.trim() === "undefined" ? "" : [],
+  description: `Opposite of ${pluginShowIfUndefined.id}`,
+  examples: [
+    { argument: "undefined", scope: "Will not be shown" },
+    { argument: "abc", scope: "Will be shown" },
+  ],
+  func: (content?: string) => (!pluginShowIfUndefinedLogic(content) ? [] : ""),
 };
 
 export const pluginShowIfStringsTheSame: MessageParserPlugin = {
   id: "SHOW_IF_STRINGS_THE_SAME",
   description:
-    "Plugin that only displays text inside of its scope if the two supplied strings are the same",
+    "Plugin that only displays text inside of its scope if the two supplied strings separated by '===' are the same",
   examples: [
-    { argument: "hello===goodbye", scope: "Will not be shown" },
     { argument: "hello===hello", scope: "Will be shown" },
+    { argument: "hello===goodbye", scope: "Will not be shown" },
   ],
   func: (aStringEqualsBString?: string) => {
     if (
@@ -69,10 +105,10 @@ export const pluginShowIfStringsTheSame: MessageParserPlugin = {
 export const pluginShowIfStringsNotTheSame: MessageParserPlugin = {
   id: "SHOW_IF_STRINGS_NOT_THE_SAME",
   description:
-    "Plugin that only displays text inside of its scope if the two supplied strings are not the same",
+    "Plugin that only displays text inside of its scope if the two supplied strings separated by '!==' are not the same",
   examples: [
-    { before: "This", argument: "hello!==goodbye", scope: " will be shown" },
-    { before: "This", argument: "hello!==hello", scope: " will not be shown" },
+    { argument: "hello!==hello", scope: "Will not be shown" },
+    { argument: "hello!==goodbye", scope: "Will be shown" },
   ],
   func: (aStringEqualsBString?: string) => {
     if (
@@ -98,6 +134,12 @@ export const pluginShowIfStringsNotTheSame: MessageParserPlugin = {
 
 export const pluginShowIfNumberGreaterThan: MessageParserPlugin = {
   id: "SHOW_IF_NUMBER_GREATER_THAN",
+  description:
+    "Plugin that only displays text inside of its scope if the first of the two supplied numbers separated by '>' is greater than the second one",
+  examples: [
+    { argument: "10>1", scope: "Will be shown" },
+    { argument: "2>4", scope: "Will not be shown" },
+  ],
   func: (aGreaterThanB?: string) => {
     if (aGreaterThanB === undefined || aGreaterThanB.trim().length === 0) {
       throw Error("No numbers were found!");
@@ -122,6 +164,7 @@ export const pluginShowIfNumberGreaterThan: MessageParserPlugin = {
 
 export const pluginShowIfNumberNotGreaterThan: MessageParserPlugin = {
   id: "SHOW_IF_NUMBER_NOT_GREATER_THAN",
+  description: `Opposite of ${pluginShowIfNumberGreaterThan.id}`,
   func: (aGreaterThanB?: string) => {
     if (aGreaterThanB === undefined || aGreaterThanB.trim().length === 0) {
       throw Error("No numbers were found!");
@@ -146,6 +189,12 @@ export const pluginShowIfNumberNotGreaterThan: MessageParserPlugin = {
 
 export const pluginShowIfNumberSmallerThan: MessageParserPlugin = {
   id: "SHOW_IF_NUMBER_SMALLER_THAN",
+  description:
+    "Plugin that only displays text inside of its scope if the first of the two supplied numbers separated by '<' is smaller than the second one",
+  examples: [
+    { argument: "10<1", scope: "Will not be shown" },
+    { argument: "2<4", scope: "Will be shown" },
+  ],
   func: (aSmallerThanB?: string) => {
     if (aSmallerThanB === undefined || aSmallerThanB.trim().length === 0) {
       throw Error("No numbers were found!");
@@ -166,6 +215,7 @@ export const pluginShowIfNumberSmallerThan: MessageParserPlugin = {
 
 export const pluginShowIfNumberNotSmallerThan: MessageParserPlugin = {
   id: "SHOW_IF_NUMBER_NOT_SMALLER_THAN",
+  description: `Opposite of ${pluginShowIfNumberSmallerThan.id}`,
   func: (aSmallerThanB?: string) => {
     if (aSmallerThanB === undefined || aSmallerThanB.trim().length === 0) {
       throw Error("No numbers were found!");
