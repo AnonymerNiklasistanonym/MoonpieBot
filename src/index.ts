@@ -596,9 +596,8 @@ export const main = async (logger: Logger, configDir: string) => {
         customTimer.channels,
         customTimer.message,
         customTimer.cronString,
-        twitchApiClient,
-        // TODO Add macro for StreamCompanion
-        //osuStreamCompanionCurrentMapData,
+        plugins,
+        macros,
         logger
       );
     }
