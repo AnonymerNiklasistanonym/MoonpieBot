@@ -9,9 +9,9 @@ import { MessageParserPlugin } from "./messageParser/plugins";
  * macros in a plugin up in the parse tree for its children (pluginContent).
  *
  * There are 3 types of nodes:
- * 1. text: Then content contains a pure string.
- * 2. plugin: Then there is a plugin name, and optional a value or content
- * 3. children: Then there is a list of child nodes
+ * 1. Text: Then content contains a pure string.
+ * 2. Plugin: Then there is a plugin name, and optional a value or content
+ * 3. Children: Then there is a list of child nodes.
  */
 export interface ParseTreeNode {
   originalString: string;
@@ -425,19 +425,29 @@ export type Macros = Map<string, MacroDictionary>;
 
 const replaceMacros = (text: string, macros: Macros) => {
   return text.replace(
-    /%([^:]+?):([^:]+?)%/g,
+    /%([^:\s]+?):([^:\s]+?)%/g,
     (_fullMatch, macroName, macroValue) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const macro = macros.get(macroName);
       if (macro === undefined) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        throw Error(`Macro (${macroName}) was not found`);
+        throw Error(
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          `Macro (${macroName}) was not found [${Array.from(macros.entries())
+            .map((a) => a[0])
+            .join(",")}]`
+        );
       }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const macroOutput = macro.get(macroValue);
       if (macroOutput === undefined) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        throw Error(`Macro (${macroName}:${macroValue}) was not found`);
+        throw Error(
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          `Macro (${macroName}:${macroValue}) was not found [${Array.from(
+            macro.entries()
+          )
+            .map((a) => a[0])
+            .join(",")}]`
+        );
       }
       return macroOutput;
     }
@@ -465,7 +475,11 @@ export const parseTreeNode = async (
       // eslint-disable-next-line no-case-declarations
       const plugin = plugins.get(pluginName);
       if (plugin === undefined) {
-        throw Error(`Plugin (${pluginName}) was not found`);
+        throw Error(
+          `Plugin (${pluginName}) was not found [${Array.from(plugins.entries())
+            .map((a) => a[0])
+            .join(",")}]`
+        );
       }
       // eslint-disable-next-line no-case-declarations
       const pluginValue = treeNode.pluginValue;

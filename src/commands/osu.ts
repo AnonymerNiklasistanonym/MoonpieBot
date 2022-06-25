@@ -13,6 +13,8 @@ import type { Client as IrcClient } from "irc";
 import type { StreamCompanionData } from "../streamcompanion";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { Strings } from "../strings";
+import type { Macros, Plugins } from "../messageParser";
 
 /**
  * The logging ID of this command.
@@ -191,7 +193,9 @@ export const osuChatHandler = async (
     | (() => StreamCompanionData | undefined)
     | undefined,
   enabled: undefined | string[],
-  strings: Map<string, string>,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (enabled === undefined) {
@@ -351,7 +355,9 @@ export const osuChatHandler = async (
               enableOsuBeatmapRequestsDetailed,
               osuIrcBot,
               osuIrcRequestTarget,
-              strings,
+              globalStrings,
+              globalPlugins,
+              globalMacros,
               logger
             );
           }

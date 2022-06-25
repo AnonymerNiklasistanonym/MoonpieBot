@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import osuApiV2, { OAuthAccessToken, RankedStatus } from "osu-api-v2";
-import { MessageParserPlugin } from "../plugins";
+import osuApiV2, { OsuApiV2WebRequestError, RankedStatus } from "osu-api-v2";
+import type { OsuApiV2Credentials } from "../../commands/osu";
+import type { MessageParserPlugin } from "../plugins";
 
 const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
   switch (rankedStatus) {
@@ -37,7 +38,7 @@ const monthNames = [
 ];
 
 export const pluginOsuBeatmap = (
-  oauthAccessToken: OAuthAccessToken
+  osuApiV2Credentials: OsuApiV2Credentials
 ): MessageParserPlugin => {
   return {
     id: "OSU_BEATMAP",
@@ -46,6 +47,10 @@ export const pluginOsuBeatmap = (
         throw Error("osu! beatmap ID was empty!");
       }
       const beatmapIdNumber = parseInt(beatmapId);
+      const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
+        osuApiV2Credentials.clientId,
+        osuApiV2Credentials.clientSecret
+      );
       const beatmap = await osuApiV2.beatmaps.get(
         oauthAccessToken,
         beatmapIdNumber
@@ -53,7 +58,7 @@ export const pluginOsuBeatmap = (
       const beatmapUpdate = new Date(beatmap.last_updated);
       return [
         ["TITLE", `${beatmap.beatmapset?.title}`],
-        ["DIFFICULTY", `${beatmap.version}`],
+        ["VERSION", `${beatmap.version}`],
         [
           "DIFFICULTY_RATING",
           `${
@@ -84,7 +89,7 @@ export const pluginOsuBeatmap = (
 };
 
 export const pluginOsuScore = (
-  oauthAccessToken: OAuthAccessToken
+  osuApiV2Credentials: OsuApiV2Credentials
 ): MessageParserPlugin => {
   return {
     id: "OSU_SCORE",
@@ -101,44 +106,61 @@ export const pluginOsuScore = (
       if (beatmapIdAndUserIdNumber.length !== 2) {
         throw Error("osu! beatmap or user ID missing!");
       }
-      const beatmapScore = await osuApiV2.beatmaps.scores.users(
-        oauthAccessToken,
-        beatmapIdAndUserIdNumber[0],
-        beatmapIdAndUserIdNumber[1]
+      const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
+        osuApiV2Credentials.clientId,
+        osuApiV2Credentials.clientSecret
       );
-      const score = beatmapScore.score;
-      const scoreDate = new Date(score.created_at);
-      const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
-      return [
-        [
-          "EXISTS",
-          `${
-            beatmapScore.position !== undefined && beatmapScore.position !== -1
-          }`,
-        ],
-        ["PASSED", `${score.passed}`],
-        ["RANK", `${score.rank}`],
-        ["FC", `${score.perfect}`],
-        [
-          "PP",
-          score.pp == null
-            ? "undefined"
-            : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
-        ],
-        ["MODS", `${score.mods.join(" ")}`],
-        ["COUNT_300", `${score.statistics.count_300}`],
-        ["COUNT_100", `${score.statistics.count_100}`],
-        ["COUNT_50", `${score.statistics.count_50}`],
-        ["COUNT_MISS", `${score.statistics.count_miss}`],
-        ["MAX_COMBO", `${score.max_combo}`],
-        ["TIME_IN_S_AGO", `${scoreDateRangeMs / 1000}`],
-        ["DATE_MONTH", monthNames[scoreDate.getMonth()]],
-        ["DATE_YEAR", `${scoreDate.getFullYear()}`],
-        ["USER_NAME", `${score.user?.username}`],
-        ["USER_ID", `${score.user?.id}`],
-        ["HAS_REPLAY", `${score.replay}`],
-        ["ID", `${score.id}`],
-      ];
+      try {
+        const beatmapScore = await osuApiV2.beatmaps.scores.users(
+          oauthAccessToken,
+          beatmapIdAndUserIdNumber[0],
+          beatmapIdAndUserIdNumber[1]
+        );
+        const score = beatmapScore.score;
+        const scoreDate = new Date(score.created_at);
+        const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
+        return [
+          [
+            "EXISTS",
+            `${
+              beatmapScore.position !== undefined &&
+              beatmapScore.position !== -1
+            }`,
+          ],
+          ["PASSED", `${score.passed}`],
+          ["RANK", `${score.rank}`],
+          ["FC", `${score.perfect}`],
+          [
+            "ACC",
+            `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`,
+          ],
+          [
+            "PP",
+            score.pp == null
+              ? "undefined"
+              : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
+          ],
+          ["MODS", `${score.mods.join(",")}`],
+          ["COUNT_300", `${score.statistics.count_300}`],
+          ["COUNT_100", `${score.statistics.count_100}`],
+          ["COUNT_50", `${score.statistics.count_50}`],
+          ["COUNT_MISS", `${score.statistics.count_miss}`],
+          ["MAX_COMBO", `${score.max_combo}`],
+          ["TIME_IN_S_AGO", `${scoreDateRangeMs / 1000}`],
+          ["DATE_MONTH", monthNames[scoreDate.getMonth()]],
+          ["DATE_YEAR", `${scoreDate.getFullYear()}`],
+          ["USER_NAME", `${score.user?.username}`],
+          ["USER_ID", `${score.user?.id}`],
+          ["HAS_REPLAY", `${score.replay}`],
+          ["ID", `${score.id}`],
+        ];
+      } catch (err) {
+        if ((err as OsuApiV2WebRequestError).statusCode === 404) {
+          return [["EXISTS", "false"]];
+        } else {
+          throw err;
+        }
+      }
     },
   };
 };

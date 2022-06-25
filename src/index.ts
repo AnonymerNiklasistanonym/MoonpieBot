@@ -60,6 +60,7 @@ import {
 } from "./messageParser/plugins/general";
 import { errorMessageUserNameUndefined } from "./commands";
 import { pluginTwitchApi } from "./messageParser/plugins/twitchApi";
+import { pluginOsuBeatmap, pluginOsuScore } from "./messageParser/plugins/osu";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -100,8 +101,6 @@ export const main = async (logger: Logger, configDir: string) => {
     configDir,
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
-
-  const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
 
   const spotifyApiClientId = getEnvVariableValueOrCustomDefault(
     EnvVariable.SPOTIFY_API_CLIENT_ID,
@@ -314,12 +313,25 @@ export const main = async (logger: Logger, configDir: string) => {
     pluginsList,
     macrosList
   );
+  const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
   const pluginsAndMacrosMap = generatePluginsAndMacrosMap(
     pluginsList,
     macrosList
   );
   const plugins = pluginsAndMacrosMap.pluginsMap;
   const macros = pluginsAndMacrosMap.macrosMap;
+  if (osuApiClientId && osuApiClientSecret) {
+    const pluginOsuBeatmapReady = pluginOsuBeatmap({
+      clientId: parseInt(osuApiClientId),
+      clientSecret: osuApiClientSecret,
+    });
+    const pluginOsuScoreReady = pluginOsuScore({
+      clientId: parseInt(osuApiClientId),
+      clientSecret: osuApiClientSecret,
+    });
+    plugins.set(pluginOsuBeatmapReady.id, pluginOsuBeatmapReady.func);
+    plugins.set(pluginOsuScoreReady.id, pluginOsuScoreReady.func);
+  }
 
   // Create TwitchClient and listen to certain events
   const twitchClient = createTwitchClient(
@@ -372,7 +384,7 @@ export const main = async (logger: Logger, configDir: string) => {
         channel,
         tags["user-id"]
       )) {
-        pluginsChannel.set(plugin.id, plugin.func);
+        plugins.set(plugin.id, plugin.func);
       }
     }
     pluginsChannel.set("USER", () => {
@@ -430,6 +442,8 @@ export const main = async (logger: Logger, configDir: string) => {
           ","
         ),
         strings,
+        pluginsChannel,
+        macros,
         logger
       ).catch((err) => {
         logger.error(err);
@@ -466,6 +480,8 @@ export const main = async (logger: Logger, configDir: string) => {
           ? ["np"]
           : enableCommands.filter((a) => a === "np"),
         strings,
+        pluginsChannel,
+        macros,
         logger
       ).catch((err) => {
         logger.error(err);

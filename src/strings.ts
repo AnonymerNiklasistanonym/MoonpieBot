@@ -3,8 +3,8 @@
  */
 
 import { Logger } from "winston";
-import { moonpieCommandReply } from "./strings/moonpie";
-//import { osuBeatmapRequest } from "./strings/osu";
+import { moonpieCommandReply } from "./strings/moonpie/commandReply";
+import { osuBeatmapRequests } from "./strings/osu/beatmapRequest";
 import { promises as fs } from "fs";
 import { generatePluginAndMacroDocumentation } from "./messageParser";
 import { MessageParserPlugin } from "./messageParser/plugins";
@@ -19,7 +19,7 @@ export const PREFIX_CUSTOM_STRING = "MOONPIE_CUSTOM_STRING_";
  */
 export const defaultStrings: Strings = new Map<string, string>([
   ...moonpieCommandReply,
-  //...osuBeatmapRequest,
+  ...osuBeatmapRequests,
   //[
   //  "OSU_NP_COMMAND_REPLY_STREAMCOMPANION",
   //  "@$(USER) Currently playing '%OSU_STREAMCOMPANION:TITLE%' from '%OSU_STREAMCOMPANION:ARTIST%' ['%OSU_STREAMCOMPANION:VERSION%'] TODO",
