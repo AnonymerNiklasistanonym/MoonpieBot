@@ -58,7 +58,11 @@ export const pluginShowIfStringsTheSame: MessageParserPlugin = {
       }
       return "";
     }
-    throw Error("More than 2 strings were given!");
+    throw Error(
+      `SHOW_IF_STRINGS_THE_SAME: More or less than 2 strings were given! (${aStringEqualsBString}=>${JSON.stringify(
+        givenStrings
+      )})`
+    );
   },
 };
 
@@ -84,7 +88,11 @@ export const pluginShowIfStringsNotTheSame: MessageParserPlugin = {
       }
       return "";
     }
-    throw Error("More than 2 strings were given!");
+    throw Error(
+      `SHOW_IF_STRINGS_NOT_THE_SAME: More or less than 2 strings were given! (${aStringEqualsBString}=>${JSON.stringify(
+        givenStrings
+      )})`
+    );
   },
 };
 

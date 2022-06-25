@@ -18,10 +18,21 @@ export const pluginStreamCompanion = (
         ["VERSION", `${streamCompanionData.diffName}`],
         ["ID", `${streamCompanionData.mapid}`],
         ["SET_ID", `${streamCompanionData.mapsetid}`],
+        ["CS", `${streamCompanionData.mCS}`],
         ["AR", `${streamCompanionData.mAR}`],
         ["OD", `${streamCompanionData.mOD}`],
         ["HP", `${streamCompanionData.mHP}`],
         ["BPM", `${streamCompanionData.mBpm}`],
+        [
+          "DIFFICULTY_RATING",
+          `${
+            streamCompanionData.mStars !== undefined
+              ? Math.round(
+                  streamCompanionData.mStars * 10000 + Number.EPSILON
+                ) / 100
+              : undefined
+          }`,
+        ],
         ["MAX_COMBO", `${streamCompanionData.maxCombo}`],
         ["MODS", `${streamCompanionData.mods}`],
       ];

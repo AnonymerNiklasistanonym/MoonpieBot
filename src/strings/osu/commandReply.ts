@@ -11,18 +11,18 @@ export const osuCommandReplyNp = {
 export const osuCommandReplyNpStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION`,
   default:
-    "@$(USER) Currently playing '%OSU_STREAMCOMPANION:TITLE_ROMAN%' from '%OSU_STREAMCOMPANION:ARTIST_ROMAN%' [%OSU_STREAMCOMPANION:DIFF_NAME%]$(SHOW_IF_NOT_UNDEFINED=%OSU_STREAMCOMPANION:MODS%|$(SHOW_IF_STRINGS_NOT_THE_SAME=%OSU_STREAMCOMPANION:MODS%===None| using %OSU_STREAMCOMPANION:MODS%)) - CS %OSU_STREAMCOMPANION:CS%, AR %OSU_STREAMCOMPANION:AR%, OD %OSU_STREAMCOMPANION:OD%, HP %OSU_STREAMCOMPANION:HP%, BPM %OSU_STREAMCOMPANION:BPM%, %OSU_STREAMCOMPANION:MAX_COMBO%x, %OSU_STREAMCOMPANION:STARS%* ($(SHOW_IF_NUMBER_GREATER_THAN=%OSU_STREAMCOMPANION:ID%>0|https://osu.ppy.sh/beatmaps/%OSU_STREAMCOMPANION:ID% - )$(SHOW_IF_NUMBER_NOT_GREATER_THAN=%OSU_STREAMCOMPANION:ID%>0|$(SHOW_IF_NUMBER_GREATER_THAN=%OSU_STREAMCOMPANION:SET_ID%>0|https://osu.ppy.sh/beatmapsets/%OSU_STREAMCOMPANION:SET_ID% - ))StreamCompanion)",
+    "@$(USER) Currently playing $(OSU_STREAMCOMPANION|'%OSU_STREAMCOMPANION:TITLE_ROMAN%' from '%OSU_STREAMCOMPANION:ARTIST_ROMAN%' [%OSU_STREAMCOMPANION:VERSION%]$(SHOW_IF_NOT_UNDEFINED=%OSU_STREAMCOMPANION:MODS%|$(SHOW_IF_STRINGS_NOT_THE_SAME=%OSU_STREAMCOMPANION:MODS%!==None| using %OSU_STREAMCOMPANION:MODS%)) - CS %OSU_STREAMCOMPANION:CS%, AR %OSU_STREAMCOMPANION:AR%, OD %OSU_STREAMCOMPANION:OD%, HP %OSU_STREAMCOMPANION:HP%, BPM %OSU_STREAMCOMPANION:BPM%, %OSU_STREAMCOMPANION:MAX_COMBO%x, %OSU_STREAMCOMPANION:DIFFICULTY_RATING%* ($(SHOW_IF_NUMBER_GREATER_THAN=%OSU_STREAMCOMPANION:ID%>0|https://osu.ppy.sh/beatmaps/%OSU_STREAMCOMPANION:ID% - )$(SHOW_IF_NUMBER_NOT_GREATER_THAN=%OSU_STREAMCOMPANION:ID%>0|$(SHOW_IF_NUMBER_GREATER_THAN=%OSU_STREAMCOMPANION:SET_ID%>0|https://osu.ppy.sh/beatmapsets/%OSU_STREAMCOMPANION:SET_ID% - ))StreamCompanion))",
 };
 
 export const osuCommandReplyNpNoMap = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP`,
-  default: "$(USER) No map is currently being played",
+  default: "@$(USER) No map is currently being played",
 };
 
 export const osuCommandReplyNpNoMapStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP_STREAMCOMPANION`,
   default:
-    "$(USER) No map is currently being played (Please wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
+    "$(USER) No map is currently being played (This is either a custom map or you need to wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
 };
 
 export const osuCommandReplyNpStreamCompanionNotRunning = {
