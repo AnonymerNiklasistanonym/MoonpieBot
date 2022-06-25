@@ -2,6 +2,27 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import WebSocket from "ws";
 import type { Logger } from "winston";
 
+/**
+ * The logging ID of this module.
+ */
+const LOG_ID_MODULE_OSU_STREAMCOMPANION = "osu_streamcompanion";
+
+const OSU_STREAMCOMPANION_DATA = [
+  "titleRoman",
+  "artistRoman",
+  "diffName",
+  "mapid",
+  "mapsetid",
+  "maxCombo",
+  "mods",
+  "mAR",
+  "mCS",
+  "mOD",
+  "mHP",
+  "mStars",
+  "mBpm",
+];
+
 export interface StreamCompanionData {
   titleRoman?: string;
   artistRoman?: string;
@@ -36,34 +57,22 @@ export const createStreamCompanionConnection = (
     WebSocket: WebSocket,
     connectionTimeout: websocketReconnectTimeoutInS * 1000,
   });
-  logger.info(
-    `Try to connect to StreamCompanion via '${
+  logger.info({
+    message: `Try to connect to StreamCompanion via '${
       (ws as unknown as ReconnectingWebSocketHelper)._url
-    }' (url=${websocketUrl}, timeout=${websocketReconnectTimeoutInS}s)`
-  );
+    }' (url=${websocketUrl}, timeout=${websocketReconnectTimeoutInS}s)`,
+    section: LOG_ID_MODULE_OSU_STREAMCOMPANION,
+  });
   ws.onopen = () => {
     connectedToStreamCompanion = true;
-    logger.info("StreamCompanion socket was opened");
+    logger.info({
+      message: "StreamCompanion socket was opened",
+      section: LOG_ID_MODULE_OSU_STREAMCOMPANION,
+    });
     // Send token names which should be watched for value changes
     // https://piotrekol.github.io/StreamCompanion/development/SC/api.html#json
     // TODO: Check what happens for invalid/custom maps
-    ws.send(
-      JSON.stringify([
-        "titleRoman",
-        "artistRoman",
-        "diffName",
-        "mapid",
-        "mapsetid",
-        "maxCombo",
-        "mods",
-        "mAR",
-        "mCS",
-        "mOD",
-        "mHP",
-        "mStars",
-        "mBpm",
-      ])
-    );
+    ws.send(JSON.stringify(OSU_STREAMCOMPANION_DATA));
   };
   const cache: StreamCompanionData = {};
   ws.onmessage = (wsEvent) => {
@@ -71,17 +80,26 @@ export const createStreamCompanionConnection = (
       cache,
       JSON.parse(wsEvent.data as string) as StreamCompanionData
     );
-    logger.debug(`New StreamCompanion data: '${wsEvent.data as string}'`);
+    logger.debug({
+      message: `New StreamCompanion data: '${wsEvent.data as string}'`,
+      section: LOG_ID_MODULE_OSU_STREAMCOMPANION,
+    });
   };
   ws.onclose = () => {
     if (connectedToStreamCompanion) {
       connectedToStreamCompanion = false;
-      logger.info("StreamCompanion socket was closed");
+      logger.info({
+        message: "StreamCompanion socket was closed",
+        section: LOG_ID_MODULE_OSU_STREAMCOMPANION,
+      });
     }
   };
   ws.onerror = (err) => {
     connectedToStreamCompanion = false;
-    logger.error(`StreamCompanion socket error: ${err.message}`);
+    logger.error({
+      message: `StreamCompanion socket error: ${err.message}`,
+      section: LOG_ID_MODULE_OSU_STREAMCOMPANION,
+    });
   };
   return () => (connectedToStreamCompanion ? cache : undefined);
 };

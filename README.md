@@ -10,11 +10,15 @@ A custom Twitch chat bot.
 
 - [Features](#features)
   - [Optional: osu!](#optional-osu)
+  - [Optional: Spotify](#optional-spotify)
   - [Optional: Custom commands/timers](#optional-custom-commandstimers)
 - [Setup](#setup)
   - [Build it yourself](#build-it-yourself)
   - [Binary releases](#binary-releases)
+    - [Linux](#linux)
+    - [Windows](#windows)
   - [Package managers](#package-managers)
+    - [Pacman](#pacman)
 - [Migrate to a new version](#migrate-to-a-new-version)
 - [Helping Resources](#helping-resources)
 - [Examples](#examples)
@@ -66,6 +70,18 @@ Given an osu! IRC login it can even send these beatmap links to the osu! client.
 It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) can be found in the configuration even if no other osu! related configurations is set.
 
 *Everything is currently optimized and written for osu! standard which means you need to open an issue if you need other behaviour!*
+
+### Optional: Spotify
+
+Given a Spotify client ID/secret the bot can additionally fetch some Spotify related information.
+
+After a successful authentication (the bot will automatically open a website for the authentication) you will be able to copy the access and refresh token so next time the authentication does not necessarily need to be repeated in the browser.
+
+| Command | Permissions | Description |
+| ------ | -- | -------- |
+| `!song` | everyone | Get the currently playing song title/artist and album (if not a single) as well as the same information about the 2 previously played songs |
+
+Every command can be optionally disabled.
 
 ### Optional: Custom commands/timers
 

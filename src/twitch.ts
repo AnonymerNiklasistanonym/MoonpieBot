@@ -28,7 +28,7 @@ export interface CreateTwitchClientError extends Error {
   code?: CreateTwitchClientErrorCode;
 }
 
-/**
+/**.
  * Create a Twitch client/connection.
  *
  * The twitch client can then listen to multiple events.

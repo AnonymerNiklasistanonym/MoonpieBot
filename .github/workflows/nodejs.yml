@@ -4,10 +4,16 @@
 name: Node.js CI
 
 on:
+  # Run CI when a new version tag is created
+  create:
+    tags:
+      - v*
+  # Run CI when a new commit is pushed
   push:
-    branches: [ main, binary-release ]
+    branches: [ main, dev ]
+  # Run CI when a new pull request is created
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   build-linux:
@@ -39,7 +45,7 @@ jobs:
     - name: Save binary artifact
       uses: actions/upload-artifact@v3
       with:
-        name: moonpiebot-${{ github.ref_name }}-linux-node-${{ matrix.node-version }}
+        name: moonpiebot-linux-node-${{ matrix.node-version }}
         path: bin/moonpiebot
         retention-days: 14
         if-no-files-found: error
@@ -77,7 +83,7 @@ jobs:
     - name: Save binary artifact [standalone]
       uses: actions/upload-artifact@v3
       with:
-        name: moonpiebot-${{ github.ref_name }}-windows-node-${{ matrix.node-version }}
+        name: moonpiebot-windows-node-${{ matrix.node-version }}
         path: bin/moonpiebot.exe
         retention-days: 14
         if-no-files-found: error
@@ -87,7 +93,7 @@ jobs:
     - name: Save binary artifact [installer]
       uses: actions/upload-artifact@v3
       with:
-        name: moonpiebot-installer-${{ github.ref_name }}-windows-node-${{ matrix.node-version }}
+        name: moonpiebot-installer-windows-node-${{ matrix.node-version }}
         path: bin/moonpiebot_setup.exe
         retention-days: 14
         if-no-files-found: error

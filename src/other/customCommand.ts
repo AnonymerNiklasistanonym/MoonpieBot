@@ -5,12 +5,11 @@ import {
   logTwitchMessageCommandDetected,
   logTwitchMessageCommandReply,
 } from "../commands";
-import { parseMessage } from "./parseMessage";
 import { TwitchBadgeLevels } from "./twitchBadgeParser";
 // Type imports
-import type { ApiClient } from "@twurple/api";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
+import { Macros, messageParser, Plugins } from "../messageParser";
 
 /**
  * The logging ID of this command.
@@ -33,8 +32,8 @@ export const checkCustomCommand = async (
   regexString: string,
   userLevel: "broadcaster" | "mod" | "vip" | "everyone" | undefined,
   commandName: string | undefined,
-  commandCount: number,
-  twitchApiClient: ApiClient | undefined,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<boolean> => {
   if (tags.id === undefined) {
@@ -85,15 +84,19 @@ export const checkCustomCommand = async (
     LOG_ID_MODULE_CUSTOM_COMMAND
   );
 
+  const pluginsCommand: Plugins = new Map(globalPlugins);
+  pluginsCommand.set("REGEX_GROUP", (regexGroupIndex?: string) => {
+    if (regexGroupIndex === undefined || regexGroupIndex.length === 0) {
+      throw Error("Regex group index was undefined or empty!");
+    }
+    return `${match[parseInt(regexGroupIndex)]}`;
+  });
+
   if (channels.find((a) => a === channel)) {
-    const parsedMessage = await parseMessage(
+    const parsedMessage = await messageParser(
       messageCommand,
-      match,
-      commandCount,
-      tags.username,
-      twitchApiClient,
-      tags["user-id"],
-      channel
+      pluginsCommand,
+      globalMacros
     );
     const sentMessage = await client.say(channel, parsedMessage);
 

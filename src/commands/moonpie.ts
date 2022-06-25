@@ -12,6 +12,8 @@ import { logTwitchMessageCommandDetected } from "../commands";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
+import { Macros, Plugins } from "../messageParser";
+import { Strings } from "../strings";
 
 /**
  * The logging ID of this command.
@@ -157,23 +159,22 @@ export const moonpieChatHandler = async (
   tags: ChatUserstate,
   message: string,
   databasePath: string,
-  enabled: undefined | string[],
+  enabled: string[] = [
+    MoonpieCommands.ABOUT,
+    MoonpieCommands.ADD,
+    MoonpieCommands.CLAIM,
+    MoonpieCommands.COMMANDS,
+    MoonpieCommands.DELETE,
+    MoonpieCommands.GET,
+    MoonpieCommands.LEADERBOARD,
+    MoonpieCommands.REMOVE,
+    MoonpieCommands.SET,
+  ],
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
-  if (enabled === undefined) {
-    // per default enable all options
-    enabled = [
-      MoonpieCommands.ABOUT,
-      MoonpieCommands.ADD,
-      MoonpieCommands.CLAIM,
-      MoonpieCommands.COMMANDS,
-      MoonpieCommands.DELETE,
-      MoonpieCommands.GET,
-      MoonpieCommands.LEADERBOARD,
-      MoonpieCommands.REMOVE,
-      MoonpieCommands.SET,
-    ];
-  }
   if (message.match(regexMoonpie)) {
     // > !moonpie commands
     if (
@@ -204,7 +205,16 @@ export const moonpieChatHandler = async (
         MoonpieCommands.LEADERBOARD,
         LOG_ID_MODULE_MOONPIE
       );
-      await commandLeaderboard(client, channel, tags.id, databasePath, logger);
+      await commandLeaderboard(
+        client,
+        channel,
+        tags.id,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        databasePath,
+        logger
+      );
       return;
     }
     // > !moonpie about
@@ -220,7 +230,15 @@ export const moonpieChatHandler = async (
         MoonpieCommands.ABOUT,
         LOG_ID_MODULE_MOONPIE
       );
-      await commandAbout(client, channel, tags.id, logger);
+      await commandAbout(
+        client,
+        channel,
+        tags.id,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger
+      );
       return;
     }
     // > !moonpie delete $USER
@@ -412,6 +430,9 @@ export const moonpieChatHandler = async (
         tags.id,
         tags.username,
         tags["user-id"],
+        globalStrings,
+        globalPlugins,
+        globalMacros,
         databasePath,
         logger
       );

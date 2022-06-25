@@ -13,6 +13,8 @@ import type { Client as IrcClient } from "irc";
 import type { StreamCompanionData } from "../streamcompanion";
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { Strings } from "../strings";
+import type { Macros, Plugins } from "../messageParser";
 
 /**
  * The logging ID of this command.
@@ -191,6 +193,9 @@ export const osuChatHandler = async (
     | (() => StreamCompanionData | undefined)
     | undefined,
   enabled: undefined | string[],
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (enabled === undefined) {
@@ -213,6 +218,9 @@ export const osuChatHandler = async (
       tags.username,
       osuApiV2Credentials,
       osuStreamCompanionCurrentMapData,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
       logger
     );
     return;
@@ -237,6 +245,9 @@ export const osuChatHandler = async (
       osuDefaultId,
       matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
       matchName && matchName.length >= 2 ? matchName[1] : undefined,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
       logger
     );
     return;
@@ -261,6 +272,9 @@ export const osuChatHandler = async (
       osuDefaultId,
       matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
       matchName && matchName.length >= 2 ? matchName[1] : undefined,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
       logger
     );
     return;
@@ -344,12 +358,14 @@ export const osuChatHandler = async (
               tags.id,
               tags.username,
               osuApiV2Credentials,
-              osuDefaultId,
               match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
               match[3],
               enableOsuBeatmapRequestsDetailed,
               osuIrcBot,
               osuIrcRequestTarget,
+              globalStrings,
+              globalPlugins,
+              globalMacros,
               logger
             );
           }

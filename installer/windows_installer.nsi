@@ -170,6 +170,7 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   ;into it
   SetOutPath "$AppData\${PRODUCT}"
   File "..\.env.example"
+  File "..\.env.strings.example"
   File "..\customCommands.example.json"
   File "..\customTimers.example.json"
   File "..\customCommands.schema.json"

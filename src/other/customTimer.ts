@@ -1,17 +1,18 @@
 import cron from "node-cron";
-import { parseMessage } from "./parseMessage";
 import { logTwitchMessageBroadcast } from "../logging";
+import { messageParser } from "../messageParser";
 // Type imports
-import type { ApiClient } from "@twurple/api";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { Macros, Plugins } from "../messageParser";
 
 export const registerTimer = (
   client: Client,
   channels: string[],
   message: string,
   cronString: string,
-  twitchApiClient: ApiClient | undefined,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): cron.ScheduledTask => {
   if (!cron.validate(cronString)) {
@@ -21,15 +22,7 @@ export const registerTimer = (
   return cron.schedule(cronString, () => {
     logger.debug(`Timer triggered ${cronString}: "${message}"`);
     for (const channel of channels) {
-      parseMessage(
-        message,
-        [message],
-        0,
-        "<not_available>",
-        twitchApiClient,
-        undefined,
-        channel
-      )
+      messageParser(message, globalPlugins, globalMacros)
         .then((parsedMessage) => client.say(channel, parsedMessage))
         .then((sentMessage) => {
           logTwitchMessageBroadcast(logger, sentMessage, "timer");

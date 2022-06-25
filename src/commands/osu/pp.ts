@@ -5,16 +5,19 @@ import {
   errorMessageIdUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { mapUserToStr } from "../../other/osuStringBuilder";
 import {
   errorMessageOsuApiCredentialsUndefined,
   OsuCommands,
   LOG_ID_COMMAND_OSU,
 } from "../osu";
+import { messageParser } from "../../messageParser";
+import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
+import type { Strings } from "../../strings";
+import type { Macros, Plugins } from "../../messageParser";
 
 /**
  * PP (from performance points) command: Get performance/general information
@@ -30,6 +33,9 @@ import type { OsuApiV2Credentials } from "../osu";
  * account ID and over the not undefined custom osu name if not undefined).
  * @param customOsuName The osu account name (use this over the default osu
  * account ID if not undefined).
+ * @param globalStrings Global message strings.
+ * @param globalPlugins Global plugins.
+ * @param globalMacros Global macros.
  * @param logger Logger (used for logging).
  */
 export const commandPp = async (
@@ -40,6 +46,9 @@ export const commandPp = async (
   defaultOsuId: number,
   customOsuId: undefined | number,
   customOsuName: undefined | string,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -68,12 +77,25 @@ export const commandPp = async (
     }
   }
 
-  const user = await osuApiV2.users.id(
+  await osuApiV2.users.id(
     oauthAccessToken,
     customOsuId !== undefined ? customOsuId : defaultOsuId,
     GameMode.osu
   );
-  const message = mapUserToStr(user);
+
+  const osuPpRequestMacros = new Map(globalMacros);
+  osuPpRequestMacros.set(
+    "OSU_PP_REQUEST",
+    new Map([
+      ["ID", `${customOsuId !== undefined ? customOsuId : defaultOsuId}`],
+    ])
+  );
+
+  const message = await messageParser(
+    globalStrings.get(osuCommandReplyPp.id),
+    globalPlugins,
+    osuPpRequestMacros
+  );
   const sentMessage = await client.say(channel, message);
 
   logTwitchMessageCommandReply(

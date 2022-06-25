@@ -5,6 +5,7 @@ import { mkdirSync, promises as fs } from "fs";
 import irc from "irc";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
+import SpotifyWebApi from "spotify-web-api-node";
 // Local imports
 import { createLogger } from "./logging";
 import { createTwitchClient } from "./twitch";
@@ -29,10 +30,45 @@ import { pyramidSpammer } from "./other/pyramidSpammer";
 import { createStreamCompanionConnection } from "./streamcompanion";
 import { createOsuIrcConnection } from "./osuirc";
 import { CliVariable, getCliVariableDocumentation } from "./cli";
+import { setupSpotifyAuthentication } from "./spotify";
+import { spotifyChatHandler } from "./commands/spotify";
+import {
+  defaultStrings,
+  updateStringsMapWithCustomEnvStrings,
+  writeStringsVariableDocumentation,
+} from "./strings";
+import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
+import { generatePluginsAndMacrosMap } from "./messageParser";
+import {
+  pluginLowercase,
+  pluginRandomNumber,
+  pluginShowIfEmpty,
+  pluginShowIfNotEmpty,
+  pluginShowIfNotUndefined,
+  pluginShowIfNumberGreaterThan,
+  pluginShowIfNumberNotGreaterThan,
+  pluginShowIfNumberNotSmallerThan,
+  pluginShowIfNumberSmallerThan,
+  pluginShowIfStringsNotTheSame,
+  pluginShowIfStringsTheSame,
+  pluginShowIfUndefined,
+  pluginTimeInSToHumanReadableString,
+  pluginTimeInSToStopwatchString,
+  pluginUppercase,
+} from "./messageParser/plugins/general";
+import { errorMessageUserNameUndefined } from "./commands";
+import { pluginTwitchApi } from "./messageParser/plugins/twitchApi";
+import {
+  pluginOsuBeatmap,
+  pluginOsuMostRecentPlay,
+  pluginOsuScore,
+  pluginOsuUser,
+} from "./messageParser/plugins/osu";
+import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -69,12 +105,35 @@ export const main = async (logger: Logger, configDir: string) => {
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 
-  await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
-
   const databasePath = path.resolve(
     configDir,
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
+
+  const spotifyApiClientId = getEnvVariableValueOrCustomDefault(
+    EnvVariable.SPOTIFY_API_CLIENT_ID,
+    undefined
+  );
+  const spotifyApiClientSecret = getEnvVariableValueOrCustomDefault(
+    EnvVariable.SPOTIFY_API_CLIENT_SECRET,
+    undefined
+  );
+  const spotifyApiRefreshToken = getEnvVariableValueOrCustomDefault(
+    EnvVariable.SPOTIFY_API_REFRESH_TOKEN,
+    undefined
+  );
+  let spotifyWebApi: undefined | SpotifyWebApi = undefined;
+  if (
+    spotifyApiClientId !== undefined &&
+    spotifyApiClientSecret !== undefined
+  ) {
+    spotifyWebApi = await setupSpotifyAuthentication(
+      spotifyApiClientId,
+      spotifyApiClientSecret,
+      spotifyApiRefreshToken,
+      logger
+    );
+  }
 
   const osuApiClientId = getEnvVariableValueOrCustomDefault(
     EnvVariable.OSU_API_CLIENT_ID,
@@ -168,11 +227,20 @@ export const main = async (logger: Logger, configDir: string) => {
         JSON.parse(content.toString()) as CustomCommandDataJson
       ).commands;
       for (const newCustomCommand of newCustomCommands) {
-        logger.info(
-          `Add custom command ${
+        logger.debug({
+          message: `Add custom command ${
             newCustomCommand.name ? newCustomCommand.name : "no-name"
-          }: ${newCustomCommand.regexString} => ${newCustomCommand.message}`
-        );
+          }: ${newCustomCommand.regexString} => ${newCustomCommand.message}`,
+          section: "customCommands",
+        });
+      }
+      if (newCustomCommands.length > 0) {
+        logger.info({
+          message: `Added ${newCustomCommands.length} custom command${
+            newCustomCommands.length > 1 ? "s" : ""
+          }`,
+          section: "customCommands",
+        });
       }
       customCommands.push(...newCustomCommands);
     }
@@ -230,6 +298,73 @@ export const main = async (logger: Logger, configDir: string) => {
     });
   }
 
+  // Setup message parser
+  const pluginsList = [
+    pluginLowercase,
+    pluginUppercase,
+    pluginRandomNumber,
+    pluginShowIfEmpty,
+    pluginShowIfNotEmpty,
+    pluginShowIfNotUndefined,
+    pluginShowIfUndefined,
+    pluginShowIfNumberGreaterThan,
+    pluginShowIfNumberSmallerThan,
+    pluginShowIfNumberNotGreaterThan,
+    pluginShowIfNumberNotSmallerThan,
+    pluginShowIfStringsTheSame,
+    pluginShowIfStringsNotTheSame,
+    pluginTimeInSToHumanReadableString,
+    pluginTimeInSToStopwatchString,
+  ];
+  const macrosList = [macroMoonpieBot];
+  await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
+  await writeStringsVariableDocumentation(
+    path.join(configDir, ".env.strings.example"),
+    pluginsList,
+    macrosList
+  );
+  const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
+  const pluginsAndMacrosMap = generatePluginsAndMacrosMap(
+    pluginsList,
+    macrosList
+  );
+  const plugins = pluginsAndMacrosMap.pluginsMap;
+  const macros = pluginsAndMacrosMap.macrosMap;
+  if (osuApiDefaultId) {
+    macros.set("OSU_API", new Map([["DEFAULT_USER_ID", `${osuApiDefaultId}`]]));
+  }
+  if (osuApiClientId && osuApiClientSecret) {
+    const pluginOsuBeatmapReady = pluginOsuBeatmap({
+      clientId: parseInt(osuApiClientId),
+      clientSecret: osuApiClientSecret,
+    });
+    const pluginOsuScoreReady = pluginOsuScore({
+      clientId: parseInt(osuApiClientId),
+      clientSecret: osuApiClientSecret,
+    });
+    const pluginOsuMostRecentPlayReady = pluginOsuMostRecentPlay({
+      clientId: parseInt(osuApiClientId),
+      clientSecret: osuApiClientSecret,
+    });
+    const pluginOsuUserReady = pluginOsuUser({
+      clientId: parseInt(osuApiClientId),
+      clientSecret: osuApiClientSecret,
+    });
+    plugins.set(pluginOsuBeatmapReady.id, pluginOsuBeatmapReady.func);
+    plugins.set(pluginOsuScoreReady.id, pluginOsuScoreReady.func);
+    plugins.set(
+      pluginOsuMostRecentPlayReady.id,
+      pluginOsuMostRecentPlayReady.func
+    );
+    plugins.set(pluginOsuUserReady.id, pluginOsuUserReady.func);
+  }
+  if (osuStreamCompanionCurrentMapData !== undefined) {
+    const pluginStreamCompanionReady = pluginStreamCompanion(
+      osuStreamCompanionCurrentMapData
+    );
+    plugins.set(pluginStreamCompanionReady.id, pluginStreamCompanionReady.func);
+  }
+
   // Create TwitchClient and listen to certain events
   const twitchClient = createTwitchClient(
     getEnvVariableValue(EnvVariable.TWITCH_NAME),
@@ -273,6 +408,24 @@ export const main = async (logger: Logger, configDir: string) => {
       return;
     }
 
+    // TODO Think about how to document client dependent plugins
+    const pluginsChannel = new Map(plugins);
+    if (twitchApiClient) {
+      for (const plugin of pluginTwitchApi(
+        twitchApiClient,
+        channel,
+        tags["user-id"]
+      )) {
+        plugins.set(plugin.id, plugin.func);
+      }
+    }
+    pluginsChannel.set("USER", () => {
+      if (tags.username === undefined) {
+        throw errorMessageUserNameUndefined();
+      }
+      return `${tags.username}`;
+    });
+
     // Handle all bot commands
     moonpieChatHandler(
       twitchClient,
@@ -283,6 +436,9 @@ export const main = async (logger: Logger, configDir: string) => {
       getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS)?.split(
         ","
       ),
+      strings,
+      pluginsChannel,
+      macros,
       logger
     ).catch((err) => {
       logger.error(err);
@@ -317,6 +473,9 @@ export const main = async (logger: Logger, configDir: string) => {
         getEnvVariableValueOrDefault(EnvVariable.OSU_ENABLE_COMMANDS)?.split(
           ","
         ),
+        strings,
+        pluginsChannel,
+        macros,
         logger
       ).catch((err) => {
         logger.error(err);
@@ -352,6 +511,9 @@ export const main = async (logger: Logger, configDir: string) => {
         enableCommands === undefined
           ? ["np"]
           : enableCommands.filter((a) => a === "np"),
+        strings,
+        pluginsChannel,
+        macros,
         logger
       ).catch((err) => {
         logger.error(err);
@@ -370,9 +532,39 @@ export const main = async (logger: Logger, configDir: string) => {
       });
     }
 
+    if (spotifyWebApi !== undefined) {
+      spotifyChatHandler(
+        twitchClient,
+        channel,
+        tags,
+        message,
+        spotifyWebApi,
+        undefined,
+        strings,
+        logger
+      ).catch((err) => {
+        logger.error(err);
+        // When the chat handler throws an error write the error message in chat
+        const errorInfo = err as ErrorWithCode;
+        twitchClient
+          .say(
+            channel,
+            `${tags.username ? "@" + tags.username + " " : ""}Spotify Error: ${
+              errorInfo.message
+            }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
+          )
+          .catch(logger.error);
+      });
+    }
+
     // Check custom commands
     try {
+      const pluginsCustomCommands = new Map(pluginsChannel);
       for (const customCommand of customCommands) {
+        pluginsCustomCommands.set(
+          "COUNT",
+          () => `${customCommand.count ? customCommand.count + 1 : 1}`
+        );
         checkCustomCommand(
           twitchClient,
           channel,
@@ -384,10 +576,8 @@ export const main = async (logger: Logger, configDir: string) => {
           customCommand.regexString,
           customCommand.userLevel,
           customCommand.name,
-          customCommand.count ? customCommand.count + 1 : 1,
-          twitchApiClient,
-          // TODO Add macro for StreamCompanion
-          // osuStreamCompanionCurrentMapData,
+          pluginsCustomCommands,
+          macros,
           logger
         )
           .then((commandExecuted) => {
@@ -416,7 +606,21 @@ export const main = async (logger: Logger, configDir: string) => {
                 .catch(logger.error);
             }
           })
-          .catch(logger.error);
+          .catch((err) => {
+            logger.error(err);
+            // When the chat handler throws an error write the error message in chat
+            const errorInfo = err as ErrorWithCode;
+            twitchClient
+              .say(
+                channel,
+                `${
+                  tags.username ? "@" + tags.username + " " : ""
+                }Custom Command Error: ${errorInfo.message}${
+                  errorInfo.code ? " (" + errorInfo.code + ")" : ""
+                }`
+              )
+              .catch(logger.error);
+          });
       }
     } catch (err) {
       logger.error(err);
@@ -440,9 +644,8 @@ export const main = async (logger: Logger, configDir: string) => {
         customTimer.channels,
         customTimer.message,
         customTimer.cronString,
-        twitchApiClient,
-        // TODO Add macro for StreamCompanion
-        //osuStreamCompanionCurrentMapData,
+        plugins,
+        macros,
         logger
       );
     }
@@ -529,6 +732,9 @@ if (isEntryPoint()) {
       // Load environment variables if existing from the .env file
       dotenv.config({
         path: path.join(configDir, ".env"),
+      });
+      dotenv.config({
+        path: path.join(configDir, ".env.strings"),
       });
 
       // Print for debugging the (private/secret) environment values to the console

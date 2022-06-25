@@ -6,7 +6,6 @@ import {
   errorMessageIdUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { mapScoreToStr } from "../../other/osuStringBuilder";
 import {
   errorMessageOsuApiCredentialsUndefined,
   OsuCommands,
@@ -16,6 +15,13 @@ import {
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
+import { messageParser } from "../../messageParser";
+import {
+  osuCommandReplyRp,
+  osuCommandReplyRpNotFound,
+} from "../../strings/osu/commandReply";
+import type { Macros, Plugins } from "../../messageParser";
+import type { Strings } from "../../strings";
 
 /**
  * RP (recently played) command: Send the map that was most recently played
@@ -31,6 +37,9 @@ import type { OsuApiV2Credentials } from "../osu";
  * account ID and over the not undefined custom osu name if not undefined).
  * @param customOsuName The osu account name (use this over the default osu
  * account ID if not undefined).
+ * @param globalStrings Global message strings.
+ * @param globalPlugins Global plugins.
+ * @param globalMacros Global macros.
  * @param logger Logger (used for logging).
  */
 export const commandRp = async (
@@ -41,6 +50,9 @@ export const commandRp = async (
   defaultOsuId: number,
   customOsuId: undefined | number,
   customOsuName: undefined | string,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -78,10 +90,29 @@ export const commandRp = async (
     0,
     true
   );
-  const message =
-    lastPlay.length > 0
-      ? `Most recent play: ${lastPlay.map(mapScoreToStr).join(", ")}`
-      : "No recent play found";
+
+  const osuRpRequestMacros = new Map(globalMacros);
+  osuRpRequestMacros.set(
+    "OSU_RP_REQUEST",
+    new Map([
+      ["ID", `${customOsuId !== undefined ? customOsuId : defaultOsuId}`],
+    ])
+  );
+
+  let message = "";
+  if (lastPlay.length > 0) {
+    message = await messageParser(
+      globalStrings.get(osuCommandReplyRp.id),
+      globalPlugins,
+      osuRpRequestMacros
+    );
+  } else {
+    message = await messageParser(
+      globalStrings.get(osuCommandReplyRpNotFound.id),
+      globalPlugins,
+      osuRpRequestMacros
+    );
+  }
   const sentMessage = await client.say(channel, message);
 
   logTwitchMessageCommandReply(

@@ -1,27 +1,32 @@
 // Package imports
-import osuApiV2, {
-  GameMode,
-  OsuApiV2WebRequestError,
-  RankedStatus,
-} from "osu-api-v2";
+import osuApiV2, { OsuApiV2WebRequestError } from "osu-api-v2";
 // Local imports
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { mapUserScoreToStr, mapToStr } from "../../other/osuStringBuilder";
 import {
   errorMessageOsuApiCredentialsUndefined,
   LOG_ID_COMMAND_OSU,
 } from "../osu";
 import { isProcessRunning } from "../../other/processInformation";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
+import { messageParser } from "../../messageParser";
 // Type imports
 import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
+import type { Macros, Plugins } from "../../messageParser";
+import {
+  osuBeatmapRequest,
+  osuBeatmapRequestDetailed,
+  osuBeatmapRequestIrc,
+  osuBeatmapRequestIrcDetailed,
+  osuBeatmapRequestNotFound,
+} from "../../strings/osu/beatmapRequest";
+import type { Strings } from "../../strings";
 
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
@@ -32,7 +37,6 @@ import type { OsuApiV2Credentials } from "../osu";
  * @param messageId Twitch message ID of the request (used for logging).
  * @param userName Twitch user name of the requester.
  * @param osuApiV2Credentials The osu API (v2) credentials.
- * @param defaultOsuId Default osu account ID (used for checking for existing
  * scores).
  * @param beatmapId The recognized osu beatmap ID.
  * @param comment The recognized comment to the beatmap.
@@ -41,6 +45,9 @@ import type { OsuApiV2Credentials } from "../osu";
  * client using IRC).
  * @param osuIrcRequestTarget The osu account ID to whom the IRC request should
  * be sent to.
+ * @param globalStrings Global message strings.
+ * @param globalPlugins Global plugins.
+ * @param globalMacros Global macros.
  * @param logger Logger (used for global logs).
  */
 export const commandBeatmap = async (
@@ -49,12 +56,14 @@ export const commandBeatmap = async (
   messageId: string | undefined,
   userName: string | undefined,
   osuApiV2Credentials: OsuApiV2Credentials | undefined,
-  defaultOsuId: number,
   beatmapId: number,
   comment: string | undefined,
   detailedBeatmapInformation: undefined | boolean,
   osuIrcBot: (() => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -72,64 +81,72 @@ export const commandBeatmap = async (
     osuApiV2Credentials.clientSecret
   );
 
+  const osuBeatmapRequestMacros = new Map(globalMacros);
+  osuBeatmapRequestMacros.set(
+    "OSU_BEATMAP_REQUEST",
+    new Map([
+      ["ID", `${beatmapId}`],
+      [
+        "COMMENT",
+        `${
+          comment !== undefined && comment.trim().length > 0
+            ? comment.trim()
+            : ""
+        }`,
+      ],
+    ])
+  );
+
   // Get beatmap and if found the current top score and convert them into a
   // message for Twitch and IRC channel
   let beatmapInformationWasFound = false;
   let messageRequest = "";
   let messageRequestIrc = "";
-  let messageRequestDetailed = "";
-  let messageRequestDetailedIrc = "";
-  let messageRequestTopScore = "";
   try {
-    const beatmap = await osuApiV2.beatmaps.get(oauthAccessToken, beatmapId);
+    await osuApiV2.beatmaps.get(oauthAccessToken, beatmapId);
     beatmapInformationWasFound = true;
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    messageRequest = `${userName} requested ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}`;
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    messageRequestIrc = `${userName} requested [https://osu.ppy.sh/beatmapsets/${beatmap.beatmapset?.id}#osu/${beatmap.id} ${beatmap.beatmapset?.title} '${beatmap.version}' by ${beatmap.beatmapset?.artist}]`;
-    messageRequestDetailed = mapToStr(beatmap, true, true);
-    messageRequestDetailedIrc = mapToStr(beatmap, true);
     // Check for user score
-    if (
-      beatmap.ranked === RankedStatus.loved ||
-      beatmap.ranked === RankedStatus.qualified ||
-      beatmap.ranked === RankedStatus.ranked
-    ) {
-      try {
-        const score = await osuApiV2.beatmaps.scores.users(
-          oauthAccessToken,
-          beatmapId,
-          defaultOsuId,
-          GameMode.osu,
-          undefined
-        );
-        messageRequestTopScore = `Current top score is ${mapUserScoreToStr(
-          score
-        )}`;
-      } catch (err) {
-        messageRequestTopScore = `No score found`;
-      }
-    }
   } catch (err) {
     if ((err as OsuApiV2WebRequestError).statusCode === 404) {
       logger.warn(err);
-      throw Error("osu! beatmap was not found");
+      const errorMessage = await messageParser(
+        globalStrings.get(osuBeatmapRequestNotFound.id),
+        globalPlugins,
+        osuBeatmapRequestMacros
+      );
+      throw Error(errorMessage);
     } else {
       throw err;
     }
   }
 
-  let message = messageRequest;
   if (detailedBeatmapInformation) {
-    message += ` ${messageRequestDetailed}`;
-  }
-  if (messageRequestTopScore !== "") {
-    message += ` - ${messageRequestTopScore}`;
+    messageRequest = await messageParser(
+      globalStrings.get(osuBeatmapRequestDetailed.id),
+      globalPlugins,
+      osuBeatmapRequestMacros
+    );
+    messageRequestIrc = await messageParser(
+      globalStrings.get(osuBeatmapRequestIrcDetailed.id),
+      globalPlugins,
+      osuBeatmapRequestMacros
+    );
+  } else {
+    messageRequest = await messageParser(
+      globalStrings.get(osuBeatmapRequest.id),
+      globalPlugins,
+      osuBeatmapRequestMacros
+    );
+    messageRequestIrc = await messageParser(
+      globalStrings.get(osuBeatmapRequestIrc.id),
+      globalPlugins,
+      osuBeatmapRequestMacros
+    );
   }
 
   // Send response to Twitch channel and if found to IRC channel
   await Promise.all([
-    client.say(channel, message).then((sentMessage) => {
+    client.say(channel, messageRequest).then((sentMessage) => {
       logTwitchMessageCommandReply(
         logger,
         messageId,
@@ -164,22 +181,10 @@ export const commandBeatmap = async (
               logger.info("Try to connect to osu IRC channel");
               osuIrcBotInstance.connect(2, () => {
                 logger.info("osu! IRC connection was established");
-                osuIrcBotInstance?.say(osuIrcRequestTarget, messageRequestIrc);
-                osuIrcBotInstance?.say(
-                  osuIrcRequestTarget,
-                  `> ${messageRequestDetailedIrc}`
-                );
-                if (comment && comment.trim().length > 0) {
-                  osuIrcBotInstance?.say(
-                    osuIrcRequestTarget,
-                    `> Comment: ${comment.trim()}`
-                  );
-                }
-                if (messageRequestTopScore !== "") {
-                  osuIrcBotInstance?.say(
-                    osuIrcRequestTarget,
-                    `> Score: ${messageRequestTopScore}`
-                  );
+                for (const messagePart of messageRequestIrc.split(
+                  "%NEWLINE%"
+                )) {
+                  osuIrcBotInstance?.say(osuIrcRequestTarget, messagePart);
                 }
                 osuIrcBotInstance?.disconnect("", () => {
                   osuIrcBotInstance?.conn.end();

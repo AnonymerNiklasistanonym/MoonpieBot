@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { MoonpieCommands } from "./commands/moonpie";
 import { OsuCommands } from "./commands/osu";
+import { SpotifyCommands } from "./commands/spotify";
 import { splitTextAtLength } from "./other/splitTextAtLength";
 
 /** Path to the root directory of the source code. */
@@ -28,19 +29,24 @@ export enum EnvVariable {
   TWITCH_OAUTH_TOKEN = "TWITCH_OAUTH_TOKEN",
   MOONPIE_ENABLE_COMMANDS = "MOONPIE_ENABLE_COMMANDS",
   MOONPIE_DATABASE_PATH = "MOONPIE_DATABASE_PATH",
-  OSU_ENABLE_COMMANDS = "OSU_ENABLE_COMMANDS",
   OSU_API_CLIENT_ID = "OSU_API_CLIENT_ID",
   OSU_API_CLIENT_SECRET = "OSU_API_CLIENT_SECRET",
   OSU_API_DEFAULT_ID = "OSU_API_DEFAULT_ID",
   OSU_API_RECOGNIZE_MAP_REQUESTS = "OSU_API_RECOGNIZE_MAP_REQUESTS",
   OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED = "OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED",
+  OSU_ENABLE_COMMANDS = "OSU_ENABLE_COMMANDS",
   OSU_IRC_PASSWORD = "OSU_IRC_PASSWORD",
-  OSU_IRC_USERNAME = "OSU_IRC_USERNAME",
   OSU_IRC_REQUEST_TARGET = "OSU_IRC_REQUEST_TARGET",
+  OSU_IRC_USERNAME = "OSU_IRC_USERNAME",
   OSU_STREAM_COMPANION_URL = "OSU_STREAM_COMPANION_URL",
-  TWITCH_API_CLIENT_ID = "TWITCH_API_CLIENT_ID",
+  SPOTIFY_API_CLIENT_ID = "SPOTIFY_API_CLIENT_ID",
+  SPOTIFY_API_CLIENT_SECRET = "SPOTIFY_API_CLIENT_SECRET",
+  SPOTIFY_API_REFRESH_TOKEN = "SPOTIFY_API_REFRESH_TOKEN",
+  SPOTIFY_ENABLE_COMMANDS = "SPOTIFY_ENABLE_COMMANDS",
   TWITCH_API_ACCESS_TOKEN = "TWITCH_API_ACCESS_TOKEN",
+  TWITCH_API_CLIENT_ID = "TWITCH_API_CLIENT_ID",
 }
+// https://developer.spotify.com/dashboard/applications
 
 /**
  * Environment variables are grouped in blocks.
@@ -54,6 +60,8 @@ export enum EnvVariableBlocks {
   OSU_API = "OSU_API",
   OSU_IRC = "OSU_IRC",
   OSU_STREAM_COMPANION = "OSU_STREAM_COMPANION",
+  SPOTIFY = "SPOTIFY",
+  SPOTIFY_API = "SPOTIFY_API",
   TWITCH_API = "TWITCH_API",
 }
 
@@ -119,6 +127,8 @@ export interface EnvVariableValueInformation {
 }
 
 export const EMPTY_OPTION_LIST_VALUE_NONE = "none";
+
+export const ENABLE_COMMANDS_DEFAULT_DESCRIPTION = `You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to '${EMPTY_OPTION_LIST_VALUE_NONE}' if no commands should be enabled).`;
 
 export const getEnvVariableValueInformation = (
   envVariable: EnvVariable | string,
@@ -195,7 +205,7 @@ export const getEnvVariableValueInformation = (
           MoonpieCommands.SET,
           EMPTY_OPTION_LIST_VALUE_NONE,
         ],
-        description: `You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to '${EMPTY_OPTION_LIST_VALUE_NONE}' if no commands should be enabled).`,
+        description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
         block: EnvVariableBlocks.MOONPIE,
       };
     case EnvVariable.MOONPIE_DATABASE_PATH:
@@ -221,7 +231,7 @@ export const getEnvVariableValueInformation = (
           OsuCommands.RP,
           EMPTY_OPTION_LIST_VALUE_NONE,
         ],
-        description: `You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to '${EMPTY_OPTION_LIST_VALUE_NONE}' if no commands should be enabled). If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!`,
+        description: `${ENABLE_COMMANDS_DEFAULT_DESCRIPTION} If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!`,
         block: EnvVariableBlocks.OSU,
       };
 
@@ -295,7 +305,37 @@ export const getEnvVariableValueInformation = (
         block: EnvVariableBlocks.OSU_STREAM_COMPANION,
       };
 
-    case EnvVariable.TWITCH_API_CLIENT_ID:
+    case EnvVariable.SPOTIFY_ENABLE_COMMANDS:
+      return {
+        default: `${SpotifyCommands.SONG}`,
+        supportedValues: [SpotifyCommands.SONG, EMPTY_OPTION_LIST_VALUE_NONE],
+        description: `${ENABLE_COMMANDS_DEFAULT_DESCRIPTION} If you don't provide Spotify API credentials the commands won't be enabled!`,
+        block: EnvVariableBlocks.SPOTIFY,
+      };
+    case EnvVariable.SPOTIFY_API_CLIENT_ID:
+      return {
+        example: "abcdefghijklmnop",
+        description:
+          "Provide client id/secret to enable Twitch api calls in commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application).",
+        block: EnvVariableBlocks.SPOTIFY_API,
+        censor: true,
+      };
+    case EnvVariable.SPOTIFY_API_CLIENT_SECRET:
+      return {
+        example: "abcdefghijklmnop",
+        description: `Check the description of ${envVariablePrefix}${EnvVariable.SPOTIFY_API_CLIENT_ID}.`,
+        block: EnvVariableBlocks.SPOTIFY_API,
+        censor: true,
+      };
+    case EnvVariable.SPOTIFY_API_REFRESH_TOKEN:
+      return {
+        example: "abcdefghijklmnop",
+        description: `You can get this token by authenticating once successfully using the ${envVariablePrefix}${EnvVariable.SPOTIFY_API_CLIENT_ID} and ${envVariablePrefix}${EnvVariable.SPOTIFY_API_CLIENT_SECRET}. After the successful authentication via a website that will open you can copy the refresh token from there.`,
+        block: EnvVariableBlocks.SPOTIFY_API,
+        censor: true,
+      };
+
+    case EnvVariable.TWITCH_API_ACCESS_TOKEN:
       return {
         example: "abcdefghijklmnop",
         description:
@@ -303,10 +343,11 @@ export const getEnvVariableValueInformation = (
         block: EnvVariableBlocks.TWITCH_API,
         censor: true,
       };
-    case EnvVariable.TWITCH_API_ACCESS_TOKEN:
+    case EnvVariable.TWITCH_API_CLIENT_ID:
       return {
         example: "abcdefghijklmnop",
-        description: `Check the description of ${envVariablePrefix}${EnvVariable.TWITCH_API_CLIENT_ID}.`,
+        description: `Check the description of ${envVariablePrefix}${EnvVariable.TWITCH_API_ACCESS_TOKEN}.`,
+
         block: EnvVariableBlocks.TWITCH_API,
         censor: true,
       };
@@ -400,6 +441,17 @@ export const envVariableStructure: (
     name: "OSU STREAM COMPANION",
     description:
       "Optional osu! StreamCompanion connection that can be enabled for a much better !np command.",
+  },
+  {
+    block: EnvVariableBlocks.SPOTIFY,
+    name: "SPOTIFY",
+    description: "Optional Spotify commands that can be enabled.",
+  },
+  {
+    block: EnvVariableBlocks.SPOTIFY_API,
+    name: "SPOTIFY API",
+    description:
+      "Optional Spotify API connection that can be enabled to use Spotify commands.",
   },
   {
     block: EnvVariableBlocks.TWITCH_API,
