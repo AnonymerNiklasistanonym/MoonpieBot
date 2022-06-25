@@ -37,7 +37,6 @@ import type { Strings } from "../../strings";
  * @param messageId Twitch message ID of the request (used for logging).
  * @param userName Twitch user name of the requester.
  * @param osuApiV2Credentials The osu API (v2) credentials.
- * @param defaultOsuId Default osu account ID (used for checking for existing
  * scores).
  * @param beatmapId The recognized osu beatmap ID.
  * @param comment The recognized comment to the beatmap.
@@ -57,7 +56,6 @@ export const commandBeatmap = async (
   messageId: string | undefined,
   userName: string | undefined,
   osuApiV2Credentials: OsuApiV2Credentials | undefined,
-  defaultOsuId: number,
   beatmapId: number,
   comment: string | undefined,
   detailedBeatmapInformation: undefined | boolean,
@@ -97,10 +95,6 @@ export const commandBeatmap = async (
         }`,
       ],
     ])
-  );
-  osuBeatmapRequestMacros.set(
-    "OSU_API",
-    new Map([["DEFAULT_USER_ID", `${defaultOsuId}`]])
   );
 
   // Get beatmap and if found the current top score and convert them into a

@@ -245,6 +245,9 @@ export const osuChatHandler = async (
       osuDefaultId,
       matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
       matchName && matchName.length >= 2 ? matchName[1] : undefined,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
       logger
     );
     return;
@@ -352,7 +355,6 @@ export const osuChatHandler = async (
               tags.id,
               tags.username,
               osuApiV2Credentials,
-              osuDefaultId,
               match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
               match[3],
               enableOsuBeatmapRequestsDetailed,

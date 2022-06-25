@@ -62,7 +62,11 @@ import {
 } from "./messageParser/plugins/general";
 import { errorMessageUserNameUndefined } from "./commands";
 import { pluginTwitchApi } from "./messageParser/plugins/twitchApi";
-import { pluginOsuBeatmap, pluginOsuScore } from "./messageParser/plugins/osu";
+import {
+  pluginOsuBeatmap,
+  pluginOsuMostRecentPlay,
+  pluginOsuScore,
+} from "./messageParser/plugins/osu";
 import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
 
 // TODO Move to database tables so they can be changed on the fly
@@ -325,6 +329,9 @@ export const main = async (logger: Logger, configDir: string) => {
   );
   const plugins = pluginsAndMacrosMap.pluginsMap;
   const macros = pluginsAndMacrosMap.macrosMap;
+  if (osuApiDefaultId) {
+    macros.set("OSU_API", new Map([["DEFAULT_USER_ID", `${osuApiDefaultId}`]]));
+  }
   if (osuApiClientId && osuApiClientSecret) {
     const pluginOsuBeatmapReady = pluginOsuBeatmap({
       clientId: parseInt(osuApiClientId),
@@ -334,8 +341,16 @@ export const main = async (logger: Logger, configDir: string) => {
       clientId: parseInt(osuApiClientId),
       clientSecret: osuApiClientSecret,
     });
+    const pluginOsuMostRecentPlayReady = pluginOsuMostRecentPlay({
+      clientId: parseInt(osuApiClientId),
+      clientSecret: osuApiClientSecret,
+    });
     plugins.set(pluginOsuBeatmapReady.id, pluginOsuBeatmapReady.func);
     plugins.set(pluginOsuScoreReady.id, pluginOsuScoreReady.func);
+    plugins.set(
+      pluginOsuMostRecentPlayReady.id,
+      pluginOsuMostRecentPlayReady.func
+    );
   }
   if (osuStreamCompanionCurrentMapData !== undefined) {
     const pluginStreamCompanionReady = pluginStreamCompanion(

@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import osuApiV2, { OsuApiV2WebRequestError, RankedStatus } from "osu-api-v2";
+import osuApiV2, {
+  GameMode,
+  OsuApiV2WebRequestError,
+  RankedStatus,
+} from "osu-api-v2";
+import { ScoresType } from "osu-api-v2/lib/users/scores";
 import type { OsuApiV2Credentials } from "../../commands/osu";
 import type { MessageParserPlugin } from "../plugins";
 
@@ -153,6 +158,11 @@ export const pluginOsuScore = (
           ["USER_ID", `${score.user?.id}`],
           ["HAS_REPLAY", `${score.replay}`],
           ["ID", `${score.id}`],
+          ["USER_ID", `${score.user?.id}`],
+          ["USER_NAME", `${score.user?.username}`],
+          ["TITLE", `${score.beatmapset?.title}`],
+          ["ARTIST", `${score.beatmapset?.artist}`],
+          ["VERSION", `${score.beatmap?.version}`],
         ];
       } catch (err) {
         if ((err as OsuApiV2WebRequestError).statusCode === 404) {
@@ -161,6 +171,71 @@ export const pluginOsuScore = (
           throw err;
         }
       }
+    },
+  };
+};
+
+export const pluginOsuMostRecentPlay = (
+  osuApiV2Credentials: OsuApiV2Credentials
+): MessageParserPlugin => {
+  return {
+    id: "OSU_MOST_RECENT_PLAY",
+    func: async (userId?: string) => {
+      if (userId === undefined || userId.trim().length === 0) {
+        throw Error("osu! user ID was empty!");
+      }
+      const userIdNumber = parseInt(userId);
+      const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
+        osuApiV2Credentials.clientId,
+        osuApiV2Credentials.clientSecret
+      );
+      const lastPlay = await osuApiV2.users.scores(
+        oauthAccessToken,
+        userIdNumber,
+        ScoresType.Recent,
+        GameMode.osu,
+        1,
+        0,
+        true
+      );
+      if (lastPlay.length > 0) {
+        const score = lastPlay[0];
+        const scoreDate = new Date(score.created_at);
+        const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
+        return [
+          ["FOUND", "true"],
+          ["PASSED", `${score.passed}`],
+          ["RANK", `${score.rank}`],
+          ["FC", `${score.perfect}`],
+          [
+            "ACC",
+            `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`,
+          ],
+          [
+            "PP",
+            score.pp == null
+              ? "undefined"
+              : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
+          ],
+          ["MODS", `${score.mods.join(",")}`],
+          ["COUNT_300", `${score.statistics.count_300}`],
+          ["COUNT_100", `${score.statistics.count_100}`],
+          ["COUNT_50", `${score.statistics.count_50}`],
+          ["COUNT_MISS", `${score.statistics.count_miss}`],
+          ["MAX_COMBO", `${score.max_combo}`],
+          ["TIME_IN_S_AGO", `${scoreDateRangeMs / 1000}`],
+          ["DATE_MONTH", monthNames[scoreDate.getMonth()]],
+          ["DATE_YEAR", `${scoreDate.getFullYear()}`],
+          ["USER_NAME", `${score.user?.username}`],
+          ["USER_ID", `${score.user?.id}`],
+          ["HAS_REPLAY", `${score.replay}`],
+          ["ID", `${score.id}`],
+          ["MAP_ID", `${score.beatmap?.id}`],
+          ["USER_ID", `${score.user?.id}`],
+          ["USER_NAME", `${score.user?.username}`],
+        ];
+      }
+      return [["FOUND", "false"]];
     },
   };
 };

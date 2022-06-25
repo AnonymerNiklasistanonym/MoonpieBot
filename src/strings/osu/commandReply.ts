@@ -31,6 +31,24 @@ export const osuCommandReplyNpStreamCompanionNotRunning = {
     "$(USER) No map is currently being played (StreamCompanion was configured but not found running!)",
 };
 
+export const osuCommandReplyRp = {
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_RP`,
+  default:
+    "@$(USER) $(OSU_MOST_RECENT_PLAY=%OSU_RP_REQUEST:ID%|" +
+    "$(SHOW_IF_STRINGS_THE_SAME=%OSU_MOST_RECENT_PLAY:FOUND%===true|" +
+    "Most recent play of %OSU_MOST_RECENT_PLAY:USER_NAME%: $(SHOW_IF_STRINGS_THE_SAME=%OSU_MOST_RECENT_PLAY:PASSED%===true|%OSU_MOST_RECENT_PLAY:RANK%)$(SHOW_IF_STRINGS_THE_SAME=%OSU_MOST_RECENT_PLAY:PASSED%===false|A fail)" +
+    "$(SHOW_IF_NOT_EMPTY=%OSU_MOST_RECENT_PLAY:MODS%| using %OSU_MOST_RECENT_PLAY:MODS%)$(SHOW_IF_NOT_UNDEFINED=%OSU_MOST_RECENT_PLAY:PP%| with %OSU_MOST_RECENT_PLAY:PP%pp) \\(%OSU_MOST_RECENT_PLAY:COUNT_300%/%OSU_MOST_RECENT_PLAY:COUNT_100%/%OSU_MOST_RECENT_PLAY:COUNT_50%/%OSU_MOST_RECENT_PLAY:COUNT_MISS%\\) [mc=%OSU_MOST_RECENT_PLAY:MAX_COMBO%, acc=%OSU_MOST_RECENT_PLAY:ACC%%]" +
+    " on $(OSU_BEATMAP=%OSU_MOST_RECENT_PLAY:MAP_ID%|%OSU_BEATMAP:TITLE% '%OSU_BEATMAP:VERSION%' by '%OSU_BEATMAP:ARTIST%' [%OSU_BEATMAP:DIFFICULTY_RATING%* $(TIME_IN_S_TO_STOPWATCH_STRING=%OSU_BEATMAP:LENGTH_IN_S%) %OSU_BEATMAP:RANKED_STATUS%] from %OSU_BEATMAP:LAST_UPDATED_MONTH% %OSU_BEATMAP:LAST_UPDATED_YEAR% {FC=%OSU_BEATMAP:MAX_COMBO%, CS=%OSU_BEATMAP:CS%, DRAIN=%OSU_BEATMAP:DRAIN%, ACC=%OSU_BEATMAP:ACC%, AR=%OSU_BEATMAP:AR%, BPM=%OSU_BEATMAP:BPM%, CC=%OSU_BEATMAP:CC%, SLC=%OSU_BEATMAP:SLC%, SPC=%OSU_BEATMAP:SPC%})" +
+    "$(SHOW_IF_STRINGS_THE_SAME=%OSU_MOST_RECENT_PLAY:HAS_REPLAY%===true| {replay available})" +
+    ")" +
+    "$(SHOW_IF_STRINGS_THE_SAME=%OSU_MOST_RECENT_PLAY:FOUND%===false|" +
+    "No recent play was found))",
+};
+export const osuCommandReplyRpNotFound = {
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_RP_NOT_FOUND`,
+  default: "$(USER) No recent play was found",
+};
+
 export const osuCommandReply: Iterable<readonly [string, string]> = [
   [osuCommandReplyNp.id, osuCommandReplyNp.default],
   [osuCommandReplyNpNoMap.id, osuCommandReplyNpNoMap.default],
@@ -46,4 +64,6 @@ export const osuCommandReply: Iterable<readonly [string, string]> = [
     osuCommandReplyNpStreamCompanionNotRunning.id,
     osuCommandReplyNpStreamCompanionNotRunning.default,
   ],
+  [osuCommandReplyRp.id, osuCommandReplyRp.default],
+  [osuCommandReplyRpNotFound.id, osuCommandReplyRpNotFound.default],
 ];
