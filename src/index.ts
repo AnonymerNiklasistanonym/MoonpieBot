@@ -429,6 +429,7 @@ export const main = async (logger: Logger, configDir: string) => {
       }
       return `${tags.username}`;
     });
+    pluginsChannel.set("CHANNEL", () => channel.slice(1));
 
     // Handle all bot commands
     moonpieChatHandler(
