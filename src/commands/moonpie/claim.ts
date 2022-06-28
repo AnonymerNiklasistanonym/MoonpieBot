@@ -73,7 +73,7 @@ export const commandClaim = async (
       currentTimestamp - moonpieEntry.timestamp,
       0
     );
-    logger.info(
+    logger.debug(
       `millisecondsSinceLastClaim=${currentTimestamp}-${moonpieEntry.timestamp}=${millisecondsSinceLastClaim}`
     );
 
