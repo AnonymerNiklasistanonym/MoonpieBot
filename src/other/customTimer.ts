@@ -5,12 +5,14 @@ import { messageParser } from "../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { Macros, Plugins } from "../messageParser";
+import type { Strings } from "../strings";
 
 export const registerTimer = (
   client: Client,
   channels: string[],
   message: string,
   cronString: string,
+  globalStrings: Strings,
   globalPlugins: Plugins,
   globalMacros: Macros,
   logger: Logger
@@ -22,7 +24,7 @@ export const registerTimer = (
   return cron.schedule(cronString, () => {
     logger.debug(`Timer triggered ${cronString}: "${message}"`);
     for (const channel of channels) {
-      messageParser(message, globalPlugins, globalMacros, logger)
+      messageParser(message, globalStrings, globalPlugins, globalMacros, logger)
         .then((parsedMessage) => client.say(channel, parsedMessage))
         .then((sentMessage) => {
           logTwitchMessageBroadcast(logger, sentMessage, "timer");

@@ -1,6 +1,6 @@
 import { name, sourceCodeUrl } from "../../info";
 import { getVersion } from "../../version";
-import { MessageParserMacro } from "../macros";
+import type { MessageParserMacro } from "../macros";
 
 export const macroMoonpieBot: MessageParserMacro = {
   id: "MOONPIEBOT",

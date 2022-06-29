@@ -4,13 +4,13 @@ import {
   logTwitchMessageCommandDetected,
   logTwitchMessageCommandReply,
 } from "../commands";
+import { messageParserById } from "../messageParser";
+import { spotifyCommandReplySong } from "../strings/spotify/commandReply";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { Strings } from "../strings";
 import type { Macros, Plugins } from "../messageParser";
-import { messageParser } from "../messageParser";
-import { spotifyCommandReplySong } from "../strings/spotify/commandReply";
 
 /**
  * The logging ID of this command.
@@ -70,8 +70,9 @@ export const commandSong = async (
     throw errorMessageUserNameUndefined();
   }
 
-  const message = await messageParser(
-    globalStrings.get(spotifyCommandReplySong.id),
+  const message = await messageParserById(
+    spotifyCommandReplySong.id,
+    globalStrings,
     globalPlugins,
     globalMacros,
     logger

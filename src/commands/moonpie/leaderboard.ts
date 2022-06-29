@@ -8,7 +8,7 @@ import {
   moonpieCommandReplyLeaderboardEntry,
   moonpieCommandReplyLeaderboardPrefix,
 } from "../../strings/moonpie/commandReply";
-import { messageParser } from "../../messageParser";
+import { messageParserById } from "../../messageParser";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -47,8 +47,9 @@ export const commandLeaderboard = async (
     logger
   );
 
-  let messageLeaderboard = await messageParser(
-    globalStrings.get(moonpieCommandReplyLeaderboardPrefix.id),
+  let messageLeaderboard = await messageParserById(
+    moonpieCommandReplyLeaderboardPrefix.id,
+    globalStrings,
     globalPlugins,
     globalMacros,
     logger
@@ -65,8 +66,9 @@ export const commandLeaderboard = async (
       ])
     );
     messageLeaderboardEntries.push(
-      await messageParser(
-        globalStrings.get(moonpieCommandReplyLeaderboardEntry.id),
+      await messageParserById(
+        moonpieCommandReplyLeaderboardEntry.id,
+        globalStrings,
         globalPlugins,
         macros,
         logger

@@ -1,4 +1,4 @@
-import { PluginFunc } from "../messageParser";
+import type { PluginFunc } from "../messageParser";
 
 export interface MessageParserPluginExample {
   before?: string;

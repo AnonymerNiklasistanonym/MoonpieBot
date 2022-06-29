@@ -5,11 +5,13 @@ import {
   logTwitchMessageCommandDetected,
   logTwitchMessageCommandReply,
 } from "../commands";
+import { messageParser } from "../messageParser";
 import { TwitchBadgeLevels } from "./twitchBadgeParser";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
-import { Macros, messageParser, Plugins } from "../messageParser";
+import type { Macros, Plugins } from "../messageParser";
+import type { Strings } from "../strings";
 
 /**
  * The logging ID of this command.
@@ -32,6 +34,7 @@ export const checkCustomCommand = async (
   regexString: string,
   userLevel: "broadcaster" | "mod" | "vip" | "everyone" | undefined,
   commandName: string | undefined,
+  globalStrings: Strings,
   globalPlugins: Plugins,
   globalMacros: Macros,
   logger: Logger
@@ -95,6 +98,7 @@ export const checkCustomCommand = async (
   if (channels.find((a) => a === channel)) {
     const parsedMessage = await messageParser(
       messageCommand,
+      globalStrings,
       pluginsCommand,
       globalMacros,
       logger

@@ -38,10 +38,6 @@ import {
   writeStringsVariableDocumentation,
 } from "./strings";
 import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
-// Type imports
-import type { Logger } from "winston";
-import type { ErrorWithCode } from "./error";
-import type { StreamCompanionData } from "./streamcompanion";
 import { generatePluginsAndMacrosMap } from "./messageParser";
 import {
   pluginLowercase,
@@ -72,6 +68,10 @@ import {
 } from "./messageParser/plugins/osu";
 import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
+// Type imports
+import type { Logger } from "winston";
+import type { ErrorWithCode } from "./error";
+import type { StreamCompanionData } from "./streamcompanion";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -325,6 +325,7 @@ export const main = async (logger: Logger, configDir: string) => {
   await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
   await writeStringsVariableDocumentation(
     path.join(configDir, ".env.strings.example"),
+    defaultStrings,
     pluginsList,
     macrosList,
     logger
@@ -588,6 +589,7 @@ export const main = async (logger: Logger, configDir: string) => {
           customCommand.regexString,
           customCommand.userLevel,
           customCommand.name,
+          strings,
           pluginsCustomCommands,
           macros,
           logger
@@ -656,6 +658,7 @@ export const main = async (logger: Logger, configDir: string) => {
         customTimer.channels,
         customTimer.message,
         customTimer.cronString,
+        strings,
         plugins,
         macros,
         logger

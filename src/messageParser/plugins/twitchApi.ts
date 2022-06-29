@@ -1,6 +1,6 @@
-import { ApiClient } from "@twurple/api/lib";
 import { errorMessageUserIdUndefined } from "../../commands";
-import { MessageParserPlugin } from "../plugins";
+import type { ApiClient } from "@twurple/api/lib";
+import type { MessageParserPlugin } from "../plugins";
 
 const TWITCH_API_PREFIX = "TWITCH_API_";
 

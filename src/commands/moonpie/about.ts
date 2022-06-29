@@ -3,7 +3,7 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
-import { messageParser } from "../../messageParser";
+import { messageParserById } from "../../messageParser";
 import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
 // Type imports
 import type { Client } from "tmi.js";
@@ -35,8 +35,9 @@ export const commandAbout = async (
     throw errorMessageIdUndefined();
   }
 
-  const message = await messageParser(
-    globalStrings.get(moonpieCommandReplyAbout.id),
+  const message = await messageParserById(
+    moonpieCommandReplyAbout.id,
+    globalStrings,
     globalPlugins,
     globalMacros,
     logger

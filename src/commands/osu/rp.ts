@@ -11,15 +11,15 @@ import {
   OsuCommands,
   LOG_ID_COMMAND_OSU,
 } from "../osu";
-// Type imports
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
-import type { OsuApiV2Credentials } from "../osu";
-import { messageParser } from "../../messageParser";
+import { messageParserById } from "../../messageParser";
 import {
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
 } from "../../strings/osu/commandReply";
+// Type imports
+import type { Client } from "tmi.js";
+import type { Logger } from "winston";
+import type { OsuApiV2Credentials } from "../osu";
 import type { Macros, Plugins } from "../../messageParser";
 import type { Strings } from "../../strings";
 
@@ -101,15 +101,17 @@ export const commandRp = async (
 
   let message = "";
   if (lastPlay.length > 0) {
-    message = await messageParser(
-      globalStrings.get(osuCommandReplyRp.id),
+    message = await messageParserById(
+      osuCommandReplyRp.id,
+      globalStrings,
       globalPlugins,
       osuRpRequestMacros,
       logger
     );
   } else {
-    message = await messageParser(
-      globalStrings.get(osuCommandReplyRpNotFound.id),
+    message = await messageParserById(
+      osuCommandReplyRpNotFound.id,
+      globalStrings,
       globalPlugins,
       osuRpRequestMacros,
       logger

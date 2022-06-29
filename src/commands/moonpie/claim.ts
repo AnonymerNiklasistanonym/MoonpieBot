@@ -6,16 +6,17 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
-// Type imports
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
-import { Macros, messageParser, Plugins } from "../../messageParser";
-import type { Strings } from "../../strings";
+import { messageParserById } from "../../messageParser";
 import {
   moonpieCommandReplyAlreadyClaimed,
   moonpieCommandReplyAlreadyClaimedStar,
   moonpieCommandReplyClaim,
 } from "../../strings/moonpie/commandReply";
+// Type imports
+import type { Client } from "tmi.js";
+import type { Logger } from "winston";
+import type { Macros, Plugins } from "../../messageParser";
+import type { Strings } from "../../strings";
 
 /**
  * Claim command: Claim a moonpie if no moonpie was claimed in the last 24
@@ -115,8 +116,9 @@ export const commandClaim = async (
     ])
   );
 
-  let message = await messageParser(
-    globalStrings.get(moonpieCommandReplyClaim.id),
+  let message = await messageParserById(
+    moonpieCommandReplyClaim.id,
+    globalStrings,
     globalPlugins,
     macros,
     logger
@@ -125,15 +127,17 @@ export const commandClaim = async (
   if (alreadyClaimedAMoonpie) {
     if (userId === "93818178") {
       // Easter egg for the most cute star there is <3
-      message = await messageParser(
-        globalStrings.get(moonpieCommandReplyAlreadyClaimedStar.id),
+      message = await messageParserById(
+        moonpieCommandReplyAlreadyClaimedStar.id,
+        globalStrings,
         globalPlugins,
         macros,
         logger
       );
     } else {
-      message = await messageParser(
-        globalStrings.get(moonpieCommandReplyAlreadyClaimed.id),
+      message = await messageParserById(
+        moonpieCommandReplyAlreadyClaimed.id,
+        globalStrings,
         globalPlugins,
         macros,
         logger

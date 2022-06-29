@@ -2,7 +2,7 @@
  * Strings handling.
  */
 
-import { Logger } from "winston";
+import type { Logger } from "winston";
 import { moonpieCommandReply } from "./strings/moonpie/commandReply";
 import { osuBeatmapRequests } from "./strings/osu/beatmapRequest";
 import { promises as fs } from "fs";
@@ -31,21 +31,49 @@ export const updateStringsMapWithCustomEnvStrings = (
   logger: Logger
 ) => {
   let foundCustomStringsCounter = 0;
+  let foundCustomNonDefaultStringsCounter = 0;
+  // First check for the default string entries
   for (const [key] of defaultStrings.entries()) {
     const envValue = process.env[`${PREFIX_CUSTOM_STRING}${key}`];
     if (envValue !== undefined && envValue.trim().length > 0) {
       strings.set(key, envValue);
       foundCustomStringsCounter++;
       logger.debug({
-        message: `Found custom string: ${key}=${envValue}`,
+        message: `Found default custom string: ${key}=${envValue}`,
         section: "strings",
       });
     }
   }
+  // Now check for custom strings
+  Object.keys(process.env).forEach((key) => {
+    if (
+      key.startsWith(PREFIX_CUSTOM_STRING) &&
+      strings.get(key) === undefined
+    ) {
+      const envValue = process.env[key];
+      if (envValue !== undefined && envValue.trim().length > 0) {
+        strings.set(key.slice(PREFIX_CUSTOM_STRING.length), envValue);
+        foundCustomNonDefaultStringsCounter++;
+        logger.info({
+          message: `Found non-default custom string: ${key}=${envValue}`,
+          section: "strings",
+        });
+      }
+    }
+  });
+
   if (foundCustomStringsCounter > 0) {
     logger.info({
-      message: `Found ${foundCustomStringsCounter} custom string${
+      message: `Found ${foundCustomStringsCounter} default custom string${
         foundCustomStringsCounter > 1 ? "s" : ""
+      }`,
+      section: "strings",
+    });
+  }
+  if (foundCustomNonDefaultStringsCounter > 0) {
+    logger.info({
+      message: `Found ${foundCustomNonDefaultStringsCounter} non-default custom string${
+        foundCustomNonDefaultStringsCounter > 1 ? "s" : ""
       }`,
       section: "strings",
     });
@@ -55,6 +83,7 @@ export const updateStringsMapWithCustomEnvStrings = (
 
 export const writeStringsVariableDocumentation = async (
   path: string,
+  strings: Strings,
   plugins: MessageParserPlugin[] = [],
   macros: MessageParserMacro[] = [],
   logger: Logger
@@ -67,7 +96,7 @@ export const writeStringsVariableDocumentation = async (
     "# Additionally there are plugins and macros that help with adding logic:\n\n";
 
   const pluginsAndMacroDocumentation =
-    await generatePluginAndMacroDocumentation(plugins, macros, logger);
+    await generatePluginAndMacroDocumentation(strings, plugins, macros, logger);
   data += `${pluginsAndMacroDocumentation}\n`;
 
   data += "# Sometimes there are additional plugins/macros like $(USER).\n";

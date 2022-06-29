@@ -1,4 +1,4 @@
-import { MessageParserPlugin } from "../plugins";
+import type { MessageParserPlugin } from "../plugins";
 
 const pluginShowIfEmptyLogic = (content?: string): boolean =>
   content === undefined || content.trim().length === 0;

@@ -1,6 +1,7 @@
-import { Logger } from "winston";
-import { MessageParserMacro } from "./messageParser/macros";
-import { MessageParserPlugin } from "./messageParser/plugins";
+import type { Logger } from "winston";
+import type { MessageParserMacro } from "./messageParser/macros";
+import type { MessageParserPlugin } from "./messageParser/plugins";
+import type { Strings } from "./strings";
 
 /**
  * A message parse tree node.
@@ -68,6 +69,10 @@ enum ParseState {
    * Currently parsing a plugin content scope.
    */
   PLUGIN_CONTENT = "PLUGIN_CONTENT",
+  /**
+   * Currently parsing a reference name.
+   */
+  REFERENCE_NAME = "REFERENCE_NAME",
 }
 /**
  * There are multiple subroutines during certain parse states.
@@ -93,7 +98,17 @@ enum ParseStateHelper {
    * Subroutine if plugin value is detected since this requires a recursive call.
    */
   PLUGIN_VALUE_FOUND = "PLUGIN_VALUE_FOUND",
+  /**
+   * Subroutine if a reference is detected.
+   */
+  REFERENCE_WAS_OPENED = "REFERENCE_WAS_OPENED",
+  /**
+   * Subroutine if a reference closing is detected.
+   */
+  REFERENCE_WAS_CLOSED = "REFERENCE_WAS_CLOSED",
 }
+
+const MAX_STRING_DEPTH = 15;
 
 /**
  * Create a parse tree of a message string.
@@ -102,14 +117,20 @@ enum ParseStateHelper {
  * scope close is detected.
  *
  * @param messageString The input string.
+ * @param strings The global string dictonary for references.
  * @param pluginDepth The depth of the plugin which is used for recursive calls.
  * @param earlyExitBecausePluginValue If true this means a call was made to parse a plugin value so a special early exit is necessary.
+ * @param stringDepth The depth of the current string reference to detect loops.
+ * @param logger Global logger.
  * @returns Parse tree of the message string.
  */
 export const createParseTree = (
   messageString: string,
+  strings: Strings,
   pluginDepth = 0,
-  earlyExitBecausePluginValue = false
+  earlyExitBecausePluginValue = false,
+  stringDepth = 0,
+  logger: Logger
 ) => {
   //console.log(`Generate parse tree of '${messageString}'`);
   //if (pluginDepth > 0) {
@@ -157,8 +178,16 @@ export const createParseTree = (
    * scope close in a recursive call.
    */
   let earlyExitBecausePluginClosed = false;
+  /**
+   * Track string references.
+   */
+  let referenceName = "";
   // Iterate over the whole input message string one character at a time:
   for (const character of messageString) {
+    //console.log({
+    //  character,
+    //  skipCharacterCount,
+    //});
     // Update the length and content of the read in substring
     lengthOfReadSubstring++;
     currentChildNode.originalString += character;
@@ -215,9 +244,18 @@ export const createParseTree = (
         // or go back to parsing text normally
         if (character === "(") {
           parseStateHelper = ParseStateHelper.PLUGIN_WAS_OPENED;
+        } else if (character === "[") {
+          parseStateHelper = ParseStateHelper.REFERENCE_WAS_OPENED;
         } else {
           parseState = ParseState.TEXT;
           currentChildNode.content += "$" + character;
+        }
+        break;
+      case ParseState.REFERENCE_NAME:
+        if (character === "]") {
+          parseStateHelper = ParseStateHelper.REFERENCE_WAS_CLOSED;
+        } else {
+          referenceName += character;
         }
         break;
       case ParseState.PLUGIN_NAME:
@@ -287,7 +325,6 @@ export const createParseTree = (
           throw Error("A plugin was opened while not being in text type!");
         }
         if (
-          currentChildNode.type === "text" &&
           currentChildNode.content !== undefined &&
           currentChildNode.content.length > 0
         ) {
@@ -314,8 +351,11 @@ export const createParseTree = (
         currentChildNode.pluginValue = createParseTree(
           // Remove the parsed substring from the input string
           messageString.slice(lengthOfReadSubstring),
+          strings,
           pluginDepth,
-          true
+          true,
+          stringDepth,
+          logger
         );
         //console.log(
         //  `Determined pluginValue from '${messageString.slice(
@@ -336,7 +376,11 @@ export const createParseTree = (
         currentChildNode.pluginContent = createParseTree(
           // Remove the parsed substring from the input string
           messageString.slice(lengthOfReadSubstring),
-          pluginDepth
+          strings,
+          pluginDepth,
+          undefined,
+          stringDepth,
+          logger
         );
         //console.log(
         //  `Determined pluginContent from '${messageString.slice(
@@ -365,6 +409,65 @@ export const createParseTree = (
           originalString: "",
         };
         break;
+      case ParseStateHelper.REFERENCE_WAS_OPENED:
+        parseStateHelper = ParseStateHelper.NOTHING;
+        // Prevent stack overflows when string references have loop
+        if (stringDepth > MAX_STRING_DEPTH) {
+          throw Error(
+            "The maximum string depth was reached, most likely there is a loop!"
+          );
+        }
+        // And increase the plugin depth by 1
+        stringDepth++;
+        // If the current walking node has content that is not the empty string
+        // add it to the root node before doing anything:
+        if (currentChildNode.type !== "text") {
+          throw Error("A reference was found while not being in text type!");
+        }
+        if (
+          currentChildNode.type === "text" &&
+          currentChildNode.content !== undefined &&
+          currentChildNode.content.length > 0
+        ) {
+          rootNode.children?.push({
+            ...currentChildNode,
+            // Remove the begin of the reference scope open from the string
+            originalString: currentChildNode.originalString.slice(0, -2),
+          });
+        }
+        parseState = ParseState.REFERENCE_NAME;
+        referenceName = "";
+        break;
+      case ParseStateHelper.REFERENCE_WAS_CLOSED:
+        parseStateHelper = ParseStateHelper.NOTHING;
+        // eslint-disable-next-line no-case-declarations
+        const referenceString = strings.get(referenceName);
+        if (referenceString === undefined) {
+          throw Error(`The reference '${referenceName}' was not found!`);
+        }
+        // eslint-disable-next-line no-case-declarations
+        const referenceParseTree = createParseTree(
+          referenceString,
+          strings,
+          undefined,
+          undefined,
+          stringDepth,
+          logger
+        );
+        //console.log(
+        //  `Reference parse tree: ${JSON.stringify(
+        //    referenceParseTree
+        //  )} from ${referenceName}=>${referenceString}`
+        //);
+        rootNode.children?.push(referenceParseTree);
+        // If a reference scope close was detected parse now text
+        parseState = ParseState.TEXT;
+        currentChildNode = {
+          type: "text",
+          content: "",
+          originalString: "",
+        };
+        break;
     }
     //console.log({
     //  second: true,
@@ -385,7 +488,11 @@ export const createParseTree = (
     }
   }
   if (parseState !== ParseState.TEXT) {
-    throw Error(`Message is invalid! Final parse state was "${parseState}"`);
+    throw Error(
+      `Message is invalid! Final parse state was "${parseState}" (${JSON.stringify(
+        { rootNode, currentChildNode }
+      )})`
+    );
   }
   // If there is content that was not yet added to the root node add it now
   if (
@@ -404,14 +511,22 @@ export const createParseTree = (
   }
   // Finally check if the root node has exactly 1 child, if yes don't return the
   // root node but its only child to keep the size of the parse tree minimal:
-  if (rootNode.children?.length === 1) {
-    return rootNode.children[0];
-  }
-  // If the root node is returned in a recursive call fix the original string
+  let nodeToReturn = rootNode;
+  // Fix original string
+  let fixedOriginalString = nodeToReturn.originalString;
   if (earlyExitBecausePluginClosed) {
-    rootNode.originalString = messageString.slice(0, lengthOfReadSubstring - 1);
+    //console.log(
+    //  `Rename original string because of early exit from '${
+    //    nodeToReturn.originalString
+    //  }' to '${messageString.slice(0, lengthOfReadSubstring - 1)}'`
+    //);
+    fixedOriginalString = messageString.slice(0, lengthOfReadSubstring - 1);
   }
-  return rootNode;
+  if (rootNode.children?.length === 1) {
+    nodeToReturn = rootNode.children[0];
+  }
+  nodeToReturn.originalString = fixedOriginalString;
+  return nodeToReturn;
 };
 
 // A plugin can have a scope in which special plugins can be defined
@@ -524,6 +639,7 @@ export const parseTreeNode = async (
 
 export const messageParser = async (
   messageString: undefined | string,
+  strings: Strings = new Map(),
   plugins: Plugins = new Map(),
   macros: Macros = new Map(),
   logger: Logger
@@ -532,10 +648,31 @@ export const messageParser = async (
     throw Error("Message string could not be parsed because it's undefined!");
   }
   // 1. Create parse tree
-  const parseTreeNodeRoot = createParseTree(messageString);
+  const parseTreeNodeRoot = createParseTree(
+    messageString,
+    strings,
+    undefined,
+    undefined,
+    undefined,
+    logger
+  );
   //console.log(JSON.stringify(parseTreeNodeRoot));
   // 2. Parse parse tree from top down
   return await parseTreeNode(parseTreeNodeRoot, plugins, macros, logger);
+};
+
+export const messageParserById = async (
+  stringId: string,
+  strings: Strings,
+  plugins: Plugins = new Map(),
+  macros: Macros = new Map(),
+  logger: Logger
+) => {
+  const stringFromId = strings.get(stringId);
+  if (stringFromId === undefined) {
+    throw Error(`Message string could not be found via its ID '${stringId}'!`);
+  }
+  return await messageParser(stringFromId, strings, plugins, macros, logger);
 };
 
 export const generatePluginsAndMacrosMap = (
@@ -557,6 +694,7 @@ export const generatePluginsAndMacrosMap = (
 };
 
 export const generatePluginAndMacroDocumentation = async (
+  strings: Strings,
   plugins: MessageParserPlugin[],
   macros: MessageParserMacro[],
   logger: Logger
@@ -593,6 +731,7 @@ export const generatePluginAndMacroDocumentation = async (
         }
         const exampleStringOutput = await messageParser(
           exampleString,
+          strings,
           pluginsMap,
           macrosMap,
           logger
@@ -615,6 +754,7 @@ export const generatePluginAndMacroDocumentation = async (
       const macroString = `%${macro.id}:${key}%`;
       const macroStringOutput = await messageParser(
         macroString,
+        strings,
         pluginsMap,
         macrosMap,
         logger

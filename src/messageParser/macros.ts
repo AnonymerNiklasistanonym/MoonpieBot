@@ -1,4 +1,4 @@
-import { MacroDictionary } from "../messageParser";
+import type { MacroDictionary } from "../messageParser";
 
 export interface MessageParserMacro {
   description?: string;

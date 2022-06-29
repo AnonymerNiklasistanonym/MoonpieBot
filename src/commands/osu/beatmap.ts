@@ -12,7 +12,7 @@ import {
 } from "../osu";
 import { isProcessRunning } from "../../other/processInformation";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
-import { messageParser } from "../../messageParser";
+import { messageParserById } from "../../messageParser";
 // Type imports
 import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
@@ -108,8 +108,9 @@ export const commandBeatmap = async (
   } catch (err) {
     if ((err as OsuApiV2WebRequestError).statusCode === 404) {
       logger.warn(err);
-      const errorMessage = await messageParser(
-        globalStrings.get(osuBeatmapRequestNotFound.id),
+      const errorMessage = await messageParserById(
+        osuBeatmapRequestNotFound.id,
+        globalStrings,
         globalPlugins,
         osuBeatmapRequestMacros,
         logger
@@ -121,27 +122,31 @@ export const commandBeatmap = async (
   }
 
   if (detailedBeatmapInformation) {
-    messageRequest = await messageParser(
-      globalStrings.get(osuBeatmapRequestDetailed.id),
+    messageRequest = await messageParserById(
+      osuBeatmapRequestDetailed.id,
+      globalStrings,
       globalPlugins,
       osuBeatmapRequestMacros,
       logger
     );
-    messageRequestIrc = await messageParser(
-      globalStrings.get(osuBeatmapRequestIrcDetailed.id),
+    messageRequestIrc = await messageParserById(
+      osuBeatmapRequestIrcDetailed.id,
+      globalStrings,
       globalPlugins,
       osuBeatmapRequestMacros,
       logger
     );
   } else {
-    messageRequest = await messageParser(
-      globalStrings.get(osuBeatmapRequest.id),
+    messageRequest = await messageParserById(
+      osuBeatmapRequest.id,
+      globalStrings,
       globalPlugins,
       osuBeatmapRequestMacros,
       logger
     );
-    messageRequestIrc = await messageParser(
-      globalStrings.get(osuBeatmapRequestIrc.id),
+    messageRequestIrc = await messageParserById(
+      osuBeatmapRequestIrc.id,
+      globalStrings,
       globalPlugins,
       osuBeatmapRequestMacros,
       logger

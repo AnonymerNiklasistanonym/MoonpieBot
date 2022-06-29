@@ -12,8 +12,8 @@ import { logTwitchMessageCommandDetected } from "../commands";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
-import { Macros, Plugins } from "../messageParser";
-import { Strings } from "../strings";
+import type { Macros, Plugins } from "../messageParser";
+import type { Strings } from "../strings";
 
 /**
  * The logging ID of this command.

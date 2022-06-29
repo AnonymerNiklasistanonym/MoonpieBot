@@ -10,7 +10,7 @@ import {
   OsuCommands,
   LOG_ID_COMMAND_OSU,
 } from "../osu";
-import { messageParser } from "../../messageParser";
+import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 // Type imports
 import type { Client } from "tmi.js";
@@ -91,8 +91,9 @@ export const commandPp = async (
     ])
   );
 
-  const message = await messageParser(
-    globalStrings.get(osuCommandReplyPp.id),
+  const message = await messageParserById(
+    osuCommandReplyPp.id,
+    globalStrings,
     globalPlugins,
     osuPpRequestMacros,
     logger

@@ -12,13 +12,7 @@ import {
   LOG_ID_COMMAND_OSU,
 } from "../osu";
 import { getProcessWindowTitle } from "../../other/processInformation";
-// Type imports
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
-import type { StreamCompanionData } from "../../streamcompanion";
-import type { OsuApiV2Credentials } from "../osu";
-import { Macros, messageParser, Plugins } from "../../messageParser";
-import type { Strings } from "../../strings";
+import { messageParserById } from "../../messageParser";
 import {
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
@@ -26,6 +20,13 @@ import {
   osuCommandReplyNpStreamCompanion,
   osuCommandReplyNpStreamCompanionNotRunning,
 } from "../../strings/osu/commandReply";
+// Type imports
+import type { Client } from "tmi.js";
+import type { Logger } from "winston";
+import type { StreamCompanionData } from "../../streamcompanion";
+import type { OsuApiV2Credentials } from "../osu";
+import type { Macros, Plugins } from "../../messageParser";
+import type { Strings } from "../../strings";
 
 /**
  * Regex to parse the now playing window title on Windows.
@@ -86,8 +87,9 @@ export const commandNp = async (
   if (userName === undefined) {
     throw errorMessageUserNameUndefined();
   }
-  let message = await messageParser(
-    globalStrings.get(osuCommandReplyNpNoMap.id),
+  let message = await messageParserById(
+    osuCommandReplyNpNoMap.id,
+    globalStrings,
     globalPlugins,
     globalMacros,
     logger
@@ -100,8 +102,9 @@ export const commandNp = async (
       currentMapData.mapid !== undefined &&
       currentMapData.mapid !== 0
     ) {
-      message = await messageParser(
-        globalStrings.get(osuCommandReplyNpStreamCompanion.id),
+      message = await messageParserById(
+        osuCommandReplyNpStreamCompanion.id,
+        globalStrings,
         globalPlugins,
         globalMacros,
         logger
@@ -111,15 +114,17 @@ export const commandNp = async (
       currentMapData.mapid !== undefined &&
       currentMapData.mapid === 0
     ) {
-      message = await messageParser(
-        globalStrings.get(osuCommandReplyNpNoMapStreamCompanion.id),
+      message = await messageParserById(
+        osuCommandReplyNpNoMapStreamCompanion.id,
+        globalStrings,
         globalPlugins,
         globalMacros,
         logger
       );
     } else {
-      message = await messageParser(
-        globalStrings.get(osuCommandReplyNpStreamCompanionNotRunning.id),
+      message = await messageParserById(
+        osuCommandReplyNpStreamCompanionNotRunning.id,
+        globalStrings,
         globalPlugins,
         globalMacros,
         logger
@@ -186,8 +191,9 @@ export const commandNp = async (
             ["MAP_ID_VIA_API", `${mapId}`],
           ])
         );
-        message = await messageParser(
-          globalStrings.get(osuCommandReplyNp.id),
+        message = await messageParserById(
+          osuCommandReplyNp.id,
+          globalStrings,
           globalPlugins,
           customMacros,
           logger
