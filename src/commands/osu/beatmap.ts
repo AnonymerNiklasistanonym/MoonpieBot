@@ -37,7 +37,6 @@ import type { Strings } from "../../strings";
  * @param messageId Twitch message ID of the request (used for logging).
  * @param userName Twitch user name of the requester.
  * @param osuApiV2Credentials The osu API (v2) credentials.
- * scores).
  * @param beatmapId The recognized osu beatmap ID.
  * @param comment The recognized comment to the beatmap.
  * @param detailedBeatmapInformation Print detailed beatmap information.
