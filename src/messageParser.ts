@@ -1,6 +1,11 @@
 import type { Logger } from "winston";
 import type { MessageParserMacro } from "./messageParser/macros";
 import type { MessageParserPlugin } from "./messageParser/plugins";
+import {
+  FileDocumentationParts,
+  FileDocumentationPartType,
+  FileDocumentationPartValue,
+} from "./other/splitTextAtLength";
 import type { Strings } from "./strings";
 
 /**
@@ -702,17 +707,27 @@ export const generatePluginAndMacroDocumentation = async (
   const maps = generatePluginsAndMacrosMap(plugins, macros);
   const pluginsMap = maps.pluginsMap;
   const macrosMap = maps.macrosMap;
-  let output = `# ${"-".repeat(80)}\n# Supported Plugins:\n`;
+  const output: FileDocumentationParts[] = [];
+  output.push({
+    type: FileDocumentationPartType.HEADING,
+    title: "Supported Plugins",
+  });
   if (plugins.length === 0) {
-    output += `# ${"-".repeat(80)}\n# None\n`;
+    output.push({
+      type: FileDocumentationPartType.TEXT,
+      content: "None",
+    });
   }
   for (const plugin of plugins) {
-    output += `# ${"-".repeat(80)}\n# $(${plugin.id})\n`;
-    if (plugin.description) {
-      output += `# > ${plugin.description}\n`;
-    }
+    const pluginEntry: FileDocumentationPartValue = {
+      type: FileDocumentationPartType.VALUE,
+      prefix: ">",
+      description: plugin.description,
+      title: `$(${plugin.id})`,
+    };
     if (plugin.examples && plugin.examples.length > 0) {
-      output += `# Examples:\n`;
+      pluginEntry.lists = [];
+      const pluginListExamples = [];
       for (const example of plugin.examples) {
         let exampleString = "";
         if (example.before) {
@@ -736,20 +751,37 @@ export const generatePluginAndMacroDocumentation = async (
           macrosMap,
           logger
         );
-        output += `# - "${exampleString}" => "${exampleStringOutput}"\n`;
+        pluginListExamples.push(
+          `"${exampleString}" => "${exampleStringOutput}"`
+        );
       }
+      pluginEntry.lists.push(["Examples", pluginListExamples]);
     }
+    output.push(pluginEntry);
   }
-  output += `\n# ${"-".repeat(80)}\n# Supported Macros:\n`;
+  output.push({
+    type: FileDocumentationPartType.NEWLINE,
+    count: 1,
+  });
+  output.push({
+    type: FileDocumentationPartType.HEADING,
+    title: "Supported Macros",
+  });
   if (macros.length === 0) {
-    output += `# ${"-".repeat(80)}\n# None\n`;
+    output.push({
+      type: FileDocumentationPartType.TEXT,
+      content: "None",
+    });
   }
   for (const macro of macros) {
-    output += `# ${"-".repeat(80)}\n# %${macro.id}:KEY%\n`;
-    if (macro.description) {
-      output += `# > ${macro.description}\n`;
-    }
-    output += `# Keys:\n`;
+    const macroEntry: FileDocumentationPartValue = {
+      type: FileDocumentationPartType.VALUE,
+      prefix: ">",
+      description: macro.description,
+      title: `%${macro.id}:KEY%`,
+    };
+    macroEntry.lists = [];
+    const macroListKeys = [];
     for (const [key] of macro.values.entries()) {
       const macroString = `%${macro.id}:${key}%`;
       const macroStringOutput = await messageParser(
@@ -759,8 +791,11 @@ export const generatePluginAndMacroDocumentation = async (
         macrosMap,
         logger
       );
-      output += `# - "${macroString}" => "${macroStringOutput}"\n`;
+      macroListKeys.push(`"${macroString}" => "${macroStringOutput}"`);
     }
+    macroEntry.lists.push(["Keys", macroListKeys]);
+    output.push(macroEntry);
   }
+
   return output;
 };

@@ -2,15 +2,20 @@
  * Strings handling.
  */
 
-import type { Logger } from "winston";
 import { moonpieCommandReply } from "./strings/moonpie/commandReply";
 import { osuBeatmapRequests } from "./strings/osu/beatmapRequest";
 import { promises as fs } from "fs";
 import { generatePluginAndMacroDocumentation } from "./messageParser";
-import { MessageParserPlugin } from "./messageParser/plugins";
-import { MessageParserMacro } from "./messageParser/macros";
 import { osuCommandReply } from "./strings/osu/commandReply";
 import { spotifyCommandReply } from "./strings/spotify/commandReply";
+import {
+  FileDocumentationPartType,
+  generateFileDocumentation,
+} from "./other/splitTextAtLength";
+import type { Logger } from "winston";
+import type { MessageParserPlugin } from "./messageParser/plugins";
+import type { MessageParserMacro } from "./messageParser/macros";
+import type { FileDocumentationParts } from "./other/splitTextAtLength";
 
 export type Strings = Map<string, string>;
 
@@ -88,34 +93,55 @@ export const writeStringsVariableDocumentation = async (
   macros: MessageParserMacro[] = [],
   logger: Logger
 ) => {
-  let data =
-    "# This program allows to customize certain strings listed in this file.\n";
-  data +=
-    "# To use a customized value instead of the default one uncomment the line.\n\n";
-  data +=
-    "# Additionally there are plugins and macros that help with adding logic:\n\n";
-
+  const data: FileDocumentationParts[] = [];
+  data.push({
+    type: FileDocumentationPartType.TEXT,
+    content:
+      "This program allows to customize certain strings listed in this file. " +
+      "To use a customized value instead of the default one uncomment the line. " +
+      "Additionally there are plugins and macros that help with adding logic:",
+  });
+  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
   const pluginsAndMacroDocumentation =
     await generatePluginAndMacroDocumentation(strings, plugins, macros, logger);
-  data += `${pluginsAndMacroDocumentation}\n`;
-
-  data += "# Sometimes there are additional plugins/macros like $(USER).\n";
-  data += "# These plugins/macros can only be used when they are provided.\n";
-  data +=
-    "# So be sure to compare the default values plugins/macros for them.\n\n";
-  data +=
-    "# To use a customized value instead of the default one uncomment the line.\n";
-  data += `# (The lines that start with ${PREFIX_CUSTOM_STRING})\n\n`;
+  data.push(...pluginsAndMacroDocumentation);
+  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+  data.push({
+    type: FileDocumentationPartType.TEXT,
+    content:
+      "Sometimes there are additional plugins/macros like $(USER). " +
+      "These plugins/macros can only be used when they are provided. " +
+      "So be sure to compare the default values plugins/macros for them.",
+  });
+  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+  data.push({
+    type: FileDocumentationPartType.TEXT,
+    content:
+      "To use a customized value instead of the default one uncomment the line. " +
+      `(The lines that start with ${PREFIX_CUSTOM_STRING})`,
+  });
+  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
 
   for (const [key, defaultValue] of defaultStrings.entries()) {
     if (defaultValue.endsWith(" ") || defaultValue.startsWith(" ")) {
-      data += `#${PREFIX_CUSTOM_STRING}${key}="${defaultValue}"`;
+      data.push({
+        type: FileDocumentationPartType.VALUE,
+        value: `${PREFIX_CUSTOM_STRING}${key}="${defaultValue}"`,
+        prefix: ">",
+        description: undefined,
+        isComment: true,
+      });
     } else {
-      data += `#${PREFIX_CUSTOM_STRING}${key}=${defaultValue}`;
+      data.push({
+        type: FileDocumentationPartType.VALUE,
+        value: `${PREFIX_CUSTOM_STRING}${key}=${defaultValue}`,
+        prefix: ">",
+        description: undefined,
+        isComment: true,
+      });
     }
-    data += `\n`;
   }
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(path, data);
+  await fs.writeFile(path, generateFileDocumentation(data));
 };
