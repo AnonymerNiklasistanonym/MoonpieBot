@@ -49,6 +49,8 @@ export interface FileDocumentationPartValue
   title?: string;
   prefix: string;
   lists?: [string, string[]][];
+  properties?: [string, string][];
+  infos?: string[];
 }
 export interface FileDocumentationPartNewline
   extends FileDocumentationPart<FileDocumentationPartType.NEWLINE> {
@@ -118,6 +120,21 @@ export const generateFileDocumentation = (
             data += list[1]
               .map((a) => `# ${" ".repeat(inputPart.prefix.length)} - ${a}\n`)
               .join("");
+          }
+        }
+        if (
+          inputPart.properties !== undefined &&
+          inputPart.properties.length > 0
+        ) {
+          for (const property of inputPart.properties) {
+            data += `# ${" ".repeat(inputPart.prefix.length)} ${property[0]}: ${
+              property[1]
+            }\n`;
+          }
+        }
+        if (inputPart.infos !== undefined && inputPart.infos.length > 0) {
+          for (const info of inputPart.infos) {
+            data += `# ${" ".repeat(inputPart.prefix.length)} ${info}\n`;
           }
         }
         if (inputPart.isComment) {

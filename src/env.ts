@@ -3,7 +3,14 @@ import * as path from "path";
 import { MoonpieCommands } from "./commands/moonpie";
 import { OsuCommands } from "./commands/osu";
 import { SpotifyCommands } from "./commands/spotify";
-import { splitTextAtLength } from "./other/splitTextAtLength";
+import {
+  generateFileDocumentation,
+  FileDocumentationPartType,
+} from "./other/splitTextAtLength";
+import type {
+  FileDocumentationParts,
+  FileDocumentationPartValue,
+} from "./other/splitTextAtLength";
 
 /** Path to the root directory of the source code. */
 const pathToRootDir = path.join(__dirname, "..");
@@ -462,82 +469,71 @@ export const envVariableStructure: (
 ];
 
 export const writeEnvVariableDocumentation = async (path: string) => {
-  let data = "";
-  const maxLineLength = 78;
+  const data: FileDocumentationParts[] = [];
 
   for (const structurePart of envVariableStructure) {
     if (!(structurePart as EnvVariableStructureVariablesBlock)?.block) {
       // Just a text block
       const structurePartText = structurePart as EnvVariableStructureTextBlock;
-      const textData = splitTextAtLength(
-        structurePartText.content,
-        maxLineLength
-      );
-      for (const textDataPart of textData) {
-        data += `# ${textDataPart}\n`;
-      }
+      data.push({
+        type: FileDocumentationPartType.TEXT,
+        content: structurePartText.content,
+      });
     } else {
       // Variable documentation block
       const structurePartVariables =
         structurePart as EnvVariableStructureVariablesBlock;
-      data += `${"#".repeat(maxLineLength + 2)}\n`;
-      data += `# ${structurePartVariables.name}\n`;
-      data += `# ${"-".repeat(structurePartVariables.name.length)}\n`;
-      const descriptionData = splitTextAtLength(
-        structurePartVariables.description,
-        maxLineLength
-      );
-      for (const descriptionDataPart of descriptionData) {
-        data += `# ${descriptionDataPart}\n`;
-      }
-      data += `${"#".repeat(maxLineLength + 2)}\n`;
+      data.push({
+        type: FileDocumentationPartType.NEWLINE,
+        count: 1,
+      });
+      data.push({
+        type: FileDocumentationPartType.HEADING,
+        title: structurePartVariables.name,
+        description: structurePartVariables.description,
+      });
+
       // Now add for each variable of the block the documentation
       for (const envVariable in EnvVariable) {
         const envVariableInfo = getEnvVariableValueInformation(envVariable);
         if (envVariableInfo?.block === structurePartVariables.block) {
-          const variableDescriptionData = splitTextAtLength(
-            envVariableInfo.description,
-            maxLineLength - 2
-          );
-          let first = true;
-          for (const variableDescriptionDataPart of variableDescriptionData) {
-            data += `# ${first ? ">" : " "} ${variableDescriptionDataPart}\n`;
-            first = false;
+          const envVariableEntry: FileDocumentationPartValue = {
+            type: FileDocumentationPartType.VALUE,
+            description: envVariableInfo.description,
+            prefix: ">",
+          };
+          if (
+            envVariableInfo.supportedValues &&
+            envVariableInfo.supportedValues.length > 0
+          ) {
+            envVariableEntry.properties = [];
+            envVariableEntry.properties.push([
+              "Supported values",
+              envVariableInfo.supportedValues.join(", "),
+            ]);
           }
-          if (envVariableInfo.supportedValues) {
-            const supportedValuesText = splitTextAtLength(
-              `Supported values are: ${envVariableInfo.supportedValues.join(
-                ", "
-              )})`,
-              maxLineLength - 2
-            );
-            let first = true;
-            for (const supportedValuesTextPart of supportedValuesText) {
-              data += `#   ${first ? "(" : " "}${supportedValuesTextPart}\n`;
-              first = false;
-            }
-          }
+          envVariableEntry.infos = [];
           if (envVariableInfo.censor) {
-            data += `#   [KEEP THIS VARIABLE PRIVATE!]\n`;
+            envVariableEntry.infos.push("KEEP THIS VARIABLE PRIVATE!");
           }
           if (envVariableInfo.default) {
-            data += `${
-              envVariableInfo.necessary ? "" : "#"
-            }${envVariablePrefix}${envVariable}=${envVariableInfo.default}\n`;
+            envVariableEntry.value = `${envVariablePrefix}${envVariable}=${envVariableInfo.default}`;
+            envVariableEntry.isComment = !envVariableInfo.necessary;
           } else if (envVariableInfo.example) {
-            data += `#   (The following line is only an example!)\n`;
-            data += `${
-              envVariableInfo.necessary ? "" : "#"
-            }${envVariablePrefix}${envVariable}=${envVariableInfo.example}\n`;
+            envVariableEntry.infos.push(
+              "(The following line is only an example!)"
+            );
+            envVariableEntry.value = `${envVariablePrefix}${envVariable}=${envVariableInfo.example}`;
+            envVariableEntry.isComment = !envVariableInfo.necessary;
           } else {
-            data += "# ERROR\n";
+            envVariableEntry.value = `ERROR`;
           }
+          data.push(envVariableEntry);
         }
       }
     }
-    data += `\n`;
   }
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(path, data);
+  await fs.writeFile(path, generateFileDocumentation(data));
 };
