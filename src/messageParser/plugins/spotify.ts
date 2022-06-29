@@ -8,7 +8,7 @@ export const pluginSpotifyCurrentPreviousSong = (
   spotifyWebApi: SpotifyWebApi
 ): MessageParserPlugin => {
   return {
-    id: "SPOTIFY_CURRENT_PREVIOUS_SONG",
+    id: "SPOTIFY_SONG",
     func: async (logger) => {
       const data = await spotifyGetCurrentSongAndRecentlyPlayedSongs(
         spotifyWebApi,
