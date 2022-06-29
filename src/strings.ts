@@ -55,6 +55,7 @@ export const updateStringsMapWithCustomEnvStrings = (
       key.startsWith(PREFIX_CUSTOM_STRING) &&
       strings.get(key) === undefined
     ) {
+      // eslint-disable-next-line security/detect-object-injection
       const envValue = process.env[key];
       if (envValue !== undefined && envValue.trim().length > 0) {
         strings.set(key.slice(PREFIX_CUSTOM_STRING.length), envValue);
