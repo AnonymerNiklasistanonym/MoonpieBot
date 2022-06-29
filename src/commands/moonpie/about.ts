@@ -38,7 +38,8 @@ export const commandAbout = async (
   const message = await messageParser(
     globalStrings.get(moonpieCommandReplyAbout.id),
     globalPlugins,
-    globalMacros
+    globalMacros,
+    logger
   );
   const sentMessage = await client.say(channel, message);
 

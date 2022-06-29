@@ -10,6 +10,7 @@ import { generatePluginAndMacroDocumentation } from "./messageParser";
 import { MessageParserPlugin } from "./messageParser/plugins";
 import { MessageParserMacro } from "./messageParser/macros";
 import { osuCommandReply } from "./strings/osu/commandReply";
+import { spotifyCommandReply } from "./strings/spotify/commandReply";
 
 export type Strings = Map<string, string>;
 
@@ -22,6 +23,7 @@ export const defaultStrings: Strings = new Map<string, string>([
   ...moonpieCommandReply,
   ...osuBeatmapRequests,
   ...osuCommandReply,
+  ...spotifyCommandReply,
 ]);
 
 export const updateStringsMapWithCustomEnvStrings = (
@@ -54,7 +56,8 @@ export const updateStringsMapWithCustomEnvStrings = (
 export const writeStringsVariableDocumentation = async (
   path: string,
   plugins: MessageParserPlugin[] = [],
-  macros: MessageParserMacro[] = []
+  macros: MessageParserMacro[] = [],
+  logger: Logger
 ) => {
   let data =
     "# This program allows to customize certain strings listed in this file.\n";
@@ -64,7 +67,7 @@ export const writeStringsVariableDocumentation = async (
     "# Additionally there are plugins and macros that help with adding logic:\n\n";
 
   const pluginsAndMacroDocumentation =
-    await generatePluginAndMacroDocumentation(plugins, macros);
+    await generatePluginAndMacroDocumentation(plugins, macros, logger);
   data += `${pluginsAndMacroDocumentation}\n`;
 
   data += "# Sometimes there are additional plugins/macros like $(USER).\n";

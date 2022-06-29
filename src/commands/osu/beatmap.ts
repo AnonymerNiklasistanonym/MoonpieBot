@@ -111,7 +111,8 @@ export const commandBeatmap = async (
       const errorMessage = await messageParser(
         globalStrings.get(osuBeatmapRequestNotFound.id),
         globalPlugins,
-        osuBeatmapRequestMacros
+        osuBeatmapRequestMacros,
+        logger
       );
       throw Error(errorMessage);
     } else {
@@ -123,23 +124,27 @@ export const commandBeatmap = async (
     messageRequest = await messageParser(
       globalStrings.get(osuBeatmapRequestDetailed.id),
       globalPlugins,
-      osuBeatmapRequestMacros
+      osuBeatmapRequestMacros,
+      logger
     );
     messageRequestIrc = await messageParser(
       globalStrings.get(osuBeatmapRequestIrcDetailed.id),
       globalPlugins,
-      osuBeatmapRequestMacros
+      osuBeatmapRequestMacros,
+      logger
     );
   } else {
     messageRequest = await messageParser(
       globalStrings.get(osuBeatmapRequest.id),
       globalPlugins,
-      osuBeatmapRequestMacros
+      osuBeatmapRequestMacros,
+      logger
     );
     messageRequestIrc = await messageParser(
       globalStrings.get(osuBeatmapRequestIrc.id),
       globalPlugins,
-      osuBeatmapRequestMacros
+      osuBeatmapRequestMacros,
+      logger
     );
   }
 

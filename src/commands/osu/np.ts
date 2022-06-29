@@ -89,7 +89,8 @@ export const commandNp = async (
   let message = await messageParser(
     globalStrings.get(osuCommandReplyNpNoMap.id),
     globalPlugins,
-    globalMacros
+    globalMacros,
+    logger
   );
 
   if (osuStreamCompanionCurrentMapData !== undefined) {
@@ -102,7 +103,8 @@ export const commandNp = async (
       message = await messageParser(
         globalStrings.get(osuCommandReplyNpStreamCompanion.id),
         globalPlugins,
-        globalMacros
+        globalMacros,
+        logger
       );
     } else if (
       currentMapData !== undefined &&
@@ -112,13 +114,15 @@ export const commandNp = async (
       message = await messageParser(
         globalStrings.get(osuCommandReplyNpNoMapStreamCompanion.id),
         globalPlugins,
-        globalMacros
+        globalMacros,
+        logger
       );
     } else {
       message = await messageParser(
         globalStrings.get(osuCommandReplyNpStreamCompanionNotRunning.id),
         globalPlugins,
-        globalMacros
+        globalMacros,
+        logger
       );
     }
   } else {
@@ -185,7 +189,8 @@ export const commandNp = async (
         message = await messageParser(
           globalStrings.get(osuCommandReplyNp.id),
           globalPlugins,
-          customMacros
+          customMacros,
+          logger
         );
       }
     }

@@ -118,7 +118,8 @@ export const commandClaim = async (
   let message = await messageParser(
     globalStrings.get(moonpieCommandReplyClaim.id),
     globalPlugins,
-    macros
+    macros,
+    logger
   );
 
   if (alreadyClaimedAMoonpie) {
@@ -127,13 +128,15 @@ export const commandClaim = async (
       message = await messageParser(
         globalStrings.get(moonpieCommandReplyAlreadyClaimedStar.id),
         globalPlugins,
-        macros
+        macros,
+        logger
       );
     } else {
       message = await messageParser(
         globalStrings.get(moonpieCommandReplyAlreadyClaimed.id),
         globalPlugins,
-        macros
+        macros,
+        logger
       );
     }
   }

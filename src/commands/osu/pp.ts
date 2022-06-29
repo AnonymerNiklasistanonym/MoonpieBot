@@ -94,7 +94,8 @@ export const commandPp = async (
   const message = await messageParser(
     globalStrings.get(osuCommandReplyPp.id),
     globalPlugins,
-    osuPpRequestMacros
+    osuPpRequestMacros,
+    logger
   );
   const sentMessage = await client.say(channel, message);
 

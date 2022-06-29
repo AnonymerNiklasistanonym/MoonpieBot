@@ -48,7 +48,7 @@ import {
   pluginRandomNumber,
   pluginShowIfEmpty,
   pluginShowIfNotEmpty,
-  pluginShowIfNotTrue,
+  pluginShowIfFalse,
   pluginShowIfNotUndefined,
   pluginShowIfNumberGreaterThan,
   pluginShowIfNumberNotGreaterThan,
@@ -71,6 +71,7 @@ import {
   pluginOsuUser,
 } from "./messageParser/plugins/osu";
 import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
+import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
 
 // TODO Move to database tables so they can be changed on the fly
 const fileExists = async (path: string) =>
@@ -309,7 +310,7 @@ export const main = async (logger: Logger, configDir: string) => {
     pluginShowIfNotEmpty,
     pluginShowIfNotUndefined,
     pluginShowIfUndefined,
-    pluginShowIfNotTrue,
+    pluginShowIfFalse,
     pluginShowIfTrue,
     pluginShowIfNumberGreaterThan,
     pluginShowIfNumberSmallerThan,
@@ -325,7 +326,8 @@ export const main = async (logger: Logger, configDir: string) => {
   await writeStringsVariableDocumentation(
     path.join(configDir, ".env.strings.example"),
     pluginsList,
-    macrosList
+    macrosList,
+    logger
   );
   const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
   const pluginsAndMacrosMap = generatePluginsAndMacrosMap(
@@ -367,6 +369,10 @@ export const main = async (logger: Logger, configDir: string) => {
       osuStreamCompanionCurrentMapData
     );
     plugins.set(pluginStreamCompanionReady.id, pluginStreamCompanionReady.func);
+  }
+  if (spotifyWebApi !== undefined) {
+    const pluginSpotifyReady = pluginSpotifyCurrentPreviousSong(spotifyWebApi);
+    plugins.set(pluginSpotifyReady.id, pluginSpotifyReady.func);
   }
 
   // Create TwitchClient and listen to certain events
@@ -543,9 +549,10 @@ export const main = async (logger: Logger, configDir: string) => {
         channel,
         tags,
         message,
-        spotifyWebApi,
         undefined,
         strings,
+        pluginsChannel,
+        macros,
         logger
       ).catch((err) => {
         logger.error(err);

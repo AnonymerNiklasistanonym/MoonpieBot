@@ -50,7 +50,8 @@ export const commandLeaderboard = async (
   let messageLeaderboard = await messageParser(
     globalStrings.get(moonpieCommandReplyLeaderboardPrefix.id),
     globalPlugins,
-    globalMacros
+    globalMacros,
+    logger
   );
   const messageLeaderboardEntries = [];
   for (const moonpieEntry of moonpieEntries) {
@@ -67,7 +68,8 @@ export const commandLeaderboard = async (
       await messageParser(
         globalStrings.get(moonpieCommandReplyLeaderboardEntry.id),
         globalPlugins,
-        macros
+        macros,
+        logger
       )
     );
   }

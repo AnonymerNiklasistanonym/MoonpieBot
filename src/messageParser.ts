@@ -1,3 +1,4 @@
+import { Logger } from "winston";
 import { MessageParserMacro } from "./messageParser/macros";
 import { MessageParserPlugin } from "./messageParser/plugins";
 
@@ -416,10 +417,12 @@ export const createParseTree = (
 // A plugin can have a scope in which special plugins can be defined
 // They output a tuple list of macro value and macro output or just a string
 export type PluginFunc = (
+  logger: Logger,
   value?: string
-) => Promise<[string, string][] | string> | [string, string][] | string;
+) => Promise<MacroDictionaryEntry[] | string> | MacroDictionaryEntry[] | string;
 export type Plugins = Map<string, PluginFunc>;
 // A macro is a simple text replace dictionary
+export type MacroDictionaryEntry = [string, string];
 export type MacroDictionary = Map<string, string>;
 export type Macros = Map<string, MacroDictionary>;
 
@@ -457,7 +460,8 @@ const replaceMacros = (text: string, macros: Macros) => {
 export const parseTreeNode = async (
   treeNode: ParseTreeNode,
   plugins: Plugins,
-  macros: Macros
+  macros: Macros,
+  logger: Logger
 ): Promise<string> => {
   switch (treeNode.type) {
     case "text":
@@ -485,10 +489,10 @@ export const parseTreeNode = async (
       const pluginValue = treeNode.pluginValue;
       // eslint-disable-next-line no-case-declarations
       const pluginValueString = pluginValue
-        ? await parseTreeNode(pluginValue, plugins, macros)
+        ? await parseTreeNode(pluginValue, plugins, macros, logger)
         : undefined;
       // eslint-disable-next-line no-case-declarations
-      const pluginOutput = await plugin(pluginValueString);
+      const pluginOutput = await plugin(logger, pluginValueString);
       if (Array.isArray(pluginOutput)) {
         for (const macro of pluginOutput) {
           if (!macros.has(pluginName)) {
@@ -501,7 +505,7 @@ export const parseTreeNode = async (
           throw Error(`Plugin content (${pluginName}) was undefined`);
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return parseTreeNode(pluginContentNode, plugins, macros);
+        return parseTreeNode(pluginContentNode, plugins, macros, logger);
       } else {
         return pluginOutput;
       }
@@ -512,7 +516,7 @@ export const parseTreeNode = async (
       // eslint-disable-next-line no-case-declarations
       let output = "";
       for (const childNode of treeNode.children) {
-        output += await parseTreeNode(childNode, plugins, macros);
+        output += await parseTreeNode(childNode, plugins, macros, logger);
       }
       return output;
   }
@@ -521,7 +525,8 @@ export const parseTreeNode = async (
 export const messageParser = async (
   messageString: undefined | string,
   plugins: Plugins = new Map(),
-  macros: Macros = new Map()
+  macros: Macros = new Map(),
+  logger: Logger
 ) => {
   if (messageString === undefined) {
     throw Error("Message string could not be parsed because it's undefined!");
@@ -530,7 +535,7 @@ export const messageParser = async (
   const parseTreeNodeRoot = createParseTree(messageString);
   //console.log(JSON.stringify(parseTreeNodeRoot));
   // 2. Parse parse tree from top down
-  return await parseTreeNode(parseTreeNodeRoot, plugins, macros);
+  return await parseTreeNode(parseTreeNodeRoot, plugins, macros, logger);
 };
 
 export const generatePluginsAndMacrosMap = (
@@ -553,7 +558,8 @@ export const generatePluginsAndMacrosMap = (
 
 export const generatePluginAndMacroDocumentation = async (
   plugins: MessageParserPlugin[],
-  macros: MessageParserMacro[]
+  macros: MessageParserMacro[],
+  logger: Logger
 ) => {
   const maps = generatePluginsAndMacrosMap(plugins, macros);
   const pluginsMap = maps.pluginsMap;
@@ -588,7 +594,8 @@ export const generatePluginAndMacroDocumentation = async (
         const exampleStringOutput = await messageParser(
           exampleString,
           pluginsMap,
-          macrosMap
+          macrosMap,
+          logger
         );
         output += `# - "${exampleString}" => "${exampleStringOutput}"\n`;
       }
@@ -609,7 +616,8 @@ export const generatePluginAndMacroDocumentation = async (
       const macroStringOutput = await messageParser(
         macroString,
         pluginsMap,
-        macrosMap
+        macrosMap,
+        logger
       );
       output += `# - "${macroString}" => "${macroStringOutput}"\n`;
     }

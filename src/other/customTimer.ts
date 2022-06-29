@@ -22,7 +22,7 @@ export const registerTimer = (
   return cron.schedule(cronString, () => {
     logger.debug(`Timer triggered ${cronString}: "${message}"`);
     for (const channel of channels) {
-      messageParser(message, globalPlugins, globalMacros)
+      messageParser(message, globalPlugins, globalMacros, logger)
         .then((parsedMessage) => client.say(channel, parsedMessage))
         .then((sentMessage) => {
           logTwitchMessageBroadcast(logger, sentMessage, "timer");

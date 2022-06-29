@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { StreamCompanionData } from "src/streamcompanion";
+import { StreamCompanionData } from "../../streamcompanion";
 import type { MessageParserPlugin } from "../plugins";
 
 export const pluginStreamCompanion = (

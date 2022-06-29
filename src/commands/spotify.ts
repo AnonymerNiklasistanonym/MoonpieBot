@@ -7,8 +7,10 @@ import {
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
-import type SpotifyWebApi from "spotify-web-api-node";
-import { spotifyGetCurrentSongAndRecentlyPlayedSongs } from "../spotify";
+import type { Strings } from "../strings";
+import type { Macros, Plugins } from "../messageParser";
+import { messageParser } from "../messageParser";
+import { spotifyCommandReplySong } from "../strings/spotify/commandReply";
 
 /**
  * The logging ID of this command.
@@ -56,8 +58,9 @@ export const commandSong = async (
   channel: string,
   messageId: string | undefined,
   userName: string | undefined,
-  spotifyWebApi: SpotifyWebApi,
-  _strings: Map<string, string>,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -67,49 +70,14 @@ export const commandSong = async (
     throw errorMessageUserNameUndefined();
   }
 
-  const data = await spotifyGetCurrentSongAndRecentlyPlayedSongs(
-    spotifyWebApi,
+  const message = await messageParser(
+    globalStrings.get(spotifyCommandReplySong.id),
+    globalPlugins,
+    globalMacros,
     logger
   );
 
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  let messageCurrentlyPlaying = "Currently no song is playing";
-  const currData = data?.currentlyPlaying.body.item;
-  const recenData = data?.recentlyPlayedTracks.body.items;
-  if (currData != null && currData !== undefined) {
-    const album = (currData as unknown as ItemAlbum).album;
-    const artist = (currData as unknown as ItemArtist).artists;
-    messageCurrentlyPlaying = `Currently playing: ${currData.name} by ${artist
-      ?.map((a) => a.name)
-      .join(", ")}`;
-    if (album.album_type !== "single") {
-      messageCurrentlyPlaying += ` from ${album.name}`;
-    }
-    if (currData.external_urls.spotify !== undefined) {
-      messageCurrentlyPlaying += ` (${currData.external_urls.spotify})`;
-    }
-  }
-  if (recenData != null && recenData !== undefined) {
-    messageCurrentlyPlaying +=
-      " previously played " +
-      recenData
-        .slice(0, 2)
-        .map((a) => {
-          let b = `${a.track.name} by ${a.track.artists
-            ?.map((a) => a.name)
-            .join(", ")}`;
-          if (a.track.album.album_type !== "single") {
-            b += ` from ${a.track.album.name}`;
-          }
-          return b;
-        })
-        .join(", ");
-  }
-
-  const sentMessage = await client.say(
-    channel,
-    `@${userName} ${messageCurrentlyPlaying}`
-  );
+  const sentMessage = await client.say(channel, message);
 
   logTwitchMessageCommandReply(
     logger,
@@ -125,9 +93,10 @@ export const spotifyChatHandler = async (
   channel: string,
   tags: ChatUserstate,
   message: string,
-  spotifyWebApi: SpotifyWebApi,
   enabled: undefined | string[],
-  _strings: Map<string, string>,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (enabled === undefined) {
@@ -148,8 +117,9 @@ export const spotifyChatHandler = async (
       channel,
       tags.id,
       tags.username,
-      spotifyWebApi,
-      _strings,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
       logger
     );
     return;

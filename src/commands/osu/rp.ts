@@ -104,13 +104,15 @@ export const commandRp = async (
     message = await messageParser(
       globalStrings.get(osuCommandReplyRp.id),
       globalPlugins,
-      osuRpRequestMacros
+      osuRpRequestMacros,
+      logger
     );
   } else {
     message = await messageParser(
       globalStrings.get(osuCommandReplyRpNotFound.id),
       globalPlugins,
-      osuRpRequestMacros
+      osuRpRequestMacros,
+      logger
     );
   }
   const sentMessage = await client.say(channel, message);

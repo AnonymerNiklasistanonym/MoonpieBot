@@ -11,7 +11,8 @@ export const pluginShowIfEmpty: MessageParserPlugin = {
     { argument: "not empty", scope: "Will not be shown" },
     { argument: "", scope: "Will be shown" },
   ],
-  func: (content?: string) => (pluginShowIfEmptyLogic(content) ? [] : ""),
+  func: (_logger, content?: string) =>
+    pluginShowIfEmptyLogic(content) ? [] : "",
 };
 
 export const pluginShowIfNotEmpty: MessageParserPlugin = {
@@ -21,7 +22,8 @@ export const pluginShowIfNotEmpty: MessageParserPlugin = {
     { argument: "not empty", scope: "Will be shown" },
     { argument: "", scope: "Will not be shown" },
   ],
-  func: (content?: string) => (!pluginShowIfEmptyLogic(content) ? [] : ""),
+  func: (_logger, content?: string) =>
+    !pluginShowIfEmptyLogic(content) ? [] : "",
 };
 
 const pluginShowIfTrueLogic = (content?: string): boolean =>
@@ -35,17 +37,23 @@ export const pluginShowIfTrue: MessageParserPlugin = {
   ],
   description:
     "Plugin that only displays text inside of its scope if the supplied value is 'true'",
-  func: (content?: string) => (pluginShowIfTrueLogic(content) ? [] : ""),
+  func: (_logger, content?: string) =>
+    pluginShowIfTrueLogic(content) ? [] : "",
 };
 
-export const pluginShowIfNotTrue: MessageParserPlugin = {
-  id: "SHOW_IF_NOT_TRUE",
-  description: `Opposite of ${pluginShowIfTrue.id}`,
+const pluginShowIfFalseLogic = (content?: string): boolean =>
+  content !== undefined && content.trim().toLowerCase() === "false";
+
+export const pluginShowIfFalse: MessageParserPlugin = {
+  id: "SHOW_IF_FALSE",
+  description:
+    "Plugin that only displays text inside of its scope if the supplied value is 'false'",
   examples: [
     { argument: "true", scope: "Will not be shown" },
     { argument: "false", scope: "Will be shown" },
   ],
-  func: (content?: string) => (!pluginShowIfTrueLogic(content) ? [] : ""),
+  func: (_logger, content?: string) =>
+    pluginShowIfFalseLogic(content) ? [] : "",
 };
 
 const pluginShowIfUndefinedLogic = (content?: string): boolean =>
@@ -59,7 +67,8 @@ export const pluginShowIfUndefined: MessageParserPlugin = {
     { argument: "undefined", scope: "Will be shown" },
     { argument: "abc", scope: "Will not be shown" },
   ],
-  func: (content?: string) => (pluginShowIfUndefinedLogic(content) ? [] : ""),
+  func: (_logger, content?: string) =>
+    pluginShowIfUndefinedLogic(content) ? [] : "",
 };
 
 export const pluginShowIfNotUndefined: MessageParserPlugin = {
@@ -69,7 +78,8 @@ export const pluginShowIfNotUndefined: MessageParserPlugin = {
     { argument: "undefined", scope: "Will not be shown" },
     { argument: "abc", scope: "Will be shown" },
   ],
-  func: (content?: string) => (!pluginShowIfUndefinedLogic(content) ? [] : ""),
+  func: (_logger, content?: string) =>
+    !pluginShowIfUndefinedLogic(content) ? [] : "",
 };
 
 export const pluginShowIfStringsTheSame: MessageParserPlugin = {
@@ -80,7 +90,7 @@ export const pluginShowIfStringsTheSame: MessageParserPlugin = {
     { argument: "hello===hello", scope: "Will be shown" },
     { argument: "hello===goodbye", scope: "Will not be shown" },
   ],
-  func: (aStringEqualsBString?: string) => {
+  func: (_logger, aStringEqualsBString?: string) => {
     if (
       aStringEqualsBString === undefined ||
       aStringEqualsBString.trim().length === 0
@@ -110,7 +120,7 @@ export const pluginShowIfStringsNotTheSame: MessageParserPlugin = {
     { argument: "hello!==hello", scope: "Will not be shown" },
     { argument: "hello!==goodbye", scope: "Will be shown" },
   ],
-  func: (aStringEqualsBString?: string) => {
+  func: (_logger, aStringEqualsBString?: string) => {
     if (
       aStringEqualsBString === undefined ||
       aStringEqualsBString.trim().length === 0
@@ -140,7 +150,7 @@ export const pluginShowIfNumberGreaterThan: MessageParserPlugin = {
     { argument: "10>1", scope: "Will be shown" },
     { argument: "2>4", scope: "Will not be shown" },
   ],
-  func: (aGreaterThanB?: string) => {
+  func: (_logger, aGreaterThanB?: string) => {
     if (aGreaterThanB === undefined || aGreaterThanB.trim().length === 0) {
       throw Error("No numbers were found!");
     }
@@ -165,7 +175,7 @@ export const pluginShowIfNumberGreaterThan: MessageParserPlugin = {
 export const pluginShowIfNumberNotGreaterThan: MessageParserPlugin = {
   id: "SHOW_IF_NUMBER_NOT_GREATER_THAN",
   description: `Opposite of ${pluginShowIfNumberGreaterThan.id}`,
-  func: (aGreaterThanB?: string) => {
+  func: (_logger, aGreaterThanB?: string) => {
     if (aGreaterThanB === undefined || aGreaterThanB.trim().length === 0) {
       throw Error("No numbers were found!");
     }
@@ -195,7 +205,7 @@ export const pluginShowIfNumberSmallerThan: MessageParserPlugin = {
     { argument: "10<1", scope: "Will not be shown" },
     { argument: "2<4", scope: "Will be shown" },
   ],
-  func: (aSmallerThanB?: string) => {
+  func: (_logger, aSmallerThanB?: string) => {
     if (aSmallerThanB === undefined || aSmallerThanB.trim().length === 0) {
       throw Error("No numbers were found!");
     }
@@ -216,7 +226,7 @@ export const pluginShowIfNumberSmallerThan: MessageParserPlugin = {
 export const pluginShowIfNumberNotSmallerThan: MessageParserPlugin = {
   id: "SHOW_IF_NUMBER_NOT_SMALLER_THAN",
   description: `Opposite of ${pluginShowIfNumberSmallerThan.id}`,
-  func: (aSmallerThanB?: string) => {
+  func: (_logger, aSmallerThanB?: string) => {
     if (aSmallerThanB === undefined || aSmallerThanB.trim().length === 0) {
       throw Error("No numbers were found!");
     }
@@ -238,7 +248,7 @@ export const pluginLowercase: MessageParserPlugin = {
   id: "LOWERCASE",
   description: "Converts the plugin argument to lowercase letters",
   examples: [{ argument: "Hello World!" }],
-  func: (content?: string) =>
+  func: (_logger, content?: string) =>
     content === undefined ? "" : content.toLowerCase(),
 };
 
@@ -246,7 +256,7 @@ export const pluginUppercase: MessageParserPlugin = {
   id: "UPPERCASE",
   description: "Converts the plugin argument to uppercase letters",
   examples: [{ argument: "Hello World!" }],
-  func: (content?: string) =>
+  func: (_logger, content?: string) =>
     content === undefined ? "" : content.toUpperCase(),
 };
 
@@ -262,7 +272,7 @@ export const pluginRandomNumber: MessageParserPlugin = {
     { before: "Random number between 1 and 10: ", argument: "10" },
     { before: "Random number between -100 and 0: ", argument: "-100<-->0" },
   ],
-  func: (interval?: string) => {
+  func: (_logger, interval?: string) => {
     // If no interval string is given assume number between 0 an 100
     if (interval === undefined || interval.trim().length === 0) {
       return `${randomIntFromInterval(0, 100)}`;
@@ -327,7 +337,7 @@ export const pluginTimeInSToStopwatchString: MessageParserPlugin = {
     { before: "3600s will be converted to ", argument: "3600" },
     { before: "62s will be converted to ", argument: "62" },
   ],
-  func: (timeInS?: string) => {
+  func: (_logger, timeInS?: string) => {
     if (timeInS === undefined) {
       throw Error("Time was undefined!");
     }
@@ -363,7 +373,7 @@ export const pluginTimeInSToHumanReadableString: MessageParserPlugin = {
     { before: "3600s will be converted to ", argument: "3600" },
     { before: "62s will be converted to ", argument: "62" },
   ],
-  func: (timeInS?: string) => {
+  func: (_logger, timeInS?: string) => {
     if (timeInS === undefined) {
       throw Error("Time was undefined!");
     }

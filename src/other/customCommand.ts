@@ -85,7 +85,7 @@ export const checkCustomCommand = async (
   );
 
   const pluginsCommand: Plugins = new Map(globalPlugins);
-  pluginsCommand.set("REGEX_GROUP", (regexGroupIndex?: string) => {
+  pluginsCommand.set("REGEX_GROUP", (_logger, regexGroupIndex?: string) => {
     if (regexGroupIndex === undefined || regexGroupIndex.length === 0) {
       throw Error("Regex group index was undefined or empty!");
     }
@@ -96,7 +96,8 @@ export const checkCustomCommand = async (
     const parsedMessage = await messageParser(
       messageCommand,
       pluginsCommand,
-      globalMacros
+      globalMacros,
+      logger
     );
     const sentMessage = await client.say(channel, parsedMessage);
 

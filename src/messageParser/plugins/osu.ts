@@ -47,7 +47,7 @@ export const pluginOsuBeatmap = (
 ): MessageParserPlugin => {
   return {
     id: "OSU_BEATMAP",
-    func: async (beatmapId?: string) => {
+    func: async (_logger, beatmapId?: string) => {
       if (beatmapId === undefined || beatmapId.trim().length === 0) {
         throw Error("osu! beatmap ID was empty!");
       }
@@ -98,7 +98,7 @@ export const pluginOsuScore = (
 ): MessageParserPlugin => {
   return {
     id: "OSU_SCORE",
-    func: async (beatmapIdAndUserId?: string) => {
+    func: async (_logger, beatmapIdAndUserId?: string) => {
       if (
         beatmapIdAndUserId === undefined ||
         beatmapIdAndUserId.trim().length === 0
@@ -180,7 +180,7 @@ export const pluginOsuMostRecentPlay = (
 ): MessageParserPlugin => {
   return {
     id: "OSU_MOST_RECENT_PLAY",
-    func: async (userId?: string) => {
+    func: async (_logger, userId?: string) => {
       if (userId === undefined || userId.trim().length === 0) {
         throw Error("osu! user ID was empty!");
       }
@@ -245,7 +245,7 @@ export const pluginOsuUser = (
 ): MessageParserPlugin => {
   return {
     id: "OSU_USER",
-    func: async (userId?: string) => {
+    func: async (_logger, userId?: string) => {
       if (userId === undefined || userId.trim().length === 0) {
         throw Error("osu! user ID was empty!");
       }
