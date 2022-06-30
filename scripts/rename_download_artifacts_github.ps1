@@ -18,7 +18,7 @@ Set-Location ..
 $BinaryDir = Join-Path "bin" "github_binaries"
 New-Item -ItemType Directory -Force -Path $BinaryDir
 # Downloaded file paths
-$CurrentVersion = "1.0.9"
+$CurrentVersion = "1.0.10"
 $GitBranch = "main"
 $ApplicationName = "moonpiebot"
 $ArtifactWindowsInstaller16 = Join-Path $BinaryDir "$ApplicationName-installer-$GitBranch-windows-node-16.x.zip"
