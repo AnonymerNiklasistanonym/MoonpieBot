@@ -1,6 +1,7 @@
 import type { Logger } from "winston";
 import type { MessageParserMacro } from "./messageParser/macros";
 import type { MessageParserPlugin } from "./messageParser/plugins";
+import { genericStringSorter } from "./other/genericStringSorter";
 import {
   FileDocumentationParts,
   FileDocumentationPartType,
@@ -771,6 +772,7 @@ export const generatePluginAndMacroDocumentation = async (
       content: "None",
     });
   }
+  const pluginEntries: FileDocumentationPartValue[] = [];
   for (const plugin of plugins) {
     const pluginEntry: FileDocumentationPartValue = {
       type: FileDocumentationPartType.VALUE,
@@ -810,8 +812,11 @@ export const generatePluginAndMacroDocumentation = async (
       }
       pluginEntry.lists.push(["Examples", pluginListExamples]);
     }
-    output.push(pluginEntry);
+    pluginEntries.push(pluginEntry);
   }
+  output.push(
+    ...pluginEntries.sort((a, b) => genericStringSorter(a.title, b.title))
+  );
   output.push({
     type: FileDocumentationPartType.NEWLINE,
     count: 1,
@@ -826,6 +831,7 @@ export const generatePluginAndMacroDocumentation = async (
       content: "None",
     });
   }
+  const macroEntries: FileDocumentationPartValue[] = [];
   for (const macro of macros) {
     const macroEntry: FileDocumentationPartValue = {
       type: FileDocumentationPartType.VALUE,
@@ -847,8 +853,11 @@ export const generatePluginAndMacroDocumentation = async (
       macroListKeys.push(`"${macroString}" => "${macroStringOutput}"`);
     }
     macroEntry.lists.push(["Keys", macroListKeys]);
-    output.push(macroEntry);
+    macroEntries.push(macroEntry);
   }
+  output.push(
+    ...macroEntries.sort((a, b) => genericStringSorter(a.title, b.title))
+  );
 
   return output;
 };

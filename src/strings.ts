@@ -19,6 +19,7 @@ import type {
   FileDocumentationPartValue,
   FileDocumentationParts,
 } from "./other/splitTextAtLength";
+import { genericStringSorter } from "./other/genericStringSorter";
 
 export type Strings = Map<string, string>;
 
@@ -154,12 +155,7 @@ export const writeStringsVariableDocumentation = async (
     }
   }
   data.push(
-    ...dataDefaultStrings.sort((a, b) => {
-      if (a.value === undefined || b.value === undefined) {
-        return 0;
-      }
-      return a.value < b.value ? -1 : a.value > b.value ? 1 : 0;
-    })
+    ...dataDefaultStrings.sort((a, b) => genericStringSorter(a.value, b.value))
   );
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
