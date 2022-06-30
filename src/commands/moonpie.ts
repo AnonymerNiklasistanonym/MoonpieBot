@@ -159,6 +159,7 @@ export const moonpieChatHandler = async (
   tags: ChatUserstate,
   message: string,
   databasePath: string,
+  moonpieCooldownHoursNumber: number,
   enabled: string[] = [
     MoonpieCommands.ABOUT,
     MoonpieCommands.ADD,
@@ -434,6 +435,7 @@ export const moonpieChatHandler = async (
         globalPlugins,
         globalMacros,
         databasePath,
+        moonpieCooldownHoursNumber,
         logger
       );
       return;

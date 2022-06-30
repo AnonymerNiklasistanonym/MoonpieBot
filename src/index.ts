@@ -55,6 +55,7 @@ import {
   pluginIfTrue,
   pluginIfUndefined,
   pluginTimeInSToHumanReadableString,
+  pluginTimeInSToHumanReadableStringShort,
   pluginTimeInSToStopwatchString,
   pluginUppercase,
 } from "./messageParser/plugins/general";
@@ -112,6 +113,18 @@ export const main = async (logger: Logger, configDir: string) => {
     configDir,
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
+  const moonpieCooldownHoursString = getEnvVariableValueOrDefault(
+    EnvVariable.MOONPIE_COOLDOWN_HOURS,
+    configDir
+  );
+  let moonpieCooldownHoursNumber: number;
+  try {
+    moonpieCooldownHoursNumber = parseInt(moonpieCooldownHoursString);
+  } catch (err) {
+    throw Error(
+      `The moonpie cooldown hours number string could not be parsed (${moonpieCooldownHoursString})`
+    );
+  }
 
   const spotifyApiClientId = getEnvVariableValueOrCustomDefault(
     EnvVariable.SPOTIFY_API_CLIENT_ID,
@@ -319,6 +332,7 @@ export const main = async (logger: Logger, configDir: string) => {
     pluginIfEqual,
     pluginIfNotEqual,
     pluginTimeInSToHumanReadableString,
+    pluginTimeInSToHumanReadableStringShort,
     pluginTimeInSToStopwatchString,
   ];
   const macrosList = [macroMoonpieBot];
@@ -445,6 +459,7 @@ export const main = async (logger: Logger, configDir: string) => {
       tags,
       message,
       databasePath,
+      moonpieCooldownHoursNumber,
       getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS)?.split(
         ","
       ),

@@ -31,6 +31,7 @@ import type { Strings } from "../../strings";
  * @param globalPlugins Global plugins.
  * @param globalMacros Global macros.
  * @param moonpieDbPath Database file path of the moonpie database.
+ * @param moonpieClaimCooldownHours The number of hours between moonpie claims.
  * @param logger Logger (used for global logs).
  */
 export const commandClaim = async (
@@ -43,6 +44,7 @@ export const commandClaim = async (
   globalPlugins: Plugins,
   globalMacros: Macros,
   moonpieDbPath: string,
+  moonpieClaimCooldownHours: number,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -57,7 +59,9 @@ export const commandClaim = async (
 
   // Check if a moonpie entry already exists
   let newMoonpieCount = 1;
-  let millisecondsSinceLastClaim = 0;
+  let msSinceLastClaim = 0;
+  let msTillNextClaim = 0;
+  const claimCooldownMs = moonpieClaimCooldownHours * 60 * 60 * 1000;
   let alreadyClaimedAMoonpie = false;
   let newTimestamp = new Date().getTime();
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -70,15 +74,16 @@ export const commandClaim = async (
 
     // If a moonpie entry already exists check if a moonpie was redeemed in the last 24 hours
     const currentTimestamp = new Date().getTime();
-    millisecondsSinceLastClaim = Math.max(
-      currentTimestamp - moonpieEntry.timestamp,
+    msSinceLastClaim = Math.max(currentTimestamp - moonpieEntry.timestamp, 0);
+    msTillNextClaim = Math.max(
+      claimCooldownMs + moonpieEntry.timestamp - currentTimestamp,
       0
     );
     logger.debug(
-      `millisecondsSinceLastClaim=${currentTimestamp}-${moonpieEntry.timestamp}=${millisecondsSinceLastClaim}`
+      `millisecondsSinceLastClaim=${currentTimestamp}-${moonpieEntry.timestamp}=${msSinceLastClaim}`
     );
 
-    if (millisecondsSinceLastClaim > 24 * 60 * 60 * 1000) {
+    if (msSinceLastClaim > claimCooldownMs) {
       newMoonpieCount = moonpieEntry.count + 1;
     } else {
       newMoonpieCount = moonpieEntry.count;
@@ -111,7 +116,9 @@ export const commandClaim = async (
     "MOONPIE",
     new Map([
       ["COUNT", `${newMoonpieCount}`],
-      ["TIME_SINCE_CLAIM_IN_S", `${millisecondsSinceLastClaim / 1000}`],
+      ["TIME_SINCE_CLAIM_IN_S", `${msSinceLastClaim / 1000}`],
+      ["TIME_TILL_NEXT_CLAIM_IN_S", `${msTillNextClaim / 1000}`],
+      ["COOLDOWN_HOURS", `${moonpieClaimCooldownHours}`],
       ["LEADERBOARD_RANK", `${currentMoonpieLeaderboardEntry.rank}`],
     ])
   );

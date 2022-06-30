@@ -36,6 +36,7 @@ export enum EnvVariable {
   TWITCH_OAUTH_TOKEN = "TWITCH_OAUTH_TOKEN",
   MOONPIE_ENABLE_COMMANDS = "MOONPIE_ENABLE_COMMANDS",
   MOONPIE_DATABASE_PATH = "MOONPIE_DATABASE_PATH",
+  MOONPIE_COOLDOWN_HOURS = "MOONPIE_COOLDOWN_HOURS",
   OSU_API_CLIENT_ID = "OSU_API_CLIENT_ID",
   OSU_API_CLIENT_SECRET = "OSU_API_CLIENT_SECRET",
   OSU_API_DEFAULT_ID = "OSU_API_DEFAULT_ID",
@@ -226,6 +227,13 @@ export const getEnvVariableValueInformation = (
         ),
         description:
           "The database file path that contains the persistent moonpie data.",
+        block: EnvVariableBlocks.MOONPIE,
+      };
+    case EnvVariable.MOONPIE_COOLDOWN_HOURS:
+      return {
+        default: "24",
+        description:
+          "The number of hours for which a user is unable to claim a Moonpie after claiming one.",
         block: EnvVariableBlocks.MOONPIE,
       };
 

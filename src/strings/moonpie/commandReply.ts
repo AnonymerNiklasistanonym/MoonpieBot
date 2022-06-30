@@ -16,7 +16,7 @@ export const moonpieCommandReplyClaim = {
 export const moonpieCommandReplyAlreadyClaimed = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED`,
   default:
-    "@$(USER) You already claimed a moonpie for today ($(TIME_IN_S_TO_HUMAN_READABLE_STRING=%MOONPIE:TIME_SINCE_CLAIM_IN_S%) ago) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+    "@$(USER) You already claimed a moonpie for today ($(TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT=%MOONPIE:TIME_SINCE_CLAIM_IN_S%) ago - next claim can be made in $(TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT=%MOONPIE:TIME_TILL_NEXT_CLAIM_IN_S%)) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
 };
 
 export const moonpieCommandReplyAlreadyClaimedStar = {

@@ -382,3 +382,72 @@ export const pluginTimeInSToHumanReadableString: MessageParserPlugin = {
     return finalString;
   },
 };
+
+export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
+  id: "TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT",
+  description: `Short version of ${pluginTimeInSToHumanReadableString.id} that discards smaller time units if bigger ones are given`,
+  examples: [
+    { before: "3600234s will be converted to ", argument: "3600234" },
+    { before: "3600s will be converted to ", argument: "3600" },
+    { before: "62s will be converted to ", argument: "62" },
+  ],
+  func: (_logger, timeInS?: string) => {
+    if (timeInS === undefined) {
+      throw Error("Time was undefined");
+    }
+    const seconds = parseInt(timeInS);
+    const secondsObject = secondsToObject(seconds);
+    const finalStringList = [];
+    let yearsFound = false;
+    let daysFound = false;
+    let hoursFound = false;
+    if (secondsObject.years > 0) {
+      yearsFound = true;
+      finalStringList.push(
+        `${secondsObject.years} year${secondsObject.years === 1 ? "" : "s"}`
+      );
+    }
+    if (secondsObject.days > 0) {
+      daysFound = true;
+      finalStringList.push(
+        `${secondsObject.days} day${secondsObject.days === 1 ? "" : "s"}`
+      );
+    }
+    if (!(yearsFound || secondsObject.days > 1)) {
+      if (secondsObject.hours > 0) {
+        hoursFound = true;
+        finalStringList.push(
+          `${secondsObject.hours} hour${secondsObject.hours === 1 ? "" : "s"}`
+        );
+      }
+      if (!(daysFound || secondsObject.hours > 1)) {
+        if (secondsObject.minutes > 0) {
+          finalStringList.push(
+            `${secondsObject.minutes} minute${
+              secondsObject.minutes === 1 ? "" : "s"
+            }`
+          );
+        }
+        if (!(hoursFound || secondsObject.minutes > 10)) {
+          if (secondsObject.seconds > 0 || finalStringList.length === 0) {
+            finalStringList.push(
+              `${secondsObject.seconds} second${
+                secondsObject.seconds === 1 ? "" : "s"
+              }`
+            );
+          }
+        }
+      }
+    }
+    const finalString = finalStringList.reduce((prev, curr, currentIndex) => {
+      if (currentIndex === 0) {
+        return `${curr}`;
+      } else if (currentIndex < finalStringList.length - 1) {
+        return `${prev}, ${curr}`;
+      } else {
+        return `${prev} and ${curr}`;
+      }
+    }, "");
+    return finalString;
+  },
+};
