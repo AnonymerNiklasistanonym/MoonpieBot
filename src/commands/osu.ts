@@ -1,5 +1,6 @@
 import {
   commandBeatmap,
+  commandBeatmapRequestsStatus,
   commandBeatmapWhenDisabled,
   commandSetBeatmapRequests,
 } from "./osu/beatmap";
@@ -169,6 +170,18 @@ export const regexDisableBeatmapRequests =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^\s*!osu\s+requests\s+off\s*?(?:\s+(.*?)\s*)?$/i;
 
+/**
+ * Regex to recognize the !osu requests command.
+ *
+ * @example
+ * ```text
+ * !osu requests $OPTIONAL_TEXT
+ * ```
+ */
+export const regexBeatmapRequestsStatus =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!osu\s+requests(\s+.*)?$/i;
+
 export interface OsuApiV2Credentials {
   clientId: number;
   clientSecret: string;
@@ -319,6 +332,31 @@ export const osuChatHandler = async (
         parseTwitchBadgeLevel(tags),
         runtimeToggleEnableBeatmapRequests,
         runtimeToggleDisableBeatmapRequestsCustomMessage,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger
+      );
+      return;
+    } else if (message.match(regexBeatmapRequestsStatus)) {
+      logTwitchMessageCommandDetected(
+        logger,
+        tags.id,
+        [tags.username ? `#${tags.username}` : "undefined", message],
+        LOG_ID_COMMAND_OSU,
+        "beatmap_requests_status",
+        LOG_ID_MODULE_OSU
+      );
+      await commandBeatmapRequestsStatus(
+        client,
+        channel,
+        tags.id,
+        tags.username,
+        runtimeToggleEnableBeatmapRequests,
+        runtimeToggleDisableBeatmapRequestsCustomMessage,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
         logger
       );
       return;
@@ -342,6 +380,9 @@ export const osuChatHandler = async (
           tags.id,
           tags.username,
           runtimeToggleDisableBeatmapRequestsCustomMessage,
+          globalStrings,
+          globalPlugins,
+          globalMacros,
           logger
         );
       } else {

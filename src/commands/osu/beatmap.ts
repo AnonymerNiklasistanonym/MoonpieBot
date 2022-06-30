@@ -13,6 +13,18 @@ import {
 import { isProcessRunning } from "../../other/processInformation";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 import { messageParserById } from "../../messageParser";
+import {
+  osuBeatmapRequest,
+  osuBeatmapRequestCurrentlyOff,
+  osuBeatmapRequestCurrentlyOn,
+  osuBeatmapRequestDetailed,
+  osuBeatmapRequestIrc,
+  osuBeatmapRequestIrcDetailed,
+  osuBeatmapRequestNotFound,
+  osuBeatmapRequestPermissionError,
+  osuBeatmapRequestTurnedOff,
+  osuBeatmapRequestTurnedOn,
+} from "../../strings/osu/beatmapRequest";
 // Type imports
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { Client as IrcClient } from "irc";
@@ -20,13 +32,6 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
 import type { Macros, Plugins } from "../../messageParser";
-import {
-  osuBeatmapRequest,
-  osuBeatmapRequestDetailed,
-  osuBeatmapRequestIrc,
-  osuBeatmapRequestIrcDetailed,
-  osuBeatmapRequestNotFound,
-} from "../../strings/osu/beatmapRequest";
 import type { Strings } from "../../strings";
 
 /**
@@ -225,6 +230,9 @@ export const commandBeatmap = async (
  * @param twitchBadgeLevel The Twitch badge level (used for permission control).
  * @param enable If true enable requests, otherwise disable requests.
  * @param customDisableMessage A custom disable message.
+ * @param globalStrings Global message strings.
+ * @param globalPlugins Global plugins.
+ * @param globalMacros Global macros.
  * @param logger Logger (used for global logs).
  */
 export const commandSetBeatmapRequests = async (
@@ -235,6 +243,9 @@ export const commandSetBeatmapRequests = async (
   twitchBadgeLevel: TwitchBadgeLevels,
   enable: boolean,
   customDisableMessage: string | undefined,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -245,24 +256,47 @@ export const commandSetBeatmapRequests = async (
   }
 
   if (twitchBadgeLevel != TwitchBadgeLevels.BROADCASTER) {
-    throw Error(
-      `The user ${userName} is not a broadcaster and thus is not allowed to use this command`
+    const errorMessage = await messageParserById(
+      osuBeatmapRequestPermissionError.id,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
     );
+    throw Error(errorMessage);
   }
 
-  let message = "";
+  let message;
   let osuCommandId;
   if (enable) {
-    message = "Beatmap requests: On";
     osuCommandId = "beatmap_requests_on";
+    message = await messageParserById(
+      osuBeatmapRequestTurnedOn.id,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
+    );
   } else {
-    message = "Beatmap requests: Off";
     osuCommandId = "beatmap_requests_off";
-    if (customDisableMessage) {
-      message += ` (${customDisableMessage})`;
-    }
+    const macros = new Map(globalMacros);
+    macros.set(
+      "BEATMAP_REQUEST",
+      new Map([
+        [
+          "CUSTOM_MESSAGE",
+          customDisableMessage !== undefined ? customDisableMessage : "",
+        ],
+      ])
+    );
+    message = await messageParserById(
+      osuBeatmapRequestTurnedOff.id,
+      globalStrings,
+      globalPlugins,
+      macros,
+      logger
+    );
   }
-
   const sentMessage = await client.say(channel, message);
 
   logTwitchMessageCommandReply(
@@ -282,6 +316,9 @@ export const commandSetBeatmapRequests = async (
  * @param messageId Twitch message ID of the request (used for logging).
  * @param userName Twitch user name of the requester.
  * @param customDisableMessage A custom disable message.
+ * @param globalStrings Global message strings.
+ * @param globalPlugins Global plugins.
+ * @param globalMacros Global macros.
  * @param logger Logger (used for global logs).
  */
 export const commandBeatmapWhenDisabled = async (
@@ -290,6 +327,9 @@ export const commandBeatmapWhenDisabled = async (
   messageId: string | undefined,
   userName: string | undefined,
   customDisableMessage: string | undefined,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
@@ -299,12 +339,97 @@ export const commandBeatmapWhenDisabled = async (
     throw errorMessageUserNameUndefined();
   }
 
-  let message = `@${userName} Beatmap requests are currently off`;
-  if (customDisableMessage) {
-    message += ` (${customDisableMessage})`;
+  const macros = new Map(globalMacros);
+  macros.set(
+    "BEATMAP_REQUEST",
+    new Map([
+      [
+        "CUSTOM_MESSAGE",
+        customDisableMessage !== undefined ? customDisableMessage : "",
+      ],
+    ])
+  );
+  const message = await messageParserById(
+    osuBeatmapRequestCurrentlyOff.id,
+    globalStrings,
+    globalPlugins,
+    macros,
+    logger
+  );
+  const sentMessage = await client.say(channel, message);
+
+  logTwitchMessageCommandReply(
+    logger,
+    messageId,
+    sentMessage,
+    LOG_ID_COMMAND_OSU,
+    "beatmap_requests_disabled"
+  );
+};
+
+/**
+ * Status message to beatmap requests.
+ *
+ * @param client Twitch client (used to send messages).
+ * @param channel Twitch channel (where the response should be sent to).
+ * @param messageId Twitch message ID of the request (used for logging).
+ * @param userName Twitch user name of the requester.
+ * @param enable If true enable requests, otherwise disable requests.
+ * @param customDisableMessage A custom disable message.
+ * @param globalStrings Global message strings.
+ * @param globalPlugins Global plugins.
+ * @param globalMacros Global macros.
+ * @param logger Logger (used for global logs).
+ */
+export const commandBeatmapRequestsStatus = async (
+  client: Client,
+  channel: string,
+  messageId: string | undefined,
+  userName: string | undefined,
+  enable: boolean,
+  customDisableMessage: string | undefined,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
+  logger: Logger
+): Promise<void> => {
+  if (messageId === undefined) {
+    throw errorMessageIdUndefined();
+  }
+  if (userName === undefined) {
+    throw errorMessageUserNameUndefined();
   }
 
+  let message;
+  if (enable) {
+    message = await messageParserById(
+      osuBeatmapRequestCurrentlyOn.id,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
+    );
+  } else {
+    const macros = new Map(globalMacros);
+    macros.set(
+      "BEATMAP_REQUEST",
+      new Map([
+        [
+          "CUSTOM_MESSAGE",
+          customDisableMessage !== undefined ? customDisableMessage : "",
+        ],
+      ])
+    );
+    message = await messageParserById(
+      osuBeatmapRequestCurrentlyOff.id,
+      globalStrings,
+      globalPlugins,
+      macros,
+      logger
+    );
+  }
   const sentMessage = await client.say(channel, message);
+
   logTwitchMessageCommandReply(
     logger,
     messageId,

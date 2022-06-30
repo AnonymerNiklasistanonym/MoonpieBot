@@ -39,10 +39,40 @@ export const osuBeatmapRequestIrcDetailed = {
     "$(IF_NOT_EMPTY=%OSU_BEATMAP_REQUEST:COMMENT%|%NEWLINE% > Comment: %OSU_BEATMAP_REQUEST:COMMENT%)",
 };
 
+export const osuBeatmapRequestPermissionError = {
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_PERMISSION_ERROR`,
+  default:
+    "You are not a broadcaster and thus are not allowed to use this command!",
+};
+
+export const osuBeatmapRequestTurnedOff = {
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_OFF`,
+  default:
+    "Beatmap requests: Off$(IF_NOT_EMPTY=%BEATMAP_REQUEST:CUSTOM_MESSAGE%| \\(%BEATMAP_REQUEST:CUSTOM_MESSAGE%\\))",
+};
+export const osuBeatmapRequestTurnedOn = {
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_ON`,
+  default: "Beatmap requests: On",
+};
+export const osuBeatmapRequestCurrentlyOff = {
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_OFF`,
+  default:
+    "@$(USER) Beatmap requests are currently off$(IF_NOT_EMPTY=%BEATMAP_REQUEST:CUSTOM_MESSAGE%| \\(%BEATMAP_REQUEST:CUSTOM_MESSAGE%\\))",
+};
+export const osuBeatmapRequestCurrentlyOn = {
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
+  default: "@$(USER) Beatmap requests are currently on",
+};
+
 export const osuBeatmapRequests = [
   osuBeatmapRequest,
   osuBeatmapRequestDetailed,
   osuBeatmapRequestNotFound,
   osuBeatmapRequestIrc,
   osuBeatmapRequestIrcDetailed,
+  osuBeatmapRequestPermissionError,
+  osuBeatmapRequestTurnedOff,
+  osuBeatmapRequestTurnedOn,
+  osuBeatmapRequestCurrentlyOff,
+  osuBeatmapRequestCurrentlyOn,
 ];
