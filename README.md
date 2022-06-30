@@ -65,7 +65,7 @@ Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can
 Every command can be optionally disabled.
 
 It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat if enabled.
-(This can be temporarily turned off/on with the commands `!osu requests on`/`!osu requests off [Optional reason]`)
+(This can be temporarily turned off/on with the commands `!osu requests on`/`!osu requests off [Optional reason]` and `!osu requests` can be used to get the current status)
 Given an osu! IRC login it can even send these beatmap links to the osu! client.
 
 It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) can be found in the configuration even if no other osu! related configurations is set.
@@ -127,7 +127,14 @@ Most messages can be customized to a high degree using a custom message parser t
 The idea is that instead of a final message (in English) there is a way to replace the default string with a custom one.
 Important variables and values will then at runtime be parsed and inserted into the string.
 
-Of course these overrides can be set in the `.env` file or via the command line but the recommended way of redefining the custom strings/messages is in a `.env.strings` file ([there is an example for the file](./.env.strings.example) where all the default values are listed and can be uncommented and edited).
+To do this there are:
+
+- Macros: `%MACRO_TITLE:MACRO_NAME%` that simply get replaced with a string value
+- Plugins: `$(PLUGIN=OPTIONAL_PLUGIN_VALUE|OPTIONAL_PLUGIN_SCOPE)` that can for example evaluate a request like for example setting the stream title or evaluating if the plugin scope text should be displayed in respect to the plugin value
+- References: `$[STRING_REFERENCE]` that simply reference another string that will then be inserted
+
+To override the default strings and add custom ones you can create a `.env.strings` file ([there is an example for the file](./.env.strings.example) where all the default values are listed and can be uncommented and edited).
+
 ## Setup
 
 ### Build it yourself
