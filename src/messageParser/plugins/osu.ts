@@ -49,7 +49,7 @@ export const pluginOsuBeatmap = (
     id: "OSU_BEATMAP",
     func: async (_logger, beatmapId?: string) => {
       if (beatmapId === undefined || beatmapId.trim().length === 0) {
-        throw Error("osu! beatmap ID was empty!");
+        throw Error("osu! beatmap ID was empty");
       }
       const beatmapIdNumber = parseInt(beatmapId);
       const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
@@ -103,13 +103,13 @@ export const pluginOsuScore = (
         beatmapIdAndUserId === undefined ||
         beatmapIdAndUserId.trim().length === 0
       ) {
-        throw Error("osu! beatmap/user ID was empty!");
+        throw Error("osu! beatmap/user ID was empty");
       }
       const beatmapIdAndUserIdNumber = beatmapIdAndUserId
         .split(" ")
         .map((a) => parseInt(a));
       if (beatmapIdAndUserIdNumber.length !== 2) {
-        throw Error("osu! beatmap or user ID missing!");
+        throw Error("osu! beatmap or user ID missing");
       }
       const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
         osuApiV2Credentials.clientId,
@@ -182,7 +182,7 @@ export const pluginOsuMostRecentPlay = (
     id: "OSU_MOST_RECENT_PLAY",
     func: async (_logger, userId?: string) => {
       if (userId === undefined || userId.trim().length === 0) {
-        throw Error("osu! user ID was empty!");
+        throw Error("osu! user ID was empty");
       }
       const userIdNumber = parseInt(userId);
       const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
@@ -247,7 +247,7 @@ export const pluginOsuUser = (
     id: "OSU_USER",
     func: async (_logger, userId?: string) => {
       if (userId === undefined || userId.trim().length === 0) {
-        throw Error("osu! user ID was empty!");
+        throw Error("osu! user ID was empty");
       }
       const userIdNumber = parseInt(userId);
       const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(

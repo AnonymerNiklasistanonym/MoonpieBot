@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { messageParser } from "../../src/messageParser";
 import {
-  pluginShowIfEmpty,
-  pluginShowIfNotEmpty,
+  pluginIfEmpty,
+  pluginIfNotEmpty,
   pluginLowercase,
   pluginRandomNumber,
   pluginTimeInSToHumanReadableString,
@@ -256,8 +256,8 @@ describe("messageParser", () => {
         pluginTimeInSToHumanReadableString.id,
         pluginTimeInSToHumanReadableString.func
       );
-      plugins.set(pluginShowIfEmpty.id, pluginShowIfEmpty.func);
-      plugins.set(pluginShowIfNotEmpty.id, pluginShowIfNotEmpty.func);
+      plugins.set(pluginIfEmpty.id, pluginIfEmpty.func);
+      plugins.set(pluginIfNotEmpty.id, pluginIfNotEmpty.func);
 
       const message0 = "$(UPPERCASE=hello world)";
       const output0 = await messageParser(
@@ -344,7 +344,7 @@ describe("messageParser", () => {
       );
       expect(output8).to.be.equal("01:43:31 h");
 
-      const message9 = "$(SHOW_IF_EMPTY=not empty|hi)";
+      const message9 = "$(IF_EMPTY=not empty|hi)";
       const output9 = await messageParser(
         message9,
         undefined,
@@ -353,7 +353,7 @@ describe("messageParser", () => {
         logger
       );
       expect(output9).to.be.equal("");
-      const message10 = "$(SHOW_IF_EMPTY=|hi)";
+      const message10 = "$(IF_EMPTY=|hi)";
       const output10 = await messageParser(
         message10,
         undefined,
@@ -362,7 +362,7 @@ describe("messageParser", () => {
         logger
       );
       expect(output10).to.be.equal("hi");
-      const message11 = "$(SHOW_IF_NOT_EMPTY=not empty|hi)";
+      const message11 = "$(IF_NOT_EMPTY=not empty|hi)";
       const output11 = await messageParser(
         message11,
         undefined,
@@ -371,7 +371,7 @@ describe("messageParser", () => {
         logger
       );
       expect(output11).to.be.equal("hi");
-      const message12 = "$(SHOW_IF_NOT_EMPTY=|hi)";
+      const message12 = "$(IF_NOT_EMPTY=|hi)";
       const output12 = await messageParser(
         message12,
         undefined,

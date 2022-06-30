@@ -10,18 +10,18 @@ export const spotifyCommandReplyRefSongNone = {
 export const spotifyCommandReplyRefSongCurrent = {
   id: `REF_${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_CURRENT`,
   default:
-    "Currently playing '%SPOTIFY_SONG:CURRENT_TITLE%' by '%SPOTIFY_SONG:CURRENT_ARTISTS%'$(SHOW_IF_FALSE=%SPOTIFY_SONG:CURRENT_IS_SINGLE%| from '%SPOTIFY_SONG:CURRENT_ALBUM%')",
+    "Currently playing '%SPOTIFY_SONG:CURRENT_TITLE%' by '%SPOTIFY_SONG:CURRENT_ARTISTS%'$(IF_FALSE=%SPOTIFY_SONG:CURRENT_IS_SINGLE%| from '%SPOTIFY_SONG:CURRENT_ALBUM%')",
 };
 
 export const spotifyCommandReplyRefSongPrevious = {
   id: `REF_${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_PREVIOUS`,
   default:
-    ", previously played '%SPOTIFY_SONG:PREVIOUS_TITLE%' by '%SPOTIFY_SONG:PREVIOUS_ARTISTS%'$(SHOW_IF_FALSE=%SPOTIFY_SONG:PREVIOUS_IS_SINGLE%| from '%SPOTIFY_SONG:PREVIOUS_ALBUM%')",
+    ", previously played '%SPOTIFY_SONG:PREVIOUS_TITLE%' by '%SPOTIFY_SONG:PREVIOUS_ARTISTS%'$(IF_FALSE=%SPOTIFY_SONG:PREVIOUS_IS_SINGLE%| from '%SPOTIFY_SONG:PREVIOUS_ALBUM%')",
 };
 
 export const spotifyCommandReplySong = {
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG`,
-  default: `@$(USER) $(SPOTIFY_SONG|$(SHOW_IF_TRUE=%SPOTIFY_SONG:HAS_CURRENT%|$[${spotifyCommandReplyRefSongCurrent.id}])$(SHOW_IF_FALSE=%SPOTIFY_SONG:HAS_CURRENT%|$[${spotifyCommandReplyRefSongNone.id}])$(SHOW_IF_TRUE=%SPOTIFY_SONG:HAS_PREVIOUS%|$[${spotifyCommandReplyRefSongPrevious.id}]))`,
+  default: `@$(USER) $(SPOTIFY_SONG|$(IF_TRUE=%SPOTIFY_SONG:HAS_CURRENT%|$[${spotifyCommandReplyRefSongCurrent.id}])$(IF_FALSE=%SPOTIFY_SONG:HAS_CURRENT%|$[${spotifyCommandReplyRefSongNone.id}])$(IF_TRUE=%SPOTIFY_SONG:HAS_PREVIOUS%|$[${spotifyCommandReplyRefSongPrevious.id}]))`,
 };
 
 export const spotifyCommandReply: Iterable<readonly [string, string]> = [

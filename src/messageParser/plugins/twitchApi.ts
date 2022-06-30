@@ -14,7 +14,7 @@ export const pluginTwitchApi: (
       id: `${TWITCH_API_PREFIX}SET_GAME`,
       func: async (_logger, gameName?: string) => {
         if (gameName === undefined || gameName.length === 0) {
-          throw Error("Game name was undefined or empty!");
+          throw Error("Game name was undefined or empty");
         }
 
         try {
@@ -87,7 +87,7 @@ export const pluginTwitchApi: (
       id: `${TWITCH_API_PREFIX}SET_TITLE`,
       func: async (_logger, title?: string) => {
         if (title === undefined || title.length === 0) {
-          throw Error("Game name was undefined or empty!");
+          throw Error("Game name was undefined or empty");
         }
 
         try {

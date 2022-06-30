@@ -327,7 +327,7 @@ export const createParseTree = (
         // If the current walking node has content that is not the empty string
         // add it to the root node before doing anything:
         if (currentChildNode.type !== "text") {
-          throw Error("A plugin was opened while not being in text type!");
+          throw Error("A plugin was opened while not being in text type");
         }
         if (
           currentChildNode.content !== undefined &&
@@ -427,7 +427,7 @@ export const createParseTree = (
         // If the current walking node has content that is not the empty string
         // add it to the root node before doing anything:
         if (currentChildNode.type !== "text") {
-          throw Error("A reference was found while not being in text type!");
+          throw Error("A reference was found while not being in text type");
         }
         if (
           currentChildNode.type === "text" &&
@@ -448,7 +448,9 @@ export const createParseTree = (
         // eslint-disable-next-line no-case-declarations
         const referenceString = strings.get(referenceName);
         if (referenceString === undefined) {
-          throw Error(`The reference '${referenceName}' was not found!`);
+          throw Error(
+            `The reference '${referenceName}' from '${messageString}' was not found`
+          );
         }
         // eslint-disable-next-line no-case-declarations
         const referenceParseTree = createParseTree(
@@ -586,33 +588,71 @@ export const parseTreeNode = async (
   switch (treeNode.type) {
     case "text":
       if (treeNode.content === undefined) {
-        throw Error("Macro text content was not found");
+        throw Error(
+          `Parse tree node '${treeNode.type}' had no content (${treeNode.originalString})`
+        );
       }
-      return replaceMacros(treeNode.content, macros);
+      try {
+        return replaceMacros(treeNode.content, macros);
+      } catch (err) {
+        throw Error(
+          `Parse tree node '${treeNode.type}' encountered a macro error ('${
+            treeNode.originalString
+          }',${(err as Error).message})`
+        );
+      }
     case "plugin":
       // Run plugin
       // eslint-disable-next-line no-case-declarations
       const pluginName = treeNode.pluginName;
       if (pluginName === undefined) {
-        throw Error("Plugin name is undefined");
+        throw Error(
+          `Parse tree node '${treeNode.type}' had no plugin name (${treeNode.originalString})`
+        );
       }
       // eslint-disable-next-line no-case-declarations
       const plugin = plugins.get(pluginName);
       if (plugin === undefined) {
         throw Error(
-          `Plugin (${pluginName}) was not found [${Array.from(plugins.entries())
+          `Parse tree node '${treeNode.type}' plugin name was not found ('${
+            treeNode.originalString
+          }',[${Array.from(plugins.entries())
             .map((a) => a[0])
-            .join(",")}]`
+            .join(",")}])`
         );
       }
       // eslint-disable-next-line no-case-declarations
       const pluginValue = treeNode.pluginValue;
       // eslint-disable-next-line no-case-declarations
-      const pluginValueString = pluginValue
-        ? await parseTreeNode(pluginValue, plugins, macros, logger)
-        : undefined;
+      let pluginValueString;
+      try {
+        pluginValueString = pluginValue
+          ? await parseTreeNode(pluginValue, plugins, macros, logger)
+          : undefined;
+      } catch (err) {
+        logger.error(err);
+        throw Error(
+          `Parse tree node '${
+            treeNode.type
+          }' could not produce plugin value string ('${
+            treeNode.originalString
+          }',${(err as Error).message})`
+        );
+      }
       // eslint-disable-next-line no-case-declarations
-      const pluginOutput = await plugin(logger, pluginValueString);
+      let pluginOutput;
+      try {
+        pluginOutput = await plugin(logger, pluginValueString);
+      } catch (err) {
+        logger.error(err);
+        throw Error(
+          `Parse tree node '${
+            treeNode.type
+          }' could not produce plugin output (${treeNode.originalString},${
+            (err as Error).message
+          })`
+        );
+      }
       if (Array.isArray(pluginOutput)) {
         for (const macro of pluginOutput) {
           if (!macros.has(pluginName)) {
@@ -622,7 +662,9 @@ export const parseTreeNode = async (
         }
         const pluginContentNode = treeNode.pluginContent;
         if (pluginContentNode === undefined) {
-          throw Error(`Plugin content (${pluginName}) was undefined`);
+          throw Error(
+            `Parse tree node '${treeNode.type}' had no plugin content (${treeNode.originalString})`
+          );
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return parseTreeNode(pluginContentNode, plugins, macros, logger);
@@ -631,7 +673,9 @@ export const parseTreeNode = async (
       }
     case "children":
       if (treeNode.children === undefined) {
-        throw Error(`Parse tree children were undefined`);
+        throw Error(
+          `Parse tree node '${treeNode.type}' had no children (${treeNode.originalString})`
+        );
       }
       // eslint-disable-next-line no-case-declarations
       let output = "";
@@ -650,20 +694,29 @@ export const messageParser = async (
   logger: Logger
 ) => {
   if (messageString === undefined) {
-    throw Error("Message string could not be parsed because it's undefined!");
+    throw Error("Message string could not be parsed because it's undefined");
   }
-  // 1. Create parse tree
-  const parseTreeNodeRoot = createParseTree(
-    messageString,
-    strings,
-    undefined,
-    undefined,
-    undefined,
-    logger
-  );
-  //console.log(JSON.stringify(parseTreeNodeRoot));
-  // 2. Parse parse tree from top down
-  return await parseTreeNode(parseTreeNodeRoot, plugins, macros, logger);
+  try {
+    // 1. Create parse tree
+    const parseTreeNodeRoot = createParseTree(
+      messageString,
+      strings,
+      undefined,
+      undefined,
+      undefined,
+      logger
+    );
+    //console.log(JSON.stringify(parseTreeNodeRoot));
+    // 2. Parse parse tree from top down
+    return await parseTreeNode(parseTreeNodeRoot, plugins, macros, logger);
+  } catch (err) {
+    logger.error(err);
+    throw Error(
+      `There was an error parsing the message string '${messageString}': ${
+        (err as Error).message
+      }`
+    );
+  }
 };
 
 export const messageParserById = async (
@@ -675,7 +728,7 @@ export const messageParserById = async (
 ) => {
   const stringFromId = strings.get(stringId);
   if (stringFromId === undefined) {
-    throw Error(`Message string could not be found via its ID '${stringId}'!`);
+    throw Error(`Message string could not be found via its ID '${stringId}'`);
   }
   return await messageParser(stringFromId, strings, plugins, macros, logger);
 };

@@ -1,5 +1,5 @@
 // Package imports
-import osuApiV2, { OsuApiV2WebRequestError } from "osu-api-v2";
+import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
   errorMessageIdUndefined,
@@ -14,6 +14,7 @@ import { isProcessRunning } from "../../other/processInformation";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 import { messageParserById } from "../../messageParser";
 // Type imports
+import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { Client as IrcClient } from "irc";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";

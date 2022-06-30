@@ -90,7 +90,7 @@ export const checkCustomCommand = async (
   const pluginsCommand: Plugins = new Map(globalPlugins);
   pluginsCommand.set("REGEX_GROUP", (_logger, regexGroupIndex?: string) => {
     if (regexGroupIndex === undefined || regexGroupIndex.length === 0) {
-      throw Error("Regex group index was undefined or empty!");
+      throw Error("Regex group index was undefined or empty");
     }
     return `${match[parseInt(regexGroupIndex)]}`;
   });

@@ -103,7 +103,7 @@ export const remove = async (
   }
   // Sanity check on Windows
   if (await exists(dbNamePath, logger)) {
-    throw Error("Database still exists!");
+    throw Error("Database still exists");
   }
 };
 

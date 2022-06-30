@@ -122,6 +122,13 @@ export const writeStringsVariableDocumentation = async (
       `(The lines that start with ${PREFIX_CUSTOM_STRING})`,
   });
   data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+  data.push({
+    type: FileDocumentationPartType.TEXT,
+    content:
+      "You can also reference other strings via $[REFERENCE]. " +
+      `This will then be replaced by the string saved in ${PREFIX_CUSTOM_STRING}REFERENCE.`,
+  });
+  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
 
   for (const [key, defaultValue] of defaultStrings.entries()) {
     if (defaultValue.endsWith(" ") || defaultValue.startsWith(" ")) {

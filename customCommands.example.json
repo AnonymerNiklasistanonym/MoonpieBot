@@ -6,7 +6,7 @@
             "channels": [
                 "#salk1n616"
             ],
-            "message": "Test command was called $(COUNT) time$(SHOW_IF_NUMBER_GREATER_THAN=$(COUNT)>1|s) (random number between 1 and 10: $(RANDOM_NUMBER=1<->10))",
+            "message": "Test command was called $(COUNT) time$(IF_GREATER=$(COUNT)>1|s) (random number between 1 and 10: $(RANDOM_NUMBER=1<->10))",
             "regexString": "!testBasic",
             "count": 0,
             "userLevel": "everyone"
@@ -17,7 +17,7 @@
                 "#salk1n616"
             ],
             "count": 20,
-            "message": "Test command query is: $(SHOW_IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|'$(REGEX_GROUP=1)')$(SHOW_IF_UNDEFINED=$(REGEX_GROUP=1)|There was no query :()",
+            "message": "Test command query is: $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|'$(REGEX_GROUP=1)')$(IF_UNDEFINED=$(REGEX_GROUP=1)|There was no query :()",
             "regexString": "!testRegex(?:\\s+(.*?))?\\s*$",
             "userLevel": "everyone"
         },
@@ -56,7 +56,7 @@
             "channels": [
                 "#salk1n616"
             ],
-            "message": "@$(USER) $(SHOW_IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|You updated the title to '$(TWITCH_API_SET_TITLE=$(REGEX_GROUP=1))')$(SHOW_IF_UNDEFINED=$(REGEX_GROUP=1)|The current title is '$(TWITCH_API_GET_TITLE)')",
+            "message": "@$(USER) $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|You updated the title to '$(TWITCH_API_SET_TITLE=$(REGEX_GROUP=1))')$(IF_UNDEFINED=$(REGEX_GROUP=1)|The current title is '$(TWITCH_API_GET_TITLE)')",
             "regexString": "^!title(?:\\s+(.*?))?\\s*$",
             "count": 0,
             "userLevel": "mod"
@@ -66,7 +66,7 @@
             "channels": [
                 "#salk1n616"
             ],
-            "message": "@$(USER) $(SHOW_IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|You updated the game to '$(TWITCH_API_SET_GAME=$(REGEX_GROUP=1))')$(SHOW_IF_UNDEFINED=$(REGEX_GROUP=1)|The current game is '$(TWITCH_API_GET_GAME)')",
+            "message": "@$(USER) $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|You updated the game to '$(TWITCH_API_SET_GAME=$(REGEX_GROUP=1))')$(IF_UNDEFINED=$(REGEX_GROUP=1)|The current game is '$(TWITCH_API_GET_GAME)')",
             "regexString": "^!game(?:\\s+(.*?))?\\s*$",
             "count": 0,
             "userLevel": "mod"
