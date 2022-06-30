@@ -7,10 +7,21 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
+import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
+import { messageParserById } from "../../messageParser";
+import {
+  moonpieUserGet,
+  moonpieUserSet,
+  moonpieUserSetNAN,
+  moonpieUserNeverClaimed,
+  moonpieUserPermissionError,
+  moonpieUserDelete,
+} from "../../strings/moonpie/user";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
+import type { Strings } from "../../strings";
+import type { Macros, Plugins } from "../../messageParser";
 
 export const commandUserGet = async (
   client: Client,
@@ -19,6 +30,9 @@ export const commandUserGet = async (
   userName: string | undefined,
   userId: string | undefined,
   usernameMoonpieEntry: string,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   moonpieDbPath: string,
   logger: Logger
 ): Promise<void> => {
@@ -47,13 +61,33 @@ export const commandUserGet = async (
         moonpieEntry.id,
         logger
       );
-    message = `@${userName} The user ${usernameMoonpieEntry} has ${
-      currentMoonpieLeaderboardEntry.count
-    } moonpie${
-      currentMoonpieLeaderboardEntry.count > 1 ? "s" : ""
-    } and is rank ${currentMoonpieLeaderboardEntry.rank} on the leaderboard!`;
+
+    const macros = new Map(globalMacros);
+    macros.set(
+      "MOONPIE",
+      new Map([
+        ["USER", `${usernameMoonpieEntry}`],
+        ["COUNT", `${currentMoonpieLeaderboardEntry.count}`],
+        ["LEADERBOARD_RANK", `${currentMoonpieLeaderboardEntry.rank}`],
+      ])
+    );
+    message = await messageParserById(
+      moonpieUserGet.id,
+      globalStrings,
+      globalPlugins,
+      macros,
+      logger
+    );
   } else {
-    message = `@${userName} The user ${usernameMoonpieEntry} has never claimed a moonpie!`;
+    const macros = new Map(globalMacros);
+    macros.set("MOONPIE", new Map([["USER", `${usernameMoonpieEntry}`]]));
+    message = await messageParserById(
+      moonpieUserNeverClaimed.id,
+      globalStrings,
+      globalPlugins,
+      macros,
+      logger
+    );
   }
 
   const sentMessage = await client.say(channel, message);
@@ -77,6 +111,9 @@ export const commandUserSetCount = async (
   countMoonpies: number,
   operation: "+" | "-" | "=" = "=",
   twitchBadgeLevel: TwitchBadgeLevels,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   moonpieDbPath: string,
   logger: Logger
 ): Promise<void> => {
@@ -91,21 +128,49 @@ export const commandUserSetCount = async (
   }
 
   if (twitchBadgeLevel != TwitchBadgeLevels.BROADCASTER) {
-    throw Error(
-      `The user ${userName} is not a broadcaster and thus is not allowed to use this command`
+    const errorMessage = await messageParserById(
+      moonpieUserPermissionError.id,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
     );
+    throw Error(errorMessage);
   }
   if (!Number.isInteger(countMoonpies)) {
-    throw Error(`The given moonpie count ${countMoonpies} is not an integer`);
+    const macros = new Map(globalMacros);
+    macros.set(
+      "MOONPIE",
+      new Map([
+        ["USER", `${usernameMoonpieEntry}`],
+        ["SET_COUNT", `${countMoonpies}`],
+        ["SET_OPERATION", `${operation}`],
+      ])
+    );
+    const errorMessage = await messageParserById(
+      moonpieUserSetNAN.id,
+      globalStrings,
+      globalPlugins,
+      macros,
+      logger
+    );
+    throw Error(errorMessage);
   }
 
   // Check if a moonpie entry already exists
   if (
     !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
   ) {
-    throw Error(
-      `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be changed`
+    const macros = new Map(globalMacros);
+    macros.set("MOONPIE", new Map([["USER", `${usernameMoonpieEntry}`]]));
+    const errorMessage = await messageParserById(
+      moonpieUserNeverClaimed.id,
+      globalStrings,
+      globalPlugins,
+      macros,
+      logger
     );
+    throw Error(errorMessage);
   }
 
   const moonpieEntry = await moonpieDb.getMoonpieName(
@@ -150,12 +215,24 @@ export const commandUserSetCount = async (
       logger
     );
 
-  const message = `@${userName} You set the number of moonpies of the user ${usernameMoonpieEntry} to ${newCount} moonpie${
-    newCount > 1 ? "s" : ""
-  } (${operation}${countMoonpies}) and they are now rank ${
-    currentMoonpieLeaderboardEntry.rank
-  } on the leaderboard!`;
-
+  const macros = new Map(globalMacros);
+  macros.set(
+    "MOONPIE",
+    new Map([
+      ["USER", `${usernameMoonpieEntry}`],
+      ["COUNT", `${newCount}`],
+      ["LEADERBOARD_RANK", `${currentMoonpieLeaderboardEntry.rank}`],
+      ["SET_OPERATION", `${operation}`],
+      ["SET_COUNT", `${countMoonpies}`],
+    ])
+  );
+  const message = await messageParserById(
+    moonpieUserSet.id,
+    globalStrings,
+    globalPlugins,
+    macros,
+    logger
+  );
   const sentMessage = await client.say(channel, message);
 
   logTwitchMessageCommandReply(
@@ -175,6 +252,9 @@ export const commandUserDelete = async (
   userId: string | undefined,
   usernameMoonpieEntry: string,
   twitchBadgeLevel: TwitchBadgeLevels,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   moonpieDbPath: string,
   logger: Logger
 ): Promise<void> => {
@@ -189,24 +269,43 @@ export const commandUserDelete = async (
   }
 
   if (twitchBadgeLevel != TwitchBadgeLevels.BROADCASTER) {
-    throw Error(
-      `The user ${userName} is not a broadcaster and thus is not allowed to use this command`
+    const errorMessage = await messageParserById(
+      moonpieUserPermissionError.id,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
     );
+    throw Error(errorMessage);
   }
 
   // Check if a moonpie entry already exists
   if (
     !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
   ) {
-    throw Error(
-      `The user ${usernameMoonpieEntry} has never claimed a moonpie and thus has no entry to be deleted`
+    const macros = new Map(globalMacros);
+    macros.set("MOONPIE", new Map([["USER", `${usernameMoonpieEntry}`]]));
+    const errorMessage = await messageParserById(
+      moonpieUserNeverClaimed.id,
+      globalStrings,
+      globalPlugins,
+      macros,
+      logger
     );
+    throw Error(errorMessage);
   }
 
   await moonpieDb.removeName(moonpieDbPath, usernameMoonpieEntry, logger);
 
-  const message = `@${userName} You deleted the entry of the user ${usernameMoonpieEntry}`;
-
+  const macros = new Map(globalMacros);
+  macros.set("MOONPIE", new Map([["USER", `${usernameMoonpieEntry}`]]));
+  const message = await messageParserById(
+    moonpieUserDelete.id,
+    globalStrings,
+    globalPlugins,
+    macros,
+    logger
+  );
   const sentMessage = await client.say(channel, message);
 
   logTwitchMessageCommandReply(

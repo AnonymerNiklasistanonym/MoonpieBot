@@ -4,16 +4,16 @@ import {
 } from "../../commands";
 import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 import {
-  moonpieCommandAbout,
-  moonpieCommandAdd,
-  moonpieCommandClaim,
-  moonpieCommandDelete,
-  moonpieCommandGet,
-  moonpieCommandLeaderboard,
-  moonpieCommandNone,
-  moonpieCommandPrefix,
-  moonpieCommandRemove,
-  moonpieCommandSet,
+  moonpieCommandsAbout,
+  moonpieCommandsAdd,
+  moonpieCommandsClaim,
+  moonpieCommandsDelete,
+  moonpieCommandsGet,
+  moonpieCommandsLeaderboard,
+  moonpieCommandsNone,
+  moonpieCommandsPrefix,
+  moonpieCommandsRemove,
+  moonpieCommandsSet,
 } from "../../strings/moonpie/commands";
 import { messageParserById } from "../../messageParser";
 // Type imports
@@ -39,32 +39,32 @@ export const commandCommands = async (
   const commandsStringIds = [];
 
   if (enabled.includes(MoonpieCommands.CLAIM)) {
-    commandsStringIds.push(moonpieCommandClaim.id);
+    commandsStringIds.push(moonpieCommandsClaim.id);
   }
   if (enabled.includes(MoonpieCommands.LEADERBOARD)) {
-    commandsStringIds.push(moonpieCommandLeaderboard.id);
+    commandsStringIds.push(moonpieCommandsLeaderboard.id);
   }
   if (enabled.includes(MoonpieCommands.GET)) {
-    commandsStringIds.push(moonpieCommandGet.id);
+    commandsStringIds.push(moonpieCommandsGet.id);
   }
   if (enabled.includes(MoonpieCommands.SET)) {
-    commandsStringIds.push(moonpieCommandSet.id);
+    commandsStringIds.push(moonpieCommandsSet.id);
   }
   if (enabled.includes(MoonpieCommands.ADD)) {
-    commandsStringIds.push(moonpieCommandAdd.id);
+    commandsStringIds.push(moonpieCommandsAdd.id);
   }
   if (enabled.includes(MoonpieCommands.REMOVE)) {
-    commandsStringIds.push(moonpieCommandRemove.id);
+    commandsStringIds.push(moonpieCommandsRemove.id);
   }
   if (enabled.includes(MoonpieCommands.DELETE)) {
-    commandsStringIds.push(moonpieCommandDelete.id);
+    commandsStringIds.push(moonpieCommandsDelete.id);
   }
   if (enabled.includes(MoonpieCommands.ABOUT)) {
-    commandsStringIds.push(moonpieCommandAbout.id);
+    commandsStringIds.push(moonpieCommandsAbout.id);
   }
 
   if (commandsStringIds.length === 0) {
-    commandsStringIds.push(moonpieCommandNone.id);
+    commandsStringIds.push(moonpieCommandsNone.id);
   }
 
   const commands = [];
@@ -81,7 +81,7 @@ export const commandCommands = async (
   }
 
   const messagePrefix = await messageParserById(
-    moonpieCommandPrefix.id,
+    moonpieCommandsPrefix.id,
     globalStrings,
     globalPlugins,
     globalMacros,

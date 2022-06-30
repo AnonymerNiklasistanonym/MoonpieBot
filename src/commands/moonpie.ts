@@ -274,6 +274,9 @@ export const moonpieChatHandler = async (
           tags["user-id"],
           match[1],
           parseTwitchBadgeLevel(tags),
+          globalStrings,
+          globalPlugins,
+          globalMacros,
           databasePath,
           logger
         );
@@ -306,6 +309,9 @@ export const moonpieChatHandler = async (
           tags.username,
           tags["user-id"],
           match[1],
+          globalStrings,
+          globalPlugins,
+          globalMacros,
           databasePath,
           logger
         );
@@ -341,6 +347,9 @@ export const moonpieChatHandler = async (
           parseInt(match[2]),
           "=",
           parseTwitchBadgeLevel(tags),
+          globalStrings,
+          globalPlugins,
+          globalMacros,
           databasePath,
           logger
         );
@@ -376,6 +385,9 @@ export const moonpieChatHandler = async (
           parseInt(match[2]),
           "+",
           parseTwitchBadgeLevel(tags),
+          globalStrings,
+          globalPlugins,
+          globalMacros,
           databasePath,
           logger
         );
@@ -411,6 +423,9 @@ export const moonpieChatHandler = async (
           parseInt(match[2]),
           "-",
           parseTwitchBadgeLevel(tags),
+          globalStrings,
+          globalPlugins,
+          globalMacros,
           databasePath,
           logger
         );

@@ -13,7 +13,8 @@ import {
   generateFileDocumentation,
 } from "./other/splitTextAtLength";
 import { genericStringSorter } from "./other/genericStringSorter";
-import { moonpieCommand } from "./strings/moonpie/commands";
+import { moonpieCommands } from "./strings/moonpie/commands";
+import { moonpieUser } from "./strings/moonpie/user";
 import type { Logger } from "winston";
 import type { MessageParserPlugin } from "./messageParser/plugins";
 import type { MessageParserMacro } from "./messageParser/macros";
@@ -39,7 +40,8 @@ export const generateStringList = (stringEntries: StringEntry[]) => {
  */
 export const defaultStrings: Strings = new Map<string, string>([
   ...generateStringList(moonpieCommandReply),
-  ...generateStringList(moonpieCommand),
+  ...generateStringList(moonpieCommands),
+  ...generateStringList(moonpieUser),
   ...generateStringList(osuBeatmapRequests),
   ...generateStringList(osuCommandReply),
   ...generateStringList(spotifyCommandReply),
