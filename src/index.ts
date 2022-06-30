@@ -59,7 +59,10 @@ import {
   pluginTimeInSToStopwatchString,
   pluginUppercase,
 } from "./messageParser/plugins/general";
-import { errorMessageUserNameUndefined } from "./commands";
+import {
+  errorMessageUserIdUndefined,
+  errorMessageUserNameUndefined,
+} from "./commands";
 import { pluginTwitchApi } from "./messageParser/plugins/twitchApi";
 import {
   pluginOsuBeatmap,
@@ -435,6 +438,7 @@ export const main = async (logger: Logger, configDir: string) => {
 
     // TODO Think about how to document client dependent plugins
     const pluginsChannel = new Map(plugins);
+    const macrosChannel = new Map(macros);
     if (twitchApiClient) {
       for (const plugin of pluginTwitchApi(
         twitchApiClient,
@@ -444,11 +448,26 @@ export const main = async (logger: Logger, configDir: string) => {
         plugins.set(plugin.id, plugin.func);
       }
     }
+    macrosChannel.set(
+      "TWITCH",
+      new Map([
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        ["USER", `${tags.username}`],
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        ["USER_ID", `${tags["user-id"]}`],
+      ])
+    );
     pluginsChannel.set("USER", () => {
       if (tags.username === undefined) {
         throw errorMessageUserNameUndefined();
       }
-      return `${tags.username}`;
+      return tags.username;
+    });
+    pluginsChannel.set("USER_ID", () => {
+      if (tags["user-id"] === undefined) {
+        throw errorMessageUserIdUndefined();
+      }
+      return tags["user-id"];
     });
     pluginsChannel.set("CHANNEL", () => channel.slice(1));
 
@@ -465,7 +484,7 @@ export const main = async (logger: Logger, configDir: string) => {
       ),
       strings,
       pluginsChannel,
-      macros,
+      macrosChannel,
       logger
     ).catch((err) => {
       logger.error(err);
@@ -502,7 +521,7 @@ export const main = async (logger: Logger, configDir: string) => {
         ),
         strings,
         pluginsChannel,
-        macros,
+        macrosChannel,
         logger
       ).catch((err) => {
         logger.error(err);
@@ -540,7 +559,7 @@ export const main = async (logger: Logger, configDir: string) => {
           : enableCommands.filter((a) => a === "np"),
         strings,
         pluginsChannel,
-        macros,
+        macrosChannel,
         logger
       ).catch((err) => {
         logger.error(err);
@@ -568,7 +587,7 @@ export const main = async (logger: Logger, configDir: string) => {
         undefined,
         strings,
         pluginsChannel,
-        macros,
+        macrosChannel,
         logger
       ).catch((err) => {
         logger.error(err);
@@ -606,7 +625,7 @@ export const main = async (logger: Logger, configDir: string) => {
           customCommand.name,
           strings,
           pluginsCustomCommands,
-          macros,
+          macrosChannel,
           logger
         )
           .then((commandExecuted) => {

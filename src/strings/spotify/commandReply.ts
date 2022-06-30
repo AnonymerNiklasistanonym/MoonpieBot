@@ -3,18 +3,18 @@ import { SPOTIFY_STRING_ID } from "../spotify";
 export const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
 
 export const spotifyCommandReplyRefSongNone = {
-  id: `REF_${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_NO_SONG`,
+  id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_NO_SONG`,
   default: "Currently playing no song",
 };
 
 export const spotifyCommandReplyRefSongCurrent = {
-  id: `REF_${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_CURRENT`,
+  id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_CURRENT`,
   default:
     "Currently playing '%SPOTIFY_SONG:CURRENT_TITLE%' by '%SPOTIFY_SONG:CURRENT_ARTISTS%'$(IF_FALSE=%SPOTIFY_SONG:CURRENT_IS_SINGLE%| from '%SPOTIFY_SONG:CURRENT_ALBUM%')",
 };
 
 export const spotifyCommandReplyRefSongPrevious = {
-  id: `REF_${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_PREVIOUS`,
+  id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_PREVIOUS`,
   default:
     ", previously played '%SPOTIFY_SONG:PREVIOUS_TITLE%' by '%SPOTIFY_SONG:PREVIOUS_ARTISTS%'$(IF_FALSE=%SPOTIFY_SONG:PREVIOUS_IS_SINGLE%| from '%SPOTIFY_SONG:PREVIOUS_ALBUM%')",
 };

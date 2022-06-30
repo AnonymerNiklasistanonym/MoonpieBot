@@ -9,7 +9,6 @@ import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 import { messageParserById } from "../../messageParser";
 import {
   moonpieCommandReplyAlreadyClaimed,
-  moonpieCommandReplyAlreadyClaimedStar,
   moonpieCommandReplyClaim,
 } from "../../strings/moonpie/commandReply";
 // Type imports
@@ -79,9 +78,6 @@ export const commandClaim = async (
       claimCooldownMs + moonpieEntry.timestamp - currentTimestamp,
       0
     );
-    logger.debug(
-      `millisecondsSinceLastClaim=${currentTimestamp}-${moonpieEntry.timestamp}=${msSinceLastClaim}`
-    );
 
     if (msSinceLastClaim > claimCooldownMs) {
       newMoonpieCount = moonpieEntry.count + 1;
@@ -132,24 +128,13 @@ export const commandClaim = async (
   );
 
   if (alreadyClaimedAMoonpie) {
-    if (userId === "93818178") {
-      // Easter egg for the most cute star there is <3
-      message = await messageParserById(
-        moonpieCommandReplyAlreadyClaimedStar.id,
-        globalStrings,
-        globalPlugins,
-        macros,
-        logger
-      );
-    } else {
-      message = await messageParserById(
-        moonpieCommandReplyAlreadyClaimed.id,
-        globalStrings,
-        globalPlugins,
-        macros,
-        logger
-      );
-    }
+    message = await messageParserById(
+      moonpieCommandReplyAlreadyClaimed.id,
+      globalStrings,
+      globalPlugins,
+      macros,
+      logger
+    );
   }
 
   const sentMessage = await client.say(channel, message);

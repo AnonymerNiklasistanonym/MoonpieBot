@@ -13,16 +13,21 @@ export const moonpieCommandReplyClaim = {
     "@$(USER) You just claimed a moonpie! You have now %MOONPIE:COUNT% moonpie$(IF_GREATER=%MOONPIE:COUNT%>1|s) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
 };
 
-export const moonpieCommandReplyAlreadyClaimed = {
-  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED`,
+export const moonpieCommandReplyAlreadyClaimedRefNormal = {
+  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_REF_NORMAL`,
   default:
-    "@$(USER) You already claimed a moonpie for today ($(TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT=%MOONPIE:TIME_SINCE_CLAIM_IN_S%) ago - next claim can be made in $(TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT=%MOONPIE:TIME_TILL_NEXT_CLAIM_IN_S%)) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+    "You already claimed a moonpie for today ($(TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT=%MOONPIE:TIME_SINCE_CLAIM_IN_S%) ago - next claim can be made in $(TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT=%MOONPIE:TIME_TILL_NEXT_CLAIM_IN_S%)) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
 };
 
-export const moonpieCommandReplyAlreadyClaimedStar = {
-  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_STAR`,
+export const moonpieCommandReplyAlreadyClaimedRefStar = {
+  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_REF_STAR`,
   default:
-    "@$(USER) You are the cutest! You have now 6969 moonpies and are rank 1 in my heart! <3",
+    "You are the cutest! You have 6969 moonpies and are rank 1 in my heart! <3",
+};
+
+export const moonpieCommandReplyAlreadyClaimed = {
+  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED`,
+  default: `@$(USER) %TWITCH:USER_ID% $(IF_EQUAL=%TWITCH:USER_ID%===93818178|$[${moonpieCommandReplyAlreadyClaimedRefStar.id}])$(IF_NOT_EQUAL=%TWITCH:USER_ID%!==93818178|$[${moonpieCommandReplyAlreadyClaimedRefNormal.id}])`,
 };
 
 export const moonpieCommandReplyLeaderboardPrefix = {
@@ -44,15 +49,19 @@ export const moonpieCommandReply: Iterable<readonly [string, string]> = [
     moonpieCommandReplyAlreadyClaimed.default,
   ],
   [
-    moonpieCommandReplyAlreadyClaimedStar.id,
-    moonpieCommandReplyAlreadyClaimedStar.default,
-  ],
-  [
     moonpieCommandReplyLeaderboardPrefix.id,
     moonpieCommandReplyLeaderboardPrefix.default,
   ],
   [
     moonpieCommandReplyLeaderboardEntry.id,
     moonpieCommandReplyLeaderboardEntry.default,
+  ],
+  [
+    moonpieCommandReplyAlreadyClaimedRefNormal.id,
+    moonpieCommandReplyAlreadyClaimedRefNormal.default,
+  ],
+  [
+    moonpieCommandReplyAlreadyClaimedRefStar.id,
+    moonpieCommandReplyAlreadyClaimedRefStar.default,
   ],
 ];

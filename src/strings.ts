@@ -15,7 +15,10 @@ import {
 import type { Logger } from "winston";
 import type { MessageParserPlugin } from "./messageParser/plugins";
 import type { MessageParserMacro } from "./messageParser/macros";
-import type { FileDocumentationParts } from "./other/splitTextAtLength";
+import type {
+  FileDocumentationPartValue,
+  FileDocumentationParts,
+} from "./other/splitTextAtLength";
 
 export type Strings = Map<string, string>;
 
@@ -130,9 +133,10 @@ export const writeStringsVariableDocumentation = async (
   });
   data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
 
+  const dataDefaultStrings: FileDocumentationPartValue[] = [];
   for (const [key, defaultValue] of defaultStrings.entries()) {
     if (defaultValue.endsWith(" ") || defaultValue.startsWith(" ")) {
-      data.push({
+      dataDefaultStrings.push({
         type: FileDocumentationPartType.VALUE,
         value: `${PREFIX_CUSTOM_STRING}${key}="${defaultValue}"`,
         prefix: ">",
@@ -140,7 +144,7 @@ export const writeStringsVariableDocumentation = async (
         isComment: true,
       });
     } else {
-      data.push({
+      dataDefaultStrings.push({
         type: FileDocumentationPartType.VALUE,
         value: `${PREFIX_CUSTOM_STRING}${key}=${defaultValue}`,
         prefix: ">",
@@ -149,6 +153,14 @@ export const writeStringsVariableDocumentation = async (
       });
     }
   }
+  data.push(
+    ...dataDefaultStrings.sort((a, b) => {
+      if (a.value === undefined || b.value === undefined) {
+        return 0;
+      }
+      return a.value < b.value ? -1 : a.value > b.value ? 1 : 0;
+    })
+  );
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(path, generateFileDocumentation(data));
