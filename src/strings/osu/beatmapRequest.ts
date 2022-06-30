@@ -39,10 +39,10 @@ export const osuBeatmapRequestIrcDetailed = {
     "$(IF_NOT_EMPTY=%OSU_BEATMAP_REQUEST:COMMENT%|%NEWLINE% > Comment: %OSU_BEATMAP_REQUEST:COMMENT%)",
 };
 
-export const osuBeatmapRequests: Iterable<readonly [string, string]> = [
-  [osuBeatmapRequest.id, osuBeatmapRequest.default],
-  [osuBeatmapRequestDetailed.id, osuBeatmapRequestDetailed.default],
-  [osuBeatmapRequestNotFound.id, osuBeatmapRequestNotFound.default],
-  [osuBeatmapRequestIrc.id, osuBeatmapRequestIrc.default],
-  [osuBeatmapRequestIrcDetailed.id, osuBeatmapRequestIrcDetailed.default],
+export const osuBeatmapRequests = [
+  osuBeatmapRequest,
+  osuBeatmapRequestDetailed,
+  osuBeatmapRequestNotFound,
+  osuBeatmapRequestIrc,
+  osuBeatmapRequestIrcDetailed,
 ];

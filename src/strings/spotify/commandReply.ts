@@ -24,15 +24,9 @@ export const spotifyCommandReplySong = {
   default: `@$(USER) $(SPOTIFY_SONG|$(IF_TRUE=%SPOTIFY_SONG:HAS_CURRENT%|$[${spotifyCommandReplyRefSongCurrent.id}])$(IF_FALSE=%SPOTIFY_SONG:HAS_CURRENT%|$[${spotifyCommandReplyRefSongNone.id}])$(IF_TRUE=%SPOTIFY_SONG:HAS_PREVIOUS%|$[${spotifyCommandReplyRefSongPrevious.id}]))`,
 };
 
-export const spotifyCommandReply: Iterable<readonly [string, string]> = [
-  [spotifyCommandReplySong.id, spotifyCommandReplySong.default],
-  [spotifyCommandReplyRefSongNone.id, spotifyCommandReplyRefSongNone.default],
-  [
-    spotifyCommandReplyRefSongCurrent.id,
-    spotifyCommandReplyRefSongCurrent.default,
-  ],
-  [
-    spotifyCommandReplyRefSongPrevious.id,
-    spotifyCommandReplyRefSongPrevious.default,
-  ],
+export const spotifyCommandReply = [
+  spotifyCommandReplySong,
+  spotifyCommandReplyRefSongNone,
+  spotifyCommandReplyRefSongCurrent,
+  spotifyCommandReplyRefSongPrevious,
 ];

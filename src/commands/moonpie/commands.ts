@@ -3,55 +3,93 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
+import {
+  moonpieCommandAbout,
+  moonpieCommandAdd,
+  moonpieCommandClaim,
+  moonpieCommandDelete,
+  moonpieCommandGet,
+  moonpieCommandLeaderboard,
+  moonpieCommandNone,
+  moonpieCommandPrefix,
+  moonpieCommandRemove,
+  moonpieCommandSet,
+} from "../../strings/moonpie/commands";
+import { messageParserById } from "../../messageParser";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { Strings } from "../../strings";
+import type { Macros, Plugins } from "../../messageParser";
 
 export const commandCommands = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
   enabled: string[],
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
   if (messageId === undefined) {
     throw errorMessageIdUndefined();
   }
 
-  const commands = [];
+  const commandsStringIds = [];
 
   if (enabled.includes(MoonpieCommands.CLAIM)) {
-    commands.push("!moonpie [claim one moonepie per day]");
+    commandsStringIds.push(moonpieCommandClaim.id);
   }
   if (enabled.includes(MoonpieCommands.LEADERBOARD)) {
-    commands.push("!moonpie leaderboard [get the top moonpie holder]");
+    commandsStringIds.push(moonpieCommandLeaderboard.id);
   }
   if (enabled.includes(MoonpieCommands.GET)) {
-    commands.push("!moonpie get $USER [get the moonpie count of a user]");
+    commandsStringIds.push(moonpieCommandGet.id);
   }
   if (enabled.includes(MoonpieCommands.SET)) {
-    commands.push("!moonpie set $USER $COUNT [set moonpies of a user]");
+    commandsStringIds.push(moonpieCommandSet.id);
   }
   if (enabled.includes(MoonpieCommands.ADD)) {
-    commands.push("!moonpie add $USER $COUNT [add moonpies to a user]");
+    commandsStringIds.push(moonpieCommandAdd.id);
   }
   if (enabled.includes(MoonpieCommands.REMOVE)) {
-    commands.push("!moonpie remove $USER $COUNT [remove moonpies of a user]");
+    commandsStringIds.push(moonpieCommandRemove.id);
   }
   if (enabled.includes(MoonpieCommands.DELETE)) {
-    commands.push("!moonpie delete $USER [remove a user from the database]");
+    commandsStringIds.push(moonpieCommandDelete.id);
   }
   if (enabled.includes(MoonpieCommands.ABOUT)) {
-    commands.push("!moonpie about [get version and source code]");
+    commandsStringIds.push(moonpieCommandAbout.id);
   }
 
-  if (commands.length === 0) {
-    commands.push("None");
+  if (commandsStringIds.length === 0) {
+    commandsStringIds.push(moonpieCommandNone.id);
   }
 
+  const commands = [];
+  for (const commandsStringId of commandsStringIds) {
+    commands.push(
+      await messageParserById(
+        commandsStringId,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger
+      )
+    );
+  }
+
+  const messagePrefix = await messageParserById(
+    moonpieCommandPrefix.id,
+    globalStrings,
+    globalPlugins,
+    globalMacros,
+    logger
+  );
   const sentMessage = await client.say(
     channel,
-    "The following commands are supported: " + commands.join(", ")
+    `${messagePrefix} ${commands.join(", ")}`
   );
 
   logTwitchMessageCommandReply(

@@ -12,6 +12,8 @@ import {
   FileDocumentationPartType,
   generateFileDocumentation,
 } from "./other/splitTextAtLength";
+import { genericStringSorter } from "./other/genericStringSorter";
+import { moonpieCommand } from "./strings/moonpie/commands";
 import type { Logger } from "winston";
 import type { MessageParserPlugin } from "./messageParser/plugins";
 import type { MessageParserMacro } from "./messageParser/macros";
@@ -19,20 +21,28 @@ import type {
   FileDocumentationPartValue,
   FileDocumentationParts,
 } from "./other/splitTextAtLength";
-import { genericStringSorter } from "./other/genericStringSorter";
 
 export type Strings = Map<string, string>;
 
 export const PREFIX_CUSTOM_STRING = "MOONPIE_CUSTOM_STRING_";
 
+export const generateStringList = (stringEntries: StringEntry[]) => {
+  const out: [string, string][] = [];
+  for (const stringEntry of stringEntries) {
+    out.push([stringEntry.id, stringEntry.default]);
+  }
+  return out;
+};
+
 /**
  * The default values for all strings.
  */
 export const defaultStrings: Strings = new Map<string, string>([
-  ...moonpieCommandReply,
-  ...osuBeatmapRequests,
-  ...osuCommandReply,
-  ...spotifyCommandReply,
+  ...generateStringList(moonpieCommandReply),
+  ...generateStringList(moonpieCommand),
+  ...generateStringList(osuBeatmapRequests),
+  ...generateStringList(osuCommandReply),
+  ...generateStringList(spotifyCommandReply),
 ]);
 
 export const updateStringsMapWithCustomEnvStrings = (
@@ -161,3 +171,14 @@ export const writeStringsVariableDocumentation = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(path, generateFileDocumentation(data));
 };
+
+export interface StringEntry {
+  /**
+   * The unique ID of the string entry.
+   */
+  id: string;
+  /**
+   * The default value.
+   */
+  default: string;
+}

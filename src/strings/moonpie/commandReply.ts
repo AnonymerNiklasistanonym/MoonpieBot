@@ -41,27 +41,12 @@ export const moonpieCommandReplyLeaderboardEntry = {
     "%MOONPIE_LEADERBOARD_ENTRY:RANK%. %MOONPIE_LEADERBOARD_ENTRY:NAME% (%MOONPIE_LEADERBOARD_ENTRY:COUNT%)",
 };
 
-export const moonpieCommandReply: Iterable<readonly [string, string]> = [
-  [moonpieCommandReplyAbout.id, moonpieCommandReplyAbout.default],
-  [moonpieCommandReplyClaim.id, moonpieCommandReplyClaim.default],
-  [
-    moonpieCommandReplyAlreadyClaimed.id,
-    moonpieCommandReplyAlreadyClaimed.default,
-  ],
-  [
-    moonpieCommandReplyLeaderboardPrefix.id,
-    moonpieCommandReplyLeaderboardPrefix.default,
-  ],
-  [
-    moonpieCommandReplyLeaderboardEntry.id,
-    moonpieCommandReplyLeaderboardEntry.default,
-  ],
-  [
-    moonpieCommandReplyAlreadyClaimedRefNormal.id,
-    moonpieCommandReplyAlreadyClaimedRefNormal.default,
-  ],
-  [
-    moonpieCommandReplyAlreadyClaimedRefStar.id,
-    moonpieCommandReplyAlreadyClaimedRefStar.default,
-  ],
+export const moonpieCommandReply = [
+  moonpieCommandReplyAbout,
+  moonpieCommandReplyClaim,
+  moonpieCommandReplyAlreadyClaimed,
+  moonpieCommandReplyLeaderboardPrefix,
+  moonpieCommandReplyLeaderboardEntry,
+  moonpieCommandReplyAlreadyClaimedRefNormal,
+  moonpieCommandReplyAlreadyClaimedRefStar,
 ];
