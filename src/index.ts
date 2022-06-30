@@ -455,6 +455,7 @@ export const main = async (logger: Logger, configDir: string) => {
         ["USER", `${tags.username}`],
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         ["USER_ID", `${tags["user-id"]}`],
+        ["CHANNEL", channel.slice(1)],
       ])
     );
     pluginsChannel.set("USER", () => {
