@@ -27,9 +27,8 @@ export const pluginStreamCompanion = (
           "DIFFICULTY_RATING",
           `${
             streamCompanionData.mStars !== undefined
-              ? Math.round(
-                  streamCompanionData.mStars * 10000 + Number.EPSILON
-                ) / 100
+              ? Math.round(streamCompanionData.mStars * 100 + Number.EPSILON) /
+                100
               : undefined
           }`,
         ],
