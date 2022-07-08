@@ -8,6 +8,8 @@ A custom Twitch chat bot.
 
 ![MoonpieBot icon](res/icons/moonpiebot.png)
 
+**ATTENTION: You need a runtime that implements `fetch` which means you need for example [Node.js v18+](https://nodejs.org/ko/blog/announcements/v18-release-announce/).**
+
 - [Features](#features)
   - [Optional: osu!](#optional-osu)
   - [Optional: Spotify](#optional-spotify)
