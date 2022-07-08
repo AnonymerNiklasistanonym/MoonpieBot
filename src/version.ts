@@ -19,7 +19,7 @@ export const version: Version = {
   major: 1,
   minor: 0,
   patch: 12,
-  beta: true,
+  beta: false,
 };
 
 /**

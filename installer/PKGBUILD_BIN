@@ -3,7 +3,7 @@ _applicationname=moonpiebot
 #pkgname="$_applicationname"
 #pkgname="$_applicationname-git"
 pkgname="$_applicationname-bin"
-pkgver=1.0.11
+pkgver=1.0.12
 pkgrel=1
 pkgdesc='A custom Twitch chat bot'
 arch=('x86_64')
@@ -20,7 +20,7 @@ source=("$_applicationname.bin::$url/releases/download/v$pkgver/$_applicationnam
         "$_applicationname.svg::$url/releases/download/v$pkgver/$_applicationname.svg")
 #sha1sums=('SKIP')
 # Run the command 'sha1sum filename' to update them
-sha1sums=('4c3c10e72d8a77104a864291a938b0acb4ff2dda'
+sha1sums=('SKIP'
           'c3e267b66111aeeb73497c495623709c420eed87')
 # Don't strip the symbols from the downloaded binary file since this breaks it
 options=(!strip)
