@@ -16,6 +16,9 @@
     "directories": {
         "test": "test"
     },
+    "engines": {
+        "node": ">=18"
+    },
     "scripts": {
         "start": "node .",
         "start:dev": "cross-env NODE_PATH=./dist NODE_ENV=production node .",
