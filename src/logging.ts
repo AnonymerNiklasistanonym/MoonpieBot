@@ -52,6 +52,7 @@ export const createLogger = (
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             return `[${timestamp}] ${service} ${level}: ${message}`;
           }
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           return `${level}: ${message}`;
         }
       )
