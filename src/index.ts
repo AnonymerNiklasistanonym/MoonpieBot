@@ -1,7 +1,7 @@
 // Package imports
 import dotenv from "dotenv";
 import * as path from "path";
-import { mkdirSync, promises as fs } from "fs";
+import { mkdirSync } from "fs";
 import irc from "irc";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
@@ -72,15 +72,18 @@ import {
 } from "./messageParser/plugins/osu";
 import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
+import {
+  fileExists,
+  readJsonFile,
+  writeJsonFile,
+} from "./other/fileOperations";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
 
 // TODO Move to database tables so they can be changed on the fly
-const fileExists = async (path: string) =>
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  !!(await fs.stat(path).catch(() => false));
+
 export interface CustomTimerJson {
   name?: string;
   channels: string[];
@@ -88,6 +91,7 @@ export interface CustomTimerJson {
   cronString: string;
 }
 export interface CustomTimerDataJson {
+  $schema?: string;
   timers: CustomTimerJson[];
 }
 export interface CustomCommandJson {
@@ -99,6 +103,7 @@ export interface CustomCommandJson {
   userLevel?: "broadcaster" | "mod" | "vip" | "everyone";
 }
 export interface CustomCommandDataJson {
+  $schema?: string;
   commands: CustomCommandJson[];
 }
 
@@ -241,9 +246,8 @@ export const main = async (logger: Logger, configDir: string) => {
     if (await fileExists(pathCustomCommands)) {
       logger.info("Found custom command file");
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      const content = await fs.readFile(pathCustomCommands);
       const newCustomCommands = (
-        JSON.parse(content.toString()) as CustomCommandDataJson
+        await readJsonFile<CustomCommandDataJson>(pathCustomCommands)
       ).commands;
       for (const newCustomCommand of newCustomCommands) {
         logger.debug({
@@ -272,10 +276,8 @@ export const main = async (logger: Logger, configDir: string) => {
   try {
     if (await fileExists(pathCustomTimers)) {
       logger.info("Found custom timers file");
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      const content = await fs.readFile(pathCustomTimers);
       const newCustomTimers = (
-        JSON.parse(content.toString()) as CustomTimerDataJson
+        await readJsonFile<CustomTimerDataJson>(pathCustomTimers)
       ).timers;
       for (const newCustomTimer of newCustomTimers) {
         logger.info(
@@ -637,18 +639,10 @@ export const main = async (logger: Logger, configDir: string) => {
                 customCommand.count += 1;
               }
               // Save custom command counts to files
-              // eslint-disable-next-line security/detect-non-literal-fs-filename
-              fs.writeFile(
-                pathCustomCommands,
-                JSON.stringify(
-                  {
-                    $schema: "./customCommands.schema.json",
-                    commands: customCommands,
-                  },
-                  undefined,
-                  4
-                )
-              )
+              writeJsonFile<CustomCommandDataJson>(pathCustomCommands, {
+                $schema: "./customCommands.schema.json",
+                commands: customCommands,
+              })
                 .then(() => {
                   logger.info("Custom commands were saved");
                 })
