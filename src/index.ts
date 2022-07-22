@@ -382,6 +382,7 @@ export const main = async (logger: Logger, configDir: string) => {
     getEnvVariableValue(EnvVariable.TWITCH_CHANNELS)
       ?.split(" ")
       .filter((a) => a.trim().length !== 0),
+    false,
     logger
   );
   twitchClient.on("connecting", (address, port) => {

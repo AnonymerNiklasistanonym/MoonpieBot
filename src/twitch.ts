@@ -47,14 +47,17 @@ export interface CreateTwitchClientError extends Error {
  * @param twitchOAuthToken The authorization token to the Twitch account.
  * @param twitchChannels The Twitch channels that should be connected to.
  * @param logger Logger (used for logging).
+ * @param debug Print Twitch client debug output to the console.
  * @returns Twitch client.
  */
 export const createTwitchClient = (
   twitchName: string | undefined,
   twitchOAuthToken: string | undefined,
   twitchChannels: string[] | undefined,
+  debug = false,
   logger: Logger
 ): Client => {
+  // Throw an error if Twitch name,token or channels were not defined or empty
   if (twitchName === undefined) {
     const error = Error(
       "Could not create Twitch client: twitchName was undefined"
@@ -107,8 +110,9 @@ export const createTwitchClient = (
     section: LOG_ID_MODULE_TWITCH,
   });
 
+  // Create Twitch client that can listen to all specified channels
   const client: Client = new tmiClient({
-    options: { debug: true },
+    options: { debug },
     connection: {
       secure: true,
       reconnect: true,
