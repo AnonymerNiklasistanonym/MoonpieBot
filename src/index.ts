@@ -87,8 +87,6 @@ import type {
 } from "./other/customCommand";
 import type { CustomTimerDataJson, CustomTimerJson } from "./other/customTimer";
 
-// TODO Move to database tables so they can be changed on the fly
-
 /**
  * Main method that runs the bot.
  *
