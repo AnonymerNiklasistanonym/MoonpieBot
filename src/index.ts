@@ -741,6 +741,7 @@ if (isEntryPoint()) {
       // Get additional command line arguments
       // $ npm run start -- --argument
       // $ node . --argument
+      // $ programName --argument
       const commandLineArgs = process.argv.slice(2);
 
       // Catch CLI version request
