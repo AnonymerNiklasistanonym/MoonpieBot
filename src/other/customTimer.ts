@@ -7,6 +7,17 @@ import type { Logger } from "winston";
 import type { Macros, Plugins } from "../messageParser";
 import type { Strings } from "../strings";
 
+export interface CustomTimerJson {
+  name?: string;
+  channels: string[];
+  message: string;
+  cronString: string;
+}
+export interface CustomTimerDataJson {
+  $schema?: string;
+  timers: CustomTimerJson[];
+}
+
 export const registerTimer = (
   client: Client,
   channels: string[],

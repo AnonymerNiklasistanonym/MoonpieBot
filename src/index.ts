@@ -81,31 +81,13 @@ import {
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
 import type { StreamCompanionData } from "./streamcompanion";
+import type {
+  CustomCommandDataJson,
+  CustomCommandJson,
+} from "./other/customCommand";
+import type { CustomTimerDataJson, CustomTimerJson } from "./other/customTimer";
 
 // TODO Move to database tables so they can be changed on the fly
-
-export interface CustomTimerJson {
-  name?: string;
-  channels: string[];
-  message: string;
-  cronString: string;
-}
-export interface CustomTimerDataJson {
-  $schema?: string;
-  timers: CustomTimerJson[];
-}
-export interface CustomCommandJson {
-  name?: string;
-  channels: string[];
-  message: string;
-  regexString: string;
-  count?: number;
-  userLevel?: "broadcaster" | "mod" | "vip" | "everyone";
-}
-export interface CustomCommandDataJson {
-  $schema?: string;
-  commands: CustomCommandJson[];
-}
 
 /**
  * Main method that runs the bot.

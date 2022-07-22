@@ -23,6 +23,19 @@ const LOG_ID_COMMAND_CUSTOM_COMMAND = "custom_command";
  */
 const LOG_ID_MODULE_CUSTOM_COMMAND = "custom_command";
 
+export interface CustomCommandJson {
+  name?: string;
+  channels: string[];
+  message: string;
+  regexString: string;
+  count?: number;
+  userLevel?: "broadcaster" | "mod" | "vip" | "everyone";
+}
+export interface CustomCommandDataJson {
+  $schema?: string;
+  commands: CustomCommandJson[];
+}
+
 export const checkCustomCommand = async (
   client: Client,
   channel: string,
