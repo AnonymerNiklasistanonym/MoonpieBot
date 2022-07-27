@@ -75,20 +75,34 @@ export enum EnvVariableBlocks {
 
 export const printEnvVariablesToConsole = (censor = true) => {
   for (const envVariable in EnvVariable) {
-    const envVariableName = `${envVariablePrefix}${envVariable.toString()}`;
     // eslint-disable-next-line security/detect-object-injection
-    const envVariableValue = process.env[envVariableName];
+    const envVariableName = getEnvVariableName(envVariable);
+    const envVariableValue = getEnvVariableValue(envVariable);
+    let legacyString = undefined;
 
     const envVariableInformation = getEnvVariableValueInformation(envVariable);
     let envVariableValueString = "Not found!";
-    if (envVariableValue !== undefined) {
-      envVariableValueString = `"${envVariableValue}"`;
+    if (envVariableValue.value !== undefined) {
+      envVariableValueString = `"${envVariableValue.value}"`;
       if (censor && envVariableInformation.censor) {
         // Censor secret variables per default
         envVariableValueString = "*******[secret]********";
       }
-      if (envVariableValue.length === 0) {
+      if (envVariableValue.value.length === 0) {
         envVariableValueString = "Empty string!";
+      }
+
+      // Add note if the value was derived via a legacy variable
+      if (envVariableValue.legacy) {
+        if (envVariableValue.envVariableName === undefined) {
+          throw Error("No ENV variable name found while a value was given");
+        }
+        const legacyEnvVariableName = getEnvVariableName(
+          envVariableValue.envVariableName
+        );
+        legacyString =
+          "THE VALUE WAS DERIVED FROM A DEPRECATED NAME!\n" +
+          `Please change the name '${legacyEnvVariableName}'\nto '${envVariableName}'`;
       }
     } else if (envVariableInformation.default !== undefined) {
       envVariableValueString += ` (default="${envVariableInformation.default}")`;
@@ -100,27 +114,58 @@ export const printEnvVariablesToConsole = (censor = true) => {
       envVariableValueString += " (NECESSARY!)";
     }
 
-    console.log(
-      `${envVariablePrefix}${envVariable.toString()}=${envVariableValueString}`
-    );
+    console.log(`${envVariableName}=${envVariableValueString}`);
+    if (legacyString !== undefined) {
+      const legacyStrings = legacyString.split("\n");
+      console.log(`\tWARNING: ${legacyStrings[0]}`);
+      for (const legacyStringParts of legacyStrings.slice(1)) {
+        console.log(`\t> ${legacyStringParts}`);
+      }
+    }
   }
 };
 
+export interface EnvVariableValue {
+  /** Undefined if not found. */
+  value: string | undefined;
+  /** The name of the ENV variable if a value was found. */
+  envVariableName: string | undefined;
+  /** True if the variable was derived from a legacy variable name. */
+  legacy?: boolean;
+}
+
 export const getEnvVariableValue = (
-  envVariable: EnvVariable
-): string | undefined => {
-  return process.env[getEnvVariableName(envVariable)];
+  envVariable: EnvVariable | string
+): EnvVariableValue => {
+  const value = process.env[getEnvVariableName(envVariable)];
+  if (value === undefined) {
+    // Check legacy values
+    const envVariableInformation = getEnvVariableValueInformation(envVariable);
+    if (envVariableInformation.legacyNames !== undefined) {
+      for (const legacyName of envVariableInformation.legacyNames) {
+        const legacyValue = process.env[getEnvVariableName(legacyName)];
+        if (legacyValue !== undefined) {
+          return {
+            value: legacyValue,
+            legacy: true,
+            envVariableName: legacyName,
+          };
+        }
+      }
+    }
+  }
+  return { value, envVariableName: envVariable.toString() };
 };
 
 export const getEnvVariableValueOrCustomDefault = <T>(
   envVariable: EnvVariable,
   defaultValue: T
 ): string | T => {
-  const value = process.env[getEnvVariableName(envVariable)];
-  if (value === undefined || value.trim().length === 0) {
+  const envValue = getEnvVariableValue(envVariable);
+  if (envValue.value === undefined || envValue.value.trim().length === 0) {
     return defaultValue;
   }
-  return value;
+  return envValue.value;
 };
 
 export interface EnvVariableValueInformation {
@@ -132,6 +177,10 @@ export interface EnvVariableValueInformation {
   block: EnvVariableBlocks;
   necessary?: boolean;
   censor?: boolean;
+  /**
+   * Legacy names of the variable to be compatible with older configurations.
+   */
+  legacyNames?: string[];
 }
 
 export const EMPTY_OPTION_LIST_VALUE_NONE = "none";
@@ -163,6 +212,7 @@ export const getEnvVariableValueInformation = (
         ),
         description: "The directory file path of the log files",
         block: EnvVariableBlocks.LOGGING,
+        legacyNames: ["DIR_LOGS"],
       };
     case EnvVariable.LOGGING_FILE_LOG_LEVEL:
       return {
@@ -171,6 +221,7 @@ export const getEnvVariableValueInformation = (
           "The log level of the log messages that are written to the log files.",
         supportedValues: ["error", "warn", "debug", "info"],
         block: EnvVariableBlocks.LOGGING,
+        legacyNames: ["FILE_LOG_LEVEL"],
       };
 
     case EnvVariable.TWITCH_CHANNELS:
@@ -180,6 +231,7 @@ export const getEnvVariableValueInformation = (
           "A with a space separated list of all the channels the bot should be active.",
         block: EnvVariableBlocks.TWITCH,
         necessary: true,
+        legacyNames: ["TWITCH_CHANNEL"],
       };
     case EnvVariable.TWITCH_NAME:
       return {
@@ -215,6 +267,7 @@ export const getEnvVariableValueInformation = (
         ],
         description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
         block: EnvVariableBlocks.MOONPIE,
+        legacyNames: ["ENABLE_COMMANDS"],
       };
     case EnvVariable.MOONPIE_DATABASE_PATH:
       return {
@@ -228,6 +281,7 @@ export const getEnvVariableValueInformation = (
         description:
           "The database file path that contains the persistent moonpie data.",
         block: EnvVariableBlocks.MOONPIE,
+        legacyNames: ["DB_FILEPATH"],
       };
     case EnvVariable.MOONPIE_COOLDOWN_HOURS:
       return {
@@ -257,6 +311,7 @@ export const getEnvVariableValueInformation = (
           "The osu! client ID (and client secret) to use the osu! api v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).",
         block: EnvVariableBlocks.OSU_API,
         censor: true,
+        legacyNames: ["OSU_CLIENT_ID"],
       };
     case EnvVariable.OSU_API_CLIENT_SECRET:
       return {
@@ -264,6 +319,7 @@ export const getEnvVariableValueInformation = (
         description: `Check the description of ${envVariablePrefix}${EnvVariable.OSU_API_CLIENT_ID}.`,
         block: EnvVariableBlocks.OSU_API,
         censor: true,
+        legacyNames: ["OSU_CLIENT_SECRET"],
       };
     case EnvVariable.OSU_API_DEFAULT_ID:
       return {
@@ -271,6 +327,7 @@ export const getEnvVariableValueInformation = (
         description:
           "The default osu! account ID used to check for recent play or a top play on a map.",
         block: EnvVariableBlocks.OSU_API,
+        legacyNames: ["OSU_DEFAULT_ID"],
       };
     case EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS:
       return {
@@ -279,6 +336,7 @@ export const getEnvVariableValueInformation = (
         description:
           "Automatically recognize beatmap links (=requests) in chat.",
         block: EnvVariableBlocks.OSU_API,
+        legacyNames: ["OSU_RECOGNIZE_MAP_REQUESTS"],
       };
     case EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED:
       return {
@@ -286,6 +344,7 @@ export const getEnvVariableValueInformation = (
         supportedValues: ["ON", "OFF"],
         description: `If recognizing is enabled (${envVariablePrefix}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=ON) additionally output more detailed information about the map in the chat.`,
         block: EnvVariableBlocks.OSU_API,
+        legacyNames: ["OSU_RECOGNIZE_MAP_REQUESTS_DETAILED"],
       };
 
     case EnvVariable.OSU_IRC_PASSWORD:
@@ -391,7 +450,9 @@ export const getEnvVariableValueOrDefault = (
   return value;
 };
 
-export const getEnvVariableName = (envVariable: EnvVariable): string => {
+export const getEnvVariableName = (
+  envVariable: EnvVariable | string
+): string => {
   return `${envVariablePrefix}${envVariable.toString()}`;
 };
 
@@ -514,7 +575,9 @@ export const writeEnvVariableDocumentation = async (path: string) => {
             envVariableInfo.supportedValues &&
             envVariableInfo.supportedValues.length > 0
           ) {
-            envVariableEntry.properties = [];
+            if (envVariableEntry.properties === undefined) {
+              envVariableEntry.properties = [];
+            }
             envVariableEntry.properties.push([
               "Supported values",
               envVariableInfo.supportedValues.join(", "),
@@ -535,6 +598,19 @@ export const writeEnvVariableDocumentation = async (path: string) => {
             envVariableEntry.isComment = !envVariableInfo.necessary;
           } else {
             envVariableEntry.value = `ERROR`;
+          }
+
+          if (
+            envVariableInfo.legacyNames &&
+            envVariableInfo.legacyNames.length > 0
+          ) {
+            if (envVariableEntry.properties === undefined) {
+              envVariableEntry.properties = [];
+            }
+            envVariableEntry.properties.push([
+              `Legacy name${envVariableInfo.legacyNames.length > 1 ? "s" : ""}`,
+              envVariableInfo.legacyNames.map(getEnvVariableName).join(", "),
+            ]);
           }
           data.push(envVariableEntry);
         }

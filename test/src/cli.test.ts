@@ -67,25 +67,25 @@ describe("cli", () => {
 
   it("getCliVariableValue", () => {
     chai
-      .expect(getEnvVariableValue(EnvVariable.LOGGING_DIRECTORY_PATH))
+      .expect(getEnvVariableValue(EnvVariable.LOGGING_DIRECTORY_PATH).value)
       .to.be.equal("logs_expected");
     chai
-      .expect(getEnvVariableValue(EnvVariable.LOGGING_CONSOLE_LOG_LEVEL))
+      .expect(getEnvVariableValue(EnvVariable.LOGGING_CONSOLE_LOG_LEVEL).value)
       .to.be.equal("console_info_expected");
     chai
-      .expect(getEnvVariableValue(EnvVariable.LOGGING_FILE_LOG_LEVEL))
+      .expect(getEnvVariableValue(EnvVariable.LOGGING_FILE_LOG_LEVEL).value)
       .to.be.equal("file_info_expected");
     chai
-      .expect(getEnvVariableValue(EnvVariable.TWITCH_NAME))
+      .expect(getEnvVariableValue(EnvVariable.TWITCH_NAME).value)
       .to.be.equal("twitchName_expected");
     chai
-      .expect(getEnvVariableValue(EnvVariable.TWITCH_OAUTH_TOKEN))
+      .expect(getEnvVariableValue(EnvVariable.TWITCH_OAUTH_TOKEN).value)
       .to.be.equal("twitchOAuthToken_expected");
     chai
-      .expect(getEnvVariableValue(EnvVariable.TWITCH_CHANNELS))
+      .expect(getEnvVariableValue(EnvVariable.TWITCH_CHANNELS).value)
       .to.be.equal("twitchChannels_expected");
     chai
-      .expect(getEnvVariableValue(EnvVariable.MOONPIE_DATABASE_PATH))
+      .expect(getEnvVariableValue(EnvVariable.MOONPIE_DATABASE_PATH).value)
       .to.be.equal("dbFilepath_expected");
 
     sandbox.stub(process, "env").value({
@@ -93,7 +93,7 @@ describe("cli", () => {
     });
 
     chai
-      .expect(getEnvVariableValue(EnvVariable.TWITCH_CHANNELS))
+      .expect(getEnvVariableValue(EnvVariable.TWITCH_CHANNELS).value)
       .to.be.equal(undefined);
   });
 

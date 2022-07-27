@@ -16,7 +16,6 @@ import { name } from "./info";
 import { getVersion } from "./version";
 import {
   EnvVariable,
-  getEnvVariableValue,
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrCustomDefault,
   printEnvVariablesToConsole,
@@ -376,12 +375,24 @@ export const main = async (logger: Logger, configDir: string) => {
   }
 
   // Create TwitchClient and listen to certain events
+  const twitchName = getEnvVariableValueOrCustomDefault(
+    EnvVariable.TWITCH_NAME,
+    undefined
+  );
+  const twitchOAuthToken = getEnvVariableValueOrCustomDefault(
+    EnvVariable.TWITCH_OAUTH_TOKEN,
+    undefined
+  );
+  const twitchChannels = getEnvVariableValueOrCustomDefault(
+    EnvVariable.TWITCH_CHANNELS,
+    undefined
+  );
+  // If any of the variables are undefined the client creation method will
+  // throw an error
   const twitchClient = createTwitchClient(
-    getEnvVariableValue(EnvVariable.TWITCH_NAME),
-    getEnvVariableValue(EnvVariable.TWITCH_OAUTH_TOKEN),
-    getEnvVariableValue(EnvVariable.TWITCH_CHANNELS)
-      ?.split(" ")
-      .filter((a) => a.trim().length !== 0),
+    twitchName,
+    twitchOAuthToken,
+    twitchChannels?.split(" ").filter((a) => a.trim().length !== 0),
     false,
     logger
   );
