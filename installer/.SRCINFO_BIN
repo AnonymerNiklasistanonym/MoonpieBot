@@ -1,6 +1,6 @@
 pkgbase = moonpiebot-bin
 	pkgdesc = A custom Twitch chat bot
-	pkgver = 1.0.12
+	pkgver = 1.0.13
 	pkgrel = 1
 	url = https://github.com/AnonymerNiklasistanonym/MoonpieBot
 	arch = x86_64
@@ -10,8 +10,8 @@ pkgbase = moonpiebot-bin
 	conflicts = moonpiebot-bin
 	conflicts = moonpiebot-git
 	options = !strip
-	source = moonpiebot.bin::https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases/download/v1.0.12/moonpiebot-v1.0.12-linux64-node-18
-	source = moonpiebot.svg::https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases/download/v1.0.12/moonpiebot.svg
+	source = moonpiebot.bin::https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases/download/v1.0.13/moonpiebot-v1.0.13-linux64-node-18
+	source = moonpiebot.svg::https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases/download/v1.0.13/moonpiebot.svg
 	sha1sums = SKIP
 	sha1sums = c3e267b66111aeeb73497c495623709c420eed87
 
