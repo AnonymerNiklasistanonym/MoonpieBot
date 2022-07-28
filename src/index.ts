@@ -89,6 +89,15 @@ import type { CustomTimerDataJson, CustomTimerJson } from "./other/customTimer";
 /**
  * Main method that runs the bot.
  *
+ * ```mermaid
+ * graph TB
+ *   a["get environment variable values"] --> b;
+ *   b["initialize global objects/variables"] --> c;
+ *   c["initialize database"] --> d;
+ *   d["initialize message parser"] --> e;
+ *   e["connect bot logic with Twitch triggers"] --> f["initialize timers"];
+ * ```
+ *
  * @param logger Logger (used for logging).
  * @param configDir The directory in which all configurations are contained.
  */
