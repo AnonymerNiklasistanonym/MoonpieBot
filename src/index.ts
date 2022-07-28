@@ -797,6 +797,7 @@ if (isEntryPoint()) {
       try {
         logger.info(`${name} ${getVersion()} was started (logs: '${logDir}')`);
         logger.debug(`Config directory: '${configDir}'`);
+        logger.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
         await main(logger, configDir);
         logger.debug(`${name} was closed`);
       } catch (err) {
