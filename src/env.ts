@@ -34,8 +34,11 @@ export enum EnvVariable {
   TWITCH_CHANNELS = "TWITCH_CHANNELS",
   TWITCH_NAME = "TWITCH_NAME",
   TWITCH_OAUTH_TOKEN = "TWITCH_OAUTH_TOKEN",
+  /** Disable/Enable !moonpie commands. */
   MOONPIE_ENABLE_COMMANDS = "MOONPIE_ENABLE_COMMANDS",
+  /** The path to the moonpie database. */
   MOONPIE_DATABASE_PATH = "MOONPIE_DATABASE_PATH",
+  /** The amount of hours between which no moonpie can be claimed. */
   MOONPIE_COOLDOWN_HOURS = "MOONPIE_COOLDOWN_HOURS",
   OSU_API_CLIENT_ID = "OSU_API_CLIENT_ID",
   OSU_API_CLIENT_SECRET = "OSU_API_CLIENT_SECRET",
@@ -167,6 +170,15 @@ export const getEnvVariableValueOrCustomDefault = <T>(
   }
   return envValue.value;
 };
+export const getEnvVariableValueOrUndefined = (
+  envVariable: EnvVariable
+): string | undefined => {
+  const envValue = getEnvVariableValue(envVariable);
+  if (envValue.value === undefined || envValue.value.trim().length === 0) {
+    return undefined;
+  }
+  return envValue.value;
+};
 
 export interface EnvVariableValueInformation {
   default?: string;
@@ -189,7 +201,7 @@ export const ENABLE_COMMANDS_DEFAULT_DESCRIPTION = `You can provide a list of co
 
 export const getEnvVariableValueInformation = (
   envVariable: EnvVariable | string,
-  configDir?: string
+  configDir = pathToRootDir
 ): EnvVariableValueInformation => {
   switch (envVariable) {
     case EnvVariable.LOGGING_CONSOLE_LOG_LEVEL:
@@ -202,14 +214,8 @@ export const getEnvVariableValueInformation = (
       };
     case EnvVariable.LOGGING_DIRECTORY_PATH:
       return {
-        default: path.relative(
-          configDir ? configDir : pathToRootDir,
-          path.join(configDir ? configDir : pathToRootDir, "logs")
-        ),
-        defaultValue: path.resolve(
-          configDir ? configDir : pathToRootDir,
-          "logs"
-        ),
+        default: path.relative(configDir, path.join(configDir, "logs")),
+        defaultValue: path.resolve(configDir, "logs"),
         description: "The directory file path of the log files",
         block: EnvVariableBlocks.LOGGING,
         legacyNames: ["DIR_LOGS"],
@@ -271,13 +277,8 @@ export const getEnvVariableValueInformation = (
       };
     case EnvVariable.MOONPIE_DATABASE_PATH:
       return {
-        default: path.relative(
-          configDir ? configDir : pathToRootDir,
-          path.join(configDir ? configDir : pathToRootDir, "moonpie.db")
-        ),
-        defaultValue: path.resolve(
-          path.join(configDir ? configDir : pathToRootDir, "moonpie.db")
-        ),
+        default: path.relative(configDir, path.join(configDir, "moonpie.db")),
+        defaultValue: path.resolve(path.join(configDir, "moonpie.db")),
         description:
           "The database file path that contains the persistent moonpie data.",
         block: EnvVariableBlocks.MOONPIE,
@@ -429,9 +430,17 @@ export const getEnvVariableValueInformation = (
   throw Error(`The Cli variable ${envVariable} has no information`);
 };
 
+/**
+ * Get the value of an environment variable or if not found a default value.
+ * If the value is a (relative) path a configuration directory path needs to be supplied to get the correct value.
+ *
+ * @param envVariable The environment variable.
+ * @param configDir The configuration directory for correct relative file paths.
+ * @returns The value or default value of the environment variable.
+ */
 export const getEnvVariableValueOrDefault = (
   envVariable: EnvVariable,
-  configDir?: string
+  configDir = pathToRootDir
 ) => {
   const value = process.env[getEnvVariableName(envVariable)];
   if (value === undefined || value.trim().length === 0) {
@@ -450,6 +459,12 @@ export const getEnvVariableValueOrDefault = (
   return value;
 };
 
+/**
+ * Get the actual name of the environment variable.
+ *
+ * @param envVariable The environment variable.
+ * @returns The actual name of the environment variable.
+ */
 export const getEnvVariableName = (
   envVariable: EnvVariable | string
 ): string => {

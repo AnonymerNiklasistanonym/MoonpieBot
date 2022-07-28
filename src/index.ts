@@ -17,9 +17,9 @@ import { getVersion } from "./version";
 import {
   EnvVariable,
   getEnvVariableValueOrDefault,
-  getEnvVariableValueOrCustomDefault,
   printEnvVariablesToConsole,
   writeEnvVariableDocumentation,
+  getEnvVariableValueOrUndefined,
 } from "./env";
 import { checkCustomCommand } from "./other/customCommand";
 import { registerTimer } from "./other/customTimer";
@@ -96,13 +96,29 @@ export const main = async (logger: Logger, configDir: string) => {
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 
-  const databasePath = path.resolve(
+  // Read in necessary paths/values from environment variables
+  // Twitch connection
+  const twitchName = getEnvVariableValueOrUndefined(EnvVariable.TWITCH_NAME);
+  const twitchOAuthToken = getEnvVariableValueOrUndefined(
+    EnvVariable.TWITCH_OAUTH_TOKEN
+  );
+  const twitchChannels = getEnvVariableValueOrUndefined(
+    EnvVariable.TWITCH_CHANNELS
+  );
+  // Twitch API
+  const twitchApiClientId = getEnvVariableValueOrUndefined(
+    EnvVariable.TWITCH_API_CLIENT_ID
+  );
+  const twitchApiAccessToken = getEnvVariableValueOrUndefined(
+    EnvVariable.TWITCH_API_ACCESS_TOKEN
+  );
+  // > Moonpie
+  const pathDatabase = path.resolve(
     configDir,
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
   const moonpieCooldownHoursString = getEnvVariableValueOrDefault(
-    EnvVariable.MOONPIE_COOLDOWN_HOURS,
-    configDir
+    EnvVariable.MOONPIE_COOLDOWN_HOURS
   );
   let moonpieCooldownHoursNumber: number;
   try {
@@ -112,19 +128,67 @@ export const main = async (logger: Logger, configDir: string) => {
       `The moonpie cooldown hours number string could not be parsed (${moonpieCooldownHoursString})`
     );
   }
+  // > Spotify API
+  const spotifyApiClientId = getEnvVariableValueOrUndefined(
+    EnvVariable.SPOTIFY_API_CLIENT_ID
+  );
+  const spotifyApiClientSecret = getEnvVariableValueOrUndefined(
+    EnvVariable.SPOTIFY_API_CLIENT_SECRET
+  );
+  const spotifyApiRefreshToken = getEnvVariableValueOrUndefined(
+    EnvVariable.SPOTIFY_API_REFRESH_TOKEN
+  );
+  // > osu! API
+  const osuApiClientId = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_CLIENT_ID
+  );
+  const osuApiClientSecret = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_CLIENT_SECRET
+  );
+  const osuApiDefaultId = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_DEFAULT_ID
+  );
+  const osuApiBeatmapRequests = getEnvVariableValueOrDefault(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS
+  );
+  const osuApiBeatmapRequestsDetailed = getEnvVariableValueOrDefault(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED
+  );
+  const osuIrcPassword = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_IRC_PASSWORD
+  );
+  const osuIrcUsername = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_IRC_USERNAME
+  );
+  const osuIrcRequestTarget = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_IRC_REQUEST_TARGET
+  );
+  // > osu! StreamCompanion
+  const osuStreamCompanionUrl = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_STREAM_COMPANION_URL
+  );
 
-  const spotifyApiClientId = getEnvVariableValueOrCustomDefault(
-    EnvVariable.SPOTIFY_API_CLIENT_ID,
-    undefined
+  // Initialize global objects
+  // Twitch connection
+  const twitchClient = createTwitchClient(
+    twitchName,
+    twitchOAuthToken,
+    twitchChannels?.split(" ").filter((a) => a.trim().length !== 0),
+    false,
+    logger
   );
-  const spotifyApiClientSecret = getEnvVariableValueOrCustomDefault(
-    EnvVariable.SPOTIFY_API_CLIENT_SECRET,
-    undefined
-  );
-  const spotifyApiRefreshToken = getEnvVariableValueOrCustomDefault(
-    EnvVariable.SPOTIFY_API_REFRESH_TOKEN,
-    undefined
-  );
+  // Twitch API
+  let twitchApiClient: undefined | ApiClient = undefined;
+  if (twitchApiClientId !== undefined && twitchApiAccessToken !== undefined) {
+    const authProviderScopes = new StaticAuthProvider(
+      twitchApiClientId,
+      twitchApiAccessToken
+    );
+    twitchApiClient = new ApiClient({
+      authProvider: authProviderScopes,
+    });
+  }
+  // > Spotify API
   let spotifyWebApi: undefined | SpotifyWebApi = undefined;
   if (
     spotifyApiClientId !== undefined &&
@@ -137,65 +201,36 @@ export const main = async (logger: Logger, configDir: string) => {
       logger
     );
   }
-
-  const osuApiClientId = getEnvVariableValueOrCustomDefault(
-    EnvVariable.OSU_API_CLIENT_ID,
-    undefined
-  );
-  const osuApiClientSecret = getEnvVariableValueOrCustomDefault(
-    EnvVariable.OSU_API_CLIENT_SECRET,
-    undefined
-  );
-  const osuApiDefaultId = getEnvVariableValueOrCustomDefault(
-    EnvVariable.OSU_API_DEFAULT_ID,
-    undefined
-  );
+  // > osu! API
   const enableOsu =
     osuApiClientId !== undefined &&
     osuApiClientSecret !== undefined &&
     osuApiDefaultId !== undefined;
-  const enableOsuBeatmapRequests =
-    getEnvVariableValueOrDefault(EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS) ===
-    "ON";
-  const enableOsuBeatmapRequestsDetailed =
-    getEnvVariableValueOrDefault(
-      EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED
-    ) === "ON";
-  const osuIrcPassword = getEnvVariableValueOrCustomDefault(
-    EnvVariable.OSU_IRC_PASSWORD,
-    undefined
-  );
-  const osuIrcUsername = getEnvVariableValueOrCustomDefault(
-    EnvVariable.OSU_IRC_USERNAME,
-    undefined
-  );
-  const osuIrcRequestTarget = getEnvVariableValueOrCustomDefault(
-    EnvVariable.OSU_IRC_REQUEST_TARGET,
-    undefined
-  );
   const enableOsuIrc =
     osuIrcPassword !== undefined &&
     osuIrcUsername !== undefined &&
     osuIrcRequestTarget !== undefined;
-
-  let osuIrcBot: (() => irc.Client) | undefined = undefined;
+  const enableOsuBeatmapRequests = osuApiBeatmapRequests === "ON";
+  const enableOsuBeatmapRequestsDetailed =
+    osuApiBeatmapRequestsDetailed === "ON";
+  let osuIrcBot: undefined | (() => irc.Client) = undefined;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
     osuIrcBot = () =>
       createOsuIrcConnection(osuIrcUsername, osuIrcPassword, logger);
   }
-  const osuStreamCompanionUrl = getEnvVariableValueOrCustomDefault(
-    EnvVariable.OSU_STREAM_COMPANION_URL,
-    undefined
-  );
+  // > osu! StreamCompanion
   let osuStreamCompanionCurrentMapData:
-    | (() => StreamCompanionData | undefined)
-    | undefined = undefined;
+    | undefined
+    | (() => StreamCompanionData | undefined) = undefined;
   if (osuStreamCompanionUrl !== undefined) {
     osuStreamCompanionCurrentMapData = createStreamCompanionConnection(
       osuStreamCompanionUrl,
       logger
     );
   }
+
+  // Print to console information about certain things that were enabled
+  // > osu!
   if (!enableOsu && osuStreamCompanionCurrentMapData !== undefined) {
     logger.info(
       "Osu features besides the StreamCompanion integration are disabled since not all variables were set"
@@ -271,32 +306,8 @@ export const main = async (logger: Logger, configDir: string) => {
     logger.error(err);
   }
 
-  await moonpieDbSetupTables(databasePath, logger);
-
-  const twitchApiClientId = getEnvVariableValueOrCustomDefault(
-    EnvVariable.TWITCH_API_CLIENT_ID,
-    undefined
-  );
-  const twitchApiAccessToken = getEnvVariableValueOrCustomDefault(
-    EnvVariable.TWITCH_API_ACCESS_TOKEN,
-    undefined
-  );
-  const enableTwitchApiCalls =
-    twitchApiClientId !== undefined && twitchApiAccessToken !== undefined;
-  let twitchApiClient: ApiClient | undefined = undefined;
-  if (!enableTwitchApiCalls) {
-    logger.info(
-      "Twitch API features are disabled since not all variables were set"
-    );
-  } else {
-    const authProviderScopes = new StaticAuthProvider(
-      twitchApiClientId,
-      twitchApiAccessToken
-    );
-    twitchApiClient = new ApiClient({
-      authProvider: authProviderScopes,
-    });
-  }
+  // Setup database tables (or do nothing if they already exist)
+  await moonpieDbSetupTables(pathDatabase, logger);
 
   // Setup message parser
   const pluginsList = [
@@ -374,28 +385,7 @@ export const main = async (logger: Logger, configDir: string) => {
     plugins.set(pluginSpotifyReady.id, pluginSpotifyReady.func);
   }
 
-  // Create TwitchClient and listen to certain events
-  const twitchName = getEnvVariableValueOrCustomDefault(
-    EnvVariable.TWITCH_NAME,
-    undefined
-  );
-  const twitchOAuthToken = getEnvVariableValueOrCustomDefault(
-    EnvVariable.TWITCH_OAUTH_TOKEN,
-    undefined
-  );
-  const twitchChannels = getEnvVariableValueOrCustomDefault(
-    EnvVariable.TWITCH_CHANNELS,
-    undefined
-  );
-  // If any of the variables are undefined the client creation method will
-  // throw an error
-  const twitchClient = createTwitchClient(
-    twitchName,
-    twitchOAuthToken,
-    twitchChannels?.split(" ").filter((a) => a.trim().length !== 0),
-    false,
-    logger
-  );
+  // Connect functionality to Twitch connection triggers
   twitchClient.on("connecting", (address, port) => {
     // Triggers when the client is connecting to Twitch
     logger.info(`Connecting to Twitch: ${address}:${port}`);
@@ -472,7 +462,7 @@ export const main = async (logger: Logger, configDir: string) => {
       channel,
       tags,
       message,
-      databasePath,
+      pathDatabase,
       moonpieCooldownHoursNumber,
       getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS)?.split(
         ","
@@ -663,7 +653,7 @@ export const main = async (logger: Logger, configDir: string) => {
   });
 
   process.on("SIGINT", () => {
-    // When the process is being force closed catch that and close safely
+    // When the process is being force closed catch that and close "safely"
     logger.info("SIGINT was detected");
     process.exit();
   });
