@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import { logTwitchMessageBroadcast } from "../logging";
+import { logTwitchMessageBroadcast } from "../twitch";
 import { messageParser } from "../messageParser";
 // Type imports
 import type { Client } from "tmi.js";

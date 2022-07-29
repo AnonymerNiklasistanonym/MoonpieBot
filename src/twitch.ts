@@ -126,3 +126,99 @@ export const createTwitchClient = (
 
   return client;
 };
+
+/**
+ * Additional information for Twitch logs.
+ */
+export interface LogTwitchMessageOptions {
+  subsection?: string;
+}
+
+/**
+ * Log a Twitch message.
+ *
+ * @param logger The global logger.
+ * @param message The message to log.
+ * @param options Additional information like a subsection.
+ */
+export const logTwitchMessage = (
+  logger: Logger,
+  message: string,
+  options?: LogTwitchMessageOptions
+) => {
+  logger.log({
+    level: "debug",
+    message: message,
+    section: "twitch_message",
+    subsection: options?.subsection,
+  });
+};
+
+/**
+ * Log a Twitch message reply.
+ *
+ * @param logger The global logger.
+ * @param messageId The ID of the message that is replied to.
+ * @param sentMessage The sent message information.
+ * @param replySourceId The ID of the reply source.
+ */
+export const logTwitchMessageReply = (
+  logger: Logger,
+  messageId: string,
+  sentMessage: string[],
+  replySourceId: string
+) => {
+  logTwitchMessage(
+    logger,
+    `Successfully replied to message ${messageId}: '${JSON.stringify(
+      sentMessage
+    )}'`,
+    { subsection: replySourceId }
+  );
+};
+
+/**
+ * Log a Twitch broadcast message.
+ *
+ * @param logger The global logger.
+ * @param sentMessage The sent message information.
+ * @param broadcastSourceId The ID of the broadcast source.
+ */
+export const logTwitchMessageBroadcast = (
+  logger: Logger,
+  sentMessage: string[],
+  broadcastSourceId: string
+) => {
+  logTwitchMessage(
+    logger,
+    `Successfully broadcasted: '${JSON.stringify(sentMessage)}'`,
+    {
+      subsection: broadcastSourceId,
+    }
+  );
+};
+
+/**
+ * Log a detected command in a  Twitch message.
+ *
+ * @param logger The global logger.
+ * @param messageId The ID of the message that is replied to.
+ * @param message The message that something was detected in.
+ * @param detectionReason What was detected.
+ * @param detectorSourceId The ID of the detection source.
+ */
+export const logTwitchMessageDetected = (
+  logger: Logger,
+  messageId: string,
+  message: string[],
+  detectionReason: string,
+  detectorSourceId: string
+) => {
+  logTwitchMessage(
+    logger,
+    `Detected ${detectionReason} in message ${messageId}: ${JSON.stringify(
+      message
+    )}`,
+    { subsection: detectorSourceId }
+  );
+};

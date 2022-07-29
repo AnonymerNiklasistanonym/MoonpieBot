@@ -1,4 +1,4 @@
-import { logTwitchMessageDetected, logTwitchMessageReply } from "./logging";
+import { logTwitchMessageDetected, logTwitchMessageReply } from "./twitch";
 // Type imports
 import type { Logger } from "winston";
 

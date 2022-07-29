@@ -2,13 +2,20 @@ import {
   createLogger as createWinstonLogger,
   transports,
   format,
-  Logger,
 } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 import { name } from "./info";
 
+/**
+ * The default log levels of the logger.
+ */
+export type LoggerLevel = "error" | "warn" | "debug" | "info";
+
+/**
+ * The information the logger stores.
+ */
 export interface LoggerInformation {
-  level: string;
+  level: LoggerLevel | string;
   message: string;
   timestamp?: string;
   service?: string;
@@ -16,11 +23,18 @@ export interface LoggerInformation {
   subsection?: string;
 }
 
-// "error" | "warn" | "debug" | "info"
+/**
+ * Create a global logger.
+ *
+ * @param logDir The directory to log to.
+ * @param logLevelConsole The log level of the console logger.
+ * @param logLevelFile The log level of the file logger.
+ * @returns Logger.
+ */
 export const createLogger = (
   logDir: string,
-  logLevelConsole = "info",
-  logLevelFile = "debug"
+  logLevelConsole: LoggerLevel | string = "info",
+  logLevelFile: LoggerLevel | string = "debug"
 ) => {
   return createWinstonLogger({
     exitOnError: false,
@@ -38,88 +52,21 @@ export const createLogger = (
     ],
     format: format.combine(
       format.timestamp(),
-      format.printf(
-        ({ timestamp, level, message, service, section, subsection }) => {
-          if (timestamp !== undefined && service !== undefined) {
-            if (section !== undefined) {
-              if (subsection !== undefined) {
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                return `[${timestamp}] ${service}#${section}#${subsection} ${level}: ${message}`;
-              }
-              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              return `[${timestamp}] ${service}#${section} ${level}: ${message}`;
+      format.printf((logInfo: LoggerInformation) => {
+        if (logInfo.timestamp !== undefined && logInfo.service !== undefined) {
+          if (logInfo.section !== undefined) {
+            if (logInfo.subsection !== undefined) {
+              return `[${logInfo.timestamp}] ${logInfo.service}#${logInfo.section}#${logInfo.subsection} ${logInfo.level}: ${logInfo.message}`;
             }
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            return `[${timestamp}] ${service} ${level}: ${message}`;
+            return `[${logInfo.timestamp}] ${logInfo.service}#${logInfo.section} ${logInfo.level}: ${logInfo.message}`;
           }
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          return `${level}: ${message}`;
+          return `[${logInfo.timestamp}] ${logInfo.service} ${logInfo.level}: ${logInfo.message}`;
         }
-      )
+        return `${logInfo.level}: ${logInfo.message}`;
+      })
     ),
     defaultMeta: {
       service: `${name}`,
     },
   });
-};
-
-export interface LogTwitchMessageOptions {
-  subsection?: string;
-}
-
-export const logTwitchMessage = (
-  logger: Logger,
-  message: string,
-  options?: LogTwitchMessageOptions
-) => {
-  logger.log({
-    level: "debug",
-    message: message,
-    section: "twitch_message",
-    subsection: options?.subsection,
-  });
-};
-
-export const logTwitchMessageReply = (
-  logger: Logger,
-  messageId: string,
-  sentMessage: string[],
-  replyId: string
-) => {
-  logTwitchMessage(
-    logger,
-    `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    { subsection: replyId }
-  );
-};
-
-export const logTwitchMessageBroadcast = (
-  logger: Logger,
-  sentMessage: string[],
-  sourceId: string
-) => {
-  logTwitchMessage(
-    logger,
-    `Successfully broadcasted: '${JSON.stringify(sentMessage)}'`,
-    {
-      subsection: sourceId,
-    }
-  );
-};
-export const logTwitchMessageDetected = (
-  logger: Logger,
-  messageId: string,
-  message: string[],
-  detectionReason: string,
-  detectorId: string
-) => {
-  logTwitchMessage(
-    logger,
-    `Detected ${detectionReason} in message ${messageId}: ${JSON.stringify(
-      message
-    )}`,
-    { subsection: detectorId }
-  );
 };
