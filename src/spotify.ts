@@ -1,11 +1,12 @@
 // Package imports
+import SpotifyWebApi from "spotify-web-api-node";
 import fetch from "node-fetch";
 import http from "http";
 import open from "open";
-import SpotifyWebApi from "spotify-web-api-node";
+// Local imports
+import { createLogFunc } from "./logging";
 // Type imports
 import type { Logger } from "winston";
-import { createLogFunc } from "./logging";
 
 /**
  * The logging ID of this module.

@@ -1,12 +1,15 @@
-import { promises as fs } from "fs";
+// Package imports
 import * as path from "path";
-import { MoonpieCommands } from "./commands/moonpie";
-import { OsuCommands } from "./commands/osu";
-import { SpotifyCommands } from "./commands/spotify";
+import { promises as fs } from "fs";
+// Local imports
 import {
   FileDocumentationPartType,
   generateFileDocumentation,
 } from "./other/splitTextAtLength";
+import { MoonpieCommands } from "./commands/moonpie";
+import { OsuCommands } from "./commands/osu";
+import { SpotifyCommands } from "./commands/spotify";
+// Type imports
 import type {
   FileDocumentationPartValue,
   FileDocumentationParts,

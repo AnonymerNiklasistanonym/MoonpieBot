@@ -46,9 +46,13 @@ export const createOsuIrcConnection = (
   osuIrcBotInstance.addListener(
     "message",
     (from: string, to: string, text: string, message: string) => {
-      const logOsuIrcMsgListener = createLogFunc(logger, LOG_ID_MODULE_OSU_IRC, {
-        subsection: "message_listener",
-      });
+      const logOsuIrcMsgListener = createLogFunc(
+        logger,
+        LOG_ID_MODULE_OSU_IRC,
+        {
+          subsection: "message_listener",
+        }
+      );
       logOsuIrcMsgListener.info(
         JSON.stringify({ creationDate, from, to, text, message })
       );
@@ -66,9 +70,13 @@ export const createOsuIrcConnection = (
     }
   );
   osuIrcBotInstance.addListener("error", (message: string) => {
-    const logOsuIrcErrorListener = createLogFunc(logger, LOG_ID_MODULE_OSU_IRC, {
-      subsection: "pm_listener",
-    });
+    const logOsuIrcErrorListener = createLogFunc(
+      logger,
+      LOG_ID_MODULE_OSU_IRC,
+      {
+        subsection: "pm_listener",
+      }
+    );
     logOsuIrcErrorListener.error(
       Error(JSON.stringify({ creationDate, message }))
     );
@@ -81,9 +89,13 @@ export const createOsuIrcConnection = (
   });
   // Emitted when a message is sent from the client
   osuIrcBotInstance.addListener("selfMessage", (to: string, text: string) => {
-    const logOsuIrcSelfMsgListener = createLogFunc(logger, LOG_ID_MODULE_OSU_IRC, {
-      subsection: "self_message_listener",
-    });
+    const logOsuIrcSelfMsgListener = createLogFunc(
+      logger,
+      LOG_ID_MODULE_OSU_IRC,
+      {
+        subsection: "self_message_listener",
+      }
+    );
     logOsuIrcSelfMsgListener.info(JSON.stringify({ creationDate, to, text }));
   });
   return osuIrcBotInstance;

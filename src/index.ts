@@ -1,19 +1,12 @@
 // Package imports
-import dotenv from "dotenv";
 import * as path from "path";
-import { mkdirSync } from "fs";
-import irc from "irc";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
-import SpotifyWebApi from "spotify-web-api-node";
+import dotenv from "dotenv";
+import irc from "irc";
+import { mkdirSync } from "fs";
 // Local imports
-import { createLogger, createLogFunc } from "./logging";
-import { createTwitchClient } from "./twitch";
-import { moonpieDbSetupTables } from "./database/moonpieDb";
-import { moonpieChatHandler } from "./commands/moonpie";
-import { osuChatHandler, OsuCommands } from "./commands/osu";
-import { name } from "./info";
-import { getVersion } from "./version";
+import { CliVariable, getCliVariableDocumentation } from "./cli";
 import {
   EnvVariable,
   getEnvVariableValueOrDefault,
@@ -21,26 +14,22 @@ import {
   printEnvVariablesToConsole,
   writeEnvVariableDocumentation,
 } from "./env";
+import { OsuCommands, osuChatHandler } from "./commands/osu";
 import {
   checkCustomCommand,
   loadCustomCommandsFromFile,
 } from "./other/customCommand";
-import { loadCustomTimersFromFile, registerTimer } from "./other/customTimer";
-import { isProcessRunning } from "./other/processInformation";
-import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
-import { pyramidSpammer } from "./other/pyramidSpammer";
-import { createStreamCompanionConnection } from "./streamcompanion";
-import { createOsuIrcConnection } from "./osuirc";
-import { CliVariable, getCliVariableDocumentation } from "./cli";
-import { setupSpotifyAuthentication } from "./spotify";
-import { spotifyChatHandler } from "./commands/spotify";
+import { createLogFunc, createLogger } from "./logging";
 import {
   defaultStrings,
   updateStringsMapWithCustomEnvStrings,
   writeStringsVariableDocumentation,
 } from "./strings";
-import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
-import { generatePluginsAndMacrosMap } from "./messageParser";
+import {
+  errorMessageUserIdUndefined,
+  errorMessageUserNameUndefined,
+} from "./commands";
+import { loadCustomTimersFromFile, registerTimer } from "./other/customTimer";
 import {
   pluginConvertToShortNumber,
   pluginIfEmpty,
@@ -63,29 +52,40 @@ import {
   pluginUppercase,
 } from "./messageParser/plugins/general";
 import {
-  errorMessageUserIdUndefined,
-  errorMessageUserNameUndefined,
-} from "./commands";
-import { pluginTwitchApi } from "./messageParser/plugins/twitchApi";
-import {
   pluginOsuBeatmap,
   pluginOsuMostRecentPlay,
   pluginOsuScore,
   pluginOsuUser,
 } from "./messageParser/plugins/osu";
-import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
+import { createOsuIrcConnection } from "./osuirc";
+import { createStreamCompanionConnection } from "./streamcompanion";
+import { createTwitchClient } from "./twitch";
+import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
+import { generatePluginsAndMacrosMap } from "./messageParser";
+import { getVersion } from "./version";
+import { isProcessRunning } from "./other/processInformation";
+import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
+import { moonpieChatHandler } from "./commands/moonpie";
+import { moonpieDbSetupTables } from "./database/moonpieDb";
+import { name } from "./info";
+import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
+import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
+import { pluginTwitchApi } from "./messageParser/plugins/twitchApi";
+import { pyramidSpammer } from "./other/pyramidSpammer";
+import { setupSpotifyAuthentication } from "./spotify";
+import { spotifyChatHandler } from "./commands/spotify";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
-import type { Logger } from "winston";
-import type { ErrorWithCode } from "./error";
-import type { StreamCompanionData } from "./streamcompanion";
 import type {
   CustomCommandDataJson,
   CustomCommandJson,
 } from "./other/customCommand";
 import type { CustomTimerJson } from "./other/customTimer";
-import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
+import type { ErrorWithCode } from "./error";
+import type { Logger } from "winston";
+import type SpotifyWebApi from "spotify-web-api-node";
+import type { StreamCompanionData } from "./streamcompanion";
 
 /**
  * The logging ID of this module.

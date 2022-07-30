@@ -1,3 +1,4 @@
+// Local imports
 import { logTwitchMessageDetected, logTwitchMessageReply } from "./twitch";
 // Type imports
 import type { Logger } from "winston";

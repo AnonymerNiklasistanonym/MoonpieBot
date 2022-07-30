@@ -1,15 +1,19 @@
 // Package imports
 import ReconnectingWebSocket from "reconnecting-websocket";
 import WebSocket from "ws";
+// Local imports
+import { createLogFunc } from "./logging";
 // Type imports
 import type { Logger } from "winston";
-import { createLogFunc } from "./logging";
 
 /**
  * The logging ID of this module.
  */
 const LOG_ID_MODULE_STREAMCOMPANION = "osu_streamcompanion";
 
+/**
+ * The data that StreamCompanion should watch for changes.
+ */
 const OSU_STREAMCOMPANION_DATA = [
   "titleRoman",
   "artistRoman",
@@ -26,6 +30,9 @@ const OSU_STREAMCOMPANION_DATA = [
   "mBpm",
 ];
 
+/**
+ * A representation of the data that StreamCompanion should watch for changes.
+ */
 export interface StreamCompanionData {
   titleRoman?: string;
   artistRoman?: string;
@@ -51,7 +58,10 @@ export const createStreamCompanionConnection = (
   streamCompanionUrl: string,
   logger: Logger
 ) => {
-  const logStreamCompanion = createLogFunc(logger, LOG_ID_MODULE_STREAMCOMPANION);
+  const logStreamCompanion = createLogFunc(
+    logger,
+    LOG_ID_MODULE_STREAMCOMPANION
+  );
 
   // Automatically reconnect on loss of connection - this means StreamCompanion
   // does not need to be run all the time but only when needed

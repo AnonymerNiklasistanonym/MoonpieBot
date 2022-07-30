@@ -4,13 +4,13 @@ import {
   FileDocumentationPartValue,
   FileDocumentationParts,
 } from "./other/splitTextAtLength";
+import { createLogFunc } from "./logging";
 import { genericStringSorter } from "./other/genericStringSorter";
 // Type imports
 import type { Logger } from "winston";
 import type { MessageParserMacro } from "./messageParser/macros";
 import type { MessageParserPlugin } from "./messageParser/plugins";
 import type { Strings } from "./strings";
-import { createLogFunc } from "./logging";
 
 /**
  * The logging ID of this module.

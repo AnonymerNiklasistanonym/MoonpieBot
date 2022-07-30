@@ -1,3 +1,4 @@
+// Local imports
 import { splitTextAtLength } from "./other/splitTextAtLength";
 
 /** Path to the root directory of the source code. */

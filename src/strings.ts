@@ -9,6 +9,7 @@ import {
   FileDocumentationPartType,
   generateFileDocumentation,
 } from "./other/splitTextAtLength";
+import { createLogFunc } from "./logging";
 import { generatePluginAndMacroDocumentation } from "./messageParser";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { moonpieCommandReply } from "./strings/moonpie/commandReply";
@@ -25,7 +26,6 @@ import type {
 import type { Logger } from "winston";
 import type { MessageParserMacro } from "./messageParser/macros";
 import type { MessageParserPlugin } from "./messageParser/plugins";
-import { createLogFunc } from "./logging";
 
 export type Strings = Map<string, string>;
 
