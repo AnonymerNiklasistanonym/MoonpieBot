@@ -442,8 +442,8 @@ export const getEnvVariableValueOrDefault = (
   envVariable: EnvVariable,
   configDir = pathToRootDir
 ) => {
-  const value = process.env[getEnvVariableName(envVariable)];
-  if (value === undefined || value.trim().length === 0) {
+  const value = getEnvVariableValue(envVariable);
+  if (value.value === undefined || value.value.trim().length === 0) {
     const variableInformation = getEnvVariableValueInformation(
       envVariable,
       configDir
@@ -456,7 +456,7 @@ export const getEnvVariableValueOrDefault = (
     }
     throw Error(`The environment variable ${envVariable} has no default`);
   }
-  return value;
+  return value.value;
 };
 
 /**
