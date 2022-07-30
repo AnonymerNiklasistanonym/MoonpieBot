@@ -9,7 +9,7 @@ moonpiebot - A custom Twitch chat bot.
 **moonpiebot** [*OPTION*]
 
 # DESCRIPTION
-**moonpiebot** will start a Twitch connected bot with information provided by either environment variables, a *.env* file in the same directory or given a *--config-dir* a *.env* file in that directory.
+**moonpiebot** will start a Twitch connected bot with information provided by either environment variables, a *.env* file in the same directory or given a *----config-dir* a *.env* file in that directory.
 
 # OPTIONS
 **----help**
