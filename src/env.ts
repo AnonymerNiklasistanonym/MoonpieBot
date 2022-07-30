@@ -295,11 +295,12 @@ export const getEnvVariableValueInformation = (
 
     case EnvVariable.OSU_ENABLE_COMMANDS:
       return {
-        default: `${OsuCommands.NP},${OsuCommands.PP},${OsuCommands.RP}`,
+        default: `${OsuCommands.NP},${OsuCommands.PP},${OsuCommands.RP},${OsuCommands.REQUESTS}`,
         supportedValues: [
           OsuCommands.NP,
           OsuCommands.PP,
           OsuCommands.RP,
+          OsuCommands.REQUESTS,
           EMPTY_OPTION_LIST_VALUE_NONE,
         ],
         description: `${ENABLE_COMMANDS_DEFAULT_DESCRIPTION} If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!`,

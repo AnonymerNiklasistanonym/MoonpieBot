@@ -11,7 +11,7 @@ import { createLogger, logMessage } from "./logging";
 import { createTwitchClient } from "./twitch";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { moonpieChatHandler } from "./commands/moonpie";
-import { osuChatHandler } from "./commands/osu";
+import { osuChatHandler, OsuCommands } from "./commands/osu";
 import { name } from "./info";
 import { getVersion } from "./version";
 import {
@@ -507,8 +507,11 @@ export const main = async (
           .catch(loggerMain.error);
       });
     } else if (osuStreamCompanionCurrentMapData !== undefined) {
-      // Dirty solution to enable !np bot functionality only without any other
-      // osu! tokens or credentials, refactor that better in the future
+      // If osu! is not enabled but StreamCompanion is found filter all osu!
+      // commands that need the osu API from the function
+      // This currently means only allow the NP command which uses
+      // StreamCompanion and nothing else
+      // TODO Dirty solution, refactor that better in the future
       const enableCommands = getEnvVariableValueOrDefault(
         EnvVariable.OSU_ENABLE_COMMANDS
       )?.split(",");
@@ -524,9 +527,7 @@ export const main = async (
         undefined,
         undefined,
         osuStreamCompanionCurrentMapData,
-        enableCommands === undefined
-          ? ["np"]
-          : enableCommands.filter((a) => a === "np"),
+        enableCommands.filter((a) => a === OsuCommands.NP),
         strings,
         pluginsChannel,
         macrosChannel,
@@ -538,11 +539,9 @@ export const main = async (
         twitchClient
           .say(
             channel,
-            `${
-              tags.username ? "@" + tags.username + " " : ""
-            }Osu StreamCompanion Error: ${errorInfo.message}${
-              errorInfo.code ? " (" + errorInfo.code + ")" : ""
-            }`
+            `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
+              errorInfo.message
+            }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
           )
           .catch(loggerMain.error);
       });

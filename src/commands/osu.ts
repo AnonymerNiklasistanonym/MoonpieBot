@@ -36,6 +36,7 @@ export enum OsuCommands {
   PP = "pp",
   NP = "np",
   RP = "rp",
+  REQUESTS = "requests",
 }
 
 export enum OsuCommandErrorCode {
@@ -153,39 +154,39 @@ export const regexBeatmapUrl =
   /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))\s*(?:\s+(.+?))?\s*$/i;
 
 /**
- * Regex to recognize the !osu requests enable command.
+ * Regex to recognize the !osuRequests enable command.
  *
  * @example
  * ```text
- * !osu requests on
+ * !osuRequests on
  * ```
  */
 export const regexEnableBeatmapRequests =
-  /^\s*!osu\s+requests\s+on(?:\s*|\s+.*)$/i;
+  /^\s*!osuRequests\s+on(?:\s*|\s+.*)$/i;
 
 /**
- * Regex to recognize the !osu requests disable command.
+ * Regex to recognize the !osuRequests disable command.
  *
  * @example
  * ```text
- * !osu requests off $OPTIONAL_TEXT
+ * !osuRequests off $OPTIONAL_TEXT
  * ```
  */
 export const regexDisableBeatmapRequests =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!osu\s+requests\s+off\s*?(?:\s+(.*?)\s*)?$/i;
+  /^\s*!osuRequests\s+off\s*?(?:\s+(.*?)\s*)?$/i;
 
 /**
- * Regex to recognize the !osu requests command.
+ * Regex to recognize the !osuRequests command.
  *
  * @example
  * ```text
- * !osu requests $OPTIONAL_TEXT
+ * !osuRequests $OPTIONAL_TEXT
  * ```
  */
 export const regexBeatmapRequestsStatus =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!osu\s+requests(\s+.*)?$/i;
+  /^\s*!osuRequests(\s+.*)?$/i;
 
 export interface OsuApiV2Credentials {
   clientId: number;
@@ -210,15 +211,12 @@ export const osuChatHandler = async (
   osuStreamCompanionCurrentMapData:
     | (() => StreamCompanionData | undefined)
     | undefined,
-  enabled: undefined | string[],
+  enabled: (OsuCommands | string)[] = [],
   globalStrings: Strings,
   globalPlugins: Plugins,
   globalMacros: Macros,
   logger: Logger
 ): Promise<void> => {
-  if (enabled === undefined) {
-    enabled = [OsuCommands.NP, OsuCommands.PP, OsuCommands.RP];
-  }
   // > !np
   if (message.match(regexNp) && enabled?.includes(OsuCommands.NP)) {
     logTwitchMessageCommandDetected(
@@ -300,8 +298,9 @@ export const osuChatHandler = async (
   // > Any beatmap link
   if (enableOsuBeatmapRequests) {
     if (
-      message.match(regexEnableBeatmapRequests) ||
-      message.match(regexDisableBeatmapRequests)
+      (message.match(regexEnableBeatmapRequests) ||
+        message.match(regexDisableBeatmapRequests)) &&
+      enabled?.includes(OsuCommands.REQUESTS)
     ) {
       const matchEnable = message.match(regexEnableBeatmapRequests);
       const matchDisable = message.match(regexDisableBeatmapRequests);
@@ -343,7 +342,10 @@ export const osuChatHandler = async (
         logger
       );
       return;
-    } else if (message.match(regexBeatmapRequestsStatus)) {
+    } else if (
+      message.match(regexBeatmapRequestsStatus) &&
+      enabled?.includes(OsuCommands.REQUESTS)
+    ) {
       logTwitchMessageCommandDetected(
         logger,
         tags.id,
