@@ -257,20 +257,21 @@ export const getEnvVariableValueInformation = (
       };
 
     case EnvVariable.MOONPIE_ENABLE_COMMANDS:
+      // eslint-disable-next-line no-case-declarations
+      const moonpieCommands = [
+        MoonpieCommands.ABOUT,
+        MoonpieCommands.ADD,
+        MoonpieCommands.CLAIM,
+        MoonpieCommands.COMMANDS,
+        MoonpieCommands.DELETE,
+        MoonpieCommands.GET,
+        MoonpieCommands.LEADERBOARD,
+        MoonpieCommands.REMOVE,
+        MoonpieCommands.SET,
+      ];
       return {
-        default: `${MoonpieCommands.ABOUT},${MoonpieCommands.ADD},${MoonpieCommands.CLAIM},${MoonpieCommands.COMMANDS},${MoonpieCommands.DELETE},${MoonpieCommands.GET},${MoonpieCommands.LEADERBOARD},${MoonpieCommands.REMOVE},${MoonpieCommands.SET}`,
-        supportedValues: [
-          MoonpieCommands.ABOUT,
-          MoonpieCommands.ADD,
-          MoonpieCommands.CLAIM,
-          MoonpieCommands.COMMANDS,
-          MoonpieCommands.DELETE,
-          MoonpieCommands.GET,
-          MoonpieCommands.LEADERBOARD,
-          MoonpieCommands.REMOVE,
-          MoonpieCommands.SET,
-          EMPTY_OPTION_LIST_VALUE_NONE,
-        ],
+        default: moonpieCommands.sort().join(","),
+        supportedValues: [...moonpieCommands, EMPTY_OPTION_LIST_VALUE_NONE],
         description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
         block: EnvVariableBlocks.MOONPIE,
         legacyNames: ["ENABLE_COMMANDS"],
@@ -294,15 +295,16 @@ export const getEnvVariableValueInformation = (
       };
 
     case EnvVariable.OSU_ENABLE_COMMANDS:
+      // eslint-disable-next-line no-case-declarations
+      const osuCommands = [
+        OsuCommands.NP,
+        OsuCommands.PP,
+        OsuCommands.RP,
+        OsuCommands.REQUESTS,
+      ];
       return {
-        default: `${OsuCommands.NP},${OsuCommands.PP},${OsuCommands.RP},${OsuCommands.REQUESTS}`,
-        supportedValues: [
-          OsuCommands.NP,
-          OsuCommands.PP,
-          OsuCommands.RP,
-          OsuCommands.REQUESTS,
-          EMPTY_OPTION_LIST_VALUE_NONE,
-        ],
+        default: osuCommands.sort().join(","),
+        supportedValues: [...osuCommands, EMPTY_OPTION_LIST_VALUE_NONE],
         description: `${ENABLE_COMMANDS_DEFAULT_DESCRIPTION} If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!`,
         block: EnvVariableBlocks.OSU,
       };
@@ -383,9 +385,11 @@ export const getEnvVariableValueInformation = (
       };
 
     case EnvVariable.SPOTIFY_ENABLE_COMMANDS:
+      // eslint-disable-next-line no-case-declarations
+      const spotifyCommands = [SpotifyCommands.SONG];
       return {
-        default: `${SpotifyCommands.SONG}`,
-        supportedValues: [SpotifyCommands.SONG, EMPTY_OPTION_LIST_VALUE_NONE],
+        default: spotifyCommands.sort().join(","),
+        supportedValues: [...spotifyCommands, EMPTY_OPTION_LIST_VALUE_NONE],
         description: `${ENABLE_COMMANDS_DEFAULT_DESCRIPTION} If you don't provide Spotify API credentials the commands won't be enabled!`,
         block: EnvVariableBlocks.SPOTIFY,
       };
@@ -597,7 +601,7 @@ export const writeEnvVariableDocumentation = async (path: string) => {
             }
             envVariableEntry.properties.push([
               "Supported values",
-              envVariableInfo.supportedValues.join(", "),
+              envVariableInfo.supportedValues.sort().join(", "),
             ]);
           }
           envVariableEntry.infos = [];
