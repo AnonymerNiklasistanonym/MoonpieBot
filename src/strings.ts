@@ -25,7 +25,7 @@ import type {
 import type { Logger } from "winston";
 import type { MessageParserMacro } from "./messageParser/macros";
 import type { MessageParserPlugin } from "./messageParser/plugins";
-import { logMessage } from "./logging";
+import { createLogFunc } from "./logging";
 
 export type Strings = Map<string, string>;
 
@@ -60,7 +60,7 @@ export const updateStringsMapWithCustomEnvStrings = (
   strings: Map<string, string> = new Map(defaultStrings),
   logger: Logger
 ) => {
-  const logStrings = logMessage(logger, LOG_ID_MODULE_STRINGS, {
+  const logStrings = createLogFunc(logger, LOG_ID_MODULE_STRINGS, {
     subsection: "update_strings_with_custom_env_strings",
   });
 

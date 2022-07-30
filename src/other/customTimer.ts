@@ -1,7 +1,7 @@
 import cron from "node-cron";
 import { logTwitchMessageBroadcast } from "../twitch";
 import { messageParser } from "../messageParser";
-import { logMessage } from "../logging";
+import { createLogFunc } from "../logging";
 import { fileExists, readJsonFile } from "./fileOperations";
 // Type imports
 import type { Client } from "tmi.js";
@@ -35,7 +35,7 @@ export const registerTimer = (
   globalMacros: Macros,
   logger: Logger
 ): cron.ScheduledTask => {
-  const logCustomTimer = logMessage(logger, LOG_ID_MODULE_CUSTOM_TIMER, {
+  const logCustomTimer = createLogFunc(logger, LOG_ID_MODULE_CUSTOM_TIMER, {
     subsection: "register_timer",
   });
 
@@ -57,7 +57,7 @@ export const registerTimer = (
 };
 
 export const removeTimer = (cronTask: cron.ScheduledTask, logger: Logger) => {
-  const logCustomTimer = logMessage(logger, LOG_ID_MODULE_CUSTOM_TIMER, {
+  const logCustomTimer = createLogFunc(logger, LOG_ID_MODULE_CUSTOM_TIMER, {
     subsection: "remove_timer",
   });
 
@@ -70,7 +70,7 @@ export const loadCustomTimersFromFile = async (
   logger: Logger
 ) => {
   const customTimers: CustomTimerJson[] = [];
-  const loggerCustomTimers = logMessage(logger, "custom_timer");
+  const loggerCustomTimers = createLogFunc(logger, "custom_timer");
 
   if (await fileExists(filePath)) {
     loggerCustomTimers.info("Found custom timers file");

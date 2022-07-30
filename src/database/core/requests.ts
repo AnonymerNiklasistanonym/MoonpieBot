@@ -1,7 +1,7 @@
 // Package imports
 import { open } from "../core";
 // Local imports
-import { logMessage } from "../../logging";
+import { createLogFunc } from "../../logging";
 // Type imports
 import type { Logger } from "winston";
 import type { RunResult } from "sqlite3";
@@ -53,7 +53,7 @@ interface LoggerDatabaseOptions {
 const LOG_ID_DATABASE_REQUESTS = "database_requests";
 
 const logDatabase = (logger: Logger, options?: LoggerDatabaseOptions) =>
-  logMessage(logger, LOG_ID_DATABASE_REQUESTS, {
+  createLogFunc(logger, LOG_ID_DATABASE_REQUESTS, {
     subsection: options?.subsection,
   });
 

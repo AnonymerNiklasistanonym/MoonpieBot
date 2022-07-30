@@ -3,7 +3,7 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import WebSocket from "ws";
 // Type imports
 import type { Logger } from "winston";
-import { logMessage } from "./logging";
+import { createLogFunc } from "./logging";
 
 /**
  * The logging ID of this module.
@@ -51,7 +51,7 @@ export const createStreamCompanionConnection = (
   streamCompanionUrl: string,
   logger: Logger
 ) => {
-  const logStreamCompanion = logMessage(logger, LOG_ID_MODULE_STREAMCOMPANION);
+  const logStreamCompanion = createLogFunc(logger, LOG_ID_MODULE_STREAMCOMPANION);
 
   // Automatically reconnect on loss of connection - this means StreamCompanion
   // does not need to be run all the time but only when needed

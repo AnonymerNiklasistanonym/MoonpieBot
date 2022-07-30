@@ -20,7 +20,7 @@ import {
   osuCommandReplyNpStreamCompanionNotRunning,
 } from "../../strings/osu/commandReply";
 import { getProcessWindowTitle } from "../../other/processInformation";
-import { logMessage } from "../../logging";
+import { createLogFunc } from "../../logging";
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { Client } from "tmi.js";
@@ -90,7 +90,7 @@ export const commandNp = async (
     throw errorMessageUserNameUndefined();
   }
 
-  const logCmdNp = logMessage(logger, LOG_ID_CHAT_HANDLER_OSU, {
+  const logCmdNp = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU, {
     subsection: OsuCommands.NP,
   });
 

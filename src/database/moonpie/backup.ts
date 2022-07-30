@@ -1,7 +1,7 @@
 // Local imports
 import * as database from "../core";
 import * as moonpie from "./requests";
-import { logMessage } from "../../logging";
+import { createLogFunc } from "../../logging";
 // Type imports
 import type { Logger } from "winston";
 
@@ -27,7 +27,7 @@ export const exportMoonpieCountTableToJson = async (
   databasePath: string,
   logger: Logger
 ): Promise<DatabaseStructure[]> => {
-  const logDbBackup = logMessage(logger, LOG_ID_MODULE_DB_BACKUP);
+  const logDbBackup = createLogFunc(logger, LOG_ID_MODULE_DB_BACKUP);
 
   logDbBackup.debug("Backup moonpie database...");
 

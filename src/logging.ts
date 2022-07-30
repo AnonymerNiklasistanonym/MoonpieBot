@@ -52,8 +52,8 @@ export const createLogger = (
   logDir: string,
   logLevelConsole: LoggerLevel | string = "info",
   logLevelFile: LoggerLevel | string = "debug"
-) => {
-  return createWinstonLogger({
+) =>
+  createWinstonLogger({
     exitOnError: false,
     transports: [
       new DailyRotateFile({
@@ -72,47 +72,36 @@ export const createLogger = (
       service: name,
     },
   });
-};
 
 export interface LogMessageInfo {
   subsection?: string;
 }
 
-export const logMessage = (
+/**
+ * Create a function that will log messages with a hardcoded section.
+ *
+ * @param logger The logger.
+ * @param section The section which the log function should log.
+ * @param info Additional log information like a subsection.
+ * @returns Log function with hardcoded section.
+ */
+export const createLogFunc = (
   logger: Logger,
   section: string,
   info: LogMessageInfo = {}
-) => ({
-  info: (message: string) => {
-    logger.log({
-      level: "info",
-      message,
-      section,
-      subsection: info.subsection ? info.subsection : undefined,
-    });
-  },
-  debug: (message: string) => {
-    logger.log({
-      level: "debug",
-      message,
-      section,
-      subsection: info.subsection ? info.subsection : undefined,
-    });
-  },
-  warn: (message: string) => {
-    logger.log({
-      level: "warn",
-      message,
-      section,
-      subsection: info.subsection ? info.subsection : undefined,
-    });
-  },
-  error: (error: Error) => {
-    logger.log({
-      level: "error",
-      message: error.message,
-      section,
-      subsection: info.subsection ? info.subsection : undefined,
-    });
-  },
-});
+) => {
+  const subsection = info.subsection ? info.subsection : undefined;
+  const baseLogFunc = (level: LoggerLevel) => {
+    return (message: string) => {
+      logger.log({ level, message, section, subsection });
+    };
+  };
+  return {
+    info: baseLogFunc("info"),
+    debug: baseLogFunc("debug"),
+    warn: baseLogFunc("warn"),
+    error: (err: Error) => {
+      logger.log({ level: "error", message: err.message, section, subsection });
+    },
+  };
+};

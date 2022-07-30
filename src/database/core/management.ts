@@ -4,7 +4,7 @@ import { Database } from "sqlite3";
 import { promises as fs } from "fs";
 // Local imports
 import { ErrorCodePostRequest } from "./requests";
-import { logMessage } from "../../logging";
+import { createLogFunc } from "../../logging";
 // Type imports
 import type { Logger } from "winston";
 
@@ -32,7 +32,7 @@ interface LoggerDatabaseOptions {
 const LOG_ID_DATABASE_MANAGEMENT = "database_management";
 
 const logDatabase = (logger: Logger, options?: LoggerDatabaseOptions) =>
-  logMessage(logger, LOG_ID_DATABASE_MANAGEMENT, {
+  createLogFunc(logger, LOG_ID_DATABASE_MANAGEMENT, {
     subsection: options?.subsection,
   });
 

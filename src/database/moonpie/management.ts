@@ -1,4 +1,4 @@
-import { logMessage } from "../../logging";
+import { createLogFunc } from "../../logging";
 import type { Logger } from "winston";
 import * as database from "../core";
 import * as moonpie from "./requests";
@@ -13,7 +13,7 @@ export const createAndSetupTables = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {
-  const loggerDatabase = logMessage(logger, "database", {
+  const loggerDatabase = createLogFunc(logger, "database", {
     subsection: "setup",
   });
   loggerDatabase.debug("Setup database...");
@@ -121,7 +121,7 @@ export const setupInitialData = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {
-  const loggerDatabase = logMessage(logger, "database", {
+  const loggerDatabase = createLogFunc(logger, "database", {
     subsection: "setup_initial_data",
   });
   // Add initial account

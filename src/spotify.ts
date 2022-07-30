@@ -5,7 +5,7 @@ import open from "open";
 import SpotifyWebApi from "spotify-web-api-node";
 // Type imports
 import type { Logger } from "winston";
-import { logMessage } from "./logging";
+import { createLogFunc } from "./logging";
 
 /**
  * The logging ID of this module.
@@ -30,7 +30,7 @@ export const setupSpotifyAuthentication = async (
   spotifyRefreshToken: string | undefined,
   logger: Logger
 ) => {
-  const logSpotify = logMessage(logger, LOG_ID_MODULE_SPOTIFY, {
+  const logSpotify = createLogFunc(logger, LOG_ID_MODULE_SPOTIFY, {
     subsection: "setup_authentication",
   });
 
@@ -156,7 +156,7 @@ export const spotifyGetCurrentAndRecentSongs = async (
   spotifyApi: SpotifyWebApi,
   logger: Logger
 ) => {
-  const logSpotify = logMessage(logger, LOG_ID_MODULE_SPOTIFY, {
+  const logSpotify = createLogFunc(logger, LOG_ID_MODULE_SPOTIFY, {
     subsection: "get_current_and_recent_songs",
   });
 

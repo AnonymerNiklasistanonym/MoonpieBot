@@ -10,7 +10,7 @@ import type { Logger } from "winston";
 import type { MessageParserMacro } from "./messageParser/macros";
 import type { MessageParserPlugin } from "./messageParser/plugins";
 import type { Strings } from "./strings";
-import { logMessage } from "./logging";
+import { createLogFunc } from "./logging";
 
 /**
  * The logging ID of this module.
@@ -594,7 +594,7 @@ export const parseTreeNode = async (
   macros: Macros,
   logger: Logger
 ): Promise<string> => {
-  const logMessageParser = logMessage(logger, LOG_ID_MODULE_MESSAGE_PARSER, {
+  const logMessageParser = createLogFunc(logger, LOG_ID_MODULE_MESSAGE_PARSER, {
     subsection: "parse_tree_node",
   });
 
@@ -707,7 +707,7 @@ export const messageParser = async (
   macros: Macros = new Map(),
   logger: Logger
 ) => {
-  const logMessageParser = logMessage(logger, LOG_ID_MODULE_MESSAGE_PARSER);
+  const logMessageParser = createLogFunc(logger, LOG_ID_MODULE_MESSAGE_PARSER);
 
   if (messageString === undefined) {
     throw Error("Message string could not be parsed because it's undefined");

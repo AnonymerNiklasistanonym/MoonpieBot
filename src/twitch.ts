@@ -5,7 +5,7 @@
 // Package imports
 import { Client, client as tmiClient } from "tmi.js";
 // Local imports
-import { logMessage } from "./logging";
+import { createLogFunc } from "./logging";
 // Type imports
 import type { Logger } from "winston";
 
@@ -60,7 +60,7 @@ export const createTwitchClient = (
   debug = false,
   logger: Logger
 ): Client => {
-  const logTwitch = logMessage(logger, LOG_ID_MODULE_TWITCH, {
+  const logTwitch = createLogFunc(logger, LOG_ID_MODULE_TWITCH, {
     subsection: "create_client",
   });
 
@@ -141,7 +141,7 @@ export const logTwitchMessage = (
   message: string,
   options?: LogTwitchMessageOptions
 ): void =>
-  logMessage(logger, "twitch_message", {
+  createLogFunc(logger, "twitch_message", {
     subsection: options?.subsection,
   }).debug(message);
 

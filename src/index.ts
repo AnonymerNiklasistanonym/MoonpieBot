@@ -7,7 +7,7 @@ import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
 import SpotifyWebApi from "spotify-web-api-node";
 // Local imports
-import { createLogger, logMessage } from "./logging";
+import { createLogger, createLogFunc } from "./logging";
 import { createTwitchClient } from "./twitch";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { moonpieChatHandler } from "./commands/moonpie";
@@ -116,7 +116,7 @@ export const main = async (
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 
-  const loggerMain = logMessage(logger, LOG_ID_MODULE_MAIN);
+  const loggerMain = createLogFunc(logger, LOG_ID_MODULE_MAIN);
 
   // Read in necessary paths/values from environment variables
   // Twitch connection
@@ -771,7 +771,7 @@ if (isEntryPoint()) {
         getEnvVariableValueOrDefault(EnvVariable.LOGGING_CONSOLE_LOG_LEVEL),
         getEnvVariableValueOrDefault(EnvVariable.LOGGING_FILE_LOG_LEVEL)
       );
-      const logMain = logMessage(logger, "main");
+      const logMain = createLogFunc(logger, "main");
 
       // Call main method
       try {

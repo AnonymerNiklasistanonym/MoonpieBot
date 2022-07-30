@@ -24,7 +24,7 @@ import {
   osuBeatmapRequestTurnedOn,
 } from "../../strings/osu/beatmapRequest";
 import { isProcessRunning } from "../../other/processInformation";
-import { logMessage } from "../../logging";
+import { createLogFunc } from "../../logging";
 import { messageParserById } from "../../messageParser";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
@@ -83,7 +83,7 @@ export const commandBeatmap = async (
     throw errorMessageOsuApiCredentialsUndefined();
   }
 
-  const logCmdBeatmap = logMessage(logger, LOG_ID_CHAT_HANDLER_OSU, {
+  const logCmdBeatmap = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU, {
     subsection: "beatmap",
   });
 

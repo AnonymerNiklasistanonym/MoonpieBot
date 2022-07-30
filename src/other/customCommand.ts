@@ -8,7 +8,7 @@ import {
 import { messageParser } from "../messageParser";
 import { TwitchBadgeLevels } from "./twitchBadgeParser";
 import { fileExists, readJsonFile } from "./fileOperations";
-import { logMessage } from "../logging";
+import { createLogFunc } from "../logging";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -136,7 +136,7 @@ export const loadCustomCommandsFromFile = async (
   logger: Logger
 ) => {
   const customCommands: CustomCommandJson[] = [];
-  const loggerCustomCommands = logMessage(logger, "custom_command");
+  const loggerCustomCommands = createLogFunc(logger, "custom_command");
 
   if (await fileExists(filePath)) {
     loggerCustomCommands.info("Found custom commands file");
