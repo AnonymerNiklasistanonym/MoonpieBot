@@ -2,7 +2,7 @@ import {
   errorMessageIdUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { MoonpieCommands, LOG_ID_COMMAND_MOONPIE } from "../moonpie";
+import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import { messageParserById } from "../../messageParser";
 import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
 // Type imports

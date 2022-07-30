@@ -1,5 +1,6 @@
+// Package imports
 import { expect } from "chai";
-import { messageParser } from "../../src/messageParser";
+// Local imports
 import {
   pluginIfEmpty,
   pluginIfNotEmpty,
@@ -10,8 +11,9 @@ import {
   pluginUppercase,
 } from "../../src/messageParser/plugins/general";
 import { getTestLogger } from "./logger";
+import { messageParser } from "../../src/messageParser";
 // Type imports
-import type { Plugins, Macros } from "../../src/messageParser";
+import type { Macros, Plugins } from "../../src/messageParser";
 import type { PluginFunc } from "../../src/messageParser";
 import type { Strings } from "../../src/strings";
 

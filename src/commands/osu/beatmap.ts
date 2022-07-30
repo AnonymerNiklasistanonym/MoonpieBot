@@ -7,8 +7,8 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import {
-  errorMessageOsuApiCredentialsUndefined,
   LOG_ID_COMMAND_OSU,
+  errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import { isProcessRunning } from "../../other/processInformation";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";

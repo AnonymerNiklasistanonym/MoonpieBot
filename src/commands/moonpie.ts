@@ -1,7 +1,7 @@
 import {
+  commandUserDelete,
   commandUserGet,
   commandUserSetCount,
-  commandUserDelete,
 } from "./moonpie/user";
 import { commandCommands } from "./moonpie/commands";
 import { commandAbout } from "./moonpie/about";
@@ -280,10 +280,6 @@ export const moonpieChatHandler = async (
           databasePath,
           logger
         );
-      } else {
-        logger.error(
-          `User was not found for !moonpie delete $USER in message '${message}'`
-        );
       }
       return;
     }
@@ -314,10 +310,6 @@ export const moonpieChatHandler = async (
           globalMacros,
           databasePath,
           logger
-        );
-      } else {
-        logger.error(
-          `User was not found for !moonpie get $USER in message '${message}'`
         );
       }
       return;
@@ -353,10 +345,6 @@ export const moonpieChatHandler = async (
           databasePath,
           logger
         );
-      } else {
-        logger.error(
-          `User/NewCount was not found for !moonpie set $USER in message '${message}'`
-        );
       }
       return;
     }
@@ -391,10 +379,6 @@ export const moonpieChatHandler = async (
           databasePath,
           logger
         );
-      } else {
-        logger.error(
-          `User/CountToAdd was not found for !moonpie add $USER in message '${message}'`
-        );
       }
       return;
     }
@@ -428,10 +412,6 @@ export const moonpieChatHandler = async (
           globalMacros,
           databasePath,
           logger
-        );
-      } else {
-        logger.error(
-          `User/CountToRemove was not found for !moonpie remove $USER in message '${message}'`
         );
       }
       return;

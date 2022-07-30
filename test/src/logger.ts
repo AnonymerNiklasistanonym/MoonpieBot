@@ -1,26 +1,15 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+// Package imports
 import winston, { format } from "winston";
+// Local imports
+import { logFormat } from "../../src/logging";
 import { name } from "../../src/info";
 
 export const getTestLogger = (testName: string) =>
   winston.createLogger({
     level: "warn",
     transports: [new winston.transports.Console()],
-    format: format.combine(
-      format.timestamp(),
-      format.printf(
-        ({ timestamp, level, message, service, section, subsection }) => {
-          if (section !== undefined) {
-            if (subsection !== undefined) {
-              return `[${timestamp}] ${service}#${section}#${subsection} ${level}: ${message}`;
-            }
-            return `[${timestamp}] ${service}#${section} ${level}: ${message}`;
-          }
-          return `[${timestamp}] ${service} ${level}: ${message}`;
-        }
-      )
-    ),
+    format: format.combine(format.timestamp(), format.printf(logFormat)),
     defaultMeta: {
-      service: `${name}Test${testName}`,
+      service: `${name}_Test_${testName}`,
     },
   });

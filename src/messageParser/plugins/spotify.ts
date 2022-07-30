@@ -1,4 +1,4 @@
-import { spotifyGetCurrentSongAndRecentlyPlayedSongs } from "../../spotify";
+import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 import type SpotifyWebApi from "spotify-web-api-node";
 import type { MessageParserPlugin } from "../plugins";
 import type { MacroDictionaryEntry } from "../../messageParser";
@@ -10,10 +10,7 @@ export const pluginSpotifyCurrentPreviousSong = (
   return {
     id: "SPOTIFY_SONG",
     func: async (logger) => {
-      const data = await spotifyGetCurrentSongAndRecentlyPlayedSongs(
-        spotifyWebApi,
-        logger
-      );
+      const data = await spotifyGetCurrentAndRecentSongs(spotifyWebApi, logger);
       const macros: MacroDictionaryEntry[] = [];
       const currData = data?.currentlyPlaying.body.item;
       const hasCurrent = currData != null && currData !== undefined;
@@ -52,7 +49,6 @@ export const pluginSpotifyCurrentPreviousSong = (
         }
         macros.push(["PREVIOUS_URL", previousSong.track.external_urls.spotify]);
       }
-      logger.info(macros);
       return macros;
     },
   };

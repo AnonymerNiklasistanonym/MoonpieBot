@@ -1,4 +1,6 @@
+// Package imports
 import { expect } from "chai";
+// Local imports
 import {
   regexMoonpieAdd,
   regexMoonpieClaim,

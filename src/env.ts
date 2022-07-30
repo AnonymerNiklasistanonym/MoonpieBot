@@ -4,12 +4,12 @@ import { MoonpieCommands } from "./commands/moonpie";
 import { OsuCommands } from "./commands/osu";
 import { SpotifyCommands } from "./commands/spotify";
 import {
-  generateFileDocumentation,
   FileDocumentationPartType,
+  generateFileDocumentation,
 } from "./other/splitTextAtLength";
 import type {
-  FileDocumentationParts,
   FileDocumentationPartValue,
+  FileDocumentationParts,
 } from "./other/splitTextAtLength";
 
 /** Path to the root directory of the source code. */

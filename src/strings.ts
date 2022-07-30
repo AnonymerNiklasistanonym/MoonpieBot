@@ -2,28 +2,37 @@
  * Strings handling.
  */
 
-import { moonpieCommandReply } from "./strings/moonpie/commandReply";
-import { osuBeatmapRequests } from "./strings/osu/beatmapRequest";
+// Package imports
 import { promises as fs } from "fs";
-import { generatePluginAndMacroDocumentation } from "./messageParser";
-import { osuCommandReply } from "./strings/osu/commandReply";
-import { spotifyCommandReply } from "./strings/spotify/commandReply";
+// Local imports
 import {
   FileDocumentationPartType,
   generateFileDocumentation,
 } from "./other/splitTextAtLength";
+import { generatePluginAndMacroDocumentation } from "./messageParser";
 import { genericStringSorter } from "./other/genericStringSorter";
+import { moonpieCommandReply } from "./strings/moonpie/commandReply";
 import { moonpieCommands } from "./strings/moonpie/commands";
 import { moonpieUser } from "./strings/moonpie/user";
-import type { Logger } from "winston";
-import type { MessageParserPlugin } from "./messageParser/plugins";
-import type { MessageParserMacro } from "./messageParser/macros";
+import { osuBeatmapRequests } from "./strings/osu/beatmapRequest";
+import { osuCommandReply } from "./strings/osu/commandReply";
+import { spotifyCommandReply } from "./strings/spotify/commandReply";
+// Type imports
 import type {
   FileDocumentationPartValue,
   FileDocumentationParts,
 } from "./other/splitTextAtLength";
+import type { Logger } from "winston";
+import type { MessageParserMacro } from "./messageParser/macros";
+import type { MessageParserPlugin } from "./messageParser/plugins";
+import { logMessage } from "./logging";
 
 export type Strings = Map<string, string>;
+
+/**
+ * The logging ID of this module.
+ */
+const LOG_ID_MODULE_STRINGS = "strings";
 
 export const PREFIX_CUSTOM_STRING = "MOONPIE_CUSTOM_STRING_";
 
@@ -51,6 +60,10 @@ export const updateStringsMapWithCustomEnvStrings = (
   strings: Map<string, string> = new Map(defaultStrings),
   logger: Logger
 ) => {
+  const logStrings = logMessage(logger, LOG_ID_MODULE_STRINGS, {
+    subsection: "update_strings_with_custom_env_strings",
+  });
+
   let foundCustomStringsCounter = 0;
   let foundCustomNonDefaultStringsCounter = 0;
   // First check for the default string entries
@@ -59,10 +72,7 @@ export const updateStringsMapWithCustomEnvStrings = (
     if (envValue !== undefined && envValue.trim().length > 0) {
       strings.set(key, envValue);
       foundCustomStringsCounter++;
-      logger.debug({
-        message: `Found default custom string: ${key}=${envValue}`,
-        section: "strings",
-      });
+      logStrings.debug(`Found default custom string: ${key}=${envValue}`);
     }
   }
   // Now check for custom strings
@@ -76,29 +86,24 @@ export const updateStringsMapWithCustomEnvStrings = (
       if (envValue !== undefined && envValue.trim().length > 0) {
         strings.set(key.slice(PREFIX_CUSTOM_STRING.length), envValue);
         foundCustomNonDefaultStringsCounter++;
-        logger.info({
-          message: `Found non-default custom string: ${key}=${envValue}`,
-          section: "strings",
-        });
+        logStrings.info(`Found non-default custom string: ${key}=${envValue}`);
       }
     }
   });
 
   if (foundCustomStringsCounter > 0) {
-    logger.info({
-      message: `Found ${foundCustomStringsCounter} default custom string${
+    logStrings.info(
+      `Found ${foundCustomStringsCounter} default custom string${
         foundCustomStringsCounter > 1 ? "s" : ""
-      }`,
-      section: "strings",
-    });
+      }`
+    );
   }
   if (foundCustomNonDefaultStringsCounter > 0) {
-    logger.info({
-      message: `Found ${foundCustomNonDefaultStringsCounter} non-default custom string${
+    logStrings.info(
+      `Found ${foundCustomNonDefaultStringsCounter} non-default custom string${
         foundCustomNonDefaultStringsCounter > 1 ? "s" : ""
-      }`,
-      section: "strings",
-    });
+      }`
+    );
   }
   return strings;
 };

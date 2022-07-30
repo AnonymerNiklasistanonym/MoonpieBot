@@ -1,8 +1,11 @@
-import SpotifyWebApi from "spotify-web-api-node";
-import http from "http";
+// Package imports
 import fetch from "node-fetch";
+import http from "http";
 import open from "open";
+import SpotifyWebApi from "spotify-web-api-node";
+// Type imports
 import type { Logger } from "winston";
+import { logMessage } from "./logging";
 
 /**
  * The logging ID of this module.
@@ -27,6 +30,10 @@ export const setupSpotifyAuthentication = async (
   spotifyRefreshToken: string | undefined,
   logger: Logger
 ) => {
+  const logSpotify = logMessage(logger, LOG_ID_MODULE_SPOTIFY, {
+    subsection: "setup_authentication",
+  });
+
   const spotifyApi = new SpotifyWebApi({
     clientId: spotifyClientId,
     clientSecret: spotifyClientSecret,
@@ -43,16 +50,15 @@ export const setupSpotifyAuthentication = async (
 
   // If no refresh token is found start authentication process
   const server = http.createServer((req, res) => {
-    logger.debug({
-      message: `Spotify API redirect was detected ${JSON.stringify({
+    logSpotify.debug(
+      `Spotify API redirect was detected ${JSON.stringify({
         method: req.method,
         host: req.headers.host,
         location: req.headers.location,
         referer: req.headers.referer,
         url: req.url,
-      })}`,
-      section: LOG_ID_MODULE_SPOTIFY,
-    });
+      })}`
+    );
     if (req.url && req.headers.host) {
       if (req.url.endsWith("/")) {
         res.writeHead(200);
@@ -63,10 +69,7 @@ export const setupSpotifyAuthentication = async (
         const url = new URL(req.headers.host + req.url);
         const codeToken = url.searchParams.get("code");
         if (codeToken != null) {
-          logger.debug({
-            message: "Spotify API redirect contained code token",
-            section: LOG_ID_MODULE_SPOTIFY,
-          });
+          logSpotify.debug("Spotify API redirect contained code token");
           spotifyApi
             .authorizationCodeGrant(codeToken)
             .then((codeGrantAuthorization) => {
@@ -92,10 +95,7 @@ export const setupSpotifyAuthentication = async (
                   refreshToken ? refreshToken : "ERROR"
                 }</span></p></body><script>window.history.replaceState({}, document.title, "/");</script></html>`
               );
-              logger.info({
-                message: "Spotify API connection was successful",
-                section: LOG_ID_MODULE_SPOTIFY,
-              });
+              logSpotify.info("Spotify API connection was successful");
             })
             .catch((err) => {
               res.writeHead(403);
@@ -119,10 +119,7 @@ export const setupSpotifyAuthentication = async (
   });
   await new Promise<void>((resolve) => {
     server.listen(REDIRECT_PORT, undefined, () => {
-      logger.info({
-        message: "Server started",
-        section: LOG_ID_MODULE_SPOTIFY,
-      });
+      logSpotify.info("Server started");
       resolve();
     });
   });
@@ -155,16 +152,17 @@ export const setupSpotifyAuthentication = async (
  * @param logger Used for logging.
  * @returns Currently playing and recently played songs data.
  */
-export const spotifyGetCurrentSongAndRecentlyPlayedSongs = async (
+export const spotifyGetCurrentAndRecentSongs = async (
   spotifyApi: SpotifyWebApi,
   logger: Logger
 ) => {
+  const logSpotify = logMessage(logger, LOG_ID_MODULE_SPOTIFY, {
+    subsection: "get_current_and_recent_songs",
+  });
+
   try {
     if (spotifyApi.getRefreshToken() === undefined) {
-      logger.error({
-        message: "Spotify refresh token was undefined",
-        section: LOG_ID_MODULE_SPOTIFY,
-      });
+      logSpotify.error(Error("Spotify refresh token was undefined"));
       return undefined;
     }
 
@@ -173,10 +171,7 @@ export const spotifyGetCurrentSongAndRecentlyPlayedSongs = async (
     spotifyApi.setAccessToken(response.body.access_token);
 
     if (spotifyApi.getAccessToken() === undefined) {
-      logger.error({
-        message: "Spotify access token was undefined",
-        section: LOG_ID_MODULE_SPOTIFY,
-      });
+      logSpotify.error(Error("Spotify access token was undefined"));
       return undefined;
     }
 
@@ -184,20 +179,16 @@ export const spotifyGetCurrentSongAndRecentlyPlayedSongs = async (
     const currentlyPlaying = await spotifyApi.getMyCurrentPlayingTrack();
     const recentlyPlayedTracks = await spotifyApi.getMyRecentlyPlayedTracks();
 
-    logger.debug({
-      message: "Spotify data was successfully acquired",
-      section: LOG_ID_MODULE_SPOTIFY,
-    });
+    logSpotify.debug("Spotify data was successfully acquired");
 
     return {
       currentlyPlaying,
       recentlyPlayedTracks,
     };
   } catch (err) {
-    logger.error({
-      message: `Connection not successful: ${JSON.stringify(err)}`,
-      section: LOG_ID_MODULE_SPOTIFY,
-    });
+    logSpotify.error(
+      Error(`Connection not successful: ${JSON.stringify(err)}`)
+    );
     throw err;
   }
 };

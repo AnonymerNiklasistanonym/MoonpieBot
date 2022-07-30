@@ -1,3 +1,9 @@
+// Package imports
+import { describe } from "mocha";
+import chai from "chai";
+import sinon from "sinon";
+import sinonChai from "sinon-chai";
+// Local imports
 import {
   EnvVariable,
   getEnvVariableName,
@@ -5,10 +11,6 @@ import {
   getEnvVariableValueOrCustomDefault,
   printEnvVariablesToConsole,
 } from "../../src/env";
-import { describe } from "mocha";
-import chai from "chai";
-import sinon from "sinon";
-import sinonChai from "sinon-chai";
 
 chai.use(sinonChai);
 

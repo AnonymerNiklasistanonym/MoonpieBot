@@ -7,6 +7,8 @@ import {
 } from "../commands";
 import { messageParser } from "../messageParser";
 import { TwitchBadgeLevels } from "./twitchBadgeParser";
+import { fileExists, readJsonFile } from "./fileOperations";
+import { logMessage } from "../logging";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -127,4 +129,36 @@ export const checkCustomCommand = async (
     );
   }
   return true;
+};
+
+export const loadCustomCommandsFromFile = async (
+  filePath: string,
+  logger: Logger
+) => {
+  const customCommands: CustomCommandJson[] = [];
+  const loggerCustomCommands = logMessage(logger, "custom_command");
+
+  if (await fileExists(filePath)) {
+    loggerCustomCommands.info("Found custom command file");
+    const newCustomCommands = (
+      await readJsonFile<CustomCommandDataJson>(filePath)
+    ).commands;
+    for (const newCustomCommand of newCustomCommands) {
+      loggerCustomCommands.debug(
+        `Add custom command ${
+          newCustomCommand.name ? newCustomCommand.name : "no-name"
+        }: ${newCustomCommand.regexString} => ${newCustomCommand.message}`
+      );
+    }
+    if (newCustomCommands.length > 0) {
+      loggerCustomCommands.info(
+        `Added ${newCustomCommands.length} custom command${
+          newCustomCommands.length > 1 ? "s" : ""
+        }`
+      );
+    }
+    customCommands.push(...newCustomCommands);
+  }
+
+  return customCommands;
 };

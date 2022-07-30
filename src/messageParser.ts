@@ -1,13 +1,21 @@
+// Local imports
+import {
+  FileDocumentationPartType,
+  FileDocumentationPartValue,
+  FileDocumentationParts,
+} from "./other/splitTextAtLength";
+import { genericStringSorter } from "./other/genericStringSorter";
+// Type imports
 import type { Logger } from "winston";
 import type { MessageParserMacro } from "./messageParser/macros";
 import type { MessageParserPlugin } from "./messageParser/plugins";
-import { genericStringSorter } from "./other/genericStringSorter";
-import {
-  FileDocumentationParts,
-  FileDocumentationPartType,
-  FileDocumentationPartValue,
-} from "./other/splitTextAtLength";
 import type { Strings } from "./strings";
+import { logMessage } from "./logging";
+
+/**
+ * The logging ID of this module.
+ */
+const LOG_ID_MODULE_MESSAGE_PARSER = "message_parser";
 
 /**
  * A message parse tree node.
@@ -586,6 +594,10 @@ export const parseTreeNode = async (
   macros: Macros,
   logger: Logger
 ): Promise<string> => {
+  const logMessageParser = logMessage(logger, LOG_ID_MODULE_MESSAGE_PARSER, {
+    subsection: "parse_tree_node",
+  });
+
   switch (treeNode.type) {
     case "text":
       if (treeNode.content === undefined) {
@@ -631,7 +643,7 @@ export const parseTreeNode = async (
           ? await parseTreeNode(pluginValue, plugins, macros, logger)
           : undefined;
       } catch (err) {
-        logger.error(err);
+        logMessageParser.error(err as Error);
         throw Error(
           `Parse tree node '${
             treeNode.type
@@ -645,7 +657,7 @@ export const parseTreeNode = async (
       try {
         pluginOutput = await plugin(logger, pluginValueString);
       } catch (err) {
-        logger.error(err);
+        logMessageParser.error(err as Error);
         throw Error(
           `Parse tree node '${
             treeNode.type
@@ -694,6 +706,8 @@ export const messageParser = async (
   macros: Macros = new Map(),
   logger: Logger
 ) => {
+  const logMessageParser = logMessage(logger, LOG_ID_MODULE_MESSAGE_PARSER);
+
   if (messageString === undefined) {
     throw Error("Message string could not be parsed because it's undefined");
   }
@@ -711,7 +725,7 @@ export const messageParser = async (
     // 2. Parse parse tree from top down
     return await parseTreeNode(parseTreeNodeRoot, plugins, macros, logger);
   } catch (err) {
-    logger.error(err);
+    logMessageParser.error(err as Error);
     throw Error(
       `There was an error parsing the message string '${messageString}': ${
         (err as Error).message

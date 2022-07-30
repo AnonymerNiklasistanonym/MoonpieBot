@@ -1,4 +1,8 @@
+// Package imports
 import irc from "irc";
+// Local imports
+import { logMessage } from "./logging";
+// Type imports
 import type { Logger } from "winston";
 
 /**
@@ -24,12 +28,13 @@ export const createOsuIrcConnection = (
   osuIrcPassword: string,
   logger: Logger
 ) => {
+  const logOsuIrc = logMessage(logger, LOG_ID_MODULE_OSU_IRC);
+
   // TODO Handle authentication errors
   const creationDate = new Date().toISOString();
-  logger.info({
-    message: `Trying to connect to ${OSU_IRC_URL}:${OSU_IRC_PORT} as ${osuIrcUsername} (creationDate=${creationDate})`,
-    section: LOG_ID_MODULE_OSU_IRC,
-  });
+  logOsuIrc.info(
+    `Trying to connect to ${OSU_IRC_URL}:${OSU_IRC_PORT} as ${osuIrcUsername} (creationDate=${creationDate})`
+  );
   const osuIrcBotInstance = new irc.Client(OSU_IRC_URL, osuIrcUsername, {
     channels: [
       /*"#osu"*/
@@ -41,44 +46,45 @@ export const createOsuIrcConnection = (
   osuIrcBotInstance.addListener(
     "message",
     (from: string, to: string, text: string, message: string) => {
-      logger.info({
-        message: JSON.stringify({ creationDate, from, to, text, message }),
-        section: LOG_ID_MODULE_OSU_IRC,
+      const logOsuIrcMsgListener = logMessage(logger, LOG_ID_MODULE_OSU_IRC, {
         subsection: "message_listener",
       });
+      logOsuIrcMsgListener.info(
+        JSON.stringify({ creationDate, from, to, text, message })
+      );
     }
   );
   osuIrcBotInstance.addListener(
     "pm",
     (from: string, text: string, message: string) => {
-      logger.info({
-        message: JSON.stringify({ creationDate, from, text, message }),
-        section: LOG_ID_MODULE_OSU_IRC,
+      const logOsuIrcPmListener = logMessage(logger, LOG_ID_MODULE_OSU_IRC, {
         subsection: "pm_listener",
       });
+      logOsuIrcPmListener.info(
+        JSON.stringify({ creationDate, from, text, message })
+      );
     }
   );
   osuIrcBotInstance.addListener("error", (message: string) => {
-    logger.error({
-      message: JSON.stringify({ creationDate, message }),
-      section: LOG_ID_MODULE_OSU_IRC,
-      subsection: "error_listener",
+    const logOsuIrcErrorListener = logMessage(logger, LOG_ID_MODULE_OSU_IRC, {
+      subsection: "pm_listener",
     });
+    logOsuIrcErrorListener.error(
+      Error(JSON.stringify({ creationDate, message }))
+    );
   });
   osuIrcBotInstance.addListener("registered", (message: string) => {
-    logger.info({
-      message: JSON.stringify({ creationDate, message }),
-      section: LOG_ID_MODULE_OSU_IRC,
+    const logOsuIrcRegListener = logMessage(logger, LOG_ID_MODULE_OSU_IRC, {
       subsection: "registered_listener",
     });
+    logOsuIrcRegListener.info(JSON.stringify({ creationDate, message }));
   });
   // Emitted when a message is sent from the client
   osuIrcBotInstance.addListener("selfMessage", (to: string, text: string) => {
-    logger.info({
-      message: JSON.stringify({ creationDate, to, text }),
-      section: LOG_ID_MODULE_OSU_IRC,
-      subsection: "message_sent_listener",
+    const logOsuIrcSelfMsgListener = logMessage(logger, LOG_ID_MODULE_OSU_IRC, {
+      subsection: "self_message_listener",
     });
+    logOsuIrcSelfMsgListener.info(JSON.stringify({ creationDate, to, text }));
   });
   return osuIrcBotInstance;
 };

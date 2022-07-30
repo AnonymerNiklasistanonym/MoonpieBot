@@ -1,10 +1,11 @@
-import core from "./database/core.test";
-import moonpie from "./database/moonpie.test";
-
+// Package imports
+import { mkdirSync, rmSync as rm } from "fs";
 import { describe } from "mocha";
 import os from "os";
 import path from "path";
-import { rmSync as rm, mkdirSync } from "fs";
+// Local imports
+import core from "./database/core.test";
+import moonpie from "./database/moonpie.test";
 
 describe("database", () => {
   const databaseDirPath = path.join(os.tmpdir(), "moonpiebot");

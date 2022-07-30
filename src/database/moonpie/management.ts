@@ -1,3 +1,4 @@
+import { logMessage } from "../../logging";
 import type { Logger } from "winston";
 import * as database from "../core";
 import * as moonpie from "./requests";
@@ -12,7 +13,10 @@ export const createAndSetupTables = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {
-  logger.info("Setup database..");
+  const loggerDatabase = logMessage(logger, "database", {
+    subsection: "setup",
+  });
+  loggerDatabase.info("Setup database..");
 
   // Create database
   // The warning makes literally no sense
@@ -23,7 +27,7 @@ export const createAndSetupTables = async (
   // The warning makes literally no sense
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await database.open(databasePath, logger);
-  logger.info(`> Database was created/loaded '${databasePath}'`);
+  loggerDatabase.info(`Database was created/loaded '${databasePath}'`);
 
   // Moonpie table
   await database.requests.post(
@@ -105,7 +109,7 @@ export const createAndSetupTables = async (
     undefined,
     logger
   );
-  logger.info(`> Database tables were created/loaded '${databasePath}'`);
+  loggerDatabase.info(`Database tables were created/loaded '${databasePath}'`);
 };
 
 /**
@@ -118,6 +122,9 @@ export const setupInitialData = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {
+  const loggerDatabase = logMessage(logger, "database", {
+    subsection: "setup_initial_data",
+  });
   // Add initial account
   try {
     await moonpie.create(
@@ -165,6 +172,6 @@ export const setupInitialData = async (
       logger
     );
   } catch (err) {
-    logger.error(err);
+    loggerDatabase.error(err as Error);
   }
 };

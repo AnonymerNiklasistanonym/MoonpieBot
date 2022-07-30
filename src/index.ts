@@ -7,7 +7,7 @@ import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
 import SpotifyWebApi from "spotify-web-api-node";
 // Local imports
-import { createLogger } from "./logging";
+import { createLogger, logMessage } from "./logging";
 import { createTwitchClient } from "./twitch";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { moonpieChatHandler } from "./commands/moonpie";
@@ -17,12 +17,15 @@ import { getVersion } from "./version";
 import {
   EnvVariable,
   getEnvVariableValueOrDefault,
+  getEnvVariableValueOrUndefined,
   printEnvVariablesToConsole,
   writeEnvVariableDocumentation,
-  getEnvVariableValueOrUndefined,
 } from "./env";
-import { checkCustomCommand } from "./other/customCommand";
-import { registerTimer } from "./other/customTimer";
+import {
+  checkCustomCommand,
+  loadCustomCommandsFromFile,
+} from "./other/customCommand";
+import { loadCustomTimersFromFile, registerTimer } from "./other/customTimer";
 import { isProcessRunning } from "./other/processInformation";
 import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
 import { pyramidSpammer } from "./other/pyramidSpammer";
@@ -39,20 +42,20 @@ import {
 import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { generatePluginsAndMacrosMap } from "./messageParser";
 import {
-  pluginLowercase,
-  pluginRandomNumber,
   pluginIfEmpty,
-  pluginIfNotEmpty,
+  pluginIfEqual,
   pluginIfFalse,
-  pluginIfNotUndefined,
   pluginIfGreater,
+  pluginIfNotEmpty,
+  pluginIfNotEqual,
   pluginIfNotGreater,
   pluginIfNotSmaller,
+  pluginIfNotUndefined,
   pluginIfSmaller,
-  pluginIfNotEqual,
-  pluginIfEqual,
   pluginIfTrue,
   pluginIfUndefined,
+  pluginLowercase,
+  pluginRandomNumber,
   pluginTimeInSToHumanReadableString,
   pluginTimeInSToHumanReadableStringShort,
   pluginTimeInSToStopwatchString,
@@ -71,11 +74,7 @@ import {
 } from "./messageParser/plugins/osu";
 import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
-import {
-  fileExists,
-  readJsonFile,
-  writeJsonFile,
-} from "./other/fileOperations";
+import { writeJsonFile } from "./other/fileOperations";
 // Type imports
 import type { Logger } from "winston";
 import type { ErrorWithCode } from "./error";
@@ -84,9 +83,14 @@ import type {
   CustomCommandDataJson,
   CustomCommandJson,
 } from "./other/customCommand";
-import type { CustomTimerDataJson, CustomTimerJson } from "./other/customTimer";
+import type { CustomTimerJson } from "./other/customTimer";
 
 /**
+ * The logging ID of this module.
+ */
+const LOG_ID_MODULE_MAIN = "main";
+
+/**.
  * Main method that runs the bot.
  *
  * ```mermaid
@@ -104,6 +108,8 @@ import type { CustomTimerDataJson, CustomTimerJson } from "./other/customTimer";
 export const main = async (logger: Logger, configDir: string) => {
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
+
+  const loggerMain = logMessage(logger, LOG_ID_MODULE_MAIN);
 
   // Read in necessary paths/values from environment variables
   // Twitch connection
@@ -240,24 +246,27 @@ export const main = async (logger: Logger, configDir: string) => {
 
   // Print to console information about certain things that were enabled
   // > osu!
+  // TODO Remove unnecessary log output
   if (!enableOsu && osuStreamCompanionCurrentMapData !== undefined) {
-    logger.info(
+    loggerMain.info(
       "Osu features besides the StreamCompanion integration are disabled since not all variables were set"
     );
   } else if (!enableOsu) {
-    logger.info("Osu features are disabled since not all variables were set");
+    loggerMain.info(
+      "Osu features are disabled since not all variables were set"
+    );
   } else {
     if (!enableOsuBeatmapRequests) {
-      logger.info(
+      loggerMain.info(
         "Osu beatmap recognition features are disabled since not all variables were set"
       );
     } else if (!enableOsuIrc) {
-      logger.info(
+      loggerMain.info(
         "Osu IRC features are disabled since not all variables were set"
       );
     }
     if (osuStreamCompanionCurrentMapData === undefined) {
-      logger.info(
+      loggerMain.info(
         "Osu StreamCompanion beatmap recognition features are disabled since not all variables were set"
       );
     }
@@ -266,53 +275,21 @@ export const main = async (logger: Logger, configDir: string) => {
   // Load custom commands
   const customCommands: CustomCommandJson[] = [];
   try {
-    if (await fileExists(pathCustomCommands)) {
-      logger.info("Found custom command file");
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      const newCustomCommands = (
-        await readJsonFile<CustomCommandDataJson>(pathCustomCommands)
-      ).commands;
-      for (const newCustomCommand of newCustomCommands) {
-        logger.debug({
-          message: `Add custom command ${
-            newCustomCommand.name ? newCustomCommand.name : "no-name"
-          }: ${newCustomCommand.regexString} => ${newCustomCommand.message}`,
-          section: "customCommands",
-        });
-      }
-      if (newCustomCommands.length > 0) {
-        logger.info({
-          message: `Added ${newCustomCommands.length} custom command${
-            newCustomCommands.length > 1 ? "s" : ""
-          }`,
-          section: "customCommands",
-        });
-      }
-      customCommands.push(...newCustomCommands);
-    }
+    customCommands.push(
+      ...(await loadCustomCommandsFromFile(pathCustomCommands, logger))
+    );
   } catch (err) {
-    logger.error(err);
+    loggerMain.error(err as Error);
   }
 
   // Load custom timers
   const customTimers: CustomTimerJson[] = [];
   try {
-    if (await fileExists(pathCustomTimers)) {
-      logger.info("Found custom timers file");
-      const newCustomTimers = (
-        await readJsonFile<CustomTimerDataJson>(pathCustomTimers)
-      ).timers;
-      for (const newCustomTimer of newCustomTimers) {
-        logger.info(
-          `Add custom command ${
-            newCustomTimer.name ? newCustomTimer.name : "no-name"
-          }: ${newCustomTimer.message} [${newCustomTimer.cronString}]`
-        );
-      }
-      customTimers.push(...newCustomTimers);
-    }
+    customTimers.push(
+      ...(await loadCustomTimersFromFile(pathCustomTimers, logger))
+    );
   } catch (err) {
-    logger.error(err);
+    loggerMain.error(err as Error);
   }
 
   // Setup database tables (or do nothing if they already exist)
@@ -320,24 +297,24 @@ export const main = async (logger: Logger, configDir: string) => {
 
   // Setup message parser
   const pluginsList = [
-    pluginLowercase,
-    pluginUppercase,
-    pluginRandomNumber,
     pluginIfEmpty,
-    pluginIfNotEmpty,
-    pluginIfNotUndefined,
-    pluginIfUndefined,
+    pluginIfEqual,
     pluginIfFalse,
-    pluginIfTrue,
     pluginIfGreater,
-    pluginIfSmaller,
+    pluginIfNotEmpty,
+    pluginIfNotEqual,
     pluginIfNotGreater,
     pluginIfNotSmaller,
-    pluginIfEqual,
-    pluginIfNotEqual,
+    pluginIfNotUndefined,
+    pluginIfSmaller,
+    pluginIfTrue,
+    pluginIfUndefined,
+    pluginLowercase,
+    pluginRandomNumber,
     pluginTimeInSToHumanReadableString,
     pluginTimeInSToHumanReadableStringShort,
     pluginTimeInSToStopwatchString,
+    pluginUppercase,
   ];
   const macrosList = [macroMoonpieBot];
   await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
@@ -397,25 +374,27 @@ export const main = async (logger: Logger, configDir: string) => {
   // Connect functionality to Twitch connection triggers
   twitchClient.on("connecting", (address, port) => {
     // Triggers when the client is connecting to Twitch
-    logger.info(`Connecting to Twitch: ${address}:${port}`);
+    loggerMain.info(`Connecting to Twitch: ${address}:${port}`);
   });
   twitchClient.on("connected", (address, port) => {
     // Triggers when the client successfully connected to Twitch
-    logger.info(`Connected to Twitch: ${address}:${port}`);
+    loggerMain.info(`Connected to Twitch: ${address}:${port}`);
   });
   twitchClient.on("disconnected", (reason) => {
     // Triggers when the client was disconnected from Twitch
-    logger.info(`Disconnected from Twitch: ${reason}`);
+    loggerMain.info(`Disconnected from Twitch: ${reason}`);
   });
   twitchClient.on("join", (channel, username, self) => {
     // Triggers when a new user joins a Twitch channel that is being listened to
     if (self) {
       // Only catch when the Twitch client itself joins a Twitch channel
-      logger.info(`Joined the Twitch channel "${channel}" as "${username}"`);
+      loggerMain.info(
+        `Joined the Twitch channel "${channel}" as "${username}"`
+      );
       // Easter Egg: Spam pyramids on joining the channel
       if (channel === "#ztalx_") {
         pyramidSpammer(twitchClient, channel, "ztalxWow", 10).catch(
-          logger.error
+          loggerMain.error
         );
       }
     }
@@ -481,7 +460,7 @@ export const main = async (logger: Logger, configDir: string) => {
       macrosChannel,
       logger
     ).catch((err) => {
-      logger.error(err);
+      loggerMain.error(err as Error);
       // When the chat handler throws an error write the error message in chat
       const errorInfo = err as ErrorWithCode;
       twitchClient
@@ -491,7 +470,7 @@ export const main = async (logger: Logger, configDir: string) => {
             errorInfo.message
           }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
         )
-        .catch(logger.error);
+        .catch(loggerMain.error);
     });
 
     if (enableOsu) {
@@ -518,7 +497,7 @@ export const main = async (logger: Logger, configDir: string) => {
         macrosChannel,
         logger
       ).catch((err) => {
-        logger.error(err);
+        loggerMain.error(err as Error);
         // When the chat handler throws an error write the error message in chat
         const errorInfo = err as ErrorWithCode;
         twitchClient
@@ -528,7 +507,7 @@ export const main = async (logger: Logger, configDir: string) => {
               errorInfo.message
             }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
           )
-          .catch(logger.error);
+          .catch(loggerMain.error);
       });
     } else if (osuStreamCompanionCurrentMapData !== undefined) {
       // Dirty solution to enable !np bot functionality only without any other
@@ -556,7 +535,7 @@ export const main = async (logger: Logger, configDir: string) => {
         macrosChannel,
         logger
       ).catch((err) => {
-        logger.error(err);
+        loggerMain.error(err as Error);
         // When the chat handler throws an error write the error message in chat
         const errorInfo = err as ErrorWithCode;
         twitchClient
@@ -568,7 +547,7 @@ export const main = async (logger: Logger, configDir: string) => {
               errorInfo.code ? " (" + errorInfo.code + ")" : ""
             }`
           )
-          .catch(logger.error);
+          .catch(loggerMain.error);
       });
     }
 
@@ -584,7 +563,7 @@ export const main = async (logger: Logger, configDir: string) => {
         macrosChannel,
         logger
       ).catch((err) => {
-        logger.error(err);
+        loggerMain.error(err as Error);
         // When the chat handler throws an error write the error message in chat
         const errorInfo = err as ErrorWithCode;
         twitchClient
@@ -594,7 +573,7 @@ export const main = async (logger: Logger, configDir: string) => {
               errorInfo.message
             }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
           )
-          .catch(logger.error);
+          .catch(loggerMain.error);
       });
     }
 
@@ -629,19 +608,20 @@ export const main = async (logger: Logger, configDir: string) => {
               } else {
                 customCommand.count += 1;
               }
+              // TODO Make this into an external method
               // Save custom command counts to files
               writeJsonFile<CustomCommandDataJson>(pathCustomCommands, {
                 $schema: "./customCommands.schema.json",
                 commands: customCommands,
               })
                 .then(() => {
-                  logger.info("Custom commands were saved");
+                  loggerMain.info("Custom commands were saved");
                 })
-                .catch(logger.error);
+                .catch(loggerMain.error);
             }
           })
           .catch((err) => {
-            logger.error(err);
+            loggerMain.error(err as Error);
             // When the chat handler throws an error write the error message in chat
             const errorInfo = err as ErrorWithCode;
             twitchClient
@@ -653,17 +633,17 @@ export const main = async (logger: Logger, configDir: string) => {
                   errorInfo.code ? " (" + errorInfo.code + ")" : ""
                 }`
               )
-              .catch(logger.error);
+              .catch(loggerMain.error);
           });
       }
     } catch (err) {
-      logger.error(err);
+      loggerMain.error(err as Error);
     }
   });
 
   process.on("SIGINT", () => {
     // When the process is being force closed catch that and close "safely"
-    logger.info("SIGINT was detected");
+    loggerMain.info("SIGINT was detected");
     process.exit();
   });
 
@@ -685,7 +665,7 @@ export const main = async (logger: Logger, configDir: string) => {
       );
     }
   } catch (err) {
-    logger.error(err);
+    loggerMain.error(err as Error);
   }
 
   // Check if IRC bot is working
@@ -697,9 +677,9 @@ export const main = async (logger: Logger, configDir: string) => {
   ) {
     try {
       let osuIrcBotInstance: undefined | irc.Client = osuIrcBot();
-      logger.info("Try to connect to osu IRC channel");
+      loggerMain.info("Try to connect to osu IRC channel");
       osuIrcBotInstance.connect(2, () => {
-        logger.info("osu! IRC connection was established");
+        loggerMain.info("osu! IRC connection was established");
         osuIrcBotInstance?.say(
           osuIrcRequestTarget,
           `UwU (${name} ${getVersion()})`
@@ -707,16 +687,18 @@ export const main = async (logger: Logger, configDir: string) => {
         osuIrcBotInstance?.disconnect("", () => {
           osuIrcBotInstance?.conn.end();
           osuIrcBotInstance = undefined;
-          logger.info("osu! IRC connection was closed");
+          loggerMain.info("osu! IRC connection was closed");
         });
       });
     } catch (err) {
-      logger.error(
-        `osu! IRC connection could not be established": ${
-          (err as Error).message
-        }`
+      loggerMain.error(
+        Error(
+          `osu! IRC connection could not be established": ${
+            (err as Error).message
+          }`
+        )
       );
-      logger.error(err);
+      loggerMain.error(err as Error);
     }
   }
 };
@@ -788,21 +770,23 @@ if (isEntryPoint()) {
         )
       );
       const logger = createLogger(
+        name,
         logDir,
         getEnvVariableValueOrDefault(EnvVariable.LOGGING_CONSOLE_LOG_LEVEL),
         getEnvVariableValueOrDefault(EnvVariable.LOGGING_FILE_LOG_LEVEL)
       );
+      const logMain = logMessage(logger, "main");
 
       // Call main method
       try {
-        logger.info(`${name} ${getVersion()} was started (logs: '${logDir}')`);
-        logger.debug(`Config directory: '${configDir}'`);
-        logger.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
+        logMain.info(`${name} ${getVersion()} was started (logs: '${logDir}')`);
+        logMain.debug(`Config directory: '${configDir}'`);
+        logMain.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
         await main(logger, configDir);
-        logger.debug(`${name} was closed`);
+        logMain.debug(`${name} was closed`);
       } catch (err) {
-        logger.error(err);
-        logger.debug(`${name} was closed after unexpected error`);
+        logMain.error(err as Error);
+        logMain.debug(`${name} was closed after unexpected error`);
         throw err;
       }
     } catch (err) {

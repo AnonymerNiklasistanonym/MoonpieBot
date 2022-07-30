@@ -2,8 +2,11 @@
  * Twitch Client/Connection
  */
 
-import { client as tmiClient, Client } from "tmi.js";
-// Type import
+// Package imports
+import { Client, client as tmiClient } from "tmi.js";
+// Local imports
+import { logMessage } from "./logging";
+// Type imports
 import type { Logger } from "winston";
 
 /**
@@ -57,16 +60,17 @@ export const createTwitchClient = (
   debug = false,
   logger: Logger
 ): Client => {
+  const logTwitch = logMessage(logger, LOG_ID_MODULE_TWITCH, {
+    subsection: "create_client",
+  });
+
   // Throw an error if Twitch name,token or channels were not defined or empty
   if (twitchName === undefined) {
     const error = Error(
       "Could not create Twitch client: twitchName was undefined"
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_NAME_UNDEFINED;
-    logger.error({
-      message: error.message,
-      section: LOG_ID_MODULE_TWITCH,
-    });
+    logTwitch.error(error);
     throw error;
   }
   if (twitchOAuthToken === undefined) {
@@ -74,10 +78,7 @@ export const createTwitchClient = (
       "Could not create Twitch client: twitchOAuthToken was undefined"
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_OAUTH_TOKEN_UNDEFINED;
-    logger.error({
-      message: error.message,
-      section: LOG_ID_MODULE_TWITCH,
-    });
+    logTwitch.error(error);
     throw error;
   }
   if (twitchChannels === undefined) {
@@ -85,10 +86,7 @@ export const createTwitchClient = (
       "Could not create Twitch client: twitchChannels was undefined"
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_CHANNELS_UNDEFINED;
-    logger.error({
-      message: error.message,
-      section: LOG_ID_MODULE_TWITCH,
-    });
+    logTwitch.error(error);
     throw error;
   }
   if (twitchChannels.length === 0) {
@@ -96,19 +94,15 @@ export const createTwitchClient = (
       "Could not create Twitch client: twitchChannels list was empty"
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_CHANNELS_EMPTY;
-    logger.error({
-      message: error.message,
-      section: LOG_ID_MODULE_TWITCH,
-    });
+    logTwitch.error(error);
     throw error;
   }
 
-  logger.info({
-    message: `Create Twitch client for the account "${twitchName}" in the channels: ${twitchChannels
+  logTwitch.info(
+    `Create Twitch client for the account "${twitchName}" in the channels: ${twitchChannels
       .map((a) => '"' + a + '"')
-      .join(",")}`,
-    section: LOG_ID_MODULE_TWITCH,
-  });
+      .join(",")}`
+  );
 
   // Create Twitch client that can listen to all specified channels
   const client: Client = new tmiClient({
@@ -134,6 +128,7 @@ export interface LogTwitchMessageOptions {
   subsection?: string;
 }
 
+// eslint-disable-next-line jsdoc/require-returns
 /**
  * Log a Twitch message.
  *
@@ -145,15 +140,12 @@ export const logTwitchMessage = (
   logger: Logger,
   message: string,
   options?: LogTwitchMessageOptions
-) => {
-  logger.log({
-    level: "debug",
-    message: message,
-    section: "twitch_message",
+): void =>
+  logMessage(logger, "twitch_message", {
     subsection: options?.subsection,
-  });
-};
+  }).debug(message);
 
+// eslint-disable-next-line jsdoc/require-returns
 /**
  * Log a Twitch message reply.
  *
@@ -167,7 +159,7 @@ export const logTwitchMessageReply = (
   messageId: string,
   sentMessage: string[],
   replySourceId: string
-) => {
+) =>
   logTwitchMessage(
     logger,
     `Successfully replied to message ${messageId}: '${JSON.stringify(
@@ -175,8 +167,8 @@ export const logTwitchMessageReply = (
     )}'`,
     { subsection: replySourceId }
   );
-};
 
+// eslint-disable-next-line jsdoc/require-returns
 /**
  * Log a Twitch broadcast message.
  *
@@ -188,7 +180,7 @@ export const logTwitchMessageBroadcast = (
   logger: Logger,
   sentMessage: string[],
   broadcastSourceId: string
-) => {
+) =>
   logTwitchMessage(
     logger,
     `Successfully broadcasted: '${JSON.stringify(sentMessage)}'`,
@@ -196,8 +188,8 @@ export const logTwitchMessageBroadcast = (
       subsection: broadcastSourceId,
     }
   );
-};
 
+// eslint-disable-next-line jsdoc/require-returns
 /**
  * Log a detected command in a  Twitch message.
  *
@@ -213,7 +205,7 @@ export const logTwitchMessageDetected = (
   message: string[],
   detectionReason: string,
   detectorSourceId: string
-) => {
+) =>
   logTwitchMessage(
     logger,
     `Detected ${detectionReason} in message ${messageId}: ${JSON.stringify(
@@ -221,4 +213,3 @@ export const logTwitchMessageDetected = (
     )}`,
     { subsection: detectorSourceId }
   );
-};

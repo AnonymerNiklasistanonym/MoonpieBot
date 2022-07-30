@@ -7,9 +7,9 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import {
-  errorMessageOsuApiCredentialsUndefined,
-  OsuCommands,
   LOG_ID_COMMAND_OSU,
+  OsuCommands,
+  errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import { messageParserById } from "../../messageParser";
 import {
