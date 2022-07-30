@@ -101,7 +101,7 @@ export const spotifyChatHandler = async (
   logger: Logger
 ): Promise<void> => {
   // > !np
-  if (message.match(regexSong) && enabled?.includes(SpotifyCommands.SONG)) {
+  if (message.match(regexSong) && enabled.includes(SpotifyCommands.SONG)) {
     logTwitchMessageCommandDetected(
       logger,
       tags.id,

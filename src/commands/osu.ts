@@ -218,7 +218,7 @@ export const osuChatHandler = async (
   logger: Logger
 ): Promise<void> => {
   // > !np
-  if (message.match(regexNp) && enabled?.includes(OsuCommands.NP)) {
+  if (message.match(regexNp) && enabled.includes(OsuCommands.NP)) {
     logTwitchMessageCommandDetected(
       logger,
       tags.id,
@@ -242,7 +242,7 @@ export const osuChatHandler = async (
     return;
   }
   // > !rp
-  if (message.match(regexRp) && enabled?.includes(OsuCommands.RP)) {
+  if (message.match(regexRp) && enabled.includes(OsuCommands.RP)) {
     logTwitchMessageCommandDetected(
       logger,
       tags.id,
@@ -269,7 +269,7 @@ export const osuChatHandler = async (
     return;
   }
   // > !pp
-  if (message.match(regexPp) && enabled?.includes(OsuCommands.PP)) {
+  if (message.match(regexPp) && enabled.includes(OsuCommands.PP)) {
     logTwitchMessageCommandDetected(
       logger,
       tags.id,
@@ -300,7 +300,7 @@ export const osuChatHandler = async (
     if (
       (message.match(regexEnableBeatmapRequests) ||
         message.match(regexDisableBeatmapRequests)) &&
-      enabled?.includes(OsuCommands.REQUESTS)
+      enabled.includes(OsuCommands.REQUESTS)
     ) {
       const matchEnable = message.match(regexEnableBeatmapRequests);
       const matchDisable = message.match(regexDisableBeatmapRequests);
@@ -344,7 +344,7 @@ export const osuChatHandler = async (
       return;
     } else if (
       message.match(regexBeatmapRequestsStatus) &&
-      enabled?.includes(OsuCommands.REQUESTS)
+      enabled.includes(OsuCommands.REQUESTS)
     ) {
       logTwitchMessageCommandDetected(
         logger,
