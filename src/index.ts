@@ -84,6 +84,7 @@ import type {
   CustomCommandJson,
 } from "./other/customCommand";
 import type { CustomTimerJson } from "./other/customTimer";
+import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 
 /**
  * The logging ID of this module.
@@ -104,8 +105,13 @@ const LOG_ID_MODULE_MAIN = "main";
  *
  * @param logger Logger (used for logging).
  * @param configDir The directory in which all configurations are contained.
+ * @param logDir The directory in which all logs are contained.
  */
-export const main = async (logger: Logger, configDir: string) => {
+export const main = async (
+  logger: Logger,
+  configDir: string,
+  logDir: string
+) => {
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 
@@ -294,6 +300,23 @@ export const main = async (logger: Logger, configDir: string) => {
 
   // Setup database tables (or do nothing if they already exist)
   await moonpieDbSetupTables(pathDatabase, logger);
+  try {
+    const databaseBackupData = await exportMoonpieCountTableToJson(
+      pathDatabase,
+      logger
+    );
+    const dateObject = new Date();
+    const dateDay = `0${dateObject.getDate()}`.slice(-2);
+    const DateMonth = `0${dateObject.getMonth() + 1}`.slice(-2);
+    const dateYear = dateObject.getFullYear();
+    const pathDatabaseBackup = path.join(
+      logDir,
+      `db_backup_moonpie_${dateYear}-${DateMonth}-${dateDay}.json`
+    );
+    await writeJsonFile(pathDatabaseBackup, databaseBackupData);
+  } catch (err) {
+    loggerMain.error(err as Error);
+  }
 
   // Setup message parser
   const pluginsList = [
@@ -782,7 +805,7 @@ if (isEntryPoint()) {
         logMain.info(`${name} ${getVersion()} was started (logs: '${logDir}')`);
         logMain.debug(`Config directory: '${configDir}'`);
         logMain.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
-        await main(logger, configDir);
+        await main(logger, configDir, logDir);
         logMain.debug(`${name} was closed`);
       } catch (err) {
         logMain.error(err as Error);
