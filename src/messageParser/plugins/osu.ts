@@ -88,6 +88,14 @@ export const pluginOsuBeatmap = (
         ["CC", `${beatmap.count_circles}`],
         ["SLC", `${beatmap.count_sliders}`],
         ["SPC", `${beatmap.count_spinners}`],
+        ["PLAY_COUNT", `${beatmap.playcount}`],
+        ["PASS_COUNT", `${beatmap.passcount}`],
+        [
+          "PLAY_COUNT_SHORT",
+          `${Intl.NumberFormat("en", { notation: "compact" }).format(
+            beatmap.playcount
+          )}`,
+        ],
       ];
     },
   };
