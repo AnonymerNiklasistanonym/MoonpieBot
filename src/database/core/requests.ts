@@ -52,24 +52,10 @@ interface LoggerDatabaseOptions {
  */
 const LOG_ID_DATABASE_REQUESTS = "database_requests";
 
-const loggerDatabase = (
-  logger: Logger,
-  message: string,
-  options?: LoggerDatabaseOptions
-) =>
+const logDatabase = (logger: Logger, options?: LoggerDatabaseOptions) =>
   logMessage(logger, LOG_ID_DATABASE_REQUESTS, {
     subsection: options?.subsection,
-  }).debug(message);
-
-const loggerDatabaseError = (
-  logger: Logger,
-  message: string,
-  error: Error,
-  options?: LoggerDatabaseOptions
-) =>
-  logMessage(logger, LOG_ID_DATABASE_REQUESTS, {
-    subsection: options?.subsection,
-  }).error(Error(`${message}: ${error.message}`));
+  });
 
 /**
  * Get one result from the database.
@@ -88,24 +74,20 @@ export const getEach = async <DB_OUT extends { [key: string]: any }>(
   parameters: (string | number)[] = [],
   logger: Logger
 ): Promise<DB_OUT | undefined> => {
-  loggerDatabase(logger, `Run query: '${query}'`, {
-    subsection: "getEach",
-  });
+  const logDbGetEach = logDatabase(logger, { subsection: "getEach" });
+  const logDbGetEachSql = logDatabase(logger, { subsection: "getEach:Sql" });
+  logDbGetEach.debug(`Run query: '${query}'`);
   const db = await open(databasePath, logger, { readOnly: true });
   let requestedElement: DB_OUT;
   return new Promise((resolve, reject) =>
     db
-      .on("trace", (sql) =>
-        loggerDatabase(logger, sql, { subsection: "getEachSql" })
-      )
+      .on("trace", (sql) => logDbGetEachSql.debug(sql))
       .each(
         query,
         parameters,
         (err, row) => {
           if (err) {
-            loggerDatabaseError(logger, "Database error row", err, {
-              subsection: "getEach",
-            });
+            logDbGetEach.error(Error(`Database error row: ${err.message}`));
             reject(err);
           } else {
             requestedElement = row as DB_OUT;
@@ -113,23 +95,19 @@ export const getEach = async <DB_OUT extends { [key: string]: any }>(
         },
         (err) => {
           if (err) {
-            loggerDatabaseError(logger, "Database error", err, {
-              subsection: "getEach",
-            });
+            logDbGetEach.error(Error(`Database error: ${err.message}`));
           }
           db.close((errClose) => {
             if (errClose) {
-              loggerDatabaseError(logger, "Database error close", errClose, {
-                subsection: "getEach",
-              });
+              logDbGetEach.error(
+                Error(`Database error close: ${errClose.message}`)
+              );
             }
             if (err || errClose) {
               return reject(err ? err : errClose);
             }
-            loggerDatabase(
-              logger,
-              `Run result each: "${JSON.stringify(requestedElement)}"`,
-              { subsection: "getEach" }
+            logDbGetEach.debug(
+              `Run result each: "${JSON.stringify(requestedElement)}"`
             );
             resolve(requestedElement);
           });
@@ -155,33 +133,27 @@ export const getAll = async <DB_OUT extends { [key: string]: any }>(
   parameters: (string | number)[] = [],
   logger: Logger
 ): Promise<DB_OUT[]> => {
-  loggerDatabase(logger, `Run query: '${query}'`, {
-    subsection: "getAll",
-  });
+  const logDbGetAll = logDatabase(logger, { subsection: "getAll" });
+  const logDbGetAllSql = logDatabase(logger, { subsection: "getAll:Sql" });
+  logDbGetAll.debug(`Run query: '${query}'`);
   const db = await open(databasePath, logger, { readOnly: true });
   return new Promise((resolve, reject) =>
     db
-      .on("trace", (sql) =>
-        loggerDatabase(logger, sql, { subsection: "getAllSql" })
-      )
+      .on("trace", (sql) => logDbGetAllSql.debug(sql))
       .all(query, parameters, (err, rows) => {
         if (err) {
-          loggerDatabaseError(logger, "Database error", err, {
-            subsection: "getAll",
-          });
+          logDbGetAll.error(Error(`Database error: ${err.message}`));
         }
         db.close((errClose) => {
           if (errClose) {
-            loggerDatabaseError(logger, "Database error close", errClose, {
-              subsection: "getAll",
-            });
+            logDbGetAll.error(
+              Error(`Database error close: ${errClose.message}`)
+            );
           }
           if (err || errClose) {
             return reject(err ? err : errClose);
           }
-          loggerDatabase(logger, `Run Result: '${JSON.stringify(rows)}'`, {
-            subsection: "getAll",
-          });
+          logDbGetAll.debug(`Run Result: '${JSON.stringify(rows)}'`);
           resolve(rows);
         });
       })
@@ -203,33 +175,25 @@ export const post = async (
   parameters: (string | number)[] = [],
   logger: Logger
 ): Promise<RunResult> => {
-  loggerDatabase(logger, `Run query: "${query}"`, {
-    subsection: "post",
-  });
+  const logDbPost = logDatabase(logger, { subsection: "post" });
+  const logDbPostSql = logDatabase(logger, { subsection: "post:Sql" });
+  logDbPost.debug(`Run query: "${query}"`);
   const db = await open(databasePath, logger);
   return new Promise((resolve, reject) =>
     db
-      .on("trace", (sql) =>
-        loggerDatabase(logger, sql, { subsection: "postSql" })
-      )
+      .on("trace", (sql) => logDbPostSql.debug(sql))
       .run(query, parameters, function (err) {
         if (err) {
-          loggerDatabaseError(logger, "Database error", err, {
-            subsection: "post",
-          });
+          logDbPost.error(Error(`Database error: ${err.message}`));
         }
         db.close((errClose) => {
           if (errClose) {
-            loggerDatabaseError(logger, "Database error close", errClose, {
-              subsection: "post",
-            });
+            logDbPost.error(Error(`Database error close: ${errClose.message}`));
           }
           if (err || errClose) {
             return reject(err ? err : errClose);
           }
-          loggerDatabase(logger, `Post Result: '${JSON.stringify(this)}'`, {
-            subsection: "post",
-          });
+          logDbPost.debug(`Post Result: '${JSON.stringify(this)}'`);
           resolve(this);
         });
       })

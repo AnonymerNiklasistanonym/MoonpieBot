@@ -23,7 +23,6 @@ export interface OpenDatabaseOptions {
 }
 
 interface LoggerDatabaseOptions {
-  error?: boolean;
   subsection?: string;
 }
 
@@ -32,39 +31,26 @@ interface LoggerDatabaseOptions {
  */
 const LOG_ID_DATABASE_MANAGEMENT = "database_management";
 
-const loggerDatabase = (
-  logger: Logger,
-  message: string | Error,
-  options?: LoggerDatabaseOptions
-) => {
-  const baseMethod = logMessage(logger, LOG_ID_DATABASE_MANAGEMENT, {
+const logDatabase = (logger: Logger, options?: LoggerDatabaseOptions) =>
+  logMessage(logger, LOG_ID_DATABASE_MANAGEMENT, {
     subsection: options?.subsection,
   });
-  if (options?.error !== undefined) {
-    baseMethod.error(message instanceof Error ? message : Error(message));
-  } else {
-    baseMethod.debug(message instanceof Error ? message.message : message);
-  }
-};
 
 export const open = async (
   dbNamePath: string,
   logger: Logger,
   options?: OpenDatabaseOptions
 ): Promise<Database> => {
+  const logDbOpen = logDatabase(logger, { subsection: "open" });
   return new Promise((resolve, reject) => {
-    loggerDatabase(
-      logger,
-      `Open '${dbNamePath}' (options=${JSON.stringify(options)})`,
-      { subsection: "open" }
-    );
+    logDbOpen.debug(`Open '${dbNamePath}' (${JSON.stringify(options)})`);
     const sqliteOpenMode =
       options !== undefined && options.readOnly
         ? sqlite3.OPEN_READONLY
         : sqlite3.OPEN_READWRITE;
     const db = new sqlite3.Database(dbNamePath, sqliteOpenMode, (err) => {
       if (err) {
-        loggerDatabase(logger, err, { error: true, subsection: "open" });
+        logDbOpen.error(err);
         reject(err);
       } else {
         resolve(db);
@@ -81,14 +67,15 @@ export const create = async (
   dbNamePath: string,
   logger: Logger
 ): Promise<Database> => {
+  const logDbCreate = logDatabase(logger, { subsection: "open" });
   return new Promise((resolve, reject) => {
-    loggerDatabase(logger, `Create '${dbNamePath}'`, { subsection: "create" });
+    logDbCreate.debug(`Create '${dbNamePath}'`);
     const db = new sqlite3.Database(
       dbNamePath,
       sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
       (err) => {
         if (err) {
-          loggerDatabase(logger, err, { error: true, subsection: "create" });
+          logDbCreate.error(err);
           reject(err);
         } else {
           resolve(db);
@@ -102,7 +89,8 @@ export const remove = async (
   dbNamePath: string,
   logger: Logger
 ): Promise<void> => {
-  loggerDatabase(logger, `Remove '${dbNamePath}'`, { subsection: "remove" });
+  const logDbRemove = logDatabase(logger, { subsection: "remove" });
+  logDbRemove.debug(`Remove '${dbNamePath}'`);
   try {
     await fs.access(dbNamePath);
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -113,7 +101,9 @@ export const remove = async (
   }
   // Sanity check on Windows
   if (await exists(dbNamePath, logger)) {
-    throw Error("Database still exists");
+    const errorStillExists = Error("Database still exists");
+    logDbRemove.error(errorStillExists);
+    throw errorStillExists;
   }
 };
 
@@ -121,7 +111,9 @@ export const exists = async (
   dbNamePath: string,
   logger: Logger
 ): Promise<boolean> => {
-  loggerDatabase(logger, `Does '${dbNamePath}' exist`, { subsection: "exits" });
+  logDatabase(logger, { subsection: "exists" }).debug(
+    `Does '${dbNamePath}' exist`
+  );
   try {
     await fs.access(dbNamePath);
     return true;
