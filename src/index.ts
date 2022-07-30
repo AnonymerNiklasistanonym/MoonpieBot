@@ -42,6 +42,7 @@ import {
 import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { generatePluginsAndMacrosMap } from "./messageParser";
 import {
+  pluginConvertToShortNumber,
   pluginIfEmpty,
   pluginIfEqual,
   pluginIfFalse,
@@ -292,6 +293,7 @@ export const main = async (
 
   // Setup message parser
   const pluginsList = [
+    pluginConvertToShortNumber,
     pluginIfEmpty,
     pluginIfEqual,
     pluginIfFalse,

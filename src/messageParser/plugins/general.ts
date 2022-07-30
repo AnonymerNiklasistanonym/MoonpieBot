@@ -451,3 +451,21 @@ export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
     return finalString;
   },
 };
+
+export const pluginConvertToShortNumber: MessageParserPlugin = {
+  id: "CONVERT_TO_SHORT_NUMBER",
+  description: `Shorten a long number into a short number string`,
+  examples: [
+    { argument: "26934111" },
+    { argument: "0" },
+    { argument: "10" },
+    { argument: "1101" },
+  ],
+  func: (_logger, numberString?: string) => {
+    if (numberString === undefined) {
+      throw Error("Number string was undefined");
+    }
+    const number = parseInt(numberString);
+    return Intl.NumberFormat("en", { notation: "compact" }).format(number);
+  },
+};
