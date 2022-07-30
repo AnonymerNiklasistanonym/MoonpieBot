@@ -39,7 +39,7 @@ export enum EnvVariable {
   /** The path to the moonpie database. */
   MOONPIE_DATABASE_PATH = "MOONPIE_DATABASE_PATH",
   /** The amount of hours between which no moonpie can be claimed. */
-  MOONPIE_COOLDOWN_HOURS = "MOONPIE_COOLDOWN_HOURS",
+  MOONPIE_CLAIM_COOLDOWN_HOURS = "MOONPIE_CLAIM_COOLDOWN_HOURS",
   OSU_API_CLIENT_ID = "OSU_API_CLIENT_ID",
   OSU_API_CLIENT_SECRET = "OSU_API_CLIENT_SECRET",
   OSU_API_DEFAULT_ID = "OSU_API_DEFAULT_ID",
@@ -284,12 +284,13 @@ export const getEnvVariableValueInformation = (
         block: EnvVariableBlocks.MOONPIE,
         legacyNames: ["DB_FILEPATH"],
       };
-    case EnvVariable.MOONPIE_COOLDOWN_HOURS:
+    case EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS:
       return {
-        default: "24",
+        default: "18",
         description:
-          "The number of hours for which a user is unable to claim a Moonpie after claiming one.",
+          "The number of hours for which a user is unable to claim a Moonpie after claiming one (less than 24 in case of daily streams).",
         block: EnvVariableBlocks.MOONPIE,
+        legacyNames: ["MOONPIE_COOLDOWN_HOURS"],
       };
 
     case EnvVariable.OSU_ENABLE_COMMANDS:

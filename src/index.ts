@@ -140,14 +140,14 @@ export const main = async (
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
   const moonpieCooldownHoursString = getEnvVariableValueOrDefault(
-    EnvVariable.MOONPIE_COOLDOWN_HOURS
+    EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS
   );
-  let moonpieCooldownHoursNumber: number;
+  let moonpieClaimCooldownHoursNumber: number;
   try {
-    moonpieCooldownHoursNumber = parseInt(moonpieCooldownHoursString);
+    moonpieClaimCooldownHoursNumber = parseInt(moonpieCooldownHoursString);
   } catch (err) {
     throw Error(
-      `The moonpie cooldown hours number string could not be parsed (${moonpieCooldownHoursString})`
+      `The moonpie claim cooldown hours number string could not be parsed (${moonpieCooldownHoursString})`
     );
   }
   // > Spotify API
@@ -448,7 +448,7 @@ export const main = async (
       tags,
       message,
       pathDatabase,
-      moonpieCooldownHoursNumber,
+      moonpieClaimCooldownHoursNumber,
       getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS)?.split(
         ","
       ),
