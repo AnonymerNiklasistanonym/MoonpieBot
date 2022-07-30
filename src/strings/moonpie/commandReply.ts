@@ -27,7 +27,7 @@ export const moonpieCommandReplyAlreadyClaimedRefStar = {
 
 export const moonpieCommandReplyAlreadyClaimed = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED`,
-  default: `@$(USER) %TWITCH:USER_ID% $(IF_EQUAL=%TWITCH:USER_ID%===93818178|$[${moonpieCommandReplyAlreadyClaimedRefStar.id}])$(IF_NOT_EQUAL=%TWITCH:USER_ID%!==93818178|$[${moonpieCommandReplyAlreadyClaimedRefNormal.id}])`,
+  default: `@$(USER) $(IF_EQUAL=%TWITCH:USER_ID%===93818178|$[${moonpieCommandReplyAlreadyClaimedRefStar.id}])$(IF_NOT_EQUAL=%TWITCH:USER_ID%!==93818178|$[${moonpieCommandReplyAlreadyClaimedRefNormal.id}])`,
 };
 
 export const moonpieCommandReplyLeaderboardPrefix = {
