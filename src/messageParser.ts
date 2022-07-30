@@ -655,6 +655,7 @@ export const parseTreeNode = async (
       // eslint-disable-next-line no-case-declarations
       let pluginOutput;
       try {
+        // TODO Think about a cache implementation
         pluginOutput = await plugin(logger, pluginValueString);
       } catch (err) {
         logMessageParser.error(err as Error);

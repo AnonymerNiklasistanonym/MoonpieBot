@@ -1,8 +1,11 @@
+// Package imports
 import { open } from "../core";
-
-import { RunResult } from "sqlite3";
-import { SqliteInternalError } from "./management";
+// Local imports
+import { logMessage } from "../../logging";
+// Type imports
 import type { Logger } from "winston";
+import type { RunResult } from "sqlite3";
+import type { SqliteInternalError } from "./management";
 
 /**
  * List of errors that can happen during a post request.
@@ -44,32 +47,29 @@ interface LoggerDatabaseOptions {
   subsection?: string;
 }
 
+/**
+ * The logging ID of this chat handler.
+ */
+const LOG_ID_DATABASE_REQUESTS = "database_requests";
+
 const loggerDatabase = (
   logger: Logger,
   message: string,
   options?: LoggerDatabaseOptions
-) => {
-  logger.log({
-    level: "debug",
-    message: message,
-    section: "databaseRequests",
+) =>
+  logMessage(logger, LOG_ID_DATABASE_REQUESTS, {
     subsection: options?.subsection,
-  });
-};
+  }).debug(message);
 
 const loggerDatabaseError = (
   logger: Logger,
   message: string,
   error: Error,
   options?: LoggerDatabaseOptions
-) => {
-  logger.log({
-    level: "error",
-    message: `${message}: ${error.message}`,
-    section: "databaseRequests",
+) =>
+  logMessage(logger, LOG_ID_DATABASE_REQUESTS, {
     subsection: options?.subsection,
-  });
-};
+  }).error(Error(`${message}: ${error.message}`));
 
 /**
  * Get one result from the database.

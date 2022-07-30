@@ -63,7 +63,7 @@ export const exists = async (
   twitchId: string,
   logger: Logger
 ): Promise<boolean> => {
-  logger.debug("database: exists");
+  //logger.debug("database: exists");
   try {
     const runResultExists =
       await database.requests.getEach<database.queries.ExistsDbOut>(
@@ -96,7 +96,7 @@ export const existsName = async (
   twitchName: string,
   logger: Logger
 ): Promise<boolean> => {
-  logger.debug("database: exists");
+  //logger.debug("database: exists");
   try {
     const runResultExists =
       await database.requests.getEach<database.queries.ExistsDbOut>(

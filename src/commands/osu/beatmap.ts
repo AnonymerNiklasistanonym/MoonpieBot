@@ -8,11 +8,9 @@ import {
 } from "../../commands";
 import {
   LOG_ID_COMMAND_OSU,
+  LOG_ID_CHAT_HANDLER_OSU,
   errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
-import { isProcessRunning } from "../../other/processInformation";
-import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
-import { messageParserById } from "../../messageParser";
 import {
   osuBeatmapRequest,
   osuBeatmapRequestCurrentlyOff,
@@ -25,6 +23,10 @@ import {
   osuBeatmapRequestTurnedOff,
   osuBeatmapRequestTurnedOn,
 } from "../../strings/osu/beatmapRequest";
+import { isProcessRunning } from "../../other/processInformation";
+import { logMessage } from "../../logging";
+import { messageParserById } from "../../messageParser";
+import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { Client as IrcClient } from "irc";
@@ -81,6 +83,10 @@ export const commandBeatmap = async (
     throw errorMessageOsuApiCredentialsUndefined();
   }
 
+  const logCmdBeatmap = logMessage(logger, LOG_ID_CHAT_HANDLER_OSU, {
+    subsection: "beatmap",
+  });
+
   const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
     osuApiV2Credentials.clientId,
     osuApiV2Credentials.clientSecret
@@ -113,7 +119,7 @@ export const commandBeatmap = async (
     // Check for user score
   } catch (err) {
     if ((err as OsuApiV2WebRequestError).statusCode === 404) {
-      logger.warn(err);
+      logCmdBeatmap.warn((err as OsuApiV2WebRequestError).message);
       const errorMessage = await messageParserById(
         osuBeatmapRequestNotFound.id,
         globalStrings,
@@ -172,7 +178,7 @@ export const commandBeatmap = async (
     }),
     new Promise<void>((resolve, reject) => {
       if (!beatmapInformationWasFound) {
-        logger.debug(
+        logCmdBeatmap.debug(
           "osu! beatmap information was not found, stop attempt sending beatmap over IRC channel"
         );
         return resolve();
@@ -180,7 +186,7 @@ export const commandBeatmap = async (
       isProcessRunning("osu")
         .then((osuIsRunning) => {
           if (!osuIsRunning) {
-            logger.debug(
+            logCmdBeatmap.debug(
               "osu! was not found running, stop attempt sending beatmap over IRC channel"
             );
             return resolve();
@@ -190,12 +196,12 @@ export const commandBeatmap = async (
             osuIrcBot !== undefined &&
             osuIsRunning
           ) {
-            logger.info("Try to create an osu IRC connection");
+            logCmdBeatmap.info("Try to create an osu IRC connection");
             try {
               let osuIrcBotInstance: undefined | IrcClient = osuIrcBot();
-              logger.info("Try to connect to osu IRC channel");
+              logCmdBeatmap.info("Try to connect to osu IRC channel");
               osuIrcBotInstance.connect(2, () => {
-                logger.info("osu! IRC connection was established");
+                logCmdBeatmap.info("osu! IRC connection was established");
                 for (const messagePart of messageRequestIrc.split(
                   "%NEWLINE%"
                 )) {
@@ -204,7 +210,7 @@ export const commandBeatmap = async (
                 osuIrcBotInstance?.disconnect("", () => {
                   osuIrcBotInstance?.conn.end();
                   osuIrcBotInstance = undefined;
-                  logger.info("osu! IRC connection was closed");
+                  logCmdBeatmap.info("osu! IRC connection was closed");
                   return resolve();
                 });
               });

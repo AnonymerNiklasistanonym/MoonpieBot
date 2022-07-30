@@ -10,9 +10,8 @@ import {
   LOG_ID_COMMAND_OSU,
   OsuCommands,
   errorMessageOsuApiCredentialsUndefined,
+  LOG_ID_CHAT_HANDLER_OSU,
 } from "../osu";
-import { getProcessWindowTitle } from "../../other/processInformation";
-import { messageParserById } from "../../messageParser";
 import {
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
@@ -20,6 +19,9 @@ import {
   osuCommandReplyNpStreamCompanion,
   osuCommandReplyNpStreamCompanionNotRunning,
 } from "../../strings/osu/commandReply";
+import { getProcessWindowTitle } from "../../other/processInformation";
+import { logMessage } from "../../logging";
+import { messageParserById } from "../../messageParser";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
@@ -87,6 +89,11 @@ export const commandNp = async (
   if (userName === undefined) {
     throw errorMessageUserNameUndefined();
   }
+
+  const logCmdNp = logMessage(logger, LOG_ID_CHAT_HANDLER_OSU, {
+    subsection: OsuCommands.NP,
+  });
+
   let message = await messageParserById(
     osuCommandReplyNpNoMap.id,
     globalStrings,
@@ -178,7 +185,7 @@ export const commandNp = async (
             }
           }
         } catch (err) {
-          logger.warn(err);
+          logCmdNp.warn((err as Error).message);
         }
         const customMacros = new Map(globalMacros);
         customMacros.set(

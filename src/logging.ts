@@ -99,6 +99,14 @@ export const logMessage = (
       subsection: info.subsection ? info.subsection : undefined,
     });
   },
+  warn: (message: string) => {
+    logger.log({
+      level: "warn",
+      message,
+      section,
+      subsection: info.subsection ? info.subsection : undefined,
+    });
+  },
   error: (error: Error) => {
     logger.log({
       level: "error",

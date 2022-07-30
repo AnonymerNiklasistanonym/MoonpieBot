@@ -27,6 +27,11 @@ export const LOG_ID_COMMAND_OSU = "osu";
  */
 export const LOG_ID_MODULE_OSU = "osu";
 
+/**
+ * The logging ID of this chat handler.
+ */
+export const LOG_ID_CHAT_HANDLER_OSU = "osu_chat_handler";
+
 export enum OsuCommands {
   PP = "pp",
   NP = "np",

@@ -1,8 +1,11 @@
-import { Database } from "sqlite3";
+// Package imports
 import * as sqlite from "sqlite3";
-
-import { ErrorCodePostRequest } from "./requests";
+import { Database } from "sqlite3";
 import { promises as fs } from "fs";
+// Local imports
+import { ErrorCodePostRequest } from "./requests";
+import { logMessage } from "../../logging";
+// Type imports
 import type { Logger } from "winston";
 
 const sqlite3 = sqlite.verbose();
@@ -24,17 +27,24 @@ interface LoggerDatabaseOptions {
   subsection?: string;
 }
 
+/**
+ * The logging ID of this chat handler.
+ */
+const LOG_ID_DATABASE_MANAGEMENT = "database_management";
+
 const loggerDatabase = (
   logger: Logger,
   message: string | Error,
   options?: LoggerDatabaseOptions
 ) => {
-  logger.log({
-    level: options?.error !== undefined ? "error" : "debug",
-    message: message.toString(),
-    section: "databaseManagement",
+  const baseMethod = logMessage(logger, LOG_ID_DATABASE_MANAGEMENT, {
     subsection: options?.subsection,
   });
+  if (options?.error !== undefined) {
+    baseMethod.error(message instanceof Error ? message : Error(message));
+  } else {
+    baseMethod.debug(message instanceof Error ? message.message : message);
+  }
 };
 
 export const open = async (
@@ -99,7 +109,7 @@ export const remove = async (
     await fs.unlink(dbNamePath);
   } catch (error) {
     // File does not exist, do nothing
-    logger.warn(error);
+    //logger.warn(error);
   }
   // Sanity check on Windows
   if (await exists(dbNamePath, logger)) {
