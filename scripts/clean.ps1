@@ -23,7 +23,7 @@ $InstallerDir = "installer"
 $TmpDir = "tmp"
 
 $DirectoriesToRemove = $DistDir,$BinaryDir,$DocsDir,$NodeModulesDir,$TmpDir
-$FilesToRemoveFromInstallerDir = Get-ChildItem -Recurse -Include "*.log","*.zst","*.log","*.bin","*.svg","*.git","*.pkg","*.tar" $InstallerDir
+$FilesToRemoveFromInstallerDir = Get-ChildItem -Recurse -Include "*.log","*.zst","*.log","*.bin","*.svg","*.git","*.pkg","*.tar","logpipe.*","*.log.*" $InstallerDir
 
 Remove-Item $DirectoriesToRemove -ErrorAction Ignore -Recurse -Force -Confirm:$false
 
