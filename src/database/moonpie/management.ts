@@ -16,20 +16,19 @@ export const createAndSetupTables = async (
   const loggerDatabase = logMessage(logger, "database", {
     subsection: "setup",
   });
-  loggerDatabase.info("Setup database..");
+  loggerDatabase.debug("Setup database...");
 
-  // Create database
+  // Create database if not already existing
   // The warning makes literally no sense
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   if (!(await database.exists(databasePath, logger))) {
     await database.create(databasePath, logger);
   }
-  // The warning makes literally no sense
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await database.open(databasePath, logger);
-  loggerDatabase.info(`Database was created/loaded '${databasePath}'`);
 
-  // Moonpie table
+  // TODO Update this and think about migrations on later versions
+
+  // Setup database tables
+  // > Create Moonpie table if not existing
   await database.requests.post(
     databasePath,
     database.queries.createTable(
@@ -61,7 +60,7 @@ export const createAndSetupTables = async (
     undefined,
     logger
   );
-  // Moonpie leaderboard table
+  // > Create Moonpie leaderboard table if not existing
   await database.requests.post(
     databasePath,
     database.queries.createView(
@@ -109,7 +108,7 @@ export const createAndSetupTables = async (
     undefined,
     logger
   );
-  loggerDatabase.info(`Database tables were created/loaded '${databasePath}'`);
+  loggerDatabase.debug(`Database tables were created/loaded '${databasePath}'`);
 };
 
 /**

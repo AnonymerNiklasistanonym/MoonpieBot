@@ -139,7 +139,7 @@ export const loadCustomCommandsFromFile = async (
   const loggerCustomCommands = logMessage(logger, "custom_command");
 
   if (await fileExists(filePath)) {
-    loggerCustomCommands.info("Found custom command file");
+    loggerCustomCommands.info("Found custom commands file");
     const newCustomCommands = (
       await readJsonFile<CustomCommandDataJson>(filePath)
     ).commands;
@@ -150,13 +150,11 @@ export const loadCustomCommandsFromFile = async (
         }: ${newCustomCommand.regexString} => ${newCustomCommand.message}`
       );
     }
-    if (newCustomCommands.length > 0) {
-      loggerCustomCommands.info(
-        `Added ${newCustomCommands.length} custom command${
-          newCustomCommands.length > 1 ? "s" : ""
-        }`
-      );
-    }
+    loggerCustomCommands.info(
+      `Added ${newCustomCommands.length} custom command${
+        newCustomCommands.length > 1 ? "s" : ""
+      }`
+    );
     customCommands.push(...newCustomCommands);
   }
 

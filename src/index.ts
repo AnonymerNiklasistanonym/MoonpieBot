@@ -250,34 +250,6 @@ export const main = async (
     );
   }
 
-  // Print to console information about certain things that were enabled
-  // > osu!
-  // TODO Remove unnecessary log output
-  if (!enableOsu && osuStreamCompanionCurrentMapData !== undefined) {
-    loggerMain.info(
-      "Osu features besides the StreamCompanion integration are disabled since not all variables were set"
-    );
-  } else if (!enableOsu) {
-    loggerMain.info(
-      "Osu features are disabled since not all variables were set"
-    );
-  } else {
-    if (!enableOsuBeatmapRequests) {
-      loggerMain.info(
-        "Osu beatmap recognition features are disabled since not all variables were set"
-      );
-    } else if (!enableOsuIrc) {
-      loggerMain.info(
-        "Osu IRC features are disabled since not all variables were set"
-      );
-    }
-    if (osuStreamCompanionCurrentMapData === undefined) {
-      loggerMain.info(
-        "Osu StreamCompanion beatmap recognition features are disabled since not all variables were set"
-      );
-    }
-  }
-
   // Load custom commands
   const customCommands: CustomCommandJson[] = [];
   try {

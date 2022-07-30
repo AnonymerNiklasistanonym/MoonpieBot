@@ -29,20 +29,22 @@ export const exportMoonpieCountTableToJson = async (
 ): Promise<DatabaseStructure[]> => {
   const logDbBackup = logMessage(logger, LOG_ID_MODULE_DB_BACKUP);
 
-  logDbBackup.info("Backup database..");
+  logDbBackup.debug("Backup moonpie database...");
 
-  // Create database
+  // Check if the database exists
   // The warning makes literally no sense
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   if (!(await database.exists(databasePath, logger))) {
-    logDbBackup.info("Database not found");
+    logDbBackup.error(Error("Database not found"));
     throw Error(moonpie.GeneralError.NOT_EXISTING);
   }
+
+  // Check if the database can be opened
   // The warning makes literally no sense
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await database.open(databasePath, logger);
+  await database.open(databasePath, logger, { readOnly: true });
 
-  // Moonpie table
+  // Get Moonpie table data
   const moonpieData = await database.requests.getAll<DatabaseStructure>(
     databasePath,
     database.queries.select(
