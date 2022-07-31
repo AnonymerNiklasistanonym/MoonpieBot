@@ -2,16 +2,16 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
-  errorMessageIdUndefined,
-  errorMessageUserNameUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
-import {
   LOG_ID_CHAT_HANDLER_OSU,
   LOG_ID_COMMAND_OSU,
   OsuCommands,
   errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
+import {
+  errorMessageIdUndefined,
+  errorMessageUserNameUndefined,
+  logTwitchMessageCommandReply,
+} from "../../commands";
 import {
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
@@ -19,15 +19,15 @@ import {
   osuCommandReplyNpStreamCompanion,
   osuCommandReplyNpStreamCompanionNotRunning,
 } from "../../strings/osu/commandReply";
-import { getProcessWindowTitle } from "../../other/processInformation";
 import { createLogFunc } from "../../logging";
+import { getProcessWindowTitle } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
 // Type imports
+import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import type { StreamCompanionData } from "../../streamcompanion";
 import type { OsuApiV2Credentials } from "../osu";
-import type { Macros, Plugins } from "../../messageParser";
+import type { StreamCompanionData } from "../../streamcompanion";
 import type { Strings } from "../../strings";
 
 /**

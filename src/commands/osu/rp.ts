@@ -3,24 +3,24 @@ import osuApiV2, { GameMode } from "osu-api-v2";
 import { ScoresType } from "osu-api-v2/lib/users/scores";
 // Local imports
 import {
-  errorMessageIdUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
-import {
   LOG_ID_COMMAND_OSU,
   OsuCommands,
   errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
-import { messageParserById } from "../../messageParser";
+import {
+  errorMessageIdUndefined,
+  logTwitchMessageCommandReply,
+} from "../../commands";
 import {
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
 } from "../../strings/osu/commandReply";
+import { messageParserById } from "../../messageParser";
 // Type imports
+import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
-import type { Macros, Plugins } from "../../messageParser";
 import type { Strings } from "../../strings";
 
 /**

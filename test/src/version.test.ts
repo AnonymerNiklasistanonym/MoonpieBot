@@ -1,6 +1,8 @@
-import { getVersion, getVersionFromObject } from "../../src/version";
-import { describe } from "mocha";
+// Package imports
 import chai from "chai";
+import { describe } from "mocha";
+// Local imports
+import { getVersion, getVersionFromObject } from "../../src/version";
 
 describe("version", () => {
   it("getVersion", () => {

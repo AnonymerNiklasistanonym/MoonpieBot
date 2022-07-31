@@ -2,15 +2,15 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
-  errorMessageIdUndefined,
-  errorMessageUserNameUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
-import {
   LOG_ID_CHAT_HANDLER_OSU,
   LOG_ID_COMMAND_OSU,
   errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
+import {
+  errorMessageIdUndefined,
+  errorMessageUserNameUndefined,
+  logTwitchMessageCommandReply,
+} from "../../commands";
 import {
   osuBeatmapRequest,
   osuBeatmapRequestCurrentlyOff,
@@ -23,17 +23,17 @@ import {
   osuBeatmapRequestTurnedOff,
   osuBeatmapRequestTurnedOn,
 } from "../../strings/osu/beatmapRequest";
-import { isProcessRunning } from "../../other/processInformation";
+import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 import { createLogFunc } from "../../logging";
 import { messageParserById } from "../../messageParser";
-import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
+import { tryToSendOsuIrcMessage } from "../../osuirc";
 // Type imports
-import type { OsuApiV2WebRequestError } from "osu-api-v2";
-import type { Client as IrcClient } from "irc";
+import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
+import type { Client as IrcClient } from "irc";
 import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
-import type { Macros, Plugins } from "../../messageParser";
+import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { Strings } from "../../strings";
 
 /**
@@ -66,7 +66,7 @@ export const commandBeatmap = async (
   beatmapId: number,
   comment: string | undefined,
   detailedBeatmapInformation: undefined | boolean,
-  osuIrcBot: (() => IrcClient) | undefined,
+  osuIrcBot: ((id: string) => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
   globalStrings: Strings,
   globalPlugins: Plugins,
@@ -166,64 +166,32 @@ export const commandBeatmap = async (
   }
 
   // Send response to Twitch channel and if found to IRC channel
-  await Promise.all([
-    client.say(channel, messageRequest).then((sentMessage) => {
-      logTwitchMessageCommandReply(
-        logger,
-        messageId,
-        sentMessage,
-        LOG_ID_COMMAND_OSU,
-        "beatmap"
-      );
-    }),
-    new Promise<void>((resolve, reject) => {
-      if (!beatmapInformationWasFound) {
-        logCmdBeatmap.debug(
-          "osu! beatmap information was not found, stop attempt sending beatmap over IRC channel"
-        );
-        return resolve();
-      }
-      isProcessRunning("osu")
-        .then((osuIsRunning) => {
-          if (!osuIsRunning) {
-            logCmdBeatmap.debug(
-              "osu! was not found running, stop attempt sending beatmap over IRC channel"
-            );
-            return resolve();
-          }
-          if (
-            osuIrcRequestTarget !== undefined &&
-            osuIrcBot !== undefined &&
-            osuIsRunning
-          ) {
-            logCmdBeatmap.info("Try to create an osu IRC connection");
-            try {
-              let osuIrcBotInstance: undefined | IrcClient = osuIrcBot();
-              logCmdBeatmap.info("Try to connect to osu IRC channel");
-              osuIrcBotInstance.connect(2, () => {
-                logCmdBeatmap.info("osu! IRC connection was established");
-                for (const messagePart of messageRequestIrc.split(
-                  "%NEWLINE%"
-                )) {
-                  osuIrcBotInstance?.say(osuIrcRequestTarget, messagePart);
-                }
-                osuIrcBotInstance?.disconnect("", () => {
-                  osuIrcBotInstance?.conn.end();
-                  osuIrcBotInstance = undefined;
-                  logCmdBeatmap.info("osu! IRC connection was closed");
-                  return resolve();
-                });
-              });
-            } catch (err) {
-              return reject(err);
-            }
-          } else {
-            return resolve();
-          }
-        })
-        .catch(reject);
-    }),
-  ]);
+  const sentMessage = await client.say(channel, messageRequest);
+
+  logTwitchMessageCommandReply(
+    logger,
+    messageId,
+    sentMessage,
+    LOG_ID_COMMAND_OSU,
+    "beatmap"
+  );
+
+  if (!beatmapInformationWasFound) {
+    logCmdBeatmap.debug(
+      "osu! beatmap information was not found, stop attempt sending beatmap over IRC channel"
+    );
+    return;
+  }
+  if (osuIrcRequestTarget !== undefined && osuIrcBot !== undefined) {
+    logCmdBeatmap.info("Try to send beatmap request via osu! IRC connection");
+    await tryToSendOsuIrcMessage(
+      osuIrcBot,
+      "commandBeatmap",
+      osuIrcRequestTarget,
+      messageRequestIrc.split("%NEWLINE%"),
+      logger
+    );
+  }
 };
 
 /**

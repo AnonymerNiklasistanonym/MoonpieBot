@@ -7,6 +7,7 @@ import irc from "irc";
 import { mkdirSync } from "fs";
 // Local imports
 import { CliVariable, getCliVariableDocumentation } from "./cli";
+import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuirc";
 import {
   EnvVariable,
   getEnvVariableValueOrDefault,
@@ -57,13 +58,11 @@ import {
   pluginOsuScore,
   pluginOsuUser,
 } from "./messageParser/plugins/osu";
-import { createOsuIrcConnection } from "./osuirc";
 import { createStreamCompanionConnection } from "./streamcompanion";
 import { createTwitchClient } from "./twitch";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { generatePluginsAndMacrosMap } from "./messageParser";
 import { getVersion } from "./version";
-import { isProcessRunning } from "./other/processInformation";
 import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
@@ -235,10 +234,10 @@ export const main = async (
   const enableOsuBeatmapRequests = osuApiBeatmapRequests === "ON";
   const enableOsuBeatmapRequestsDetailed =
     osuApiBeatmapRequestsDetailed === "ON";
-  let osuIrcBot: undefined | (() => irc.Client) = undefined;
+  let osuIrcBot: undefined | ((id: string) => irc.Client) = undefined;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
-    osuIrcBot = () =>
-      createOsuIrcConnection(osuIrcUsername, osuIrcPassword, logger);
+    osuIrcBot = (id: string) =>
+      createOsuIrcConnection(osuIrcUsername, osuIrcPassword, id, logger);
   }
   // > osu! StreamCompanion
   let osuStreamCompanionCurrentMapData:
@@ -665,35 +664,16 @@ export const main = async (
   }
 
   // Check if IRC bot is working
-  if (
-    enableOsu &&
-    osuIrcBot &&
-    osuIrcRequestTarget &&
-    (await isProcessRunning("osu"))
-  ) {
+  if (enableOsu && osuIrcBot && osuIrcRequestTarget) {
     try {
-      let osuIrcBotInstance: undefined | irc.Client = osuIrcBot();
-      loggerMain.info("Try to connect to osu IRC channel");
-      osuIrcBotInstance.connect(2, () => {
-        loggerMain.info("osu! IRC connection was established");
-        osuIrcBotInstance?.say(
-          osuIrcRequestTarget,
-          `UwU (${name} ${getVersion()})`
-        );
-        osuIrcBotInstance?.disconnect("", () => {
-          osuIrcBotInstance?.conn.end();
-          osuIrcBotInstance = undefined;
-          loggerMain.info("osu! IRC connection was closed");
-        });
-      });
-    } catch (err) {
-      loggerMain.error(
-        Error(
-          `osu! IRC connection could not be established": ${
-            (err as Error).message
-          }`
-        )
+      await tryToSendOsuIrcMessage(
+        osuIrcBot,
+        "main",
+        osuIrcRequestTarget,
+        [`UwU (${name} ${getVersion()})`],
+        logger
       );
+    } catch (err) {
       loggerMain.error(err as Error);
     }
   }

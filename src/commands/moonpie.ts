@@ -1,18 +1,19 @@
+// Local imports
 import {
   commandUserDelete,
   commandUserGet,
   commandUserSetCount,
 } from "./moonpie/user";
-import { commandCommands } from "./moonpie/commands";
 import { commandAbout } from "./moonpie/about";
-import { commandLeaderboard } from "./moonpie/leaderboard";
 import { commandClaim } from "./moonpie/claim";
-import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
+import { commandCommands } from "./moonpie/commands";
+import { commandLeaderboard } from "./moonpie/leaderboard";
 import { logTwitchMessageCommandDetected } from "../commands";
+import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
-import type { Logger } from "winston";
 import type { Macros, Plugins } from "../messageParser";
+import type { Logger } from "winston";
 import type { Strings } from "../strings";
 
 /**

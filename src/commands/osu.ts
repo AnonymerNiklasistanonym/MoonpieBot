@@ -206,7 +206,7 @@ export const osuChatHandler = async (
   osuDefaultId: number,
   enableOsuBeatmapRequests: undefined | boolean,
   enableOsuBeatmapRequestsDetailed: undefined | boolean,
-  osuIrcBot: (() => IrcClient) | undefined,
+  osuIrcBot: ((id: string) => IrcClient) | undefined,
   osuIrcRequestTarget: undefined | string,
   osuStreamCompanionCurrentMapData:
     | (() => StreamCompanionData | undefined)
