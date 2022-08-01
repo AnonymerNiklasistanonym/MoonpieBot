@@ -342,7 +342,7 @@ export const getEnvVariableValueInformation = (
         default: "OFF",
         supportedValues: ["ON", "OFF"],
         description:
-          "Automatically recognize beatmap links (=requests) in chat.",
+          "Automatically recognize osu! beatmap links (=requests) in chat.",
         block: EnvVariableBlocks.OSU_API,
         legacyNames: ["OSU_RECOGNIZE_MAP_REQUESTS"],
       };

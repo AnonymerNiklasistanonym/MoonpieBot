@@ -11,6 +11,7 @@ A custom Twitch chat bot.
 **ATTENTION: You need a runtime that implements `fetch` which means you need for example [Node.js v18+](https://nodejs.org/ko/blog/announcements/v18-release-announce/).**
 
 - [Features](#features)
+  - [Default: moonpie](#default-moonpie)
   - [Optional: osu!](#optional-osu)
   - [Optional: Spotify](#optional-spotify)
   - [Optional: Custom commands/timers](#optional-custom-commandstimers)
@@ -39,7 +40,11 @@ A custom Twitch chat bot.
 
 Given a Twitch account name, a connected OAuth token and the channel name where the bot should be deployed will imitate the given account in the given channel.
 
-- Every day a user can claim a *moonpie* and the count is saved in a persistent database:
+All features are optional (which means they can be enabled and disabled) but the moonpie feature is enabled per default.
+
+### Default: moonpie
+
+- Every day a user can claim a *moonpie* and the count is saved in a persistent database that can be accessed with the following commands:
 
   | Command | Permissions | Description |
   | ------ | -- | -------- |
@@ -52,11 +57,11 @@ Given a Twitch account name, a connected OAuth token and the channel name where 
   | `!moonpie set $USER $COUNT` | broadcaster badge | Set moonpie `$COUNT` to `$USER` if found in database |
   | `!moonpie delete $USER` | broadcaster badge | Delete a `$USER` from the database if found in database |
 
-Every command can be optionally disabled.
+**Every command can be optionally disabled.**
 
 ### Optional: osu!
 
-Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can additionally fetch some osu! related information.
+Given an osu! OAuth client ID/secret and a default (streamer) osu! ID the bot can additionally fetch some osu! related information.
 
 | Command | Permissions | Description |
 | ------ | -- | -------- |
@@ -64,15 +69,15 @@ Given an osu! OAuth client ID/secret and a default (streamer) Osu ID the bot can
 | `!pp ($OSU_ID/$OSU_NAME)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given osu! player ID |
 | `!np` | everyone | Get a link to the currently being played map (this can be either done by using the osu! window text [default, slow and only works if the map is being played] or if [StreamCompanion](https://github.com/Piotrekol/StreamCompanion) is configured and running it can use this information instead which works always, is very fast and contains detailed information even regarding the current selected mods) |
 
-Every command can be optionally disabled.
-
 It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat if enabled.
 (This can be temporarily turned off/on with the commands `!osuRequests on`/`!osuRequests off [Optional reason]` and `!osuRequests` can be used to get the current status)
 Given an osu! IRC login it can even send these beatmap links to the osu! client.
 
 It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) can be found in the configuration even if no other osu! related configurations is set.
 
-*Everything is currently optimized and written for osu! standard which means you need to open an issue if you need other behaviour!*
+*Everything is currently optimized and written for osu! standard which means you need to open an issue if you want to use it with another game mode!*
+
+**Every command can be optionally disabled.**
 
 ### Optional: Spotify
 
@@ -84,7 +89,7 @@ After a successful authentication (the bot will automatically open a website for
 | ------ | -- | -------- |
 | `!song` | everyone | Get the currently playing song title/artist and album (if not a single) as well as the same information about the 2 previously played songs |
 
-Every command can be optionally disabled.
+**Every command can be optionally disabled.**
 
 ### Optional: Custom commands/timers
 
@@ -109,7 +114,7 @@ A file called `customTimers.json` can be provided that enables to write custom t
 
 ```json
 {
-    "name": "Timer name",
+    "name": "Timer name (will broadcast message every 30s)",
     "channels": [
         "#channelName"
     ],
@@ -120,7 +125,9 @@ A file called `customTimers.json` can be provided that enables to write custom t
 
 An example file for this is [`customTimers.example.json`](./customTimers.example.json).
 
-For some macros to work (like Twitch API connections for `!so`/`!followage`/`!settitle`/`!setgame`) additional Twitch API credentials need to be provided.
+To convert a `cronString` into a more human readable format you can use for example [this webpage by bradymholt](https://bradymholt.github.io/cron-expression-descriptor/).
+
+For some macros to work (like Twitch API connections for `!so`/`!followage`/`!settitle`/`!setgame`) additional Twitch API credentials need to be provided since the default Twitch API connection is only configured to read and write chat messages.
 
 ### Optional: Custom strings/messages
 
@@ -261,7 +268,7 @@ Migrating to a new version CAN break the database, custom commands, etc.
 This means you should always backup (or don't overwrite) your old configuration file (`.env`), database file (`moonpie.db`) and custom commands/timers (`customCommands/Timers.json`).
 In case of a bug or error this means you can always go back to how it was before and lose nothing.
 
-In case there will be a dabase change I will try to migrate that on the software side but even if this is not happening it should be listed in this section what the breaking change was.
+In case there will be a database change I will try to migrate that on the software side but even if this is not happening it should be listed in this section what the breaking change was.
 
 ---
 
@@ -283,6 +290,8 @@ In case there will be a dabase change I will try to migrate that on the software
    ```sh
    npm run start
    ```
+
+   After following all those steps you don't need to to the previous steps any more until there is an update.
 
 ## Helping Resources
 
@@ -331,7 +340,7 @@ In the following there is a list of some possible configurations (`.env` files):
    - Supports the osu! related now playing "!np" command which will use the StreamCompanion information
    - Supports simple custom commands/timers that don't need special APIs in their messages
 
-3. Default *Moonpie commands and osu! commands* bot configuration: (***lune***)
+3. Default *Moonpie, osu! and Spotify commands* bot configuration: (***lune***)
 
    ```sh
    # Variables necessary for the Twitch chat (read/write) connection
@@ -344,7 +353,7 @@ In the following there is a list of some possible configurations (`.env` files):
    MOONPIE_CONFIG_OSU_API_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
    # Variable of the user that should be checked for top scores
    MOONPIE_CONFIG_OSU_API_DEFAULT_ID=1185432
-   # Variables that enables osu beatmap requests (with detailed map information)
+   # Variables that enables osu! beatmap requests (with detailed map information)
    MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON
    MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED=ON
 
@@ -356,17 +365,26 @@ In the following there is a list of some possible configurations (`.env` files):
    # Variable necessary for the StreamCompanion connection
    MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727
 
-   # Only enable the !np and !rp osu command
-   MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=np,rp
+   # Enable custom commands to make use of some Twitch API connections
+   MOONPIE_CONFIG_TWITCH_API_CLIENT_ID=abcdefghijklmnop
+   MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN=abcdefghijklmnop
+
+   # Enable Spotify API connections and the !song command
+   MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID=abcdefghijklmnop
+   MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET=abcdefghijklmnop
+   MOONPIE_CONFIG_SPOTIFY_API_REFRESH_TOKEN=abcdefghijklmnop
    ```
 
    - Supports all moonpie commands
    - Supports beatmap requests in chat which will use the osu! API
    - Supports the osu! related now playing "!np" command which will use the StreamCompanion information
    - Supports the osu! related most recent play "!rp" command which will use the osu! API
+   - Supports the osu! related "!osuRequests" command which can toggle if beatmap requests are on(=default) or off
    - Supports simple custom commands/timers that don't need special APIs in their messages
+   - Supports advanced custom commands/timers that need access to a special Twitch API in their messages (set/get a game/title or the follow-age)
+   - Supports a Spotify related !song command for getting the currently played song
 
-4. Simple bot that can recognize advanced custom commands configuration:
+4. Simple bot that can make use of the Twitch API (for getting the game of a channel or followage) in custom commands configuration:
 
    ```sh
    # Variables necessary for the Twitch chat (read/write) connection
@@ -385,7 +403,7 @@ In the following there is a list of some possible configurations (`.env` files):
    - Disables default moonpie commands
    - Supports advanced custom commands/timers that need access to a special Twitch API in their messages (set/get a game/title or the follow-age)
 
-5. osu! map request and recent play bot configuration: (***geo***)
+5. osu! map requests and recent play bot configuration: (***geo***)
 
    ```sh
    # Variables necessary for the Twitch chat (read/write) connection
@@ -395,15 +413,15 @@ In the following there is a list of some possible configurations (`.env` files):
 
    # Disable default moonpie commands
    MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS=none
-   # Only enable the !rp osu command
-   MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=rp
+   # Only enable the !rp and !osuRequests osu! command
+   MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=rp,requests
 
    # Variables necessary to use the osu! API
    MOONPIE_CONFIG_OSU_API_CLIENT_ID=1234
    MOONPIE_CONFIG_OSU_API_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
    # Variable of the user that should be checked for top scores
    MOONPIE_CONFIG_OSU_API_DEFAULT_ID=1185432
-   # Variables that enables osu beatmap requests (with detailed map information)
+   # Variables that enables osu! beatmap requests (with detailed map information)
    MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON
    MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED=ON
 
@@ -416,23 +434,31 @@ In the following there is a list of some possible configurations (`.env` files):
    - Disables default moonpie commands
    - Supports beatmap requests in chat which will use the osu! API
    - Supports the osu! related most recent play "!rp" command which will use the osu! API
+   - Supports the osu! related "!osuRequests" command which can toggle if beatmap requests are on(=default) or off
    - Supports simple custom commands/timers that don't need special APIs in their messages
 
 ## TODOs
 
-Things that need to be added before it can be released:
+Things that should still be added:
+
+- [ ] Add cooldown to commands
+- [ ] Add cooldown to custom commands
+- [ ] Add possibility for commands to manipulate global variables to allow for example !death, !addDeath, !removeDeath, !resetDeath
+  - [ ] Add that for numbers (set:Number/get/add:Number/remove:Number), if not found create number with value `0`
+  - [ ] Add that for strings (set:String/get/add:String), if not found create string with value `""`
+- [ ] Add possibility for custom commands to be added/deleted/edited from the Twitch chat (moderator level)
+
+Not important things that can be added if time:
 
 - [ ] Database
   - [ ] (*not important*) Add more tests
   - [ ] (*not important*) Add better `ROW_NUMBER () OVER ()` integration
   - [ ] (*not important*) Add better `lower()` integration
 - [ ] Commands:
-  - [ ] (*not important*) Add admin integration
+  - [ ] (*not important*) Add admin integration to allow more than the broadcaster to use certain commands (like !moonpie set/add/remove)
     - [ ] `!moonpie add-admin $USER`
     - [ ] `!moonpie remove-admin $USER`
-- [ ] Clean code and code comments
 - [ ] (*not important*) Check if the bot can see if a stream is happening and otherwise blocking claiming moonpies
-- [ ] (*not important*) Add cooldown environment variable
 
 ## Implementation
 
