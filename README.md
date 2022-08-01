@@ -447,6 +447,7 @@ Things that should still be added:
   - [ ] Add that for numbers (set:Number/get/add:Number/remove:Number), if not found create number with value `0`
   - [ ] Add that for strings (set:String/get/add:String), if not found create string with value `""`
 - [ ] Add possibility for custom commands to be added/deleted/edited from the Twitch chat (moderator level)
+- [ ] Add a method that automatically creates a man page (but is per default commented out) to remove redundancy
 
 Not important things that can be added if time:
 
