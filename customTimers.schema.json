@@ -1,58 +1,58 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/CustomTimerDataJson",
     "definitions": {
-        "customTimer": {
-            "additionalProperties": false,
-            "description": "Represents a custom timer",
+        "CustomTimerDataJson": {
+            "type": "object",
             "properties": {
-                "name": {
-                    "description": "Name of the timer",
-                    "type": "string"
+                "$schema": {
+                    "type": "string",
+                    "description": "Pointer to the schema against which this document should be validated (Schema URL/path)."
                 },
-                "channels": {
-                    "description": "The channels where the timer should be active",
+                "timers": {
                     "type": "array",
                     "items": {
-                        "type": "string"
-                    }
-                },
-                "message": {
-                    "description": "The message that should be sent",
-                    "type": "string"
-                },
-                "cronString": {
-                    "description": "The cron(job) string",
-                    "type": "string"
+                        "$ref": "#/definitions/CustomTimerJson"
+                    },
+                    "description": "All custom timers."
                 }
             },
             "required": [
-                "name",
+                "timers"
+            ],
+            "additionalProperties": false,
+            "description": "Structured data object that contains all information about custom timers."
+        },
+        "CustomTimerJson": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the timer."
+                },
+                "channels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "The channels where the timer should be active."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "The message that should be sent (will be parsed by the message parser)."
+                },
+                "cronString": {
+                    "type": "string",
+                    "description": "The cron(job) string. For more information/help you can for example use this website: https://crontab.cronhub.io/."
+                }
+            },
+            "required": [
                 "channels",
                 "message",
                 "cronString"
             ],
-            "title": "Custom timer",
-            "type": "object"
+            "additionalProperties": false,
+            "description": "Represents a custom timer."
         }
-    },
-    "description": "Structured data object that can contain all information about custom timers",
-    "properties": {
-        "$schema": {
-            "description": "Pointer to the schema against which this document should be validated (Schema URL/path)",
-            "type": "string"
-        },
-        "timers": {
-            "description": "All custom timers",
-            "items": {
-                "$ref": "#/definitions/customTimer"
-            },
-            "type": "array"
-        }
-    },
-    "required": [
-        "timers"
-    ],
-    "title": "Custom Timer Data",
-    "type": "object"
+    }
 }

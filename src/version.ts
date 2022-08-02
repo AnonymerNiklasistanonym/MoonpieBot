@@ -36,6 +36,6 @@ export const getVersionFromObject = (version: Version) =>
 /**
  * Get a version string of the current program version.
  *
- * @returns "1.2.3b" or "1.2.3" if not in beta.
+ * @returns "v1.2.3b" or "v1.2.3" if not in beta.
  */
 export const getVersion = () => getVersionFromObject(version);

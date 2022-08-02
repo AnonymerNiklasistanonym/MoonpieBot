@@ -125,8 +125,6 @@ A file called `customTimers.json` can be provided that enables to write custom t
 
 An example file for this is [`customTimers.example.json`](./customTimers.example.json).
 
-To convert a `cronString` into a more human readable format you can use for example [this webpage by bradymholt](https://bradymholt.github.io/cron-expression-descriptor/).
-
 For some macros to work (like Twitch API connections for `!so`/`!followage`/`!settitle`/`!setgame`) additional Twitch API credentials need to be provided since the default Twitch API connection is only configured to read and write chat messages.
 
 ### Optional: Custom strings/messages

@@ -25,17 +25,50 @@ const LOG_ID_COMMAND_CUSTOM_COMMAND = "custom_command";
  */
 const LOG_ID_MODULE_CUSTOM_COMMAND = "custom_command";
 
+// TODO Create plugin that can set and get the custom command values
+
+/**
+ * Represents a custom command.
+ */
 export interface CustomCommandJson {
-  name?: string;
+  /** Name of the command. */
+  name: string;
+  /** The channels where the timer should be active. */
   channels: string[];
+  /** The message that should be sent. */
   message: string;
+  /** The regex string that is used to check for the command. */
   regexString: string;
-  count?: number;
+  /** The allowed user level. */
   userLevel?: "broadcaster" | "mod" | "vip" | "everyone";
+  /** The number of times the command got called. */
+  count?: number;
+  /** The number of seconds between a command can not be used after it was used. */
+  cooldown?: number;
+  /** A description for the command. */
+  description?: string;
 }
+/**
+ * Represents a custom command global data value.
+ */
+export interface CustomCommandGlobalDataJson {
+  /** The ID. */
+  id: string;
+  /** The actual value. */
+  value: string | number;
+  /** A description for the global data value. */
+  description?: string;
+}
+/**
+ * Structured data object that contains all information about custom commands and their global data.
+ */
 export interface CustomCommandDataJson {
+  /** Pointer to the schema against which this document should be validated (Schema URL/path). */
   $schema?: string;
+  /** All custom commands. */
   commands: CustomCommandJson[];
+  /** All global data of the custom commands. */
+  commandGlobalData?: CustomCommandGlobalDataJson[];
 }
 
 export const checkCustomCommand = async (

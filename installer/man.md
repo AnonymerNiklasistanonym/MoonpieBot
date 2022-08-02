@@ -1,6 +1,6 @@
 % MoonpieBot(1) moonpiebot 1.0.15b
 % AnonymerNiklasistanonym
-% July 2022
+% August 2022
 
 # NAME
 
@@ -12,24 +12,23 @@ moonpiebot - A custom Twitch chat bot.
 
 # DESCRIPTION
 
-**moonpiebot** will start a Twitch connected bot with information provided by either environment variables, a *.env* file in the same directory or given a **----config-dir** *CONFIG_DIR* option a *.env* file in that *CONFIG_DIR* directory.
+Running this program will start a Twitch connected bot using information provided by either environment variables, a *.env* file in the same directory or given a **----config-dir** argument a *.env* file in the specified directory. Additionally log files and the database are written to this directory if not specified otherwise. In this directory can optionally a JSON file for custom commands (*customCommands.json*) and custom timers (*customTimers.json*) be specified.
 
-If this program is installed via a package **moonpiebot** will per default use **----config-dir** *"$HOME/.local/share/moonpiebot"*.
-This can be overridden by providing another **----config-dir** *CONFIG_DIR* option that specifies another directory which will then be used.
+If this program is installed via a package it will use *$HOME/.local/share/moonpiebot* as the default **----config-dir**.
 
 # OPTIONS
 
-**----help**
-: Displays a help message.
-
-**----version**
-: Displays the software version.
-
 **----config-dir** *CONFIG_DIR*
-: Use a specific directory as root for configuration, log, ... files.
+: The directory that should contain all configurations and databases if not configured otherwise
 
 **----disable-censoring**
-: Disable the default censoring of private information of certain variables.
+: Disabling the censoring stops the censoring of private tokens which is helpful to debug if the inputs are read correctly but should otherwise be avoided
+
+**----help**
+: Get instructions on how to run and configure this program
+
+**----version**
+: Get the version of the program
 
 # BUGS
 

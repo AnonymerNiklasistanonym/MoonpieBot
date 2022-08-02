@@ -16,13 +16,24 @@ on:
     branches: [ main, dev ]
 
 jobs:
-  build-linux:
 
-    runs-on: ubuntu-latest
+
+  build:
 
     strategy:
       matrix:
         node-version: [18.x]
+        os: [ubuntu-latest,windows-latest]
+        include:
+          - os: ubuntu-latest
+            os-name: linux
+            binary-name: moonpiebot
+          - os: windows-latest
+            os-name: windows
+            binary-name: moonpiebot.exe
+            binary-name-installer: moonpiebot_setup.exe
+
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
@@ -30,9 +41,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install dependencies (system)
+    - name: Install dependencies (apt)
+      if: matrix.os == 'ubuntu-latest'
       run: sudo apt install graphviz
-    - name: Install dependencies (node)
+    - name: Install dependencies (choco)
+      if: matrix.os == 'windows-latest'
+      run: choco install graphviz
+    - name: Install dependencies (npm)
       run: npm ci
     - name: Run tests and see code coverage
       run: npm run test
@@ -42,72 +57,45 @@ jobs:
       run: npm run lint
     - name: Create documentation
       run: npm run docs
+    - name: Create files
+      run: |
+        npm run create:manPage
+        npm run create:jsonSchemas
     - name: Create binary release
-      run: npm run package:linux
-    - name: Save binary artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: moonpiebot-linux-node-${{ matrix.node-version }}
-        path: bin/moonpiebot
-        retention-days: 14
-        if-no-files-found: error
-
-
-# TODO: Arch Linux Package Builds
-
-
-  build-windows:
-
-    runs-on: windows-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Install dependencies
-      run: npm ci
-    - name: Run tests and see code coverage
-      run: npm run test
-    - name: Build the bot
-      run: npm run build
-    - name: Lint the code
-      run: npm run lint
-    - name: Create documentation
-      run: npm run docs
-    - name: Create binary release
-      run: npm run package:win
+      run: npm run package:${{ matrix.os-name }}
     - name: Save binary artifact [standalone]
       uses: actions/upload-artifact@v3
       with:
-        name: moonpiebot-windows-node-${{ matrix.node-version }}
-        path: bin/moonpiebot.exe
+        name: moonpiebot-${{ matrix.os-name }}-node-${{ matrix.node-version }}
+        path: bin/${{ matrix.binary-name }}
         retention-days: 14
         if-no-files-found: error
     - name: Create installer
+      if: matrix.os == 'windows-latest'
       run: makensis .\windows_installer.nsi
       working-directory: .\installer
     - name: Save binary artifact [installer]
+      if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v3
       with:
-        name: moonpiebot-installer-windows-node-${{ matrix.node-version }}
-        path: bin/moonpiebot_setup.exe
+        name: moonpiebot-installer-${{ matrix.os-name }}-node-${{ matrix.node-version }}
+        path: bin/${{ matrix.binary-name-installer }}
         retention-days: 14
         if-no-files-found: error
 
 
   update-documentation:
 
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [18.x]
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    # Only update documentation if the build didn't fail and happened on the main branch
+    needs: build
+    if: github.ref == 'refs/heads/main'
 
     steps:
     - uses: actions/checkout@v2
@@ -115,19 +103,23 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install dependencies (system)
+    - name: Install dependencies (apt)
+      if: matrix.os == 'ubuntu-latest'
       run: sudo apt install graphviz
-    - name: Install dependencies (node)
+    - name: Install dependencies (choco)
+      if: matrix.os == 'windows-latest'
+      run: choco install graphviz
+    - name: Install dependencies (npm)
       run: npm ci
     - name: Create documentation
       run: npm run docs
-    - run: |
+    - name: Copy moonpiebot icon
+      if: matrix.os == 'ubuntu-latest'
+      run: |
         mkdir -p ./docs/res/icons
         cp res/icons/moonpiebot.png ./docs/res/icons/
     - name: Deploy to GitHub Pages
-      # Only deploy the website when pushing on the main branch
-      if: github.ref == 'refs/heads/main'
       uses: JamesIves/github-pages-deploy-action@v4.2.5
       with:
         branch: gh-pages # The branch the action should deploy to.
-        folder: ./docs # The folder the action should deploy.
+        folder: docs # The folder the action should deploy.

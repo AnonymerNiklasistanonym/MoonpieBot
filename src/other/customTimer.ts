@@ -14,14 +14,30 @@ import type { Strings } from "../strings";
  */
 const LOG_ID_MODULE_CUSTOM_TIMER = "custom_timer";
 
+/**
+ * Represents a custom timer.
+ */
 export interface CustomTimerJson {
+  /** Name of the timer. */
   name?: string;
+  /** The channels where the timer should be active. */
   channels: string[];
+  /** The message that should be sent (will be parsed by the message parser). */
   message: string;
+  /**
+   * The cron(job) string.
+   * For more information/help you can for example use this website: https://crontab.cronhub.io/.
+   */
   cronString: string;
 }
+
+/**
+ * Structured data object that contains all information about custom timers.
+ */
 export interface CustomTimerDataJson {
+  /** Pointer to the schema against which this document should be validated (Schema URL/path). */
   $schema?: string;
+  /** All custom timers. */
   timers: CustomTimerJson[];
 }
 
