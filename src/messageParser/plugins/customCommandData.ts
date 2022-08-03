@@ -111,26 +111,46 @@ export const customCommandDataPlugins = (
   plugins.push({
     id: "SET_CUSTOM_COMMAND_DATA",
     description: "Set a global custom command data value",
-    func: (_logger, content?: string) =>
-      customCommandGlobalDataLogic(content, "==", customCommands),
+    func: (_logger, content, signature) => {
+      const separator = "==";
+      if (signature === true) {
+        return { type: "signature", argument: `id${separator}numberOrString` };
+      }
+      return customCommandGlobalDataLogic(content, separator, customCommands);
+    },
   });
   plugins.push({
     id: "GET_CUSTOM_COMMAND_DATA",
     description: "Get a global custom command data value",
-    func: (_logger, content?: string) =>
-      customCommandGlobalDataLogic(content, "<>", customCommands),
+    func: (_logger, content, signature) => {
+      const separator = "<>";
+      if (signature === true) {
+        return { type: "signature", argument: `id${separator}valueIfNotFound` };
+      }
+      return customCommandGlobalDataLogic(content, separator, customCommands);
+    },
   });
   plugins.push({
     id: "ADD_CUSTOM_COMMAND_DATA",
     description: "Add a global custom command data value if its a number",
-    func: (_logger, content?: string) =>
-      customCommandGlobalDataLogic(content, "+=", customCommands),
+    func: (_, content, signature) => {
+      const separator = "+=";
+      if (signature === true) {
+        return { type: "signature", argument: `id${separator}number` };
+      }
+      return customCommandGlobalDataLogic(content, separator, customCommands);
+    },
   });
   plugins.push({
     id: "REMOVE_CUSTOM_COMMAND_DATA",
     description: "Remove a global custom command data value if its a number",
-    func: (_logger, content?: string) =>
-      customCommandGlobalDataLogic(content, "-=", customCommands),
+    func: (_, content, signature) => {
+      const separator = "-=";
+      if (signature === true) {
+        return { type: "signature", argument: `id${separator}number` };
+      }
+      return customCommandGlobalDataLogic(content, separator, customCommands);
+    },
   });
 
   return plugins;

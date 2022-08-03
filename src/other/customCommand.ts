@@ -151,7 +151,13 @@ export const checkCustomCommand = async (
   );
 
   const pluginsCommand: Plugins = new Map(globalPlugins);
-  pluginsCommand.set("REGEX_GROUP", (_logger, regexGroupIndex?: string) => {
+  pluginsCommand.set("REGEX_GROUP", (_, regexGroupIndex, signature) => {
+    if (signature === true) {
+      return {
+        type: "signature",
+        argument: "regexGroupIndex",
+      };
+    }
     if (regexGroupIndex === undefined || regexGroupIndex.length === 0) {
       throw Error("Regex group index was undefined or empty");
     }

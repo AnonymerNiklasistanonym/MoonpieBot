@@ -12,7 +12,13 @@ export const pluginTwitchApi: (
   return [
     {
       id: `${TWITCH_API_PREFIX}SET_GAME`,
-      func: async (_logger, gameName?: string) => {
+      func: async (_, gameName, signature) => {
+        if (signature === true) {
+          return {
+            type: "signature",
+            argument: "gameName",
+          };
+        }
         if (gameName === undefined || gameName.length === 0) {
           throw Error("Game name was undefined or empty");
         }
@@ -41,7 +47,12 @@ export const pluginTwitchApi: (
     },
     {
       id: `${TWITCH_API_PREFIX}GET_GAME`,
-      func: async () => {
+      func: async (_, __, signature) => {
+        if (signature === true) {
+          return {
+            type: "signature",
+          };
+        }
         try {
           const channelUserInfo = await twitchApiClient.users.getUserByName(
             channelName.slice(1)
@@ -63,7 +74,12 @@ export const pluginTwitchApi: (
     },
     {
       id: `${TWITCH_API_PREFIX}GET_TITLE`,
-      func: async () => {
+      func: async (_, __, signature) => {
+        if (signature === true) {
+          return {
+            type: "signature",
+          };
+        }
         try {
           const channelUserInfo = await twitchApiClient.users.getUserByName(
             channelName.slice(1)
@@ -85,7 +101,13 @@ export const pluginTwitchApi: (
     },
     {
       id: `${TWITCH_API_PREFIX}SET_TITLE`,
-      func: async (_logger, title?: string) => {
+      func: async (_, title, signature) => {
+        if (signature === true) {
+          return {
+            type: "signature",
+            argument: "title",
+          };
+        }
         if (title === undefined || title.length === 0) {
           throw Error("Game name was undefined or empty");
         }
@@ -108,7 +130,13 @@ export const pluginTwitchApi: (
     },
     {
       id: `${TWITCH_API_PREFIX}GET_FOLLOW_AGE`,
-      func: async (_logger, userName) => {
+      func: async (_, userName, signature) => {
+        if (signature === true) {
+          return {
+            type: "signature",
+            argument: "userName",
+          };
+        }
         try {
           const channelUserInfo = await twitchApiClient.users.getUserByName(
             channelName.slice(1)

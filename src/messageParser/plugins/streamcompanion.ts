@@ -7,7 +7,13 @@ export const pluginStreamCompanion = (
 ): MessageParserPlugin => {
   return {
     id: "OSU_STREAMCOMPANION",
-    func: () => {
+    func: (_, __, signature) => {
+      if (signature === true) {
+        return {
+          type: "signature",
+          exportsMacro: true,
+        };
+      }
       const streamCompanionData = streamCompanionDataFunc();
       if (streamCompanionData === undefined) {
         return [];

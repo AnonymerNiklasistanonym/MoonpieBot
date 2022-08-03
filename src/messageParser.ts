@@ -546,20 +546,32 @@ export const createParseTree = (
 };
 
 export interface RequestHelp {
+  type: "help";
   plugins?: boolean;
   macros?: boolean;
+}
+export interface PluginSignature {
+  type: "signature";
+  argument?: string | string[];
+  scope?: string;
+  exportsMacro?: boolean;
 }
 
 // A plugin can have a scope in which special plugins can be defined
 // They output a tuple list of macro value and macro output or just a string
 export type PluginFunc = (
   logger: Logger,
-  value?: string
+  value?: string,
+  /**
+   * Return the plugin signature if available.
+   */
+  signature?: boolean
 ) =>
-  | Promise<MacroDictionaryEntry[] | string | RequestHelp>
+  | Promise<MacroDictionaryEntry[] | string | RequestHelp | PluginSignature>
   | MacroDictionaryEntry[]
   | string
-  | RequestHelp;
+  | RequestHelp
+  | PluginSignature;
 export type Plugins = Map<string, PluginFunc>;
 // A macro is a simple text replace dictionary
 export type MacroDictionaryEntry = [string, string];
@@ -595,6 +607,59 @@ const replaceMacros = (text: string, macros: Macros) => {
       return macroOutput;
     }
   );
+};
+
+export const createPluginSignatureString = async (
+  logger: Logger,
+  pluginName: string,
+  pluginFunc: PluginFunc
+) => {
+  // Check for plugin signature
+  const argumentSignatures: string[] = [];
+  let scopeSignature: string | undefined;
+  try {
+    const pluginSignature = await pluginFunc(logger, undefined, true);
+    if (
+      typeof pluginSignature === "object" &&
+      !Array.isArray(pluginSignature) &&
+      pluginSignature?.type === "signature"
+    ) {
+      if (pluginSignature.argument) {
+        if (Array.isArray(pluginSignature.argument)) {
+          argumentSignatures.push(...pluginSignature.argument);
+        } else {
+          argumentSignatures.push(pluginSignature.argument);
+        }
+      }
+      if (pluginSignature.scope) {
+        scopeSignature = pluginSignature.scope;
+      }
+      if (pluginSignature.exportsMacro) {
+        if (scopeSignature === undefined) {
+          scopeSignature = "";
+        }
+        if (scopeSignature.length > 0) {
+          scopeSignature += ";";
+        }
+        scopeSignature += `%${pluginName}:KEYS%`;
+      }
+    }
+  } catch (err) {
+    // ignore
+  }
+  if (argumentSignatures.length === 0) {
+    return `$(${pluginName}${scopeSignature ? "|" + scopeSignature : ""})`;
+  }
+  return argumentSignatures
+    .map(
+      (argumentSignature) =>
+        `$(${pluginName}${
+          argumentSignature && argumentSignature.length > 0
+            ? "=" + argumentSignature
+            : ""
+        }${scopeSignature ? "|" + scopeSignature : ""})`
+    )
+    .join(",");
 };
 
 export const parseTreeNode = async (
@@ -693,7 +758,7 @@ export const parseTreeNode = async (
         return parseTreeNode(pluginContentNode, plugins, macros, logger);
       } else if (typeof pluginOutput === "string") {
         return pluginOutput;
-      } else {
+      } else if (pluginOutput.type === "help") {
         let helpOutput = "";
         if (pluginOutput.macros && macros) {
           const stringsMacros: string[] = [];
@@ -717,7 +782,9 @@ export const parseTreeNode = async (
         if (pluginOutput.plugins && plugins) {
           const stringsPlugins: string[] = [];
           for (const plugin of plugins.entries()) {
-            stringsPlugins.push(`$(${plugin[0]})`);
+            stringsPlugins.push(
+              await createPluginSignatureString(logger, plugin[0], plugin[1])
+            );
           }
           if (helpOutput.length > 0) {
             helpOutput += "; ";
@@ -730,6 +797,10 @@ export const parseTreeNode = async (
           }
         }
         return helpOutput;
+      } else if (pluginOutput.type === "signature") {
+        throw Error("Signature output is not supported in the message parser!");
+      } else {
+        throw Error("This should be unreachable!");
       }
     case "children":
       if (treeNode.children === undefined) {
@@ -839,7 +910,7 @@ export const generatePluginAndMacroDocumentation = async (
       type: FileDocumentationPartType.VALUE,
       prefix: ">",
       description: plugin.description,
-      title: `$(${plugin.id})`,
+      title: await createPluginSignatureString(logger, plugin.id, plugin.func),
     };
     if (plugin.examples && plugin.examples.length > 0) {
       pluginEntry.lists = [];

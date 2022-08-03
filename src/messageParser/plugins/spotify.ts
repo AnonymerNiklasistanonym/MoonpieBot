@@ -9,7 +9,13 @@ export const pluginSpotifyCurrentPreviousSong = (
 ): MessageParserPlugin => {
   return {
     id: "SPOTIFY_SONG",
-    func: async (logger) => {
+    func: async (logger, _, signature) => {
+      if (signature === true) {
+        return {
+          type: "signature",
+          exportsMacro: true,
+        };
+      }
       const data = await spotifyGetCurrentAndRecentSongs(spotifyWebApi, logger);
       const macros: MacroDictionaryEntry[] = [];
       const currData = data?.currentlyPlaying.body.item;

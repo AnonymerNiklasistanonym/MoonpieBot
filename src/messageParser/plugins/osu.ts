@@ -81,7 +81,14 @@ export const pluginOsuBeatmap = (
 ): MessageParserPlugin => {
   return {
     id: osuBeatmapPluginMacroName,
-    func: async (_logger, beatmapId?: string) => {
+    func: async (_logger, beatmapId, signature) => {
+      if (signature === true) {
+        return {
+          type: "signature",
+          argument: "osuBeatmapID",
+          exportsMacro: true,
+        };
+      }
       if (beatmapId === undefined || beatmapId.trim().length === 0) {
         throw Error("osu! beatmap ID was empty");
       }
@@ -104,7 +111,14 @@ export const pluginOsuScore = (
 ): MessageParserPlugin => {
   return {
     id: "OSU_SCORE",
-    func: async (_logger, beatmapIdAndUserId?: string) => {
+    func: async (_logger, beatmapIdAndUserId, signature) => {
+      if (signature === true) {
+        return {
+          type: "signature",
+          argument: "osuBeatmapId osuUserId",
+          exportsMacro: true,
+        };
+      }
       if (
         beatmapIdAndUserId === undefined ||
         beatmapIdAndUserId.trim().length === 0
@@ -186,7 +200,14 @@ export const pluginOsuMostRecentPlay = (
 ): MessageParserPlugin => {
   return {
     id: "OSU_MOST_RECENT_PLAY",
-    func: async (_logger, userId?: string) => {
+    func: async (_logger, userId, signature) => {
+      if (signature === true) {
+        return {
+          type: "signature",
+          argument: "osuUserId",
+          exportsMacro: true,
+        };
+      }
       if (userId === undefined || userId.trim().length === 0) {
         throw Error("osu! user ID was empty");
       }
@@ -251,7 +272,14 @@ export const pluginOsuUser = (
 ): MessageParserPlugin => {
   return {
     id: "OSU_USER",
-    func: async (_logger, userId?: string) => {
+    func: async (_logger, userId, signature) => {
+      if (signature === true) {
+        return {
+          type: "signature",
+          argument: "osuUserId",
+          exportsMacro: true,
+        };
+      }
       if (userId === undefined || userId.trim().length === 0) {
         throw Error("osu! user ID was empty");
       }
