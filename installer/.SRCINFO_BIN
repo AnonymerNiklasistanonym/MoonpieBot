@@ -11,9 +11,11 @@ pkgbase = moonpiebot-bin
 	conflicts = moonpiebot-bin
 	conflicts = moonpiebot-git
 	options = !strip
-	source = moonpiebot.bin::https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases/download/v1.0.14/moonpiebot-v1.0.14-linux64-node-18
-	source = moonpiebot.svg::https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases/download/v1.0.14/moonpiebot.svg
+	source = moonpiebot.bin::https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases/download/v1.0.15/moonpiebot-v1.0.15-linux64-node-18
+	source = man.md::https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases/download/v1.0.15/man.md
+	source = moonpiebot.svg::https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases/download/v1.0.15/moonpiebot.svg
 	sha1sums = SKIP
-	sha1sums = c3e267b66111aeeb73497c495623709c420eed87
+	sha1sums = SKIP
+	sha1sums = SKIP
 
 pkgname = moonpiebot-bin
