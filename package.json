@@ -1,6 +1,6 @@
 {
     "name": "moonpiebot",
-    "version": "1.0.14",
+    "version": "1.0.15",
     "description": "A custom twitch bot",
     "main": "dist",
     "bin": "dist/index.js",
