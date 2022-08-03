@@ -7,6 +7,7 @@ import {
 import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
+import { commandScore } from "./osu/score";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 import { logTwitchMessageCommandDetected } from "../commands";
 // Type imports
@@ -36,6 +37,7 @@ export enum OsuCommands {
   PP = "pp",
   NP = "np",
   RP = "rp",
+  SCORE = "score",
   REQUESTS = "requests",
 }
 
@@ -98,6 +100,18 @@ export const regexRpCustomId = /^\s*!rp\s+([0-9]+)\s*.*$/i;
  * ```
  */
 export const regexRpCustomName = /^\s*!rp\s+(\S+)\s*.*$/i;
+
+/**
+ * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
+ *
+ * - The first group is the custom osu user name string.
+ *
+ * @example
+ * ```text
+ * !score osuName $OPTIONAL_TEXT_WITH_SPACES
+ * ```
+ */
+export const regexScore = /^\s*!score\s+(\S+)\s*.*$/i;
 
 /**
  * Regex to recognize the `!pp` command.
@@ -193,6 +207,7 @@ export interface OsuApiV2Credentials {
   clientSecret: string;
 }
 
+let lastBeatmapId: number | undefined = undefined;
 let runtimeToggleEnableBeatmapRequests = true;
 let runtimeToggleDisableBeatmapRequestsCustomMessage: string | undefined =
   undefined;
@@ -288,6 +303,32 @@ export const osuChatHandler = async (
       osuDefaultId,
       matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
       matchName && matchName.length >= 2 ? matchName[1] : undefined,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
+    );
+    return;
+  }
+  // > !score
+  if (message.match(regexScore) && enabled.includes(OsuCommands.SCORE)) {
+    logTwitchMessageCommandDetected(
+      logger,
+      tags.id,
+      [tags.username ? `#${tags.username}` : "undefined", message],
+      LOG_ID_COMMAND_OSU,
+      OsuCommands.SCORE,
+      LOG_ID_MODULE_OSU
+    );
+    const match = regexScore.exec(message);
+    await commandScore(
+      client,
+      channel,
+      tags.id,
+      tags.username,
+      osuApiV2Credentials,
+      lastBeatmapId,
+      match && match.length >= 2 ? match[1] : undefined,
       globalStrings,
       globalPlugins,
       globalMacros,
@@ -400,13 +441,16 @@ export const osuChatHandler = async (
           .map((a) => a.match(regexBeatmapUrl));
         for (const match of [...possibleBeatmapRequestsMatches]) {
           if (match != null) {
+            const beatmapId =
+              match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]);
+            lastBeatmapId = beatmapId;
             await commandBeatmap(
               client,
               channel,
               tags.id,
               tags.username,
               osuApiV2Credentials,
-              match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]),
+              beatmapId,
               match[3],
               enableOsuBeatmapRequestsDetailed,
               osuIrcBot,

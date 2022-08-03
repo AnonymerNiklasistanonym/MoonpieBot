@@ -1,4 +1,5 @@
 import { OSU_STRING_ID } from "../osu";
+import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
 
 export const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
 
@@ -56,6 +57,22 @@ export const osuCommandReplyPp = {
     "@$(USER) $(OSU_USER=%OSU_PP_REQUEST:ID%|%OSU_USER:NAME% \\(https://osu.ppy.sh/users/%OSU_USER:ID%\\) from %OSU_USER:COUNTRY% plays$(IF_NOT_UNDEFINED=%OSU_USER:PLAYSTYLE%| with %OSU_USER:PLAYSTYLE%) since %OSU_USER:JOIN_DATE_MONTH% %OSU_USER:JOIN_DATE_YEAR%$(IF_EQUAL=%OSU_USER:HAS_STATISTICS%===true| and reached rank #%OSU_USER:GLOBAL_RANK% [country #%OSU_USER:COUNTRY_RANK%] with %OSU_USER:PP%pp, %OSU_USER:ACC%% accuracy, a max combo of  %OSU_USER:MAX_COMBO%, %OSU_USER:COUNTS_SSH% SSHs, %OSU_USER:COUNTS_SS% SSs, %OSU_USER:COUNTS_SH% SHs, %OSU_USER:COUNTS_S% Ss, %OSU_USER:COUNTS_A% As) - bunny=$(IF_EQUAL=%OSU_USER:HAS_BUNNY%===true|yes)$(IF_EQUAL=%OSU_USER:HAS_BUNNY%===false|no),tutel=$(IF_EQUAL=%OSU_USER:HAS_TUTEL%===true|yes)$(IF_EQUAL=%OSU_USER:HAS_TUTEL%===false|no))",
 };
 
+export const osuScoreNoBeatmap = {
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_BEATMAP`,
+  default: "@$(USER) No beatmap was found",
+};
+
+export const osuScoreNotFound = {
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_SCORE`,
+  default:
+    "@$(USER) No score was found of the user %OSU_SCORE_REQUEST:USER_NAME% on the map",
+};
+
+export const osuScore = {
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE`,
+  default: `@$(USER) %OSU_SCORE_REQUEST:USER_NAME% has a $[${osuBeatmapRequestRefTopScore.id}]`,
+};
+
 export const osuCommandReply = [
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
@@ -65,4 +82,7 @@ export const osuCommandReply = [
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
   osuCommandReplyPp,
+  osuScoreNoBeatmap,
+  osuScoreNotFound,
+  osuScore,
 ];

@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import osuApiV2, { GameMode, RankedStatus } from "osu-api-v2";
 import { ScoresType } from "osu-api-v2/lib/users/scores";
-import { MacroDictionaryEntry } from "src/messageParser";
 // Type imports
-import type { Beatmap, OsuApiV2WebRequestError } from "osu-api-v2";
+import type {
+  Beatmap,
+  BeatmapUserScore,
+  OsuApiV2WebRequestError,
+} from "osu-api-v2";
 import type { OsuApiV2Credentials } from "../../commands/osu";
+import type { MacroDictionaryEntry } from "src/messageParser";
 import type { MessageParserPlugin } from "../plugins";
 
 const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
@@ -106,11 +110,54 @@ export const pluginOsuBeatmap = (
   };
 };
 
+export const osuScorePluginMacroName = "OSU_SCORE";
+export const convertOsuScoreToMacros = (
+  beatmapScore: BeatmapUserScore
+): MacroDictionaryEntry[] => {
+  const score = beatmapScore.score;
+  const scoreDate = new Date(score.created_at);
+  const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
+  return [
+    [
+      "EXISTS",
+      `${beatmapScore.position !== undefined && beatmapScore.position !== -1}`,
+    ],
+    ["PASSED", `${score.passed}`],
+    ["RANK", `${score.rank}`],
+    ["FC", `${score.perfect}`],
+    ["ACC", `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`],
+    [
+      "PP",
+      score.pp == null
+        ? "undefined"
+        : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
+    ],
+    ["MODS", `${score.mods.join(",")}`],
+    ["COUNT_300", `${score.statistics.count_300}`],
+    ["COUNT_100", `${score.statistics.count_100}`],
+    ["COUNT_50", `${score.statistics.count_50}`],
+    ["COUNT_MISS", `${score.statistics.count_miss}`],
+    ["MAX_COMBO", `${score.max_combo}`],
+    ["TIME_IN_S_AGO", `${scoreDateRangeMs / 1000}`],
+    ["DATE_MONTH", monthNames[scoreDate.getMonth()]],
+    ["DATE_YEAR", `${scoreDate.getFullYear()}`],
+    ["USER_NAME", `${score.user?.username}`],
+    ["USER_ID", `${score.user?.id}`],
+    ["HAS_REPLAY", `${score.replay}`],
+    ["ID", `${score.id}`],
+    ["USER_ID", `${score.user?.id}`],
+    ["USER_NAME", `${score.user?.username}`],
+    ["TITLE", `${score.beatmapset?.title}`],
+    ["ARTIST", `${score.beatmapset?.artist}`],
+    ["VERSION", `${score.beatmap?.version}`],
+  ];
+};
+
 export const pluginOsuScore = (
   osuApiV2Credentials: OsuApiV2Credentials
 ): MessageParserPlugin => {
   return {
-    id: "OSU_SCORE",
+    id: osuScorePluginMacroName,
     func: async (_logger, beatmapIdAndUserId, signature) => {
       if (signature === true) {
         return {
@@ -141,49 +188,7 @@ export const pluginOsuScore = (
           beatmapIdAndUserIdNumber[0],
           beatmapIdAndUserIdNumber[1]
         );
-        const score = beatmapScore.score;
-        const scoreDate = new Date(score.created_at);
-        const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
-        return [
-          [
-            "EXISTS",
-            `${
-              beatmapScore.position !== undefined &&
-              beatmapScore.position !== -1
-            }`,
-          ],
-          ["PASSED", `${score.passed}`],
-          ["RANK", `${score.rank}`],
-          ["FC", `${score.perfect}`],
-          [
-            "ACC",
-            `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`,
-          ],
-          [
-            "PP",
-            score.pp == null
-              ? "undefined"
-              : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
-          ],
-          ["MODS", `${score.mods.join(",")}`],
-          ["COUNT_300", `${score.statistics.count_300}`],
-          ["COUNT_100", `${score.statistics.count_100}`],
-          ["COUNT_50", `${score.statistics.count_50}`],
-          ["COUNT_MISS", `${score.statistics.count_miss}`],
-          ["MAX_COMBO", `${score.max_combo}`],
-          ["TIME_IN_S_AGO", `${scoreDateRangeMs / 1000}`],
-          ["DATE_MONTH", monthNames[scoreDate.getMonth()]],
-          ["DATE_YEAR", `${scoreDate.getFullYear()}`],
-          ["USER_NAME", `${score.user?.username}`],
-          ["USER_ID", `${score.user?.id}`],
-          ["HAS_REPLAY", `${score.replay}`],
-          ["ID", `${score.id}`],
-          ["USER_ID", `${score.user?.id}`],
-          ["USER_NAME", `${score.user?.username}`],
-          ["TITLE", `${score.beatmapset?.title}`],
-          ["ARTIST", `${score.beatmapset?.artist}`],
-          ["VERSION", `${score.beatmap?.version}`],
-        ];
+        return convertOsuScoreToMacros(beatmapScore);
       } catch (err) {
         if ((err as OsuApiV2WebRequestError).statusCode === 404) {
           return [["EXISTS", "false"]];

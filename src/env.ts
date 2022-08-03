@@ -303,6 +303,7 @@ export const getEnvVariableValueInformation = (
         OsuCommands.NP,
         OsuCommands.PP,
         OsuCommands.RP,
+        OsuCommands.SCORE,
         OsuCommands.REQUESTS,
       ];
       return {
