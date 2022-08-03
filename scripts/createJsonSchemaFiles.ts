@@ -13,13 +13,13 @@ interface Config {
 
 const configs = [
   {
-    type: "CustomCommandDataJson",
+    type: "CustomCommandsJson",
     outputPath: path.join(rootPath, "customCommands.schema.json"),
     inputPath: path.join(rootPath, "src", "other", "customCommand.ts"),
     tsConfigPath: path.join(rootPath, "tsconfig.json"),
   },
   {
-    type: "CustomTimerDataJson",
+    type: "CustomTimersJson",
     outputPath: path.join(rootPath, "customTimers.schema.json"),
     inputPath: path.join(rootPath, "src", "other", "customTimer.ts"),
     tsConfigPath: path.join(rootPath, "tsconfig.json"),

@@ -17,7 +17,7 @@ const LOG_ID_MODULE_CUSTOM_TIMER = "custom_timer";
 /**
  * Represents a custom timer.
  */
-export interface CustomTimerJson {
+export interface CustomTimer {
   /** Name of the timer. */
   name?: string;
   /** The channels where the timer should be active. */
@@ -34,11 +34,11 @@ export interface CustomTimerJson {
 /**
  * Structured data object that contains all information about custom timers.
  */
-export interface CustomTimerDataJson {
+export interface CustomTimersJson {
   /** Pointer to the schema against which this document should be validated (Schema URL/path). */
   $schema?: string;
   /** All custom timers. */
-  timers: CustomTimerJson[];
+  timers: CustomTimer[];
 }
 
 export const registerTimer = (
@@ -85,12 +85,12 @@ export const loadCustomTimersFromFile = async (
   filePath: string,
   logger: Logger
 ) => {
-  const customTimers: CustomTimerJson[] = [];
+  const customTimers: CustomTimer[] = [];
   const loggerCustomTimers = createLogFunc(logger, "custom_timer");
 
   if (await fileExists(filePath)) {
     loggerCustomTimers.info("Found custom timers file");
-    const newCustomTimers = (await readJsonFile<CustomTimerDataJson>(filePath))
+    const newCustomTimers = (await readJsonFile<CustomTimersJson>(filePath))
       .timers;
     for (const newCustomTimer of newCustomTimers) {
       loggerCustomTimers.info(

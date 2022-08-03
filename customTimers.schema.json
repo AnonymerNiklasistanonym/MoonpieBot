@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/CustomTimerDataJson",
+    "$ref": "#/definitions/CustomTimersJson",
     "definitions": {
-        "CustomTimerDataJson": {
+        "CustomTimersJson": {
             "type": "object",
             "properties": {
                 "$schema": {
@@ -12,7 +12,7 @@
                 "timers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/CustomTimerJson"
+                        "$ref": "#/definitions/CustomTimer"
                     },
                     "description": "All custom timers."
                 }
@@ -23,7 +23,7 @@
             "additionalProperties": false,
             "description": "Structured data object that contains all information about custom timers."
         },
-        "CustomTimerJson": {
+        "CustomTimer": {
             "type": "object",
             "properties": {
                 "name": {

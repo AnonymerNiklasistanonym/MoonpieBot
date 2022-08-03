@@ -30,7 +30,7 @@ const LOG_ID_MODULE_CUSTOM_COMMAND = "custom_command";
 /**
  * Represents a custom command.
  */
-export interface CustomCommandJson {
+export interface CustomCommand {
   /** Name of the command. */
   name?: string;
   /** The channels where the timer should be active. */
@@ -51,7 +51,7 @@ export interface CustomCommandJson {
 /**
  * Represents a custom command global data value.
  */
-export interface CustomCommandGlobalDataJson {
+export interface CustomCommandGlobalData {
   /** The ID. */
   id: string;
   /** The actual value. */
@@ -62,13 +62,13 @@ export interface CustomCommandGlobalDataJson {
 /**
  * Structured data object that contains all information about custom commands and their global data.
  */
-export interface CustomCommandDataJson {
+export interface CustomCommandsJson {
   /** Pointer to the schema against which this document should be validated (Schema URL/path). */
   $schema?: string;
   /** All custom commands. */
-  commands: CustomCommandJson[];
+  commands: CustomCommand[];
   /** All global data of the custom commands. */
-  commandGlobalData?: CustomCommandGlobalDataJson[];
+  globalData?: CustomCommandGlobalData[];
 }
 
 export const checkCustomCommand = async (
@@ -165,23 +165,23 @@ export const checkCustomCommand = async (
 };
 
 export interface CustomCommandsData {
-  customCommands: CustomCommandJson[];
-  customCommandsGlobalData: CustomCommandGlobalDataJson[];
+  customCommands: CustomCommand[];
+  customCommandsGlobalData: CustomCommandGlobalData[];
 }
 
 export const loadCustomCommandsFromFile = async (
   filePath: string,
   logger: Logger
 ) => {
-  const customCommands: CustomCommandJson[] = [];
-  const customCommandsGlobalData: CustomCommandGlobalDataJson[] = [];
+  const customCommands: CustomCommand[] = [];
+  const customCommandsGlobalData: CustomCommandGlobalData[] = [];
   const loggerCustomCommands = createLogFunc(logger, "custom_command");
 
   if (await fileExists(filePath)) {
     loggerCustomCommands.info("Found custom commands file");
-    const data = await readJsonFile<CustomCommandDataJson>(filePath);
+    const data = await readJsonFile<CustomCommandsJson>(filePath);
     const newCustomCommands = data.commands;
-    const newCustomCommandsGlobalData = data.commandGlobalData;
+    const newCustomCommandsGlobalData = data.globalData;
     for (const newCustomCommand of newCustomCommands) {
       loggerCustomCommands.debug(
         `Add custom command ${
@@ -201,7 +201,7 @@ export const loadCustomCommandsFromFile = async (
         );
       }
       loggerCustomCommands.info(
-        `Added ${newCustomCommandsGlobalData.length} custom commands global data`
+        `Added ${newCustomCommandsGlobalData.length} custom command global data`
       );
       customCommandsGlobalData.push(...newCustomCommandsGlobalData);
     }

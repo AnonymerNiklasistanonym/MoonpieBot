@@ -76,8 +76,8 @@ import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
-import type { CustomCommandDataJson } from "./other/customCommand";
-import type { CustomTimerJson } from "./other/customTimer";
+import type { CustomCommandsJson } from "./other/customCommand";
+import type { CustomTimer } from "./other/customTimer";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
 import type SpotifyWebApi from "spotify-web-api-node";
@@ -249,25 +249,25 @@ export const main = async (
   }
 
   // Load custom commands
-  const customCommands: CustomCommandDataJson = {
+  const customCommands: CustomCommandsJson = {
     commands: [],
-    commandGlobalData: [],
+    globalData: [],
   };
   try {
     const data = await loadCustomCommandsFromFile(pathCustomCommands, logger);
     customCommands.commands.push(...data.customCommands);
-    if (customCommands.commandGlobalData === undefined) {
-      customCommands.commandGlobalData = [];
-    }
     if (data.customCommandsGlobalData) {
-      customCommands.commandGlobalData.push(...data.customCommandsGlobalData);
+      if (customCommands.globalData === undefined) {
+        customCommands.globalData = [];
+      }
+      customCommands.globalData.push(...data.customCommandsGlobalData);
     }
   } catch (err) {
     loggerMain.error(err as Error);
   }
 
   // Load custom timers
-  const customTimers: CustomTimerJson[] = [];
+  const customTimers: CustomTimer[] = [];
   try {
     customTimers.push(
       ...(await loadCustomTimersFromFile(pathCustomTimers, logger))
@@ -581,6 +581,7 @@ export const main = async (
     // Check custom commands
     try {
       const pluginsCustomCommands = new Map(pluginsChannel);
+      // Add plugins to manipulate custom command global data
       const globalDataPlugins = customCommandDataPlugins(customCommands);
       for (const globalDataPlugin of globalDataPlugins) {
         pluginsCustomCommands.set(globalDataPlugin.id, globalDataPlugin.func);
@@ -615,7 +616,7 @@ export const main = async (
               }
               // TODO Make this into an external method
               // Save custom command counts to files
-              writeJsonFile<CustomCommandDataJson>(pathCustomCommands, {
+              writeJsonFile<CustomCommandsJson>(pathCustomCommands, {
                 $schema: "./customCommands.schema.json",
                 ...customCommands,
               })

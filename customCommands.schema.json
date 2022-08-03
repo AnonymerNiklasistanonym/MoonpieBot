@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/CustomCommandDataJson",
+    "$ref": "#/definitions/CustomCommandsJson",
     "definitions": {
-        "CustomCommandDataJson": {
+        "CustomCommandsJson": {
             "type": "object",
             "properties": {
                 "$schema": {
@@ -12,14 +12,14 @@
                 "commands": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/CustomCommandJson"
+                        "$ref": "#/definitions/CustomCommand"
                     },
                     "description": "All custom commands."
                 },
-                "commandGlobalData": {
+                "globalData": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/CustomCommandGlobalDataJson"
+                        "$ref": "#/definitions/CustomCommandGlobalData"
                     },
                     "description": "All global data of the custom commands."
                 }
@@ -30,7 +30,7 @@
             "additionalProperties": false,
             "description": "Structured data object that contains all information about custom commands and their global data."
         },
-        "CustomCommandJson": {
+        "CustomCommand": {
             "type": "object",
             "properties": {
                 "name": {
@@ -83,7 +83,7 @@
             "additionalProperties": false,
             "description": "Represents a custom command."
         },
-        "CustomCommandGlobalDataJson": {
+        "CustomCommandGlobalData": {
             "type": "object",
             "properties": {
                 "id": {
