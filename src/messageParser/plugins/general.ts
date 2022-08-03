@@ -469,3 +469,10 @@ export const pluginConvertToShortNumber: MessageParserPlugin = {
     return Intl.NumberFormat("en", { notation: "compact" }).format(number);
   },
 };
+
+export const pluginHelp: MessageParserPlugin = {
+  id: "HELP",
+  description: "Print all available plugins and macros",
+  examples: [{}],
+  func: () => ({ macros: true, plugins: true }),
+};

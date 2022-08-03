@@ -121,6 +121,15 @@
             "regexString": "!cooldown",
             "userLevel": "everyone",
             "count": 2
+        },
+        {
+            "name": "Custom command 7 > Help (list all available macros and plugins)",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "$(HELP)",
+            "regexString": "!help",
+            "userLevel": "everyone"
         }
     ]
 }

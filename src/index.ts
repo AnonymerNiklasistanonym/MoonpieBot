@@ -33,6 +33,7 @@ import {
 import { loadCustomTimersFromFile, registerTimer } from "./other/customTimer";
 import {
   pluginConvertToShortNumber,
+  pluginHelp,
   pluginIfEmpty,
   pluginIfEqual,
   pluginIfFalse,
@@ -299,6 +300,7 @@ export const main = async (
   // Setup message parser
   const pluginsList = [
     pluginConvertToShortNumber,
+    pluginHelp,
     pluginIfEmpty,
     pluginIfEqual,
     pluginIfFalse,

@@ -545,12 +545,21 @@ export const createParseTree = (
   return nodeToReturn;
 };
 
+export interface RequestHelp {
+  plugins?: boolean;
+  macros?: boolean;
+}
+
 // A plugin can have a scope in which special plugins can be defined
 // They output a tuple list of macro value and macro output or just a string
 export type PluginFunc = (
   logger: Logger,
   value?: string
-) => Promise<MacroDictionaryEntry[] | string> | MacroDictionaryEntry[] | string;
+) =>
+  | Promise<MacroDictionaryEntry[] | string | RequestHelp>
+  | MacroDictionaryEntry[]
+  | string
+  | RequestHelp;
 export type Plugins = Map<string, PluginFunc>;
 // A macro is a simple text replace dictionary
 export type MacroDictionaryEntry = [string, string];
@@ -682,8 +691,45 @@ export const parseTreeNode = async (
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return parseTreeNode(pluginContentNode, plugins, macros, logger);
-      } else {
+      } else if (typeof pluginOutput === "string") {
         return pluginOutput;
+      } else {
+        let helpOutput = "";
+        if (pluginOutput.macros && macros) {
+          const stringsMacros: string[] = [];
+          for (const macro of macros.entries()) {
+            for (const macroValue of macro[1]) {
+              stringsMacros.push(
+                `%${macro[0]}:${macroValue[0]}%='${macroValue[1]}'`
+              );
+            }
+          }
+          if (helpOutput.length > 0) {
+            helpOutput += "; ";
+          }
+          helpOutput += "Macros: ";
+          if (stringsMacros.length > 0) {
+            helpOutput += stringsMacros.join(",");
+          } else {
+            helpOutput += "[]";
+          }
+        }
+        if (pluginOutput.plugins && plugins) {
+          const stringsPlugins: string[] = [];
+          for (const plugin of plugins.entries()) {
+            stringsPlugins.push(`$(${plugin[0]})`);
+          }
+          if (helpOutput.length > 0) {
+            helpOutput += "; ";
+          }
+          helpOutput += "Plugins: ";
+          if (stringsPlugins.length > 0) {
+            helpOutput += stringsPlugins.join(",");
+          } else {
+            helpOutput += "[]";
+          }
+        }
+        return helpOutput;
       }
     case "children":
       if (treeNode.children === undefined) {
