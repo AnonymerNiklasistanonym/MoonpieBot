@@ -70,6 +70,46 @@
             "regexString": "^!game(?:\\s+(.*?))?\\s*$",
             "count": 0,
             "userLevel": "mod"
+        },
+        {
+            "name": "Custom command 5.1 > Death counter using the custom command global data (add)",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "death was added, streamer died $(ADD_CUSTOM_COMMAND_DATA=death+=1) times",
+            "regexString": "!addDeath",
+            "userLevel": "mod",
+            "count": 6
+        },
+        {
+            "name": "Custom command 5.2 > Death counter using the custom command global data (get)",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "streamer died $(GET_CUSTOM_COMMAND_DATA=death<>0) times",
+            "regexString": "!deaths",
+            "userLevel": "everyone",
+            "count": 6
+        },
+        {
+            "name": "Custom command 5.3 > Death counter using the custom command global data (remove)",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "death was removed, streamer died $(REMOVE_CUSTOM_COMMAND_DATA=death-=1) times",
+            "regexString": "!removeDeath",
+            "userLevel": "everyone",
+            "count": 3
+        },
+        {
+            "name": "Custom command 5.4 > Death counter using the custom command global data (reset)",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "death was reset, streamer died $(SET_CUSTOM_COMMAND_DATA=death==0) times",
+            "regexString": "!resetDeath",
+            "userLevel": "everyone",
+            "count": 2
         }
     ]
 }

@@ -76,15 +76,13 @@ import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
-import type {
-  CustomCommandDataJson,
-  CustomCommandJson,
-} from "./other/customCommand";
+import type { CustomCommandDataJson } from "./other/customCommand";
 import type { CustomTimerJson } from "./other/customTimer";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
 import type SpotifyWebApi from "spotify-web-api-node";
 import type { StreamCompanionData } from "./streamcompanion";
+import { customCommandDataPlugins } from "./messageParser/plugins/customCommandData";
 
 /**
  * The logging ID of this module.
@@ -251,11 +249,19 @@ export const main = async (
   }
 
   // Load custom commands
-  const customCommands: CustomCommandJson[] = [];
+  const customCommands: CustomCommandDataJson = {
+    commands: [],
+    commandGlobalData: [],
+  };
   try {
-    customCommands.push(
-      ...(await loadCustomCommandsFromFile(pathCustomCommands, logger))
-    );
+    const data = await loadCustomCommandsFromFile(pathCustomCommands, logger);
+    customCommands.commands.push(...data.customCommands);
+    if (customCommands.commandGlobalData === undefined) {
+      customCommands.commandGlobalData = [];
+    }
+    if (data.customCommandsGlobalData) {
+      customCommands.commandGlobalData.push(...data.customCommandsGlobalData);
+    }
   } catch (err) {
     loggerMain.error(err as Error);
   }
@@ -575,7 +581,11 @@ export const main = async (
     // Check custom commands
     try {
       const pluginsCustomCommands = new Map(pluginsChannel);
-      for (const customCommand of customCommands) {
+      const globalDataPlugins = customCommandDataPlugins(customCommands);
+      for (const globalDataPlugin of globalDataPlugins) {
+        pluginsCustomCommands.set(globalDataPlugin.id, globalDataPlugin.func);
+      }
+      for (const customCommand of customCommands.commands) {
         pluginsCustomCommands.set(
           "COUNT",
           () => `${customCommand.count ? customCommand.count + 1 : 1}`
@@ -607,7 +617,7 @@ export const main = async (
               // Save custom command counts to files
               writeJsonFile<CustomCommandDataJson>(pathCustomCommands, {
                 $schema: "./customCommands.schema.json",
-                commands: customCommands,
+                ...customCommands,
               })
                 .then(() => {
                   loggerMain.info("Custom commands were saved");

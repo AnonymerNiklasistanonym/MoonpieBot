@@ -32,7 +32,7 @@ const LOG_ID_MODULE_CUSTOM_COMMAND = "custom_command";
  */
 export interface CustomCommandJson {
   /** Name of the command. */
-  name: string;
+  name?: string;
   /** The channels where the timer should be active. */
   channels: string[];
   /** The message that should be sent. */
@@ -164,18 +164,24 @@ export const checkCustomCommand = async (
   return true;
 };
 
+export interface CustomCommandsData {
+  customCommands: CustomCommandJson[];
+  customCommandsGlobalData: CustomCommandGlobalDataJson[];
+}
+
 export const loadCustomCommandsFromFile = async (
   filePath: string,
   logger: Logger
 ) => {
   const customCommands: CustomCommandJson[] = [];
+  const customCommandsGlobalData: CustomCommandGlobalDataJson[] = [];
   const loggerCustomCommands = createLogFunc(logger, "custom_command");
 
   if (await fileExists(filePath)) {
     loggerCustomCommands.info("Found custom commands file");
-    const newCustomCommands = (
-      await readJsonFile<CustomCommandDataJson>(filePath)
-    ).commands;
+    const data = await readJsonFile<CustomCommandDataJson>(filePath);
+    const newCustomCommands = data.commands;
+    const newCustomCommandsGlobalData = data.commandGlobalData;
     for (const newCustomCommand of newCustomCommands) {
       loggerCustomCommands.debug(
         `Add custom command ${
@@ -188,8 +194,22 @@ export const loadCustomCommandsFromFile = async (
         newCustomCommands.length > 1 ? "s" : ""
       }`
     );
+    if (newCustomCommandsGlobalData) {
+      for (const newGlobalData of newCustomCommandsGlobalData) {
+        loggerCustomCommands.debug(
+          `Add custom command global data ${newGlobalData.id}: ${newGlobalData.value}`
+        );
+      }
+      loggerCustomCommands.info(
+        `Added ${newCustomCommandsGlobalData.length} custom commands global data`
+      );
+      customCommandsGlobalData.push(...newCustomCommandsGlobalData);
+    }
     customCommands.push(...newCustomCommands);
   }
 
-  return customCommands;
+  return {
+    customCommandsGlobalData,
+    customCommands,
+  };
 };

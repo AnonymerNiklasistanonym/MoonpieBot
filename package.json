@@ -25,6 +25,7 @@
         "prebuild": "rimraf ./dist/*",
         "build": "tsc",
         "package:windows": "pkg --target node18-win-x64 .",
+        "create:all": "npm run create:jsonSchemas;npm run create:manPage;npm run create:windowsInstallerConfig",
         "create:jsonSchemas": "ts-node scripts/createJsonSchemaFiles.ts",
         "create:manPage": "ts-node scripts/createManPageFile.ts",
         "create:windowsInstallerConfig": "ts-node scripts/createWindowsInstallerConfigFile.ts",
