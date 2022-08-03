@@ -1,4 +1,4 @@
-% MoonpieBot(1) moonpiebot 1.0.15b
+% MoonpieBot(1) moonpiebot 1.0.15
 % AnonymerNiklasistanonym
 % August 2022
 

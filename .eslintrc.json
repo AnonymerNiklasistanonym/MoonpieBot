@@ -34,6 +34,6 @@
     "jsdoc/no-defaults": "error",
     "jsdoc/check-indentation": "error",
     "jsdoc/check-line-alignment": "error"//,
-    //"sort-imports": ["warn"],
+    //"sort-imports": ["warn"]
   }
 }
