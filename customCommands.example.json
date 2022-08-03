@@ -110,6 +110,17 @@
             "regexString": "!resetDeath",
             "userLevel": "everyone",
             "count": 2
+        },
+        {
+            "name": "Custom command 6 > Cooldown for a command",
+            "channels": [
+                "#salk1n616"
+            ],
+            "message": "This command can only be executed ever 30s",
+            "cooldownInS": 30,
+            "regexString": "!cooldown",
+            "userLevel": "everyone",
+            "count": 2
         }
     ]
 }

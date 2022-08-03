@@ -43,8 +43,10 @@ export interface CustomCommand {
   userLevel?: "broadcaster" | "mod" | "vip" | "everyone";
   /** The number of times the command got called. */
   count?: number;
+  /** The timestamp of the last time the command was executed. */
+  timestampLastExecution?: number;
   /** The number of seconds between a command can not be used after it was used. */
-  cooldown?: number;
+  cooldownInS?: number;
   /** A description for the command. */
   description?: string;
 }
@@ -77,11 +79,7 @@ export const checkCustomCommand = async (
   tags: ChatUserstate,
   message: string,
   twitchBadgeLevel: TwitchBadgeLevels,
-  channels: string[],
-  messageCommand: string,
-  regexString: string,
-  userLevel: "broadcaster" | "mod" | "vip" | "everyone" | undefined,
-  commandName: string | undefined,
+  command: CustomCommand,
   globalStrings: Strings,
   globalPlugins: Plugins,
   globalMacros: Macros,
@@ -94,33 +92,50 @@ export const checkCustomCommand = async (
     throw errorMessageUserNameUndefined();
   }
 
-  if (userLevel !== undefined) {
+  // Check if the user is allowed to run the command (level)
+  if (command.userLevel !== undefined) {
     switch (twitchBadgeLevel) {
       case TwitchBadgeLevels.BROADCASTER:
         break;
       case TwitchBadgeLevels.MODERATOR:
-        if (userLevel === "broadcaster") {
+        if (command.userLevel === "broadcaster") {
           return false;
         }
         break;
       case TwitchBadgeLevels.VIP:
-        if (userLevel === "broadcaster" || userLevel === "mod") {
+        if (
+          command.userLevel === "broadcaster" ||
+          command.userLevel === "mod"
+        ) {
           return false;
         }
         break;
       case TwitchBadgeLevels.NONE:
         if (
-          userLevel === "broadcaster" ||
-          userLevel === "mod" ||
-          userLevel === "vip"
+          command.userLevel === "broadcaster" ||
+          command.userLevel === "mod" ||
+          command.userLevel === "vip"
         ) {
           return false;
         }
         break;
     }
   }
+  // Check if the user is allowed to run the command (cooldown)
+  if (command.cooldownInS !== undefined) {
+    const currentTimestamp = performance.now();
+    const lastTimestamp = command.timestampLastExecution
+      ? command.timestampLastExecution
+      : 0;
+    if (currentTimestamp - lastTimestamp > command.cooldownInS * 1000) {
+      command.timestampLastExecution = currentTimestamp;
+    } else {
+      return false;
+    }
+  }
+
   // eslint-disable-next-line security/detect-non-literal-regexp
-  const regex = new RegExp(regexString);
+  const regex = new RegExp(command.regexString);
   const match = message.match(regex);
   if (!match) {
     return false;
@@ -131,7 +146,7 @@ export const checkCustomCommand = async (
     tags.id,
     [tags.username ? `#${tags.username}` : "undefined", message],
     LOG_ID_COMMAND_CUSTOM_COMMAND,
-    commandName ? commandName : regex.toString(),
+    command.name ? command.name : regex.toString(),
     LOG_ID_MODULE_CUSTOM_COMMAND
   );
 
@@ -143,9 +158,9 @@ export const checkCustomCommand = async (
     return `${match[parseInt(regexGroupIndex)]}`;
   });
 
-  if (channels.find((a) => a === channel)) {
+  if (command.channels.find((a) => a === channel)) {
     const parsedMessage = await messageParser(
-      messageCommand,
+      command.message,
       globalStrings,
       pluginsCommand,
       globalMacros,
@@ -158,7 +173,7 @@ export const checkCustomCommand = async (
       tags.id,
       sentMessage,
       "custom_command",
-      commandName ? commandName : regex.toString()
+      command.name ? command.name : regex.toString()
     );
   }
   return true;

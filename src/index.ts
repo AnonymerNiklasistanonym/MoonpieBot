@@ -597,11 +597,7 @@ export const main = async (
           tags,
           message,
           parseTwitchBadgeLevel(tags),
-          customCommand.channels,
-          customCommand.message,
-          customCommand.regexString,
-          customCommand.userLevel,
-          customCommand.name,
+          customCommand,
           strings,
           pluginsCustomCommands,
           macrosChannel,
@@ -614,7 +610,6 @@ export const main = async (
               } else {
                 customCommand.count += 1;
               }
-              // TODO Make this into an external method
               // Save custom command counts to files
               writeJsonFile<CustomCommandsJson>(pathCustomCommands, {
                 $schema: "./customCommands.schema.json",

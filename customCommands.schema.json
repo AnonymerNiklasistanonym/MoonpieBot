@@ -66,7 +66,11 @@
                     "type": "number",
                     "description": "The number of times the command got called."
                 },
-                "cooldown": {
+                "timestampLastExecution": {
+                    "type": "number",
+                    "description": "The timestamp of the last time the command was executed."
+                },
+                "cooldownInS": {
                     "type": "number",
                     "description": "The number of seconds between a command can not be used after it was used."
                 },
