@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import osuApiV2, {
-  GameMode,
-  OsuApiV2WebRequestError,
-  RankedStatus,
-} from "osu-api-v2";
+import osuApiV2, { GameMode, RankedStatus } from "osu-api-v2";
 import { ScoresType } from "osu-api-v2/lib/users/scores";
+import { MacroDictionaryEntry } from "src/messageParser";
+// Type imports
+import type { Beatmap, OsuApiV2WebRequestError } from "osu-api-v2";
 import type { OsuApiV2Credentials } from "../../commands/osu";
 import type { MessageParserPlugin } from "../plugins";
 
@@ -42,11 +41,46 @@ const monthNames = [
   "December",
 ];
 
+export const osuBeatmapPluginMacroName = "OSU_BEATMAP";
+export const convertOsuBeatmapToMacros = (
+  beatmap: Beatmap
+): MacroDictionaryEntry[] => {
+  const beatmapUpdate = new Date(beatmap.last_updated);
+  return [
+    ["TITLE", `${beatmap.beatmapset?.title}`],
+    ["VERSION", `${beatmap.version}`],
+    [
+      "DIFFICULTY_RATING",
+      `${Math.round(beatmap.difficulty_rating * 100 + Number.EPSILON) / 100}`,
+    ],
+    ["ARTIST", `${beatmap.beatmapset?.artist}`],
+    ["ID", `${beatmap.id}`],
+    ["CREATOR_USER_NAME", `${beatmap.beatmapset?.creator}`],
+    ["URL", `${beatmap.url}`],
+    ["SET_ID", `${beatmap.beatmapset?.id}`],
+    ["LENGTH_IN_S", `${beatmap.total_length}`],
+    ["RANKED_STATUS", mapRankedStatusToStr(beatmap.ranked)],
+    ["LAST_UPDATED_MONTH", monthNames[beatmapUpdate.getMonth()]],
+    ["LAST_UPDATED_YEAR", `${beatmapUpdate.getFullYear()}`],
+    ["MAX_COMBO", `${beatmap.max_combo}`],
+    ["ACC", `${beatmap.accuracy}`],
+    ["CS", `${beatmap.cs}`],
+    ["DRAIN", `${beatmap.drain}`],
+    ["BPM", `${beatmap.bpm}`],
+    ["AR", `${beatmap.ar}`],
+    ["CC", `${beatmap.count_circles}`],
+    ["SLC", `${beatmap.count_sliders}`],
+    ["SPC", `${beatmap.count_spinners}`],
+    ["PLAY_COUNT", `${beatmap.playcount}`],
+    ["PASS_COUNT", `${beatmap.passcount}`],
+  ];
+};
+
 export const pluginOsuBeatmap = (
   osuApiV2Credentials: OsuApiV2Credentials
 ): MessageParserPlugin => {
   return {
-    id: "OSU_BEATMAP",
+    id: osuBeatmapPluginMacroName,
     func: async (_logger, beatmapId?: string) => {
       if (beatmapId === undefined || beatmapId.trim().length === 0) {
         throw Error("osu! beatmap ID was empty");
@@ -60,37 +94,7 @@ export const pluginOsuBeatmap = (
         oauthAccessToken,
         beatmapIdNumber
       );
-      const beatmapUpdate = new Date(beatmap.last_updated);
-      return [
-        ["TITLE", `${beatmap.beatmapset?.title}`],
-        ["VERSION", `${beatmap.version}`],
-        [
-          "DIFFICULTY_RATING",
-          `${
-            Math.round(beatmap.difficulty_rating * 100 + Number.EPSILON) / 100
-          }`,
-        ],
-        ["ARTIST", `${beatmap.beatmapset?.artist}`],
-        ["ID", `${beatmap.id}`],
-        ["CREATOR_USER_NAME", `${beatmap.beatmapset?.creator}`],
-        ["URL", `${beatmap.url}`],
-        ["SET_ID", `${beatmap.beatmapset?.id}`],
-        ["LENGTH_IN_S", `${beatmap.total_length}`],
-        ["RANKED_STATUS", mapRankedStatusToStr(beatmap.ranked)],
-        ["LAST_UPDATED_MONTH", monthNames[beatmapUpdate.getMonth()]],
-        ["LAST_UPDATED_YEAR", `${beatmapUpdate.getFullYear()}`],
-        ["MAX_COMBO", `${beatmap.max_combo}`],
-        ["ACC", `${beatmap.accuracy}`],
-        ["CS", `${beatmap.cs}`],
-        ["DRAIN", `${beatmap.drain}`],
-        ["BPM", `${beatmap.bpm}`],
-        ["AR", `${beatmap.ar}`],
-        ["CC", `${beatmap.count_circles}`],
-        ["SLC", `${beatmap.count_sliders}`],
-        ["SPC", `${beatmap.count_spinners}`],
-        ["PLAY_COUNT", `${beatmap.playcount}`],
-        ["PASS_COUNT", `${beatmap.passcount}`],
-      ];
+      return convertOsuBeatmapToMacros(beatmap);
     },
   };
 };

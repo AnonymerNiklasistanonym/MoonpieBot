@@ -7,6 +7,10 @@ import {
   errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import {
+  convertOsuBeatmapToMacros,
+  osuBeatmapPluginMacroName,
+} from "../../messageParser/plugins/osu";
+import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
@@ -28,6 +32,7 @@ import { createLogFunc } from "../../logging";
 import { messageParserById } from "../../messageParser";
 import { tryToSendOsuIrcMessage } from "../../osuirc";
 // Type imports
+import type { Beatmap } from "osu-api-v2";
 import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
 import type { Client as IrcClient } from "irc";
@@ -110,12 +115,15 @@ export const commandBeatmap = async (
 
   // Get beatmap and if found the current top score and convert them into a
   // message for Twitch and IRC channel
-  let beatmapInformationWasFound = false;
   let messageRequest = "";
   let messageRequestIrc = "";
+  let beatmap: Beatmap | undefined;
   try {
-    await osuApiV2.beatmaps.get(oauthAccessToken, beatmapId);
-    beatmapInformationWasFound = true;
+    beatmap = await osuApiV2.beatmaps.get(oauthAccessToken, beatmapId);
+    osuBeatmapRequestMacros.set(
+      osuBeatmapPluginMacroName,
+      new Map(convertOsuBeatmapToMacros(beatmap))
+    );
     // Check for user score
   } catch (err) {
     if ((err as OsuApiV2WebRequestError).statusCode === 404) {
@@ -176,7 +184,7 @@ export const commandBeatmap = async (
     "beatmap"
   );
 
-  if (!beatmapInformationWasFound) {
+  if (beatmap === undefined) {
     logCmdBeatmap.debug(
       "osu! beatmap information was not found, stop attempt sending beatmap over IRC channel"
     );
