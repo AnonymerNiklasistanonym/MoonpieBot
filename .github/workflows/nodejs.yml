@@ -43,10 +43,10 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies (apt)
       if: matrix.os == 'ubuntu-latest'
-      run: sudo apt install graphviz
+      run: sudo apt install graphviz pandoc
     - name: Install dependencies (choco)
       if: matrix.os == 'windows-latest'
-      run: choco install graphviz nsis
+      run: choco install graphviz nsis pandoc
     - name: Install dependencies (nsis-plugins)
       if: matrix.os == 'windows-latest'
       run: |
