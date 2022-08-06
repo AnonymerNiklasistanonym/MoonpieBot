@@ -21,11 +21,15 @@ import {
 } from "./env";
 import { createLogFunc, createLogger } from "./logging";
 import { createStringsVariableDocumentation, defaultStrings } from "./strings";
+import {
+  fileNameEnvExample,
+  fileNameEnvStringsExample,
+} from "./info/fileNames";
 import { cliHelpGenerator } from "./cli";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getVersion } from "./version";
 import { binaryName, name, usages } from "./info/general";
-import { createExampleFiles } from "./customCommandsTimers/createExampleFiles";
+import { createCustomCommandTimerExampleFiles } from "./customCommandsTimers/createExampleFiles";
 import { main } from "./main";
 
 /**
@@ -98,15 +102,15 @@ const entryPoint = async () => {
 
     // Catch CLI create example files option
     if (cliArgs.includes(CliOption.CREATE_EXAMPLE_FILES)) {
-      await createExampleFiles(configDir);
       await createEnvVariableDocumentation(
-        path.join(configDir, ".env.example"),
+        path.join(configDir, fileNameEnvExample),
         configDir
       );
       await createStringsVariableDocumentation(
-        path.join(configDir, ".env.strings.example"),
-        defaultStrings,
-      ).catch(console.error);
+        path.join(configDir, fileNameEnvStringsExample),
+        defaultStrings
+      );
+      await createCustomCommandTimerExampleFiles(configDir);
       process.exit(0);
     }
 

@@ -12,12 +12,9 @@ import { commandScore } from "./osu/score";
 import { logTwitchMessageCommandDetected } from "../commands";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
-import type { ChatUserstate, Client } from "tmi.js";
-import type { Macros, Plugins } from "../messageParser";
 import type { Client as IrcClient } from "irc";
-import type { Logger } from "winston";
 import type { StreamCompanionData } from "../streamcompanion";
-import type { Strings } from "../strings";
+import type { TwitchChatHandler } from "../twitch";
 
 /**
  * The logging ID of this command.
@@ -213,28 +210,30 @@ let runtimeToggleEnableBeatmapRequests = true;
 let runtimeToggleDisableBeatmapRequestsCustomMessage: string | undefined =
   undefined;
 
-export const osuChatHandler = async (
-  client: Client,
-  channel: string,
-  tags: ChatUserstate,
-  message: string,
-  osuApiV2Credentials: OsuApiV2Credentials | undefined,
-  osuDefaultId: number,
-  enableOsuBeatmapRequests: undefined | boolean,
-  enableOsuBeatmapRequestsDetailed: undefined | boolean,
-  osuIrcBot: ((id: string) => IrcClient) | undefined,
-  osuIrcRequestTarget: undefined | string,
-  osuStreamCompanionCurrentMapData:
-    | (() => StreamCompanionData | undefined)
-    | undefined,
-  enabled: (OsuCommands | string)[] = [],
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
+export interface OsuChatHandlerData {
+  osuApiV2Credentials?: OsuApiV2Credentials;
+  osuDefaultId?: number;
+  enableOsuBeatmapRequests?: boolean;
+  enableOsuBeatmapRequestsDetailed?: boolean;
+  osuIrcBot?: (id: string) => IrcClient;
+  osuIrcRequestTarget?: string;
+  osuStreamCompanionCurrentMapData?: () => StreamCompanionData | undefined;
+  enabled: (OsuCommands | string)[];
+}
+
+export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
+  client,
+  channel,
+  tags,
+  message,
+  data,
+  globalStrings,
+  globalPlugins,
+  globalMacros,
+  logger
 ): Promise<void> => {
   // > !np
-  if (message.match(regexNp) && enabled.includes(OsuCommands.NP)) {
+  if (message.match(regexNp) && data.enabled.includes(OsuCommands.NP)) {
     logTwitchMessageCommandDetected(
       logger,
       tags.id,
@@ -248,8 +247,8 @@ export const osuChatHandler = async (
       channel,
       tags.id,
       tags.username,
-      osuApiV2Credentials,
-      osuStreamCompanionCurrentMapData,
+      data.osuApiV2Credentials,
+      data.osuStreamCompanionCurrentMapData,
       globalStrings,
       globalPlugins,
       globalMacros,
@@ -258,7 +257,7 @@ export const osuChatHandler = async (
     return;
   }
   // > !rp
-  if (message.match(regexRp) && enabled.includes(OsuCommands.RP)) {
+  if (message.match(regexRp) && data.enabled.includes(OsuCommands.RP)) {
     logTwitchMessageCommandDetected(
       logger,
       tags.id,
@@ -267,14 +266,17 @@ export const osuChatHandler = async (
       OsuCommands.RP,
       LOG_ID_MODULE_OSU
     );
+    if (data.osuDefaultId === undefined) {
+      throw Error("Default OSU ID was undefined");
+    }
     const matchId = regexRpCustomId.exec(message);
     const matchName = regexRpCustomName.exec(message);
     await commandRp(
       client,
       channel,
       tags.id,
-      osuApiV2Credentials,
-      osuDefaultId,
+      data.osuApiV2Credentials,
+      data.osuDefaultId,
       matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
       matchName && matchName.length >= 2 ? matchName[1] : undefined,
       globalStrings,
@@ -285,7 +287,7 @@ export const osuChatHandler = async (
     return;
   }
   // > !pp
-  if (message.match(regexPp) && enabled.includes(OsuCommands.PP)) {
+  if (message.match(regexPp) && data.enabled.includes(OsuCommands.PP)) {
     logTwitchMessageCommandDetected(
       logger,
       tags.id,
@@ -294,14 +296,17 @@ export const osuChatHandler = async (
       OsuCommands.PP,
       LOG_ID_MODULE_OSU
     );
+    if (data.osuDefaultId === undefined) {
+      throw Error("Default OSU ID was undefined");
+    }
     const matchId = regexPpCustomId.exec(message);
     const matchName = regexPpCustomName.exec(message);
     await commandPp(
       client,
       channel,
       tags.id,
-      osuApiV2Credentials,
-      osuDefaultId,
+      data.osuApiV2Credentials,
+      data.osuDefaultId,
       matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
       matchName && matchName.length >= 2 ? matchName[1] : undefined,
       globalStrings,
@@ -312,7 +317,7 @@ export const osuChatHandler = async (
     return;
   }
   // > !score
-  if (message.match(regexScore) && enabled.includes(OsuCommands.SCORE)) {
+  if (message.match(regexScore) && data.enabled.includes(OsuCommands.SCORE)) {
     logTwitchMessageCommandDetected(
       logger,
       tags.id,
@@ -327,7 +332,7 @@ export const osuChatHandler = async (
       channel,
       tags.id,
       tags.username,
-      osuApiV2Credentials,
+      data.osuApiV2Credentials,
       lastBeatmapId,
       match && match.length >= 2 ? match[1] : undefined,
       globalStrings,
@@ -338,11 +343,11 @@ export const osuChatHandler = async (
     return;
   }
   // > Any beatmap link
-  if (enableOsuBeatmapRequests) {
+  if (data.enableOsuBeatmapRequests) {
     if (
       (message.match(regexEnableBeatmapRequests) ||
         message.match(regexDisableBeatmapRequests)) &&
-      enabled.includes(OsuCommands.REQUESTS)
+      data.enabled.includes(OsuCommands.REQUESTS)
     ) {
       const matchEnable = message.match(regexEnableBeatmapRequests);
       const matchDisable = message.match(regexDisableBeatmapRequests);
@@ -386,7 +391,7 @@ export const osuChatHandler = async (
       return;
     } else if (
       message.match(regexBeatmapRequestsStatus) &&
-      enabled.includes(OsuCommands.REQUESTS)
+      data.enabled.includes(OsuCommands.REQUESTS)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -450,12 +455,12 @@ export const osuChatHandler = async (
               channel,
               tags.id,
               tags.username,
-              osuApiV2Credentials,
+              data.osuApiV2Credentials,
               beatmapId,
               match[3],
-              enableOsuBeatmapRequestsDetailed,
-              osuIrcBot,
-              osuIrcRequestTarget,
+              data.enableOsuBeatmapRequestsDetailed,
+              data.osuIrcBot,
+              data.osuIrcRequestTarget,
               globalStrings,
               globalPlugins,
               globalMacros,

@@ -18,10 +18,18 @@ import {
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
-import type { Macros, Plugins } from "../../messageParser";
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
-import type { Strings } from "../../strings";
+import type { TwitchChatHandler } from "../../twitch";
+
+export interface CommandClaimData {
+  /**
+   * Database file path of the moonpie database.
+   */
+  moonpieDbPath: string;
+  /**
+   * The number of hours between moonpie claims.
+   */
+  moonpieClaimCooldownHours: number;
+}
 
 /**
  * Claim command: Claim a moonpie if no moonpie was claimed in the last 24
@@ -29,36 +37,32 @@ import type { Strings } from "../../strings";
  *
  * @param client Twitch client (used to send messages).
  * @param channel Twitch channel (where the response should be sent to).
- * @param messageId Twitch message ID of the request (used for logging).
- * @param userName Twitch user name of the requester.
- * @param userId Twitch user ID (used for checking the database).
+ * @param tags Twitch user state information.
+ * @param _message The current Twitch message.
+ * @param data The command specific data.
  * @param globalStrings Global message strings.
  * @param globalPlugins Global plugins.
  * @param globalMacros Global macros.
- * @param moonpieDbPath Database file path of the moonpie database.
- * @param moonpieClaimCooldownHours The number of hours between moonpie claims.
  * @param logger Logger (used for global logs).
  */
-export const commandClaim = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  userName: string | undefined,
-  userId: string | undefined,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  moonpieDbPath: string,
-  moonpieClaimCooldownHours: number,
-  logger: Logger
+export const commandClaim: TwitchChatHandler<CommandClaimData> = async (
+  client,
+  channel,
+  tags,
+  _message,
+  data,
+  globalStrings,
+  globalPlugins,
+  globalMacros,
+  logger
 ): Promise<void> => {
-  if (messageId === undefined) {
+  if (tags.id === undefined) {
     throw errorMessageIdUndefined();
   }
-  if (userName === undefined) {
+  if (tags.username === undefined) {
     throw errorMessageUserNameUndefined();
   }
-  if (userId === undefined) {
+  if (tags["user-id"] === undefined) {
     throw errorMessageUserIdUndefined();
   }
 
@@ -66,14 +70,14 @@ export const commandClaim = async (
   let newMoonpieCount = 1;
   let msSinceLastClaim = 0;
   let msTillNextClaim = 0;
-  const claimCooldownMs = moonpieClaimCooldownHours * 60 * 60 * 1000;
+  const claimCooldownMs = data.moonpieClaimCooldownHours * 60 * 60 * 1000;
   let alreadyClaimedAMoonpie = false;
   let newTimestamp = new Date().getTime();
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  if (await moonpieDb.exists(moonpieDbPath, userId, logger)) {
+  if (await moonpieDb.exists(data.moonpieDbPath, tags["user-id"], logger)) {
     const moonpieEntry = await moonpieDb.getMoonpie(
-      moonpieDbPath,
-      userId,
+      data.moonpieDbPath,
+      tags["user-id"],
       logger
     );
 
@@ -94,16 +98,16 @@ export const commandClaim = async (
     }
   } else {
     await moonpieDb.create(
-      moonpieDbPath,
-      { id: userId, name: userName },
+      data.moonpieDbPath,
+      { id: tags["user-id"], name: tags.username },
       logger
     );
   }
   await moonpieDb.update(
-    moonpieDbPath,
+    data.moonpieDbPath,
     {
-      id: userId,
-      name: userName,
+      id: tags["user-id"],
+      name: tags.username,
       count: newMoonpieCount,
       timestamp: newTimestamp,
     },
@@ -111,7 +115,11 @@ export const commandClaim = async (
   );
 
   const currentMoonpieLeaderboardEntry =
-    await moonpieDb.getMoonpieLeaderboardEntry(moonpieDbPath, userId, logger);
+    await moonpieDb.getMoonpieLeaderboardEntry(
+      data.moonpieDbPath,
+      tags["user-id"],
+      logger
+    );
 
   const macros = new Map(globalMacros);
   macros.set(
@@ -122,7 +130,7 @@ export const commandClaim = async (
         MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S,
         `${msTillNextClaim / 1000}`,
       ],
-      [MacroMoonpieClaim.COOLDOWN_HOURS, `${moonpieClaimCooldownHours}`],
+      [MacroMoonpieClaim.COOLDOWN_HOURS, `${data.moonpieClaimCooldownHours}`],
     ])
   );
   macros.set(
@@ -133,7 +141,7 @@ export const commandClaim = async (
         MacroMoonpieLeaderboardEntry.RANK,
         `${currentMoonpieLeaderboardEntry.rank}`,
       ],
-      [MacroMoonpieLeaderboardEntry.NAME, `${userName}`],
+      [MacroMoonpieLeaderboardEntry.NAME, `${tags.username}`],
     ])
   );
 
@@ -159,7 +167,7 @@ export const commandClaim = async (
 
   logTwitchMessageCommandReply(
     logger,
-    messageId,
+    tags.id,
     sentMessage,
     LOG_ID_COMMAND_MOONPIE,
     MoonpieCommands.CLAIM

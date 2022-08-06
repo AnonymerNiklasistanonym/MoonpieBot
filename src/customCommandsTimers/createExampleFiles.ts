@@ -1,28 +1,41 @@
 // Package imports
 import path from "path";
 // Local imports
+import {
+  fileNameCustomCommandsExample,
+  fileNameCustomCommandsSchema,
+  fileNameCustomTimersExample,
+  fileNameCustomTimersSchema,
+} from "../info/fileNames";
 import { writeJsonFile } from "../other/fileOperations";
 import { customCommandsInformation } from "../info/customCommands";
 import { customTimersInformation } from "../info/customTimers";
-import { outputNameCustomCommands } from "./customCommand";
-import { outputNameCustomTimers } from "./customTimer";
 // Type imports
 import type { CustomCommandsJson } from "./customCommand";
 import type { CustomTimersJson } from "./customTimer";
 
-export const createExampleFiles = async (configDir: string) => {
+export interface CustomJson {
+  /**
+   * Pointer to the schema against which this document should be
+   * validated (Schema URL/path).
+   */
+  $schema?: string;
+}
+
+export const createCustomCommandTimerExampleFiles = async (
+  configDir: string
+) => {
   await writeJsonFile<CustomCommandsJson>(
-    path.join(configDir, `${outputNameCustomCommands}.example.json`),
+    path.join(configDir, fileNameCustomCommandsExample),
     {
-      $schema: `./${outputNameCustomCommands}.schema.json`,
+      $schema: `./${fileNameCustomCommandsSchema}`,
       commands: customCommandsInformation,
     }
   );
-
   await writeJsonFile<CustomTimersJson>(
-    path.join(configDir, `${outputNameCustomTimers}.example.json`),
+    path.join(configDir, fileNameCustomTimersExample),
     {
-      $schema: `./${outputNameCustomTimers}.schema.json`,
+      $schema: `./${fileNameCustomTimersSchema}`,
       timers: customTimersInformation,
     }
   );

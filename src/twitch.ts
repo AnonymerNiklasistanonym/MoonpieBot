@@ -3,11 +3,14 @@
  */
 
 // Package imports
-import { Client, client as tmiClient } from "tmi.js";
+import { client as tmiClient } from "tmi.js";
 // Local imports
 import { createLogFunc } from "./logging";
 // Type imports
+import type { ChatUserstate, Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { Strings } from "./strings";
+import type { Macros, Plugins } from "./messageParser";
 
 /**
  * The logging ID of this module.
@@ -120,6 +123,31 @@ export const createTwitchClient = (
 
   return client;
 };
+
+/**
+ * A global type for all Twitch chat (message) handler functions.
+ */
+export type TwitchChatHandler<
+  CUSTOM_OPTIONS = undefined,
+  RETURN_VALUE = void
+> = (
+  client: Client,
+  channel: string,
+  /**
+   * The Twitch chat state of a user which contains for example their user name,
+   * id, badges, ...
+   */
+  tags: ChatUserstate,
+  message: string,
+  /**
+   * The custom data of this Twitch chat message handler.
+   */
+  data: CUSTOM_OPTIONS,
+  globalStrings: Strings,
+  globalPlugins: Plugins,
+  globalMacros: Macros,
+  logger: Logger
+) => Promise<RETURN_VALUE>;
 
 /**
  * Additional information for Twitch logs.

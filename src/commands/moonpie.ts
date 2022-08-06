@@ -11,10 +11,7 @@ import { commandLeaderboard } from "./moonpie/leaderboard";
 import { logTwitchMessageCommandDetected } from "../commands";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
-import type { ChatUserstate, Client } from "tmi.js";
-import type { Macros, Plugins } from "../messageParser";
-import type { Logger } from "winston";
-import type { Strings } from "../strings";
+import type { TwitchChatHandler } from "../twitch";
 
 /**
  * The logging ID of this command.
@@ -154,24 +151,30 @@ export const regexMoonpieRemove =
  */
 export const regexMoonpieDelete = /^\s*!moonpie\s+delete\s+(\S+)\s*$/i;
 
-export const moonpieChatHandler = async (
-  client: Client,
-  channel: string,
-  tags: ChatUserstate,
-  message: string,
-  databasePath: string,
-  moonpieCooldownHoursNumber: number,
-  enabled: (MoonpieCommands | string)[] = [],
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
+export interface MoonpieChatHandlerData {
+  databasePath: string;
+  moonpieCooldownHoursNumber: number;
+  enabled: (MoonpieCommands | string)[];
+}
+
+export const moonpieChatHandler: TwitchChatHandler<
+  MoonpieChatHandlerData
+> = async (
+  client,
+  channel,
+  tags,
+  message,
+  data,
+  globalStrings,
+  globalPlugins,
+  globalMacros,
+  logger
 ): Promise<void> => {
   if (message.match(regexMoonpie)) {
     // > !moonpie commands
     if (
       message.match(regexMoonpieCommands) &&
-      enabled.includes(MoonpieCommands.COMMANDS)
+      data.enabled.includes(MoonpieCommands.COMMANDS)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -185,7 +188,7 @@ export const moonpieChatHandler = async (
         client,
         channel,
         tags.id,
-        enabled,
+        data.enabled,
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -196,7 +199,7 @@ export const moonpieChatHandler = async (
     // > !moonpie leaderboard
     if (
       message.match(regexMoonpieLeaderboard) &&
-      enabled.includes(MoonpieCommands.LEADERBOARD)
+      data.enabled.includes(MoonpieCommands.LEADERBOARD)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -213,7 +216,7 @@ export const moonpieChatHandler = async (
         globalStrings,
         globalPlugins,
         globalMacros,
-        databasePath,
+        data.databasePath,
         logger
       );
       return;
@@ -221,7 +224,7 @@ export const moonpieChatHandler = async (
     // > !moonpie about
     if (
       message.match(regexMoonpieAbout) &&
-      enabled.includes(MoonpieCommands.ABOUT)
+      data.enabled.includes(MoonpieCommands.ABOUT)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -234,7 +237,9 @@ export const moonpieChatHandler = async (
       await commandAbout(
         client,
         channel,
-        tags.id,
+        tags,
+        message,
+        undefined,
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -245,7 +250,7 @@ export const moonpieChatHandler = async (
     // > !moonpie delete $USER
     if (
       message.match(regexMoonpieDelete) &&
-      enabled.includes(MoonpieCommands.DELETE)
+      data.enabled.includes(MoonpieCommands.DELETE)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -268,7 +273,7 @@ export const moonpieChatHandler = async (
           globalStrings,
           globalPlugins,
           globalMacros,
-          databasePath,
+          data.databasePath,
           logger
         );
       }
@@ -277,7 +282,7 @@ export const moonpieChatHandler = async (
     // > !moonpie get $USER
     if (
       message.match(regexMoonpieGet) &&
-      enabled.includes(MoonpieCommands.GET)
+      data.enabled.includes(MoonpieCommands.GET)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -299,7 +304,7 @@ export const moonpieChatHandler = async (
           globalStrings,
           globalPlugins,
           globalMacros,
-          databasePath,
+          data.databasePath,
           logger
         );
       }
@@ -308,7 +313,7 @@ export const moonpieChatHandler = async (
     // > !moonpie set $USER (only broadcaster badge)
     if (
       message.match(regexMoonpieSet) &&
-      enabled.includes(MoonpieCommands.SET)
+      data.enabled.includes(MoonpieCommands.SET)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -333,7 +338,7 @@ export const moonpieChatHandler = async (
           globalStrings,
           globalPlugins,
           globalMacros,
-          databasePath,
+          data.databasePath,
           logger
         );
       }
@@ -342,7 +347,7 @@ export const moonpieChatHandler = async (
     // > !moonpie add $USER $COUNT (only broadcaster badge)
     if (
       message.match(regexMoonpieAdd) &&
-      enabled.includes(MoonpieCommands.ADD)
+      data.enabled.includes(MoonpieCommands.ADD)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -367,7 +372,7 @@ export const moonpieChatHandler = async (
           globalStrings,
           globalPlugins,
           globalMacros,
-          databasePath,
+          data.databasePath,
           logger
         );
       }
@@ -376,7 +381,7 @@ export const moonpieChatHandler = async (
     // > !moonpie remove $USER $COUNT (only broadcaster badge)
     if (
       message.match(regexMoonpieRemove) &&
-      enabled.includes(MoonpieCommands.REMOVE)
+      data.enabled.includes(MoonpieCommands.REMOVE)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -401,7 +406,7 @@ export const moonpieChatHandler = async (
           globalStrings,
           globalPlugins,
           globalMacros,
-          databasePath,
+          data.databasePath,
           logger
         );
       }
@@ -410,7 +415,7 @@ export const moonpieChatHandler = async (
     // > !moonpie ($MESSAGE)
     if (
       message.match(regexMoonpieClaim) &&
-      enabled.includes(MoonpieCommands.CLAIM)
+      data.enabled.includes(MoonpieCommands.CLAIM)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -423,14 +428,15 @@ export const moonpieChatHandler = async (
       await commandClaim(
         client,
         channel,
-        tags.id,
-        tags.username,
-        tags["user-id"],
+        tags,
+        message,
+        {
+          moonpieDbPath: data.databasePath,
+          moonpieClaimCooldownHours: data.moonpieCooldownHoursNumber,
+        },
         globalStrings,
         globalPlugins,
         globalMacros,
-        databasePath,
-        moonpieCooldownHoursNumber,
         logger
       );
       return;

@@ -77,6 +77,13 @@ export interface LogMessageInfo {
   subsection?: string;
 }
 
+export interface LogFunc {
+  info: (message: string) => void;
+  debug: (message: string) => void;
+  warn: (message: string) => void;
+  error: (err: Error) => void;
+}
+
 /**
  * Create a function that will log messages with a hardcoded section.
  *
@@ -89,7 +96,7 @@ export const createLogFunc = (
   logger: Logger,
   section: string,
   info: LogMessageInfo = {}
-) => {
+): LogFunc => {
   const subsection = info.subsection ? info.subsection : undefined;
   const baseLogFunc = (level: LoggerLevel) => {
     return (message: string) => {
@@ -105,3 +112,6 @@ export const createLogFunc = (
     },
   };
 };
+
+export const typeGuardLog = <T>(message: string, arg: T) =>
+  `${message}: '${typeof arg}'/'${JSON.stringify(arg)}'`;

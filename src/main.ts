@@ -71,7 +71,6 @@ import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
-import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
 import { pluginsTwitchChat } from "./messageParser/plugins/twitchChat";
 import { getPluginOsuStreamCompanion } from "./messageParser/plugins/streamcompanion";
@@ -166,6 +165,10 @@ export const main = async (
   const spotifyApiRefreshToken = getEnvVariableValueOrUndefined(
     EnvVariable.SPOTIFY_API_REFRESH_TOKEN
   );
+  const spotifyEnableCommands = getEnvVariableValueOrDefault(
+    EnvVariable.SPOTIFY_ENABLE_COMMANDS,
+    configDir
+  ).split(",");
   // > osu! API
   const osuApiClientId = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_API_CLIENT_ID
@@ -463,9 +466,11 @@ export const main = async (
       channel,
       tags,
       message,
-      pathDatabase,
-      moonpieClaimCooldownHoursNumber,
-      moonpieEnableCommands,
+      {
+        databasePath: pathDatabase,
+        moonpieCooldownHoursNumber: moonpieClaimCooldownHoursNumber,
+        enabled: moonpieEnableCommands,
+      },
       strings,
       pluginsChannel,
       macrosChannel,
@@ -491,16 +496,18 @@ export const main = async (
         tags,
         message,
         {
-          clientId: parseInt(osuApiClientId),
-          clientSecret: osuApiClientSecret,
+          osuApiV2Credentials: {
+            clientId: parseInt(osuApiClientId),
+            clientSecret: osuApiClientSecret,
+          },
+          osuDefaultId: parseInt(osuApiDefaultId),
+          enableOsuBeatmapRequests,
+          enableOsuBeatmapRequestsDetailed,
+          osuIrcBot,
+          osuIrcRequestTarget,
+          osuStreamCompanionCurrentMapData,
+          enabled: osuEnableCommands,
         },
-        parseInt(osuApiDefaultId),
-        enableOsuBeatmapRequests,
-        enableOsuBeatmapRequestsDetailed,
-        osuIrcBot,
-        osuIrcRequestTarget,
-        osuStreamCompanionCurrentMapData,
-        osuEnableCommands,
         strings,
         pluginsChannel,
         macrosChannel,
@@ -529,14 +536,11 @@ export const main = async (
         channel,
         tags,
         message,
-        undefined,
-        0,
-        false,
-        false,
-        undefined,
-        undefined,
-        osuStreamCompanionCurrentMapData,
-        osuEnableCommands.filter((a) => a === OsuCommands.NP),
+        {
+          // TODO Fix this later - either create a new handler or block the commands automatically
+          osuStreamCompanionCurrentMapData,
+          enabled: osuEnableCommands.filter((a) => a === OsuCommands.NP),
+        },
         strings,
         pluginsChannel,
         macrosChannel,
@@ -562,7 +566,7 @@ export const main = async (
         channel,
         tags,
         message,
-        undefined,
+        { enabled: spotifyEnableCommands },
         strings,
         pluginsChannel,
         macrosChannel,
@@ -609,8 +613,7 @@ export const main = async (
           channel,
           tags,
           message,
-          parseTwitchBadgeLevel(tags),
-          customCommand,
+          { command: customCommand },
           strings,
           pluginsCustomCommand,
           macrosChannel,

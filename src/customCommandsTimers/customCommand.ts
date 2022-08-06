@@ -1,4 +1,5 @@
 // Local imports
+import { createLogFunc, typeGuardLog } from "../logging";
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
@@ -6,14 +7,17 @@ import {
   logTwitchMessageCommandReply,
 } from "../commands";
 import { fileExists, readJsonFile } from "../other/fileOperations";
-import { TwitchBadgeLevels } from "../other/twitchBadgeParser";
-import { createLogFunc } from "../logging";
+import {
+  parseTwitchBadgeLevel,
+  TwitchBadgeLevels,
+} from "../other/twitchBadgeParser";
 import { messageParser } from "../messageParser";
 // Type imports
-import type { ChatUserstate, Client } from "tmi.js";
-import type { Macros, Plugins } from "../messageParser";
+import type { Plugins } from "../messageParser";
+import type { CustomJson } from "./createExampleFiles";
+import type { LogFunc } from "../logging";
 import type { Logger } from "winston";
-import type { Strings } from "../strings";
+import type { TwitchChatHandler } from "../twitch";
 
 /**
  * The logging ID of this command.
@@ -26,12 +30,8 @@ const LOG_ID_COMMAND_CUSTOM_COMMAND = "custom_command";
 const LOG_ID_MODULE_CUSTOM_COMMAND = "custom_command";
 
 /**
- * The output name of files connected to this module.
+ * All the possible supported user levels of a single custom command.
  */
-export const outputNameCustomCommands = "customCommands";
-
-// TODO Create plugin that can set and get the custom command values
-
 export enum CustomCommandUserLevel {
   BROADCASTER = "broadcaster",
   MOD = "mod",
@@ -62,6 +62,7 @@ export interface CustomCommand {
   /** A description for the command. */
   description?: string;
 }
+
 /**
  * Represents a custom command data value.
  */
@@ -73,94 +74,246 @@ export interface CustomCommandData {
   /** A description. */
   description?: string;
 }
+
 /**
- * Structured data object that contains all information about custom commands and their data.
+ * Structured, serializable data object that contains all information about
+ * custom commands and their data.
  */
-export interface CustomCommandsJson {
-  /** Pointer to the schema against which this document should be validated (Schema URL/path). */
-  $schema?: string;
+export interface CustomCommandsJson extends CustomJson {
   /** The custom commands. */
   commands: CustomCommand[];
   /** The custom command data. */
   data?: CustomCommandData[];
 }
 
-export const isCustomCommand = (arg: CustomCommand): arg is CustomCommand =>
-  typeof arg === "object" &&
-  typeof arg.id === "string" &&
-  Array.isArray(arg.channels) &&
-  arg.channels.every((a) => typeof a === "string") &&
-  typeof arg.message === "string" &&
-  typeof arg.regexString === "string" &&
-  (arg.userLevel
-    ? ["broadcaster", "mod", "vip", "everyone"].includes(arg.userLevel)
-    : typeof arg.userLevel === "undefined") &&
-  (arg.count
-    ? typeof arg.count === "number"
-    : typeof arg.count === "undefined") &&
-  (arg.timestampLastExecution
-    ? typeof arg.timestampLastExecution === "number"
-    : typeof arg.timestampLastExecution === "undefined") &&
-  (arg.cooldownInS
-    ? typeof arg.cooldownInS === "number"
-    : typeof arg.cooldownInS === "undefined") &&
-  (arg.description
-    ? typeof arg.description === "string"
-    : typeof arg.description === "undefined");
-
-export const isGlobalData = (
-  arg: CustomCommandData
-): arg is CustomCommandData => {
+/**
+ * Type guard for CustomCommand objects.
+ *
+ * @param arg Possible CustomCommand object.
+ * @param logger Optional logger for more detailed analysis.
+ * @returns True if the object can be used as CustomCommand.
+ */
+export const isCustomCommand = (
+  arg: CustomCommand,
+  logger?: Logger
+): arg is CustomCommand => {
+  let logFunc: LogFunc | undefined;
+  if (logger) {
+    logFunc = createLogFunc(logger, LOG_ID_MODULE_CUSTOM_COMMAND, {
+      subsection: "is_custom_command",
+    });
+  }
   if (typeof arg !== "object") {
-    console.error("custom command data is not an object");
+    logFunc?.warn(typeGuardLog("not an object", arg));
     return false;
   }
   if (typeof arg.id !== "string") {
-    console.error("custom command data.id is not a string");
+    logFunc?.warn(typeGuardLog("'id' != string", arg.id));
     return false;
   }
-  if (typeof arg.value !== "string" && typeof arg.value !== "number") {
-    console.error("custom command data.value is neither a string nor a number");
+  if (!Array.isArray(arg.channels)) {
+    logFunc?.warn(typeGuardLog("'channels' != array", arg.channels));
+    return false;
+  }
+  if (
+    !arg.channels.every((a, index) => {
+      if (typeof a !== "string") {
+        logFunc?.warn(typeGuardLog(`'channels'[${index}] != string`, a));
+        return false;
+      }
+      return true;
+    })
+  ) {
+    return false;
+  }
+  if (typeof arg.message !== "string") {
+    logFunc?.warn(typeGuardLog("'message' != string", arg.message));
+    return false;
+  }
+  if (typeof arg.regexString !== "string") {
+    logFunc?.warn(typeGuardLog("'regexString' != string", arg.regexString));
+    return false;
+  }
+  if (
+    typeof arg.userLevel !== "undefined" &&
+    !Object.values(CustomCommandUserLevel).includes(arg.userLevel)
+  ) {
+    logFunc?.warn(
+      typeGuardLog(
+        "'userLevel' != CustomCommandUserLevel/undefined",
+        arg.userLevel
+      )
+    );
+    return false;
+  }
+  if (typeof arg.count !== "undefined" && typeof arg.count !== "number") {
+    logFunc?.warn(typeGuardLog("'count' != number/undefined", arg.count));
+    return false;
+  }
+  if (
+    typeof arg.timestampLastExecution !== "undefined" &&
+    typeof arg.timestampLastExecution !== "number"
+  ) {
+    logFunc?.warn(
+      typeGuardLog(
+        "'timestampLastExecution' != number/undefined",
+        arg.timestampLastExecution
+      )
+    );
+    return false;
+  }
+  if (
+    typeof arg.cooldownInS !== "undefined" &&
+    typeof arg.cooldownInS !== "number"
+  ) {
+    logFunc?.warn(
+      typeGuardLog("'cooldownInS' != number/undefined", arg.cooldownInS)
+    );
     return false;
   }
   if (
     typeof arg.description !== "undefined" &&
     typeof arg.description !== "string"
   ) {
-    console.error(
-      "custom command data.description is not a string or undefined"
+    logFunc?.warn(
+      typeGuardLog("'description' != string/undefined", arg.description)
     );
     return false;
   }
   return true;
 };
 
+/**
+ * Type guard for CustomCommandData objects.
+ *
+ * @param arg Possible CustomCommandData object.
+ * @param logger Optional logger for more detailed analysis.
+ * @returns True if the object can be used as CustomCommandData.
+ */
+export const isCustomCommandData = (
+  arg: CustomCommandData,
+  logger?: Logger
+): arg is CustomCommandData => {
+  let logFunc: LogFunc | undefined;
+  if (logger) {
+    logFunc = createLogFunc(logger, LOG_ID_MODULE_CUSTOM_COMMAND, {
+      subsection: "is_custom_command_data",
+    });
+  }
+  if (typeof arg !== "object") {
+    logFunc?.warn(typeGuardLog("not an object", arg));
+    return false;
+  }
+  if (typeof arg.id !== "string") {
+    logFunc?.warn(typeGuardLog("'id' != string", arg.id));
+    return false;
+  }
+  if (typeof arg.value !== "string" && typeof arg.value !== "number") {
+    logFunc?.warn(typeGuardLog("'value' != string/number", arg.value));
+    return false;
+  }
+  if (
+    typeof arg.description !== "undefined" &&
+    typeof arg.description !== "string"
+  ) {
+    logFunc?.warn(
+      typeGuardLog("'description' != string/undefined", arg.description)
+    );
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Type guard for CustomCommandsJson objects.
+ *
+ * @param arg Possible CustomCommandsJson object.
+ * @param logger Optional logger for more detailed analysis.
+ * @returns True if the object can be used as CustomCommandsJson.
+ */
 export const isCustomCommandsJson = (
-  arg: CustomCommandsJson
-): arg is CustomCommandsJson =>
-  typeof arg === "object" &&
-  (arg.$schema
-    ? typeof arg.$schema === "string"
-    : typeof arg.$schema === "undefined") &&
-  Array.isArray(arg.commands) &&
-  arg.commands.map(isCustomCommand).every(Boolean) &&
-  (arg.data
-    ? Array.isArray(arg.data) && arg.data.map(isGlobalData).every(Boolean)
-    : typeof arg.data === "undefined");
+  arg: CustomCommandsJson,
+  logger?: Logger
+): arg is CustomCommandsJson => {
+  let logFunc: LogFunc | undefined;
+  if (logger) {
+    logFunc = createLogFunc(logger, LOG_ID_MODULE_CUSTOM_COMMAND, {
+      subsection: "is_custom_commands_json",
+    });
+  }
+  if (typeof arg !== "object") {
+    logFunc?.warn(typeGuardLog("not an object", arg));
+    return false;
+  }
+  if (typeof arg.$schema !== "string" && typeof arg.$schema !== "undefined") {
+    logFunc?.warn(typeGuardLog("'$schema' != string/undefined", arg.$schema));
+    return false;
+  }
+  if (!Array.isArray(arg.commands)) {
+    logFunc?.warn(typeGuardLog("'commands' != array", arg.commands));
+    return false;
+  }
+  if (
+    !arg.commands
+      .map((a, index) => {
+        if (!isCustomCommand(a, logger)) {
+          logFunc?.warn(
+            typeGuardLog(`'commands'[${index}] != CustomCommand`, a)
+          );
+          return false;
+        }
+        return true;
+      })
+      .every(Boolean)
+  ) {
+    return false;
+  }
+  if (typeof arg.data !== "undefined") {
+    if (!Array.isArray(arg.data)) {
+      logFunc?.warn(typeGuardLog("'data' != array", arg.data));
+      return false;
+    }
+    if (
+      !arg.data
+        .map((a, index) => {
+          if (!isCustomCommandData(a, logger)) {
+            logFunc?.warn(
+              typeGuardLog(`'data'[${index}] != CustomCommandData`, a)
+            );
+            return false;
+          }
+          return true;
+        })
+        .every(Boolean)
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
 
 export const pluginRegexGroupId = "REGEX_GROUP";
 
-export const checkCustomCommand = async (
-  client: Client,
-  channel: string,
-  tags: ChatUserstate,
-  message: string,
-  twitchBadgeLevel: TwitchBadgeLevels,
-  command: CustomCommand,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
+interface HandleMessageDataCheckCustomCommand {
+  /**
+   * The custom command that should be checked.
+   */
+  command: CustomCommand;
+}
+
+export const checkCustomCommand: TwitchChatHandler<
+  HandleMessageDataCheckCustomCommand,
+  boolean
+> = async (
+  client,
+  channel,
+  tags,
+  message,
+  data,
+  globalStrings,
+  globalPlugins,
+  globalMacros,
+  logger
 ): Promise<boolean> => {
   if (tags.id === undefined) {
     throw errorMessageIdUndefined();
@@ -170,28 +323,28 @@ export const checkCustomCommand = async (
   }
 
   // Check if the user is allowed to run the command (level)
-  if (command.userLevel !== undefined) {
-    switch (twitchBadgeLevel) {
+  if (data.command.userLevel !== undefined) {
+    switch (parseTwitchBadgeLevel(tags)) {
       case TwitchBadgeLevels.BROADCASTER:
         break;
       case TwitchBadgeLevels.MODERATOR:
-        if (command.userLevel === "broadcaster") {
+        if (data.command.userLevel === "broadcaster") {
           return false;
         }
         break;
       case TwitchBadgeLevels.VIP:
         if (
-          command.userLevel === "broadcaster" ||
-          command.userLevel === "mod"
+          data.command.userLevel === "broadcaster" ||
+          data.command.userLevel === "mod"
         ) {
           return false;
         }
         break;
       case TwitchBadgeLevels.NONE:
         if (
-          command.userLevel === "broadcaster" ||
-          command.userLevel === "mod" ||
-          command.userLevel === "vip"
+          data.command.userLevel === "broadcaster" ||
+          data.command.userLevel === "mod" ||
+          data.command.userLevel === "vip"
         ) {
           return false;
         }
@@ -200,7 +353,7 @@ export const checkCustomCommand = async (
   }
 
   // eslint-disable-next-line security/detect-non-literal-regexp
-  const regex = new RegExp(command.regexString);
+  const regex = new RegExp(data.command.regexString);
   const match = message.match(regex);
   if (!match) {
     return false;
@@ -211,19 +364,19 @@ export const checkCustomCommand = async (
     tags.id,
     [tags.username ? `#${tags.username}` : "undefined", message],
     LOG_ID_COMMAND_CUSTOM_COMMAND,
-    command.id ? command.id : regex.toString(),
+    data.command.id ? data.command.id : regex.toString(),
     LOG_ID_MODULE_CUSTOM_COMMAND
   );
 
   // Check if the user is allowed to run the command (cooldown)
   const currentTimestamp = new Date().getTime();
-  if (command.cooldownInS !== undefined) {
-    const lastTimestamp = command.timestampLastExecution
-      ? command.timestampLastExecution
+  if (data.command.cooldownInS !== undefined) {
+    const lastTimestamp = data.command.timestampLastExecution
+      ? data.command.timestampLastExecution
       : 0;
-    if (currentTimestamp - lastTimestamp <= command.cooldownInS * 1000) {
+    if (currentTimestamp - lastTimestamp <= data.command.cooldownInS * 1000) {
       createLogFunc(logger, LOG_ID_MODULE_CUSTOM_COMMAND).debug(
-        `Custom command '${command.id}' won't be executed because of a cooldown of ${command.cooldownInS}s`
+        `Custom command '${data.command.id}' won't be executed because of a cooldown of ${data.command.cooldownInS}s`
       );
       return false;
     }
@@ -243,9 +396,9 @@ export const checkCustomCommand = async (
     return `${match[parseInt(regexGroupIndex)]}`;
   });
 
-  if (command.channels.find((a) => `#${a}` === channel)) {
+  if (data.command.channels.find((a) => `#${a}` === channel)) {
     const parsedMessage = await messageParser(
-      command.message,
+      data.command.message,
       globalStrings,
       pluginsCommand,
       globalMacros,
@@ -258,13 +411,13 @@ export const checkCustomCommand = async (
       tags.id,
       sentMessage,
       "custom_command",
-      command.id ? command.id : regex.toString()
+      data.command.id ? data.command.id : regex.toString()
     );
   }
 
   // Update the last executed timestamp when there is a cooldown
-  if (command.cooldownInS) {
-    command.timestampLastExecution = currentTimestamp;
+  if (data.command.cooldownInS) {
+    data.command.timestampLastExecution = currentTimestamp;
   }
 
   return true;
@@ -286,7 +439,7 @@ export const loadCustomCommandsFromFile = async (
   if (await fileExists(filePath)) {
     loggerCustomCommands.info("Found custom commands file");
     const data = await readJsonFile<CustomCommandsJson>(filePath);
-    if (!isCustomCommandsJson(data)) {
+    if (!isCustomCommandsJson(data, logger)) {
       throw Error(
         `Loaded custom commands file '${filePath}' does not match its definition`
       );

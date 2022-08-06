@@ -6,48 +6,49 @@ import {
 import { messageParserById } from "../../messageParser";
 import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
 // Type imports
-import type { Macros, Plugins } from "../../messageParser";
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
-import type { Strings } from "../../strings";
+import type { TwitchChatHandler } from "../../twitch";
 
 /**
  * About command: Send the name, version and source code link of the bot.
  *
  * @param client Twitch client (used to send messages).
  * @param channel Twitch channel (where the response should be sent to).
- * @param messageId Twitch message ID of the request (used for logging).
+ * @param tags Twitch chat state (message id, user name, ...).
+ * @param _message The current Twitch message.
+ * @param _data Chat handler specific data.
  * @param globalStrings Global message strings.
  * @param globalPlugins Global plugins.
  * @param globalMacros Global macros.
  * @param logger Logger (used for global logs).
  */
-export const commandAbout = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
+export const commandAbout: TwitchChatHandler = async (
+  client,
+  channel,
+  tags,
+  _message,
+  _data,
+  globalStrings,
+  globalPlugins,
+  globalMacros,
+  logger
 ): Promise<void> => {
-  if (messageId === undefined) {
+  if (tags.id === undefined) {
     throw errorMessageIdUndefined();
   }
 
-  const message = await messageParserById(
+  const msg = await messageParserById(
     moonpieCommandReplyAbout.id,
     globalStrings,
     globalPlugins,
     globalMacros,
     logger
   );
-  const sentMessage = await client.say(channel, message);
+  const sentMsg = await client.say(channel, msg);
 
   logTwitchMessageCommandReply(
     logger,
-    messageId,
-    sentMessage,
+    tags.id,
+    sentMsg,
     LOG_ID_COMMAND_MOONPIE,
     MoonpieCommands.ABOUT
   );

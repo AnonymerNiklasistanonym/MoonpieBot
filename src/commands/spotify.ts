@@ -1,16 +1,12 @@
 import {
   errorMessageIdUndefined,
-  errorMessageUserNameUndefined,
   logTwitchMessageCommandDetected,
   logTwitchMessageCommandReply,
 } from "../commands";
 import { messageParserById } from "../messageParser";
 import { spotifyCommandReplySong } from "../strings/spotify/commandReply";
 // Type imports
-import type { ChatUserstate, Client } from "tmi.js";
-import type { Macros, Plugins } from "../messageParser";
-import type { Logger } from "winston";
-import type { Strings } from "../strings";
+import type { TwitchChatHandler } from "../twitch";
 
 /**
  * The logging ID of this command.
@@ -53,24 +49,22 @@ export interface Artist {
   name: string;
 }
 
-export const commandSong = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  userName: string | undefined,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
+export const commandSong: TwitchChatHandler = async (
+  client,
+  channel,
+  tags,
+  _,
+  __,
+  globalStrings,
+  globalPlugins,
+  globalMacros,
+  logger
+) => {
+  if (tags.id === undefined) {
     throw errorMessageIdUndefined();
   }
-  if (userName === undefined) {
-    throw errorMessageUserNameUndefined();
-  }
 
-  const message = await messageParserById(
+  const msg = await messageParserById(
     spotifyCommandReplySong.id,
     globalStrings,
     globalPlugins,
@@ -78,30 +72,39 @@ export const commandSong = async (
     logger
   );
 
-  const sentMessage = await client.say(channel, message);
+  const sentMsg = await client.say(channel, msg);
 
   logTwitchMessageCommandReply(
     logger,
-    messageId,
-    sentMessage,
+    tags.id,
+    sentMsg,
     LOG_ID_COMMAND_SPOTIFY,
     SpotifyCommands.SONG
   );
 };
 
-export const spotifyChatHandler = async (
-  client: Client,
-  channel: string,
-  tags: ChatUserstate,
-  message: string,
-  enabled: (SpotifyCommands | string)[] = [],
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
+export interface SpotifyChatHandlerData {
+  /**
+   * Array of all Spotify commands that should be enabled.
+   */
+  enabled: (SpotifyCommands | string)[];
+}
+
+export const spotifyChatHandler: TwitchChatHandler<
+  SpotifyChatHandlerData
+> = async (
+  client,
+  channel,
+  tags,
+  message,
+  data,
+  globalStrings,
+  globalPlugins,
+  globalMacros,
+  logger
 ): Promise<void> => {
-  // > !np
-  if (message.match(regexSong) && enabled.includes(SpotifyCommands.SONG)) {
+  // > !song
+  if (message.match(regexSong) && data.enabled.includes(SpotifyCommands.SONG)) {
     logTwitchMessageCommandDetected(
       logger,
       tags.id,
@@ -113,8 +116,9 @@ export const spotifyChatHandler = async (
     await commandSong(
       client,
       channel,
-      tags.id,
-      tags.username,
+      tags,
+      message,
+      undefined,
       globalStrings,
       globalPlugins,
       globalMacros,
