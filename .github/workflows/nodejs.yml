@@ -46,7 +46,13 @@ jobs:
       run: sudo apt install graphviz
     - name: Install dependencies (choco)
       if: matrix.os == 'windows-latest'
-      run: choco install graphviz
+      run: choco install graphviz nsis
+    - name: Install dependencies (nsis-plugins)
+      if: matrix.os == 'windows-latest'
+      run: |
+        $EnVarPluginArchive = Join-Path "installer" (Join-Path "windows_installer" "EnVar.zip")
+        $NsisDir = Join-Path "${env:ProgramFiles(x86)}" "NSIS"
+        Expand-Archive $EnVarPluginArchive -DestinationPath $NsisDir -Force
     - name: Install dependencies (npm)
       run: npm ci
     - name: Run tests and see code coverage
@@ -74,7 +80,7 @@ jobs:
     - name: Create installer
       if: matrix.os == 'windows-latest'
       run: makensis .\windows_installer.nsi
-      working-directory: .\installer
+      working-directory: .\installer\windows_installer
     - name: Save binary artifact [installer]
       if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v3

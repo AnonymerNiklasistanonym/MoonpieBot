@@ -33,16 +33,18 @@ Set-Location $PSScriptRoot
 Set-Location ..
 
 # Install all dependencies and build the bot
-Remove-Item "node_modules" -Recurse -ErrorAction Ignore
-npm install
-npm run build
-npm run package:win
+#Remove-Item "node_modules" -Recurse -ErrorAction Ignore
+#npm install
+#npm run build
+#npm run package:windows
 
 # Create the windows installer
 if ($makensisWasFound) {
-    cd installer
+    Set-Location installer
+    Set-Location windows_installer
     makensis windows_installer.nsi
-    cd ..
+    Set-Location ..
+    Set-Location ..
 }
 
 # Go back to the call directory

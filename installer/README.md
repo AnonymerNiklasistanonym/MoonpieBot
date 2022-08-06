@@ -23,7 +23,7 @@ Then after installing add the install directory to your environment path so that
 ```ps1
 npm install
 npm run build
-npm run package:win
+npm run package:windows
 cd installer
 makensis windows_installer.nsi
 ```

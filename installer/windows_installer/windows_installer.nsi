@@ -27,7 +27,7 @@
 
   ;Set name and output file
   Name "${PRODUCT}"
-  OutFile "..\bin\${PRODUCT_LOWERCASE}_setup.exe"
+  OutFile "..\..\bin\${PRODUCT_LOWERCASE}_setup.exe"
 
   ;Set the default installation directory
   InstallDir "$PROGRAMFILES64\${PRODUCT}"
@@ -37,6 +37,11 @@
 
   ;Request admin prvilidges to install to the program files directory
   RequestExecutionLevel admin
+
+;--------------------------------
+;Include External Logic File To Dump install log to file
+
+  !include "windows_installer_dump_log_to_file.nsi"
 
 ;--------------------------------
 ;Interface Settings
@@ -51,8 +56,8 @@
   !define MUI_LANGDLL_ALLLANGUAGES
 
   ;Use a custom (un-)install icon
-  !define MUI_ICON "..\res\icons\${PRODUCT_LOWERCASE}.ico"
-  !define MUI_UNICON "..\res\icons\${PRODUCT_LOWERCASE}_greyscale.ico"
+  !define MUI_ICON "..\..\res\icons\${PRODUCT_LOWERCASE}.ico"
+  !define MUI_UNICON "..\..\res\icons\${PRODUCT_LOWERCASE}_greyscale.ico"
 
   ;Use custom image files for the (un-)installer
   ;!define MUI_HEADERIMAGE_RIGHT
@@ -74,7 +79,7 @@
   ;Welcome page with name and version
   !insertmacro MUI_PAGE_WELCOME
   ;License page
-  !insertmacro MUI_PAGE_LICENSE "..\LICENSE"
+  !insertmacro MUI_PAGE_LICENSE "..\..\LICENSE"
   ;Component selector
   ;!insertmacro MUI_PAGE_COMPONENTS
   ;Set install directory
@@ -137,9 +142,9 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   ;Set output path to the installation directory and list the files that should
   ;be put into it
   SetOutPath "$INSTDIR"
-  File "..\bin\${PRODUCT_LOWERCASE}.exe"
+  File "..\..\bin\${PRODUCT_LOWERCASE}.exe"
   File ".\${PRODUCT_LOWERCASE}.bat"
-  File "..\res\icons\${PRODUCT_LOWERCASE}.ico"
+  File "..\..\res\icons\${PRODUCT_LOWERCASE}.ico"
 
   ;Store installation folder in registry for future installs
   WriteRegStr HKLM "Software\${PRODUCT}" "" "$INSTDIR"
@@ -169,12 +174,35 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   ;Set output path to the config directory and list the files that should be put
   ;into it
   SetOutPath "$AppData\${PRODUCT}"
-  File "..\.env.example"
-  File "..\.env.strings.example"
-  File "..\customCommands.example.json"
-  File "..\customTimers.example.json"
-  File "..\customCommands.schema.json"
-  File "..\customTimers.schema.json"
+  File "..\..\.env.example"
+  File "..\..\.env.strings.example"
+  File "..\..\customCommands.example.json"
+  File "..\..\customTimers.example.json"
+  File "..\..\customCommands.schema.json"
+  File "..\..\customTimers.schema.json"
+
+  ;Add install directory to the user path
+  EnVar::SetHKCU
+  DetailPrint "EnVar::SetHKCU"
+  ;Check for a 'PATH' variable
+  EnVar::Check "PATH" "NULL"
+  Pop $0
+  DetailPrint "EnVar::Check PATH returned=|$0|"
+  ${If} $0 != 0
+      MessageBox MB_OK 'There was an error accessing the user PATH variable (EnVar::Check PATH returned=|$0|)'
+  ${EndIf}
+  ;Add the install directory to the 'PATH' if the variable was found
+  EnVar::AddValue "PATH" "$INSTDIR"
+  Pop $0
+  DetailPrint "EnVar::AddValue PATH+=$INSTDIR returned=|$0|"
+  ${If} $0 != 0
+      MessageBox MB_OK 'There was an error adding the $INSTDIR to the user PATH variable (EnVar::AddValue PATH+=$INSTDIR returned=|$0|)'
+  ${EndIf}
+
+  ;Dump install log to file
+  StrCpy $0 "$EXEDIR\install.log"
+  Push $0
+  Call DumpLog
 
 SectionEnd
 
@@ -201,6 +229,23 @@ Section "Uninstall"
   ;Remove the start menu directory and all shortcuts within it
   Delete "$SMPROGRAMS\${PRODUCT}\*.*"
   RmDir  "$SMPROGRAMS\${PRODUCT}"
+
+  ;Remove install directory from the user path
+  EnVar::SetHKCU
+  DetailPrint "EnVar::SetHKCU"
+  ;Check for a 'PATH' variable
+  EnVar::Check "PATH" "NULL"
+  Pop $0
+  DetailPrint "EnVar::Check PATH returned=|$0|"
+  ${If} $0 == 0
+      ;Remove the install directory from the 'PATH' if the variable was found
+      EnVar::DeleteValue "PATH" "$INSTDIR"
+      Pop $0
+      DetailPrint "EnVar::DeleteValue PATH-=$INSTDIR returned=|$0|"
+      ${If} $0 != 0
+        MessageBox MB_OK 'There was an error accessing removing the $INSTDIR from the user PATH variable (EnVar::DeleteValue PATH+=$INSTDIR returned=|$0|)'
+      ${EndIf}
+  ${EndIf}
 
 SectionEnd
 
