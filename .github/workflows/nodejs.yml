@@ -65,8 +65,9 @@ jobs:
       run: npm run docs
     - name: Create files
       run: |
-        npm run create:manPage
+        npm run create:envExamples
         npm run create:jsonSchemas
+        npm run create:manPage
         npm run create:windowsInstallerConfig
     - name: Create binary release
       run: npm run package:${{ matrix.os-name }}

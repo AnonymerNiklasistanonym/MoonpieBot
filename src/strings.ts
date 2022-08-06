@@ -108,12 +108,12 @@ export const updateStringsMapWithCustomEnvStrings = (
   return strings;
 };
 
-export const writeStringsVariableDocumentation = async (
+export const createStringsVariableDocumentation = async (
   path: string,
   strings: Strings,
-  plugins: MessageParserPlugin[] = [],
-  macros: MessageParserMacro[] = [],
-  logger: Logger
+  plugins?: MessageParserPlugin[],
+  macros?: MessageParserMacro[],
+  logger?: Logger
 ) => {
   const data: FileDocumentationParts[] = [];
   data.push({
@@ -124,18 +124,25 @@ export const writeStringsVariableDocumentation = async (
       "Additionally there are plugins and macros that help with adding logic:",
   });
   data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
-  const pluginsAndMacroDocumentation =
-    await generatePluginAndMacroDocumentation(strings, plugins, macros, logger);
-  data.push(...pluginsAndMacroDocumentation);
-  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
-  data.push({
-    type: FileDocumentationPartType.TEXT,
-    content:
-      "Sometimes there are additional plugins/macros like $(USER). " +
-      "These plugins/macros can only be used when they are provided. " +
-      "So be sure to compare the default values plugins/macros for them.",
-  });
-  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+  if (plugins !== undefined && macros !== undefined && logger !== undefined) {
+    const pluginsAndMacroDocumentation =
+      await generatePluginAndMacroDocumentation(
+        strings,
+        plugins,
+        macros,
+        logger
+      );
+    data.push(...pluginsAndMacroDocumentation);
+    data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+    data.push({
+      type: FileDocumentationPartType.TEXT,
+      content:
+        "Sometimes there are additional plugins/macros like $(USER). " +
+        "These plugins/macros can only be used when they are provided. " +
+        "So be sure to compare the default values plugins/macros for them.",
+    });
+    data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+  }
   data.push({
     type: FileDocumentationPartType.TEXT,
     content:

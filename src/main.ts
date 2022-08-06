@@ -14,7 +14,6 @@ import { MacroOsuApi, macroOsuApiId } from "./messageParser/macros/osuApi";
 import {
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrUndefined,
-  writeEnvVariableDocumentation,
 } from "./env";
 import { OsuCommands, osuChatHandler } from "./commands/osu";
 import {
@@ -24,7 +23,7 @@ import {
 import {
   defaultStrings,
   updateStringsMapWithCustomEnvStrings,
-  writeStringsVariableDocumentation,
+  createStringsVariableDocumentation,
 } from "./strings";
 import {
   loadCustomTimersFromFile,
@@ -346,13 +345,9 @@ export const main = async (
     pluginUppercase,
   ];
   const macrosList = [macroMoonpieBot];
-  await writeEnvVariableDocumentation(
-    path.join(configDir, ".env.example"),
-    configDir
-  );
-  await writeStringsVariableDocumentation(
-    path.join(configDir, ".env.strings.example"),
-    defaultStrings,
+  await createStringsVariableDocumentation(
+    path.join(configDir, ".env.plugins"),
+    new Map(),
     pluginsList,
     macrosList,
     logger

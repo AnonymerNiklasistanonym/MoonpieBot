@@ -17,8 +17,10 @@ import {
 import {
   getEnvVariableValueOrDefault,
   printEnvVariablesToConsole,
+  createEnvVariableDocumentation,
 } from "./env";
 import { createLogFunc, createLogger } from "./logging";
+import { createStringsVariableDocumentation, defaultStrings } from "./strings";
 import { cliHelpGenerator } from "./cli";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getVersion } from "./version";
@@ -97,6 +99,14 @@ const entryPoint = async () => {
     // Catch CLI create example files option
     if (cliArgs.includes(CliOption.CREATE_EXAMPLE_FILES)) {
       await createExampleFiles(configDir);
+      await createEnvVariableDocumentation(
+        path.join(configDir, ".env.example"),
+        configDir
+      );
+      await createStringsVariableDocumentation(
+        path.join(configDir, ".env.strings.example"),
+        defaultStrings,
+      ).catch(console.error);
       process.exit(0);
     }
 

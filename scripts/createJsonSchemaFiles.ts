@@ -51,4 +51,5 @@ const createJsonSchemaFile = (config: Config) => {
 };
 
 configs.forEach(createJsonSchemaFile);
-createExampleFiles(path.join(__dirname, "..")).catch(console.error);
+const configDir = path.join(__dirname, "..");
+createExampleFiles(configDir).catch(console.error);

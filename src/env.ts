@@ -271,7 +271,7 @@ export const envVariableStructure: (
   },
 ];
 
-export const writeEnvVariableDocumentation = async (
+export const createEnvVariableDocumentation = async (
   path: string,
   configDir: string
 ) => {
