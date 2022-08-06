@@ -108,3 +108,18 @@ LangString LangStrUninstallTheCurrentlyInstalled3 ${LANG_FINNISH} ":n asentamist
 LangString LangStrUninstallTheCurrentlyInstalled1 ${LANG_SPANISH} "¿Desinstalar la versión "
 LangString LangStrUninstallTheCurrentlyInstalled2 ${LANG_SPANISH} " instalada antes de instalar la "
 LangString LangStrUninstallTheCurrentlyInstalled3 ${LANG_SPANISH} "?"
+
+LangString LangStrErrorEnVarCheck ${LANG_ENGLISH} "There was an error accessing the user PATH environment variable"
+LangString LangStrErrorEnVarCheck ${LANG_GERMAN}  "Es gab einen Fehler beim Zugriff auf die Umgebungsvariable PATH des Benutzers"
+LangString LangStrErrorEnVarCheck ${LANG_FINNISH} "Käyttäjän PATH-ympäristömuuttujaa käytettäessä tapahtui virhe"
+LangString LangStrErrorEnVarCheck ${LANG_SPANISH} "Se ha producido un error al acceder a la variable de entorno PATH del usuario"
+
+LangString LangStrErrorEnVarAdd ${LANG_ENGLISH} "There was an error adding the install directory to the user PATH environment variable"
+LangString LangStrErrorEnVarAdd ${LANG_GERMAN}  "Es gab einen Fehler beim Hinzufügen des Installationsverzeichnisses zur Umgebungsvariable PATH des Benutzers"
+LangString LangStrErrorEnVarAdd ${LANG_FINNISH} "Asennushakemiston lisääminen käyttäjän PATH-ympäristömuuttujaan oli virhe"
+LangString LangStrErrorEnVarAdd ${LANG_SPANISH} "Se ha producido un error al añadir el directorio de instalación a la variable de entorno PATH del usuario"
+
+LangString LangStrErrorEnVarDelete ${LANG_ENGLISH} "There was an error removing the install directory from the user PATH environment variable"
+LangString LangStrErrorEnVarDelete ${LANG_GERMAN}  "Es gab einen Fehler beim Entfernen des Installationsverzeichnisses aus der Umgebungsvariable PATH des Benutzers"
+LangString LangStrErrorEnVarDelete ${LANG_FINNISH} "Asennushakemiston poistaminen käyttäjän PATH-ympäristömuuttujasta oli virhe"
+LangString LangStrErrorEnVarDelete ${LANG_SPANISH} "Se ha producido un error al eliminar el directorio de instalación de la variable de entorno PATH del usuario"

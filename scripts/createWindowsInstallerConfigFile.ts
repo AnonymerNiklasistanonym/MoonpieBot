@@ -10,6 +10,7 @@ const rootPath = path.join(__dirname, "..");
 const windowsInstallerConfigOutputPath = path.join(
   rootPath,
   "installer",
+  "windows_installer",
   "windows_installer_config.nsi"
 );
 

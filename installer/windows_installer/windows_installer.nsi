@@ -136,6 +136,8 @@ FunctionEnd
 
 Section "${PRODUCT} ($(LangStrRequired))" Section1
 
+  DetailPrint "Install ${PRODUCT} ${PRODUCT_VERSION}"
+
   ;This will prevent this component from being disabled on the selection page
   SectionIn RO
 
@@ -189,18 +191,18 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   Pop $0
   DetailPrint "EnVar::Check PATH returned=|$0|"
   ${If} $0 != 0
-      MessageBox MB_OK 'There was an error accessing the user PATH variable (EnVar::Check PATH returned=|$0|)'
+      MessageBox MB_OK '$(LangStrErrorEnVarCheck) (EnVar::Check PATH => |$0|)'
   ${EndIf}
   ;Add the install directory to the 'PATH' if the variable was found
   EnVar::AddValue "PATH" "$INSTDIR"
   Pop $0
-  DetailPrint "EnVar::AddValue PATH+=$INSTDIR returned=|$0|"
+  DetailPrint "EnVar::AddValue PATH+='$INSTDIR' returned=|$0|"
   ${If} $0 != 0
-      MessageBox MB_OK 'There was an error adding the $INSTDIR to the user PATH variable (EnVar::AddValue PATH+=$INSTDIR returned=|$0|)'
+      MessageBox MB_OK '$(LangStrErrorEnVarAdd) (EnVar::AddValue PATH+="$INSTDIR" => |$0|)'
   ${EndIf}
 
   ;Dump install log to file
-  StrCpy $0 "$EXEDIR\install.log"
+  StrCpy $0 "$TEMP\${PRODUCT_LOWERCASE}_install.log"
   Push $0
   Call DumpLog
 
@@ -217,6 +219,8 @@ SectionEnd
 ;Uninstaller Section
 
 Section "Uninstall"
+
+  DetailPrint "Uninstall ${PRODUCT} ${PRODUCT_VERSION}"
 
   ;Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
@@ -241,9 +245,9 @@ Section "Uninstall"
       ;Remove the install directory from the 'PATH' if the variable was found
       EnVar::DeleteValue "PATH" "$INSTDIR"
       Pop $0
-      DetailPrint "EnVar::DeleteValue PATH-=$INSTDIR returned=|$0|"
+      DetailPrint "EnVar::DeleteValue PATH-='$INSTDIR' returned=|$0|"
       ${If} $0 != 0
-        MessageBox MB_OK 'There was an error accessing removing the $INSTDIR from the user PATH variable (EnVar::DeleteValue PATH+=$INSTDIR returned=|$0|)'
+        MessageBox MB_OK '$(LangStrErrorEnVarDelete) (EnVar::DeleteValue PATH-="$INSTDIR" => |$0|)'
       ${EndIf}
   ${EndIf}
 
