@@ -1,16 +1,16 @@
 // Package imports
-import { describe } from "mocha";
 import chai from "chai";
+import { describe } from "mocha";
 import sinon from "sinon";
 import sinonChai from "sinon-chai";
 // Local imports
 import {
-  EnvVariable,
   getEnvVariableName,
   getEnvVariableValue,
   getEnvVariableValueOrCustomDefault,
   printEnvVariablesToConsole,
 } from "../../src/env";
+import { EnvVariable } from "../../src/info/env";
 
 chai.use(sinonChai);
 
@@ -39,7 +39,7 @@ describe("cli", () => {
   });
 
   it("printCliVariablesToConsole", () => {
-    printEnvVariablesToConsole();
+    printEnvVariablesToConsole(process.cwd());
     chai.expect(console.log).to.be.called;
   });
 

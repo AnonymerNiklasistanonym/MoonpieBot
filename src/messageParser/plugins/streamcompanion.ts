@@ -2,11 +2,28 @@
 import type { StreamCompanionData } from "../../streamcompanion";
 import type { MessageParserPlugin } from "../plugins";
 
-export const pluginStreamCompanion = (
+export const pluginOsuStreamCompanionId = "OSU_STREAMCOMPANION";
+export enum MacroOsuStreamCompanion {
+  ARTIST_ROMAN = "ARTIST_ROMAN",
+  TITLE_ROMAN = "TITLE_ROMAN",
+  VERSION = "VERSION",
+  ID = "ID",
+  SET_ID = "SET_ID",
+  CS = "CS",
+  AR = "AR",
+  OD = "OD",
+  HP = "HP",
+  BPM = "BPM",
+  DIFFICULTY_RATING = "DIFFICULTY_RATING",
+  MAX_COMBO = "MAX_COMBO",
+  MODS = "MODS",
+}
+
+export const getPluginOsuStreamCompanion = (
   streamCompanionDataFunc: () => StreamCompanionData | undefined
 ): MessageParserPlugin => {
   return {
-    id: "OSU_STREAMCOMPANION",
+    id: pluginOsuStreamCompanionId,
     func: (_, __, signature) => {
       if (signature === true) {
         return {
@@ -19,18 +36,24 @@ export const pluginStreamCompanion = (
         return [];
       }
       return [
-        ["ARTIST_ROMAN", `${streamCompanionData.artistRoman}`],
-        ["TITLE_ROMAN", `${streamCompanionData.titleRoman}`],
-        ["VERSION", `${streamCompanionData.diffName}`],
-        ["ID", `${streamCompanionData.mapid}`],
-        ["SET_ID", `${streamCompanionData.mapsetid}`],
-        ["CS", `${streamCompanionData.mCS}`],
-        ["AR", `${streamCompanionData.mAR}`],
-        ["OD", `${streamCompanionData.mOD}`],
-        ["HP", `${streamCompanionData.mHP}`],
-        ["BPM", `${streamCompanionData.mBpm}`],
         [
-          "DIFFICULTY_RATING",
+          MacroOsuStreamCompanion.ARTIST_ROMAN,
+          `${streamCompanionData.artistRoman}`,
+        ],
+        [
+          MacroOsuStreamCompanion.TITLE_ROMAN,
+          `${streamCompanionData.titleRoman}`,
+        ],
+        [MacroOsuStreamCompanion.VERSION, `${streamCompanionData.diffName}`],
+        [MacroOsuStreamCompanion.ID, `${streamCompanionData.mapid}`],
+        [MacroOsuStreamCompanion.SET_ID, `${streamCompanionData.mapsetid}`],
+        [MacroOsuStreamCompanion.CS, `${streamCompanionData.mCS}`],
+        [MacroOsuStreamCompanion.AR, `${streamCompanionData.mAR}`],
+        [MacroOsuStreamCompanion.OD, `${streamCompanionData.mOD}`],
+        [MacroOsuStreamCompanion.HP, `${streamCompanionData.mHP}`],
+        [MacroOsuStreamCompanion.BPM, `${streamCompanionData.mBpm}`],
+        [
+          MacroOsuStreamCompanion.DIFFICULTY_RATING,
           `${
             streamCompanionData.mStars !== undefined
               ? Math.round(streamCompanionData.mStars * 100 + Number.EPSILON) /
@@ -38,8 +61,8 @@ export const pluginStreamCompanion = (
               : undefined
           }`,
         ],
-        ["MAX_COMBO", `${streamCompanionData.maxCombo}`],
-        ["MODS", `${streamCompanionData.mods}`],
+        [MacroOsuStreamCompanion.MAX_COMBO, `${streamCompanionData.maxCombo}`],
+        [MacroOsuStreamCompanion.MODS, `${streamCompanionData.mods}`],
       ];
     },
   };

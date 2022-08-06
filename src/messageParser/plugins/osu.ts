@@ -8,8 +8,18 @@ import type {
   OsuApiV2WebRequestError,
 } from "osu-api-v2";
 import type { OsuApiV2Credentials } from "../../commands/osu";
-import type { MacroDictionaryEntry } from "src/messageParser";
+import type { MacroDictionaryEntry } from "../../messageParser";
 import type { MessageParserPlugin } from "../plugins";
+import {
+  MacroOsuBeatmap,
+  MacroOsuMostRecentPlay,
+  MacroOsuScore,
+  MacroOsuUser,
+  pluginOsuBeatmapId,
+  pluginOsuMostRecentPlayId,
+  pluginOsuScoreId,
+  pluginOsuUserId,
+} from "./osuApi";
 
 const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
   switch (rankedStatus) {
@@ -45,38 +55,37 @@ const monthNames = [
   "December",
 ];
 
-export const osuBeatmapPluginMacroName = "OSU_BEATMAP";
 export const convertOsuBeatmapToMacros = (
   beatmap: Beatmap
 ): MacroDictionaryEntry[] => {
   const beatmapUpdate = new Date(beatmap.last_updated);
   return [
-    ["TITLE", `${beatmap.beatmapset?.title}`],
-    ["VERSION", `${beatmap.version}`],
+    [MacroOsuBeatmap.TITLE, `${beatmap.beatmapset?.title}`],
+    [MacroOsuBeatmap.VERSION, `${beatmap.version}`],
     [
-      "DIFFICULTY_RATING",
+      MacroOsuBeatmap.DIFFICULTY_RATING,
       `${Math.round(beatmap.difficulty_rating * 100 + Number.EPSILON) / 100}`,
     ],
-    ["ARTIST", `${beatmap.beatmapset?.artist}`],
-    ["ID", `${beatmap.id}`],
-    ["CREATOR_USER_NAME", `${beatmap.beatmapset?.creator}`],
-    ["URL", `${beatmap.url}`],
-    ["SET_ID", `${beatmap.beatmapset?.id}`],
-    ["LENGTH_IN_S", `${beatmap.total_length}`],
-    ["RANKED_STATUS", mapRankedStatusToStr(beatmap.ranked)],
-    ["LAST_UPDATED_MONTH", monthNames[beatmapUpdate.getMonth()]],
-    ["LAST_UPDATED_YEAR", `${beatmapUpdate.getFullYear()}`],
-    ["MAX_COMBO", `${beatmap.max_combo}`],
-    ["ACC", `${beatmap.accuracy}`],
-    ["CS", `${beatmap.cs}`],
-    ["DRAIN", `${beatmap.drain}`],
-    ["BPM", `${beatmap.bpm}`],
-    ["AR", `${beatmap.ar}`],
-    ["CC", `${beatmap.count_circles}`],
-    ["SLC", `${beatmap.count_sliders}`],
-    ["SPC", `${beatmap.count_spinners}`],
-    ["PLAY_COUNT", `${beatmap.playcount}`],
-    ["PASS_COUNT", `${beatmap.passcount}`],
+    [MacroOsuBeatmap.ARTIST, `${beatmap.beatmapset?.artist}`],
+    [MacroOsuBeatmap.ID, `${beatmap.id}`],
+    [MacroOsuBeatmap.CREATOR_USER_NAME, `${beatmap.beatmapset?.creator}`],
+    [MacroOsuBeatmap.URL, `${beatmap.url}`],
+    [MacroOsuBeatmap.SET_ID, `${beatmap.beatmapset?.id}`],
+    [MacroOsuBeatmap.LENGTH_IN_S, `${beatmap.total_length}`],
+    [MacroOsuBeatmap.RANKED_STATUS, mapRankedStatusToStr(beatmap.ranked)],
+    [MacroOsuBeatmap.LAST_UPDATED_MONTH, monthNames[beatmapUpdate.getMonth()]],
+    [MacroOsuBeatmap.LAST_UPDATED_YEAR, `${beatmapUpdate.getFullYear()}`],
+    [MacroOsuBeatmap.MAX_COMBO, `${beatmap.max_combo}`],
+    [MacroOsuBeatmap.ACC, `${beatmap.accuracy}`],
+    [MacroOsuBeatmap.CS, `${beatmap.cs}`],
+    [MacroOsuBeatmap.DRAIN, `${beatmap.drain}`],
+    [MacroOsuBeatmap.BPM, `${beatmap.bpm}`],
+    [MacroOsuBeatmap.AR, `${beatmap.ar}`],
+    [MacroOsuBeatmap.CC, `${beatmap.count_circles}`],
+    [MacroOsuBeatmap.SLC, `${beatmap.count_sliders}`],
+    [MacroOsuBeatmap.SPC, `${beatmap.count_spinners}`],
+    [MacroOsuBeatmap.PLAY_COUNT, `${beatmap.playcount}`],
+    [MacroOsuBeatmap.PASS_COUNT, `${beatmap.passcount}`],
   ];
 };
 
@@ -84,7 +93,7 @@ export const pluginOsuBeatmap = (
   osuApiV2Credentials: OsuApiV2Credentials
 ): MessageParserPlugin => {
   return {
-    id: osuBeatmapPluginMacroName,
+    id: pluginOsuBeatmapId,
     func: async (_logger, beatmapId, signature) => {
       if (signature === true) {
         return {
@@ -110,7 +119,6 @@ export const pluginOsuBeatmap = (
   };
 };
 
-export const osuScorePluginMacroName = "OSU_SCORE";
 export const convertOsuScoreToMacros = (
   beatmapScore: BeatmapUserScore
 ): MacroDictionaryEntry[] => {
@@ -119,37 +127,38 @@ export const convertOsuScoreToMacros = (
   const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
   return [
     [
-      "EXISTS",
+      MacroOsuScore.EXISTS,
       `${beatmapScore.position !== undefined && beatmapScore.position !== -1}`,
     ],
-    ["PASSED", `${score.passed}`],
-    ["RANK", `${score.rank}`],
-    ["FC", `${score.perfect}`],
-    ["ACC", `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`],
+    [MacroOsuScore.PASSED, `${score.passed}`],
+    [MacroOsuScore.RANK, `${score.rank}`],
+    [MacroOsuScore.FC, `${score.perfect}`],
     [
-      "PP",
+      MacroOsuScore.ACC,
+      `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`,
+    ],
+    [
+      MacroOsuScore.PP,
       score.pp == null
         ? "undefined"
         : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
     ],
-    ["MODS", `${score.mods.join(",")}`],
-    ["COUNT_300", `${score.statistics.count_300}`],
-    ["COUNT_100", `${score.statistics.count_100}`],
-    ["COUNT_50", `${score.statistics.count_50}`],
-    ["COUNT_MISS", `${score.statistics.count_miss}`],
-    ["MAX_COMBO", `${score.max_combo}`],
-    ["TIME_IN_S_AGO", `${scoreDateRangeMs / 1000}`],
-    ["DATE_MONTH", monthNames[scoreDate.getMonth()]],
-    ["DATE_YEAR", `${scoreDate.getFullYear()}`],
-    ["USER_NAME", `${score.user?.username}`],
-    ["USER_ID", `${score.user?.id}`],
-    ["HAS_REPLAY", `${score.replay}`],
-    ["ID", `${score.id}`],
-    ["USER_ID", `${score.user?.id}`],
-    ["USER_NAME", `${score.user?.username}`],
-    ["TITLE", `${score.beatmapset?.title}`],
-    ["ARTIST", `${score.beatmapset?.artist}`],
-    ["VERSION", `${score.beatmap?.version}`],
+    [MacroOsuScore.MODS, `${score.mods.join(",")}`],
+    [MacroOsuScore.COUNT_300, `${score.statistics.count_300}`],
+    [MacroOsuScore.COUNT_100, `${score.statistics.count_100}`],
+    [MacroOsuScore.COUNT_50, `${score.statistics.count_50}`],
+    [MacroOsuScore.COUNT_MISS, `${score.statistics.count_miss}`],
+    [MacroOsuScore.MAX_COMBO, `${score.max_combo}`],
+    [MacroOsuScore.TIME_IN_S_AGO, `${scoreDateRangeMs / 1000}`],
+    [MacroOsuScore.DATE_MONTH, monthNames[scoreDate.getMonth()]],
+    [MacroOsuScore.DATE_YEAR, `${scoreDate.getFullYear()}`],
+    [MacroOsuScore.USER_NAME, `${score.user?.username}`],
+    [MacroOsuScore.USER_ID, `${score.user?.id}`],
+    [MacroOsuScore.HAS_REPLAY, `${score.replay}`],
+    [MacroOsuScore.ID, `${score.id}`],
+    [MacroOsuScore.TITLE, `${score.beatmapset?.title}`],
+    [MacroOsuScore.ARTIST, `${score.beatmapset?.artist}`],
+    [MacroOsuScore.VERSION, `${score.beatmap?.version}`],
   ];
 };
 
@@ -157,7 +166,7 @@ export const pluginOsuScore = (
   osuApiV2Credentials: OsuApiV2Credentials
 ): MessageParserPlugin => {
   return {
-    id: osuScorePluginMacroName,
+    id: pluginOsuScoreId,
     func: async (_logger, beatmapIdAndUserId, signature) => {
       if (signature === true) {
         return {
@@ -200,11 +209,54 @@ export const pluginOsuScore = (
   };
 };
 
+export const convertOsuaScoreToMacros = (
+  beatmapScore: BeatmapUserScore
+): MacroDictionaryEntry[] => {
+  const score = beatmapScore.score;
+  const scoreDate = new Date(score.created_at);
+  const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
+  return [
+    [
+      MacroOsuScore.EXISTS,
+      `${beatmapScore.position !== undefined && beatmapScore.position !== -1}`,
+    ],
+    [MacroOsuScore.PASSED, `${score.passed}`],
+    [MacroOsuScore.RANK, `${score.rank}`],
+    [MacroOsuScore.FC, `${score.perfect}`],
+    [
+      MacroOsuScore.ACC,
+      `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`,
+    ],
+    [
+      MacroOsuScore.PP,
+      score.pp == null
+        ? "undefined"
+        : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
+    ],
+    [MacroOsuScore.MODS, `${score.mods.join(",")}`],
+    [MacroOsuScore.COUNT_300, `${score.statistics.count_300}`],
+    [MacroOsuScore.COUNT_100, `${score.statistics.count_100}`],
+    [MacroOsuScore.COUNT_50, `${score.statistics.count_50}`],
+    [MacroOsuScore.COUNT_MISS, `${score.statistics.count_miss}`],
+    [MacroOsuScore.MAX_COMBO, `${score.max_combo}`],
+    [MacroOsuScore.TIME_IN_S_AGO, `${scoreDateRangeMs / 1000}`],
+    [MacroOsuScore.DATE_MONTH, monthNames[scoreDate.getMonth()]],
+    [MacroOsuScore.DATE_YEAR, `${scoreDate.getFullYear()}`],
+    [MacroOsuScore.USER_NAME, `${score.user?.username}`],
+    [MacroOsuScore.USER_ID, `${score.user?.id}`],
+    [MacroOsuScore.HAS_REPLAY, `${score.replay}`],
+    [MacroOsuScore.ID, `${score.id}`],
+    [MacroOsuScore.TITLE, `${score.beatmapset?.title}`],
+    [MacroOsuScore.ARTIST, `${score.beatmapset?.artist}`],
+    [MacroOsuScore.VERSION, `${score.beatmap?.version}`],
+  ];
+};
+
 export const pluginOsuMostRecentPlay = (
   osuApiV2Credentials: OsuApiV2Credentials
 ): MessageParserPlugin => {
   return {
-    id: "OSU_MOST_RECENT_PLAY",
+    id: pluginOsuMostRecentPlayId,
     func: async (_logger, userId, signature) => {
       if (signature === true) {
         return {
@@ -235,36 +287,36 @@ export const pluginOsuMostRecentPlay = (
         const scoreDate = new Date(score.created_at);
         const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
         return [
-          ["FOUND", "true"],
-          ["PASSED", `${score.passed}`],
-          ["RANK", `${score.rank}`],
-          ["FC", `${score.perfect}`],
+          [MacroOsuMostRecentPlay.FOUND, "true"],
+          [MacroOsuMostRecentPlay.PASSED, `${score.passed}`],
+          [MacroOsuMostRecentPlay.RANK, `${score.rank}`],
+          [MacroOsuMostRecentPlay.FC, `${score.perfect}`],
           [
-            "ACC",
+            MacroOsuMostRecentPlay.ACC,
             `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`,
           ],
           [
-            "PP",
+            MacroOsuMostRecentPlay.PP,
             score.pp == null
               ? "undefined"
               : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
           ],
-          ["MODS", `${score.mods.join(",")}`],
-          ["COUNT_300", `${score.statistics.count_300}`],
-          ["COUNT_100", `${score.statistics.count_100}`],
-          ["COUNT_50", `${score.statistics.count_50}`],
-          ["COUNT_MISS", `${score.statistics.count_miss}`],
-          ["MAX_COMBO", `${score.max_combo}`],
-          ["TIME_IN_S_AGO", `${scoreDateRangeMs / 1000}`],
-          ["DATE_MONTH", monthNames[scoreDate.getMonth()]],
-          ["DATE_YEAR", `${scoreDate.getFullYear()}`],
-          ["USER_NAME", `${score.user?.username}`],
-          ["USER_ID", `${score.user?.id}`],
-          ["HAS_REPLAY", `${score.replay}`],
-          ["ID", `${score.id}`],
-          ["MAP_ID", `${score.beatmap?.id}`],
-          ["USER_ID", `${score.user?.id}`],
-          ["USER_NAME", `${score.user?.username}`],
+          [MacroOsuMostRecentPlay.MODS, `${score.mods.join(",")}`],
+          [MacroOsuMostRecentPlay.COUNT_300, `${score.statistics.count_300}`],
+          [MacroOsuMostRecentPlay.COUNT_100, `${score.statistics.count_100}`],
+          [MacroOsuMostRecentPlay.COUNT_50, `${score.statistics.count_50}`],
+          [MacroOsuMostRecentPlay.COUNT_MISS, `${score.statistics.count_miss}`],
+          [MacroOsuMostRecentPlay.MAX_COMBO, `${score.max_combo}`],
+          [MacroOsuMostRecentPlay.TIME_IN_S_AGO, `${scoreDateRangeMs / 1000}`],
+          [MacroOsuMostRecentPlay.DATE_MONTH, monthNames[scoreDate.getMonth()]],
+          [MacroOsuMostRecentPlay.DATE_YEAR, `${scoreDate.getFullYear()}`],
+          [MacroOsuMostRecentPlay.USER_NAME, `${score.user?.username}`],
+          [MacroOsuMostRecentPlay.USER_ID, `${score.user?.id}`],
+          [MacroOsuMostRecentPlay.HAS_REPLAY, `${score.replay}`],
+          [MacroOsuMostRecentPlay.ID, `${score.id}`],
+          [MacroOsuMostRecentPlay.MAP_ID, `${score.beatmap?.id}`],
+          [MacroOsuMostRecentPlay.USER_ID, `${score.user?.id}`],
+          [MacroOsuMostRecentPlay.USER_NAME, `${score.user?.username}`],
         ];
       }
       return [["FOUND", "false"]];
@@ -276,7 +328,7 @@ export const pluginOsuUser = (
   osuApiV2Credentials: OsuApiV2Credentials
 ): MessageParserPlugin => {
   return {
-    id: "OSU_USER",
+    id: pluginOsuUserId,
     func: async (_logger, userId, signature) => {
       if (signature === true) {
         return {
@@ -305,24 +357,24 @@ export const pluginOsuUser = (
 
       return [
         // eslint-disable-next-line security/detect-object-injection
-        ["JOIN_DATE_MONTH", `${monthNames[joinDateMonth]}`],
-        ["JOIN_DATE_YEAR", `${joinDateYear}`],
-        ["GLOBAL_RANK", `${user.statistics?.global_rank}`],
-        ["COUNTRY_RANK", `${user.statistics?.country_rank}`],
-        ["COUNTRY", `${user.country.name}`],
-        ["ID", `${user.id}`],
-        ["NAME", `${user.username}`],
+        [MacroOsuUser.JOIN_DATE_MONTH, `${monthNames[joinDateMonth]}`],
+        [MacroOsuUser.JOIN_DATE_YEAR, `${joinDateYear}`],
+        [MacroOsuUser.GLOBAL_RANK, `${user.statistics?.global_rank}`],
+        [MacroOsuUser.COUNTRY_RANK, `${user.statistics?.country_rank}`],
+        [MacroOsuUser.COUNTRY, `${user.country.name}`],
+        [MacroOsuUser.ID, `${user.id}`],
+        [MacroOsuUser.NAME, `${user.username}`],
         [
-          "PLAYSTYLE",
+          MacroOsuUser.PLAYSTYLE,
           `${
             user.playstyle != null && user.playstyle.length > 0
               ? user.playstyle.join(", ")
               : undefined
           }`,
         ],
-        ["HAS_STATISTICS", `${user.statistics !== undefined}`],
+        [MacroOsuUser.HAS_STATISTICS, `${user.statistics !== undefined}`],
         [
-          "PP",
+          MacroOsuUser.PP,
           `${
             user.statistics
               ? Math.round(user.statistics.pp * 100) / 100
@@ -330,21 +382,21 @@ export const pluginOsuUser = (
           }`,
         ],
         [
-          "ACC",
+          MacroOsuUser.ACC,
           `${
             user.statistics
               ? Math.round(user.statistics.hit_accuracy * 100) / 100
               : undefined
           }`,
         ],
-        ["MAX_COMBO", `${user.statistics?.maximum_combo}`],
-        ["COUNTS_SSH", `${user.statistics?.grade_counts.ssh}`],
-        ["COUNTS_SS", `${user.statistics?.grade_counts.ss}`],
-        ["COUNTS_SH", `${user.statistics?.grade_counts.sh}`],
-        ["COUNTS_S", `${user.statistics?.grade_counts.s}`],
-        ["COUNTS_A", `${user.statistics?.grade_counts.a}`],
+        [MacroOsuUser.MAX_COMBO, `${user.statistics?.maximum_combo}`],
+        [MacroOsuUser.COUNTS_SSH, `${user.statistics?.grade_counts.ssh}`],
+        [MacroOsuUser.COUNTS_SS, `${user.statistics?.grade_counts.ss}`],
+        [MacroOsuUser.COUNTS_SH, `${user.statistics?.grade_counts.sh}`],
+        [MacroOsuUser.COUNTS_S, `${user.statistics?.grade_counts.s}`],
+        [MacroOsuUser.COUNTS_A, `${user.statistics?.grade_counts.a}`],
         [
-          "HAS_BUNNY",
+          MacroOsuUser.HAS_BUNNY,
           `${
             userAchievements !== undefined &&
             userAchievements.find((a) => a.achievement_id === 6)
@@ -353,7 +405,7 @@ export const pluginOsuUser = (
           }`,
         ],
         [
-          "HAS_TUTEL",
+          MacroOsuUser.HAS_TUTEL,
           `${
             userAchievements !== undefined &&
             userAchievements?.find((a) => a.achievement_id === 151)

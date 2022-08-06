@@ -1,8 +1,8 @@
+import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import {
   errorMessageIdUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import {
   moonpieCommandsAbout,
   moonpieCommandsAdd,
@@ -17,10 +17,10 @@ import {
 } from "../../strings/moonpie/commands";
 import { messageParserById } from "../../messageParser";
 // Type imports
+import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { Strings } from "../../strings";
-import type { Macros, Plugins } from "../../messageParser";
 
 export const commandCommands = async (
   client: Client,

@@ -1,8 +1,9 @@
+// Package imports
 import fs from "fs";
 import path from "path";
-
+// Local imports
+import { name, sourceCodeUrl } from "../src/info/general";
 import { getVersion } from "../src/version";
-import { name, sourceCodeUrl } from "../src/info";
 
 const rootPath = path.join(__dirname, "..");
 

@@ -1,12 +1,14 @@
+// Package imports
 import cron from "node-cron";
+// Local imports
+import { fileExists, readJsonFile } from "../other/fileOperations";
+import { createLogFunc } from "../logging";
 import { logTwitchMessageBroadcast } from "../twitch";
 import { messageParser } from "../messageParser";
-import { createLogFunc } from "../logging";
-import { fileExists, readJsonFile } from "./fileOperations";
 // Type imports
+import type { Macros, Plugins } from "../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import type { Macros, Plugins } from "../messageParser";
 import type { Strings } from "../strings";
 
 /**
@@ -15,11 +17,16 @@ import type { Strings } from "../strings";
 const LOG_ID_MODULE_CUSTOM_TIMER = "custom_timer";
 
 /**
+ * The output name of files connected to this module.
+ */
+export const outputNameCustomTimers = "customTimers";
+
+/**
  * Represents a custom timer.
  */
 export interface CustomTimer {
-  /** Name of the timer. */
-  name?: string;
+  /** ID of the timer. */
+  id: string;
   /** The channels where the timer should be active. */
   channels: string[];
   /** The message that should be sent (will be parsed by the message parser). */
@@ -40,6 +47,24 @@ export interface CustomTimersJson {
   /** All custom timers. */
   timers: CustomTimer[];
 }
+
+export const isCustomTimer = (arg: CustomTimer): arg is CustomTimer =>
+  typeof arg === "object" &&
+  typeof arg.id === "string" &&
+  Array.isArray(arg.channels) &&
+  arg.channels.every((a) => typeof a === "string") &&
+  typeof arg.message === "string" &&
+  typeof arg.cronString === "string";
+
+export const isCustomTimersJson = (
+  arg: CustomTimersJson
+): arg is CustomTimersJson =>
+  typeof arg === "object" &&
+  (arg.$schema
+    ? typeof arg.$schema === "string"
+    : typeof arg.$schema === "undefined") &&
+  Array.isArray(arg.timers) &&
+  arg.timers.map(isCustomTimer).every(Boolean);
 
 export const registerTimer = (
   client: Client,
@@ -63,7 +88,7 @@ export const registerTimer = (
     logCustomTimer.debug(`Timer triggered ${cronString}: "${message}"`);
     for (const channel of channels) {
       messageParser(message, globalStrings, globalPlugins, globalMacros, logger)
-        .then((parsedMessage) => client.say(channel, parsedMessage))
+        .then((parsedMessage) => client.say(`#${channel}`, parsedMessage))
         .then((sentMessage) => {
           logTwitchMessageBroadcast(logger, sentMessage, "timer");
         })
@@ -90,13 +115,16 @@ export const loadCustomTimersFromFile = async (
 
   if (await fileExists(filePath)) {
     loggerCustomTimers.info("Found custom timers file");
-    const newCustomTimers = (await readJsonFile<CustomTimersJson>(filePath))
-      .timers;
+    const data = await readJsonFile<CustomTimersJson>(filePath);
+    if (!isCustomTimersJson(data)) {
+      throw Error(
+        `Loaded custom timers file '${filePath}' does not match its definition`
+      );
+    }
+    const newCustomTimers = data.timers;
     for (const newCustomTimer of newCustomTimers) {
       loggerCustomTimers.info(
-        `Add custom command ${
-          newCustomTimer.name ? newCustomTimer.name : "no-name"
-        }: ${newCustomTimer.message} [${newCustomTimer.cronString}]`
+        `Add custom timer '${newCustomTimer.id}': '${newCustomTimer.message}' [${newCustomTimer.cronString}]`
       );
     }
     loggerCustomTimers.info(

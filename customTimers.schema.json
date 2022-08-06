@@ -26,9 +26,9 @@
         "CustomTimer": {
             "type": "object",
             "properties": {
-                "name": {
+                "id": {
                     "type": "string",
-                    "description": "Name of the timer."
+                    "description": "ID of the timer."
                 },
                 "channels": {
                     "type": "array",
@@ -47,6 +47,7 @@
                 }
             },
             "required": [
+                "id",
                 "channels",
                 "message",
                 "cronString"

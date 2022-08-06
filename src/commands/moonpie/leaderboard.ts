@@ -1,19 +1,23 @@
-import { moonpieDb } from "../../database/moonpieDb";
+import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
+import {
+  MacroMoonpieLeaderboardEntry,
+  macroMoonpieLeaderboardEntryId,
+} from "../../messageParser/macros/moonpie";
 import {
   errorMessageIdUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import {
   moonpieCommandReplyLeaderboardEntry,
   moonpieCommandReplyLeaderboardPrefix,
 } from "../../strings/moonpie/commandReply";
 import { messageParserById } from "../../messageParser";
+import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
+import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { Strings } from "../../strings";
-import type { Macros, Plugins } from "../../messageParser";
 
 /**
  * Leaderboard command: Reply with the moonpie count leaderboard list (top 15).
@@ -58,11 +62,11 @@ export const commandLeaderboard = async (
   for (const moonpieEntry of moonpieEntries) {
     const macros = new Map(globalMacros);
     macros.set(
-      "MOONPIE_LEADERBOARD_ENTRY",
+      macroMoonpieLeaderboardEntryId,
       new Map([
-        ["NAME", `${moonpieEntry.name}`],
-        ["COUNT", `${moonpieEntry.count}`],
-        ["RANK", `${moonpieEntry.rank}`],
+        [MacroMoonpieLeaderboardEntry.NAME, `${moonpieEntry.name}`],
+        [MacroMoonpieLeaderboardEntry.COUNT, `${moonpieEntry.count}`],
+        [MacroMoonpieLeaderboardEntry.RANK, `${moonpieEntry.rank}`],
       ])
     );
     messageLeaderboardEntries.push(

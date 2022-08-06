@@ -1,23 +1,33 @@
 import {
   author,
   bugTrackerUrl,
+  description,
   license,
   name,
-  shortDescription,
   sourceCodeUrl,
-} from "../../info";
+} from "../../info/general";
 import { getVersion } from "../../version";
 import type { MessageParserMacro } from "../macros";
+
+export enum MacroMoonpieBot {
+  NAME = "NAME",
+  VERSION = "VERSION",
+  AUTHOR = "AUTHOR",
+  DESCRIPTION = "DESCRIPTION",
+  URL = "URL",
+  LICENSE = "LICENSE",
+  BUG_TRACKER = "BUG_TRACKER",
+}
 
 export const macroMoonpieBot: MessageParserMacro = {
   id: "MOONPIEBOT",
   values: new Map([
-    ["NAME", name],
-    ["VERSION", getVersion()],
-    ["AUTHOR", author],
-    ["DESCRIPTION", shortDescription],
-    ["URL", sourceCodeUrl],
-    ["LICENSE", license],
-    ["BUG_TRACKER", bugTrackerUrl],
+    [MacroMoonpieBot.NAME, name],
+    [MacroMoonpieBot.VERSION, getVersion()],
+    [MacroMoonpieBot.AUTHOR, author],
+    [MacroMoonpieBot.DESCRIPTION, description],
+    [MacroMoonpieBot.URL, sourceCodeUrl],
+    [MacroMoonpieBot.LICENSE, license],
+    [MacroMoonpieBot.BUG_TRACKER, bugTrackerUrl],
   ]),
 };

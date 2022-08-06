@@ -1,6 +1,11 @@
+// Package imports
 import * as tsj from "ts-json-schema-generator";
 import fs from "fs";
 import path from "path";
+// Local imports
+import { createExampleFiles } from "../src/customCommandsTimers/createExampleFiles";
+import { outputNameCustomCommands } from "../src/customCommandsTimers/customCommand";
+import { outputNameCustomTimers } from "../src/customCommandsTimers/customTimer";
 
 const rootPath = path.join(__dirname, "..");
 
@@ -14,13 +19,13 @@ interface Config {
 const configs = [
   {
     type: "CustomCommandsJson",
-    outputPath: path.join(rootPath, "customCommands.schema.json"),
+    outputPath: path.join(rootPath, `${outputNameCustomCommands}.schema.json`),
     inputPath: path.join(rootPath, "src", "other", "customCommand.ts"),
     tsConfigPath: path.join(rootPath, "tsconfig.json"),
   },
   {
     type: "CustomTimersJson",
-    outputPath: path.join(rootPath, "customTimers.schema.json"),
+    outputPath: path.join(rootPath, `${outputNameCustomTimers}.schema.json`),
     inputPath: path.join(rootPath, "src", "other", "customTimer.ts"),
     tsConfigPath: path.join(rootPath, "tsconfig.json"),
   },
@@ -46,3 +51,4 @@ const createJsonSchemaFile = (config: Config) => {
 };
 
 configs.forEach(createJsonSchemaFile);
+createExampleFiles(path.join(__dirname, "..")).catch(console.error);

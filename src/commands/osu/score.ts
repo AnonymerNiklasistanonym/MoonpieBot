@@ -7,9 +7,9 @@ import {
   errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import {
-  convertOsuScoreToMacros,
-  osuScorePluginMacroName,
-} from "../../messageParser/plugins/osu";
+  MacroOsuScoreRequest,
+  macroOsuScoreRequestId,
+} from "../../messageParser/macros/osuScoreRequest";
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
@@ -20,6 +20,7 @@ import {
   osuScoreNoBeatmap,
   osuScoreNotFound,
 } from "../../strings/osu/commandReply";
+import { convertOsuScoreToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
 import { messageParserById } from "../../messageParser";
 // Type imports
@@ -29,6 +30,7 @@ import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { Strings } from "../../strings";
+import { pluginOsuScoreId } from "../../messageParser/plugins/osuApi";
 
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
@@ -78,11 +80,11 @@ export const commandScore = async (
 
   const osuBeatmapRequestMacros = new Map(globalMacros);
   osuBeatmapRequestMacros.set(
-    "OSU_SCORE_REQUEST",
+    macroOsuScoreRequestId,
     new Map([
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      ["BEATMAP_ID", `${beatmapId}`],
-      ["USER_NAME", osuUserName],
+      [MacroOsuScoreRequest.USER_NAME, `${beatmapId}`],
+      [MacroOsuScoreRequest.USER_NAME, osuUserName],
     ])
   );
 
@@ -121,7 +123,7 @@ export const commandScore = async (
       userId
     );
     osuBeatmapRequestMacros.set(
-      osuScorePluginMacroName,
+      pluginOsuScoreId,
       new Map(convertOsuScoreToMacros(beatmapScore))
     );
     // Check for user score

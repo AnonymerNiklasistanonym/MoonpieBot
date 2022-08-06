@@ -1,42 +1,168 @@
+import {
+  MacroMoonpieLeaderboardEntry,
+  MacroMoonpieUserDelete,
+  MacroMoonpieUserNeverClaimed,
+  MacroMoonpieUserSet,
+  macroMoonpieLeaderboardEntryId,
+  macroMoonpieUserDeleteId,
+  macroMoonpieUserNeverClaimedId,
+  macroMoonpieUserSetId,
+} from "../../messageParser/macros/moonpie";
 import { MOONPIE_STRING_ID } from "../moonpie";
+import { createMessageForMessageParser } from "../../messageParser";
+import { pluginIfNotEqual } from "../../messageParser/plugins/general";
+import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
 
 export const MOONPIE_USER_STRING_ID = `${MOONPIE_STRING_ID}_USER`;
 
 export const moonpieUserGet = {
   id: `${MOONPIE_USER_STRING_ID}_GET`,
-  default:
-    "@$(USER) The user %MOONPIE:USER% has %MOONPIE:COUNT% moonpie$(IF_GREATER=%MOONPIE:COUNT%>1|s) and is rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " The user ",
+    {
+      type: "macro",
+      name: macroMoonpieLeaderboardEntryId,
+      key: MacroMoonpieLeaderboardEntry.NAME,
+    },
+    " has ",
+    {
+      type: "macro",
+      name: macroMoonpieLeaderboardEntryId,
+      key: MacroMoonpieLeaderboardEntry.COUNT,
+    },
+    " moonpie",
+    {
+      type: "plugin",
+      name: pluginIfNotEqual.id,
+      args: [
+        {
+          type: "macro",
+          name: macroMoonpieLeaderboardEntryId,
+          key: MacroMoonpieLeaderboardEntry.COUNT,
+        },
+        "!==1",
+      ],
+      scope: "s",
+    },
+    " and is rank ",
+    {
+      type: "macro",
+      name: macroMoonpieLeaderboardEntryId,
+      key: MacroMoonpieLeaderboardEntry.RANK,
+    },
+    " on the leaderboard!",
+  ]),
 };
-export const moonpieUserNeverClaimed = {
-  id: `${MOONPIE_USER_STRING_ID}_NEVER_CLAIMED`,
-  default: "The user %MOONPIE:USER% has never claimed a moonpie!",
+export const moonpieUserNeverClaimedError = {
+  id: `${MOONPIE_USER_STRING_ID}_NEVER_CLAIMED_ERROR`,
+  default: createMessageForMessageParser([
+    "The user ",
+    {
+      type: "macro",
+      name: macroMoonpieUserNeverClaimedId,
+      key: MacroMoonpieUserNeverClaimed.NAME,
+    },
+    " has never claimed a moonpie!",
+  ]),
 };
 export const moonpieUserPermissionError = {
   id: `${MOONPIE_USER_STRING_ID}_PERMISSION_ERROR`,
-  default:
+  default: createMessageForMessageParser([
     "You are not a broadcaster and thus are not allowed to use this command!",
+  ]),
 };
-export const moonpieUserSetNAN = {
-  id: `${MOONPIE_USER_STRING_ID}_SET_NAN`,
-  default:
-    "The given moonpie count (%MOONPIE:SET_OPERATION%)'%MOONPIE:SET_COUNT%' is not a valid number!",
+export const moonpieUserSetNaNError = {
+  id: `${MOONPIE_USER_STRING_ID}_SET_NAN_ERROR`,
+  default: createMessageForMessageParser([
+    "The given moonpie count (",
+    {
+      type: "macro",
+      name: macroMoonpieUserSetId,
+      key: MacroMoonpieUserSet.SET_OPERATION,
+    },
+    ") '",
+    {
+      type: "macro",
+      name: macroMoonpieUserSetId,
+      key: MacroMoonpieUserSet.SET_COUNT,
+    },
+    "' is not a valid number!",
+  ]),
 };
 
 export const moonpieUserSet = {
   id: `${MOONPIE_USER_STRING_ID}_SET`,
-  default:
-    "@$(USER) You have set the number of moonpies for the user %MOONPIE:USER% to %MOONPIE:COUNT% moonpie$(IF_GREATER=%MOONPIE:COUNT%>1|s) (%MOONPIE:SET_OPERATION%%MOONPIE:SET_COUNT%) and they are now rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " You have set the number of moonpies for the user ",
+    {
+      type: "macro",
+      name: macroMoonpieUserSetId,
+      key: MacroMoonpieUserSet.NAME,
+    },
+    " to ",
+    {
+      type: "macro",
+      name: macroMoonpieLeaderboardEntryId,
+      key: MacroMoonpieLeaderboardEntry.COUNT,
+    },
+    " moonpie",
+    {
+      type: "plugin",
+      name: pluginIfNotEqual.id,
+      args: [
+        {
+          type: "macro",
+          name: macroMoonpieLeaderboardEntryId,
+          key: MacroMoonpieLeaderboardEntry.COUNT,
+        },
+        "!==1",
+      ],
+      scope: "s",
+    },
+    " (",
+    {
+      type: "macro",
+      name: macroMoonpieUserSetId,
+      key: MacroMoonpieUserSet.SET_OPERATION,
+    },
+    {
+      type: "macro",
+      name: macroMoonpieUserSetId,
+      key: MacroMoonpieUserSet.SET_COUNT,
+    },
+    ") and they are now rank ",
+    {
+      type: "macro",
+      name: macroMoonpieLeaderboardEntryId,
+      key: MacroMoonpieLeaderboardEntry.RANK,
+    },
+    " on the leaderboard!",
+  ]),
 };
+
 export const moonpieUserDelete = {
   id: `${MOONPIE_USER_STRING_ID}_DELETE`,
-  default: "@$(USER) You deleted the entry of the user %MOONPIE:USER%",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " You deleted the entry of the user ",
+    {
+      type: "macro",
+      name: macroMoonpieUserDeleteId,
+      key: MacroMoonpieUserDelete.NAME,
+    },
+  ]),
 };
 
 export const moonpieUser = [
   moonpieUserGet,
-  moonpieUserNeverClaimed,
+  moonpieUserNeverClaimedError,
   moonpieUserPermissionError,
-  moonpieUserSetNAN,
+  moonpieUserSetNaNError,
   moonpieUserSet,
   moonpieUserDelete,
 ];

@@ -7,9 +7,11 @@ import {
   errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import {
-  convertOsuBeatmapToMacros,
-  osuBeatmapPluginMacroName,
-} from "../../messageParser/plugins/osu";
+  MacroOsuBeatmapRequest,
+  MacroOsuBeatmapRequests,
+  macroOsuBeatmapRequestId,
+  macroOsuBeatmapRequestsId,
+} from "../../messageParser/macros/osuBeatmapRequest";
 import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
@@ -28,12 +30,14 @@ import {
   osuBeatmapRequestTurnedOn,
 } from "../../strings/osu/beatmapRequest";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
+import { convertOsuBeatmapToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
 import { messageParserById } from "../../messageParser";
+import { pluginOsuBeatmapId } from "../../messageParser/plugins/osuApi";
 import { tryToSendOsuIrcMessage } from "../../osuirc";
 // Type imports
-import type { Beatmap } from "osu-api-v2";
 import type { Macros, Plugins } from "../../messageParser";
+import type { Beatmap } from "osu-api-v2";
 import type { Client } from "tmi.js";
 import type { Client as IrcClient } from "irc";
 import type { Logger } from "winston";
@@ -99,11 +103,11 @@ export const commandBeatmap = async (
 
   const osuBeatmapRequestMacros = new Map(globalMacros);
   osuBeatmapRequestMacros.set(
-    "OSU_BEATMAP_REQUEST",
+    macroOsuBeatmapRequestId,
     new Map([
-      ["ID", `${beatmapId}`],
+      [MacroOsuBeatmapRequest.ID, `${beatmapId}`],
       [
-        "COMMENT",
+        MacroOsuBeatmapRequest.COMMENT,
         `${
           comment !== undefined && comment.trim().length > 0
             ? comment.trim()
@@ -121,7 +125,7 @@ export const commandBeatmap = async (
   try {
     beatmap = await osuApiV2.beatmaps.get(oauthAccessToken, beatmapId);
     osuBeatmapRequestMacros.set(
-      osuBeatmapPluginMacroName,
+      pluginOsuBeatmapId,
       new Map(convertOsuBeatmapToMacros(beatmap))
     );
     // Check for user score
@@ -196,7 +200,7 @@ export const commandBeatmap = async (
       osuIrcBot,
       "commandBeatmap",
       osuIrcRequestTarget,
-      messageRequestIrc.split("%NEWLINE%"),
+      messageRequestIrc,
       logger
     );
   }
@@ -263,10 +267,10 @@ export const commandSetBeatmapRequests = async (
     osuCommandId = "beatmap_requests_off";
     const macros = new Map(globalMacros);
     macros.set(
-      "BEATMAP_REQUEST",
+      macroOsuBeatmapRequestsId,
       new Map([
         [
-          "CUSTOM_MESSAGE",
+          MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
           customDisableMessage !== undefined ? customDisableMessage : "",
         ],
       ])
@@ -323,10 +327,10 @@ export const commandBeatmapWhenDisabled = async (
 
   const macros = new Map(globalMacros);
   macros.set(
-    "BEATMAP_REQUEST",
+    macroOsuBeatmapRequestsId,
     new Map([
       [
-        "CUSTOM_MESSAGE",
+        MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
         customDisableMessage !== undefined ? customDisableMessage : "",
       ],
     ])
@@ -394,10 +398,10 @@ export const commandBeatmapRequestsStatus = async (
   } else {
     const macros = new Map(globalMacros);
     macros.set(
-      "BEATMAP_REQUEST",
+      macroOsuBeatmapRequestsId,
       new Map([
         [
-          "CUSTOM_MESSAGE",
+          MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
           customDisableMessage !== undefined ? customDisableMessage : "",
         ],
       ])

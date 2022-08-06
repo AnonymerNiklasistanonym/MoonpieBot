@@ -1,20 +1,26 @@
-import { moonpieDb } from "../../database/moonpieDb";
+import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
+import {
+  MacroMoonpieClaim,
+  MacroMoonpieLeaderboardEntry,
+  macroMoonpieClaimId,
+  macroMoonpieLeaderboardEntryId,
+} from "../../messageParser/macros/moonpie";
 import {
   errorMessageIdUndefined,
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
-import { messageParserById } from "../../messageParser";
 import {
   moonpieCommandReplyAlreadyClaimed,
   moonpieCommandReplyClaim,
 } from "../../strings/moonpie/commandReply";
+import { messageParserById } from "../../messageParser";
+import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
+import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import type { Macros, Plugins } from "../../messageParser";
 import type { Strings } from "../../strings";
 
 /**
@@ -109,13 +115,25 @@ export const commandClaim = async (
 
   const macros = new Map(globalMacros);
   macros.set(
-    "MOONPIE",
+    macroMoonpieClaimId,
     new Map([
-      ["COUNT", `${newMoonpieCount}`],
-      ["TIME_SINCE_CLAIM_IN_S", `${msSinceLastClaim / 1000}`],
-      ["TIME_TILL_NEXT_CLAIM_IN_S", `${msTillNextClaim / 1000}`],
-      ["COOLDOWN_HOURS", `${moonpieClaimCooldownHours}`],
-      ["LEADERBOARD_RANK", `${currentMoonpieLeaderboardEntry.rank}`],
+      [MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S, `${msSinceLastClaim / 1000}`],
+      [
+        MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S,
+        `${msTillNextClaim / 1000}`,
+      ],
+      [MacroMoonpieClaim.COOLDOWN_HOURS, `${moonpieClaimCooldownHours}`],
+    ])
+  );
+  macros.set(
+    macroMoonpieLeaderboardEntryId,
+    new Map([
+      [MacroMoonpieLeaderboardEntry.COUNT, `${newMoonpieCount}`],
+      [
+        MacroMoonpieLeaderboardEntry.RANK,
+        `${currentMoonpieLeaderboardEntry.rank}`,
+      ],
+      [MacroMoonpieLeaderboardEntry.NAME, `${userName}`],
     ])
   );
 

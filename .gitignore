@@ -195,3 +195,4 @@ installer/moonpiebot*
 !installer/*.bat
 installer/pkg
 installer/src
+installer/*.1

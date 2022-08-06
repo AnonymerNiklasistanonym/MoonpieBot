@@ -1,76 +1,769 @@
+import {
+  MacroOsuBeatmap,
+  MacroOsuMostRecentPlay,
+  MacroOsuUser,
+  pluginOsuBeatmapId,
+  pluginOsuMostRecentPlayId,
+  pluginOsuUserId,
+} from "../../messageParser/plugins/osuApi";
+import {
+  MacroOsuPpRequest,
+  macroOsuPpRequestId,
+} from "../../messageParser/macros/osuPpRequest";
+import {
+  MacroOsuRpRequest,
+  macroOsuRpRequestId,
+} from "../../messageParser/macros/osuRpRequest";
+import {
+  MacroOsuScoreRequest,
+  macroOsuScoreRequestId,
+} from "../../messageParser/macros/osuScoreRequest";
+import {
+  MacroOsuStreamCompanion,
+  pluginOsuStreamCompanionId,
+} from "../../messageParser/plugins/streamcompanion";
+import {
+  MacroOsuWindowTitle,
+  macroOsuWindowTitleId,
+} from "../../messageParser/macros/osuWindowTitle";
+import {
+  pluginIfFalse,
+  pluginIfGreater,
+  pluginIfNotEmpty,
+  pluginIfNotEqual,
+  pluginIfNotGreater,
+  pluginIfNotUndefined,
+  pluginIfTrue,
+  pluginTimeInSToStopwatchString,
+} from "../../messageParser/plugins/general";
 import { OSU_STRING_ID } from "../osu";
+import { createMessageForMessageParser } from "../../messageParser";
 import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
+import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
 
 export const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
 
 export const osuCommandReplyNp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP`,
-  default:
-    "@$(USER) Currently playing '%OSU_WINDOW_TITLE:TITLE%' from '%OSU_WINDOW_TITLE:ARTIST%' [%OSU_WINDOW_TITLE:VERSION%]$(IF_NOT_UNDEFINED=%OSU_WINDOW_TITLE:MAP_ID_VIA_API%| \\(https://osu.ppy.sh/beatmaps/%OSU_WINDOW_TITLE:MAP_ID_VIA_API%\\))",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " Currently playing '",
+    {
+      type: "macro",
+      name: macroOsuWindowTitleId,
+      key: MacroOsuWindowTitle.TITLE,
+    },
+    "' from '",
+    {
+      type: "macro",
+      name: macroOsuWindowTitleId,
+      key: MacroOsuWindowTitle.ARTIST,
+    },
+    "' [",
+    {
+      type: "macro",
+      name: macroOsuWindowTitleId,
+      key: MacroOsuWindowTitle.VERSION,
+    },
+    "]",
+    {
+      type: "plugin",
+      name: pluginIfNotUndefined.id,
+      args: {
+        type: "macro",
+        name: macroOsuWindowTitleId,
+        key: MacroOsuWindowTitle.MAP_ID_VIA_API,
+      },
+      scope: [
+        " (https://osu.ppy.sh/beatmaps/",
+        {
+          type: "macro",
+          name: macroOsuWindowTitleId,
+          key: MacroOsuWindowTitle.MAP_ID_VIA_API,
+        },
+        ")",
+      ],
+    },
+  ]),
 };
 
 export const osuCommandReplyNpStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION`,
-  default:
-    "@$(USER) Currently playing $(OSU_STREAMCOMPANION|'%OSU_STREAMCOMPANION:TITLE_ROMAN%' from '%OSU_STREAMCOMPANION:ARTIST_ROMAN%' [%OSU_STREAMCOMPANION:VERSION%]$(IF_NOT_UNDEFINED=%OSU_STREAMCOMPANION:MODS%|$(IF_NOT_EQUAL=%OSU_STREAMCOMPANION:MODS%!==None| using %OSU_STREAMCOMPANION:MODS%)) - CS %OSU_STREAMCOMPANION:CS%, AR %OSU_STREAMCOMPANION:AR%, OD %OSU_STREAMCOMPANION:OD%, HP %OSU_STREAMCOMPANION:HP%, BPM %OSU_STREAMCOMPANION:BPM%, %OSU_STREAMCOMPANION:MAX_COMBO%x, %OSU_STREAMCOMPANION:DIFFICULTY_RATING%* ($(IF_GREATER=%OSU_STREAMCOMPANION:ID%>0|https://osu.ppy.sh/beatmaps/%OSU_STREAMCOMPANION:ID% - )$(IF_NOT_GREATER=%OSU_STREAMCOMPANION:ID%<=0|$(IF_GREATER=%OSU_STREAMCOMPANION:SET_ID%>0|https://osu.ppy.sh/beatmapsets/%OSU_STREAMCOMPANION:SET_ID% - ))StreamCompanion))",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " Currently playing ",
+    {
+      type: "plugin",
+      name: pluginOsuStreamCompanionId,
+      scope: [
+        "'",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.TITLE_ROMAN,
+        },
+        "' from '",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.ARTIST_ROMAN,
+        },
+        "' [",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.VERSION,
+        },
+        "]",
+        {
+          type: "plugin",
+          name: pluginIfNotUndefined.id,
+          args: {
+            type: "macro",
+            name: pluginOsuStreamCompanionId,
+            key: MacroOsuStreamCompanion.MODS,
+          },
+          scope: {
+            type: "plugin",
+            name: pluginIfNotEqual.id,
+            args: [
+              {
+                type: "macro",
+                name: pluginOsuStreamCompanionId,
+                key: MacroOsuStreamCompanion.MODS,
+              },
+              "!==None",
+            ],
+            scope: [
+              " using ",
+              {
+                type: "macro",
+                name: pluginOsuStreamCompanionId,
+                key: MacroOsuStreamCompanion.MODS,
+              },
+            ],
+          },
+        },
+        " - CS=",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.CS,
+        },
+        ", AR=",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.AR,
+        },
+        ", OD=",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.OD,
+        },
+        ", HP=",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.HP,
+        },
+        ", BPM=",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.BPM,
+        },
+        ", ",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.MAX_COMBO,
+        },
+        "x, ",
+        {
+          type: "macro",
+          name: pluginOsuStreamCompanionId,
+          key: MacroOsuStreamCompanion.DIFFICULTY_RATING,
+        },
+        "* (",
+        {
+          type: "plugin",
+          name: pluginIfGreater.id,
+          args: [
+            {
+              type: "macro",
+              name: pluginOsuStreamCompanionId,
+              key: MacroOsuStreamCompanion.ID,
+            },
+            ">0",
+          ],
+          scope: [
+            "https://osu.ppy.sh/beatmaps/",
+            {
+              type: "macro",
+              name: pluginOsuStreamCompanionId,
+              key: MacroOsuStreamCompanion.ID,
+            },
+            " - ",
+          ],
+        },
+        {
+          type: "plugin",
+          name: pluginIfNotGreater.id,
+          args: [
+            {
+              type: "macro",
+              name: pluginOsuStreamCompanionId,
+              key: MacroOsuStreamCompanion.ID,
+            },
+            "<=0",
+          ],
+          scope: {
+            type: "plugin",
+            name: pluginIfGreater.id,
+            args: [
+              {
+                type: "macro",
+                name: pluginOsuStreamCompanionId,
+                key: MacroOsuStreamCompanion.SET_ID,
+              },
+              ">0",
+            ],
+            scope: [
+              "https://osu.ppy.sh/beatmapsets/",
+              {
+                type: "macro",
+                name: pluginOsuStreamCompanionId,
+                key: MacroOsuStreamCompanion.SET_ID,
+              },
+              " - ",
+            ],
+          },
+        },
+        "StreamCompanion)",
+      ],
+    },
+  ]),
 };
 
 export const osuCommandReplyNpNoMap = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP`,
-  default: "@$(USER) No map is currently being played",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " No map is currently being played",
+  ]),
 };
 
 export const osuCommandReplyNpNoMapStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP_STREAMCOMPANION`,
-  default:
-    "@$(USER) No map is currently being played (This is either a custom map or you need to wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " No map is currently being played (This is either a custom map or you need to wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
+  ]),
 };
 
 export const osuCommandReplyNpStreamCompanionNotRunning = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_NOT_RUNNING`,
-  default:
-    "@$(USER) No map is currently being played (StreamCompanion was configured but not found running!)",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " No map is currently being played (StreamCompanion was configured but not found running!)",
+  ]),
 };
 
 export const osuCommandReplyRp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_RP`,
-  default:
-    "@$(USER) $(OSU_MOST_RECENT_PLAY=%OSU_RP_REQUEST:ID%|" +
-    "$(IF_EQUAL=%OSU_MOST_RECENT_PLAY:FOUND%===true|" +
-    "Most recent play of %OSU_MOST_RECENT_PLAY:USER_NAME%: $(IF_EQUAL=%OSU_MOST_RECENT_PLAY:PASSED%===true|%OSU_MOST_RECENT_PLAY:RANK%)$(IF_EQUAL=%OSU_MOST_RECENT_PLAY:PASSED%===false|A fail)" +
-    "$(IF_NOT_EMPTY=%OSU_MOST_RECENT_PLAY:MODS%| using %OSU_MOST_RECENT_PLAY:MODS%)$(IF_NOT_UNDEFINED=%OSU_MOST_RECENT_PLAY:PP%| with %OSU_MOST_RECENT_PLAY:PP%pp) \\(%OSU_MOST_RECENT_PLAY:COUNT_300%/%OSU_MOST_RECENT_PLAY:COUNT_100%/%OSU_MOST_RECENT_PLAY:COUNT_50%/%OSU_MOST_RECENT_PLAY:COUNT_MISS%\\) [mc=%OSU_MOST_RECENT_PLAY:MAX_COMBO%, acc=%OSU_MOST_RECENT_PLAY:ACC%%]" +
-    " on $(OSU_BEATMAP=%OSU_MOST_RECENT_PLAY:MAP_ID%|%OSU_BEATMAP:TITLE% '%OSU_BEATMAP:VERSION%' by '%OSU_BEATMAP:ARTIST%' [%OSU_BEATMAP:DIFFICULTY_RATING%* $(TIME_IN_S_TO_STOPWATCH_STRING=%OSU_BEATMAP:LENGTH_IN_S%) %OSU_BEATMAP:RANKED_STATUS%] from %OSU_BEATMAP:LAST_UPDATED_MONTH% %OSU_BEATMAP:LAST_UPDATED_YEAR% {FC=%OSU_BEATMAP:MAX_COMBO%, CS=%OSU_BEATMAP:CS%, DRAIN=%OSU_BEATMAP:DRAIN%, ACC=%OSU_BEATMAP:ACC%, AR=%OSU_BEATMAP:AR%, BPM=%OSU_BEATMAP:BPM%, CC=%OSU_BEATMAP:CC%, SLC=%OSU_BEATMAP:SLC%, SPC=%OSU_BEATMAP:SPC%})" +
-    "$(IF_EQUAL=%OSU_MOST_RECENT_PLAY:HAS_REPLAY%===true| {replay available})" +
-    ")" +
-    "$(IF_EQUAL=%OSU_MOST_RECENT_PLAY:FOUND%===false|" +
-    "No recent play was found))",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " ",
+    {
+      type: "plugin",
+      name: pluginOsuMostRecentPlayId,
+      args: {
+        type: "macro",
+        name: macroOsuRpRequestId,
+        key: MacroOsuRpRequest.ID,
+      },
+      scope: [
+        {
+          type: "plugin",
+          name: pluginIfTrue.id,
+          args: {
+            type: "macro",
+            name: pluginOsuMostRecentPlayId,
+            key: MacroOsuMostRecentPlay.FOUND,
+          },
+          scope: [
+            "Most recent play of ",
+            {
+              type: "macro",
+              name: pluginOsuMostRecentPlayId,
+              key: MacroOsuMostRecentPlay.USER_NAME,
+            },
+            ": ",
+            {
+              type: "plugin",
+              name: pluginIfTrue.id,
+              args: {
+                type: "macro",
+                name: pluginOsuMostRecentPlayId,
+                key: MacroOsuMostRecentPlay.PASSED,
+              },
+              scope: {
+                type: "macro",
+                name: pluginOsuMostRecentPlayId,
+                key: MacroOsuMostRecentPlay.RANK,
+              },
+            },
+            {
+              type: "plugin",
+              name: pluginIfFalse.id,
+              args: {
+                type: "macro",
+                name: pluginOsuMostRecentPlayId,
+                key: MacroOsuMostRecentPlay.PASSED,
+              },
+              scope: "A fail",
+            },
+            {
+              type: "plugin",
+              name: pluginIfNotEmpty.id,
+              args: {
+                type: "macro",
+                name: pluginOsuMostRecentPlayId,
+                key: MacroOsuMostRecentPlay.MODS,
+              },
+              scope: [
+                " using ",
+                {
+                  type: "macro",
+                  name: pluginOsuMostRecentPlayId,
+                  key: MacroOsuMostRecentPlay.MODS,
+                },
+              ],
+            },
+            {
+              type: "plugin",
+              name: pluginIfNotUndefined.id,
+              args: {
+                type: "macro",
+                name: pluginOsuMostRecentPlayId,
+                key: MacroOsuMostRecentPlay.PP,
+              },
+              scope: [
+                " with ",
+                {
+                  type: "macro",
+                  name: pluginOsuMostRecentPlayId,
+                  key: MacroOsuMostRecentPlay.PP,
+                },
+                "pp",
+              ],
+            },
+            " (",
+            {
+              type: "macro",
+              name: pluginOsuMostRecentPlayId,
+              key: MacroOsuMostRecentPlay.COUNT_300,
+            },
+            "/",
+            {
+              type: "macro",
+              name: pluginOsuMostRecentPlayId,
+              key: MacroOsuMostRecentPlay.COUNT_100,
+            },
+            "/",
+            {
+              type: "macro",
+              name: pluginOsuMostRecentPlayId,
+              key: MacroOsuMostRecentPlay.COUNT_50,
+            },
+            "/",
+            {
+              type: "macro",
+              name: pluginOsuMostRecentPlayId,
+              key: MacroOsuMostRecentPlay.COUNT_MISS,
+            },
+            ") [mc=",
+            {
+              type: "macro",
+              name: pluginOsuMostRecentPlayId,
+              key: MacroOsuMostRecentPlay.MAX_COMBO,
+            },
+            ", acc=",
+            {
+              type: "macro",
+              name: pluginOsuMostRecentPlayId,
+              key: MacroOsuMostRecentPlay.ACC,
+            },
+            "] on ",
+            {
+              type: "plugin",
+              name: pluginOsuBeatmapId,
+              args: {
+                type: "macro",
+                name: pluginOsuMostRecentPlayId,
+                key: MacroOsuMostRecentPlay.MAP_ID,
+              },
+              scope: [
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.TITLE,
+                },
+                " '",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.VERSION,
+                },
+                "' by '",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.ARTIST,
+                },
+                "' [",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.DIFFICULTY_RATING,
+                },
+                "* ",
+                {
+                  type: "plugin",
+                  name: pluginTimeInSToStopwatchString.id,
+                  args: {
+                    type: "macro",
+                    name: pluginOsuBeatmapId,
+                    key: MacroOsuBeatmap.LENGTH_IN_S,
+                  },
+                },
+                " ",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.RANKED_STATUS,
+                },
+                "] from ",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.LAST_UPDATED_MONTH,
+                },
+                " ",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.LAST_UPDATED_YEAR,
+                },
+                " {FC=",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.MAX_COMBO,
+                },
+                ", CS=",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.CS,
+                },
+                ", DRAIN=",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.DRAIN,
+                },
+                ", ACC=",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.ACC,
+                },
+                ", AR=",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.AR,
+                },
+                ", BPM=",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.BPM,
+                },
+                ", CC=",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.CC,
+                },
+                ", SLC=",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.SLC,
+                },
+                ", SPC=",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.SPC,
+                },
+                "}",
+              ],
+            },
+            {
+              type: "plugin",
+              name: pluginIfTrue.id,
+              args: {
+                type: "macro",
+                name: pluginOsuMostRecentPlayId,
+                key: MacroOsuMostRecentPlay.HAS_REPLAY,
+              },
+              scope: " (replay available)",
+            },
+          ],
+        },
+        {
+          type: "plugin",
+          name: pluginIfFalse.id,
+          args: {
+            type: "macro",
+            name: pluginOsuMostRecentPlayId,
+            key: MacroOsuMostRecentPlay.FOUND,
+          },
+          scope: "No recent play was found",
+        },
+      ],
+    },
+  ]),
 };
 
 export const osuCommandReplyRpNotFound = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_RP_NOT_FOUND`,
-  default: "@$(USER) No recent play was found",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " No recent play was found",
+  ]),
 };
 
 export const osuCommandReplyPp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_PP`,
-  default:
-    "@$(USER) $(OSU_USER=%OSU_PP_REQUEST:ID%|%OSU_USER:NAME% \\(https://osu.ppy.sh/users/%OSU_USER:ID%\\) from %OSU_USER:COUNTRY% plays$(IF_NOT_UNDEFINED=%OSU_USER:PLAYSTYLE%| with %OSU_USER:PLAYSTYLE%) since %OSU_USER:JOIN_DATE_MONTH% %OSU_USER:JOIN_DATE_YEAR%$(IF_EQUAL=%OSU_USER:HAS_STATISTICS%===true| and reached rank #%OSU_USER:GLOBAL_RANK% [country #%OSU_USER:COUNTRY_RANK%] with %OSU_USER:PP%pp, %OSU_USER:ACC%% accuracy, a max combo of  %OSU_USER:MAX_COMBO%, %OSU_USER:COUNTS_SSH% SSHs, %OSU_USER:COUNTS_SS% SSs, %OSU_USER:COUNTS_SH% SHs, %OSU_USER:COUNTS_S% Ss, %OSU_USER:COUNTS_A% As) - bunny=$(IF_EQUAL=%OSU_USER:HAS_BUNNY%===true|yes)$(IF_EQUAL=%OSU_USER:HAS_BUNNY%===false|no),tutel=$(IF_EQUAL=%OSU_USER:HAS_TUTEL%===true|yes)$(IF_EQUAL=%OSU_USER:HAS_TUTEL%===false|no))",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " ",
+    {
+      type: "plugin",
+      name: pluginOsuUserId,
+      args: {
+        type: "macro",
+        name: macroOsuPpRequestId,
+        key: MacroOsuPpRequest.ID,
+      },
+      scope: [
+        { type: "macro", name: pluginOsuUserId, key: MacroOsuUser.NAME },
+        " (https://osu.ppy.sh/users/",
+        { type: "macro", name: pluginOsuUserId, key: MacroOsuUser.ID },
+        ") from ",
+        { type: "macro", name: pluginOsuUserId, key: MacroOsuUser.COUNTRY },
+        " plays ",
+        {
+          type: "plugin",
+          name: pluginIfNotUndefined.id,
+          args: {
+            type: "macro",
+            name: pluginOsuUserId,
+            key: MacroOsuUser.PLAYSTYLE,
+          },
+          scope: [
+            "with ",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.PLAYSTYLE,
+            },
+            " ",
+          ],
+        },
+        "since ",
+        {
+          type: "macro",
+          name: pluginOsuUserId,
+          key: MacroOsuUser.JOIN_DATE_MONTH,
+        },
+        " ",
+        {
+          type: "macro",
+          name: pluginOsuUserId,
+          key: MacroOsuUser.JOIN_DATE_YEAR,
+        },
+        {
+          type: "plugin",
+          name: pluginIfTrue.id,
+          args: {
+            type: "macro",
+            name: pluginOsuUserId,
+            key: MacroOsuUser.HAS_STATISTICS,
+          },
+          scope: [
+            " and reached rank #",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.GLOBAL_RANK,
+            },
+            " [country #",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.COUNTRY_RANK,
+            },
+            "] with ",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.PP,
+            },
+            "pp, ",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.ACC,
+            },
+            " accuracy, a max combo of ",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.MAX_COMBO,
+            },
+            ", ",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.COUNTS_SSH,
+            },
+            " SSH, ",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.COUNTS_SS,
+            },
+            " SS, ",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.COUNTS_SH,
+            },
+            " SH, ",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.COUNTS_S,
+            },
+            " S, ",
+            {
+              type: "macro",
+              name: pluginOsuUserId,
+              key: MacroOsuUser.COUNTS_A,
+            },
+            " A (bunny=",
+            {
+              type: "plugin",
+              name: pluginIfTrue.id,
+              args: {
+                type: "macro",
+                name: pluginOsuUserId,
+                key: MacroOsuUser.HAS_BUNNY,
+              },
+              scope: "yes",
+            },
+            {
+              type: "plugin",
+              name: pluginIfFalse.id,
+              args: {
+                type: "macro",
+                name: pluginOsuUserId,
+                key: MacroOsuUser.HAS_BUNNY,
+              },
+              scope: "no",
+            },
+            ", tutel=",
+            {
+              type: "plugin",
+              name: pluginIfTrue.id,
+              args: {
+                type: "macro",
+                name: pluginOsuUserId,
+                key: MacroOsuUser.HAS_TUTEL,
+              },
+              scope: "yes",
+            },
+            {
+              type: "plugin",
+              name: pluginIfFalse.id,
+              args: {
+                type: "macro",
+                name: pluginOsuUserId,
+                key: MacroOsuUser.HAS_TUTEL,
+              },
+              scope: "no",
+            },
+            ")",
+          ],
+        },
+      ],
+    },
+  ]),
 };
 
 export const osuScoreNoBeatmap = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_BEATMAP`,
-  default: "@$(USER) No beatmap was found",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " No beatmap was found",
+  ]),
 };
 
 export const osuScoreNotFound = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_SCORE`,
-  default:
-    "@$(USER) No score was found of the user %OSU_SCORE_REQUEST:USER_NAME% on the map",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " No score was found of the user ",
+    {
+      type: "macro",
+      name: macroOsuScoreRequestId,
+      key: MacroOsuScoreRequest.USER_NAME,
+    },
+    " on the map",
+  ]),
 };
 
 export const osuScore = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE`,
-  default: `@$(USER) %OSU_SCORE_REQUEST:USER_NAME% has a $[${osuBeatmapRequestRefTopScore.id}]`,
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " ",
+    {
+      type: "macro",
+      name: macroOsuScoreRequestId,
+      key: MacroOsuScoreRequest.USER_NAME,
+    },
+    " has a ",
+    { type: "reference", name: osuBeatmapRequestRefTopScore.id },
+  ]),
 };
 
 export const osuCommandReply = [

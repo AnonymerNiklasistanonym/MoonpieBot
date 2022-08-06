@@ -1,15 +1,21 @@
 // Package imports
-import * as path from "path";
+import path from "path";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
 import dotenv from "dotenv";
 import irc from "irc";
 import { mkdirSync } from "fs";
 // Local imports
-import { CliVariable, getCliVariableDocumentation } from "./cli";
+import { CliOption, cliOptionInformation } from "./info/cli";
 import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuirc";
 import {
+  ENV_VARIABLE_PREFIX,
   EnvVariable,
+  EnvVariableNone,
+  EnvVariableOnOff,
+  envVariableInformation,
+} from "./info/env";
+import {
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrUndefined,
   printEnvVariablesToConsole,
@@ -19,7 +25,7 @@ import { OsuCommands, osuChatHandler } from "./commands/osu";
 import {
   checkCustomCommand,
   loadCustomCommandsFromFile,
-} from "./other/customCommand";
+} from "./customCommandsTimers/customCommand";
 import { createLogFunc, createLogger } from "./logging";
 import {
   defaultStrings,
@@ -27,10 +33,9 @@ import {
   writeStringsVariableDocumentation,
 } from "./strings";
 import {
-  errorMessageUserIdUndefined,
-  errorMessageUserNameUndefined,
-} from "./commands";
-import { loadCustomTimersFromFile, registerTimer } from "./other/customTimer";
+  loadCustomTimersFromFile,
+  registerTimer,
+} from "./customCommandsTimers/customTimer";
 import {
   pluginConvertToShortNumber,
   pluginHelp,
@@ -59,31 +64,40 @@ import {
   pluginOsuScore,
   pluginOsuUser,
 } from "./messageParser/plugins/osu";
+import { cliHelpGenerator } from "./cli";
 import { createStreamCompanionConnection } from "./streamcompanion";
 import { createTwitchClient } from "./twitch";
+import {
+  getPluginsCustomCommand,
+  getPluginsCustomCommandData,
+} from "./messageParser/plugins/customCommand";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { generatePluginsAndMacrosMap } from "./messageParser";
+import { genericStringSorter } from "./other/genericStringSorter";
 import { getVersion } from "./version";
 import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
-import { name } from "./info";
+import { name } from "./info/general";
 import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
-import { pluginStreamCompanion } from "./messageParser/plugins/streamcompanion";
-import { pluginTwitchApi } from "./messageParser/plugins/twitchApi";
+import { getPluginOsuStreamCompanion } from "./messageParser/plugins/streamcompanion";
+import { pluginsTwitchApi } from "./messageParser/plugins/twitchApi";
 import { pyramidSpammer } from "./other/pyramidSpammer";
 import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
+import { binaryName, usages } from "./info/general";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
-import type { CustomCommandsJson } from "./other/customCommand";
-import type { CustomTimer } from "./other/customTimer";
+import type { CustomCommandsJson } from "./customCommandsTimers/customCommand";
+import type { CustomTimer } from "./customCommandsTimers/customTimer";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
 import type SpotifyWebApi from "spotify-web-api-node";
 import type { StreamCompanionData } from "./streamcompanion";
-import { customCommandDataPlugins } from "./messageParser/plugins/customCommandData";
+import { createExampleFiles } from "./customCommandsTimers/createExampleFiles";
+import { pluginsTwitchChat } from "./messageParser/plugins/twitchChat";
+import { MacroOsuApi, macroOsuApiId } from "./messageParser/macros/osuApi";
 
 /**
  * The logging ID of this module.
@@ -138,7 +152,8 @@ export const main = async (
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
   const moonpieCooldownHoursString = getEnvVariableValueOrDefault(
-    EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS
+    EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS,
+    configDir
   );
   let moonpieClaimCooldownHoursNumber: number;
   try {
@@ -148,6 +163,10 @@ export const main = async (
       `The moonpie claim cooldown hours number string could not be parsed (${moonpieCooldownHoursString})`
     );
   }
+  const moonpieEnableCommands = getEnvVariableValueOrDefault(
+    EnvVariable.MOONPIE_ENABLE_COMMANDS,
+    configDir
+  ).split(",");
   // > Spotify API
   const spotifyApiClientId = getEnvVariableValueOrUndefined(
     EnvVariable.SPOTIFY_API_CLIENT_ID
@@ -169,10 +188,12 @@ export const main = async (
     EnvVariable.OSU_API_DEFAULT_ID
   );
   const osuApiBeatmapRequests = getEnvVariableValueOrDefault(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS,
+    configDir
   );
   const osuApiBeatmapRequestsDetailed = getEnvVariableValueOrDefault(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
+    configDir
   );
   const osuIrcPassword = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_IRC_PASSWORD
@@ -183,6 +204,10 @@ export const main = async (
   const osuIrcRequestTarget = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_IRC_REQUEST_TARGET
   );
+  const osuEnableCommands = getEnvVariableValueOrDefault(
+    EnvVariable.OSU_ENABLE_COMMANDS,
+    configDir
+  ).split(",");
   // > osu! StreamCompanion
   const osuStreamCompanionUrl = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_STREAM_COMPANION_URL
@@ -230,9 +255,10 @@ export const main = async (
     osuIrcPassword !== undefined &&
     osuIrcUsername !== undefined &&
     osuIrcRequestTarget !== undefined;
-  const enableOsuBeatmapRequests = osuApiBeatmapRequests === "ON";
+  const enableOsuBeatmapRequests =
+    osuApiBeatmapRequests === EnvVariableOnOff.ON;
   const enableOsuBeatmapRequestsDetailed =
-    osuApiBeatmapRequestsDetailed === "ON";
+    osuApiBeatmapRequestsDetailed === EnvVariableOnOff.ON;
   let osuIrcBot: undefined | ((id: string) => irc.Client) = undefined;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
     osuIrcBot = (id: string) =>
@@ -252,16 +278,16 @@ export const main = async (
   // Load custom commands
   const customCommands: CustomCommandsJson = {
     commands: [],
-    globalData: [],
+    data: [],
   };
   try {
     const data = await loadCustomCommandsFromFile(pathCustomCommands, logger);
     customCommands.commands.push(...data.customCommands);
     if (data.customCommandsGlobalData) {
-      if (customCommands.globalData === undefined) {
-        customCommands.globalData = [];
+      if (customCommands.data === undefined) {
+        customCommands.data = [];
       }
-      customCommands.globalData.push(...data.customCommandsGlobalData);
+      customCommands.data.push(...data.customCommandsGlobalData);
     }
   } catch (err) {
     loggerMain.error(err as Error);
@@ -277,24 +303,33 @@ export const main = async (
     loggerMain.error(err as Error);
   }
 
-  // Setup database tables (or do nothing if they already exist)
-  await moonpieDbSetupTables(pathDatabase, logger);
-  try {
-    const databaseBackupData = await exportMoonpieCountTableToJson(
-      pathDatabase,
-      logger
-    );
-    const dateObject = new Date();
-    const dateDay = `0${dateObject.getDate()}`.slice(-2);
-    const DateMonth = `0${dateObject.getMonth() + 1}`.slice(-2);
-    const dateYear = dateObject.getFullYear();
-    const pathDatabaseBackup = path.join(
-      logDir,
-      `db_backup_moonpie_${dateYear}-${DateMonth}-${dateDay}.json`
-    );
-    await writeJsonFile(pathDatabaseBackup, databaseBackupData);
-  } catch (err) {
-    loggerMain.error(err as Error);
+  // Only touch the moonpie database if it will be used
+  if (
+    moonpieEnableCommands.length > 0 &&
+    !(
+      moonpieEnableCommands.length == 1 &&
+      moonpieEnableCommands.includes(EnvVariableNone.NONE)
+    )
+  ) {
+    // Setup database tables (or do nothing if they already exist)
+    await moonpieDbSetupTables(pathDatabase, logger);
+    try {
+      const databaseBackupData = await exportMoonpieCountTableToJson(
+        pathDatabase,
+        logger
+      );
+      const dateObject = new Date();
+      const dateDay = `0${dateObject.getDate()}`.slice(-2);
+      const DateMonth = `0${dateObject.getMonth() + 1}`.slice(-2);
+      const dateYear = dateObject.getFullYear();
+      const pathDatabaseBackup = path.join(
+        logDir,
+        `db_backup_moonpie_${dateYear}-${DateMonth}-${dateDay}.json`
+      );
+      await writeJsonFile(pathDatabaseBackup, databaseBackupData);
+    } catch (err) {
+      loggerMain.error(err as Error);
+    }
   }
 
   // Setup message parser
@@ -321,7 +356,10 @@ export const main = async (
     pluginUppercase,
   ];
   const macrosList = [macroMoonpieBot];
-  await writeEnvVariableDocumentation(path.join(configDir, ".env.example"));
+  await writeEnvVariableDocumentation(
+    path.join(configDir, ".env.example"),
+    configDir
+  );
   await writeStringsVariableDocumentation(
     path.join(configDir, ".env.strings.example"),
     defaultStrings,
@@ -337,7 +375,10 @@ export const main = async (
   const plugins = pluginsAndMacrosMap.pluginsMap;
   const macros = pluginsAndMacrosMap.macrosMap;
   if (osuApiDefaultId) {
-    macros.set("OSU_API", new Map([["DEFAULT_USER_ID", `${osuApiDefaultId}`]]));
+    macros.set(
+      macroOsuApiId,
+      new Map([[MacroOsuApi.DEFAULT_USER_ID, `${osuApiDefaultId}`]])
+    );
   }
   if (osuApiClientId && osuApiClientSecret) {
     const pluginOsuBeatmapReady = pluginOsuBeatmap({
@@ -365,7 +406,7 @@ export const main = async (
     plugins.set(pluginOsuUserReady.id, pluginOsuUserReady.func);
   }
   if (osuStreamCompanionCurrentMapData !== undefined) {
-    const pluginStreamCompanionReady = pluginStreamCompanion(
+    const pluginStreamCompanionReady = getPluginOsuStreamCompanion(
       osuStreamCompanionCurrentMapData
     );
     plugins.set(pluginStreamCompanionReady.id, pluginStreamCompanionReady.func);
@@ -416,37 +457,20 @@ export const main = async (
     const pluginsChannel = new Map(plugins);
     const macrosChannel = new Map(macros);
     if (twitchApiClient) {
-      for (const plugin of pluginTwitchApi(
-        twitchApiClient,
-        channel,
-        tags["user-id"]
-      )) {
-        plugins.set(plugin.id, plugin.func);
-      }
+      pluginsTwitchApi(twitchApiClient, channel, tags["user-id"]).forEach(
+        (plugin) => {
+          pluginsChannel.set(plugin.id, plugin.func);
+        }
+      );
     }
-    macrosChannel.set(
-      "TWITCH",
-      new Map([
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        ["USER", `${tags.username}`],
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        ["USER_ID", `${tags["user-id"]}`],
-        ["CHANNEL", channel.slice(1)],
-      ])
+    const generalChannelPlugins = pluginsTwitchChat(
+      tags["user-id"],
+      tags.username,
+      channel.slice(1)
     );
-    pluginsChannel.set("USER", () => {
-      if (tags.username === undefined) {
-        throw errorMessageUserNameUndefined();
-      }
-      return tags.username;
-    });
-    pluginsChannel.set("USER_ID", () => {
-      if (tags["user-id"] === undefined) {
-        throw errorMessageUserIdUndefined();
-      }
-      return tags["user-id"];
-    });
-    pluginsChannel.set("CHANNEL", () => channel.slice(1));
+    for (const generalChannelPlugin of generalChannelPlugins) {
+      pluginsChannel.set(generalChannelPlugin.id, generalChannelPlugin.func);
+    }
 
     // Handle all bot commands
     moonpieChatHandler(
@@ -456,9 +480,7 @@ export const main = async (
       message,
       pathDatabase,
       moonpieClaimCooldownHoursNumber,
-      getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS)?.split(
-        ","
-      ),
+      moonpieEnableCommands,
       strings,
       pluginsChannel,
       macrosChannel,
@@ -493,9 +515,7 @@ export const main = async (
         osuIrcBot,
         osuIrcRequestTarget,
         osuStreamCompanionCurrentMapData,
-        getEnvVariableValueOrDefault(EnvVariable.OSU_ENABLE_COMMANDS)?.split(
-          ","
-        ),
+        osuEnableCommands,
         strings,
         pluginsChannel,
         macrosChannel,
@@ -519,9 +539,6 @@ export const main = async (
       // This currently means only allow the NP command which uses
       // StreamCompanion and nothing else
       // TODO Dirty solution, refactor that better in the future
-      const enableCommands = getEnvVariableValueOrDefault(
-        EnvVariable.OSU_ENABLE_COMMANDS
-      )?.split(",");
       osuChatHandler(
         twitchClient,
         channel,
@@ -534,7 +551,7 @@ export const main = async (
         undefined,
         undefined,
         osuStreamCompanionCurrentMapData,
-        enableCommands.filter((a) => a === OsuCommands.NP),
+        osuEnableCommands.filter((a) => a === OsuCommands.NP),
         strings,
         pluginsChannel,
         macrosChannel,
@@ -584,15 +601,24 @@ export const main = async (
     try {
       const pluginsCustomCommands = new Map(pluginsChannel);
       // Add plugins to manipulate custom command global data
-      const globalDataPlugins = customCommandDataPlugins(customCommands);
-      for (const globalDataPlugin of globalDataPlugins) {
-        pluginsCustomCommands.set(globalDataPlugin.id, globalDataPlugin.func);
+      const genPluginsCustomCommandData =
+        getPluginsCustomCommandData(customCommands);
+      for (const pluginCustomCommandData of genPluginsCustomCommandData) {
+        pluginsCustomCommands.set(
+          pluginCustomCommandData.id,
+          pluginCustomCommandData.func
+        );
       }
       for (const customCommand of customCommands.commands) {
-        pluginsCustomCommands.set(
-          "COUNT",
-          () => `${customCommand.count ? customCommand.count + 1 : 1}`
-        );
+        const pluginsCustomCommand = new Map(pluginsCustomCommands);
+        // Add plugins to manipulate custom command
+        const genPluginsCustomCommand = getPluginsCustomCommand(customCommand);
+        for (const pluginCustomCommand of genPluginsCustomCommand) {
+          pluginsCustomCommand.set(
+            pluginCustomCommand.id,
+            pluginCustomCommand.func
+          );
+        }
         checkCustomCommand(
           twitchClient,
           channel,
@@ -601,7 +627,7 @@ export const main = async (
           parseTwitchBadgeLevel(tags),
           customCommand,
           strings,
-          pluginsCustomCommands,
+          pluginsCustomCommand,
           macrosChannel,
           logger
         )
@@ -678,7 +704,7 @@ export const main = async (
         osuIrcBot,
         "main",
         osuIrcRequestTarget,
-        [`UwU (${name} ${getVersion()})`],
+        `UwU (${name} ${getVersion()})`,
         logger
       );
     } catch (err) {
@@ -702,33 +728,51 @@ if (isEntryPoint()) {
       const commandLineArgs = process.argv.slice(2);
 
       // Catch CLI version request
-      if (commandLineArgs.includes(CliVariable.VERSION)) {
+      if (commandLineArgs.includes(CliOption.VERSION)) {
         console.log(getVersion());
         process.exit(0);
       }
 
-      // Catch CLI help request
-      if (commandLineArgs.includes(CliVariable.HELP)) {
-        console.log(
-          `moonpiebot [OPTIONS]\n\nOptions:\n${getCliVariableDocumentation()}`
-        );
-        process.exit(0);
-      }
-
       // Catch custom config directory
-      let configDir = process.cwd();
-      if (commandLineArgs.includes(CliVariable.CONFIG_DIRECTORY)) {
+      let configDir: string;
+      if (commandLineArgs.includes(CliOption.CONFIG_DIRECTORY)) {
         const lastIndexOfConfigDir =
-          commandLineArgs.lastIndexOf(CliVariable.CONFIG_DIRECTORY) + 1;
+          commandLineArgs.lastIndexOf(CliOption.CONFIG_DIRECTORY) + 1;
         if (lastIndexOfConfigDir >= commandLineArgs.length) {
           throw Error(
-            `${CliVariable.CONFIG_DIRECTORY} > Config directory argument is missing`
+            `${CliOption.CONFIG_DIRECTORY} > Config directory argument is missing`
           );
         }
         // eslint-disable-next-line security/detect-object-injection
         configDir = commandLineArgs[lastIndexOfConfigDir];
         // Create config directory if it doesn't exist
         mkdirSync(configDir, { recursive: true });
+      } else {
+        configDir = process.cwd();
+      }
+
+      // Catch CLI help request
+      if (commandLineArgs.includes(CliOption.HELP)) {
+        console.log(
+          cliHelpGenerator(
+            binaryName,
+            usages,
+            cliOptionInformation.sort((a, b) =>
+              genericStringSorter(a.name, b.name)
+            ),
+            envVariableInformation
+              .map((a) => ({ ...a, name: `${ENV_VARIABLE_PREFIX}${a.name}` }))
+              .sort((a, b) => genericStringSorter(a.name, b.name)),
+            configDir
+          )
+        );
+        process.exit(0);
+      }
+
+      // Catch CLI example file creation request
+      if (commandLineArgs.includes(CliOption.CREATE_EXAMPLE_FILES)) {
+        await createExampleFiles(configDir);
+        process.exit(0);
       }
 
       // Load environment variables if existing from the .env file
@@ -742,7 +786,8 @@ if (isEntryPoint()) {
       // Print for debugging the (private/secret) environment values to the console
       // (censor critical variables if not explicitly enabled)
       printEnvVariablesToConsole(
-        !commandLineArgs.includes(CliVariable.DISABLE_CENSORING)
+        configDir,
+        !commandLineArgs.includes(CliOption.DISABLE_CENSORING)
       );
 
       // Create logger
@@ -756,8 +801,14 @@ if (isEntryPoint()) {
       const logger = createLogger(
         name,
         logDir,
-        getEnvVariableValueOrDefault(EnvVariable.LOGGING_CONSOLE_LOG_LEVEL),
-        getEnvVariableValueOrDefault(EnvVariable.LOGGING_FILE_LOG_LEVEL)
+        getEnvVariableValueOrDefault(
+          EnvVariable.LOGGING_CONSOLE_LOG_LEVEL,
+          configDir
+        ),
+        getEnvVariableValueOrDefault(
+          EnvVariable.LOGGING_FILE_LOG_LEVEL,
+          configDir
+        )
       );
       const logMain = createLogFunc(logger, "main");
 

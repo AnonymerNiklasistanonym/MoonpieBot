@@ -7,6 +7,10 @@ import {
   errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import {
+  MacroOsuPpRequest,
+  macroOsuPpRequestId,
+} from "../../messageParser/macros/osuPpRequest";
+import {
   errorMessageIdUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
@@ -85,9 +89,12 @@ export const commandPp = async (
 
   const osuPpRequestMacros = new Map(globalMacros);
   osuPpRequestMacros.set(
-    "OSU_PP_REQUEST",
+    macroOsuPpRequestId,
     new Map([
-      ["ID", `${customOsuId !== undefined ? customOsuId : defaultOsuId}`],
+      [
+        MacroOsuPpRequest.ID,
+        `${customOsuId !== undefined ? customOsuId : defaultOsuId}`,
+      ],
     ])
   );
 

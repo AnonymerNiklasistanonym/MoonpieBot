@@ -13,18 +13,44 @@ const LOG_ID_MODULE_OSU_IRC = "osu_irc";
 const OSU_IRC_URL = "irc.ppy.sh";
 const OSU_IRC_PORT = 6667;
 
+export const OSU_IRC_NEWLINE = "%NEWLINE%";
+
 export interface IrcMessage {
-  /** @example cho.ppy.sh */
+  /**
+   * IRC message prefix.
+   *
+   * @example cho.ppy.sh
+   */
   prefix: string;
-  /** @example cho.ppy.sh */
+  /**
+   * IRC server URL.
+   *
+   * @example cho.ppy.sh
+   */
   server: string;
-  /** @example err_passwdmismatch */
+  /**
+   * The command/reason of a message.
+   *
+   * @example err_passwdmismatch
+   */
   command: string;
-  /** @example 464 */
+  /**
+   * The integer value of the command.
+   *
+   * @example 464
+   */
   rawCommand: string;
-  /** @example error */
+  /**
+   * The type of the command.
+   *
+   * @example error
+   */
   commandType: string;
-  /** @example ["osuId","Bad authentication token."] */
+  /**
+   * The arguments which means the *to* and the *message*.
+   *
+   * @example ["osuId","Bad authentication token."]
+   */
   args: [string, string];
 }
 
@@ -132,7 +158,7 @@ export const tryToSendOsuIrcMessage = async (
   osuIrcBot: (id: string) => irc.Client,
   id: string,
   osuIrcRequestTarget: string,
-  messages: string[],
+  message: string,
   logger: Logger
 ) => {
   const logOsuIrc = createLogFunc(logger, LOG_ID_MODULE_OSU_IRC, {
@@ -142,13 +168,13 @@ export const tryToSendOsuIrcMessage = async (
   let osuIrcBotInstance: undefined | irc.Client = osuIrcBot(id);
   await new Promise<void>((resolve, reject) => {
     logOsuIrc.info("Try to connect to osu! IRC channel");
-    osuIrcBotInstance?.connect(2, (message) => {
+    osuIrcBotInstance?.connect(2, (reply) => {
       logOsuIrc.info(
-        `osu! IRC connection was established: ${message.args.join(", ")}`
+        `osu! IRC connection was established: ${reply.args.join(", ")}`
       );
-      for (const message of messages) {
-        osuIrcBotInstance?.say(osuIrcRequestTarget, message);
-      }
+      message
+        .split(OSU_IRC_NEWLINE)
+        .forEach((a) => osuIrcBotInstance?.say(osuIrcRequestTarget, a));
       osuIrcBotInstance?.disconnect("", () => {
         osuIrcBotInstance?.conn.end();
         osuIrcBotInstance = undefined;

@@ -1,80 +1,544 @@
+import { MacroOsuApi, macroOsuApiId } from "../../messageParser/macros/osuApi";
+import {
+  MacroOsuBeatmap,
+  MacroOsuScore,
+  pluginOsuBeatmapId,
+  pluginOsuScoreId,
+} from "../../messageParser/plugins/osuApi";
+import {
+  MacroOsuBeatmapRequest,
+  MacroOsuBeatmapRequests,
+  macroOsuBeatmapRequestId,
+  macroOsuBeatmapRequestsId,
+} from "../../messageParser/macros/osuBeatmapRequest";
+import {
+  pluginConvertToShortNumber,
+  pluginIfEqual,
+  pluginIfFalse,
+  pluginIfNotEmpty,
+  pluginIfNotUndefined,
+  pluginIfTrue,
+  pluginTimeInSToStopwatchString,
+} from "../../messageParser/plugins/general";
+import { OSU_IRC_NEWLINE } from "../../osuirc";
 import { OSU_STRING_ID } from "../osu";
+import { createMessageForMessageParser } from "../../messageParser";
+import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
 
 export const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
 
 export const osuBeatmapRequestRefTopScoreShort = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE_SHORT`,
-  default:
-    "%OSU_SCORE:RANK%$(IF_NOT_EMPTY=%OSU_SCORE:MODS%| using %OSU_SCORE:MODS%)",
+  default: createMessageForMessageParser(
+    [
+      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.RANK },
+      {
+        type: "plugin",
+        name: pluginIfNotEmpty.id,
+        args: {
+          type: "macro",
+          name: pluginOsuScoreId,
+          key: MacroOsuScore.MODS,
+        },
+        scope: [
+          " using ",
+          { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.MODS },
+        ],
+      },
+    ],
+    true
+  ),
 };
 
 export const osuBeatmapRequestRefTopScore = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE`,
-  default: `$[${osuBeatmapRequestRefTopScoreShort.id}]$(IF_NOT_UNDEFINED=%OSU_SCORE:PP%| with %OSU_SCORE:PP%pp) \\(%OSU_SCORE:COUNT_300%/%OSU_SCORE:COUNT_100%/%OSU_SCORE:COUNT_50%/%OSU_SCORE:COUNT_MISS%\\) [mc=%OSU_SCORE:MAX_COMBO%, acc=%OSU_SCORE:ACC%%] from %OSU_SCORE:DATE_MONTH% %OSU_SCORE:DATE_YEAR% $(IF_EQUAL=%OSU_SCORE:HAS_REPLAY%===true| {replay available})`,
+  default: createMessageForMessageParser(
+    [
+      { type: "reference", name: osuBeatmapRequestRefTopScoreShort.id },
+      {
+        type: "plugin",
+        name: pluginIfNotUndefined.id,
+        args: { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.PP },
+        scope: [
+          " with ",
+          { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.PP },
+          "pp",
+        ],
+      },
+      " (",
+      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.COUNT_300 },
+      "/",
+      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.COUNT_100 },
+      "/",
+      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.COUNT_50 },
+      "/",
+      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.COUNT_MISS },
+      ") [mc=",
+      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.MAX_COMBO },
+      ", acc=",
+      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.ACC },
+      "%] from ",
+      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.DATE_MONTH },
+      " ",
+      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.DATE_YEAR },
+      " ",
+      {
+        type: "plugin",
+        name: pluginIfTrue.id,
+        args: {
+          type: "macro",
+          name: pluginOsuScoreId,
+          key: MacroOsuScore.HAS_REPLAY,
+        },
+        scope: " (replay available)",
+      },
+    ],
+    true
+  ),
 };
 
 export const osuBeatmapRequest = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}`,
-  default:
-    "$(USER) requested " +
-    "%OSU_BEATMAP:TITLE% '%OSU_BEATMAP:VERSION%' by '%OSU_BEATMAP:ARTIST%'" +
-    `$(OSU_SCORE=%OSU_BEATMAP_REQUEST:ID% %OSU_API:DEFAULT_USER_ID%|$(IF_EQUAL=%OSU_SCORE:EXISTS%===true| - Current top score is a $[${osuBeatmapRequestRefTopScoreShort.id}])$(IF_EQUAL=%OSU_SCORE:EXISTS%===false| - No score found)` +
-    ")",
+  default: createMessageForMessageParser([
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " requested ",
+    { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.TITLE },
+    " '",
+    { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.VERSION },
+    "' by '",
+    { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.ARTIST },
+    "'",
+    {
+      type: "plugin",
+      name: pluginOsuScoreId,
+      args: [
+        {
+          type: "macro",
+          name: macroOsuBeatmapRequestId,
+          key: MacroOsuBeatmapRequest.ID,
+        },
+        " ",
+        {
+          type: "macro",
+          name: macroOsuApiId,
+          key: MacroOsuApi.DEFAULT_USER_ID,
+        },
+      ],
+      scope: [
+        " - ",
+        {
+          type: "plugin",
+          name: pluginIfTrue.id,
+          args: {
+            type: "macro",
+            name: pluginOsuScoreId,
+            key: MacroOsuScore.EXISTS,
+          },
+          scope: [
+            "Current top score is a ",
+            { type: "reference", name: osuBeatmapRequestRefTopScoreShort.id },
+          ],
+        },
+        {
+          type: "plugin",
+          name: pluginIfFalse.id,
+          args: {
+            type: "macro",
+            name: pluginOsuScoreId,
+            key: MacroOsuScore.EXISTS,
+          },
+          scope: "No score found",
+        },
+      ],
+    },
+  ]),
+};
+
+export const osuBeatmapRequestRefDetailedStats = {
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_DETAILED_STATS`,
+  default: createMessageForMessageParser(
+    [
+      "FC=",
+      {
+        type: "macro",
+        name: pluginOsuBeatmapId,
+        key: MacroOsuBeatmap.MAX_COMBO,
+      },
+      ", CS=",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.CS },
+      ", DRAIN=",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.DRAIN },
+      ", ACC=",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.ACC },
+      ", AR=",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.AR },
+      ", BPM=",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.BPM },
+      ", CC=",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.CC },
+      ", SLC=",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.SLC },
+      ", SPC=",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.SPC },
+      ", PLAYS=",
+      {
+        type: "plugin",
+        name: pluginConvertToShortNumber.id,
+        args: {
+          type: "macro",
+          name: pluginOsuBeatmapId,
+          key: MacroOsuBeatmap.PLAY_COUNT,
+        },
+      },
+    ],
+    true
+  ),
 };
 
 export const osuBeatmapRequestDetailed = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_DETAILED`,
-  default:
-    "$(USER) requested " +
-    "%OSU_BEATMAP:TITLE% '%OSU_BEATMAP:VERSION%' by '%OSU_BEATMAP:ARTIST%' [%OSU_BEATMAP:DIFFICULTY_RATING%* $(TIME_IN_S_TO_STOPWATCH_STRING=%OSU_BEATMAP:LENGTH_IN_S%) %OSU_BEATMAP:RANKED_STATUS%] from %OSU_BEATMAP:LAST_UPDATED_MONTH% %OSU_BEATMAP:LAST_UPDATED_YEAR% {FC=%OSU_BEATMAP:MAX_COMBO%, CS=%OSU_BEATMAP:CS%, DRAIN=%OSU_BEATMAP:DRAIN%, ACC=%OSU_BEATMAP:ACC%, AR=%OSU_BEATMAP:AR%, BPM=%OSU_BEATMAP:BPM%, CC=%OSU_BEATMAP:CC%, SLC=%OSU_BEATMAP:SLC%, SPC=%OSU_BEATMAP:SPC%, PLAYS=$(CONVERT_TO_SHORT_NUMBER=%OSU_BEATMAP:PLAY_COUNT%)}" +
-    `$(OSU_SCORE=%OSU_BEATMAP_REQUEST:ID% %OSU_API:DEFAULT_USER_ID%|$(IF_EQUAL=%OSU_SCORE:EXISTS%===true| - Current top score is a $[${osuBeatmapRequestRefTopScore.id}])$(IF_EQUAL=%OSU_SCORE:EXISTS%===false| - No score found))`,
+  default: createMessageForMessageParser([
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " requested ",
+    {
+      type: "macro",
+      name: pluginOsuBeatmapId,
+      key: MacroOsuBeatmap.TITLE,
+    },
+    " '",
+    {
+      type: "macro",
+      name: pluginOsuBeatmapId,
+      key: MacroOsuBeatmap.VERSION,
+    },
+    "' by '",
+    {
+      type: "macro",
+      name: pluginOsuBeatmapId,
+      key: MacroOsuBeatmap.ARTIST,
+    },
+    "' [",
+    {
+      type: "macro",
+      name: pluginOsuBeatmapId,
+      key: MacroOsuBeatmap.DIFFICULTY_RATING,
+    },
+    "* ",
+    {
+      type: "plugin",
+      name: pluginTimeInSToStopwatchString.id,
+      args: {
+        type: "macro",
+        name: pluginOsuBeatmapId,
+        key: MacroOsuBeatmap.LENGTH_IN_S,
+      },
+    },
+    " ",
+    {
+      type: "macro",
+      name: pluginOsuBeatmapId,
+      key: MacroOsuBeatmap.RANKED_STATUS,
+    },
+    "] from ",
+    {
+      type: "macro",
+      name: pluginOsuBeatmapId,
+      key: MacroOsuBeatmap.LAST_UPDATED_MONTH,
+    },
+    " ",
+    {
+      type: "macro",
+      name: pluginOsuBeatmapId,
+      key: MacroOsuBeatmap.LAST_UPDATED_YEAR,
+    },
+    " {",
+    {
+      type: "reference",
+      name: osuBeatmapRequestRefDetailedStats.id,
+    },
+    "}",
+    {
+      type: "plugin",
+      name: pluginOsuScoreId,
+      args: [
+        {
+          type: "macro",
+          name: macroOsuBeatmapRequestId,
+          key: MacroOsuBeatmapRequest.ID,
+        },
+        " ",
+        {
+          type: "macro",
+          name: macroOsuApiId,
+          key: MacroOsuApi.DEFAULT_USER_ID,
+        },
+      ],
+      scope: [
+        {
+          type: "plugin",
+          name: pluginIfTrue.id,
+          args: {
+            type: "macro",
+            name: pluginOsuScoreId,
+            key: MacroOsuScore.EXISTS,
+          },
+          scope: [
+            " - Current top score is a ",
+            { type: "reference", name: osuBeatmapRequestRefTopScore.id },
+          ],
+        },
+        {
+          type: "plugin",
+          name: pluginIfFalse.id,
+          args: {
+            type: "macro",
+            name: pluginOsuScoreId,
+            key: MacroOsuScore.EXISTS,
+          },
+          scope: " - No score found",
+        },
+      ],
+    },
+  ]),
 };
 
 export const osuBeatmapRequestNotFound = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NOT_FOUND`,
-  default: "osu! beatmap was not found :( (ID='%OSU_BEATMAP_REQUEST:ID%')",
+  default: createMessageForMessageParser([
+    "osu! beatmap was not found :( (ID='",
+    {
+      type: "macro",
+      name: macroOsuBeatmapRequestId,
+      key: MacroOsuBeatmapRequest.ID,
+    },
+    "')",
+  ]),
+};
+
+export const osuBeatmapRequestRefIrcRequestString = {
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_REF_REQUEST_STRING`,
+  default: createMessageForMessageParser(
+    [
+      { type: "plugin", name: pluginTwitchChatUserId },
+      " requested ",
+      "[https://osu.ppy.sh/beatmapsets/",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.SET_ID },
+      "#osu/",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.ID },
+      " ",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.TITLE },
+      " '",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.VERSION },
+      "' by '",
+      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.ARTIST },
+      "']",
+    ],
+    true
+  ),
 };
 
 export const osuBeatmapRequestIrc = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC`,
-  default:
-    "$(USER) requested " +
-    "[https://osu.ppy.sh/beatmapsets/%OSU_BEATMAP:SET_ID%#osu/%OSU_BEATMAP:ID% %OSU_BEATMAP:TITLE% '%OSU_BEATMAP:VERSION%' by '%OSU_BEATMAP:ARTIST%']" +
-    `$(OSU_SCORE=%OSU_BEATMAP_REQUEST:ID% %OSU_API:DEFAULT_USER_ID%|$(IF_EQUAL=%OSU_SCORE:EXISTS%===true|%NEWLINE% > Top score: $[${osuBeatmapRequestRefTopScoreShort.id}]))` +
-    "$(IF_NOT_EMPTY=%OSU_BEATMAP_REQUEST:COMMENT%|%NEWLINE% > Comment: %OSU_BEATMAP_REQUEST:COMMENT%)",
+  default: createMessageForMessageParser([
+    { type: "reference", name: osuBeatmapRequestRefIrcRequestString.id },
+    {
+      type: "plugin",
+      name: pluginOsuScoreId,
+      args: [
+        {
+          type: "macro",
+          name: macroOsuBeatmapRequestId,
+          key: MacroOsuBeatmapRequest.ID,
+        },
+        " ",
+        {
+          type: "macro",
+          name: macroOsuApiId,
+          key: MacroOsuApi.DEFAULT_USER_ID,
+        },
+      ],
+      scope: [
+        {
+          type: "plugin",
+          name: pluginIfEqual.id,
+          args: [
+            {
+              type: "macro",
+              name: pluginOsuScoreId,
+              key: MacroOsuScore.EXISTS,
+            },
+            "===true",
+          ],
+          scope: [
+            `${OSU_IRC_NEWLINE} > Top score: `,
+            { type: "reference", name: osuBeatmapRequestRefTopScoreShort.id },
+          ],
+        },
+        {
+          type: "plugin",
+          name: pluginIfNotEmpty.id,
+          args: {
+            type: "macro",
+            name: macroOsuBeatmapRequestId,
+            key: MacroOsuBeatmapRequest.COMMENT,
+          },
+          scope: [
+            `${OSU_IRC_NEWLINE} > Comment: `,
+            {
+              type: "macro",
+              name: macroOsuBeatmapRequestId,
+              key: MacroOsuBeatmapRequest.COMMENT,
+            },
+          ],
+        },
+      ],
+    },
+  ]),
 };
 
 export const osuBeatmapRequestIrcDetailed = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_DETAILED`,
-  default:
-    "$(USER) requested [https://osu.ppy.sh/beatmapsets/%OSU_BEATMAP:SET_ID%#osu/%OSU_BEATMAP:ID% %OSU_BEATMAP:TITLE% '%OSU_BEATMAP:VERSION%' by '%OSU_BEATMAP:ARTIST%']%NEWLINE%from %OSU_BEATMAP:LAST_UPDATED_MONTH% %OSU_BEATMAP:LAST_UPDATED_YEAR% {FC=%OSU_BEATMAP:MAX_COMBO%, CS=%OSU_BEATMAP:CS%, DRAIN=%OSU_BEATMAP:DRAIN%, ACC=%OSU_BEATMAP:ACC%, AR=%OSU_BEATMAP:AR%, BPM=%OSU_BEATMAP:BPM%, CC=%OSU_BEATMAP:CC%, SLC=%OSU_BEATMAP:SLC%, SPC=%OSU_BEATMAP:SPC%, PLAYS=$(CONVERT_TO_SHORT_NUMBER=%OSU_BEATMAP:PLAY_COUNT%)}" +
-    `$(OSU_SCORE=%OSU_BEATMAP_REQUEST:ID% %OSU_API:DEFAULT_USER_ID%|$(IF_EQUAL=%OSU_SCORE:EXISTS%===true|%NEWLINE% > Top score: $[${osuBeatmapRequestRefTopScore.id}]))` +
-    "$(IF_NOT_EMPTY=%OSU_BEATMAP_REQUEST:COMMENT%|%NEWLINE% > Comment: %OSU_BEATMAP_REQUEST:COMMENT%)",
+  default: createMessageForMessageParser([
+    { type: "reference", name: osuBeatmapRequestRefIrcRequestString.id },
+    `${OSU_IRC_NEWLINE}from `,
+    {
+      type: "macro",
+      name: pluginOsuBeatmapId,
+      key: MacroOsuBeatmap.LAST_UPDATED_MONTH,
+    },
+    " ",
+    {
+      type: "macro",
+      name: pluginOsuBeatmapId,
+      key: MacroOsuBeatmap.LAST_UPDATED_YEAR,
+    },
+    " {",
+    { type: "reference", name: osuBeatmapRequestRefDetailedStats.id },
+    "}",
+    {
+      type: "plugin",
+      name: pluginOsuScoreId,
+      args: [
+        {
+          type: "macro",
+          name: macroOsuBeatmapRequestId,
+          key: MacroOsuBeatmapRequest.ID,
+        },
+        " ",
+        {
+          type: "macro",
+          name: macroOsuApiId,
+          key: MacroOsuApi.DEFAULT_USER_ID,
+        },
+      ],
+      scope: {
+        type: "plugin",
+        name: pluginIfTrue.id,
+        args: {
+          type: "macro",
+          name: pluginOsuScoreId,
+          key: MacroOsuScore.EXISTS,
+        },
+        scope: [
+          `${OSU_IRC_NEWLINE} > Top score: `,
+          { type: "reference", name: osuBeatmapRequestRefTopScore.id },
+        ],
+      },
+    },
+    {
+      type: "plugin",
+      name: pluginIfNotEmpty.id,
+      args: {
+        type: "macro",
+        name: macroOsuBeatmapRequestId,
+        key: MacroOsuBeatmapRequest.COMMENT,
+      },
+      scope: [
+        `${OSU_IRC_NEWLINE} > Comment: `,
+        {
+          type: "macro",
+          name: macroOsuBeatmapRequestId,
+          key: MacroOsuBeatmapRequest.COMMENT,
+        },
+      ],
+    },
+  ]),
 };
 
 export const osuBeatmapRequestPermissionError = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_PERMISSION_ERROR`,
-  default:
+  default: createMessageForMessageParser([
     "You are not a broadcaster and thus are not allowed to use this command!",
+  ]),
 };
 
 export const osuBeatmapRequestTurnedOff = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_OFF`,
-  default:
-    "Beatmap requests: Off$(IF_NOT_EMPTY=%BEATMAP_REQUEST:CUSTOM_MESSAGE%| \\(%BEATMAP_REQUEST:CUSTOM_MESSAGE%\\))",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " Beatmap requests: Off",
+    {
+      type: "plugin",
+      name: pluginIfNotEmpty.id,
+      args: {
+        type: "macro",
+        name: macroOsuBeatmapRequestsId,
+        key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+      },
+      scope: [
+        " (",
+        {
+          type: "macro",
+          name: macroOsuBeatmapRequestsId,
+          key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+        },
+        ")",
+      ],
+    },
+  ]),
 };
 export const osuBeatmapRequestTurnedOn = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_ON`,
-  default: "Beatmap requests: On",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " Beatmap requests: On",
+  ]),
 };
 export const osuBeatmapRequestCurrentlyOff = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_OFF`,
-  default:
-    "@$(USER) Beatmap requests are currently off$(IF_NOT_EMPTY=%BEATMAP_REQUEST:CUSTOM_MESSAGE%| \\(%BEATMAP_REQUEST:CUSTOM_MESSAGE%\\))",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " Beatmap requests are currently off",
+    {
+      type: "plugin",
+      name: pluginIfNotEmpty.id,
+      args: {
+        type: "macro",
+        name: macroOsuBeatmapRequestsId,
+        key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+      },
+      scope: [
+        " (",
+        {
+          type: "macro",
+          name: macroOsuBeatmapRequestsId,
+          key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+        },
+        ")",
+      ],
+    },
+  ]),
 };
 export const osuBeatmapRequestCurrentlyOn = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
-  default: "@$(USER) Beatmap requests are currently on",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " Beatmap requests are currently on",
+  ]),
 };
 
 export const osuBeatmapRequests = [
@@ -86,6 +550,8 @@ export const osuBeatmapRequests = [
   osuBeatmapRequestIrcDetailed,
   osuBeatmapRequestNotFound,
   osuBeatmapRequestPermissionError,
+  osuBeatmapRequestRefDetailedStats,
+  osuBeatmapRequestRefIrcRequestString,
   osuBeatmapRequestRefTopScore,
   osuBeatmapRequestRefTopScoreShort,
   osuBeatmapRequestTurnedOff,

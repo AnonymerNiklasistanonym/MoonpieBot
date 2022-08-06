@@ -2,7 +2,7 @@
 import winston, { format } from "winston";
 // Local imports
 import { logFormat } from "../../src/logging";
-import { name } from "../../src/info";
+import { name } from "../../src/info/general";
 
 export const getTestLogger = (testName: string) =>
   winston.createLogger({

@@ -1,14 +1,16 @@
-import { moonpieDb } from "../../../../src/database/moonpieDb";
+// Package imports
 import chai from "chai";
 import { describe } from "mocha";
-import { getTestLogger } from "../../logger";
-import { itAllowFail } from "../../allowFail";
 import path from "path";
-import { createAndSetupTables } from "../../../../src/database/moonpie/management";
+// Local imports
 import {
   CreateError,
   GeneralError,
 } from "../../../../src/database/moonpie/requests";
+import { createAndSetupTables } from "../../../../src/database/moonpie/management";
+import { getTestLogger } from "../../logger";
+import { itAllowFail } from "../../allowFail";
+import { moonpieDb } from "../../../../src/database/moonpieDb";
 
 const githubCiMaxTimeout = 8000;
 

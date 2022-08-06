@@ -8,9 +8,9 @@ import { messageParserById } from "../messageParser";
 import { spotifyCommandReplySong } from "../strings/spotify/commandReply";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
+import type { Macros, Plugins } from "../messageParser";
 import type { Logger } from "winston";
 import type { Strings } from "../strings";
-import type { Macros, Plugins } from "../messageParser";
 
 /**
  * The logging ID of this command.

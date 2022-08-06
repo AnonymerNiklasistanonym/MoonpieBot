@@ -128,7 +128,7 @@ An example file for this is [`customTimers.example.json`](./customTimers.example
 
 For some macros to work (like Twitch API connections for `!so`/`!followage`/`!settitle`/`!setgame`) additional Twitch API credentials need to be provided since the default Twitch API connection is only configured to read and write chat messages.
 
-Additionally commands support a *global data* structure that enables set/get (add/remove for numbers) of a value across commands which for example enables a (video game) easy death counter that can be manipulated by mods while everyone can use a different command to see the current count.
+Additionally commands support a (global) *data* structure that enables set/get (add/remove for numbers) of a value across commands which for example enables a (video game) easy death counter that can be manipulated by mods while everyone can use a different command to see the current count.
 
 ### Optional: Custom strings/messages
 

@@ -4,14 +4,20 @@ import type { MessageParserPlugin } from "../plugins";
 
 const TWITCH_API_PREFIX = "TWITCH_API_";
 
-export const pluginTwitchApi: (
+export const pluginTwitchApiSetGameId = `${TWITCH_API_PREFIX}SET_GAME`;
+export const pluginTwitchApiGetGameId = `${TWITCH_API_PREFIX}GET_GAME`;
+export const pluginTwitchApiSetTitleId = `${TWITCH_API_PREFIX}SET_TITLE`;
+export const pluginTwitchApiGetTitleId = `${TWITCH_API_PREFIX}GET_TITLE`;
+export const pluginTwitchApiGetFollowAgeId = `${TWITCH_API_PREFIX}GET_FOLLOW_AGE`;
+
+export const pluginsTwitchApi: (
   twitchApiClient: ApiClient,
   channelName: string,
   twitchUserId?: string
 ) => MessageParserPlugin[] = (twitchApiClient, channelName, twitchUserId) => {
   return [
     {
-      id: `${TWITCH_API_PREFIX}SET_GAME`,
+      id: pluginTwitchApiSetGameId,
       func: async (_, gameName, signature) => {
         if (signature === true) {
           return {
@@ -46,7 +52,7 @@ export const pluginTwitchApi: (
       },
     },
     {
-      id: `${TWITCH_API_PREFIX}GET_GAME`,
+      id: pluginTwitchApiGetGameId,
       func: async (_, __, signature) => {
         if (signature === true) {
           return {
@@ -73,7 +79,7 @@ export const pluginTwitchApi: (
       },
     },
     {
-      id: `${TWITCH_API_PREFIX}GET_TITLE`,
+      id: pluginTwitchApiGetTitleId,
       func: async (_, __, signature) => {
         if (signature === true) {
           return {
@@ -100,7 +106,7 @@ export const pluginTwitchApi: (
       },
     },
     {
-      id: `${TWITCH_API_PREFIX}SET_TITLE`,
+      id: pluginTwitchApiSetTitleId,
       func: async (_, title, signature) => {
         if (signature === true) {
           return {
@@ -129,7 +135,7 @@ export const pluginTwitchApi: (
       },
     },
     {
-      id: `${TWITCH_API_PREFIX}GET_FOLLOW_AGE`,
+      id: pluginTwitchApiGetFollowAgeId,
       func: async (_, userName, signature) => {
         if (signature === true) {
           return {

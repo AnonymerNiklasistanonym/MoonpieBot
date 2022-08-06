@@ -1,27 +1,37 @@
 // Local imports
-import { moonpieDb } from "../../database/moonpieDb";
+import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
+import {
+  MacroMoonpieLeaderboardEntry,
+  MacroMoonpieUserDelete,
+  MacroMoonpieUserNeverClaimed,
+  MacroMoonpieUserSet,
+  macroMoonpieLeaderboardEntryId,
+  macroMoonpieUserDeleteId,
+  macroMoonpieUserNeverClaimedId,
+  macroMoonpieUserSetId,
+} from "../../messageParser/macros/moonpie";
 import {
   errorMessageIdUndefined,
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
-import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
-import { messageParserById } from "../../messageParser";
 import {
   moonpieUserDelete,
   moonpieUserGet,
-  moonpieUserNeverClaimed,
+  moonpieUserNeverClaimedError,
   moonpieUserPermissionError,
   moonpieUserSet,
-  moonpieUserSetNAN,
+  moonpieUserSetNaNError,
 } from "../../strings/moonpie/user";
+import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
+import { messageParserById } from "../../messageParser";
+import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
+import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { Strings } from "../../strings";
-import type { Macros, Plugins } from "../../messageParser";
 
 export const commandUserGet = async (
   client: Client,
@@ -64,11 +74,17 @@ export const commandUserGet = async (
 
     const macros = new Map(globalMacros);
     macros.set(
-      "MOONPIE",
+      macroMoonpieLeaderboardEntryId,
       new Map([
-        ["USER", `${usernameMoonpieEntry}`],
-        ["COUNT", `${currentMoonpieLeaderboardEntry.count}`],
-        ["LEADERBOARD_RANK", `${currentMoonpieLeaderboardEntry.rank}`],
+        [MacroMoonpieLeaderboardEntry.NAME, `${usernameMoonpieEntry}`],
+        [
+          MacroMoonpieLeaderboardEntry.COUNT,
+          `${currentMoonpieLeaderboardEntry.count}`,
+        ],
+        [
+          MacroMoonpieLeaderboardEntry.RANK,
+          `${currentMoonpieLeaderboardEntry.rank}`,
+        ],
       ])
     );
     message = await messageParserById(
@@ -80,9 +96,12 @@ export const commandUserGet = async (
     );
   } else {
     const macros = new Map(globalMacros);
-    macros.set("MOONPIE", new Map([["USER", `${usernameMoonpieEntry}`]]));
+    macros.set(
+      macroMoonpieUserNeverClaimedId,
+      new Map([[MacroMoonpieUserNeverClaimed.NAME, `${usernameMoonpieEntry}`]])
+    );
     message = await messageParserById(
-      moonpieUserNeverClaimed.id,
+      moonpieUserNeverClaimedError.id,
       globalStrings,
       globalPlugins,
       macros,
@@ -137,18 +156,18 @@ export const commandUserSetCount = async (
     );
     throw Error(errorMessage);
   }
+  const macros = new Map(globalMacros);
+  macros.set(
+    macroMoonpieUserSetId,
+    new Map([
+      [MacroMoonpieUserSet.NAME, `${usernameMoonpieEntry}`],
+      [MacroMoonpieUserSet.SET_COUNT, `${countMoonpies}`],
+      [MacroMoonpieUserSet.SET_OPERATION, `${operation}`],
+    ])
+  );
   if (!Number.isInteger(countMoonpies)) {
-    const macros = new Map(globalMacros);
-    macros.set(
-      "MOONPIE",
-      new Map([
-        ["USER", `${usernameMoonpieEntry}`],
-        ["SET_COUNT", `${countMoonpies}`],
-        ["SET_OPERATION", `${operation}`],
-      ])
-    );
     const errorMessage = await messageParserById(
-      moonpieUserSetNAN.id,
+      moonpieUserSetNaNError.id,
       globalStrings,
       globalPlugins,
       macros,
@@ -161,10 +180,12 @@ export const commandUserSetCount = async (
   if (
     !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
   ) {
-    const macros = new Map(globalMacros);
-    macros.set("MOONPIE", new Map([["USER", `${usernameMoonpieEntry}`]]));
+    macros.set(
+      macroMoonpieUserNeverClaimedId,
+      new Map([[MacroMoonpieUserNeverClaimed.NAME, `${usernameMoonpieEntry}`]])
+    );
     const errorMessage = await messageParserById(
-      moonpieUserNeverClaimed.id,
+      moonpieUserNeverClaimedError.id,
       globalStrings,
       globalPlugins,
       macros,
@@ -215,15 +236,15 @@ export const commandUserSetCount = async (
       logger
     );
 
-  const macros = new Map(globalMacros);
   macros.set(
-    "MOONPIE",
+    macroMoonpieLeaderboardEntryId,
     new Map([
-      ["USER", `${usernameMoonpieEntry}`],
-      ["COUNT", `${newCount}`],
-      ["LEADERBOARD_RANK", `${currentMoonpieLeaderboardEntry.rank}`],
-      ["SET_OPERATION", `${operation}`],
-      ["SET_COUNT", `${countMoonpies}`],
+      [MacroMoonpieLeaderboardEntry.NAME, `${usernameMoonpieEntry}`],
+      [MacroMoonpieLeaderboardEntry.COUNT, `${newCount}`],
+      [
+        MacroMoonpieLeaderboardEntry.RANK,
+        `${currentMoonpieLeaderboardEntry.rank}`,
+      ],
     ])
   );
   const message = await messageParserById(
@@ -284,9 +305,12 @@ export const commandUserDelete = async (
     !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
   ) {
     const macros = new Map(globalMacros);
-    macros.set("MOONPIE", new Map([["USER", `${usernameMoonpieEntry}`]]));
+    macros.set(
+      macroMoonpieUserNeverClaimedId,
+      new Map([[MacroMoonpieUserNeverClaimed.NAME, `${usernameMoonpieEntry}`]])
+    );
     const errorMessage = await messageParserById(
-      moonpieUserNeverClaimed.id,
+      moonpieUserNeverClaimedError.id,
       globalStrings,
       globalPlugins,
       macros,
@@ -298,7 +322,10 @@ export const commandUserDelete = async (
   await moonpieDb.removeName(moonpieDbPath, usernameMoonpieEntry, logger);
 
   const macros = new Map(globalMacros);
-  macros.set("MOONPIE", new Map([["USER", `${usernameMoonpieEntry}`]]));
+  macros.set(
+    macroMoonpieUserDeleteId,
+    new Map([[MacroMoonpieUserDelete.NAME, `${usernameMoonpieEntry}`]])
+  );
   const message = await messageParserById(
     moonpieUserDelete.id,
     globalStrings,

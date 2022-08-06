@@ -27,3 +27,11 @@ npm run package:win
 cd installer
 makensis windows_installer.nsi
 ```
+
+# MAN page
+
+With the following page the man page can be updated and viewed for testing.
+
+```sh
+npm run create:manPage && pandoc "installer/man.md" -s -t man -o "installer/man.1" && man -l "installer/man.1"
+```

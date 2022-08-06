@@ -1,46 +1,79 @@
 import { MOONPIE_STRING_ID } from "../moonpie";
+import { createMessageForMessageParser } from "../../messageParser";
+import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
 
 export const MOONPIE_COMMANDS_STRING_ID = `${MOONPIE_STRING_ID}_COMMANDS`;
 
 export const moonpieCommandsClaim = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_CLAIM`,
-  default: "!moonpie [claim one moonepie per day]",
+  default: createMessageForMessageParser(
+    ["!moonpie [claim one moonepie per day]"],
+    true
+  ),
 };
 export const moonpieCommandsLeaderboard = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_LEADERBOARD`,
-  default: "!moonpie leaderboard [get the top moonpie holder]",
+  default: createMessageForMessageParser(
+    ["!moonpie leaderboard [get the top moonpie holder]"],
+    true
+  ),
 };
 export const moonpieCommandsGet = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_GET`,
-  default: "!moonpie get $USER [get the moonpie count of a user]",
+  default: createMessageForMessageParser(
+    ["!moonpie get $USER [get the moonpie count of a user]"],
+    true
+  ),
 };
 export const moonpieCommandsSet = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_SET`,
-  default: "!moonpie set $USER $COUNT [set moonpies of a user]",
+  default: createMessageForMessageParser(
+    ["!moonpie set $USER $COUNT [set moonpies of a user]"],
+    true
+  ),
 };
 export const moonpieCommandsAdd = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_ADD`,
-  default: "!moonpie add $USER $COUNT [add moonpies to a user]",
+  default: createMessageForMessageParser(
+    ["!moonpie add $USER $COUNT [add moonpies to a user]"],
+    true
+  ),
 };
 export const moonpieCommandsRemove = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_REMOVE`,
-  default: "!moonpie remove $USER $COUNT [remove moonpies of a user]",
+  default: createMessageForMessageParser(
+    ["!moonpie remove $USER $COUNT [remove moonpies of a user]"],
+    true
+  ),
 };
 export const moonpieCommandsDelete = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_DELETE`,
-  default: "!moonpie delete $USER [remove a user from the database]",
+  default: createMessageForMessageParser(
+    ["!moonpie delete $USER [remove a user from the database]"],
+    true
+  ),
 };
 export const moonpieCommandsAbout = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_ABOUT`,
-  default: "!moonpie about [get version and source code]",
+  default: createMessageForMessageParser(
+    ["!moonpie about [get version and source code]"],
+    true
+  ),
 };
 export const moonpieCommandsNone = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_NONE`,
-  default: "None",
+  default: createMessageForMessageParser(["None"], true),
 };
 export const moonpieCommandsPrefix = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_PREFIX`,
-  default: "@$(USER) The following commands are supported:",
+  default: createMessageForMessageParser(
+    [
+      "@",
+      { type: "plugin", name: pluginTwitchChatUserId },
+      " The following commands are supported:",
+    ],
+    true
+  ),
 };
 
 export const moonpieCommands = [

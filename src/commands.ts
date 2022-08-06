@@ -30,7 +30,7 @@ export const logTwitchMessageCommandDetected = (
     logger,
     messageId === undefined ? "ERROR:UNDEFINED" : messageId,
     message,
-    `${commandId}:${subcommandId}`,
+    `'${commandId}:${subcommandId}'`,
     detectorId
   );
 };

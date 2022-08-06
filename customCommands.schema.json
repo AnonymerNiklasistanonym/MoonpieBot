@@ -14,28 +14,28 @@
                     "items": {
                         "$ref": "#/definitions/CustomCommand"
                     },
-                    "description": "All custom commands."
+                    "description": "The custom commands."
                 },
-                "globalData": {
+                "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/CustomCommandGlobalData"
+                        "$ref": "#/definitions/CustomCommandData"
                     },
-                    "description": "All global data of the custom commands."
+                    "description": "The custom command data."
                 }
             },
             "required": [
                 "commands"
             ],
             "additionalProperties": false,
-            "description": "Structured data object that contains all information about custom commands and their global data."
+            "description": "Structured data object that contains all information about custom commands and their data."
         },
         "CustomCommand": {
             "type": "object",
             "properties": {
-                "name": {
+                "id": {
                     "type": "string",
-                    "description": "Name of the command."
+                    "description": "ID of the command."
                 },
                 "channels": {
                     "type": "array",
@@ -53,13 +53,7 @@
                     "description": "The regex string that is used to check for the command."
                 },
                 "userLevel": {
-                    "type": "string",
-                    "enum": [
-                        "broadcaster",
-                        "mod",
-                        "vip",
-                        "everyone"
-                    ],
+                    "$ref": "#/definitions/CustomCommandUserLevel",
                     "description": "The allowed user level."
                 },
                 "count": {
@@ -80,6 +74,7 @@
                 }
             },
             "required": [
+                "id",
                 "channels",
                 "message",
                 "regexString"
@@ -87,12 +82,21 @@
             "additionalProperties": false,
             "description": "Represents a custom command."
         },
-        "CustomCommandGlobalData": {
+        "CustomCommandUserLevel": {
+            "type": "string",
+            "enum": [
+                "broadcaster",
+                "mod",
+                "vip",
+                "everyone"
+            ]
+        },
+        "CustomCommandData": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "string",
-                    "description": "The ID."
+                    "description": "The unique ID."
                 },
                 "value": {
                     "type": [
@@ -103,7 +107,7 @@
                 },
                 "description": {
                     "type": "string",
-                    "description": "A description for the global data value."
+                    "description": "A description."
                 }
             },
             "required": [
@@ -111,7 +115,7 @@
                 "value"
             ],
             "additionalProperties": false,
-            "description": "Represents a custom command global data value."
+            "description": "Represents a custom command data value."
         }
     }
 }

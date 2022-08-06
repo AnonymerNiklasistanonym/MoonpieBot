@@ -1,6 +1,7 @@
-import { exec } from "child_process";
+// Package imports
 import { Readable } from "stream";
 import csv from "csv-parser";
+import { exec } from "child_process";
 
 interface WindowsTasklistVOutputElement {
   imageName: string;

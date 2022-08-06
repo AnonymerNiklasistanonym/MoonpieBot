@@ -701,10 +701,13 @@ export const parseTreeNode = async (
       const plugin = plugins.get(pluginName);
       if (plugin === undefined) {
         throw Error(
-          `Parse tree node '${treeNode.type}' plugin name was not found ('${
+          `Parse tree node '${
+            treeNode.type
+          }' plugin name '${pluginName}' was not found ('${
             treeNode.originalString
           }',[${Array.from(plugins.entries())
             .map((a) => a[0])
+            .sort(genericStringSorter)
             .join(",")}])`
         );
       }
@@ -718,13 +721,16 @@ export const parseTreeNode = async (
           : undefined;
       } catch (err) {
         logMessageParser.error(err as Error);
-        throw Error(
-          `Parse tree node '${
-            treeNode.type
-          }' could not produce plugin value string ('${
-            treeNode.originalString
-          }',${(err as Error).message})`
+        logMessageParser.error(
+          Error(
+            `Parse tree node '${
+              treeNode.type
+            }' could not produce plugin value string ('${
+              treeNode.originalString
+            }',${(err as Error).message}`
+          )
         );
+        throw err;
       }
       // eslint-disable-next-line no-case-declarations
       let pluginOutput;
@@ -733,13 +739,16 @@ export const parseTreeNode = async (
         pluginOutput = await plugin(logger, pluginValueString);
       } catch (err) {
         logMessageParser.error(err as Error);
-        throw Error(
-          `Parse tree node '${
-            treeNode.type
-          }' could not produce plugin output (${treeNode.originalString},${
-            (err as Error).message
-          })`
+        logMessageParser.error(
+          Error(
+            `Parse tree node '${
+              treeNode.type
+            }' could not produce plugin output (${treeNode.originalString},${
+              (err as Error).message
+            })`
+          )
         );
+        throw err;
       }
       if (Array.isArray(pluginOutput)) {
         for (const macro of pluginOutput) {
@@ -774,7 +783,7 @@ export const parseTreeNode = async (
           }
           helpOutput += "Macros: ";
           if (stringsMacros.length > 0) {
-            helpOutput += stringsMacros.join(",");
+            helpOutput += stringsMacros.sort(genericStringSorter).join(",");
           } else {
             helpOutput += "[]";
           }
@@ -791,7 +800,7 @@ export const parseTreeNode = async (
           }
           helpOutput += "Plugins: ";
           if (stringsPlugins.length > 0) {
-            helpOutput += stringsPlugins.join(",");
+            helpOutput += stringsPlugins.sort(genericStringSorter).join(",");
           } else {
             helpOutput += "[]";
           }
@@ -844,11 +853,14 @@ export const messageParser = async (
     return await parseTreeNode(parseTreeNodeRoot, plugins, macros, logger);
   } catch (err) {
     logMessageParser.error(err as Error);
-    throw Error(
-      `There was an error parsing the message string '${messageString}': ${
-        (err as Error).message
-      }`
+    logMessageParser.error(
+      Error(
+        `There was an error parsing the message string '${messageString}': ${
+          (err as Error).message
+        }`
+      )
     );
+    throw err;
   }
 };
 
@@ -993,3 +1005,73 @@ export const generatePluginAndMacroDocumentation = async (
 
   return output;
 };
+
+export interface MessageForMessageElement {
+  type: string;
+}
+export type MessageForMessageElements =
+  | string
+  | MessageForMessageElementMacro
+  | MessageForMessageElementPlugin
+  | MessageForMessageElementReference;
+
+export interface MessageForMessageElementPlugin
+  extends MessageForMessageElement {
+  name: string;
+  args?: MessageForMessageElements[] | MessageForMessageElements;
+  scope?: MessageForMessageElements[] | MessageForMessageElements;
+  type: "plugin";
+}
+
+export interface MessageForMessageElementMacro
+  extends MessageForMessageElement {
+  name: string;
+  key: string;
+  type: "macro";
+}
+
+export interface MessageForMessageElementReference
+  extends MessageForMessageElement {
+  name: string;
+  type: "reference";
+}
+
+export const createMessageForMessageParser = (
+  message: MessageForMessageElements[],
+  insidePlugin = false
+): string =>
+  message
+    .map((a) => {
+      if (typeof a === "string") {
+        if (insidePlugin) {
+          return a.replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+        }
+        return a;
+      }
+      switch (a.type) {
+        case "macro":
+          return `%${a.name}:${a.key}%`;
+        case "reference":
+          return `$[${a.name}]`;
+        case "plugin":
+          // eslint-disable-next-line no-case-declarations
+          let pluginText = `$(${a.name}`;
+          if (a.args) {
+            pluginText += `=${createMessageForMessageParser(
+              Array.isArray(a.args) ? a.args : [a.args],
+              true
+            )}`;
+          }
+          if (a.scope) {
+            pluginText += `|${createMessageForMessageParser(
+              Array.isArray(a.scope) ? a.scope : [a.scope],
+              true
+            )}`;
+          }
+          pluginText += ")";
+          return pluginText;
+        default:
+          return "ERROR";
+      }
+    })
+    .join("");

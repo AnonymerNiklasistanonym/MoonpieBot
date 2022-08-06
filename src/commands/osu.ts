@@ -1,3 +1,4 @@
+// Local imports
 import {
   commandBeatmap,
   commandBeatmapRequestsStatus,
@@ -8,15 +9,15 @@ import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
 import { commandScore } from "./osu/score";
-import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 import { logTwitchMessageCommandDetected } from "../commands";
+import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
-import type { Client as IrcClient } from "irc";
-import type { StreamCompanionData } from "../streamcompanion";
 import type { ChatUserstate, Client } from "tmi.js";
-import type { Logger } from "winston";
-import type { Strings } from "../strings";
 import type { Macros, Plugins } from "../messageParser";
+import type { Client as IrcClient } from "irc";
+import type { Logger } from "winston";
+import type { StreamCompanionData } from "../streamcompanion";
+import type { Strings } from "../strings";
 
 /**
  * The logging ID of this command.

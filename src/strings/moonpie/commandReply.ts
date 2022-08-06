@@ -1,44 +1,197 @@
+import {
+  MacroMoonpieBot,
+  macroMoonpieBot,
+} from "../../messageParser/macros/moonpiebot";
+import {
+  MacroMoonpieClaim,
+  MacroMoonpieLeaderboardEntry,
+  macroMoonpieClaimId,
+  macroMoonpieLeaderboardEntryId,
+} from "../../messageParser/macros/moonpie";
+import {
+  pluginIfEqual,
+  pluginIfNotEqual,
+  pluginTimeInSToHumanReadableStringShort,
+} from "../../messageParser/plugins/general";
+import {
+  pluginTwitchChatUserId,
+  pluginTwitchChatUserIdId,
+} from "../../messageParser/plugins/twitchChat";
 import { MOONPIE_STRING_ID } from "../moonpie";
+import { createMessageForMessageParser } from "../../messageParser";
 
 export const MOONPIE_COMMAND_REPLY_STRING_ID = `${MOONPIE_STRING_ID}_COMMAND_REPLY`;
 
 export const moonpieCommandReplyAbout = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ABOUT`,
-  default: "@$(USER) %MOONPIEBOT:NAME% %MOONPIEBOT:VERSION% (%MOONPIEBOT:URL%)",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " ",
+    { type: "macro", name: macroMoonpieBot.id, key: MacroMoonpieBot.NAME },
+    " ",
+    { type: "macro", name: macroMoonpieBot.id, key: MacroMoonpieBot.VERSION },
+    " (",
+    { type: "macro", name: macroMoonpieBot.id, key: MacroMoonpieBot.URL },
+    ")",
+  ]),
 };
 
 export const moonpieCommandReplyClaim = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIM`,
-  default:
-    "@$(USER) You just claimed a moonpie! You have now %MOONPIE:COUNT% moonpie$(IF_GREATER=%MOONPIE:COUNT%>1|s) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " You just claimed a moonpie! You have now ",
+    {
+      type: "macro",
+      name: macroMoonpieLeaderboardEntryId,
+      key: MacroMoonpieLeaderboardEntry.COUNT,
+    },
+    " moonpie",
+    {
+      type: "plugin",
+      name: pluginIfNotEqual.id,
+      args: [
+        {
+          type: "macro",
+          name: macroMoonpieLeaderboardEntryId,
+          key: MacroMoonpieLeaderboardEntry.COUNT,
+        },
+        "!==1",
+      ],
+      scope: "s",
+    },
+    " and are rank ",
+    {
+      type: "macro",
+      name: macroMoonpieLeaderboardEntryId,
+      key: MacroMoonpieLeaderboardEntry.RANK,
+    },
+    " on the leaderboard!",
+  ]),
 };
 
 export const moonpieCommandReplyAlreadyClaimedRefNormal = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_REF_NORMAL`,
-  default:
-    "You already claimed a moonpie for today ($(TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT=%MOONPIE:TIME_SINCE_CLAIM_IN_S%) ago - next claim can be made in $(TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT=%MOONPIE:TIME_TILL_NEXT_CLAIM_IN_S%)) and are rank %MOONPIE:LEADERBOARD_RANK% on the leaderboard!",
+  default: createMessageForMessageParser(
+    [
+      "You already claimed a moonpie for today (",
+      {
+        type: "plugin",
+        name: pluginTimeInSToHumanReadableStringShort.id,
+        args: {
+          type: "macro",
+          name: macroMoonpieClaimId,
+          key: MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S,
+        },
+      },
+      " ago - next claim can be made in ",
+      {
+        type: "plugin",
+        name: pluginTimeInSToHumanReadableStringShort.id,
+        args: {
+          type: "macro",
+          name: macroMoonpieClaimId,
+          key: MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S,
+        },
+      },
+      ") and are rank ",
+      {
+        type: "macro",
+        name: macroMoonpieLeaderboardEntryId,
+        key: MacroMoonpieLeaderboardEntry.RANK,
+      },
+      " on the leaderboard!",
+    ],
+    true
+  ),
 };
 
 export const moonpieCommandReplyAlreadyClaimedRefStar = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_REF_STAR`,
-  default:
-    "You are the cutest! You have 6969 moonpies and are rank 1 in my heart! <3",
+  default: createMessageForMessageParser(
+    [
+      "You are the cutest! You have 6969 moonpies and are rank 1 in my heart! <3",
+    ],
+    true
+  ),
 };
+
+const starTwitchId = 93818178;
 
 export const moonpieCommandReplyAlreadyClaimed = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED`,
-  default: `@$(USER) $(IF_EQUAL=%TWITCH:USER_ID%===93818178|$[${moonpieCommandReplyAlreadyClaimedRefStar.id}])$(IF_NOT_EQUAL=%TWITCH:USER_ID%!==93818178|$[${moonpieCommandReplyAlreadyClaimedRefNormal.id}])`,
+  default: createMessageForMessageParser([
+    "@",
+    { type: "plugin", name: pluginTwitchChatUserId },
+    " ",
+    {
+      type: "plugin",
+      name: pluginIfEqual.id,
+      args: [
+        {
+          type: "plugin",
+          name: pluginTwitchChatUserIdId,
+        },
+        `===${starTwitchId}`,
+      ],
+      scope: {
+        type: "reference",
+        name: moonpieCommandReplyAlreadyClaimedRefStar.id,
+      },
+    },
+    {
+      type: "plugin",
+      name: pluginIfNotEqual.id,
+      args: [
+        {
+          type: "plugin",
+          name: pluginTwitchChatUserIdId,
+        },
+        `!==${starTwitchId}`,
+      ],
+      scope: {
+        type: "reference",
+        name: moonpieCommandReplyAlreadyClaimedRefNormal.id,
+      },
+    },
+  ]),
 };
 
 export const moonpieCommandReplyLeaderboardPrefix = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_PREFIX`,
-  default: "@$(USER) ",
+  default: createMessageForMessageParser(
+    ["@", { type: "plugin", name: pluginTwitchChatUserId }, " "],
+    true
+  ),
 };
 
 export const moonpieCommandReplyLeaderboardEntry = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_ENTRY`,
-  default:
-    "%MOONPIE_LEADERBOARD_ENTRY:RANK%. %MOONPIE_LEADERBOARD_ENTRY:NAME% (%MOONPIE_LEADERBOARD_ENTRY:COUNT%)",
+  default: createMessageForMessageParser(
+    [
+      {
+        type: "macro",
+        name: macroMoonpieLeaderboardEntryId,
+        key: MacroMoonpieLeaderboardEntry.RANK,
+      },
+      ". ",
+      {
+        type: "macro",
+        name: macroMoonpieLeaderboardEntryId,
+        key: MacroMoonpieLeaderboardEntry.NAME,
+      },
+      " (",
+      {
+        type: "macro",
+        name: macroMoonpieLeaderboardEntryId,
+        key: MacroMoonpieLeaderboardEntry.COUNT,
+      },
+      ")",
+    ],
+    true
+  ),
 };
 
 export const moonpieCommandReply = [

@@ -8,6 +8,10 @@ import {
   errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import {
+  MacroOsuWindowTitle,
+  macroOsuWindowTitleId,
+} from "../../messageParser/macros/osuWindowTitle";
+import {
   errorMessageIdUndefined,
   errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
@@ -189,13 +193,13 @@ export const commandNp = async (
         }
         const customMacros = new Map(globalMacros);
         customMacros.set(
-          "OSU_WINDOW_TITLE",
+          macroOsuWindowTitleId,
           new Map([
-            ["TITLE", `${match[2]}`],
-            ["ARTIST", `${match[1]}`],
-            ["VERSION", `${match[3]}`],
+            [MacroOsuWindowTitle.TITLE, `${match[2]}`],
+            [MacroOsuWindowTitle.ARTIST, `${match[1]}`],
+            [MacroOsuWindowTitle.VERSION, `${match[3]}`],
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            ["MAP_ID_VIA_API", `${mapId}`],
+            [MacroOsuWindowTitle.MAP_ID_VIA_API, `${mapId}`],
           ])
         );
         message = await messageParserById(
