@@ -128,16 +128,12 @@ export const createTwitchClient = (
 export interface TwitchChatHandlerSuccessfulReply {
   sentMessage: [string];
   replyToMessageId: string;
-  commandId: string;
-  subcommandId: string;
 }
 
 export interface TwitchChatHandlerCommandDetect<DATA> {
   message: string;
   messageId?: string;
   userName?: string;
-  commandId: string;
-  subcommandId: string;
   detectorId?: string;
   data: DATA;
 }
@@ -161,16 +157,17 @@ export type TwitchChatHandler<DATA = undefined, RETURN_VALUE = void> = (
    * The custom data of this Twitch chat message handler.
    */
   data: DATA,
+  enabledCommands: Readonly<string[]>,
   globalStrings: Readonly<Strings>,
   globalPlugins: Readonly<Plugins>,
   globalMacros: Readonly<Macros>,
   logger: Readonly<Logger>
 ) => Promise<RETURN_VALUE>;
 
-export type TwitchChatCommandDetector<DATA = undefined> = (
+export type TwitchChatCommandDetector<DATA = Record<never, never>> = (
   tags: Readonly<ChatUserstate>,
   message: Readonly<string>,
-  enabledCommands: Readonly<string[]>
+  enabledCommands?: Readonly<string[]>
 ) => false | TwitchChatHandlerCommandDetect<DATA>;
 
 /**
@@ -201,6 +198,20 @@ export type TwitchChatCommandHandler<DATA = undefined> = (
  */
 export interface LogTwitchMessageOptions {
   subsection?: string;
+}
+
+export interface TwitchChatCommandInfo {
+  groupId: string;
+  id: string;
+}
+
+export interface TwitchMessageCommandHandler<
+  DATA_HANDLE extends DATA_DETECTOR,
+  DATA_DETECTOR = Record<never, never>
+> {
+  info: TwitchChatCommandInfo;
+  detect: TwitchChatCommandDetector<DATA_DETECTOR>;
+  handle: TwitchChatCommandHandler<DATA_HANDLE>;
 }
 
 // eslint-disable-next-line jsdoc/require-returns
@@ -288,3 +299,69 @@ export const logTwitchMessageDetected = (
     )}`,
     { subsection: detectorSourceId }
   );
+
+export const twitchChatCommandDetected = <DATA>(
+  logger: Logger,
+  commandInfo: TwitchChatCommandInfo,
+  commandDetected: TwitchChatHandlerCommandDetect<DATA>
+) => {
+  logTwitchMessageDetected(
+    logger,
+    commandDetected.messageId ? commandDetected.messageId : "ERROR:UNDEFINED",
+    [
+      commandDetected.userName ? `#${commandDetected.userName}` : "UNDEFINED",
+      commandDetected.message,
+    ],
+    `'${commandInfo.groupId}:${commandInfo.id}'`,
+    commandDetected.detectorId ? commandDetected.detectorId : "TODO"
+  );
+};
+
+export const twitchChatCommandReply = (
+  logger: Logger,
+  commandInfo: TwitchChatCommandInfo,
+  commandReply: TwitchChatHandlerSuccessfulReply
+) => {
+  logTwitchMessageReply(
+    logger,
+    commandReply.replyToMessageId,
+    commandReply.sentMessage,
+    `${commandInfo.groupId}:${commandInfo.id}`
+  );
+};
+
+export const handleTwitchCommand = async <
+  DATA extends DATA_HANDLE,
+  DATA_HANDLE extends DATA_DETECT,
+  DATA_DETECT
+>(
+  client: Readonly<Client>,
+  channel: Readonly<string>,
+  tags: Readonly<ChatUserstate>,
+  message: Readonly<string>,
+  data: DATA,
+  globalStrings: Readonly<Strings>,
+  globalPlugins: Readonly<Plugins>,
+  globalMacros: Readonly<Macros>,
+  logger: Readonly<Logger>,
+  command: TwitchMessageCommandHandler<DATA_HANDLE, DATA_DETECT>,
+  enabledCommands?: Readonly<string[]>
+): Promise<boolean> => {
+  const commandDetected = command.detect(tags, message, enabledCommands);
+  if (commandDetected) {
+    twitchChatCommandDetected(logger, command.info, commandDetected);
+    const commandReply = await command.handle(
+      client,
+      channel,
+      tags,
+      data,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
+    );
+    twitchChatCommandReply(logger, command.info, commandReply);
+    return true;
+  }
+  return false;
+};

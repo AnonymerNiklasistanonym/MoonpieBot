@@ -40,6 +40,7 @@ export interface CommandClaimData {
  * @param tags Twitch user state information.
  * @param _message The current Twitch message.
  * @param data The command specific data.
+ * @param _enabledCommands The commands that were enabled.
  * @param globalStrings Global message strings.
  * @param globalPlugins Global plugins.
  * @param globalMacros Global macros.
@@ -51,6 +52,7 @@ export const commandClaim: TwitchChatHandler<CommandClaimData> = async (
   tags,
   _message,
   data,
+  _enabledCommands,
   globalStrings,
   globalPlugins,
   globalMacros,

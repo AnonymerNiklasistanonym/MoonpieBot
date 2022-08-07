@@ -26,7 +26,7 @@ export const commandCommands = async (
   client: Client,
   channel: string,
   messageId: string | undefined,
-  enabled: string[],
+  enabled: Readonly<string[]>,
   globalStrings: Strings,
   globalPlugins: Plugins,
   globalMacros: Macros,

@@ -154,7 +154,6 @@ export const regexMoonpieDelete = /^\s*!moonpie\s+delete\s+(\S+)\s*$/i;
 export interface MoonpieChatHandlerData {
   databasePath: string;
   moonpieCooldownHoursNumber: number;
-  enabled: (MoonpieCommands | string)[];
 }
 
 export const moonpieChatHandler: TwitchChatHandler<
@@ -165,6 +164,7 @@ export const moonpieChatHandler: TwitchChatHandler<
   tags,
   message,
   data,
+  enabled,
   globalStrings,
   globalPlugins,
   globalMacros,
@@ -174,7 +174,7 @@ export const moonpieChatHandler: TwitchChatHandler<
     // > !moonpie commands
     if (
       message.match(regexMoonpieCommands) &&
-      data.enabled.includes(MoonpieCommands.COMMANDS)
+      enabled.includes(MoonpieCommands.COMMANDS)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -188,7 +188,7 @@ export const moonpieChatHandler: TwitchChatHandler<
         client,
         channel,
         tags.id,
-        data.enabled,
+        enabled,
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -199,7 +199,7 @@ export const moonpieChatHandler: TwitchChatHandler<
     // > !moonpie leaderboard
     if (
       message.match(regexMoonpieLeaderboard) &&
-      data.enabled.includes(MoonpieCommands.LEADERBOARD)
+      enabled.includes(MoonpieCommands.LEADERBOARD)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -224,7 +224,7 @@ export const moonpieChatHandler: TwitchChatHandler<
     // > !moonpie about
     if (
       message.match(regexMoonpieAbout) &&
-      data.enabled.includes(MoonpieCommands.ABOUT)
+      enabled.includes(MoonpieCommands.ABOUT)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -240,6 +240,7 @@ export const moonpieChatHandler: TwitchChatHandler<
         tags,
         message,
         undefined,
+        enabled,
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -250,7 +251,7 @@ export const moonpieChatHandler: TwitchChatHandler<
     // > !moonpie delete $USER
     if (
       message.match(regexMoonpieDelete) &&
-      data.enabled.includes(MoonpieCommands.DELETE)
+      enabled.includes(MoonpieCommands.DELETE)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -282,7 +283,7 @@ export const moonpieChatHandler: TwitchChatHandler<
     // > !moonpie get $USER
     if (
       message.match(regexMoonpieGet) &&
-      data.enabled.includes(MoonpieCommands.GET)
+      enabled.includes(MoonpieCommands.GET)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -313,7 +314,7 @@ export const moonpieChatHandler: TwitchChatHandler<
     // > !moonpie set $USER (only broadcaster badge)
     if (
       message.match(regexMoonpieSet) &&
-      data.enabled.includes(MoonpieCommands.SET)
+      enabled.includes(MoonpieCommands.SET)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -348,7 +349,7 @@ export const moonpieChatHandler: TwitchChatHandler<
     // > !moonpie add $USER $COUNT (only broadcaster badge)
     if (
       message.match(regexMoonpieAdd) &&
-      data.enabled.includes(MoonpieCommands.ADD)
+      enabled.includes(MoonpieCommands.ADD)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -383,7 +384,7 @@ export const moonpieChatHandler: TwitchChatHandler<
     // > !moonpie remove $USER $COUNT (only broadcaster badge)
     if (
       message.match(regexMoonpieRemove) &&
-      data.enabled.includes(MoonpieCommands.REMOVE)
+      enabled.includes(MoonpieCommands.REMOVE)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -418,7 +419,7 @@ export const moonpieChatHandler: TwitchChatHandler<
     // > !moonpie ($MESSAGE)
     if (
       message.match(regexMoonpieClaim) &&
-      data.enabled.includes(MoonpieCommands.CLAIM)
+      enabled.includes(MoonpieCommands.CLAIM)
     ) {
       logTwitchMessageCommandDetected(
         logger,
@@ -437,6 +438,7 @@ export const moonpieChatHandler: TwitchChatHandler<
           moonpieDbPath: data.databasePath,
           moonpieClaimCooldownHours: data.moonpieCooldownHoursNumber,
         },
+        enabled,
         globalStrings,
         globalPlugins,
         globalMacros,

@@ -7,17 +7,18 @@ import { ApiClient } from "@twurple/api";
 import path from "path";
 import { StaticAuthProvider } from "@twurple/auth";
 // Local imports
-import {
-  checkCustomCommand,
-  loadCustomCommandsFromFile,
-} from "./customCommandsTimers/customCommand";
 import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuirc";
 import {
   createStringsVariableDocumentation,
   defaultStrings,
   updateStringsMapWithCustomEnvStrings,
 } from "./strings";
+import { createTwitchClient, handleTwitchCommand } from "./twitch";
 import { EnvVariable, EnvVariableNone, EnvVariableOnOff } from "./info/env";
+import {
+  getCustomCommand,
+  loadCustomCommandsFromFile,
+} from "./customCommandsTimers/customCommand";
 import {
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrUndefined,
@@ -31,7 +32,6 @@ import {
   registerTimer,
 } from "./customCommandsTimers/customTimer";
 import { MacroOsuApi, macroOsuApiId } from "./messageParser/macros/osuApi";
-import { osuChatHandler, OsuCommands } from "./commands/osu";
 import {
   pluginConvertToShortNumber,
   pluginHelp,
@@ -62,7 +62,6 @@ import {
 } from "./messageParser/plugins/osu";
 import { createLogFunc } from "./logging";
 import { createStreamCompanionConnection } from "./streamcompanion";
-import { createTwitchClient } from "./twitch";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { generatePluginsAndMacrosMap } from "./messageParser";
 import { getPluginOsuStreamCompanion } from "./messageParser/plugins/streamcompanion";
@@ -70,6 +69,8 @@ import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
+import { osuChatHandler } from "./commands/osu";
+import { OsuCommands } from "./commands/chat_handler_commands";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
 import { pluginsTwitchApi } from "./messageParser/plugins/twitchApi";
 import { pluginsTwitchChat } from "./messageParser/plugins/twitchChat";
@@ -463,8 +464,8 @@ export const main = async (
       {
         databasePath: pathDatabase,
         moonpieCooldownHoursNumber: moonpieClaimCooldownHoursNumber,
-        enabled: moonpieEnableCommands,
       },
+      moonpieEnableCommands,
       strings,
       pluginsChannel,
       macrosChannel,
@@ -500,8 +501,8 @@ export const main = async (
           osuIrcBot,
           osuIrcRequestTarget,
           osuStreamCompanionCurrentMapData,
-          enabled: osuEnableCommands,
         },
+        osuEnableCommands,
         strings,
         pluginsChannel,
         macrosChannel,
@@ -533,8 +534,8 @@ export const main = async (
         {
           // TODO Fix this later - either create a new handler or block the commands automatically
           osuStreamCompanionCurrentMapData,
-          enabled: osuEnableCommands.filter((a) => a === OsuCommands.NP),
         },
+        osuEnableCommands.filter((a) => a === OsuCommands.NP),
         strings,
         pluginsChannel,
         macrosChannel,
@@ -560,7 +561,8 @@ export const main = async (
         channel,
         tags,
         message,
-        { enabled: spotifyEnableCommands },
+        {},
+        spotifyEnableCommands,
         strings,
         pluginsChannel,
         macrosChannel,
@@ -592,7 +594,9 @@ export const main = async (
           pluginCustomCommandData.func
         );
       }
-      for (const customCommand of customCommands.commands) {
+      for (const customCommand of customCommands.commands.filter((a) =>
+        a.channels.includes(channel.slice(1))
+      )) {
         const pluginsCustomCommand = new Map(pluginsCustomCommands);
         // Add plugins to manipulate custom command
         const genPluginsCustomCommand = getPluginsCustomCommand(customCommand);
@@ -602,34 +606,38 @@ export const main = async (
             pluginCustomCommand.func
           );
         }
-        checkCustomCommand(
+        handleTwitchCommand(
           twitchClient,
           channel,
           tags,
           message,
-          { command: customCommand },
+          {
+            regexGroups: [],
+          },
           strings,
           pluginsCustomCommand,
           macrosChannel,
-          logger
+          logger,
+          getCustomCommand(customCommand)
         )
-          .then((commandExecuted) => {
-            if (commandExecuted) {
-              if (customCommand.count === undefined) {
-                customCommand.count = 1;
-              } else {
-                customCommand.count += 1;
-              }
-              // Save custom command counts to files
-              writeJsonFile<CustomCommandsJson>(pathCustomCommands, {
-                $schema: "./customCommands.schema.json",
-                ...customCommands,
-              })
-                .then(() => {
-                  loggerMain.info("Custom commands were saved");
-                })
-                .catch(loggerMain.error);
+          .then((executed) => {
+            if (!executed) {
+              return;
             }
+            if (customCommand.count === undefined) {
+              customCommand.count = 1;
+            } else {
+              customCommand.count += 1;
+            }
+            // Save custom command counts to files
+            writeJsonFile<CustomCommandsJson>(pathCustomCommands, {
+              $schema: "./customCommands.schema.json",
+              ...customCommands,
+            })
+              .then(() => {
+                loggerMain.info("Custom commands were saved");
+              })
+              .catch(loggerMain.error);
           })
           .catch((err) => {
             loggerMain.error(err as Error);

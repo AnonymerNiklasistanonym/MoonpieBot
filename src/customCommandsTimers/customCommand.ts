@@ -1,23 +1,18 @@
 // Local imports
 import { createLogFunc, typeGuardLog } from "../logging";
-import {
-  errorMessageIdUndefined,
-  errorMessageUserNameUndefined,
-  logTwitchMessageCommandDetected,
-  logTwitchMessageCommandReply,
-} from "../commands";
 import { fileExists, readJsonFile } from "../other/fileOperations";
 import {
   parseTwitchBadgeLevel,
   TwitchBadgeLevels,
 } from "../other/twitchBadgeParser";
+import { errorMessageIdUndefined } from "../commands";
 import { messageParser } from "../messageParser";
 // Type imports
 import type { CustomJson } from "./createExampleFiles";
 import type { LogFunc } from "../logging";
 import type { Logger } from "winston";
 import type { Plugins } from "../messageParser";
-import type { TwitchChatHandler } from "../twitch";
+import type { TwitchMessageCommandHandler } from "../twitch";
 
 /**
  * The logging ID of this command.
@@ -292,133 +287,125 @@ export const isCustomCommandsJson = (
 
 export const pluginRegexGroupId = "REGEX_GROUP";
 
-interface HandleMessageDataCheckCustomCommand {
+export interface CommandHandleCustomCommandData {
   /**
-   * The custom command that should be checked.
+   * The regex groups matched by the custom command regex.
    */
-  command: CustomCommand;
+  regexGroups: RegExpMatchArray;
 }
 
-export const checkCustomCommand: TwitchChatHandler<
-  HandleMessageDataCheckCustomCommand,
-  boolean
-> = async (
-  client,
-  channel,
-  tags,
-  message,
-  data,
-  globalStrings,
-  globalPlugins,
-  globalMacros,
-  logger
-): Promise<boolean> => {
-  if (tags.id === undefined) {
-    throw errorMessageIdUndefined();
-  }
-  if (tags.username === undefined) {
-    throw errorMessageUserNameUndefined();
-  }
-
-  // Check if the user is allowed to run the command (level)
-  if (data.command.userLevel !== undefined) {
-    switch (parseTwitchBadgeLevel(tags)) {
-      case TwitchBadgeLevels.BROADCASTER:
-        break;
-      case TwitchBadgeLevels.MODERATOR:
-        if (data.command.userLevel === "broadcaster") {
-          return false;
+export const getCustomCommand = (
+  customCommand: CustomCommand
+): TwitchMessageCommandHandler<CommandHandleCustomCommandData> => {
+  return {
+    info: {
+      groupId: LOG_ID_COMMAND_CUSTOM_COMMAND,
+      id: customCommand.id,
+    },
+    detect: (tags, message) => {
+      // Check if the user is allowed to run the command (level)
+      if (customCommand.userLevel !== undefined) {
+        switch (parseTwitchBadgeLevel(tags)) {
+          case TwitchBadgeLevels.BROADCASTER:
+            break;
+          case TwitchBadgeLevels.MODERATOR:
+            if (customCommand.userLevel === "broadcaster") {
+              return false;
+            }
+            break;
+          case TwitchBadgeLevels.VIP:
+            if (
+              customCommand.userLevel === "broadcaster" ||
+              customCommand.userLevel === "mod"
+            ) {
+              return false;
+            }
+            break;
+          case TwitchBadgeLevels.NONE:
+            if (
+              customCommand.userLevel === "broadcaster" ||
+              customCommand.userLevel === "mod" ||
+              customCommand.userLevel === "vip"
+            ) {
+              return false;
+            }
+            break;
         }
-        break;
-      case TwitchBadgeLevels.VIP:
+      }
+      // Check if the user is allowed to run the command (cooldown)
+      const currentTimestamp = new Date().getTime();
+      if (customCommand.cooldownInS !== undefined) {
+        const lastTimestamp = customCommand.timestampLastExecution
+          ? customCommand.timestampLastExecution
+          : 0;
         if (
-          data.command.userLevel === "broadcaster" ||
-          data.command.userLevel === "mod"
+          currentTimestamp - lastTimestamp <=
+          customCommand.cooldownInS * 1000
         ) {
+          //createLogFunc(logger, LOG_ID_MODULE_CUSTOM_COMMAND).debug(
+          //  `Custom command '${customCommand.id}' won't be executed because of a cooldown of ${customCommand.cooldownInS}s`
+          //);
           return false;
         }
-        break;
-      case TwitchBadgeLevels.NONE:
-        if (
-          data.command.userLevel === "broadcaster" ||
-          data.command.userLevel === "mod" ||
-          data.command.userLevel === "vip"
-        ) {
-          return false;
-        }
-        break;
-    }
-  }
-
-  // eslint-disable-next-line security/detect-non-literal-regexp
-  const regex = new RegExp(data.command.regexString);
-  const match = message.match(regex);
-  if (!match) {
-    return false;
-  }
-
-  logTwitchMessageCommandDetected(
-    logger,
-    tags.id,
-    [tags.username ? `#${tags.username}` : "undefined", message],
-    LOG_ID_COMMAND_CUSTOM_COMMAND,
-    data.command.id ? data.command.id : regex.toString(),
-    LOG_ID_MODULE_CUSTOM_COMMAND
-  );
-
-  // Check if the user is allowed to run the command (cooldown)
-  const currentTimestamp = new Date().getTime();
-  if (data.command.cooldownInS !== undefined) {
-    const lastTimestamp = data.command.timestampLastExecution
-      ? data.command.timestampLastExecution
-      : 0;
-    if (currentTimestamp - lastTimestamp <= data.command.cooldownInS * 1000) {
-      createLogFunc(logger, LOG_ID_MODULE_CUSTOM_COMMAND).debug(
-        `Custom command '${data.command.id}' won't be executed because of a cooldown of ${data.command.cooldownInS}s`
-      );
+      }
+      // eslint-disable-next-line security/detect-non-literal-regexp
+      const regex = new RegExp(customCommand.regexString);
+      const match = message.match(regex);
+      if (match) {
+        return {
+          message,
+          messageId: tags.id,
+          userName: tags.username,
+          data: { regexGroups: match },
+        };
+      }
       return false;
-    }
-  }
-
-  const pluginsCommand: Plugins = new Map(globalPlugins);
-  pluginsCommand.set(pluginRegexGroupId, (_, regexGroupIndex, signature) => {
-    if (signature === true) {
-      return {
-        type: "signature",
-        argument: "regexGroupIndex",
-      };
-    }
-    if (regexGroupIndex === undefined || regexGroupIndex.length === 0) {
-      throw Error("Regex group index was undefined or empty");
-    }
-    return `${match[parseInt(regexGroupIndex)]}`;
-  });
-
-  if (data.command.channels.find((a) => `#${a}` === channel)) {
-    const parsedMessage = await messageParser(
-      data.command.message,
+    },
+    handle: async (
+      client,
+      channel,
+      tags,
+      data,
       globalStrings,
-      pluginsCommand,
+      globalPlugins,
       globalMacros,
       logger
-    );
-    const sentMessage = await client.say(channel, parsedMessage);
+    ) => {
+      if (tags.id === undefined) {
+        throw errorMessageIdUndefined();
+      }
+      const pluginsCommand: Plugins = new Map(globalPlugins);
+      pluginsCommand.set(
+        pluginRegexGroupId,
+        (_, regexGroupIndex, signature) => {
+          if (signature === true) {
+            return {
+              type: "signature",
+              argument: "regexGroupIndex",
+            };
+          }
+          if (regexGroupIndex === undefined || regexGroupIndex.length === 0) {
+            throw Error("Regex group index was undefined or empty");
+          }
+          return `${data.regexGroups[parseInt(regexGroupIndex)]}`;
+        }
+      );
 
-    logTwitchMessageCommandReply(
-      logger,
-      tags.id,
-      sentMessage,
-      "custom_command",
-      data.command.id ? data.command.id : regex.toString()
-    );
-  }
+      const parsedMessage = await messageParser(
+        customCommand.message,
+        globalStrings,
+        pluginsCommand,
+        globalMacros,
+        logger
+      );
+      const sentMessage = await client.say(channel, parsedMessage);
 
-  // Update the last executed timestamp when there is a cooldown
-  if (data.command.cooldownInS) {
-    data.command.timestampLastExecution = currentTimestamp;
-  }
-
-  return true;
+      return {
+        replyToMessageId: tags.id,
+        sentMessage,
+      };
+    },
+  };
 };
 
 export interface CustomCommandsData {
@@ -442,7 +429,7 @@ export const loadCustomCommandsFromFile = async (
         `Loaded custom commands file '${filePath}' does not match its definition`
       );
     }
-    const newCustomCommands = data.commands;
+    const newCustomCommands = customCommands;
     const newCustomCommandsGlobalData = data.data;
     for (const newCustomCommand of newCustomCommands) {
       loggerCustomCommands.debug(

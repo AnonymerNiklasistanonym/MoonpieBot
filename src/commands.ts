@@ -1,12 +1,7 @@
 // Package imports
 import { deprecate } from "util";
 // Local imports
-import {
-  logTwitchMessageDetected,
-  logTwitchMessageReply,
-  TwitchChatHandlerCommandDetect,
-  TwitchChatHandlerSuccessfulReply,
-} from "./twitch";
+import { logTwitchMessageDetected, logTwitchMessageReply } from "./twitch";
 // Type imports
 import type { Logger } from "winston";
 
@@ -27,35 +22,6 @@ export const logTwitchMessageCommandReply = deprecate(
   },
   "Stop using this function pls"
 );
-
-export const twitchChatCommandDetected = <DATA>(
-  logger: Logger,
-  commandDetected: TwitchChatHandlerCommandDetect<DATA>
-) => {
-  logTwitchMessageCommandDetected(
-    logger,
-    commandDetected.messageId,
-    [
-      commandDetected.userName ? `#${commandDetected.userName}` : "UNDEFINED",
-      commandDetected.message,
-    ],
-    commandDetected.commandId,
-    commandDetected.subcommandId,
-    commandDetected.detectorId
-  );
-};
-
-export const twitchChatCommandReply = (
-  logger: Logger,
-  commandReply: TwitchChatHandlerSuccessfulReply
-) => {
-  logTwitchMessageReply(
-    logger,
-    commandReply.replyToMessageId,
-    commandReply.sentMessage,
-    `${commandReply.commandId}:${commandReply.subcommandId}`
-  );
-};
 
 export const logTwitchMessageCommandDetected = (
   logger: Logger,
@@ -78,6 +44,7 @@ export enum CommandErrorCode {
   MESSAGE_ID_UNDEFINED = "MESSAGE_ID_UNDEFINED",
   USER_NAME_UNDEFINED = "USER_NAME_UNDEFINED",
   USER_ID_UNDEFINED = "USER_ID_UNDEFINED",
+  ENABLED_COMMANDS_UNDEFINED = "ENABLED_COMMANDS_UNDEFINED",
 }
 
 export interface CommandError extends Error {
@@ -105,5 +72,13 @@ export const errorMessageUserIdUndefined = () => {
     "Unable to reply to message! (userId is undefined)"
   );
   error.code = CommandErrorCode.USER_ID_UNDEFINED;
+  return error;
+};
+
+export const errorMessageEnabledCommandsUndefined = () => {
+  const error: CommandError = Error(
+    "Unable to detect message! (enabled commands is undefined)"
+  );
+  error.code = CommandErrorCode.ENABLED_COMMANDS_UNDEFINED;
   return error;
 };

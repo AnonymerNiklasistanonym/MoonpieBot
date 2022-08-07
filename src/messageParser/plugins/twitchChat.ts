@@ -45,7 +45,7 @@ export const pluginsTwitchChat = (
       if (signature) {
         return { type: "signature" };
       }
-      return channel;
+      return channel.slice(1);
     },
   },
 ];

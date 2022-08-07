@@ -16,6 +16,7 @@ import type { TwitchChatHandler } from "../../twitch";
  * @param tags Twitch chat state (message id, user name, ...).
  * @param _message The current Twitch message.
  * @param _data Chat handler specific data.
+ * @param _enabledCommands The commands that were enabled.
  * @param globalStrings Global message strings.
  * @param globalPlugins Global plugins.
  * @param globalMacros Global macros.
@@ -27,6 +28,7 @@ export const commandAbout: TwitchChatHandler = async (
   tags,
   _message,
   _data,
+  _enabledCommands,
   globalStrings,
   globalPlugins,
   globalMacros,
