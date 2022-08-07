@@ -24,7 +24,7 @@ import {
 import { createLogFunc } from "../../logging";
 import { getProcessWindowTitle } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
-import { OsuCommands } from "../chat_handler_commands";
+import { OsuCommands } from "../../info/commands";
 // Type imports
 import type { OsuApiV2Credentials } from "../osu";
 import type { StreamCompanionConnection } from "../../streamcompanion";

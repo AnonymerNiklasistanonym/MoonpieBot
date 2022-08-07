@@ -13,7 +13,7 @@ export const binaryName = name.toLowerCase();
 /** The usages of the program. */
 export const usages = [
   {
-    signature: `[OPTIONS]`,
+    signature: "[OPTIONS]",
   },
 ];
 

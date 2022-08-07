@@ -1,4 +1,5 @@
 // Local imports
+// TODO Move that function to a separate file
 import { createMessageForMessageParser } from "../messageParser";
 import { pluginRandomNumber } from "../messageParser/plugins/general";
 // Type imports

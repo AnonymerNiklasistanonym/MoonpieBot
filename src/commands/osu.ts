@@ -10,7 +10,7 @@ import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
 import { commandScore } from "./osu/score";
 import { logTwitchMessageCommandDetected } from "../commands";
-import { OsuCommands } from "./chat_handler_commands";
+import { OsuCommands } from "../info/commands";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
 import { handleTwitchCommand, TwitchChatHandler } from "../twitch";

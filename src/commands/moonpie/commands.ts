@@ -2,7 +2,6 @@ import {
   errorMessageIdUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import {
   moonpieCommandsAbout,
   moonpieCommandsAdd,
@@ -15,7 +14,9 @@ import {
   moonpieCommandsRemove,
   moonpieCommandsSet,
 } from "../../strings/moonpie/commands";
+import { LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 import { messageParserById } from "../../messageParser";
+import { MoonpieCommands } from "../../info/commands";
 // Type imports
 import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";

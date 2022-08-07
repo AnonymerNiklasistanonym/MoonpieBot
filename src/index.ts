@@ -29,8 +29,9 @@ import {
 import { cliHelpGenerator } from "./cli";
 import { createCustomCommandTimerExampleFiles } from "./customCommandsTimers/createExampleFiles";
 import { genericStringSorter } from "./other/genericStringSorter";
+import { getVersionFromObject } from "./version";
 import { main } from "./main";
-import { versionString } from "./info/version";
+import { version } from "./info/version";
 
 /**
  * The logging ID of this module.
@@ -47,6 +48,7 @@ const entryPoint = async () => {
     // ----------------------------------------------------------
 
     // Change the title of the process/terminal
+    const versionString = getVersionFromObject(version);
     process.title = `${name} ${versionString}`;
 
     // ----------------------------------------------------------

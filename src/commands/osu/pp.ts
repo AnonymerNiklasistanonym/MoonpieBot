@@ -15,7 +15,7 @@ import {
 } from "../../messageParser/macros/osuPpRequest";
 import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
-import { OsuCommands } from "../chat_handler_commands";
+import { OsuCommands } from "../../info/commands";
 // Type imports
 import type { OsuApiV2Credentials } from "../osu";
 import type { TwitchMessageCommandHandler } from "../../twitch";

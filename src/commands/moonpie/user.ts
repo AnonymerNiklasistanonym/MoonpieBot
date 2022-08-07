@@ -5,7 +5,6 @@ import {
   errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import {
   MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntryId,
@@ -24,7 +23,9 @@ import {
   moonpieUserSet,
   moonpieUserSetNaNError,
 } from "../../strings/moonpie/user";
+import { LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 import { messageParserById } from "../../messageParser";
+import { MoonpieCommands } from "../../info/commands";
 import { moonpieDb } from "../../database/moonpieDb";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports

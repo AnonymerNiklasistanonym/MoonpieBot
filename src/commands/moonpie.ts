@@ -9,6 +9,7 @@ import { commandClaim } from "./moonpie/claim";
 import { commandCommands } from "./moonpie/commands";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { logTwitchMessageCommandDetected } from "../commands";
+import { MoonpieCommands } from "../info/commands";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
 import type { TwitchChatHandler } from "../twitch";
@@ -21,18 +22,6 @@ export const LOG_ID_COMMAND_MOONPIE = "moonpie";
  * The logging ID of this module.
  */
 export const LOG_ID_MODULE_MOONPIE = "moonpie";
-
-export enum MoonpieCommands {
-  ABOUT = "about",
-  ADD = "add",
-  CLAIM = "claim",
-  COMMANDS = "commands",
-  DELETE = "delete",
-  GET = "get",
-  LEADERBOARD = "leaderboard",
-  REMOVE = "remove",
-  SET = "set",
-}
 
 /**
  * Regex to recognize all possible commands that start with `!moonpie`.

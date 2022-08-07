@@ -1,9 +1,9 @@
 // Package imports
 import path from "path";
 // Local imports
-import { MoonpieCommands } from "../commands/moonpie";
-import { OsuCommands } from "../commands/chat_handler_commands";
-import { SpotifyCommands } from "../commands/chat_handler_commands";
+import { MoonpieCommands } from "./commands";
+import { OsuCommands } from "./commands";
+import { SpotifyCommands } from "./commands";
 // Type imports
 import type { CliEnvVariableInformation } from "../cli";
 

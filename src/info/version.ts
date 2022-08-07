@@ -2,8 +2,6 @@
  * Version information
  */
 
-// Local imports
-import { getVersionFromObject } from "../version";
 // Type imports
 import type { Version } from "../version";
 
@@ -16,8 +14,3 @@ export const version: Version = {
   patch: 16,
   beta: true,
 };
-
-/**
- * The version of the program as a string.
- */
-export const versionString = getVersionFromObject(version);

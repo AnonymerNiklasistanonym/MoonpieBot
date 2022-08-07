@@ -4,7 +4,6 @@ import {
   errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import {
   MacroMoonpieClaim,
   macroMoonpieClaimId,
@@ -15,7 +14,9 @@ import {
   moonpieCommandReplyAlreadyClaimed,
   moonpieCommandReplyClaim,
 } from "../../strings/moonpie/commandReply";
+import { LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 import { messageParserById } from "../../messageParser";
+import { MoonpieCommands } from "../../info/commands";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
 import type { TwitchChatHandler } from "../../twitch";

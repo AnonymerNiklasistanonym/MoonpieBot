@@ -3,7 +3,8 @@ import fs from "fs";
 import path from "path";
 // Local imports
 import { name, sourceCodeUrl } from "../src/info/general";
-import { versionString } from "../src/info/version";
+import { getVersionFromObject } from "../src/version";
+import { version } from "../src/info/version";
 
 const rootPath = path.join(__dirname, "..");
 
@@ -22,7 +23,9 @@ const createWindowsInstallerConfigFile = (outputPath: string) => {
   outputString += `!define PRODUCT "${name}"\n`;
   outputString += `!define PRODUCT_LOWERCASE "${name.toLowerCase()}"\n`;
   outputString += ";Define version of the product\n";
-  outputString += `!define PRODUCT_VERSION "${versionString.slice(1)}"\n`;
+  outputString += `!define PRODUCT_VERSION "${getVersionFromObject(
+    version
+  ).slice(1)}"\n`;
   outputString += ";Define URL of the product\n";
   outputString += `!define PRODUCT_URL "${sourceCodeUrl}"\n`;
 

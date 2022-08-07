@@ -6,7 +6,7 @@ import {
 import { LOG_ID_COMMAND_SPOTIFY } from "../spotify";
 import { messageParserById } from "../../messageParser";
 import { spotifyCommandReplySong } from "../../strings/spotify/commandReply";
-import { SpotifyCommands } from "../chat_handler_commands";
+import { SpotifyCommands } from "../../info/commands";
 // Type imports
 import type { TwitchMessageCommandHandler } from "../../twitch";
 

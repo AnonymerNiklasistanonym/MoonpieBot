@@ -46,9 +46,6 @@ const convertRegexToString = (regex: RegExp) => {
   return regexString.slice(1, indexLastSlash);
 };
 
-// TODO Define the plugins that are missing in another file so they can be referenced and documented
-// TODO Define argument separators somewhere
-
 export const customCommandsInformation: CustomCommand[] = [
   {
     id: `Reply > ${pluginTwitchChatUserId}`,

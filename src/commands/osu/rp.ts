@@ -19,7 +19,7 @@ import {
   osuCommandReplyRpNotFound,
 } from "../../strings/osu/commandReply";
 import { messageParserById } from "../../messageParser";
-import { OsuCommands } from "../chat_handler_commands";
+import { OsuCommands } from "../../info/commands";
 // Type imports
 import type { CommandDetectorPpRpData, CommandHandlerPpRpData } from "./pp";
 import type { TwitchMessageCommandHandler } from "../../twitch";

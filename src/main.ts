@@ -70,14 +70,14 @@ import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
-import { OsuCommands } from "./commands/chat_handler_commands";
+import { OsuCommands } from "./info/commands";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
 import { pluginsTwitchApi } from "./messageParser/plugins/twitchApi";
 import { pluginsTwitchChat } from "./messageParser/plugins/twitchChat";
 import { pyramidSpammer } from "./other/pyramidSpammer";
 import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
-import { versionString } from "./info/version";
+import { version } from "./info/version";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
 import type { CustomCommandsJson } from "./customCommandsTimers/customCommand";
@@ -87,6 +87,7 @@ import type { Logger } from "winston";
 import type { OsuIrcBotSendMessageFunc } from "./osuirc";
 import type SpotifyWebApi from "spotify-web-api-node";
 import type { StreamCompanionConnection } from "./streamcompanion";
+import { getVersionFromObject } from "./version";
 
 /**
  * The logging ID of this module.
@@ -694,7 +695,7 @@ export const main = async (
         osuIrcBot,
         "main",
         osuIrcRequestTarget,
-        `UwU (${name} ${versionString})`,
+        `UwU (${name} ${getVersionFromObject(version)})`,
         logger
       );
     } catch (err) {
