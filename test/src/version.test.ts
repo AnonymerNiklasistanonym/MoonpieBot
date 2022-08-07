@@ -3,11 +3,11 @@ import chai from "chai";
 import { describe } from "mocha";
 // Local imports
 import { getVersionFromObject } from "../../src/version";
-import { versionString } from "../../src/info/version";
+import { version } from "../../src/info/version";
 
 describe("version", () => {
   it("versionString", () => {
-    chai.expect(versionString).to.be.a("string");
+    chai.expect(getVersionFromObject(version)).to.be.a("string");
   });
   it("getVersionFromObject", () => {
     chai

@@ -375,7 +375,6 @@ export const getCustomCommand = (
       globalMacros,
       logger
     ) => {
-      console.log({ data });
       if (tags.id === undefined) {
         throw errorMessageIdUndefined();
       }
