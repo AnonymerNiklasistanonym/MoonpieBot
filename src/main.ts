@@ -65,6 +65,7 @@ import { createStreamCompanionConnection } from "./streamcompanion";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { generatePluginsAndMacrosMap } from "./messageParser";
 import { getPluginOsuStreamCompanion } from "./messageParser/plugins/streamcompanion";
+import { getVersionFromObject } from "./version";
 import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
@@ -87,7 +88,6 @@ import type { Logger } from "winston";
 import type { OsuIrcBotSendMessageFunc } from "./osuirc";
 import type SpotifyWebApi from "spotify-web-api-node";
 import type { StreamCompanionConnection } from "./streamcompanion";
-import { getVersionFromObject } from "./version";
 
 /**
  * The logging ID of this module.
@@ -496,7 +496,7 @@ export const main = async (
             clientId: parseInt(osuApiClientId),
             clientSecret: osuApiClientSecret,
           },
-          osuDefaultId: parseInt(osuApiDefaultId),
+          defaultOsuId: parseInt(osuApiDefaultId),
           enableOsuBeatmapRequests,
           enableOsuBeatmapRequestsDetailed,
           osuIrcBot,

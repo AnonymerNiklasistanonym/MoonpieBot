@@ -9,13 +9,15 @@ import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
 import { commandScore } from "./osu/score";
+import { handleTwitchCommand } from "../twitch";
 import { logTwitchMessageCommandDetected } from "../commands";
 import { OsuCommands } from "../info/commands";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
-import { handleTwitchCommand, TwitchChatHandler } from "../twitch";
+import type { CommandHandlerNpData } from "./osu/np";
+import type { CommandHandlerPpRpData } from "./osu/pp";
 import type { Client as IrcClient } from "irc";
-import type { StreamCompanionConnection } from "../streamcompanion";
+import type { TwitchChatHandler } from "../twitch";
 
 /**
  * The logging ID of this command.
@@ -124,14 +126,13 @@ let globalLastBeatmapId: number | undefined;
 let globalRuntimeToggleEnableBeatmapRequests = true;
 let globalRuntimeToggleDisableBeatmapRequestsCustomMessage: string | undefined;
 
-export interface OsuChatHandlerData {
-  osuApiV2Credentials?: OsuApiV2Credentials;
-  osuDefaultId?: number;
+export interface OsuChatHandlerData
+  extends CommandHandlerPpRpData,
+    CommandHandlerNpData {
   enableOsuBeatmapRequests?: boolean;
   enableOsuBeatmapRequestsDetailed?: boolean;
   osuIrcBot?: (id: string) => IrcClient;
   osuIrcRequestTarget?: string;
-  osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
 }
 
 export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (

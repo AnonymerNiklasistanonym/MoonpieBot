@@ -175,7 +175,7 @@ export type TwitchChatCommandDetector<DATA = Record<never, never>> = (
  *
  * @tparam DATA A custom data object for the command.
  */
-export type TwitchChatCommandHandler<DATA = undefined> = (
+export type TwitchChatCommandHandler<DATA = Record<never, never>> = (
   client: Readonly<Client>,
   channel: Readonly<string>,
   /**
@@ -206,12 +206,12 @@ export interface TwitchChatCommandInfo {
 }
 
 export interface TwitchMessageCommandHandler<
-  DATA_HANDLE extends DATA_DETECTOR,
+  DATA_HANDLE = Record<never, never>,
   DATA_DETECTOR = Record<never, never>
 > {
   info: TwitchChatCommandInfo;
   detect: TwitchChatCommandDetector<DATA_DETECTOR>;
-  handle: TwitchChatCommandHandler<DATA_HANDLE>;
+  handle: TwitchChatCommandHandler<DATA_HANDLE & DATA_DETECTOR>;
 }
 
 // eslint-disable-next-line jsdoc/require-returns

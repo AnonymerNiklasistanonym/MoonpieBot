@@ -20,7 +20,7 @@ import { OsuCommands } from "../../info/commands";
 import type { OsuApiV2Credentials } from "../osu";
 import type { TwitchMessageCommandHandler } from "../../twitch";
 
-export interface CommandHandlerPpRpData extends CommandDetectorPpRpData {
+export interface CommandHandlerPpRpData {
   /**
    * The osu API (v2) credentials.
    */
