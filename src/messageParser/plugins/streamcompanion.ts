@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import type { StreamCompanionData } from "../../streamcompanion";
+
+// Type imports
 import type { MessageParserPlugin } from "../plugins";
+import type { StreamCompanionConnection } from "../../streamcompanion";
 
 export const pluginOsuStreamCompanionId = "OSU_STREAMCOMPANION";
 export enum MacroOsuStreamCompanion {
@@ -20,7 +22,7 @@ export enum MacroOsuStreamCompanion {
 }
 
 export const getPluginOsuStreamCompanion = (
-  streamCompanionDataFunc: () => StreamCompanionData | undefined
+  streamCompanionDataFunc: StreamCompanionConnection
 ): MessageParserPlugin => {
   return {
     id: pluginOsuStreamCompanionId,

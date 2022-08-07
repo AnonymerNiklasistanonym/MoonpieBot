@@ -1,5 +1,6 @@
 /*
- * Twitch Client/Connection
+ * Twitch Client/Connection setup and general functions surrounding chat message
+ * handling.
  */
 
 // Package imports
@@ -8,9 +9,9 @@ import { client as tmiClient } from "tmi.js";
 import { createLogFunc } from "./logging";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
+import type { Macros, Plugins } from "./messageParser";
 import type { Logger } from "winston";
 import type { Strings } from "./strings";
-import type { Macros, Plugins } from "./messageParser";
 
 /**
  * The logging ID of this module.

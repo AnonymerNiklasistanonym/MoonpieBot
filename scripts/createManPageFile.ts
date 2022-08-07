@@ -2,7 +2,6 @@
 import fs from "fs";
 import path from "path";
 // Local imports
-import { ENV_VARIABLE_PREFIX, envVariableInformation } from "../src/info/env";
 import {
   author,
   binaryName,
@@ -17,6 +16,7 @@ import {
   usages,
   websiteUrl,
 } from "../src/info/general";
+import { ENV_VARIABLE_PREFIX, envVariableInformation } from "../src/info/env";
 import { cliOptionInformation } from "../src/info/cli";
 import { getVersion } from "../src/version";
 
@@ -136,7 +136,9 @@ const createManPageFile = (outputPath: string) => {
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.writeFile(outputPath, outputString, (err) => {
-    if (err) throw err;
+    if (err) {
+      throw err;
+    }
   });
 };
 

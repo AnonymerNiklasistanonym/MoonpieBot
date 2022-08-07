@@ -3,8 +3,8 @@ import * as sqlite from "sqlite3";
 import { Database } from "sqlite3";
 import { promises as fs } from "fs";
 // Local imports
-import { ErrorCodePostRequest } from "./requests";
 import { createLogFunc } from "../../logging";
+import { ErrorCodePostRequest } from "./requests";
 // Type imports
 import type { Logger } from "winston";
 

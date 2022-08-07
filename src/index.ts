@@ -4,32 +4,32 @@
  */
 
 // Package imports
-import path from "path";
 import dotenv from "dotenv";
 import { promises as fs } from "fs";
+import path from "path";
 // Local imports
+import { binaryName, name, usages } from "./info/general";
 import { CliOption, cliOptionInformation } from "./info/cli";
+import {
+  createEnvVariableDocumentation,
+  getEnvVariableValueOrDefault,
+  printEnvVariablesToConsole,
+} from "./env";
+import { createLogFunc, createLogger } from "./logging";
+import { createStringsVariableDocumentation, defaultStrings } from "./strings";
 import {
   ENV_VARIABLE_PREFIX,
   EnvVariable,
   envVariableInformation,
 } from "./info/env";
 import {
-  getEnvVariableValueOrDefault,
-  printEnvVariablesToConsole,
-  createEnvVariableDocumentation,
-} from "./env";
-import { createLogFunc, createLogger } from "./logging";
-import { createStringsVariableDocumentation, defaultStrings } from "./strings";
-import {
   fileNameEnvExample,
   fileNameEnvStringsExample,
 } from "./info/fileNames";
 import { cliHelpGenerator } from "./cli";
+import { createCustomCommandTimerExampleFiles } from "./customCommandsTimers/createExampleFiles";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getVersion } from "./version";
-import { binaryName, name, usages } from "./info/general";
-import { createCustomCommandTimerExampleFiles } from "./customCommandsTimers/createExampleFiles";
 import { main } from "./main";
 
 /**

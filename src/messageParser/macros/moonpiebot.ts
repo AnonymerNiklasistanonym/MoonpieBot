@@ -7,6 +7,7 @@ import {
   sourceCodeUrl,
 } from "../../info/general";
 import { getVersion } from "../../version";
+// Type imports
 import type { MessageParserMacro } from "../macros";
 
 export enum MacroMoonpieBot {

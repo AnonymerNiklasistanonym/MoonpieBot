@@ -1,8 +1,8 @@
 // Package imports
-import SpotifyWebApi from "spotify-web-api-node";
 import fetch from "node-fetch";
 import http from "http";
 import open from "open";
+import SpotifyWebApi from "spotify-web-api-node";
 // Local imports
 import { createLogFunc } from "./logging";
 // Type imports
@@ -15,6 +15,9 @@ const LOG_ID_MODULE_SPOTIFY = "spotify";
 
 const REDIRECT_URL = "http://localhost";
 const REDIRECT_PORT = 8888;
+
+const OK_STATUS_CODE = 200;
+const FORBIDDEN_STATUS_CODE = 403;
 
 /**
  * Get current song and recently played songs on Spotify.
@@ -62,7 +65,7 @@ export const setupSpotifyAuthentication = async (
     );
     if (req.url && req.headers.host) {
       if (req.url.endsWith("/")) {
-        res.writeHead(200);
+        res.writeHead(OK_STATUS_CODE);
         res.end(
           `<html><body></body><script>window.location = window.location.href.replace('#', '?');</script></html>`
         );
@@ -84,7 +87,7 @@ export const setupSpotifyAuthentication = async (
             .then(() => {
               // Tell user that the page can now be closed and clear the private tokens from the URL
               const refreshToken = spotifyApi.getRefreshToken();
-              res.writeHead(200);
+              res.writeHead(OK_STATUS_CODE);
               res.end(
                 `<html><style>.spoiler{
                   color: black;
@@ -99,7 +102,7 @@ export const setupSpotifyAuthentication = async (
               logSpotify.info("Spotify API connection was successful");
             })
             .catch((err) => {
-              res.writeHead(403);
+              res.writeHead(FORBIDDEN_STATUS_CODE);
               res.end(
                 `<html><body>Spotify API connection was not successful: ${
                   (err as Error).message
@@ -107,14 +110,14 @@ export const setupSpotifyAuthentication = async (
               );
             });
         } else {
-          res.writeHead(403);
+          res.writeHead(FORBIDDEN_STATUS_CODE);
           res.end(
             `<html><body>Spotify API connection was not successful: Code was not found!</body></html>`
           );
         }
       }
     } else {
-      res.writeHead(403);
+      res.writeHead(FORBIDDEN_STATUS_CODE);
       res.end("Error");
     }
   });
@@ -138,7 +141,7 @@ export const setupSpotifyAuthentication = async (
   // Request authentication if no refresh token is found
   if (spotifyApi.getRefreshToken() === undefined) {
     const response = await fetch(url);
-    if (response.status === 200) {
+    if (response.ok) {
       await open(response.url);
     }
   }

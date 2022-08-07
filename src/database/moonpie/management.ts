@@ -1,7 +1,9 @@
-import { createLogFunc } from "../../logging";
-import type { Logger } from "winston";
+// Local imports
 import * as database from "../core";
 import * as moonpie from "./requests";
+import { createLogFunc } from "../../logging";
+// Type imports
+import type { Logger } from "winston";
 
 /**
  * Create tables if not existing.

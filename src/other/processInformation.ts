@@ -1,7 +1,7 @@
 // Package imports
-import { Readable } from "stream";
 import csv from "csv-parser";
 import { exec } from "child_process";
+import { Readable } from "stream";
 
 interface WindowsTasklistVOutputElement {
   imageName: string;
@@ -37,7 +37,9 @@ export const getProcessWindowTitle = async (
 
   return new Promise((resolve, reject) => {
     exec(cmd, (err, stdout /*, _stderr*/) => {
-      if (err) return reject(err);
+      if (err) {
+        return reject(err);
+      }
 
       const s = new Readable();
       s.push(stdout);
@@ -98,7 +100,9 @@ export const isProcessRunning = async (
 
   return new Promise((resolve, reject) => {
     exec(cmd, (err, stdout /*, _stderr*/) => {
-      if (err) reject(err);
+      if (err) {
+        reject(err);
+      }
 
       resolve(stdout.toLowerCase().indexOf(processName.toLowerCase()) > -1);
     });

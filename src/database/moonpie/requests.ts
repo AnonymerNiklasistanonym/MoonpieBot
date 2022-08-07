@@ -1,5 +1,5 @@
-import type { Logger } from "winston";
 import * as database from "../core";
+import type { Logger } from "winston";
 
 /** Errors that can happen during moonpie entry creations. */
 export enum CreateError {

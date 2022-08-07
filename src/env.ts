@@ -6,16 +6,16 @@ import {
   generateFileDocumentation,
 } from "./other/splitTextAtLength";
 // Type imports
-import type {
-  FileDocumentationPartValue,
-  FileDocumentationParts,
-} from "./other/splitTextAtLength";
 import {
   ENV_VARIABLE_PREFIX,
   EnvVariable,
   EnvVariableBlock,
   envVariableInformation,
 } from "./info/env";
+import type {
+  FileDocumentationParts,
+  FileDocumentationPartValue,
+} from "./other/splitTextAtLength";
 
 /**
  * Environment variable handling.
@@ -29,7 +29,7 @@ export const printEnvVariablesToConsole = (
     // eslint-disable-next-line security/detect-object-injection
     const envVariableName = getEnvVariableName(envVariable);
     const envVariableValue = getEnvVariableValue(envVariable);
-    let legacyString = undefined;
+    let legacyString;
 
     const envVariableInformation = getEnvVariableValueInformation(envVariable);
     let envVariableValueString = "Not found!";

@@ -7,9 +7,9 @@ import {
   fileNameCustomTimersExample,
   fileNameCustomTimersSchema,
 } from "../info/fileNames";
-import { writeJsonFile } from "../other/fileOperations";
 import { customCommandsInformation } from "../info/customCommands";
 import { customTimersInformation } from "../info/customTimers";
+import { writeJsonFile } from "../other/fileOperations";
 // Type imports
 import type { CustomCommandsJson } from "./customCommand";
 import type { CustomTimersJson } from "./customTimer";

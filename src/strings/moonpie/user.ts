@@ -1,15 +1,15 @@
 import {
   MacroMoonpieLeaderboardEntry,
-  MacroMoonpieUserDelete,
-  MacroMoonpieUserNeverClaimed,
-  MacroMoonpieUserSet,
   macroMoonpieLeaderboardEntryId,
+  MacroMoonpieUserDelete,
   macroMoonpieUserDeleteId,
+  MacroMoonpieUserNeverClaimed,
   macroMoonpieUserNeverClaimedId,
+  MacroMoonpieUserSet,
   macroMoonpieUserSetId,
 } from "../../messageParser/macros/moonpie";
-import { MOONPIE_STRING_ID } from "../moonpie";
 import { createMessageForMessageParser } from "../../messageParser";
+import { MOONPIE_STRING_ID } from "../moonpie";
 import { pluginIfNotEqual } from "../../messageParser/plugins/general";
 import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
 

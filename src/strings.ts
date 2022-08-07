@@ -20,13 +20,17 @@ import { osuCommandReply } from "./strings/osu/commandReply";
 import { spotifyCommandReply } from "./strings/spotify/commandReply";
 // Type imports
 import type {
-  FileDocumentationPartValue,
   FileDocumentationParts,
+  FileDocumentationPartValue,
 } from "./other/splitTextAtLength";
 import type { Logger } from "winston";
 import type { MessageParserMacro } from "./messageParser/macros";
 import type { MessageParserPlugin } from "./messageParser/plugins";
 
+/**
+ * The global Strings data structure that maps from a unique string ID to a
+ * string value that can be overridden.
+ */
 export type Strings = Map<string, string>;
 
 /**
@@ -47,7 +51,7 @@ export const generateStringList = (stringEntries: StringEntry[]) => {
 /**
  * The default values for all strings.
  */
-export const defaultStrings: Strings = new Map<string, string>([
+export const defaultStrings: Strings = new Map([
   ...generateStringList(moonpieCommandReply),
   ...generateStringList(moonpieCommands),
   ...generateStringList(moonpieUser),
@@ -57,7 +61,7 @@ export const defaultStrings: Strings = new Map<string, string>([
 ]);
 
 export const updateStringsMapWithCustomEnvStrings = (
-  strings: Map<string, string> = new Map(defaultStrings),
+  strings: Strings = new Map(defaultStrings),
   logger: Logger
 ) => {
   const logStrings = createLogFunc(logger, LOG_ID_MODULE_STRINGS, {

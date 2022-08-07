@@ -1,3 +1,5 @@
+/* eslint-disable no-magic-numbers */
+
 // Package imports
 import chai from "chai";
 import { describe } from "mocha";

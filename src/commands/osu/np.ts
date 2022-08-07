@@ -2,20 +2,20 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
+  errorMessageIdUndefined,
+  errorMessageUserNameUndefined,
+  logTwitchMessageCommandReply,
+} from "../../commands";
+import {
+  errorMessageOsuApiCredentialsUndefined,
   LOG_ID_CHAT_HANDLER_OSU,
   LOG_ID_COMMAND_OSU,
   OsuCommands,
-  errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import {
   MacroOsuWindowTitle,
   macroOsuWindowTitleId,
 } from "../../messageParser/macros/osuWindowTitle";
-import {
-  errorMessageIdUndefined,
-  errorMessageUserNameUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
 import {
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
@@ -31,7 +31,7 @@ import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
-import type { StreamCompanionData } from "../../streamcompanion";
+import type { StreamCompanionConnection } from "../../streamcompanion";
 import type { Strings } from "../../strings";
 
 /**
@@ -51,11 +51,13 @@ import type { Strings } from "../../strings";
 export const regexNowPlaying =
   /^(?:.+?)\s-\s\s*(.+?)\s*\s-\s\s*(.+?)\s*\[\s*([^\s[\]]+?)\s*\]$/;
 
+const ROUND_TO_1_DIGIT_FACTOR = 10;
+
 export const roundToOneDecimalPlace = (num: undefined | number) => {
   if (num === undefined) {
     return 0;
   }
-  return Math.round(num * 10) / 10;
+  return Math.round(num * ROUND_TO_1_DIGIT_FACTOR) / ROUND_TO_1_DIGIT_FACTOR;
 };
 
 /**
@@ -79,9 +81,7 @@ export const commandNp = async (
   messageId: string | undefined,
   userName: string | undefined,
   osuApiV2Credentials: OsuApiV2Credentials | undefined,
-  osuStreamCompanionCurrentMapData:
-    | (() => StreamCompanionData | undefined)
-    | undefined,
+  osuStreamCompanionCurrentMapData: StreamCompanionConnection | undefined,
   globalStrings: Strings,
   globalPlugins: Plugins,
   globalMacros: Macros,
@@ -149,7 +149,7 @@ export const commandNp = async (
     if (windowTitle !== undefined && windowTitle !== "osu!") {
       const match = windowTitle.match(regexNowPlaying);
       if (match != null) {
-        let mapId = undefined;
+        let mapId;
         try {
           const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
             osuApiV2Credentials.clientId,
@@ -173,6 +173,7 @@ export const commandNp = async (
               const diffNameCanBeFound = a.beatmaps?.find(
                 (b) =>
                   b.version.trim().toLocaleLowerCase() ===
+                  // eslint-disable-next-line no-magic-numbers
                   match[3].trim().toLocaleLowerCase()
               );
               return titleIsTheSame && diffNameCanBeFound;
@@ -181,6 +182,7 @@ export const commandNp = async (
               const exactBeatmapDiff = exactMatch.beatmaps?.find(
                 (a) =>
                   a.version.trim().toLocaleLowerCase() ===
+                  // eslint-disable-next-line no-magic-numbers
                   match[3].trim().toLocaleLowerCase()
               );
               if (exactBeatmapDiff) {
@@ -197,6 +199,7 @@ export const commandNp = async (
           new Map([
             [MacroOsuWindowTitle.TITLE, `${match[2]}`],
             [MacroOsuWindowTitle.ARTIST, `${match[1]}`],
+            // eslint-disable-next-line no-magic-numbers
             [MacroOsuWindowTitle.VERSION, `${match[3]}`],
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             [MacroOsuWindowTitle.MAP_ID_VIA_API, `${mapId}`],

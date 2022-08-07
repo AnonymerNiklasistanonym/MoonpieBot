@@ -63,9 +63,17 @@ export type FileDocumentationParts =
   | FileDocumentationPartValue
   | FileDocumentationPartNewline;
 
+const DEFAULT_MAX_LINE_LENGTH = 80;
+const COMMENT_CHARACTER = "#";
+const SPACING_CHARACTER = " ";
+const LIST_CHARACTER = "-";
+const DIVIDER_CHARACTER = "-";
+const LIST_CHARACTER_AND_SPACING = `${LIST_CHARACTER}${SPACING_CHARACTER}`;
+const COMMENT_CHARACTER_AND_SPACING = `${COMMENT_CHARACTER}${SPACING_CHARACTER}`;
+
 export const generateFileDocumentation = (
   input: FileDocumentationParts[],
-  maxLineLength = 80
+  maxLineLength = DEFAULT_MAX_LINE_LENGTH
 ) => {
   let data = "";
 
@@ -77,48 +85,77 @@ export const generateFileDocumentation = (
       case FileDocumentationPartType.TEXT:
         data += splitTextAtLength(
           inputPart.content,
-          maxLineLength - (inputPart.isComment ? 1 : 2)
+          maxLineLength -
+            (inputPart.isComment
+              ? COMMENT_CHARACTER.length
+              : COMMENT_CHARACTER_AND_SPACING.length)
         )
-          .map((a) => `#${inputPart.isComment ? "" : " "}${a}\n`)
+          .map(
+            (a) =>
+              `${COMMENT_CHARACTER}${
+                inputPart.isComment ? "" : SPACING_CHARACTER
+              }${a}\n`
+          )
           .join("");
         break;
       case FileDocumentationPartType.HEADING:
-        data += "#".repeat(maxLineLength) + "\n";
-        data += splitTextAtLength(inputPart.title, maxLineLength - 2)
-          .map((a) => `# ${a}\n`)
+        data += COMMENT_CHARACTER.repeat(maxLineLength) + "\n";
+        data += splitTextAtLength(
+          inputPart.title,
+          maxLineLength - COMMENT_CHARACTER_AND_SPACING.length
+        )
+          .map((a) => `${COMMENT_CHARACTER_AND_SPACING}${a}\n`)
           .join("");
         if (inputPart.description !== undefined) {
-          data += "# " + "-".repeat(maxLineLength - 2) + "\n";
-          data += splitTextAtLength(inputPart.description, maxLineLength - 2)
-            .map((a) => `# ${a}\n`)
+          data +=
+            COMMENT_CHARACTER_AND_SPACING +
+            DIVIDER_CHARACTER.repeat(
+              maxLineLength - COMMENT_CHARACTER_AND_SPACING.length
+            ) +
+            "\n";
+          data += splitTextAtLength(
+            inputPart.description,
+            maxLineLength - COMMENT_CHARACTER_AND_SPACING.length
+          )
+            .map((a) => `${COMMENT_CHARACTER_AND_SPACING}${a}\n`)
             .join("");
         }
-        data += "#".repeat(maxLineLength) + "\n";
+        data += COMMENT_CHARACTER.repeat(maxLineLength) + "\n";
         break;
       case FileDocumentationPartType.VALUE:
         if (inputPart.title !== undefined) {
-          data += `# ${inputPart.title}\n`;
+          data += `${COMMENT_CHARACTER_AND_SPACING}${inputPart.title}\n`;
         }
         if (inputPart.description !== undefined) {
           data += splitTextAtLength(
             inputPart.description,
-            maxLineLength - 2 - inputPart.prefix.length - 1
+            maxLineLength -
+              COMMENT_CHARACTER_AND_SPACING.length -
+              inputPart.prefix.length -
+              SPACING_CHARACTER.length
           )
             .map(
               (a, index) =>
-                `# ${
+                `${COMMENT_CHARACTER_AND_SPACING}${
                   index === 0
                     ? inputPart.prefix
-                    : " ".repeat(inputPart.prefix.length)
-                } ${a}\n`
+                    : SPACING_CHARACTER.repeat(inputPart.prefix.length)
+                }${SPACING_CHARACTER}${a}\n`
             )
             .join("");
         }
         if (inputPart.lists !== undefined && inputPart.lists.length > 0) {
           for (const list of inputPart.lists) {
-            data += `# ${" ".repeat(inputPart.prefix.length)} ${list[0]}:\n`;
+            data += `${COMMENT_CHARACTER_AND_SPACING}${SPACING_CHARACTER.repeat(
+              inputPart.prefix.length + 1
+            )}${list[0]}:\n`;
             data += list[1]
-              .map((a) => `# ${" ".repeat(inputPart.prefix.length)} - ${a}\n`)
+              .map(
+                (a) =>
+                  `${COMMENT_CHARACTER_AND_SPACING}${SPACING_CHARACTER.repeat(
+                    inputPart.prefix.length + 1
+                  )}${LIST_CHARACTER_AND_SPACING}${a}\n`
+              )
               .join("");
           }
         }
@@ -127,18 +164,20 @@ export const generateFileDocumentation = (
           inputPart.properties.length > 0
         ) {
           for (const property of inputPart.properties) {
-            data += `# ${" ".repeat(inputPart.prefix.length)} ${property[0]}: ${
-              property[1]
-            }\n`;
+            data += `${COMMENT_CHARACTER_AND_SPACING}${SPACING_CHARACTER.repeat(
+              inputPart.prefix.length
+            )} ${property[0]}: ${property[1]}\n`;
           }
         }
         if (inputPart.infos !== undefined && inputPart.infos.length > 0) {
           for (const info of inputPart.infos) {
-            data += `# ${" ".repeat(inputPart.prefix.length)} ${info}\n`;
+            data += `${COMMENT_CHARACTER_AND_SPACING}${SPACING_CHARACTER.repeat(
+              inputPart.prefix.length
+            )} ${info}\n`;
           }
         }
         if (inputPart.isComment) {
-          data += "#";
+          data += COMMENT_CHARACTER;
         }
         if (inputPart.value !== undefined) {
           data += `${inputPart.value}\n`;

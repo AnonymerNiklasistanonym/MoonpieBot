@@ -204,6 +204,8 @@ export const cliHelpGenerator = (
   return cliOutputGenerator(helpOutput, outputOptions);
 };
 
+const MINIMUM_DESCRIPTION_LENGTH_ON_THE_SIDE = 30;
+
 /**
  * Generic method to generate CLI output.
  *
@@ -251,15 +253,19 @@ export const cliOutputGenerator = (
             }
             // If the maximum list element length does not leave enough room for
             // a description put the description on a new line
-            if (options.maxLineLength - maximumListElementLength < 30) {
+            if (
+              options.maxLineLength - maximumListElementLength <
+              MINIMUM_DESCRIPTION_LENGTH_ON_THE_SIDE
+            ) {
               return [
                 currentLine,
                 ...description
                   .split("\n")
                   .map((b) =>
-                    splitTextAtLength(b, options.maxLineLength - 4).map(
-                      (c) => `    ${c}`
-                    )
+                    splitTextAtLength(
+                      b,
+                      options.maxLineLength - "    ".length
+                    ).map((c) => `    ${c}`)
                   )
                   .flat(),
               ].join("\n");
@@ -270,7 +276,7 @@ export const cliOutputGenerator = (
               .map((b) =>
                 splitTextAtLength(
                   b,
-                  options.maxLineLength - maximumListElementLength - 2
+                  options.maxLineLength - maximumListElementLength - "  ".length
                 )
               )
               .flat();

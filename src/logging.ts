@@ -26,9 +26,9 @@ export interface LoggerInformation {
 }
 
 export const logFormat = (logInfo: LoggerInformation) => {
-  if (logInfo.timestamp !== undefined && logInfo.service !== undefined) {
-    if (logInfo.section !== undefined) {
-      if (logInfo.subsection !== undefined) {
+  if (logInfo.timestamp && logInfo.service) {
+    if (logInfo.section) {
+      if (logInfo.subsection) {
         return `[${logInfo.timestamp}] ${logInfo.service}#${logInfo.section}#${logInfo.subsection} ${logInfo.level}: ${logInfo.message}`;
       }
       return `[${logInfo.timestamp}] ${logInfo.service}#${logInfo.section} ${logInfo.level}: ${logInfo.message}`;
@@ -113,5 +113,21 @@ export const createLogFunc = (
   };
 };
 
-export const typeGuardLog = <T>(message: string, arg: T) =>
-  `${message}: '${typeof arg}'/'${JSON.stringify(arg)}'`;
+/**
+ * Helper method for consistent and helpful type guard check warnings.
+ *
+ * @param expectedMessage The type guard message about what is weird.
+ * @param value The value that is currently being checked.
+ * @param property The name of the property that is being checked.
+ * @param index The index of the property that is being checked in an array.
+ * @returns String that contains information about the property and what is bad plus its actual value and how it looks like.
+ */
+export const typeGuardLog = <T>(
+  expectedMessage: string,
+  value: T,
+  property?: string,
+  index?: number
+) =>
+  `${
+    property ? `'${property}'${index !== undefined ? `[${index}]` : ""}: ` : ""
+  }expected ${expectedMessage} ('${typeof value}'/'${JSON.stringify(value)}')`;

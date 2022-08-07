@@ -3,32 +3,35 @@
  */
 
 // Package imports
-import path from "path";
 import { ApiClient } from "@twurple/api";
+import path from "path";
 import { StaticAuthProvider } from "@twurple/auth";
-import irc from "irc";
 // Local imports
-import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuirc";
-import { EnvVariable, EnvVariableNone, EnvVariableOnOff } from "./info/env";
-import { MacroOsuApi, macroOsuApiId } from "./messageParser/macros/osuApi";
-import {
-  getEnvVariableValueOrDefault,
-  getEnvVariableValueOrUndefined,
-} from "./env";
-import { OsuCommands, osuChatHandler } from "./commands/osu";
 import {
   checkCustomCommand,
   loadCustomCommandsFromFile,
 } from "./customCommandsTimers/customCommand";
+import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuirc";
 import {
+  createStringsVariableDocumentation,
   defaultStrings,
   updateStringsMapWithCustomEnvStrings,
-  createStringsVariableDocumentation,
 } from "./strings";
+import { EnvVariable, EnvVariableNone, EnvVariableOnOff } from "./info/env";
+import {
+  getEnvVariableValueOrDefault,
+  getEnvVariableValueOrUndefined,
+} from "./env";
+import {
+  getPluginsCustomCommand,
+  getPluginsCustomCommandData,
+} from "./messageParser/plugins/customCommand";
 import {
   loadCustomTimersFromFile,
   registerTimer,
 } from "./customCommandsTimers/customTimer";
+import { MacroOsuApi, macroOsuApiId } from "./messageParser/macros/osuApi";
+import { osuChatHandler, OsuCommands } from "./commands/osu";
 import {
   pluginConvertToShortNumber,
   pluginHelp,
@@ -60,21 +63,17 @@ import {
 import { createLogFunc } from "./logging";
 import { createStreamCompanionConnection } from "./streamcompanion";
 import { createTwitchClient } from "./twitch";
-import {
-  getPluginsCustomCommand,
-  getPluginsCustomCommandData,
-} from "./messageParser/plugins/customCommand";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { generatePluginsAndMacrosMap } from "./messageParser";
+import { getPluginOsuStreamCompanion } from "./messageParser/plugins/streamcompanion";
 import { getVersion } from "./version";
 import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
-import { pluginsTwitchChat } from "./messageParser/plugins/twitchChat";
-import { getPluginOsuStreamCompanion } from "./messageParser/plugins/streamcompanion";
 import { pluginsTwitchApi } from "./messageParser/plugins/twitchApi";
+import { pluginsTwitchChat } from "./messageParser/plugins/twitchChat";
 import { pyramidSpammer } from "./other/pyramidSpammer";
 import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
@@ -84,8 +83,9 @@ import type { CustomCommandsJson } from "./customCommandsTimers/customCommand";
 import type { CustomTimer } from "./customCommandsTimers/customTimer";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
+import type { OsuIrcBotSendMessageFunc } from "./osuirc";
 import type SpotifyWebApi from "spotify-web-api-node";
-import type { StreamCompanionData } from "./streamcompanion";
+import type { StreamCompanionConnection } from "./streamcompanion";
 
 /**
  * The logging ID of this module.
@@ -215,8 +215,8 @@ export const main = async (
     logger
   );
   // Twitch API
-  let twitchApiClient: undefined | ApiClient = undefined;
-  if (twitchApiClientId !== undefined && twitchApiAccessToken !== undefined) {
+  let twitchApiClient: undefined | ApiClient;
+  if (twitchApiClientId && twitchApiAccessToken) {
     const authProviderScopes = new StaticAuthProvider(
       twitchApiClientId,
       twitchApiAccessToken
@@ -226,11 +226,8 @@ export const main = async (
     });
   }
   // > Spotify API
-  let spotifyWebApi: undefined | SpotifyWebApi = undefined;
-  if (
-    spotifyApiClientId !== undefined &&
-    spotifyApiClientSecret !== undefined
-  ) {
+  let spotifyWebApi: undefined | SpotifyWebApi;
+  if (spotifyApiClientId && spotifyApiClientSecret) {
     spotifyWebApi = await setupSpotifyAuthentication(
       spotifyApiClientId,
       spotifyApiClientSecret,
@@ -239,28 +236,20 @@ export const main = async (
     );
   }
   // > osu! API
-  const enableOsu =
-    osuApiClientId !== undefined &&
-    osuApiClientSecret !== undefined &&
-    osuApiDefaultId !== undefined;
-  const enableOsuIrc =
-    osuIrcPassword !== undefined &&
-    osuIrcUsername !== undefined &&
-    osuIrcRequestTarget !== undefined;
+  const enableOsu = osuApiClientId && osuApiClientSecret && osuApiDefaultId;
+  const enableOsuIrc = osuIrcPassword && osuIrcUsername && osuIrcRequestTarget;
   const enableOsuBeatmapRequests =
     osuApiBeatmapRequests === EnvVariableOnOff.ON;
   const enableOsuBeatmapRequestsDetailed =
     osuApiBeatmapRequestsDetailed === EnvVariableOnOff.ON;
-  let osuIrcBot: undefined | ((id: string) => irc.Client) = undefined;
+  let osuIrcBot: undefined | OsuIrcBotSendMessageFunc;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
     osuIrcBot = (id: string) =>
       createOsuIrcConnection(osuIrcUsername, osuIrcPassword, id, logger);
   }
   // > osu! StreamCompanion
-  let osuStreamCompanionCurrentMapData:
-    | undefined
-    | (() => StreamCompanionData | undefined) = undefined;
-  if (osuStreamCompanionUrl !== undefined) {
+  let osuStreamCompanionCurrentMapData: undefined | StreamCompanionConnection;
+  if (osuStreamCompanionUrl) {
     osuStreamCompanionCurrentMapData = createStreamCompanionConnection(
       osuStreamCompanionUrl,
       logger
@@ -299,7 +288,7 @@ export const main = async (
   if (
     moonpieEnableCommands.length > 0 &&
     !(
-      moonpieEnableCommands.length == 1 &&
+      moonpieEnableCommands.length === 1 &&
       moonpieEnableCommands.includes(EnvVariableNone.NONE)
     )
   ) {
@@ -310,9 +299,14 @@ export const main = async (
         pathDatabase,
         logger
       );
+      const PAD_DAY_MONTH_TO_2_DIGITS_FACTOR = 2;
       const dateObject = new Date();
-      const dateDay = `0${dateObject.getDate()}`.slice(-2);
-      const DateMonth = `0${dateObject.getMonth() + 1}`.slice(-2);
+      const dateDay = `0${dateObject.getDate()}`.slice(
+        -PAD_DAY_MONTH_TO_2_DIGITS_FACTOR
+      );
+      const DateMonth = `0${dateObject.getMonth() + 1}`.slice(
+        -PAD_DAY_MONTH_TO_2_DIGITS_FACTOR
+      );
       const dateYear = dateObject.getFullYear();
       const pathDatabaseBackup = path.join(
         logDir,

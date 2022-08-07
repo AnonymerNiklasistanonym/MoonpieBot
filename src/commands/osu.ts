@@ -13,7 +13,7 @@ import { logTwitchMessageCommandDetected } from "../commands";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
 import type { Client as IrcClient } from "irc";
-import type { StreamCompanionData } from "../streamcompanion";
+import type { StreamCompanionConnection } from "../streamcompanion";
 import type { TwitchChatHandler } from "../twitch";
 
 /**
@@ -205,10 +205,9 @@ export interface OsuApiV2Credentials {
   clientSecret: string;
 }
 
-let lastBeatmapId: number | undefined = undefined;
+let lastBeatmapId: number | undefined;
 let runtimeToggleEnableBeatmapRequests = true;
-let runtimeToggleDisableBeatmapRequestsCustomMessage: string | undefined =
-  undefined;
+let runtimeToggleDisableBeatmapRequestsCustomMessage: string | undefined;
 
 export interface OsuChatHandlerData {
   osuApiV2Credentials?: OsuApiV2Credentials;
@@ -217,7 +216,7 @@ export interface OsuChatHandlerData {
   enableOsuBeatmapRequestsDetailed?: boolean;
   osuIrcBot?: (id: string) => IrcClient;
   osuIrcRequestTarget?: string;
-  osuStreamCompanionCurrentMapData?: () => StreamCompanionData | undefined;
+  osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
   enabled: (OsuCommands | string)[];
 }
 
@@ -457,6 +456,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
               tags.username,
               data.osuApiV2Credentials,
               beatmapId,
+              // eslint-disable-next-line no-magic-numbers
               match[3],
               data.enableOsuBeatmapRequestsDetailed,
               data.osuIrcBot,

@@ -28,7 +28,7 @@
                 "commands"
             ],
             "additionalProperties": false,
-            "description": "Structured data object that contains all information about custom commands and their data."
+            "description": "Structured, serializable data object that contains all information about custom commands and their data."
         },
         "CustomCommand": {
             "type": "object",
@@ -89,7 +89,8 @@
                 "mod",
                 "vip",
                 "everyone"
-            ]
+            ],
+            "description": "All the possible supported user levels of a single custom command."
         },
         "CustomCommandData": {
             "type": "object",

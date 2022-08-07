@@ -13,10 +13,10 @@ import {
 } from "../other/twitchBadgeParser";
 import { messageParser } from "../messageParser";
 // Type imports
-import type { Plugins } from "../messageParser";
 import type { CustomJson } from "./createExampleFiles";
 import type { LogFunc } from "../logging";
 import type { Logger } from "winston";
+import type { Plugins } from "../messageParser";
 import type { TwitchChatHandler } from "../twitch";
 
 /**
@@ -104,21 +104,21 @@ export const isCustomCommand = (
     });
   }
   if (typeof arg !== "object") {
-    logFunc?.warn(typeGuardLog("not an object", arg));
+    logFunc?.warn(typeGuardLog("object", arg));
     return false;
   }
   if (typeof arg.id !== "string") {
-    logFunc?.warn(typeGuardLog("'id' != string", arg.id));
+    logFunc?.warn(typeGuardLog("string", arg.id, "id"));
     return false;
   }
   if (!Array.isArray(arg.channels)) {
-    logFunc?.warn(typeGuardLog("'channels' != array", arg.channels));
+    logFunc?.warn(typeGuardLog("array", arg.channels, "channels"));
     return false;
   }
   if (
     !arg.channels.every((a, index) => {
       if (typeof a !== "string") {
-        logFunc?.warn(typeGuardLog(`'channels'[${index}] != string`, a));
+        logFunc?.warn(typeGuardLog(`string`, a, "channels", index));
         return false;
       }
       return true;
@@ -127,11 +127,11 @@ export const isCustomCommand = (
     return false;
   }
   if (typeof arg.message !== "string") {
-    logFunc?.warn(typeGuardLog("'message' != string", arg.message));
+    logFunc?.warn(typeGuardLog("string", arg.message, "message"));
     return false;
   }
   if (typeof arg.regexString !== "string") {
-    logFunc?.warn(typeGuardLog("'regexString' != string", arg.regexString));
+    logFunc?.warn(typeGuardLog("string", arg.regexString, "regexString"));
     return false;
   }
   if (
@@ -140,14 +140,15 @@ export const isCustomCommand = (
   ) {
     logFunc?.warn(
       typeGuardLog(
-        "'userLevel' != CustomCommandUserLevel/undefined",
-        arg.userLevel
+        "CustomCommandUserLevel/undefined",
+        arg.userLevel,
+        "userLevel"
       )
     );
     return false;
   }
   if (typeof arg.count !== "undefined" && typeof arg.count !== "number") {
-    logFunc?.warn(typeGuardLog("'count' != number/undefined", arg.count));
+    logFunc?.warn(typeGuardLog("number/undefined", arg.count, "count"));
     return false;
   }
   if (
@@ -156,8 +157,9 @@ export const isCustomCommand = (
   ) {
     logFunc?.warn(
       typeGuardLog(
-        "'timestampLastExecution' != number/undefined",
-        arg.timestampLastExecution
+        "number/undefined",
+        arg.timestampLastExecution,
+        "timestampLastExecution"
       )
     );
     return false;
@@ -167,7 +169,7 @@ export const isCustomCommand = (
     typeof arg.cooldownInS !== "number"
   ) {
     logFunc?.warn(
-      typeGuardLog("'cooldownInS' != number/undefined", arg.cooldownInS)
+      typeGuardLog("number/undefined", arg.cooldownInS, "cooldownInS")
     );
     return false;
   }
@@ -176,7 +178,7 @@ export const isCustomCommand = (
     typeof arg.description !== "string"
   ) {
     logFunc?.warn(
-      typeGuardLog("'description' != string/undefined", arg.description)
+      typeGuardLog("string/undefined", arg.description, "description")
     );
     return false;
   }
@@ -201,15 +203,15 @@ export const isCustomCommandData = (
     });
   }
   if (typeof arg !== "object") {
-    logFunc?.warn(typeGuardLog("not an object", arg));
+    logFunc?.warn(typeGuardLog("object", arg));
     return false;
   }
   if (typeof arg.id !== "string") {
-    logFunc?.warn(typeGuardLog("'id' != string", arg.id));
+    logFunc?.warn(typeGuardLog("string", arg.id, "id"));
     return false;
   }
   if (typeof arg.value !== "string" && typeof arg.value !== "number") {
-    logFunc?.warn(typeGuardLog("'value' != string/number", arg.value));
+    logFunc?.warn(typeGuardLog("string/number", arg.value, "value"));
     return false;
   }
   if (
@@ -217,7 +219,7 @@ export const isCustomCommandData = (
     typeof arg.description !== "string"
   ) {
     logFunc?.warn(
-      typeGuardLog("'description' != string/undefined", arg.description)
+      typeGuardLog("string/undefined", arg.description, "description")
     );
     return false;
   }
@@ -242,24 +244,22 @@ export const isCustomCommandsJson = (
     });
   }
   if (typeof arg !== "object") {
-    logFunc?.warn(typeGuardLog("not an object", arg));
+    logFunc?.warn(typeGuardLog("object", arg));
     return false;
   }
   if (typeof arg.$schema !== "string" && typeof arg.$schema !== "undefined") {
-    logFunc?.warn(typeGuardLog("'$schema' != string/undefined", arg.$schema));
+    logFunc?.warn(typeGuardLog("string/undefined", arg.$schema, "$schema"));
     return false;
   }
   if (!Array.isArray(arg.commands)) {
-    logFunc?.warn(typeGuardLog("'commands' != array", arg.commands));
+    logFunc?.warn(typeGuardLog("array", arg.commands, "commands"));
     return false;
   }
   if (
     !arg.commands
       .map((a, index) => {
         if (!isCustomCommand(a, logger)) {
-          logFunc?.warn(
-            typeGuardLog(`'commands'[${index}] != CustomCommand`, a)
-          );
+          logFunc?.warn(typeGuardLog(`CustomCommand`, a, "commands", index));
           return false;
         }
         return true;
@@ -270,16 +270,14 @@ export const isCustomCommandsJson = (
   }
   if (typeof arg.data !== "undefined") {
     if (!Array.isArray(arg.data)) {
-      logFunc?.warn(typeGuardLog("'data' != array", arg.data));
+      logFunc?.warn(typeGuardLog("array", arg.data, "data"));
       return false;
     }
     if (
       !arg.data
         .map((a, index) => {
           if (!isCustomCommandData(a, logger)) {
-            logFunc?.warn(
-              typeGuardLog(`'data'[${index}] != CustomCommandData`, a)
-            );
+            logFunc?.warn(typeGuardLog("CustomCommandData", a, "data", index));
             return false;
           }
           return true;

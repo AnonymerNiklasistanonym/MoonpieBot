@@ -36,8 +36,8 @@ import {
   pluginIfTrue,
   pluginTimeInSToStopwatchString,
 } from "../../messageParser/plugins/general";
-import { OSU_STRING_ID } from "../osu";
 import { createMessageForMessageParser } from "../../messageParser";
+import { OSU_STRING_ID } from "../osu";
 import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
 import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
 
@@ -640,7 +640,7 @@ export const osuCommandReplyPp = {
               name: pluginOsuUserId,
               key: MacroOsuUser.ACC,
             },
-            " accuracy, a max combo of ",
+            "%, a max combo of ",
             {
               type: "macro",
               name: pluginOsuUserId,

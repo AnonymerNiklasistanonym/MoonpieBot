@@ -4,8 +4,8 @@ import {
 } from "../../messageParser/macros/moonpiebot";
 import {
   MacroMoonpieClaim,
-  MacroMoonpieLeaderboardEntry,
   macroMoonpieClaimId,
+  MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntryId,
 } from "../../messageParser/macros/moonpie";
 import {
@@ -17,8 +17,8 @@ import {
   pluginTwitchChatUserId,
   pluginTwitchChatUserIdId,
 } from "../../messageParser/plugins/twitchChat";
-import { MOONPIE_STRING_ID } from "../moonpie";
 import { createMessageForMessageParser } from "../../messageParser";
+import { MOONPIE_STRING_ID } from "../moonpie";
 
 export const MOONPIE_COMMAND_REPLY_STRING_ID = `${MOONPIE_STRING_ID}_COMMAND_REPLY`;
 

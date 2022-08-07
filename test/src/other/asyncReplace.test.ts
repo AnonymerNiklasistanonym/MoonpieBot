@@ -10,6 +10,8 @@ const asyncTimeout = <T>(time: number, valueToReturn: T): Promise<T> => {
   });
 };
 
+const maxTimeout = 400;
+
 export default (): Mocha.Suite => {
   return describe("asyncReplace", () => {
     it("basics", async () => {
@@ -27,15 +29,17 @@ export default (): Mocha.Suite => {
       );
       chai.expect(testResult2).to.be.equal("T[abc]st 1234");
 
+      const timeoutIn10ms = 10;
       const testResult3 = await asyncReplace(testString1, testRegex2, () =>
-        asyncTimeout(10, "10")
+        asyncTimeout(timeoutIn10ms, "10")
       );
       chai.expect(testResult3).to.be.equal("T10st 1234");
 
+      const timeoutIn100ms = 100;
       const testResult4 = await asyncReplace(testString1, testRegex2, () =>
-        asyncTimeout(100, "100")
+        asyncTimeout(timeoutIn100ms, "100")
       );
       chai.expect(testResult4).to.be.equal("T100st 1234");
-    }).timeout(400);
+    }).timeout(maxTimeout);
   });
 };

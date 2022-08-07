@@ -1,8 +1,9 @@
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
-import type SpotifyWebApi from "spotify-web-api-node";
-import type { MessageParserPlugin } from "../plugins";
-import type { MacroDictionaryEntry } from "../../messageParser";
+// Type imports
 import type { ItemAlbum, ItemArtist } from "../../commands/spotify";
+import type { MacroDictionaryEntry } from "../../messageParser";
+import type { MessageParserPlugin } from "../plugins";
+import type SpotifyWebApi from "spotify-web-api-node";
 
 export const pluginSpotifySongId = "SPOTIFY_SONG";
 export const enum SpotifySongMacro {

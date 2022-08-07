@@ -1,7 +1,7 @@
 // Package imports
-import path from "path";
 import chai from "chai";
 import { describe } from "mocha";
+import path from "path";
 // Local imports
 import * as database from "../../../../src/database/core";
 import { getTestLogger } from "../../logger";

@@ -324,6 +324,7 @@ export const moonpieChatHandler: TwitchChatHandler<
         LOG_ID_MODULE_MOONPIE
       );
       const match = regexMoonpieSet.exec(message);
+      // eslint-disable-next-line no-magic-numbers
       if (match && match.length >= 3) {
         await commandUserSetCount(
           client,
@@ -358,6 +359,7 @@ export const moonpieChatHandler: TwitchChatHandler<
         LOG_ID_MODULE_MOONPIE
       );
       const match = regexMoonpieAdd.exec(message);
+      // eslint-disable-next-line no-magic-numbers
       if (match && match.length >= 3) {
         await commandUserSetCount(
           client,
@@ -392,6 +394,7 @@ export const moonpieChatHandler: TwitchChatHandler<
         LOG_ID_MODULE_MOONPIE
       );
       const match = regexMoonpieRemove.exec(message);
+      // eslint-disable-next-line no-magic-numbers
       if (match && match.length >= 3) {
         await commandUserSetCount(
           client,

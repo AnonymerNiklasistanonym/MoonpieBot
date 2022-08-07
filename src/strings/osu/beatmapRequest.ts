@@ -7,8 +7,8 @@ import {
 } from "../../messageParser/plugins/osuApi";
 import {
   MacroOsuBeatmapRequest,
-  MacroOsuBeatmapRequests,
   macroOsuBeatmapRequestId,
+  MacroOsuBeatmapRequests,
   macroOsuBeatmapRequestsId,
 } from "../../messageParser/macros/osuBeatmapRequest";
 import {
@@ -20,9 +20,9 @@ import {
   pluginIfTrue,
   pluginTimeInSToStopwatchString,
 } from "../../messageParser/plugins/general";
+import { createMessageForMessageParser } from "../../messageParser";
 import { OSU_IRC_NEWLINE } from "../../osuirc";
 import { OSU_STRING_ID } from "../osu";
-import { createMessageForMessageParser } from "../../messageParser";
 import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
 
 export const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;

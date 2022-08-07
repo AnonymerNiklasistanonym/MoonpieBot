@@ -1,8 +1,8 @@
-import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import {
   errorMessageIdUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
+import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import { messageParserById } from "../../messageParser";
 import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
 // Type imports

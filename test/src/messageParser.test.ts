@@ -1,3 +1,5 @@
+/* eslint-disable no-magic-numbers */
+
 // Package imports
 import { expect } from "chai";
 // Local imports

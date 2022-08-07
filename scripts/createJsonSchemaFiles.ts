@@ -1,11 +1,13 @@
 // Package imports
 import * as tsj from "ts-json-schema-generator";
-import fs from "fs";
 import path from "path";
 // Local imports
-import { createExampleFiles } from "../src/customCommandsTimers/createExampleFiles";
-import { outputNameCustomCommands } from "../src/customCommandsTimers/customCommand";
-import { outputNameCustomTimers } from "../src/customCommandsTimers/customTimer";
+import {
+  fileNameCustomCommandsSchema,
+  fileNameCustomTimersSchema,
+} from "../src/info/fileNames";
+import { createCustomCommandTimerExampleFiles } from "../src/customCommandsTimers/createExampleFiles";
+import { writeJsonFile } from "../src/other/fileOperations";
 
 const rootPath = path.join(__dirname, "..");
 
@@ -19,13 +21,13 @@ interface Config {
 const configs = [
   {
     type: "CustomCommandsJson",
-    outputPath: path.join(rootPath, `${outputNameCustomCommands}.schema.json`),
+    outputPath: path.join(rootPath, fileNameCustomCommandsSchema),
     inputPath: path.join(rootPath, "src", "other", "customCommand.ts"),
     tsConfigPath: path.join(rootPath, "tsconfig.json"),
   },
   {
     type: "CustomTimersJson",
-    outputPath: path.join(rootPath, `${outputNameCustomTimers}.schema.json`),
+    outputPath: path.join(rootPath, fileNameCustomTimersSchema),
     inputPath: path.join(rootPath, "src", "other", "customTimer.ts"),
     tsConfigPath: path.join(rootPath, "tsconfig.json"),
   },
@@ -44,12 +46,9 @@ const createJsonSchemaFile = (config: Config) => {
     })
     .createSchema(config.type);
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.writeFile(config.outputPath, JSON.stringify(schema, null, 4), (err) => {
-    if (err) throw err;
-  });
+  writeJsonFile(config.outputPath, schema).catch(console.error);
 };
 
 configs.forEach(createJsonSchemaFile);
 const configDir = path.join(__dirname, "..");
-createExampleFiles(configDir).catch(console.error);
+createCustomCommandTimerExampleFiles(configDir).catch(console.error);

@@ -1,21 +1,21 @@
 // Local imports
-import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
-import {
-  MacroMoonpieLeaderboardEntry,
-  MacroMoonpieUserDelete,
-  MacroMoonpieUserNeverClaimed,
-  MacroMoonpieUserSet,
-  macroMoonpieLeaderboardEntryId,
-  macroMoonpieUserDeleteId,
-  macroMoonpieUserNeverClaimedId,
-  macroMoonpieUserSetId,
-} from "../../messageParser/macros/moonpie";
 import {
   errorMessageIdUndefined,
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
+import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
+import {
+  MacroMoonpieLeaderboardEntry,
+  macroMoonpieLeaderboardEntryId,
+  MacroMoonpieUserDelete,
+  macroMoonpieUserDeleteId,
+  MacroMoonpieUserNeverClaimed,
+  macroMoonpieUserNeverClaimedId,
+  MacroMoonpieUserSet,
+  macroMoonpieUserSetId,
+} from "../../messageParser/macros/moonpie";
 import {
   moonpieUserDelete,
   moonpieUserGet,
@@ -24,9 +24,9 @@ import {
   moonpieUserSet,
   moonpieUserSetNaNError,
 } from "../../strings/moonpie/user";
-import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
+import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
 import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
@@ -146,7 +146,7 @@ export const commandUserSetCount = async (
     throw errorMessageUserIdUndefined();
   }
 
-  if (twitchBadgeLevel != TwitchBadgeLevels.BROADCASTER) {
+  if (twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER) {
     const errorMessage = await messageParserById(
       moonpieUserPermissionError.id,
       globalStrings,
@@ -289,7 +289,7 @@ export const commandUserDelete = async (
     throw errorMessageUserIdUndefined();
   }
 
-  if (twitchBadgeLevel != TwitchBadgeLevels.BROADCASTER) {
+  if (twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER) {
     const errorMessage = await messageParserById(
       moonpieUserPermissionError.id,
       globalStrings,

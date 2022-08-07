@@ -1,11 +1,11 @@
 // Package imports
 import path from "path";
 // Local imports
-import { createEnvVariableDocumentation } from "../src/env";
 import {
   createStringsVariableDocumentation,
   defaultStrings,
 } from "../src/strings";
+import { createEnvVariableDocumentation } from "../src/env";
 
 const configDir = path.join(__dirname, "..");
 createEnvVariableDocumentation(
@@ -14,5 +14,5 @@ createEnvVariableDocumentation(
 ).catch(console.error);
 createStringsVariableDocumentation(
   path.join(configDir, ".env.strings.example"),
-  defaultStrings,
+  defaultStrings
 ).catch(console.error);

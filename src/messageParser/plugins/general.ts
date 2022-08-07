@@ -527,6 +527,10 @@ export const pluginTimeInSToHumanReadableString: MessageParserPlugin = {
   },
 };
 
+const MIN_COUNT_UNTIL_S_HIDDEN = 2;
+const D_COUNT_UNTIL_H_HIDDEN = 1;
+const H_COUNT_UNTIL_MIN_HIDDEN = 1;
+
 export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
   id: "TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT",
   description: `Short version of ${pluginTimeInSToHumanReadableString.id} that discards smaller time units if bigger ones are given`,
@@ -560,14 +564,14 @@ export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
         `${secondsObject.days} day${secondsObject.days === 1 ? "" : "s"}`
       );
     }
-    if (!(yearsFound || secondsObject.days > 1)) {
+    if (!(yearsFound || secondsObject.days > D_COUNT_UNTIL_H_HIDDEN)) {
       if (secondsObject.hours > 0) {
         hoursFound = true;
         finalStringList.push(
           `${secondsObject.hours} hour${secondsObject.hours === 1 ? "" : "s"}`
         );
       }
-      if (!(daysFound || secondsObject.hours > 1)) {
+      if (!(daysFound || secondsObject.hours > H_COUNT_UNTIL_MIN_HIDDEN)) {
         if (secondsObject.minutes > 0) {
           finalStringList.push(
             `${secondsObject.minutes} minute${
@@ -575,7 +579,7 @@ export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
             }`
           );
         }
-        if (!(hoursFound || secondsObject.minutes > 10)) {
+        if (!(hoursFound || secondsObject.minutes > MIN_COUNT_UNTIL_S_HIDDEN)) {
           if (secondsObject.seconds > 0 || finalStringList.length === 0) {
             finalStringList.push(
               `${secondsObject.seconds} second${

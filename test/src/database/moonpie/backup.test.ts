@@ -1,11 +1,13 @@
+/* eslint-disable no-magic-numbers */
+
 // Package imports
 import chai from "chai";
 import { describe } from "mocha";
 import path from "path";
 // Local imports
 import { moonpieDb, moonpieDbBackup } from "../../../../src/database/moonpieDb";
-import { GeneralError } from "../../../../src/database/moonpie/requests";
 import { createAndSetupTables } from "../../../../src/database/moonpie/management";
+import { GeneralError } from "../../../../src/database/moonpie/requests";
 import { getTestLogger } from "../../logger";
 import { itAllowFail } from "../../allowFail";
 

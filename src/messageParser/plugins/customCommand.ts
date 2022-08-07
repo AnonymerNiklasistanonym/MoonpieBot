@@ -1,9 +1,9 @@
 // Type imports
-import type { MessageParserPlugin } from "../plugins";
 import type {
   CustomCommand,
   CustomCommandsJson,
 } from "../../customCommandsTimers/customCommand";
+import type { MessageParserPlugin } from "../plugins";
 
 export const pluginCustomCommandCountId = "COUNT";
 

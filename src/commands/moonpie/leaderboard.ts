@@ -1,12 +1,12 @@
+import {
+  errorMessageIdUndefined,
+  logTwitchMessageCommandReply,
+} from "../../commands";
 import { LOG_ID_COMMAND_MOONPIE, MoonpieCommands } from "../moonpie";
 import {
   MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntryId,
 } from "../../messageParser/macros/moonpie";
-import {
-  errorMessageIdUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
 import {
   moonpieCommandReplyLeaderboardEntry,
   moonpieCommandReplyLeaderboardPrefix,
@@ -18,6 +18,9 @@ import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { Strings } from "../../strings";
+
+const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 15;
+const MAX_LENGTH_OF_A_TWITCH_MESSAGE = 499;
 
 /**
  * Leaderboard command: Reply with the moonpie count leaderboard list (top 15).
@@ -47,7 +50,7 @@ export const commandLeaderboard = async (
 
   const moonpieEntries = await moonpieDb.getMoonpieLeaderboard(
     moonpieDbPath,
-    15,
+    NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH,
     logger
   );
 
@@ -83,8 +86,11 @@ export const commandLeaderboard = async (
 
   // Slice the message if too long
   const message =
-    messageLeaderboard.length > 499
-      ? messageLeaderboard.slice(0, 449 - 3) + "..."
+    messageLeaderboard.length > MAX_LENGTH_OF_A_TWITCH_MESSAGE
+      ? messageLeaderboard.slice(
+          0,
+          MAX_LENGTH_OF_A_TWITCH_MESSAGE - "...".length
+        ) + "..."
       : messageLeaderboard;
   const sentMessage = await client.say(channel, message);
 

@@ -28,7 +28,9 @@ const createWindowsInstallerConfigFile = (outputPath: string) => {
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.writeFile(outputPath, outputString, (err) => {
-    if (err) throw err;
+    if (err) {
+      throw err;
+    }
   });
 };
 

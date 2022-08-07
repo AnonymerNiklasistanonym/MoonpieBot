@@ -1,5 +1,5 @@
-import { MOONPIE_STRING_ID } from "../moonpie";
 import { createMessageForMessageParser } from "../../messageParser";
+import { MOONPIE_STRING_ID } from "../moonpie";
 import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
 
 export const MOONPIE_COMMANDS_STRING_ID = `${MOONPIE_STRING_ID}_COMMANDS`;

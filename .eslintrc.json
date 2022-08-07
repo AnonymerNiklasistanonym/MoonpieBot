@@ -26,6 +26,23 @@
   },
   "rules": {
     "prettier/prettier": "error",
+    "curly": "error",
+    "eqeqeq": [
+      "error",
+      "smart"
+    ],
+    "no-undef-init": "error",
+    "sort-imports": [
+      "error",
+      {
+        "ignoreCase": true,
+        "allowSeparatedGroups": true
+      }
+    ],
+    "no-lonely-if": "error",
+    "no-magic-numbers": ["error", {
+      "ignore": [-1,0,1,2,10,24,60,365,100,1000]
+    }],
     "jsdoc/require-param-type": "off",
     "jsdoc/require-returns-type": "off",
     "jsdoc/require-description-complete-sentence": "warn",
@@ -33,7 +50,7 @@
     "jsdoc/no-types": "error",
     "jsdoc/no-defaults": "error",
     "jsdoc/check-indentation": "error",
-    "jsdoc/check-line-alignment": "error"//,
+    "jsdoc/check-line-alignment": "error" //,
     //"sort-imports": ["warn"]
   }
 }

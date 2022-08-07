@@ -1,8 +1,8 @@
 // Package imports
 import cron from "node-cron";
 // Local imports
-import { fileExists, readJsonFile } from "../other/fileOperations";
 import { createLogFunc, typeGuardLog } from "../logging";
+import { fileExists, readJsonFile } from "../other/fileOperations";
 import { logTwitchMessageBroadcast } from "../twitch";
 import { messageParser } from "../messageParser";
 // Type imports
@@ -62,21 +62,21 @@ export const isCustomTimer = (
     });
   }
   if (typeof arg !== "object") {
-    logFunc?.warn(typeGuardLog("not an object", arg));
+    logFunc?.warn(typeGuardLog("object", arg));
     return false;
   }
   if (typeof arg.id !== "string") {
-    logFunc?.warn(typeGuardLog("'id' != string", arg.id));
+    logFunc?.warn(typeGuardLog("string", arg.id, "id"));
     return false;
   }
   if (!Array.isArray(arg.channels)) {
-    logFunc?.warn(typeGuardLog("'channels' != array", arg.channels));
+    logFunc?.warn(typeGuardLog("array", arg.channels, "channels"));
     return false;
   }
   if (
     !arg.channels.every((a, index) => {
       if (typeof a !== "string") {
-        logFunc?.warn(typeGuardLog(`'channels'[${index}] != string`, a));
+        logFunc?.warn(typeGuardLog("string", a, "channels", index));
         return false;
       }
       return true;
@@ -85,11 +85,11 @@ export const isCustomTimer = (
     return false;
   }
   if (typeof arg.message !== "string") {
-    logFunc?.warn(typeGuardLog("'message' != string", arg.message));
+    logFunc?.warn(typeGuardLog("string", arg.message, "message"));
     return false;
   }
   if (typeof arg.cronString !== "string") {
-    logFunc?.warn(typeGuardLog("'cronString' != string", arg.cronString));
+    logFunc?.warn(typeGuardLog("string", arg.cronString, "cronString"));
     return false;
   }
   return true;
@@ -113,22 +113,22 @@ export const isCustomTimersJson = (
     });
   }
   if (typeof arg !== "object") {
-    logFunc?.warn(typeGuardLog("not an object", arg));
+    logFunc?.warn(typeGuardLog("object", arg));
     return false;
   }
   if (typeof arg.$schema !== "string" && typeof arg.$schema !== "undefined") {
-    logFunc?.warn(typeGuardLog("'$schema' != string/undefined", arg.$schema));
+    logFunc?.warn(typeGuardLog("string/undefined", arg.$schema, "$schema"));
     return false;
   }
   if (!Array.isArray(arg.timers)) {
-    logFunc?.warn(typeGuardLog("'timers' != array", arg.timers));
+    logFunc?.warn(typeGuardLog("array", arg.timers, "timers"));
     return false;
   }
   if (
     !arg.timers
       .map((a, index) => {
         if (!isCustomTimer(a, logger)) {
-          logFunc?.warn(typeGuardLog(`'timers'[${index}] != CustomTimer`, a));
+          logFunc?.warn(typeGuardLog("CustomTimer", a, "timers", index));
           return false;
         }
         return true;

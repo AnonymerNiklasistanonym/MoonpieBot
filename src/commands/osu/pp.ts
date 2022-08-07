@@ -2,18 +2,18 @@
 import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
 import {
+  errorMessageIdUndefined,
+  logTwitchMessageCommandReply,
+} from "../../commands";
+import {
+  errorMessageOsuApiCredentialsUndefined,
   LOG_ID_COMMAND_OSU,
   OsuCommands,
-  errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import {
   MacroOsuPpRequest,
   macroOsuPpRequestId,
 } from "../../messageParser/macros/osuPpRequest";
-import {
-  errorMessageIdUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
 import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 // Type imports

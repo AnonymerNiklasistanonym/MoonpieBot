@@ -21,7 +21,7 @@
                 "timers"
             ],
             "additionalProperties": false,
-            "description": "Structured data object that contains all information about custom timers."
+            "description": "Structured, serializable data object that contains all information about custom timers."
         },
         "CustomTimer": {
             "type": "object",

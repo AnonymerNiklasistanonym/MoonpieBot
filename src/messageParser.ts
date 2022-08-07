@@ -1,8 +1,8 @@
 // Local imports
 import {
+  FileDocumentationParts,
   FileDocumentationPartType,
   FileDocumentationPartValue,
-  FileDocumentationParts,
 } from "./other/splitTextAtLength";
 import { createLogFunc } from "./logging";
 import { genericStringSorter } from "./other/genericStringSorter";
@@ -345,7 +345,10 @@ export const createParseTree = (
           rootNode.children?.push({
             ...currentChildNode,
             // Remove the begin of the plugin scope open from the string
-            originalString: currentChildNode.originalString.slice(0, -2),
+            originalString: currentChildNode.originalString.slice(
+              0,
+              -"$(".length
+            ),
           });
         }
         // Now that all previously recorded content was pushed to the root node
@@ -446,7 +449,10 @@ export const createParseTree = (
           rootNode.children?.push({
             ...currentChildNode,
             // Remove the begin of the reference scope open from the string
-            originalString: currentChildNode.originalString.slice(0, -2),
+            originalString: currentChildNode.originalString.slice(
+              0,
+              -"$[".length
+            ),
           });
         }
         parseState = ParseState.REFERENCE_NAME;

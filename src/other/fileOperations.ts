@@ -22,6 +22,8 @@ export const readJsonFile = async <OUTPUT>(filePath: string) => {
   return JSON.parse(content.toString()) as OUTPUT;
 };
 
+const JSON_SPACING = 4;
+
 /**
  * Write a JSON file.
  *
@@ -30,4 +32,4 @@ export const readJsonFile = async <OUTPUT>(filePath: string) => {
  * @template INPUT The type of the JSON file to validate the data.
  */
 export const writeJsonFile = async <INPUT>(filePath: string, data: INPUT) =>
-  await fs.writeFile(filePath, JSON.stringify(data, undefined, 4));
+  await fs.writeFile(filePath, JSON.stringify(data, undefined, JSON_SPACING));

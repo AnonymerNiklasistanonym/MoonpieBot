@@ -1,14 +1,15 @@
-import {
-  SpotifySongMacro,
-  pluginSpotifySongId,
-} from "../../messageParser/plugins/spotify";
+// Local imports
 import {
   pluginIfFalse,
   pluginIfTrue,
 } from "../../messageParser/plugins/general";
-import { SPOTIFY_STRING_ID } from "../spotify";
+import {
+  pluginSpotifySongId,
+  SpotifySongMacro,
+} from "../../messageParser/plugins/spotify";
 import { createMessageForMessageParser } from "../../messageParser";
 import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
+import { SPOTIFY_STRING_ID } from "../spotify";
 
 export const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
 

@@ -2,19 +2,19 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
+  errorMessageIdUndefined,
+  errorMessageUserNameUndefined,
+  logTwitchMessageCommandReply,
+} from "../../commands";
+import {
+  errorMessageOsuApiCredentialsUndefined,
   LOG_ID_CHAT_HANDLER_OSU,
   LOG_ID_COMMAND_OSU,
-  errorMessageOsuApiCredentialsUndefined,
 } from "../osu";
 import {
   MacroOsuScoreRequest,
   macroOsuScoreRequestId,
 } from "../../messageParser/macros/osuScoreRequest";
-import {
-  errorMessageIdUndefined,
-  errorMessageUserNameUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
 import {
   osuScore,
   osuScoreNoBeatmap,
@@ -23,6 +23,7 @@ import {
 import { convertOsuScoreToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
 import { messageParserById } from "../../messageParser";
+import { pluginOsuScoreId } from "../../messageParser/plugins/osuApi";
 // Type imports
 import type { Macros, Plugins } from "../../messageParser";
 import type { Client } from "tmi.js";
@@ -30,7 +31,8 @@ import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { Strings } from "../../strings";
-import { pluginOsuScoreId } from "../../messageParser/plugins/osuApi";
+
+const NOT_FOUND_STATUS_CODE = 404;
 
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
@@ -128,7 +130,7 @@ export const commandScore = async (
     );
     // Check for user score
   } catch (err) {
-    if ((err as OsuApiV2WebRequestError).statusCode === 404) {
+    if ((err as OsuApiV2WebRequestError).statusCode === NOT_FOUND_STATUS_CODE) {
       logCmdBeatmap.warn((err as OsuApiV2WebRequestError).message);
       const errorMessage = await messageParserById(
         osuScoreNotFound.id,

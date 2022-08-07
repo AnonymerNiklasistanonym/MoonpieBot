@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+
+// Package imports
 import osuApiV2, { GameMode, RankedStatus } from "osu-api-v2";
 import { ScoresType } from "osu-api-v2/lib/users/scores";
 // Type imports
@@ -7,9 +9,6 @@ import type {
   BeatmapUserScore,
   OsuApiV2WebRequestError,
 } from "osu-api-v2";
-import type { OsuApiV2Credentials } from "../../commands/osu";
-import type { MacroDictionaryEntry } from "../../messageParser";
-import type { MessageParserPlugin } from "../plugins";
 import {
   MacroOsuBeatmap,
   MacroOsuMostRecentPlay,
@@ -20,6 +19,9 @@ import {
   pluginOsuScoreId,
   pluginOsuUserId,
 } from "./osuApi";
+import type { MacroDictionaryEntry } from "../../messageParser";
+import type { MessageParserPlugin } from "../plugins";
+import type { OsuApiV2Credentials } from "../../commands/osu";
 
 const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
   switch (rankedStatus) {
@@ -119,6 +121,8 @@ export const pluginOsuBeatmap = (
   };
 };
 
+const ROUND_TO_2_DIGITS_FACTOR = 100;
+
 export const convertOsuScoreToMacros = (
   beatmapScore: BeatmapUserScore
 ): MacroDictionaryEntry[] => {
@@ -135,13 +139,20 @@ export const convertOsuScoreToMacros = (
     [MacroOsuScore.FC, `${score.perfect}`],
     [
       MacroOsuScore.ACC,
-      `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`,
+      `${
+        Math.round(
+          score.accuracy * 100 * ROUND_TO_2_DIGITS_FACTOR + Number.EPSILON
+        ) / ROUND_TO_2_DIGITS_FACTOR
+      }`,
     ],
     [
       MacroOsuScore.PP,
       score.pp == null
         ? "undefined"
-        : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
+        : `${
+            Math.round(score.pp * ROUND_TO_2_DIGITS_FACTOR + Number.EPSILON) /
+            ROUND_TO_2_DIGITS_FACTOR
+          }`,
     ],
     [MacroOsuScore.MODS, `${score.mods.join(",")}`],
     [MacroOsuScore.COUNT_300, `${score.statistics.count_300}`],
@@ -161,6 +172,8 @@ export const convertOsuScoreToMacros = (
     [MacroOsuScore.VERSION, `${score.beatmap?.version}`],
   ];
 };
+
+const STATUS_CODE_NOT_FOUND = 404;
 
 export const pluginOsuScore = (
   osuApiV2Credentials: OsuApiV2Credentials
@@ -199,7 +212,9 @@ export const pluginOsuScore = (
         );
         return convertOsuScoreToMacros(beatmapScore);
       } catch (err) {
-        if ((err as OsuApiV2WebRequestError).statusCode === 404) {
+        if (
+          (err as OsuApiV2WebRequestError).statusCode === STATUS_CODE_NOT_FOUND
+        ) {
           return [["EXISTS", "false"]];
         } else {
           throw err;
@@ -225,13 +240,20 @@ export const convertOsuaScoreToMacros = (
     [MacroOsuScore.FC, `${score.perfect}`],
     [
       MacroOsuScore.ACC,
-      `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`,
+      `${
+        Math.round(
+          score.accuracy * 100 * ROUND_TO_2_DIGITS_FACTOR + Number.EPSILON
+        ) / ROUND_TO_2_DIGITS_FACTOR
+      }`,
     ],
     [
       MacroOsuScore.PP,
       score.pp == null
         ? "undefined"
-        : `${Math.round(score.pp * 100 + Number.EPSILON) / 100}`,
+        : `${
+            Math.round(score.pp * ROUND_TO_2_DIGITS_FACTOR + Number.EPSILON) /
+            ROUND_TO_2_DIGITS_FACTOR
+          }`,
     ],
     [MacroOsuScore.MODS, `${score.mods.join(",")}`],
     [MacroOsuScore.COUNT_300, `${score.statistics.count_300}`],
@@ -293,7 +315,11 @@ export const pluginOsuMostRecentPlay = (
           [MacroOsuMostRecentPlay.FC, `${score.perfect}`],
           [
             MacroOsuMostRecentPlay.ACC,
-            `${Math.round(score.accuracy * 10000 + Number.EPSILON) / 100}`,
+            `${
+              Math.round(
+                score.accuracy * 100 * ROUND_TO_2_DIGITS_FACTOR + Number.EPSILON
+              ) / ROUND_TO_2_DIGITS_FACTOR
+            }`,
           ],
           [
             MacroOsuMostRecentPlay.PP,
@@ -323,6 +349,9 @@ export const pluginOsuMostRecentPlay = (
     },
   };
 };
+
+const OSU_ACHIEVEMENT_ID_TUTEL = 151;
+const OSU_ACHIEVEMENT_ID_BUNNY = 6;
 
 export const pluginOsuUser = (
   osuApiV2Credentials: OsuApiV2Credentials
@@ -377,7 +406,8 @@ export const pluginOsuUser = (
           MacroOsuUser.PP,
           `${
             user.statistics
-              ? Math.round(user.statistics.pp * 100) / 100
+              ? Math.round(user.statistics.pp * ROUND_TO_2_DIGITS_FACTOR) /
+                ROUND_TO_2_DIGITS_FACTOR
               : undefined
           }`,
         ],
@@ -385,7 +415,9 @@ export const pluginOsuUser = (
           MacroOsuUser.ACC,
           `${
             user.statistics
-              ? Math.round(user.statistics.hit_accuracy * 100) / 100
+              ? Math.round(
+                  user.statistics.hit_accuracy * ROUND_TO_2_DIGITS_FACTOR
+                ) / ROUND_TO_2_DIGITS_FACTOR
               : undefined
           }`,
         ],
@@ -399,7 +431,9 @@ export const pluginOsuUser = (
           MacroOsuUser.HAS_BUNNY,
           `${
             userAchievements !== undefined &&
-            userAchievements.find((a) => a.achievement_id === 6)
+            userAchievements.find(
+              (a) => a.achievement_id === OSU_ACHIEVEMENT_ID_BUNNY
+            )
               ? true
               : false
           }`,
@@ -408,7 +442,9 @@ export const pluginOsuUser = (
           MacroOsuUser.HAS_TUTEL,
           `${
             userAchievements !== undefined &&
-            userAchievements?.find((a) => a.achievement_id === 151)
+            userAchievements?.find(
+              (a) => a.achievement_id === OSU_ACHIEVEMENT_ID_TUTEL
+            )
               ? true
               : false
           }`,

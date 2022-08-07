@@ -1,3 +1,7 @@
+/*
+ * StreamCompanion connection.
+ */
+
 // Package imports
 import ReconnectingWebSocket from "reconnecting-websocket";
 import WebSocket from "ws";
@@ -54,10 +58,21 @@ interface ReconnectingWebSocketHelper {
   _url: string;
 }
 
+export type StreamCompanionConnection = () => StreamCompanionData | undefined;
+
+/**
+ * This method will setup an infinite loop that will continuously try to connect
+ * to StreamCompanion.
+ *
+ * @param streamCompanionUrl The URL of the StreamCompanion websocket.
+ * @param logger Global logger.
+ * @returns A function that will if there is a connection and data available
+ * return that data. Otherwise it will just return undefined.
+ */
 export const createStreamCompanionConnection = (
   streamCompanionUrl: string,
   logger: Logger
-) => {
+): StreamCompanionConnection => {
   const logStreamCompanion = createLogFunc(
     logger,
     LOG_ID_MODULE_STREAMCOMPANION
