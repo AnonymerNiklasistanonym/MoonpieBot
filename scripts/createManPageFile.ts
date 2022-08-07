@@ -18,7 +18,7 @@ import {
 } from "../src/info/general";
 import { ENV_VARIABLE_PREFIX, envVariableInformation } from "../src/info/env";
 import { cliOptionInformation } from "../src/info/cli";
-import { getVersion } from "../src/version";
+import { versionString } from "../src/info/version";
 
 const rootPath = path.join(__dirname, "..");
 
@@ -29,7 +29,7 @@ const createManPageFile = (outputPath: string) => {
 
   let outputString = "";
   // Header
-  outputString += `% ${name}(1) ${binaryName} ${getVersion().slice(1)}\n`;
+  outputString += `% ${name}(1) ${binaryName} ${versionString.slice(1)}\n`;
   outputString += `% ${author}\n`;
   const currentDate = new Date();
   const monthNames = [

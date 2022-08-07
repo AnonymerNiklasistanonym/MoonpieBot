@@ -66,7 +66,6 @@ import { createTwitchClient } from "./twitch";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { generatePluginsAndMacrosMap } from "./messageParser";
 import { getPluginOsuStreamCompanion } from "./messageParser/plugins/streamcompanion";
-import { getVersion } from "./version";
 import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
@@ -77,6 +76,7 @@ import { pluginsTwitchChat } from "./messageParser/plugins/twitchChat";
 import { pyramidSpammer } from "./other/pyramidSpammer";
 import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
+import { versionString } from "./info/version";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
 import type { CustomCommandsJson } from "./customCommandsTimers/customCommand";
@@ -686,7 +686,7 @@ export const main = async (
         osuIrcBot,
         "main",
         osuIrcRequestTarget,
-        `UwU (${name} ${getVersion()})`,
+        `UwU (${name} ${versionString})`,
         logger
       );
     } catch (err) {

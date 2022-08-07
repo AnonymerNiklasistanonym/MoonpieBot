@@ -125,12 +125,19 @@ export const createTwitchClient = (
   return client;
 };
 
+export interface TwitchChatHandlerSuccessfulReply {
+  sentMessage: [string];
+  replyToMessageId: string;
+  commandId: string;
+  subcommandId: string;
+}
+
 /**
  * A global type for all Twitch chat (message) handler functions.
  */
 export type TwitchChatHandler<
   CUSTOM_OPTIONS = undefined,
-  RETURN_VALUE = void
+  RETURN_VALUE = TwitchChatHandlerSuccessfulReply
 > = (
   client: Client,
   channel: string,

@@ -1,5 +1,5 @@
 /*
- * Version handling
+ * Version structure
  */
 
 /**
@@ -13,16 +13,6 @@ export interface Version {
 }
 
 /**
- * The version of the program.
- */
-export const version: Version = {
-  major: 1,
-  minor: 0,
-  patch: 16,
-  beta: true,
-};
-
-/**
  * Get a version string.
  *
  * @param version The version that should be used.
@@ -32,10 +22,3 @@ export const getVersionFromObject = (version: Version) =>
   `v${version.major}.${version.minor}.${version.patch}${
     version.beta ? "b" : ""
   }`;
-
-/**
- * Get a version string of the current program version.
- *
- * @returns "v1.2.3b" or "v1.2.3" if not in beta.
- */
-export const getVersion = () => getVersionFromObject(version);

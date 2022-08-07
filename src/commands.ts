@@ -1,5 +1,5 @@
 // Local imports
-import { logTwitchMessageDetected, logTwitchMessageReply } from "./twitch";
+import { logTwitchMessageDetected, logTwitchMessageReply, TwitchChatHandlerSuccessfulReply } from "./twitch";
 // Type imports
 import type { Logger } from "winston";
 
@@ -15,6 +15,18 @@ export const logTwitchMessageCommandReply = (
     messageId,
     sentMessage,
     `${commandId}:${subcommandId}`
+  );
+};
+
+export const logTwitchMessageCommandReply2 = (
+  logger: Logger,
+  commandReply: TwitchChatHandlerSuccessfulReply
+) => {
+  logTwitchMessageReply(
+    logger,
+    commandReply.replyToMessageId,
+    commandReply.sentMessage,
+    `${commandReply.commandId}:${commandReply.subcommandId}`
   );
 };
 

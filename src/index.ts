@@ -29,8 +29,8 @@ import {
 import { cliHelpGenerator } from "./cli";
 import { createCustomCommandTimerExampleFiles } from "./customCommandsTimers/createExampleFiles";
 import { genericStringSorter } from "./other/genericStringSorter";
-import { getVersion } from "./version";
 import { main } from "./main";
+import { versionString } from "./info/version";
 
 /**
  * The logging ID of this module.
@@ -47,7 +47,7 @@ const entryPoint = async () => {
     // ----------------------------------------------------------
 
     // Change the title of the process/terminal
-    process.title = `${name} ${getVersion()}`;
+    process.title = `${name} ${versionString}`;
 
     // ----------------------------------------------------------
     // Handle CLI options
@@ -61,7 +61,7 @@ const entryPoint = async () => {
 
     // Catch CLI version option
     if (cliArgs.includes(CliOption.VERSION)) {
-      console.log(getVersion());
+      console.log(versionString);
       process.exit(0);
     }
 
@@ -157,7 +157,7 @@ const entryPoint = async () => {
 
     // Call main method
     try {
-      logIndex.info(`${name} ${getVersion()} was started (logs: '${logDir}')`);
+      logIndex.info(`${name} ${versionString} was started (logs: '${logDir}')`);
       logIndex.debug(`Config directory: '${configDir}'`);
       logIndex.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
       await main(logger, configDir, logDir);

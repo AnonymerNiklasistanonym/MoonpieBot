@@ -2,6 +2,7 @@ import {
   errorMessageIdUndefined,
   logTwitchMessageCommandDetected,
   logTwitchMessageCommandReply,
+  logTwitchMessageCommandReply2,
 } from "../commands";
 import { messageParserById } from "../messageParser";
 import { spotifyCommandReplySong } from "../strings/spotify/commandReply";
@@ -72,15 +73,12 @@ export const commandSong: TwitchChatHandler = async (
     logger
   );
 
-  const sentMsg = await client.say(channel, msg);
-
-  logTwitchMessageCommandReply(
-    logger,
-    tags.id,
-    sentMsg,
-    LOG_ID_COMMAND_SPOTIFY,
-    SpotifyCommands.SONG
-  );
+  return {
+    sentMessage: await client.say(channel, msg),
+    replyToMessageId: tags.id,
+    commandId: LOG_ID_COMMAND_SPOTIFY,
+    subcommandId: SpotifyCommands.SONG,
+  };
 };
 
 export interface SpotifyChatHandlerData {
@@ -91,7 +89,8 @@ export interface SpotifyChatHandlerData {
 }
 
 export const spotifyChatHandler: TwitchChatHandler<
-  SpotifyChatHandlerData
+  SpotifyChatHandlerData,
+  void
 > = async (
   client,
   channel,
@@ -102,7 +101,7 @@ export const spotifyChatHandler: TwitchChatHandler<
   globalPlugins,
   globalMacros,
   logger
-): Promise<void> => {
+) => {
   // > !song
   if (message.match(regexSong) && data.enabled.includes(SpotifyCommands.SONG)) {
     logTwitchMessageCommandDetected(
@@ -113,7 +112,7 @@ export const spotifyChatHandler: TwitchChatHandler<
       SpotifyCommands.SONG,
       LOG_ID_MODULE_SPOTIFY
     );
-    await commandSong(
+    const commandReply = await commandSong(
       client,
       channel,
       tags,
@@ -124,6 +123,6 @@ export const spotifyChatHandler: TwitchChatHandler<
       globalMacros,
       logger
     );
-    return;
+    logTwitchMessageCommandReply2(logger, commandReply);
   }
 };

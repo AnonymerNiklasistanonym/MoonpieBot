@@ -2,11 +2,12 @@
 import chai from "chai";
 import { describe } from "mocha";
 // Local imports
-import { getVersion, getVersionFromObject } from "../../src/version";
+import { getVersionFromObject } from "../../src/version";
+import { versionString } from "../../src/info/version";
 
 describe("version", () => {
-  it("getVersion", () => {
-    chai.expect(getVersion()).to.be.a("string");
+  it("versionString", () => {
+    chai.expect(versionString).to.be.a("string");
   });
   it("getVersionFromObject", () => {
     chai

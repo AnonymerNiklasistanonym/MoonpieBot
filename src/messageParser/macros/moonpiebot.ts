@@ -6,7 +6,7 @@ import {
   name,
   sourceCodeUrl,
 } from "../../info/general";
-import { getVersion } from "../../version";
+import { versionString } from "../../info/version";
 // Type imports
 import type { MessageParserMacro } from "../macros";
 
@@ -24,7 +24,7 @@ export const macroMoonpieBot: MessageParserMacro = {
   id: "MOONPIEBOT",
   values: new Map([
     [MacroMoonpieBot.NAME, name],
-    [MacroMoonpieBot.VERSION, getVersion()],
+    [MacroMoonpieBot.VERSION, versionString],
     [MacroMoonpieBot.AUTHOR, author],
     [MacroMoonpieBot.DESCRIPTION, description],
     [MacroMoonpieBot.URL, sourceCodeUrl],
