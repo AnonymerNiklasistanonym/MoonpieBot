@@ -6,7 +6,7 @@ import type { MessageParserPlugin } from "../plugins";
 import type SpotifyWebApi from "spotify-web-api-node";
 
 export const pluginSpotifySongId = "SPOTIFY_SONG";
-export const enum SpotifySongMacro {
+export enum SpotifySongMacro {
   HAS_CURRENT = "HAS_CURRENT",
   CURRENT_TITLE = "CURRENT_TITLE",
   CURRENT_ARTISTS = "CURRENT_ARTISTS",
@@ -31,6 +31,7 @@ export const pluginSpotifyCurrentPreviousSong = (
         return {
           type: "signature",
           exportsMacro: true,
+          exportedMacroKeys: Object.values(SpotifySongMacro),
         };
       }
       const data = await spotifyGetCurrentAndRecentSongs(spotifyWebApi, logger);

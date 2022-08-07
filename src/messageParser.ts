@@ -561,6 +561,7 @@ export interface PluginSignature {
   argument?: string | string[];
   scope?: string;
   exportsMacro?: boolean;
+  exportedMacroKeys?: string[];
 }
 
 // A plugin can have a scope in which special plugins can be defined
@@ -647,7 +648,16 @@ export const createPluginSignatureString = async (
         if (scopeSignature.length > 0) {
           scopeSignature += ";";
         }
-        scopeSignature += `%${pluginName}:KEYS%`;
+        if (
+          pluginSignature.exportedMacroKeys &&
+          pluginSignature.exportedMacroKeys.length > 0
+        ) {
+          scopeSignature += `%${pluginName}:[${pluginSignature.exportedMacroKeys
+            .sort(genericStringSorter)
+            .join(",")}]%`;
+        } else {
+          scopeSignature += `%${pluginName}:KEYS%`;
+        }
       }
     }
   } catch (err) {

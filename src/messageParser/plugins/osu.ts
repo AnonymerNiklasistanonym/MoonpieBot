@@ -102,6 +102,7 @@ export const pluginOsuBeatmap = (
           type: "signature",
           argument: "osuBeatmapID",
           exportsMacro: true,
+          exportedMacroKeys: Object.values(MacroOsuBeatmap),
         };
       }
       if (beatmapId === undefined || beatmapId.trim().length === 0) {
@@ -186,6 +187,7 @@ export const pluginOsuScore = (
           type: "signature",
           argument: "osuBeatmapId osuUserId",
           exportsMacro: true,
+          exportedMacroKeys: Object.values(MacroOsuScore),
         };
       }
       if (
@@ -224,56 +226,6 @@ export const pluginOsuScore = (
   };
 };
 
-export const convertOsuaScoreToMacros = (
-  beatmapScore: BeatmapUserScore
-): MacroDictionaryEntry[] => {
-  const score = beatmapScore.score;
-  const scoreDate = new Date(score.created_at);
-  const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
-  return [
-    [
-      MacroOsuScore.EXISTS,
-      `${beatmapScore.position !== undefined && beatmapScore.position !== -1}`,
-    ],
-    [MacroOsuScore.PASSED, `${score.passed}`],
-    [MacroOsuScore.RANK, `${score.rank}`],
-    [MacroOsuScore.FC, `${score.perfect}`],
-    [
-      MacroOsuScore.ACC,
-      `${
-        Math.round(
-          score.accuracy * 100 * ROUND_TO_2_DIGITS_FACTOR + Number.EPSILON
-        ) / ROUND_TO_2_DIGITS_FACTOR
-      }`,
-    ],
-    [
-      MacroOsuScore.PP,
-      score.pp == null
-        ? "undefined"
-        : `${
-            Math.round(score.pp * ROUND_TO_2_DIGITS_FACTOR + Number.EPSILON) /
-            ROUND_TO_2_DIGITS_FACTOR
-          }`,
-    ],
-    [MacroOsuScore.MODS, `${score.mods.join(",")}`],
-    [MacroOsuScore.COUNT_300, `${score.statistics.count_300}`],
-    [MacroOsuScore.COUNT_100, `${score.statistics.count_100}`],
-    [MacroOsuScore.COUNT_50, `${score.statistics.count_50}`],
-    [MacroOsuScore.COUNT_MISS, `${score.statistics.count_miss}`],
-    [MacroOsuScore.MAX_COMBO, `${score.max_combo}`],
-    [MacroOsuScore.TIME_IN_S_AGO, `${scoreDateRangeMs / 1000}`],
-    [MacroOsuScore.DATE_MONTH, monthNames[scoreDate.getMonth()]],
-    [MacroOsuScore.DATE_YEAR, `${scoreDate.getFullYear()}`],
-    [MacroOsuScore.USER_NAME, `${score.user?.username}`],
-    [MacroOsuScore.USER_ID, `${score.user?.id}`],
-    [MacroOsuScore.HAS_REPLAY, `${score.replay}`],
-    [MacroOsuScore.ID, `${score.id}`],
-    [MacroOsuScore.TITLE, `${score.beatmapset?.title}`],
-    [MacroOsuScore.ARTIST, `${score.beatmapset?.artist}`],
-    [MacroOsuScore.VERSION, `${score.beatmap?.version}`],
-  ];
-};
-
 export const pluginOsuMostRecentPlay = (
   osuApiV2Credentials: OsuApiV2Credentials
 ): MessageParserPlugin => {
@@ -285,6 +237,7 @@ export const pluginOsuMostRecentPlay = (
           type: "signature",
           argument: "osuUserId",
           exportsMacro: true,
+          exportedMacroKeys: Object.values(MacroOsuMostRecentPlay),
         };
       }
       if (userId === undefined || userId.trim().length === 0) {
@@ -364,6 +317,7 @@ export const pluginOsuUser = (
           type: "signature",
           argument: "osuUserId",
           exportsMacro: true,
+          exportedMacroKeys: Object.values(MacroOsuUser),
         };
       }
       if (userId === undefined || userId.trim().length === 0) {

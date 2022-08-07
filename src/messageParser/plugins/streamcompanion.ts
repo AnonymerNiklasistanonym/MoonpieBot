@@ -31,6 +31,7 @@ export const getPluginOsuStreamCompanion = (
         return {
           type: "signature",
           exportsMacro: true,
+          exportedMacroKeys: Object.values(MacroOsuStreamCompanion),
         };
       }
       const streamCompanionData = streamCompanionDataFunc();
