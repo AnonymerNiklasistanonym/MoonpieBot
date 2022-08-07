@@ -203,7 +203,7 @@ export const loadCustomTimersFromFile = async (
     }
     loggerCustomTimers.info(
       `Added ${newCustomTimers.length} custom timer${
-        newCustomTimers.length > 1 ? "s" : ""
+        newCustomTimers.length === 1 ? "" : "s"
       }`
     );
     customTimers.push(...newCustomTimers);

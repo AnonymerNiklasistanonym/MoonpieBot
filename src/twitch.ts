@@ -354,7 +354,7 @@ export const handleTwitchCommand = async <
       client,
       channel,
       tags,
-      data,
+      { ...data, ...commandDetected.data },
       globalStrings,
       globalPlugins,
       globalMacros,

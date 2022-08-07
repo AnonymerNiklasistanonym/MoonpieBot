@@ -296,7 +296,10 @@ export interface CommandHandleCustomCommandData {
 
 export const getCustomCommand = (
   customCommand: CustomCommand
-): TwitchMessageCommandHandler<CommandHandleCustomCommandData> => {
+): TwitchMessageCommandHandler<
+  Record<never, never>,
+  CommandHandleCustomCommandData
+> => {
   return {
     info: {
       groupId: LOG_ID_COMMAND_CUSTOM_COMMAND,
@@ -351,15 +354,16 @@ export const getCustomCommand = (
       // eslint-disable-next-line security/detect-non-literal-regexp
       const regex = new RegExp(customCommand.regexString);
       const match = message.match(regex);
-      if (match) {
-        return {
-          message,
-          messageId: tags.id,
-          userName: tags.username,
-          data: { regexGroups: match },
-        };
+      if (!match) {
+        return false;
       }
-      return false;
+
+      return {
+        message,
+        messageId: tags.id,
+        userName: tags.username,
+        data: { regexGroups: match },
+      };
     },
     handle: async (
       client,
@@ -371,6 +375,7 @@ export const getCustomCommand = (
       globalMacros,
       logger
     ) => {
+      console.log({ data });
       if (tags.id === undefined) {
         throw errorMessageIdUndefined();
       }
@@ -429,7 +434,7 @@ export const loadCustomCommandsFromFile = async (
         `Loaded custom commands file '${filePath}' does not match its definition`
       );
     }
-    const newCustomCommands = customCommands;
+    const newCustomCommands = data.commands;
     const newCustomCommandsGlobalData = data.data;
     for (const newCustomCommand of newCustomCommands) {
       loggerCustomCommands.debug(
@@ -438,7 +443,7 @@ export const loadCustomCommandsFromFile = async (
     }
     loggerCustomCommands.info(
       `Added ${newCustomCommands.length} custom command${
-        newCustomCommands.length > 1 ? "s" : ""
+        newCustomCommands.length === 1 ? "" : "s"
       }`
     );
     if (newCustomCommandsGlobalData) {
