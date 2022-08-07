@@ -132,30 +132,69 @@ export interface TwitchChatHandlerSuccessfulReply {
   subcommandId: string;
 }
 
+export interface TwitchChatHandlerCommandDetect<DATA> {
+  message: string;
+  messageId?: string;
+  userName?: string;
+  commandId: string;
+  subcommandId: string;
+  detectorId?: string;
+  data: DATA;
+}
+
 /**
  * A global type for all Twitch chat (message) handler functions.
+ *
+ * @tparam DATA A custom data object for the command.
+ * @tparam RETURN_VALUE A custom return value type for the command.
  */
-export type TwitchChatHandler<
-  CUSTOM_OPTIONS = undefined,
-  RETURN_VALUE = TwitchChatHandlerSuccessfulReply
-> = (
-  client: Client,
-  channel: string,
+export type TwitchChatHandler<DATA = undefined, RETURN_VALUE = void> = (
+  client: Readonly<Client>,
+  channel: Readonly<string>,
   /**
    * The Twitch chat state of a user which contains for example their user name,
    * id, badges, ...
    */
-  tags: ChatUserstate,
-  message: string,
+  tags: Readonly<ChatUserstate>,
+  message: Readonly<string>,
   /**
    * The custom data of this Twitch chat message handler.
    */
-  data: CUSTOM_OPTIONS,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
+  data: DATA,
+  globalStrings: Readonly<Strings>,
+  globalPlugins: Readonly<Plugins>,
+  globalMacros: Readonly<Macros>,
+  logger: Readonly<Logger>
 ) => Promise<RETURN_VALUE>;
+
+export type TwitchChatCommandDetector<DATA = undefined> = (
+  tags: Readonly<ChatUserstate>,
+  message: Readonly<string>,
+  enabledCommands: Readonly<string[]>
+) => false | TwitchChatHandlerCommandDetect<DATA>;
+
+/**
+ * A global type for all Twitch chat (message) command handler functions.
+ *
+ * @tparam DATA A custom data object for the command.
+ */
+export type TwitchChatCommandHandler<DATA = undefined> = (
+  client: Readonly<Client>,
+  channel: Readonly<string>,
+  /**
+   * The Twitch chat state of a user which contains for example their user name,
+   * id, badges, ...
+   */
+  tags: Readonly<ChatUserstate>,
+  /**
+   * The custom data of this Twitch chat message handler.
+   */
+  data: DATA,
+  globalStrings: Readonly<Strings>,
+  globalPlugins: Readonly<Plugins>,
+  globalMacros: Readonly<Macros>,
+  logger: Readonly<Logger>
+) => Promise<TwitchChatHandlerSuccessfulReply>;
 
 /**
  * Additional information for Twitch logs.

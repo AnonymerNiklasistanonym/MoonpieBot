@@ -43,10 +43,15 @@
     "no-magic-numbers": ["error", {
       "ignore": [-1,0,1,2,10,24,60,365,100,1000]
     }],
+    "no-underscore-dangle": "error",
     "jsdoc/require-param-type": "off",
     "jsdoc/require-returns-type": "off",
     "jsdoc/require-description-complete-sentence": "warn",
     "jsdoc/check-param-names": "error",
+    "jsdoc/check-tag-names": ["error",
+    {
+      "definedTags": ["tparam"]
+    }],
     "jsdoc/no-types": "error",
     "jsdoc/no-defaults": "error",
     "jsdoc/check-indentation": "error",

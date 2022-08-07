@@ -2,11 +2,6 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
-  errorMessageIdUndefined,
-  errorMessageUserNameUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
-import {
   errorMessageOsuApiCredentialsUndefined,
   LOG_ID_CHAT_HANDLER_OSU,
   LOG_ID_COMMAND_OSU,
@@ -24,15 +19,26 @@ import {
   osuCommandReplyNpStreamCompanionNotRunning,
 } from "../../strings/osu/commandReply";
 import { createLogFunc } from "../../logging";
+import { errorMessageIdUndefined } from "../../commands";
 import { getProcessWindowTitle } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
 // Type imports
-import type { Macros, Plugins } from "../../messageParser";
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
+import type {
+  TwitchChatCommandDetector,
+  TwitchChatCommandHandler,
+} from "../../twitch";
 import type { OsuApiV2Credentials } from "../osu";
 import type { StreamCompanionConnection } from "../../streamcompanion";
-import type { Strings } from "../../strings";
+
+/**
+ * Regex to recognize the `!np` command.
+ *
+ * @example
+ * ```text
+ * !np $OPTIONAL_TEXT_WITH_SPACES
+ * ```
+ */
+export const regexNp = /^\s*!np(?:\s*|\s.*)$/i;
 
 /**
  * Regex to parse the now playing window title on Windows.
@@ -60,45 +66,69 @@ export const roundToOneDecimalPlace = (num: undefined | number) => {
   return Math.round(num * ROUND_TO_1_DIGIT_FACTOR) / ROUND_TO_1_DIGIT_FACTOR;
 };
 
+export interface OsuChatHandlerCommandNpData {
+  /**
+   * The osu API (v2) credentials.
+   */
+  osuApiV2Credentials?: OsuApiV2Credentials;
+  /**
+   * If available get the current map data using StreamCompanion.
+   */
+  osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
+}
+
+export const detectCommandNp: TwitchChatCommandDetector = (
+  tags,
+  message,
+  enabledCommands
+) => {
+  if (message.match(regexNp) && enabledCommands.includes(OsuCommands.NP)) {
+    return {
+      commandId: LOG_ID_COMMAND_OSU,
+      subcommandId: OsuCommands.NP,
+      message: message,
+      messageId: tags.id,
+      userName: tags.username,
+      data: undefined,
+    };
+  }
+  return false;
+};
+
 /**
  * NP (now playing) command: Send the map that is currently being played in osu
  * (via the window title because the web api is not supporting it).
  *
  * @param client Twitch client (used to send messages).
  * @param channel Twitch channel (where the response should be sent to).
- * @param messageId Twitch message ID of the request (used for logging).
- * @param userName Twitch user name of the requester.
- * @param osuApiV2Credentials The osu API (v2) credentials.
- * @param osuStreamCompanionCurrentMapData If available get the current map data using StreamCompanion.
+ * @param tags Twitch user state.
+ * @param data The command specific data.
  * @param globalStrings Global message strings.
  * @param globalPlugins Global plugins.
  * @param globalMacros Global macros.
  * @param logger Logger (used for logging).
  */
-export const commandNp = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  userName: string | undefined,
-  osuApiV2Credentials: OsuApiV2Credentials | undefined,
-  osuStreamCompanionCurrentMapData: StreamCompanionConnection | undefined,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
+export const commandNp: TwitchChatCommandHandler<
+  OsuChatHandlerCommandNpData
+> = async (
+  client,
+  channel,
+  tags,
+  data,
+  globalStrings,
+  globalPlugins,
+  globalMacros,
+  logger
+) => {
+  if (tags.id === undefined) {
     throw errorMessageIdUndefined();
-  }
-  if (userName === undefined) {
-    throw errorMessageUserNameUndefined();
   }
 
   const logCmdNp = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU, {
     subsection: OsuCommands.NP,
   });
 
-  let message = await messageParserById(
+  let msg = await messageParserById(
     osuCommandReplyNpNoMap.id,
     globalStrings,
     globalPlugins,
@@ -106,14 +136,14 @@ export const commandNp = async (
     logger
   );
 
-  if (osuStreamCompanionCurrentMapData !== undefined) {
-    const currentMapData = osuStreamCompanionCurrentMapData();
+  if (data.osuStreamCompanionCurrentMapData !== undefined) {
+    const currentMapData = data.osuStreamCompanionCurrentMapData();
     if (
       currentMapData !== undefined &&
       currentMapData.mapid !== undefined &&
       currentMapData.mapid !== 0
     ) {
-      message = await messageParserById(
+      msg = await messageParserById(
         osuCommandReplyNpStreamCompanion.id,
         globalStrings,
         globalPlugins,
@@ -125,7 +155,7 @@ export const commandNp = async (
       currentMapData.mapid !== undefined &&
       currentMapData.mapid === 0
     ) {
-      message = await messageParserById(
+      msg = await messageParserById(
         osuCommandReplyNpNoMapStreamCompanion.id,
         globalStrings,
         globalPlugins,
@@ -133,7 +163,7 @@ export const commandNp = async (
         logger
       );
     } else {
-      message = await messageParserById(
+      msg = await messageParserById(
         osuCommandReplyNpStreamCompanionNotRunning.id,
         globalStrings,
         globalPlugins,
@@ -142,7 +172,7 @@ export const commandNp = async (
       );
     }
   } else {
-    if (osuApiV2Credentials === undefined) {
+    if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
     const windowTitle = await getProcessWindowTitle("osu");
@@ -152,8 +182,8 @@ export const commandNp = async (
         let mapId;
         try {
           const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
-            osuApiV2Credentials.clientId,
-            osuApiV2Credentials.clientSecret
+            data.osuApiV2Credentials.clientId,
+            data.osuApiV2Credentials.clientSecret
           );
 
           const searchResult = await osuApiV2.beatmapsets.search(
@@ -205,7 +235,7 @@ export const commandNp = async (
             [MacroOsuWindowTitle.MAP_ID_VIA_API, `${mapId}`],
           ])
         );
-        message = await messageParserById(
+        msg = await messageParserById(
           osuCommandReplyNp.id,
           globalStrings,
           globalPlugins,
@@ -215,13 +245,11 @@ export const commandNp = async (
       }
     }
   }
-  const sentMessage = await client.say(channel, message);
-
-  logTwitchMessageCommandReply(
-    logger,
-    messageId,
+  const sentMessage = await client.say(channel, msg);
+  return {
+    commandId: LOG_ID_COMMAND_OSU,
+    subcommandId: OsuCommands.NP,
+    replyToMessageId: tags.id,
     sentMessage,
-    LOG_ID_COMMAND_OSU,
-    OsuCommands.NP
-  );
+  };
 };

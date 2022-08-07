@@ -5,11 +5,15 @@ import {
   commandBeatmapWhenDisabled,
   commandSetBeatmapRequests,
 } from "./osu/beatmap";
-import { commandNp } from "./osu/np";
-import { commandPp } from "./osu/pp";
-import { commandRp } from "./osu/rp";
+import { commandNp, detectCommandNp } from "./osu/np";
+import { commandPp, detectCommandPp } from "./osu/pp";
+import { commandRp, detectCommandRp } from "./osu/rp";
+import {
+  logTwitchMessageCommandDetected,
+  twitchChatCommandDetected,
+  twitchChatCommandReply,
+} from "../commands";
 import { commandScore } from "./osu/score";
-import { logTwitchMessageCommandDetected } from "../commands";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
 import type { Client as IrcClient } from "irc";
@@ -55,49 +59,29 @@ export const errorMessageOsuApiCredentialsUndefined = () => {
   return error;
 };
 
-/**
- * Regex to recognize the `!np` command.
- *
- * @example
- * ```text
- * !np $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexNp = /^\s*!np(?:\s*|\s.*)$/i;
+export interface OsuChatHandlerCommandPpRpData extends CommandDetectorPpRpData {
+  /**
+   * The osu API (v2) credentials.
+   */
+  osuApiV2Credentials?: OsuApiV2Credentials;
+  /**
+   * Default osu Account ID (used for checking for existing scores).
+   */
+  defaultOsuId?: number;
+}
 
-/**
- * Regex to recognize the `!rp` command.
- *
- * @example
- * ```text
- * !rp $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexRp = /^\s*!rp(?:\s*|\s.*)$/i;
-
-/**
- * Regex to recognize the `!rp $OPTIONAL_OSU_USER_ID` command.
- *
- * - The first group is the custom osu user ID number.
- *
- * @example
- * ```text
- * !rp 12345 $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexRpCustomId = /^\s*!rp\s+([0-9]+)\s*.*$/i;
-
-/**
- * Regex to recognize the `!rp $OPTIONAL_OSU_USER_NAME` command.
- *
- * - The first group is the custom osu user name string.
- *
- * @example
- * ```text
- * !rp osuName $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexRpCustomName = /^\s*!rp\s+(\S+)\s*.*$/i;
+export interface CommandDetectorPpRpData {
+  /**
+   * Custom osu account ID (use this over the default osu
+   * account ID and over the not undefined custom osu name if not undefined).
+   */
+  customOsuId?: number;
+  /**
+   * The osu account name (use this over the default osu
+   * account ID if not undefined).
+   */
+  customOsuName?: string;
+}
 
 /**
  * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
@@ -110,40 +94,6 @@ export const regexRpCustomName = /^\s*!rp\s+(\S+)\s*.*$/i;
  * ```
  */
 export const regexScore = /^\s*!score\s+(\S+)\s*.*$/i;
-
-/**
- * Regex to recognize the `!pp` command.
- *
- * @example
- * ```text
- * !pp $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexPp = /^\s*!pp(?:\s*|\s.*)$/i;
-
-/**
- * Regex to recognize the `!pp $OPTIONAL_OSU_USER_ID` command.
- *
- * - The first group is the custom osu ID number.
- *
- * @example
- * ```text
- * !pp 12345 $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexPpCustomId = /^\s*!pp\s+([0-9]+)\s*.*$/i;
-
-/**
- * Regex to recognize the `!pp $OPTIONAL_OSU_USER_NAME` command.
- *
- * - The first group is the custom osu user name string.
- *
- * @example
- * ```text
- * !pp osuName $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
 
 /**
  * Regex that matches osu beatmap URLs in any message.
@@ -205,9 +155,9 @@ export interface OsuApiV2Credentials {
   clientSecret: string;
 }
 
-let lastBeatmapId: number | undefined;
-let runtimeToggleEnableBeatmapRequests = true;
-let runtimeToggleDisableBeatmapRequestsCustomMessage: string | undefined;
+let globalLastBeatmapId: number | undefined;
+let globalRuntimeToggleEnableBeatmapRequests = true;
+let globalRuntimeToggleDisableBeatmapRequestsCustomMessage: string | undefined;
 
 export interface OsuChatHandlerData {
   osuApiV2Credentials?: OsuApiV2Credentials;
@@ -230,90 +180,65 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   globalPlugins,
   globalMacros,
   logger
-): Promise<void> => {
+) => {
   // > !np
-  if (message.match(regexNp) && data.enabled.includes(OsuCommands.NP)) {
-    logTwitchMessageCommandDetected(
-      logger,
-      tags.id,
-      [tags.username ? `#${tags.username}` : "undefined", message],
-      LOG_ID_COMMAND_OSU,
-      OsuCommands.NP,
-      LOG_ID_MODULE_OSU
-    );
-    await commandNp(
+  const commandNpDetected = detectCommandNp(tags, message, data.enabled);
+  if (commandNpDetected) {
+    twitchChatCommandDetected(logger, commandNpDetected);
+    const commandNpReply = await commandNp(
       client,
       channel,
-      tags.id,
-      tags.username,
-      data.osuApiV2Credentials,
-      data.osuStreamCompanionCurrentMapData,
+      tags,
+      {
+        osuApiV2Credentials: data.osuApiV2Credentials,
+        osuStreamCompanionCurrentMapData: data.osuStreamCompanionCurrentMapData,
+      },
       globalStrings,
       globalPlugins,
       globalMacros,
       logger
     );
-    return;
+    twitchChatCommandReply(logger, commandNpReply);
   }
   // > !rp
-  if (message.match(regexRp) && data.enabled.includes(OsuCommands.RP)) {
-    logTwitchMessageCommandDetected(
-      logger,
-      tags.id,
-      [tags.username ? `#${tags.username}` : "undefined", message],
-      LOG_ID_COMMAND_OSU,
-      OsuCommands.RP,
-      LOG_ID_MODULE_OSU
-    );
-    if (data.osuDefaultId === undefined) {
-      throw Error("Default OSU ID was undefined");
-    }
-    const matchId = regexRpCustomId.exec(message);
-    const matchName = regexRpCustomName.exec(message);
-    await commandRp(
+  const commandRpDetected = detectCommandRp(tags, message, data.enabled);
+  if (commandRpDetected) {
+    twitchChatCommandDetected(logger, commandRpDetected);
+    const commandReply = await commandRp(
       client,
       channel,
-      tags.id,
-      data.osuApiV2Credentials,
-      data.osuDefaultId,
-      matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
-      matchName && matchName.length >= 2 ? matchName[1] : undefined,
+      tags,
+      {
+        defaultOsuId: data.osuDefaultId,
+        osuApiV2Credentials: data.osuApiV2Credentials,
+        ...commandRpDetected.data,
+      },
       globalStrings,
       globalPlugins,
       globalMacros,
       logger
     );
-    return;
+    twitchChatCommandReply(logger, commandReply);
   }
   // > !pp
-  if (message.match(regexPp) && data.enabled.includes(OsuCommands.PP)) {
-    logTwitchMessageCommandDetected(
-      logger,
-      tags.id,
-      [tags.username ? `#${tags.username}` : "undefined", message],
-      LOG_ID_COMMAND_OSU,
-      OsuCommands.PP,
-      LOG_ID_MODULE_OSU
-    );
-    if (data.osuDefaultId === undefined) {
-      throw Error("Default OSU ID was undefined");
-    }
-    const matchId = regexPpCustomId.exec(message);
-    const matchName = regexPpCustomName.exec(message);
-    await commandPp(
+  const commandPpDetected = detectCommandPp(tags, message, data.enabled);
+  if (commandPpDetected) {
+    twitchChatCommandDetected(logger, commandPpDetected);
+    const commandReply = await commandPp(
       client,
       channel,
-      tags.id,
-      data.osuApiV2Credentials,
-      data.osuDefaultId,
-      matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
-      matchName && matchName.length >= 2 ? matchName[1] : undefined,
+      tags,
+      {
+        defaultOsuId: data.osuDefaultId,
+        osuApiV2Credentials: data.osuApiV2Credentials,
+        ...commandPpDetected.data,
+      },
       globalStrings,
       globalPlugins,
       globalMacros,
       logger
     );
-    return;
+    twitchChatCommandReply(logger, commandReply);
   }
   // > !score
   if (message.match(regexScore) && data.enabled.includes(OsuCommands.SCORE)) {
@@ -332,7 +257,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
       tags.id,
       tags.username,
       data.osuApiV2Credentials,
-      lastBeatmapId,
+      globalLastBeatmapId,
       match && match.length >= 2 ? match[1] : undefined,
       globalStrings,
       globalPlugins,
@@ -359,7 +284,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
           "enable_beatmap_requests",
           LOG_ID_MODULE_OSU
         );
-        runtimeToggleEnableBeatmapRequests = true;
+        globalRuntimeToggleEnableBeatmapRequests = true;
       } else {
         logTwitchMessageCommandDetected(
           logger,
@@ -369,9 +294,10 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
           "disable_beatmap_requests",
           LOG_ID_MODULE_OSU
         );
-        runtimeToggleEnableBeatmapRequests = false;
+        globalRuntimeToggleEnableBeatmapRequests = false;
         if (matchDisable != null && matchDisable.length >= 2) {
-          runtimeToggleDisableBeatmapRequestsCustomMessage = matchDisable[1];
+          globalRuntimeToggleDisableBeatmapRequestsCustomMessage =
+            matchDisable[1];
         }
       }
       await commandSetBeatmapRequests(
@@ -380,8 +306,8 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         tags.id,
         tags.username,
         parseTwitchBadgeLevel(tags),
-        runtimeToggleEnableBeatmapRequests,
-        runtimeToggleDisableBeatmapRequestsCustomMessage,
+        globalRuntimeToggleEnableBeatmapRequests,
+        globalRuntimeToggleDisableBeatmapRequestsCustomMessage,
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -405,8 +331,8 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         channel,
         tags.id,
         tags.username,
-        runtimeToggleEnableBeatmapRequests,
-        runtimeToggleDisableBeatmapRequestsCustomMessage,
+        globalRuntimeToggleEnableBeatmapRequests,
+        globalRuntimeToggleDisableBeatmapRequestsCustomMessage,
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -426,13 +352,13 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         "beatmap_detected",
         LOG_ID_MODULE_OSU
       );
-      if (!runtimeToggleEnableBeatmapRequests) {
+      if (!globalRuntimeToggleEnableBeatmapRequests) {
         await commandBeatmapWhenDisabled(
           client,
           channel,
           tags.id,
           tags.username,
-          runtimeToggleDisableBeatmapRequestsCustomMessage,
+          globalRuntimeToggleDisableBeatmapRequestsCustomMessage,
           globalStrings,
           globalPlugins,
           globalMacros,
@@ -448,7 +374,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
           if (match != null) {
             const beatmapId =
               match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]);
-            lastBeatmapId = beatmapId;
+            globalLastBeatmapId = beatmapId;
             await commandBeatmap(
               client,
               channel,

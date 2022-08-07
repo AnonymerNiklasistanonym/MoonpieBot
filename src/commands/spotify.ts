@@ -1,13 +1,12 @@
 import {
   errorMessageIdUndefined,
   logTwitchMessageCommandDetected,
-  logTwitchMessageCommandReply,
-  logTwitchMessageCommandReply2,
+  twitchChatCommandReply,
 } from "../commands";
 import { messageParserById } from "../messageParser";
 import { spotifyCommandReplySong } from "../strings/spotify/commandReply";
 // Type imports
-import type { TwitchChatHandler } from "../twitch";
+import type { TwitchChatCommandHandler, TwitchChatHandler } from "../twitch";
 
 /**
  * The logging ID of this command.
@@ -50,12 +49,11 @@ export interface Artist {
   name: string;
 }
 
-export const commandSong: TwitchChatHandler = async (
+export const commandSong: TwitchChatCommandHandler = async (
   client,
   channel,
   tags,
   _,
-  __,
   globalStrings,
   globalPlugins,
   globalMacros,
@@ -116,13 +114,12 @@ export const spotifyChatHandler: TwitchChatHandler<
       client,
       channel,
       tags,
-      message,
       undefined,
       globalStrings,
       globalPlugins,
       globalMacros,
       logger
     );
-    logTwitchMessageCommandReply2(logger, commandReply);
+    twitchChatCommandReply(logger, commandReply);
   }
 };

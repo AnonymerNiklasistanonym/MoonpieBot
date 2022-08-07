@@ -89,6 +89,7 @@ export const createStreamCompanionConnection = (
   });
   logStreamCompanion.info(
     `Try to connect to StreamCompanion via '${
+      // eslint-disable-next-line no-underscore-dangle
       (ws as unknown as ReconnectingWebSocketHelper)._url
     }' (url=${websocketUrl}, timeout=${websocketReconnectTimeoutInS}s)`
   );

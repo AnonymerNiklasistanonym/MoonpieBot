@@ -1,24 +1,51 @@
+// Package imports
+import { deprecate } from "util";
 // Local imports
-import { logTwitchMessageDetected, logTwitchMessageReply, TwitchChatHandlerSuccessfulReply } from "./twitch";
+import {
+  logTwitchMessageDetected,
+  logTwitchMessageReply,
+  TwitchChatHandlerCommandDetect,
+  TwitchChatHandlerSuccessfulReply,
+} from "./twitch";
 // Type imports
 import type { Logger } from "winston";
 
-export const logTwitchMessageCommandReply = (
+export const logTwitchMessageCommandReply = deprecate(
+  (
+    logger: Logger,
+    messageId: string,
+    sentMessage: string[],
+    commandId: string,
+    subcommandId: string
+  ) => {
+    logTwitchMessageReply(
+      logger,
+      messageId,
+      sentMessage,
+      `${commandId}:${subcommandId}`
+    );
+  },
+  "Stop using this function pls"
+);
+
+export const twitchChatCommandDetected = <DATA>(
   logger: Logger,
-  messageId: string,
-  sentMessage: string[],
-  commandId: string,
-  subcommandId: string
+  commandDetected: TwitchChatHandlerCommandDetect<DATA>
 ) => {
-  logTwitchMessageReply(
+  logTwitchMessageCommandDetected(
     logger,
-    messageId,
-    sentMessage,
-    `${commandId}:${subcommandId}`
+    commandDetected.messageId,
+    [
+      commandDetected.userName ? `#${commandDetected.userName}` : "UNDEFINED",
+      commandDetected.message,
+    ],
+    commandDetected.commandId,
+    commandDetected.subcommandId,
+    commandDetected.detectorId
   );
 };
 
-export const logTwitchMessageCommandReply2 = (
+export const twitchChatCommandReply = (
   logger: Logger,
   commandReply: TwitchChatHandlerSuccessfulReply
 ) => {
@@ -36,14 +63,14 @@ export const logTwitchMessageCommandDetected = (
   message: string[],
   commandId: string,
   subcommandId: string,
-  detectorId: string
+  detectorId?: string
 ) => {
   logTwitchMessageDetected(
     logger,
     messageId === undefined ? "ERROR:UNDEFINED" : messageId,
     message,
     `'${commandId}:${subcommandId}'`,
-    detectorId
+    detectorId ? detectorId : "TODO"
   );
 };
 
