@@ -27,13 +27,13 @@ import { messageParserById } from "../../messageParser";
 import { pluginOsuBeatmapId } from "../../messageParser/plugins/osuApi";
 import { tryToSendOsuIrcMessage } from "../../osuirc";
 // Type imports
+import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {
   TwitchChatHandlerSuccessfulReply,
   TwitchMessageCommandHandler,
 } from "../../twitch";
 import type { Beatmap } from "osu-api-v2";
 import type { Client as IrcClient } from "irc";
-import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 
 /**
@@ -56,7 +56,7 @@ export const regexBeatmapUrl =
   // eslint-disable-next-line security/detect-unsafe-regex
   /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))\s*(?:\s+(.+?))?(?:\s*$|$)/i;
 
-export interface CommandHandlerBeatmapData {
+export interface CommandHandlerBeatmapDataBase {
   /**
    * The osu API (v2) credentials.
    */
@@ -69,9 +69,11 @@ export interface CommandHandlerBeatmapData {
   enableOsuBeatmapRequestsDetailed?: boolean;
   osuIrcBot?: (id: string) => IrcClient;
   osuIrcRequestTarget?: string;
-  beatmapRequestsOffMessage?: string;
 }
-
+export interface CommandHandlerBeatmapData
+  extends CommandHandlerBeatmapDataBase {
+  beatmapRequestsInfo: BeatmapRequestsInfo;
+}
 export interface BeatmapRequest {
   beatmapId: number;
   comment?: string;
@@ -158,8 +160,8 @@ export const commandBeatmap: TwitchMessageCommandHandler<
         new Map([
           [
             MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
-            data.beatmapRequestsOffMessage
-              ? data.beatmapRequestsOffMessage
+            data.beatmapRequestsInfo.beatmapRequestsOffMessage
+              ? data.beatmapRequestsInfo.beatmapRequestsOffMessage
               : "",
           ],
         ])
@@ -207,6 +209,9 @@ export const commandBeatmap: TwitchMessageCommandHandler<
           oauthAccessToken,
           beatmapRequest.beatmapId
         );
+        if (beatmap) {
+          data.beatmapRequestsInfo.lastBeatmapId = beatmap.id;
+        }
         osuBeatmapRequestMacros.set(
           pluginOsuBeatmapId,
           new Map(convertOsuBeatmapToMacros(beatmap))

@@ -14,10 +14,10 @@ import {
 import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 // Type imports
-import type { OsuApiV2Credentials } from "../osu";
+import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type { TwitchMessageCommandHandler } from "../../twitch";
 
-export interface CommandHandlerPpRpData {
+export interface CommandHandlerPpRpDataBase {
   /**
    * The osu API (v2) credentials.
    */
@@ -26,6 +26,10 @@ export interface CommandHandlerPpRpData {
    * Default osu Account ID (used for checking for existing scores).
    */
   defaultOsuId?: number;
+}
+
+export interface CommandHandlerPpRpData extends CommandHandlerPpRpDataBase {
+  beatmapRequestsInfo: BeatmapRequestsInfo;
 }
 
 export interface CommandDetectorPpRpData {

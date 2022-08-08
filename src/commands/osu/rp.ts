@@ -154,6 +154,9 @@ export const commandRp: TwitchMessageCommandHandler<
 
     let message = "";
     if (lastPlay.length > 0) {
+      if (lastPlay[0].beatmap?.id) {
+        data.beatmapRequestsInfo.lastBeatmapId = lastPlay[0].beatmap?.id;
+      }
       message = await messageParserById(
         osuCommandReplyRp.id,
         globalStrings,

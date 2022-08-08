@@ -22,7 +22,7 @@ import { createLogFunc } from "../../logging";
 import { getProcessWindowTitle } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
 // Type imports
-import type { OsuApiV2Credentials } from "../osu";
+import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type { StreamCompanionConnection } from "../../streamcompanion";
 import type { TwitchMessageCommandHandler } from "../../twitch";
 
@@ -62,7 +62,7 @@ export const roundToOneDecimalPlace = (num: undefined | number) => {
   return Math.round(num * ROUND_TO_1_DIGIT_FACTOR) / ROUND_TO_1_DIGIT_FACTOR;
 };
 
-export interface CommandHandlerNpData {
+export interface CommandHandlerNpDataBase {
   /**
    * The osu API (v2) credentials.
    */
@@ -71,6 +71,10 @@ export interface CommandHandlerNpData {
    * If available get the current map data using StreamCompanion.
    */
   osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
+}
+
+export interface CommandHandlerNpData extends CommandHandlerNpDataBase {
+  beatmapRequestsInfo: BeatmapRequestsInfo;
 }
 
 /**
@@ -127,6 +131,7 @@ export const commandNp: TwitchMessageCommandHandler<CommandHandlerNpData> = {
         currentMapData.mapid !== undefined &&
         currentMapData.mapid !== 0
       ) {
+        data.beatmapRequestsInfo.lastBeatmapId = currentMapData.mapid;
         msg = await messageParserById(
           osuCommandReplyNpStreamCompanion.id,
           globalStrings,
@@ -201,6 +206,7 @@ export const commandNp: TwitchMessageCommandHandler<CommandHandlerNpData> = {
                     match[3].trim().toLocaleLowerCase()
                 );
                 if (exactBeatmapDiff) {
+                  data.beatmapRequestsInfo.lastBeatmapId = exactBeatmapDiff.id;
                   mapId = exactBeatmapDiff.id;
                 }
               }
