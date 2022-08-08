@@ -70,26 +70,26 @@ export const commandRp: TwitchMessageCommandHandler<
     id: OsuCommands.RP,
     groupId: LOG_ID_COMMAND_OSU,
   },
-  detect: (tags, message, enabledCommands) => {
+  detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
       throw errorMessageEnabledCommandsUndefined();
     }
-    if (message.match(regexRp) && enabledCommands.includes(OsuCommands.RP)) {
-      const matchId = regexRpCustomId.exec(message);
-      const matchName = regexRpCustomName.exec(message);
-      return {
-        message: message,
-        messageId: tags.id,
-        userName: tags.username,
-        data: {
-          customOsuId:
-            matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
-          customOsuName:
-            matchName && matchName.length >= 2 ? matchName[1] : undefined,
-        },
-      };
+    if (!message.match(regexRp)) {
+      return false;
     }
-    return false;
+    if (!enabledCommands.includes(OsuCommands.RP)) {
+      return false;
+    }
+    const matchId = regexRpCustomId.exec(message);
+    const matchName = regexRpCustomName.exec(message);
+    return {
+      data: {
+        customOsuId:
+          matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
+        customOsuName:
+          matchName && matchName.length >= 2 ? matchName[1] : undefined,
+      },
+    };
   },
   handle: async (
     client,

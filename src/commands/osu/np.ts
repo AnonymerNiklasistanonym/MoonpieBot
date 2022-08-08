@@ -87,15 +87,12 @@ export const commandNp: TwitchMessageCommandHandler<CommandHandlerNpData> = {
     id: OsuCommands.NP,
     groupId: LOG_ID_COMMAND_OSU,
   },
-  detect: (tags, message, enabledCommands) => {
+  detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
       throw errorMessageEnabledCommandsUndefined();
     }
     if (message.match(regexNp) && enabledCommands.includes(OsuCommands.NP)) {
       return {
-        message: message,
-        messageId: tags.id,
-        userName: tags.username,
         data: {},
       };
     }

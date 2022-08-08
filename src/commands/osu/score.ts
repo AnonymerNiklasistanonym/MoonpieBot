@@ -2,9 +2,8 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
+  errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
-  errorMessageUserNameUndefined,
-  logTwitchMessageCommandReply,
 } from "../../commands";
 import {
   errorMessageOsuApiCredentialsUndefined,
@@ -17,148 +16,180 @@ import {
 } from "../../messageParser/macros/osuScoreRequest";
 import {
   osuScore,
-  osuScoreNoBeatmap,
-  osuScoreNotFound,
+  osuScoreErrorNoBeatmap,
+  osuScoreErrorNotFound,
 } from "../../strings/osu/commandReply";
 import { convertOsuScoreToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
 import { messageParserById } from "../../messageParser";
+import { NOT_FOUND_STATUS_CODE } from "../../info/other";
+import { OsuCommands } from "../../info/commands";
 import { pluginOsuScoreId } from "../../messageParser/plugins/osuApi";
 // Type imports
-import type { Macros, Plugins } from "../../messageParser";
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
 import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
-import type { Strings } from "../../strings";
-
-const NOT_FOUND_STATUS_CODE = 404;
+import type { TwitchMessageCommandHandler } from "src/twitch";
 
 /**
- * Post information about a osu Beatmap in the chat and if existing also show
- * the current top score of the default osu User in the chat.
+ * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
  *
- * @param client Twitch client (used to send messages).
- * @param channel Twitch channel (where the response should be sent to).
- * @param messageId Twitch message ID of the request (used for logging).
- * @param userName Twitch user name of the requester.
- * @param osuApiV2Credentials The osu API (v2) credentials.
- * @param beatmapId The osu beatmap ID.
- * @param osuUserName The osu account name for which the score should be fetched.
- * @param globalStrings Global message strings.
- * @param globalPlugins Global plugins.
- * @param globalMacros Global macros.
- * @param logger Logger (used for global logs).
+ * - The first group is the custom osu user name string.
+ *
+ * @example
+ * ```text
+ * !score osuName $OPTIONAL_TEXT_WITH_SPACES
+ * ```
  */
-export const commandScore = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  userName: string | undefined,
-  osuApiV2Credentials: OsuApiV2Credentials | undefined,
-  beatmapId: number | undefined,
-  osuUserName: string | undefined,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw errorMessageIdUndefined();
-  }
-  if (userName === undefined) {
-    throw errorMessageUserNameUndefined();
-  }
-  if (osuApiV2Credentials === undefined) {
-    throw errorMessageOsuApiCredentialsUndefined();
-  }
-  if (osuUserName === undefined) {
-    throw Error("Unable to reply to message! (osuUserName is undefined)");
-  }
+export const regexScore = /^\s*!score\s+(\S+)\s*.*$/i;
 
-  const logCmdBeatmap = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU, {
-    subsection: "score",
-  });
+export interface CommandHandlerScoreDataBase {
+  /**
+   * The osu API (v2) credentials.
+   */
+  osuApiV2Credentials?: OsuApiV2Credentials;
+}
 
-  const osuBeatmapRequestMacros = new Map(globalMacros);
-  osuBeatmapRequestMacros.set(
-    macroOsuScoreRequestId,
-    new Map([
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      [MacroOsuScoreRequest.USER_NAME, `${beatmapId}`],
-      [MacroOsuScoreRequest.USER_NAME, osuUserName],
-    ])
-  );
+export interface CommandHandlerScoreData extends CommandHandlerScoreDataBase {
+  /**
+   * The osu beatmap ID.
+   */
+  beatmapId?: number;
+}
 
-  if (beatmapId === undefined) {
+export interface CommandDetectorScoreData {
+  /**
+   * The osu account name for which the score should be fetched.
+   */
+  osuUserName: string;
+}
+
+/**
+ * Score command:
+ * Get the score of the last requested map of either the default user or a
+ * custom supplied user.
+ */
+export const commandScore: TwitchMessageCommandHandler<
+  CommandHandlerScoreData,
+  CommandDetectorScoreData
+> = {
+  info: {
+    id: OsuCommands.SCORE,
+    groupId: LOG_ID_COMMAND_OSU,
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!message.match(regexScore)) {
+      return false;
+    }
+    if (!enabledCommands.includes(OsuCommands.SCORE)) {
+      return false;
+    }
+    const match = regexScore.exec(message);
+    if (!match || match.length < 2) {
+      return false;
+    }
+    return {
+      data: {
+        osuUserName: match[1],
+      },
+    };
+  },
+  handle: async (
+    client,
+    channel,
+    tags,
+    data,
+    globalStrings,
+    globalPlugins,
+    globalMacros,
+    logger
+  ) => {
+    if (tags.id === undefined) {
+      throw errorMessageIdUndefined();
+    }
+    if (data.osuApiV2Credentials === undefined) {
+      throw errorMessageOsuApiCredentialsUndefined();
+    }
+
+    if (data.beatmapId === undefined) {
+      const errorMessage = await messageParserById(
+        osuScoreErrorNoBeatmap.id,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger
+      );
+      throw Error(errorMessage);
+    }
+
+    const osuBeatmapRequestMacros = new Map(globalMacros);
+    osuBeatmapRequestMacros.set(
+      macroOsuScoreRequestId,
+      new Map([
+        [MacroOsuScoreRequest.BEATMAP_ID, `${data.beatmapId}`],
+        [MacroOsuScoreRequest.USER_NAME, data.osuUserName],
+      ])
+    );
+
+    const logCmdBeatmap = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU, {
+      subsection: OsuCommands.SCORE,
+    });
+
+    const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
+      data.osuApiV2Credentials.clientId,
+      data.osuApiV2Credentials.clientSecret
+    );
+
+    // Get beatmap and if found the current top score and convert them into a
+    // message for Twitch and IRC channel
+    try {
+      const user = await osuApiV2.search.user(
+        oauthAccessToken,
+        data.osuUserName
+      );
+      const userId = user.user.data[0].id;
+      const beatmapScore = await osuApiV2.beatmaps.scores.users(
+        oauthAccessToken,
+        data.beatmapId,
+        userId
+      );
+      osuBeatmapRequestMacros.set(
+        pluginOsuScoreId,
+        new Map(convertOsuScoreToMacros(beatmapScore))
+      );
+      // Check for user score
+    } catch (err) {
+      if (
+        (err as OsuApiV2WebRequestError).statusCode === NOT_FOUND_STATUS_CODE
+      ) {
+        logCmdBeatmap.warn((err as OsuApiV2WebRequestError).message);
+        const errorMessage = await messageParserById(
+          osuScoreErrorNotFound.id,
+          globalStrings,
+          globalPlugins,
+          osuBeatmapRequestMacros,
+          logger
+        );
+        throw Error(errorMessage);
+      } else {
+        throw err;
+      }
+    }
+
     const message = await messageParserById(
-      osuScoreNoBeatmap.id,
+      osuScore.id,
       globalStrings,
       globalPlugins,
       osuBeatmapRequestMacros,
       logger
     );
+
     const sentMessage = await client.say(channel, message);
-    logTwitchMessageCommandReply(
-      logger,
-      messageId,
+    return {
+      replyToMessageId: tags.id,
       sentMessage,
-      LOG_ID_COMMAND_OSU,
-      "beatmap"
-    );
-    return;
-  }
-
-  const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
-    osuApiV2Credentials.clientId,
-    osuApiV2Credentials.clientSecret
-  );
-
-  // Get beatmap and if found the current top score and convert them into a
-  // message for Twitch and IRC channel
-  try {
-    const user = await osuApiV2.search.user(oauthAccessToken, osuUserName);
-    const userId = user.user.data[0].id;
-    const beatmapScore = await osuApiV2.beatmaps.scores.users(
-      oauthAccessToken,
-      beatmapId,
-      userId
-    );
-    osuBeatmapRequestMacros.set(
-      pluginOsuScoreId,
-      new Map(convertOsuScoreToMacros(beatmapScore))
-    );
-    // Check for user score
-  } catch (err) {
-    if ((err as OsuApiV2WebRequestError).statusCode === NOT_FOUND_STATUS_CODE) {
-      logCmdBeatmap.warn((err as OsuApiV2WebRequestError).message);
-      const errorMessage = await messageParserById(
-        osuScoreNotFound.id,
-        globalStrings,
-        globalPlugins,
-        osuBeatmapRequestMacros,
-        logger
-      );
-      throw Error(errorMessage);
-    } else {
-      throw err;
-    }
-  }
-
-  const message = await messageParserById(
-    osuScore.id,
-    globalStrings,
-    globalPlugins,
-    osuBeatmapRequestMacros,
-    logger
-  );
-  const sentMessage = await client.say(channel, message);
-
-  logTwitchMessageCommandReply(
-    logger,
-    messageId,
-    sentMessage,
-    LOG_ID_COMMAND_OSU,
-    "score"
-  );
+    };
+  },
 };

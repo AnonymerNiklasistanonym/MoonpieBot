@@ -30,22 +30,19 @@ export const commandSong: TwitchMessageCommandHandler<Record<never, never>> = {
     id: SpotifyCommands.SONG,
     groupId: LOG_ID_COMMAND_SPOTIFY,
   },
-  detect: (tags, message, enabledCommands) => {
+  detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
       throw errorMessageEnabledCommandsUndefined();
     }
-    if (
-      message.match(regexSong) &&
-      enabledCommands.includes(SpotifyCommands.SONG)
-    ) {
-      return {
-        message: message,
-        messageId: tags.id,
-        userName: tags.username,
-        data: {},
-      };
+    if (!message.match(regexSong)) {
+      return false;
     }
-    return false;
+    if (!enabledCommands.includes(SpotifyCommands.SONG)) {
+      return false;
+    }
+    return {
+      data: {},
+    };
   },
   handle: async (
     client,

@@ -131,12 +131,11 @@ export interface TwitchChatHandlerSuccessfulReply {
 }
 
 export interface TwitchChatHandlerCommandDetect<DATA> {
-  message: string;
-  messageId?: string;
-  userName?: string;
   detectorId?: string;
   data: DATA;
 }
+
+type EMPTY_OBJECT = Record<never, never>;
 
 /**
  * A global type for all Twitch chat (message) handler functions.
@@ -164,7 +163,7 @@ export type TwitchChatHandler<DATA = undefined, RETURN_VALUE = void> = (
   logger: Readonly<Logger>
 ) => Promise<RETURN_VALUE>;
 
-export type TwitchChatCommandDetector<DATA = Record<never, never>> = (
+export type TwitchChatCommandDetector<DATA = EMPTY_OBJECT> = (
   tags: Readonly<ChatUserstate>,
   message: Readonly<string>,
   enabledCommands?: Readonly<string[]>
@@ -175,7 +174,7 @@ export type TwitchChatCommandDetector<DATA = Record<never, never>> = (
  *
  * @tparam DATA A custom data object for the command.
  */
-export type TwitchChatCommandHandler<DATA = Record<never, never>> = (
+export type TwitchChatCommandHandler<DATA = EMPTY_OBJECT> = (
   client: Readonly<Client>,
   channel: Readonly<string>,
   /**
@@ -191,7 +190,9 @@ export type TwitchChatCommandHandler<DATA = Record<never, never>> = (
   globalPlugins: Readonly<Plugins>,
   globalMacros: Readonly<Macros>,
   logger: Readonly<Logger>
-) => Promise<TwitchChatHandlerSuccessfulReply>;
+) => Promise<
+  TwitchChatHandlerSuccessfulReply | TwitchChatHandlerSuccessfulReply[]
+>;
 
 /**
  * Additional information for Twitch logs.
@@ -206,8 +207,8 @@ export interface TwitchChatCommandInfo {
 }
 
 export interface TwitchMessageCommandHandler<
-  DATA_HANDLE = Record<never, never>,
-  DATA_DETECTOR = Record<never, never>
+  DATA_HANDLE = EMPTY_OBJECT,
+  DATA_DETECTOR = EMPTY_OBJECT
 > {
   info: TwitchChatCommandInfo;
   detect: TwitchChatCommandDetector<DATA_DETECTOR>;
@@ -303,15 +304,15 @@ export const logTwitchMessageDetected = (
 export const twitchChatCommandDetected = <DATA>(
   logger: Logger,
   commandInfo: TwitchChatCommandInfo,
-  commandDetected: TwitchChatHandlerCommandDetect<DATA>
+  commandDetected: TwitchChatHandlerCommandDetect<DATA>,
+  messageId: string | undefined,
+  userName: string | undefined,
+  message: string
 ) => {
   logTwitchMessageDetected(
     logger,
-    commandDetected.messageId ? commandDetected.messageId : "ERROR:UNDEFINED",
-    [
-      commandDetected.userName ? `#${commandDetected.userName}` : "UNDEFINED",
-      commandDetected.message,
-    ],
+    messageId ? messageId : "ERROR:UNDEFINED",
+    [userName ? `#${userName}` : "UNDEFINED", message],
     `'${commandInfo.groupId}:${commandInfo.id}'`,
     commandDetected.detectorId ? commandDetected.detectorId : "TODO"
   );
@@ -332,7 +333,7 @@ export const twitchChatCommandReply = (
 
 export const handleTwitchCommand = async <
   DATA extends DATA_HANDLE,
-  DATA_HANDLE extends DATA_DETECT,
+  DATA_HANDLE,
   DATA_DETECT
 >(
   client: Readonly<Client>,
@@ -349,7 +350,14 @@ export const handleTwitchCommand = async <
 ): Promise<boolean> => {
   const commandDetected = command.detect(tags, message, enabledCommands);
   if (commandDetected) {
-    twitchChatCommandDetected(logger, command.info, commandDetected);
+    twitchChatCommandDetected(
+      logger,
+      command.info,
+      commandDetected,
+      tags.id,
+      tags.username,
+      message
+    );
     const commandReply = await command.handle(
       client,
       channel,
@@ -360,7 +368,13 @@ export const handleTwitchCommand = async <
       globalMacros,
       logger
     );
-    twitchChatCommandReply(logger, command.info, commandReply);
+    if (Array.isArray(commandReply)) {
+      for (const a of commandReply) {
+        twitchChatCommandReply(logger, command.info, a);
+      }
+    } else {
+      twitchChatCommandReply(logger, command.info, commandReply);
+    }
     return true;
   }
   return false;

@@ -345,15 +345,11 @@ export const getCustomCommand = (
           currentTimestamp - lastTimestamp <=
           customCommand.cooldownInS * 1000
         ) {
-          //createLogFunc(logger, LOG_ID_MODULE_CUSTOM_COMMAND).debug(
-          //  `Custom command '${customCommand.id}' won't be executed because of a cooldown of ${customCommand.cooldownInS}s`
-          //);
           return false;
         }
       }
       // eslint-disable-next-line security/detect-non-literal-regexp
-      const regex = new RegExp(customCommand.regexString);
-      const match = message.match(regex);
+      const match = message.match(new RegExp(customCommand.regexString));
       if (!match) {
         return false;
       }

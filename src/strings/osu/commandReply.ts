@@ -726,21 +726,15 @@ export const osuCommandReplyPp = {
   ]),
 };
 
-export const osuScoreNoBeatmap = {
+export const osuScoreErrorNoBeatmap = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_BEATMAP`,
-  default: createMessageForMessageParser([
-    "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
-    " No beatmap was found",
-  ]),
+  default: createMessageForMessageParser(["No beatmap was found"]),
 };
 
-export const osuScoreNotFound = {
+export const osuScoreErrorNotFound = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_SCORE`,
   default: createMessageForMessageParser([
-    "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
-    " No score was found of the user ",
+    "No score was found of the user ",
     {
       type: "macro",
       name: macroOsuScoreRequestId,
@@ -775,7 +769,7 @@ export const osuCommandReply = [
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
   osuCommandReplyPp,
-  osuScoreNoBeatmap,
-  osuScoreNotFound,
+  osuScoreErrorNoBeatmap,
+  osuScoreErrorNotFound,
   osuScore,
 ];

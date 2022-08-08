@@ -12,7 +12,7 @@ import {
   regexMoonpieRemove,
   regexMoonpieSet,
 } from "../../src/commands/moonpie";
-import { regexBeatmapUrl } from "../../src/commands/osu";
+import { regexBeatmapUrl } from "../../src/commands/osu/beatmap";
 import { regexNowPlaying } from "../../src/commands/osu/np";
 
 describe("regex", () => {
