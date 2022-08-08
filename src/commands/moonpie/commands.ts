@@ -1,7 +1,4 @@
-import {
-  errorMessageIdUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
+// Local imports
 import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
@@ -18,88 +15,112 @@ import {
   moonpieCommandsRemove,
   moonpieCommandsSet,
 } from "../../strings/moonpie/commands";
+import { errorMessageEnabledCommandsUndefined } from "../../commands";
 import { messageParserById } from "../../messageParser";
 // Type imports
-import type { Macros, Plugins } from "../../messageParser";
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
-import type { Strings } from "../../strings";
+import type { TwitchMessageCommandHandler } from "../../twitch";
 
-export const commandCommands = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  enabled: Readonly<string[]>,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw errorMessageIdUndefined();
-  }
+/**
+ * Regex to recognize the `!moonpie commands` command.
+ *
+ * @example
+ * ```text
+ * !moonpie commands
+ * ```
+ */
+export const regexMoonpieCommands = /^\s*!moonpie\s+commands\s*$/i;
 
-  const commandsStringIds = [];
+export interface CommandCommandsData {
+  enabledCommands: Readonly<string[]>;
+}
 
-  if (enabled.includes(MoonpieCommands.CLAIM)) {
-    commandsStringIds.push(moonpieCommandsClaim.id);
-  }
-  if (enabled.includes(MoonpieCommands.LEADERBOARD)) {
-    commandsStringIds.push(moonpieCommandsLeaderboard.id);
-  }
-  if (enabled.includes(MoonpieCommands.GET)) {
-    commandsStringIds.push(moonpieCommandsGet.id);
-  }
-  if (enabled.includes(MoonpieCommands.SET)) {
-    commandsStringIds.push(moonpieCommandsSet.id);
-  }
-  if (enabled.includes(MoonpieCommands.ADD)) {
-    commandsStringIds.push(moonpieCommandsAdd.id);
-  }
-  if (enabled.includes(MoonpieCommands.REMOVE)) {
-    commandsStringIds.push(moonpieCommandsRemove.id);
-  }
-  if (enabled.includes(MoonpieCommands.DELETE)) {
-    commandsStringIds.push(moonpieCommandsDelete.id);
-  }
-  if (enabled.includes(MoonpieCommands.ABOUT)) {
-    commandsStringIds.push(moonpieCommandsAbout.id);
-  }
+/**
+ * Commands command: Send all available commands of the bot in chat.
+ */
+export const commandCommands: TwitchMessageCommandHandler<CommandCommandsData> =
+  {
+    info: {
+      id: MoonpieCommands.COMMANDS,
+      groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    },
+    detect: (_tags, message, enabledCommands) => {
+      if (enabledCommands === undefined) {
+        throw errorMessageEnabledCommandsUndefined();
+      }
+      if (!message.match(regexMoonpieCommands)) {
+        return false;
+      }
+      if (!enabledCommands.includes(MoonpieCommands.COMMANDS)) {
+        return false;
+      }
+      return { data: {} };
+    },
+    handle: async (
+      client,
+      channel,
+      _tags,
+      data,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
+    ) => {
+      if (data.enabledCommands === undefined) {
+        throw errorMessageEnabledCommandsUndefined();
+      }
+      const commandsStringIds = [];
 
-  if (commandsStringIds.length === 0) {
-    commandsStringIds.push(moonpieCommandsNone.id);
-  }
+      if (data.enabledCommands.includes(MoonpieCommands.CLAIM)) {
+        commandsStringIds.push(moonpieCommandsClaim.id);
+      }
+      if (data.enabledCommands.includes(MoonpieCommands.LEADERBOARD)) {
+        commandsStringIds.push(moonpieCommandsLeaderboard.id);
+      }
+      if (data.enabledCommands.includes(MoonpieCommands.GET)) {
+        commandsStringIds.push(moonpieCommandsGet.id);
+      }
+      if (data.enabledCommands.includes(MoonpieCommands.SET)) {
+        commandsStringIds.push(moonpieCommandsSet.id);
+      }
+      if (data.enabledCommands.includes(MoonpieCommands.ADD)) {
+        commandsStringIds.push(moonpieCommandsAdd.id);
+      }
+      if (data.enabledCommands.includes(MoonpieCommands.REMOVE)) {
+        commandsStringIds.push(moonpieCommandsRemove.id);
+      }
+      if (data.enabledCommands.includes(MoonpieCommands.DELETE)) {
+        commandsStringIds.push(moonpieCommandsDelete.id);
+      }
+      if (data.enabledCommands.includes(MoonpieCommands.ABOUT)) {
+        commandsStringIds.push(moonpieCommandsAbout.id);
+      }
 
-  const commands = [];
-  for (const commandsStringId of commandsStringIds) {
-    commands.push(
-      await messageParserById(
-        commandsStringId,
+      if (commandsStringIds.length === 0) {
+        commandsStringIds.push(moonpieCommandsNone.id);
+      }
+
+      const commands = [];
+      for (const commandsStringId of commandsStringIds) {
+        commands.push(
+          await messageParserById(
+            commandsStringId,
+            globalStrings,
+            globalPlugins,
+            globalMacros,
+            logger
+          )
+        );
+      }
+
+      const messagePrefix = await messageParserById(
+        moonpieCommandsPrefix.id,
         globalStrings,
         globalPlugins,
         globalMacros,
         logger
-      )
-    );
-  }
-
-  const messagePrefix = await messageParserById(
-    moonpieCommandsPrefix.id,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  );
-  const sentMessage = await client.say(
-    channel,
-    `${messagePrefix} ${commands.join(", ")}`
-  );
-
-  logTwitchMessageCommandReply(
-    logger,
-    messageId,
-    sentMessage,
-    LOG_ID_CHAT_HANDLER_MOONPIE,
-    MoonpieCommands.COMMANDS
-  );
-};
+      );
+      const message = `${messagePrefix} ${commands.join(", ")}`;
+      const sentMessage = await client.say(channel, message);
+      return { sentMessage };
+    },
+  };

@@ -1,11 +1,5 @@
 // Local imports
 import {
-  errorMessageIdUndefined,
-  errorMessageUserIdUndefined,
-  errorMessageUserNameUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
-import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
 } from "../../info/commands";
@@ -27,322 +21,455 @@ import {
   moonpieUserSet,
   moonpieUserSetNaNError,
 } from "../../strings/moonpie/user";
+import {
+  parseTwitchBadgeLevel,
+  TwitchBadgeLevels,
+} from "../../other/twitchBadgeParser";
+import { errorMessageEnabledCommandsUndefined } from "../../commands";
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
-import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
-import type { Macros, Plugins } from "../../messageParser";
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
-import type { Strings } from "../../strings";
+import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
+import type { TwitchMessageCommandHandler } from "../../twitch";
 
-export const commandUserGet = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  userName: string | undefined,
-  userId: string | undefined,
-  usernameMoonpieEntry: string,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  moonpieDbPath: string,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw errorMessageIdUndefined();
-  }
-  if (userName === undefined) {
-    throw errorMessageUserNameUndefined();
-  }
-  if (userId === undefined) {
-    throw errorMessageUserIdUndefined();
-  }
+/**
+ * Regex to recognize the `!moonpie get $USER` command.
+ *
+ * - The first group is the user name string.
+ *
+ * @example
+ * ```text
+ * !moonpie get alexa123
+ * ```
+ */
+export const regexMoonpieGet = /^\s*!moonpie\s+get\s+(\S+)\s*$/i;
 
-  let message = "";
+/**
+ * Regex to recognize the `!moonpie set $USER $COUNT` command.
+ *
+ * - The first group is the user name string.
+ * - The second group is the moonpie count that should be set.
+ *
+ * @example
+ * ```text
+ * !moonpie set alexa123 727
+ * ```
+ */
+export const regexMoonpieSet = /^\s*!moonpie\s+set\s+(\S+)\s+([0-9]+)\s*$/i;
 
-  if (await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger)) {
+/**
+ * Regex to recognize the `!moonpie add $USER $COUNT` command.
+ *
+ * - The first group is the user name string.
+ * - The second group is the moonpie count that should be added.
+ *
+ * @example
+ * ```text
+ * !moonpie add alexa123 3
+ * ```
+ */
+export const regexMoonpieAdd = /^\s*!moonpie\s+add\s+(\S+)\s+([0-9]+)\s*$/i;
+
+/**
+ * Regex to recognize the `!moonpie remove $USER $COUNT` command.
+ *
+ * - The first group is the user name string.
+ * - The second group is the moonpie count that should be removed.
+ *
+ * @example
+ * ```text
+ * !moonpie remove alexa123 4
+ * ```
+ */
+export const regexMoonpieRemove =
+  /^\s*!moonpie\s+remove\s+(.*?)\s+([0-9]+)\s*$/i;
+
+/**
+ * Regex to recognize the `!moonpie delete $USER` command.
+ *
+ * - The first group is the user name string.
+ *
+ * @example
+ * ```text
+ * !moonpie delete alexa123
+ * ```
+ */
+export const regexMoonpieDelete = /^\s*!moonpie\s+delete\s+(\S+)\s*$/i;
+
+interface CommandDetectorGetData {
+  userNameMoonpieDb: string;
+}
+
+export const commandGet: TwitchMessageCommandHandler<
+  CommandGenericDataMoonpieDbPath,
+  CommandDetectorGetData
+> = {
+  info: {
+    id: MoonpieCommands.GET,
+    groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!enabledCommands.includes(MoonpieCommands.GET)) {
+      return false;
+    }
+    const match = message.match(regexMoonpieGet);
+    if (!match) {
+      return false;
+    }
+    return { data: { userNameMoonpieDb: match[1] } };
+  },
+  handle: async (
+    client,
+    channel,
+    _tags,
+    data,
+    globalStrings,
+    globalPlugins,
+    globalMacros,
+    logger
+  ) => {
+    let message;
+
+    if (
+      await moonpieDb.existsName(
+        data.moonpieDbPath,
+        data.userNameMoonpieDb,
+        logger
+      )
+    ) {
+      const moonpieEntry = await moonpieDb.getMoonpieName(
+        data.moonpieDbPath,
+        data.userNameMoonpieDb,
+        logger
+      );
+
+      const currentMoonpieLeaderboardEntry =
+        await moonpieDb.getMoonpieLeaderboardEntry(
+          data.moonpieDbPath,
+          moonpieEntry.id,
+          logger
+        );
+
+      const macros = new Map(globalMacros);
+      macros.set(
+        macroMoonpieLeaderboardEntryId,
+        new Map([
+          [MacroMoonpieLeaderboardEntry.NAME, `${data.userNameMoonpieDb}`],
+          [
+            MacroMoonpieLeaderboardEntry.COUNT,
+            `${currentMoonpieLeaderboardEntry.count}`,
+          ],
+          [
+            MacroMoonpieLeaderboardEntry.RANK,
+            `${currentMoonpieLeaderboardEntry.rank}`,
+          ],
+        ])
+      );
+      message = await messageParserById(
+        moonpieUserGet.id,
+        globalStrings,
+        globalPlugins,
+        macros,
+        logger
+      );
+    } else {
+      const macros = new Map(globalMacros);
+      macros.set(
+        macroMoonpieUserNeverClaimedId,
+        new Map([
+          [MacroMoonpieUserNeverClaimed.NAME, `${data.userNameMoonpieDb}`],
+        ])
+      );
+      message = await messageParserById(
+        moonpieUserNeverClaimedError.id,
+        globalStrings,
+        globalPlugins,
+        macros,
+        logger
+      );
+    }
+
+    const sentMessage = await client.say(channel, message);
+    return { sentMessage };
+  },
+};
+
+interface CommandDetectorSetData {
+  userNameMoonpieDb: string;
+  operation: "+" | "-" | "=";
+  setCount: number;
+}
+
+/**
+ * Set command: Set the moonpie count of someone (multiple operations available).
+ */
+export const commandSet: TwitchMessageCommandHandler<
+  CommandGenericDataMoonpieDbPath,
+  CommandDetectorSetData
+> = {
+  info: {
+    id: MoonpieCommands.SET,
+    groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    const matchSet = message.match(regexMoonpieSet);
+    if (matchSet && enabledCommands.includes(MoonpieCommands.SET)) {
+      return {
+        data: {
+          operation: "=",
+          userNameMoonpieDb: matchSet[1],
+          setCount: parseInt(matchSet[2]),
+        },
+      };
+    }
+    const matchAdd = message.match(regexMoonpieAdd);
+    if (matchAdd && enabledCommands.includes(MoonpieCommands.ADD)) {
+      return {
+        data: {
+          operation: "+",
+          userNameMoonpieDb: matchAdd[1],
+          setCount: parseInt(matchAdd[2]),
+        },
+      };
+    }
+    const matchRemove = message.match(regexMoonpieRemove);
+    if (matchRemove && enabledCommands.includes(MoonpieCommands.REMOVE)) {
+      return {
+        data: {
+          operation: "-",
+          userNameMoonpieDb: matchRemove[1],
+          setCount: parseInt(matchRemove[2]),
+        },
+      };
+    }
+    return false;
+  },
+  handle: async (
+    client,
+    channel,
+    tags,
+    data,
+    globalStrings,
+    globalPlugins,
+    globalMacros,
+    logger
+  ) => {
+    const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
+    if (twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER) {
+      const errorMessage = await messageParserById(
+        moonpieUserPermissionError.id,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger
+      );
+      throw Error(errorMessage);
+    }
+    const macros = new Map(globalMacros);
+    macros.set(
+      macroMoonpieUserSetId,
+      new Map([
+        [MacroMoonpieUserSet.NAME, `${data.userNameMoonpieDb}`],
+        [MacroMoonpieUserSet.SET_COUNT, `${data.setCount}`],
+        [MacroMoonpieUserSet.SET_OPERATION, `${data.operation}`],
+      ])
+    );
+    if (!Number.isInteger(data.setCount)) {
+      const errorMessage = await messageParserById(
+        moonpieUserSetNaNError.id,
+        globalStrings,
+        globalPlugins,
+        macros,
+        logger
+      );
+      throw Error(errorMessage);
+    }
+
+    // Check if a moonpie entry already exists
+    if (
+      !(await moonpieDb.existsName(
+        data.moonpieDbPath,
+        data.userNameMoonpieDb,
+        logger
+      ))
+    ) {
+      macros.set(
+        macroMoonpieUserNeverClaimedId,
+        new Map([
+          [MacroMoonpieUserNeverClaimed.NAME, `${data.userNameMoonpieDb}`],
+        ])
+      );
+      const errorMessage = await messageParserById(
+        moonpieUserNeverClaimedError.id,
+        globalStrings,
+        globalPlugins,
+        macros,
+        logger
+      );
+      throw Error(errorMessage);
+    }
+
     const moonpieEntry = await moonpieDb.getMoonpieName(
-      moonpieDbPath,
-      usernameMoonpieEntry,
+      data.moonpieDbPath,
+      data.userNameMoonpieDb,
+      logger
+    );
+    let newCount = moonpieEntry.count;
+    switch (data.operation) {
+      case "+":
+        newCount += data.setCount;
+        break;
+      case "-":
+        newCount -= data.setCount;
+        break;
+      case "=":
+        newCount = data.setCount;
+        break;
+    }
+    if (newCount < 0) {
+      newCount = 0;
+    }
+    await moonpieDb.update(
+      data.moonpieDbPath,
+      {
+        id: moonpieEntry.id,
+        name: moonpieEntry.name,
+        count: newCount,
+        timestamp: moonpieEntry.timestamp,
+      },
       logger
     );
 
     const currentMoonpieLeaderboardEntry =
       await moonpieDb.getMoonpieLeaderboardEntry(
-        moonpieDbPath,
+        data.moonpieDbPath,
         moonpieEntry.id,
         logger
       );
 
-    const macros = new Map(globalMacros);
     macros.set(
       macroMoonpieLeaderboardEntryId,
       new Map([
-        [MacroMoonpieLeaderboardEntry.NAME, `${usernameMoonpieEntry}`],
-        [
-          MacroMoonpieLeaderboardEntry.COUNT,
-          `${currentMoonpieLeaderboardEntry.count}`,
-        ],
+        [MacroMoonpieLeaderboardEntry.NAME, `${data.userNameMoonpieDb}`],
+        [MacroMoonpieLeaderboardEntry.COUNT, `${newCount}`],
         [
           MacroMoonpieLeaderboardEntry.RANK,
           `${currentMoonpieLeaderboardEntry.rank}`,
         ],
       ])
     );
-    message = await messageParserById(
-      moonpieUserGet.id,
+    const message = await messageParserById(
+      moonpieUserSet.id,
       globalStrings,
       globalPlugins,
       macros,
       logger
     );
-  } else {
-    const macros = new Map(globalMacros);
-    macros.set(
-      macroMoonpieUserNeverClaimedId,
-      new Map([[MacroMoonpieUserNeverClaimed.NAME, `${usernameMoonpieEntry}`]])
-    );
-    message = await messageParserById(
-      moonpieUserNeverClaimedError.id,
-      globalStrings,
-      globalPlugins,
-      macros,
-      logger
-    );
-  }
-
-  const sentMessage = await client.say(channel, message);
-
-  logTwitchMessageCommandReply(
-    logger,
-    messageId,
-    sentMessage,
-    LOG_ID_CHAT_HANDLER_MOONPIE,
-    MoonpieCommands.GET
-  );
+    const sentMessage = await client.say(channel, message);
+    return { sentMessage };
+  },
 };
 
-export const commandUserSetCount = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  userName: string | undefined,
-  userId: string | undefined,
-  usernameMoonpieEntry: string,
-  countMoonpies: number,
-  operation: "+" | "-" | "=" = "=",
-  twitchBadgeLevel: TwitchBadgeLevels,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  moonpieDbPath: string,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw errorMessageIdUndefined();
-  }
-  if (userName === undefined) {
-    throw errorMessageUserNameUndefined();
-  }
-  if (userId === undefined) {
-    throw errorMessageUserIdUndefined();
-  }
+interface CommandDetectorDeleteData {
+  userNameMoonpieDb: string;
+}
 
-  if (twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER) {
-    const errorMessage = await messageParserById(
-      moonpieUserPermissionError.id,
-      globalStrings,
-      globalPlugins,
-      globalMacros,
-      logger
-    );
-    throw Error(errorMessage);
-  }
-  const macros = new Map(globalMacros);
-  macros.set(
-    macroMoonpieUserSetId,
-    new Map([
-      [MacroMoonpieUserSet.NAME, `${usernameMoonpieEntry}`],
-      [MacroMoonpieUserSet.SET_COUNT, `${countMoonpies}`],
-      [MacroMoonpieUserSet.SET_OPERATION, `${operation}`],
-    ])
-  );
-  if (!Number.isInteger(countMoonpies)) {
-    const errorMessage = await messageParserById(
-      moonpieUserSetNaNError.id,
-      globalStrings,
-      globalPlugins,
-      macros,
-      logger
-    );
-    throw Error(errorMessage);
-  }
-
-  // Check if a moonpie entry already exists
-  if (
-    !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
-  ) {
-    macros.set(
-      macroMoonpieUserNeverClaimedId,
-      new Map([[MacroMoonpieUserNeverClaimed.NAME, `${usernameMoonpieEntry}`]])
-    );
-    const errorMessage = await messageParserById(
-      moonpieUserNeverClaimedError.id,
-      globalStrings,
-      globalPlugins,
-      macros,
-      logger
-    );
-    throw Error(errorMessage);
-  }
-
-  const moonpieEntry = await moonpieDb.getMoonpieName(
-    moonpieDbPath,
-    usernameMoonpieEntry,
-    logger
-  );
-  let newCount = moonpieEntry.count;
-  let moonpieCommandId;
-  switch (operation) {
-    case "+":
-      newCount += countMoonpies;
-      moonpieCommandId = MoonpieCommands.ADD;
-      break;
-    case "-":
-      newCount -= countMoonpies;
-      moonpieCommandId = MoonpieCommands.REMOVE;
-      break;
-    case "=":
-      newCount = countMoonpies;
-      moonpieCommandId = MoonpieCommands.SET;
-      break;
-  }
-  if (newCount < 0) {
-    newCount = 0;
-  }
-  await moonpieDb.update(
-    moonpieDbPath,
-    {
-      id: moonpieEntry.id,
-      name: moonpieEntry.name,
-      count: newCount,
-      timestamp: moonpieEntry.timestamp,
-    },
-    logger
-  );
-
-  const currentMoonpieLeaderboardEntry =
-    await moonpieDb.getMoonpieLeaderboardEntry(
-      moonpieDbPath,
-      moonpieEntry.id,
-      logger
-    );
-
-  macros.set(
-    macroMoonpieLeaderboardEntryId,
-    new Map([
-      [MacroMoonpieLeaderboardEntry.NAME, `${usernameMoonpieEntry}`],
-      [MacroMoonpieLeaderboardEntry.COUNT, `${newCount}`],
-      [
-        MacroMoonpieLeaderboardEntry.RANK,
-        `${currentMoonpieLeaderboardEntry.rank}`,
-      ],
-    ])
-  );
-  const message = await messageParserById(
-    moonpieUserSet.id,
+/**
+ * Delete command: Remove a moonpie database entry from the database.
+ */
+export const commandDelete: TwitchMessageCommandHandler<
+  CommandGenericDataMoonpieDbPath,
+  CommandDetectorDeleteData
+> = {
+  info: {
+    id: MoonpieCommands.ABOUT,
+    groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!enabledCommands.includes(MoonpieCommands.DELETE)) {
+      return false;
+    }
+    const match = message.match(regexMoonpieDelete);
+    if (!match) {
+      return false;
+    }
+    return { data: { userNameMoonpieDb: match[1] } };
+  },
+  handle: async (
+    client,
+    channel,
+    tags,
+    data,
     globalStrings,
     globalPlugins,
-    macros,
+    globalMacros,
     logger
-  );
-  const sentMessage = await client.say(channel, message);
+  ) => {
+    const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
+    if (twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER) {
+      const errorMessage = await messageParserById(
+        moonpieUserPermissionError.id,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger
+      );
+      throw Error(errorMessage);
+    }
 
-  logTwitchMessageCommandReply(
-    logger,
-    messageId,
-    sentMessage,
-    LOG_ID_CHAT_HANDLER_MOONPIE,
-    moonpieCommandId
-  );
-};
+    // Check if a moonpie entry already exists
+    if (
+      !(await moonpieDb.existsName(
+        data.moonpieDbPath,
+        data.userNameMoonpieDb,
+        logger
+      ))
+    ) {
+      const macros = new Map(globalMacros);
+      macros.set(
+        macroMoonpieUserNeverClaimedId,
+        new Map([
+          [MacroMoonpieUserNeverClaimed.NAME, `${data.userNameMoonpieDb}`],
+        ])
+      );
+      const errorMessage = await messageParserById(
+        moonpieUserNeverClaimedError.id,
+        globalStrings,
+        globalPlugins,
+        macros,
+        logger
+      );
+      throw Error(errorMessage);
+    }
 
-export const commandUserDelete = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  userName: string | undefined,
-  userId: string | undefined,
-  usernameMoonpieEntry: string,
-  twitchBadgeLevel: TwitchBadgeLevels,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  moonpieDbPath: string,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw errorMessageIdUndefined();
-  }
-  if (userName === undefined) {
-    throw errorMessageUserNameUndefined();
-  }
-  if (userId === undefined) {
-    throw errorMessageUserIdUndefined();
-  }
-
-  if (twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER) {
-    const errorMessage = await messageParserById(
-      moonpieUserPermissionError.id,
-      globalStrings,
-      globalPlugins,
-      globalMacros,
+    await moonpieDb.removeName(
+      data.moonpieDbPath,
+      data.userNameMoonpieDb,
       logger
     );
-    throw Error(errorMessage);
-  }
 
-  // Check if a moonpie entry already exists
-  if (
-    !(await moonpieDb.existsName(moonpieDbPath, usernameMoonpieEntry, logger))
-  ) {
     const macros = new Map(globalMacros);
     macros.set(
-      macroMoonpieUserNeverClaimedId,
-      new Map([[MacroMoonpieUserNeverClaimed.NAME, `${usernameMoonpieEntry}`]])
+      macroMoonpieUserDeleteId,
+      new Map([[MacroMoonpieUserDelete.NAME, `${data.userNameMoonpieDb}`]])
     );
-    const errorMessage = await messageParserById(
-      moonpieUserNeverClaimedError.id,
+    const message = await messageParserById(
+      moonpieUserDelete.id,
       globalStrings,
       globalPlugins,
       macros,
       logger
     );
-    throw Error(errorMessage);
-  }
-
-  await moonpieDb.removeName(moonpieDbPath, usernameMoonpieEntry, logger);
-
-  const macros = new Map(globalMacros);
-  macros.set(
-    macroMoonpieUserDeleteId,
-    new Map([[MacroMoonpieUserDelete.NAME, `${usernameMoonpieEntry}`]])
-  );
-  const message = await messageParserById(
-    moonpieUserDelete.id,
-    globalStrings,
-    globalPlugins,
-    macros,
-    logger
-  );
-  const sentMessage = await client.say(channel, message);
-
-  logTwitchMessageCommandReply(
-    logger,
-    messageId,
-    sentMessage,
-    LOG_ID_CHAT_HANDLER_MOONPIE,
-    MoonpieCommands.DELETE
-  );
+    const sentMessage = await client.say(channel, message);
+    return { sentMessage };
+  },
 };

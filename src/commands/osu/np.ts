@@ -3,7 +3,6 @@ import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
   errorMessageEnabledCommandsUndefined,
-  errorMessageIdUndefined,
   errorMessageOsuApiCredentialsUndefined,
 } from "../../commands";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
@@ -101,17 +100,13 @@ export const commandNp: TwitchMessageCommandHandler<CommandHandlerNpData> = {
   handle: async (
     client,
     channel,
-    tags,
+    _tags,
     data,
     globalStrings,
     globalPlugins,
     globalMacros,
     logger
   ) => {
-    if (tags.id === undefined) {
-      throw errorMessageIdUndefined();
-    }
-
     const logCmdNp = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU, {
       subsection: OsuCommands.NP,
     });
@@ -237,9 +232,6 @@ export const commandNp: TwitchMessageCommandHandler<CommandHandlerNpData> = {
       }
     }
     const sentMessage = await client.say(channel, msg);
-    return {
-      replyToMessageId: tags.id,
-      sentMessage,
-    };
+    return { sentMessage };
   },
 };

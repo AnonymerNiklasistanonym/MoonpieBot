@@ -1,7 +1,4 @@
-import {
-  errorMessageIdUndefined,
-  logTwitchMessageCommandReply,
-} from "../../commands";
+// Local imports
 import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
@@ -14,94 +11,102 @@ import {
   moonpieCommandReplyLeaderboardEntry,
   moonpieCommandReplyLeaderboardPrefix,
 } from "../../strings/moonpie/commandReply";
+import { errorMessageEnabledCommandsUndefined } from "../../commands";
+import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../info/other";
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
-import type { Macros, Plugins } from "../../messageParser";
-import type { Client } from "tmi.js";
-import type { Logger } from "winston";
-import type { Strings } from "../../strings";
+import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
+import type { TwitchMessageCommandHandler } from "../../twitch";
+
+/**
+ * Regex to recognize the `!moonpie leaderboard` command.
+ *
+ * @example
+ * ```text
+ * !moonpie leaderboard
+ * ```
+ */
+export const regexMoonpieLeaderboard = /^\s*!moonpie\s+leaderboard\s*$/i;
 
 const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 15;
-const MAX_LENGTH_OF_A_TWITCH_MESSAGE = 499;
 
 /**
  * Leaderboard command: Reply with the moonpie count leaderboard list (top 15).
- *
- * @param client Twitch client (used to send messages).
- * @param channel Twitch channel (where the response should be sent to).
- * @param messageId Twitch message ID of the request (used for logging).
- * @param globalStrings Global message strings.
- * @param globalPlugins Global plugins.
- * @param globalMacros Global macros.
- * @param moonpieDbPath Database file path of the moonpie database.
- * @param logger Logger (used for global logs).
  */
-export const commandLeaderboard = async (
-  client: Client,
-  channel: string,
-  messageId: string | undefined,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
-  moonpieDbPath: string,
-  logger: Logger
-): Promise<void> => {
-  if (messageId === undefined) {
-    throw errorMessageIdUndefined();
-  }
+export const commandLeaderboard: TwitchMessageCommandHandler<CommandGenericDataMoonpieDbPath> =
+  {
+    info: {
+      id: MoonpieCommands.LEADERBOARD,
+      groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    },
+    detect: (_tags, message, enabledCommands) => {
+      if (enabledCommands === undefined) {
+        throw errorMessageEnabledCommandsUndefined();
+      }
+      if (!message.match(regexMoonpieLeaderboard)) {
+        return false;
+      }
+      if (!enabledCommands.includes(MoonpieCommands.LEADERBOARD)) {
+        return false;
+      }
+      return { data: {} };
+    },
+    handle: async (
+      client,
+      channel,
+      _tags,
+      data,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
+    ) => {
+      const moonpieEntries = await moonpieDb.getMoonpieLeaderboard(
+        data.moonpieDbPath,
+        NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH,
+        logger
+      );
 
-  const moonpieEntries = await moonpieDb.getMoonpieLeaderboard(
-    moonpieDbPath,
-    NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH,
-    logger
-  );
-
-  let messageLeaderboard = await messageParserById(
-    moonpieCommandReplyLeaderboardPrefix.id,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  );
-  const messageLeaderboardEntries = [];
-  for (const moonpieEntry of moonpieEntries) {
-    const macros = new Map(globalMacros);
-    macros.set(
-      macroMoonpieLeaderboardEntryId,
-      new Map([
-        [MacroMoonpieLeaderboardEntry.NAME, `${moonpieEntry.name}`],
-        [MacroMoonpieLeaderboardEntry.COUNT, `${moonpieEntry.count}`],
-        [MacroMoonpieLeaderboardEntry.RANK, `${moonpieEntry.rank}`],
-      ])
-    );
-    messageLeaderboardEntries.push(
-      await messageParserById(
-        moonpieCommandReplyLeaderboardEntry.id,
+      let messageLeaderboard = await messageParserById(
+        moonpieCommandReplyLeaderboardPrefix.id,
         globalStrings,
         globalPlugins,
-        macros,
+        globalMacros,
         logger
-      )
-    );
-  }
-  messageLeaderboard += messageLeaderboardEntries.join(", ");
+      );
+      const messageLeaderboardEntries = [];
+      for (const moonpieEntry of moonpieEntries) {
+        const macros = new Map(globalMacros);
+        macros.set(
+          macroMoonpieLeaderboardEntryId,
+          new Map([
+            [MacroMoonpieLeaderboardEntry.NAME, `${moonpieEntry.name}`],
+            [MacroMoonpieLeaderboardEntry.COUNT, `${moonpieEntry.count}`],
+            [MacroMoonpieLeaderboardEntry.RANK, `${moonpieEntry.rank}`],
+          ])
+        );
+        messageLeaderboardEntries.push(
+          await messageParserById(
+            moonpieCommandReplyLeaderboardEntry.id,
+            globalStrings,
+            globalPlugins,
+            macros,
+            logger
+          )
+        );
+      }
+      messageLeaderboard += messageLeaderboardEntries.join(", ");
 
-  // Slice the message if too long
-  const message =
-    messageLeaderboard.length > MAX_LENGTH_OF_A_TWITCH_MESSAGE
-      ? messageLeaderboard.slice(
-          0,
-          MAX_LENGTH_OF_A_TWITCH_MESSAGE - "...".length
-        ) + "..."
-      : messageLeaderboard;
-  const sentMessage = await client.say(channel, message);
-
-  logTwitchMessageCommandReply(
-    logger,
-    messageId,
-    sentMessage,
-    LOG_ID_CHAT_HANDLER_MOONPIE,
-    MoonpieCommands.LEADERBOARD
-  );
-};
+      // Slice the message if too long
+      const message =
+        messageLeaderboard.length > MAX_LENGTH_OF_A_TWITCH_MESSAGE
+          ? messageLeaderboard.slice(
+              0,
+              MAX_LENGTH_OF_A_TWITCH_MESSAGE - "...".length
+            ) + "..."
+          : messageLeaderboard;
+      const sentMessage = await client.say(channel, message);
+      return { sentMessage };
+    },
+  };

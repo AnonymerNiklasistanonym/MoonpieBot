@@ -1,8 +1,4 @@
 // Local imports
-import {
-  errorMessageEnabledCommandsUndefined,
-  errorMessageIdUndefined,
-} from "../../commands";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuBeatmapRequests,
@@ -20,6 +16,7 @@ import {
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
 import { BeatmapRequestsInfo } from "../osu";
+import { errorMessageEnabledCommandsUndefined } from "../../commands";
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { TwitchMessageCommandHandler } from "../../twitch";
@@ -127,10 +124,6 @@ export const commandBeatmapRequests: TwitchMessageCommandHandler<
     globalMacros,
     logger
   ) => {
-    if (tags.id === undefined) {
-      throw errorMessageIdUndefined();
-    }
-
     const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
     if (
       (data.beatmapRequestsType === BeatmapRequestsType.TURN_OFF ||
@@ -219,6 +212,6 @@ export const commandBeatmapRequests: TwitchMessageCommandHandler<
     }
 
     const sentMessage = await client.say(channel, message);
-    return { sentMessage, replyToMessageId: tags.id };
+    return { sentMessage };
   },
 };

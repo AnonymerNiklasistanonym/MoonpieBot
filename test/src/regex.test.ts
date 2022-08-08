@@ -5,14 +5,14 @@ import { expect } from "chai";
 // Local imports
 import {
   regexMoonpieAdd,
-  regexMoonpieClaim,
   regexMoonpieDelete,
   regexMoonpieGet,
-  regexMoonpieLeaderboard,
   regexMoonpieRemove,
   regexMoonpieSet,
-} from "../../src/commands/moonpie";
+} from "../../src/commands/moonpie/user";
 import { regexBeatmapUrl } from "../../src/commands/osu/beatmap";
+import { regexMoonpieClaim } from "../../src/commands/moonpie/claim";
+import { regexMoonpieLeaderboard } from "../../src/commands/moonpie/leaderboard";
 import { regexNowPlaying } from "../../src/commands/osu/np";
 
 describe("regex", () => {

@@ -463,8 +463,9 @@ export const main = async (
       tags,
       message,
       {
-        databasePath: pathDatabase,
-        moonpieCooldownHoursNumber: moonpieClaimCooldownHoursNumber,
+        moonpieDbPath: pathDatabase,
+        moonpieClaimCooldownHours: moonpieClaimCooldownHoursNumber,
+        enabledCommands: moonpieEnableCommands,
       },
       moonpieEnableCommands,
       strings,
@@ -612,9 +613,7 @@ export const main = async (
           channel,
           tags,
           message,
-          {
-            regexGroups: [],
-          },
+          {},
           strings,
           pluginsCustomCommand,
           macrosChannel,

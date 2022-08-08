@@ -1,12 +1,9 @@
 // Local imports
 import {
-  errorMessageEnabledCommandsUndefined,
-  errorMessageIdUndefined,
-} from "../../commands";
-import {
   LOG_ID_CHAT_HANDLER_SPOTIFY,
   SpotifyCommands,
 } from "../../info/commands";
+import { errorMessageEnabledCommandsUndefined } from "../../commands";
 import { messageParserById } from "../../messageParser";
 import { spotifyCommandReplySong } from "../../strings/spotify/commandReply";
 // Type imports
@@ -49,17 +46,13 @@ export const commandSong: TwitchMessageCommandHandler<Record<never, never>> = {
   handle: async (
     client,
     channel,
-    tags,
+    _tags,
     _data,
     globalStrings,
     globalPlugins,
     globalMacros,
     logger
   ) => {
-    if (tags.id === undefined) {
-      throw errorMessageIdUndefined();
-    }
-
     // TODO Do the song fetching in here instead of just calling the command but it's currently not important
     const msg = await messageParserById(
       spotifyCommandReplySong.id,
@@ -71,7 +64,6 @@ export const commandSong: TwitchMessageCommandHandler<Record<never, never>> = {
 
     return {
       sentMessage: await client.say(channel, msg),
-      replyToMessageId: tags.id,
     };
   },
 };

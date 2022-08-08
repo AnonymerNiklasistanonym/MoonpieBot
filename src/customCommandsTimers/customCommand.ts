@@ -5,7 +5,6 @@ import {
   parseTwitchBadgeLevel,
   TwitchBadgeLevels,
 } from "../other/twitchBadgeParser";
-import { errorMessageIdUndefined } from "../commands";
 import { messageParser } from "../messageParser";
 // Type imports
 import type { CustomJson } from "./createExampleFiles";
@@ -354,26 +353,18 @@ export const getCustomCommand = (
         return false;
       }
 
-      return {
-        message,
-        messageId: tags.id,
-        userName: tags.username,
-        data: { regexGroups: match },
-      };
+      return { data: { regexGroups: match } };
     },
     handle: async (
       client,
       channel,
-      tags,
+      _tags,
       data,
       globalStrings,
       globalPlugins,
       globalMacros,
       logger
     ) => {
-      if (tags.id === undefined) {
-        throw errorMessageIdUndefined();
-      }
       const pluginsCommand: Plugins = new Map(globalPlugins);
       pluginsCommand.set(
         pluginRegexGroupId,
@@ -400,10 +391,7 @@ export const getCustomCommand = (
       );
       const sentMessage = await client.say(channel, parsedMessage);
 
-      return {
-        replyToMessageId: tags.id,
-        sentMessage,
-      };
+      return { sentMessage };
     },
   };
 };

@@ -3,7 +3,6 @@ import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
   errorMessageEnabledCommandsUndefined,
-  errorMessageIdUndefined,
   errorMessageOsuApiCredentialsUndefined,
 } from "../../commands";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
@@ -24,7 +23,7 @@ import { pluginOsuScoreId } from "../../messageParser/plugins/osuApi";
 // Type imports
 import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
-import type { TwitchMessageCommandHandler } from "src/twitch";
+import type { TwitchMessageCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
@@ -83,7 +82,7 @@ export const commandScore: TwitchMessageCommandHandler<
       return false;
     }
     const match = regexScore.exec(message);
-    if (!match || match.length < 2) {
+    if (!match) {
       return false;
     }
     return {
@@ -95,16 +94,13 @@ export const commandScore: TwitchMessageCommandHandler<
   handle: async (
     client,
     channel,
-    tags,
+    _tags,
     data,
     globalStrings,
     globalPlugins,
     globalMacros,
     logger
   ) => {
-    if (tags.id === undefined) {
-      throw errorMessageIdUndefined();
-    }
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
@@ -183,9 +179,6 @@ export const commandScore: TwitchMessageCommandHandler<
     );
 
     const sentMessage = await client.say(channel, message);
-    return {
-      replyToMessageId: tags.id,
-      sentMessage,
-    };
+    return { sentMessage };
   },
 };

@@ -127,7 +127,6 @@ export const createTwitchClient = (
 
 export interface TwitchChatHandlerSuccessfulReply {
   sentMessage: [string];
-  replyToMessageId: string;
 }
 
 export interface TwitchChatHandlerCommandDetect<DATA> {
@@ -311,7 +310,7 @@ export const twitchChatCommandDetected = <DATA>(
 ) => {
   logTwitchMessageDetected(
     logger,
-    messageId ? messageId : "ERROR:UNDEFINED",
+    messageId ? messageId : "UNDEFINED",
     [userName ? `#${userName}` : "UNDEFINED", message],
     commandDetected.detectorId ? commandDetected.detectorId : commandInfo.id,
     `${commandInfo.groupId}:${commandInfo.id}`
@@ -321,11 +320,12 @@ export const twitchChatCommandDetected = <DATA>(
 export const twitchChatCommandReply = (
   logger: Logger,
   commandInfo: TwitchChatCommandInfo,
-  commandReply: TwitchChatHandlerSuccessfulReply
+  commandReply: TwitchChatHandlerSuccessfulReply,
+  replyToMessageId: string | undefined
 ) => {
   logTwitchMessageReply(
     logger,
-    commandReply.replyToMessageId,
+    replyToMessageId ? replyToMessageId : "UNDEFINED",
     commandReply.sentMessage,
     `${commandInfo.groupId}:${commandInfo.id}`
   );
@@ -370,10 +370,10 @@ export const handleTwitchCommand = async <
     );
     if (Array.isArray(commandReply)) {
       for (const a of commandReply) {
-        twitchChatCommandReply(logger, command.info, a);
+        twitchChatCommandReply(logger, command.info, a, tags.id);
       }
     } else {
-      twitchChatCommandReply(logger, command.info, commandReply);
+      twitchChatCommandReply(logger, command.info, commandReply, tags.id);
     }
     return true;
   }

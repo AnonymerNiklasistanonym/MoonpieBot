@@ -4,7 +4,6 @@ import { ScoresType } from "osu-api-v2/lib/users/scores";
 // Local imports
 import {
   errorMessageEnabledCommandsUndefined,
-  errorMessageIdUndefined,
   errorMessageOsuApiCredentialsUndefined,
 } from "../../commands";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
@@ -91,16 +90,13 @@ export const commandRp: TwitchMessageCommandHandler<
   handle: async (
     client,
     channel,
-    tags,
+    _tags,
     data,
     globalStrings,
     globalPlugins,
     globalMacros,
     logger
   ) => {
-    if (tags.id === undefined) {
-      throw errorMessageIdUndefined();
-    }
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
@@ -174,9 +170,6 @@ export const commandRp: TwitchMessageCommandHandler<
       );
     }
     const sentMessage = await client.say(channel, message);
-    return {
-      replyToMessageId: tags.id,
-      sentMessage,
-    };
+    return { sentMessage };
   },
 };

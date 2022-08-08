@@ -2,10 +2,6 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
-  errorMessageIdUndefined,
-  errorMessageOsuApiCredentialsUndefined,
-} from "../../commands";
-import {
   MacroOsuBeatmapRequest,
   macroOsuBeatmapRequestId,
   MacroOsuBeatmapRequests,
@@ -22,6 +18,7 @@ import {
 } from "../../strings/osu/beatmapRequest";
 import { convertOsuBeatmapToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
+import { errorMessageOsuApiCredentialsUndefined } from "../../commands";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { messageParserById } from "../../messageParser";
 import { pluginOsuBeatmapId } from "../../messageParser/plugins/osuApi";
@@ -130,16 +127,13 @@ export const commandBeatmap: TwitchMessageCommandHandler<
   handle: async (
     client,
     channel,
-    tags,
+    _tags,
     data,
     globalStrings,
     globalPlugins,
     globalMacros,
     logger
   ) => {
-    if (tags.id === undefined) {
-      throw errorMessageIdUndefined();
-    }
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
@@ -174,10 +168,7 @@ export const commandBeatmap: TwitchMessageCommandHandler<
         logger
       );
       const sentMessage = await client.say(channel, message);
-      return {
-        replyToMessageId: tags.id,
-        sentMessage,
-      };
+      return { sentMessage };
     }
 
     const commandReplies: TwitchChatHandlerSuccessfulReply[] = [];
@@ -287,10 +278,7 @@ export const commandBeatmap: TwitchMessageCommandHandler<
         );
       }
 
-      commandReplies.push({
-        replyToMessageId: tags.id,
-        sentMessage,
-      });
+      commandReplies.push({ sentMessage });
     }
     return commandReplies;
   },
