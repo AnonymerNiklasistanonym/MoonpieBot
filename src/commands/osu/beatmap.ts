@@ -2,11 +2,6 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
-  errorMessageOsuApiCredentialsUndefined,
-  LOG_ID_CHAT_HANDLER_OSU,
-  LOG_ID_COMMAND_OSU,
-} from "../osu";
-import {
   MacroOsuBeatmapRequest,
   macroOsuBeatmapRequestId,
   MacroOsuBeatmapRequests,
@@ -24,6 +19,8 @@ import {
 import { convertOsuBeatmapToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
 import { errorMessageIdUndefined } from "../../commands";
+import { errorMessageOsuApiCredentialsUndefined } from "../osu";
+import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { messageParserById } from "../../messageParser";
 import { pluginOsuBeatmapId } from "../../messageParser/plugins/osuApi";
 import { tryToSendOsuIrcMessage } from "../../osuirc";
@@ -95,7 +92,7 @@ export const commandBeatmap: TwitchMessageCommandHandler<
 > = {
   info: {
     id: "beatmap",
-    groupId: LOG_ID_COMMAND_OSU,
+    groupId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message) => {
     if (!message.match(regexBeatmapUrl)) {
@@ -152,7 +149,7 @@ export const commandBeatmap: TwitchMessageCommandHandler<
       data.osuApiV2Credentials.clientSecret
     );
 
-    if (data.enableOsuBeatmapRequests) {
+    if (!data.enableOsuBeatmapRequests) {
       const macros = new Map(globalMacros);
       macros.set(
         macroOsuBeatmapRequestsId,

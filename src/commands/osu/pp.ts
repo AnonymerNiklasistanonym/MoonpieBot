@@ -5,17 +5,14 @@ import {
   errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
 } from "../../commands";
-import {
-  errorMessageOsuApiCredentialsUndefined,
-  LOG_ID_COMMAND_OSU,
-} from "../osu";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuPpRequest,
   macroOsuPpRequestId,
 } from "../../messageParser/macros/osuPpRequest";
+import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
-import { OsuCommands } from "../../info/commands";
 // Type imports
 import type { OsuApiV2Credentials } from "../osu";
 import type { TwitchMessageCommandHandler } from "../../twitch";
@@ -88,7 +85,7 @@ export const commandPp: TwitchMessageCommandHandler<
 > = {
   info: {
     id: OsuCommands.PP,
-    groupId: LOG_ID_COMMAND_OSU,
+    groupId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {

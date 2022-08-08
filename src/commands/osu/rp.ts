@@ -6,10 +6,7 @@ import {
   errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
 } from "../../commands";
-import {
-  errorMessageOsuApiCredentialsUndefined,
-  LOG_ID_COMMAND_OSU,
-} from "../osu";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuRpRequest,
   macroOsuRpRequestId,
@@ -18,8 +15,8 @@ import {
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
 } from "../../strings/osu/commandReply";
+import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { messageParserById } from "../../messageParser";
-import { OsuCommands } from "../../info/commands";
 // Type imports
 import type { CommandDetectorPpRpData, CommandHandlerPpRpData } from "./pp";
 import type { TwitchMessageCommandHandler } from "../../twitch";
@@ -68,7 +65,7 @@ export const commandRp: TwitchMessageCommandHandler<
 > = {
   info: {
     id: OsuCommands.RP,
-    groupId: LOG_ID_COMMAND_OSU,
+    groupId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {

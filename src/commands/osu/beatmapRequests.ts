@@ -1,9 +1,9 @@
 // Local imports
-import { BeatmapRequestsInfo, LOG_ID_CHAT_HANDLER_OSU } from "../osu";
 import {
   errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
 } from "../../commands";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuBeatmapRequests,
   macroOsuBeatmapRequestsId,
@@ -19,8 +19,8 @@ import {
   parseTwitchBadgeLevel,
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
+import { BeatmapRequestsInfo } from "../osu";
 import { messageParserById } from "../../messageParser";
-import { OsuCommands } from "../../info/commands";
 // Type imports
 import type { TwitchMessageCommandHandler } from "../../twitch";
 

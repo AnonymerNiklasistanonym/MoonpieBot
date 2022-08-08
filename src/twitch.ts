@@ -313,8 +313,8 @@ export const twitchChatCommandDetected = <DATA>(
     logger,
     messageId ? messageId : "ERROR:UNDEFINED",
     [userName ? `#${userName}` : "UNDEFINED", message],
-    `'${commandInfo.groupId}:${commandInfo.id}'`,
-    commandDetected.detectorId ? commandDetected.detectorId : "TODO"
+    commandDetected.detectorId ? commandDetected.detectorId : commandInfo.id,
+    `${commandInfo.groupId}:${commandInfo.id}`
   );
 };
 

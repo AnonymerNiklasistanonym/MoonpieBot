@@ -5,11 +5,7 @@ import {
   errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
 } from "../../commands";
-import {
-  errorMessageOsuApiCredentialsUndefined,
-  LOG_ID_CHAT_HANDLER_OSU,
-  LOG_ID_COMMAND_OSU,
-} from "../osu";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuWindowTitle,
   macroOsuWindowTitleId,
@@ -22,9 +18,9 @@ import {
   osuCommandReplyNpStreamCompanionNotRunning,
 } from "../../strings/osu/commandReply";
 import { createLogFunc } from "../../logging";
+import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { getProcessWindowTitle } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
-import { OsuCommands } from "../../info/commands";
 // Type imports
 import type { OsuApiV2Credentials } from "../osu";
 import type { StreamCompanionConnection } from "../../streamcompanion";
@@ -85,7 +81,7 @@ export interface CommandHandlerNpData {
 export const commandNp: TwitchMessageCommandHandler<CommandHandlerNpData> = {
   info: {
     id: OsuCommands.NP,
-    groupId: LOG_ID_COMMAND_OSU,
+    groupId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {

@@ -11,21 +11,6 @@ import type { CommandHandlerNpData } from "./osu/np";
 import type { CommandHandlerPpRpData } from "./osu/pp";
 import type { TwitchChatHandler } from "../twitch";
 
-/**
- * The logging ID of this command.
- */
-export const LOG_ID_COMMAND_OSU = "osu";
-
-/**
- * The logging ID of this module.
- */
-export const LOG_ID_MODULE_OSU = "osu";
-
-/**
- * The logging ID of this chat handler.
- */
-export const LOG_ID_CHAT_HANDLER_OSU = "osu_chat_handler";
-
 export enum OsuCommandErrorCode {
   OSU_API_V2_CREDENTIALS_UNDEFINED = "OSU_API_V2_CREDENTIALS_UNDEFINED",
 }
@@ -136,7 +121,6 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
     message,
     {
       ...data,
-      globalBeatmapRequestObject,
       enableOsuBeatmapRequestsDetailed: data.enableOsuBeatmapRequestsDetailed,
       enableOsuBeatmapRequests:
         data.enableOsuBeatmapRequests &&
