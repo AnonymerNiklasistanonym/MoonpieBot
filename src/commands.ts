@@ -45,6 +45,7 @@ export enum CommandErrorCode {
   USER_NAME_UNDEFINED = "USER_NAME_UNDEFINED",
   USER_ID_UNDEFINED = "USER_ID_UNDEFINED",
   ENABLED_COMMANDS_UNDEFINED = "ENABLED_COMMANDS_UNDEFINED",
+  OSU_API_V2_CREDENTIALS_UNDEFINED = "OSU_API_V2_CREDENTIALS_UNDEFINED",
 }
 
 export interface CommandError extends Error {
@@ -80,5 +81,13 @@ export const errorMessageEnabledCommandsUndefined = () => {
     "Unable to detect message! (enabled commands is undefined)"
   );
   error.code = CommandErrorCode.ENABLED_COMMANDS_UNDEFINED;
+  return error;
+};
+
+export const errorMessageOsuApiCredentialsUndefined = () => {
+  const error: CommandError = Error(
+    "Unable to reply to message! (osuApiV2Credentials is undefined)"
+  );
+  error.code = CommandErrorCode.OSU_API_V2_CREDENTIALS_UNDEFINED;
   return error;
 };

@@ -2,6 +2,10 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
+  errorMessageIdUndefined,
+  errorMessageOsuApiCredentialsUndefined,
+} from "../../commands";
+import {
   MacroOsuBeatmapRequest,
   macroOsuBeatmapRequestId,
   MacroOsuBeatmapRequests,
@@ -18,8 +22,6 @@ import {
 } from "../../strings/osu/beatmapRequest";
 import { convertOsuBeatmapToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
-import { errorMessageIdUndefined } from "../../commands";
-import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { messageParserById } from "../../messageParser";
 import { pluginOsuBeatmapId } from "../../messageParser/plugins/osuApi";

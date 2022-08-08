@@ -11,22 +11,6 @@ import type { CommandHandlerNpData } from "./osu/np";
 import type { CommandHandlerPpRpData } from "./osu/pp";
 import type { TwitchChatHandler } from "../twitch";
 
-export enum OsuCommandErrorCode {
-  OSU_API_V2_CREDENTIALS_UNDEFINED = "OSU_API_V2_CREDENTIALS_UNDEFINED",
-}
-
-export interface OsuCommandError extends Error {
-  code?: OsuCommandErrorCode;
-}
-
-export const errorMessageOsuApiCredentialsUndefined = () => {
-  const error: OsuCommandError = Error(
-    "Unable to reply to message! (osuApiV2Credentials is undefined)"
-  );
-  error.code = OsuCommandErrorCode.OSU_API_V2_CREDENTIALS_UNDEFINED;
-  return error;
-};
-
 export interface OsuApiV2Credentials {
   clientId: number;
   clientSecret: string;

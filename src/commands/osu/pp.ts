@@ -4,13 +4,13 @@ import osuApiV2, { GameMode } from "osu-api-v2";
 import {
   errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
+  errorMessageOsuApiCredentialsUndefined,
 } from "../../commands";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuPpRequest,
   macroOsuPpRequestId,
 } from "../../messageParser/macros/osuPpRequest";
-import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 // Type imports

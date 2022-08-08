@@ -4,6 +4,7 @@ import osuApiV2 from "osu-api-v2";
 import {
   errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
+  errorMessageOsuApiCredentialsUndefined,
 } from "../../commands";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
@@ -17,7 +18,6 @@ import {
 } from "../../strings/osu/commandReply";
 import { convertOsuScoreToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
-import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { messageParserById } from "../../messageParser";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 import { pluginOsuScoreId } from "../../messageParser/plugins/osuApi";

@@ -4,6 +4,7 @@ import osuApiV2 from "osu-api-v2";
 import {
   errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
+  errorMessageOsuApiCredentialsUndefined,
 } from "../../commands";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
@@ -18,7 +19,6 @@ import {
   osuCommandReplyNpStreamCompanionNotRunning,
 } from "../../strings/osu/commandReply";
 import { createLogFunc } from "../../logging";
-import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { getProcessWindowTitle } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
 // Type imports

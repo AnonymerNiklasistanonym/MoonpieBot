@@ -58,6 +58,7 @@ export const commandSong: TwitchMessageCommandHandler<Record<never, never>> = {
       throw errorMessageIdUndefined();
     }
 
+    // TODO Do the song fetching in here instead of just calling the command but it's currently not important
     const msg = await messageParserById(
       spotifyCommandReplySong.id,
       globalStrings,

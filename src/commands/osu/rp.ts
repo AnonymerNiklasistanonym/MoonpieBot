@@ -5,6 +5,7 @@ import { ScoresType } from "osu-api-v2/lib/users/scores";
 import {
   errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
+  errorMessageOsuApiCredentialsUndefined,
 } from "../../commands";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
@@ -15,7 +16,6 @@ import {
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
 } from "../../strings/osu/commandReply";
-import { errorMessageOsuApiCredentialsUndefined } from "../osu";
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { CommandDetectorPpRpData, CommandHandlerPpRpData } from "./pp";
