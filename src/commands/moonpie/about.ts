@@ -2,10 +2,12 @@ import {
   errorMessageIdUndefined,
   logTwitchMessageCommandReply,
 } from "../../commands";
-import { LOG_ID_COMMAND_MOONPIE } from "../moonpie";
+import {
+  LOG_ID_CHAT_HANDLER_MOONPIE,
+  MoonpieCommands,
+} from "../../info/commands";
 import { messageParserById } from "../../messageParser";
 import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
-import { MoonpieCommands } from "../../info/commands";
 // Type imports
 import type { TwitchChatHandler } from "../../twitch";
 
@@ -52,7 +54,7 @@ export const commandAbout: TwitchChatHandler = async (
     logger,
     tags.id,
     sentMsg,
-    LOG_ID_COMMAND_MOONPIE,
+    LOG_ID_CHAT_HANDLER_MOONPIE,
     MoonpieCommands.ABOUT
   );
 };

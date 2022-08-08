@@ -6,6 +6,10 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import {
+  LOG_ID_CHAT_HANDLER_MOONPIE,
+  MoonpieCommands,
+} from "../../info/commands";
+import {
   MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntryId,
   MacroMoonpieUserDelete,
@@ -23,9 +27,7 @@ import {
   moonpieUserSet,
   moonpieUserSetNaNError,
 } from "../../strings/moonpie/user";
-import { LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 import { messageParserById } from "../../messageParser";
-import { MoonpieCommands } from "../../info/commands";
 import { moonpieDb } from "../../database/moonpieDb";
 import { TwitchBadgeLevels } from "../../other/twitchBadgeParser";
 // Type imports
@@ -116,7 +118,7 @@ export const commandUserGet = async (
     logger,
     messageId,
     sentMessage,
-    LOG_ID_COMMAND_MOONPIE,
+    LOG_ID_CHAT_HANDLER_MOONPIE,
     MoonpieCommands.GET
   );
 };
@@ -261,7 +263,7 @@ export const commandUserSetCount = async (
     logger,
     messageId,
     sentMessage,
-    LOG_ID_COMMAND_MOONPIE,
+    LOG_ID_CHAT_HANDLER_MOONPIE,
     moonpieCommandId
   );
 };
@@ -340,7 +342,7 @@ export const commandUserDelete = async (
     logger,
     messageId,
     sentMessage,
-    LOG_ID_COMMAND_MOONPIE,
+    LOG_ID_CHAT_HANDLER_MOONPIE,
     MoonpieCommands.DELETE
   );
 };

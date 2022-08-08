@@ -5,6 +5,10 @@ import {
   logTwitchMessageCommandReply,
 } from "../../commands";
 import {
+  LOG_ID_CHAT_HANDLER_MOONPIE,
+  MoonpieCommands,
+} from "../../info/commands";
+import {
   MacroMoonpieClaim,
   macroMoonpieClaimId,
   MacroMoonpieLeaderboardEntry,
@@ -14,9 +18,7 @@ import {
   moonpieCommandReplyAlreadyClaimed,
   moonpieCommandReplyClaim,
 } from "../../strings/moonpie/commandReply";
-import { LOG_ID_COMMAND_MOONPIE } from "../moonpie";
 import { messageParserById } from "../../messageParser";
-import { MoonpieCommands } from "../../info/commands";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
 import type { TwitchChatHandler } from "../../twitch";
@@ -172,7 +174,7 @@ export const commandClaim: TwitchChatHandler<CommandClaimData> = async (
     logger,
     tags.id,
     sentMessage,
-    LOG_ID_COMMAND_MOONPIE,
+    LOG_ID_CHAT_HANDLER_MOONPIE,
     MoonpieCommands.CLAIM
   );
 };

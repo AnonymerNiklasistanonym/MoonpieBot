@@ -4,24 +4,15 @@ import {
   commandUserGet,
   commandUserSetCount,
 } from "./moonpie/user";
+import { LOG_ID_CHAT_HANDLER_MOONPIE, MoonpieCommands } from "../info/commands";
 import { commandAbout } from "./moonpie/about";
 import { commandClaim } from "./moonpie/claim";
 import { commandCommands } from "./moonpie/commands";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { logTwitchMessageCommandDetected } from "../commands";
-import { MoonpieCommands } from "../info/commands";
 import { parseTwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
 import type { TwitchChatHandler } from "../twitch";
-
-/**
- * The logging ID of this command.
- */
-export const LOG_ID_COMMAND_MOONPIE = "moonpie";
-/**
- * The logging ID of this module.
- */
-export const LOG_ID_MODULE_MOONPIE = "moonpie";
 
 /**
  * Regex to recognize all possible commands that start with `!moonpie`.
@@ -169,9 +160,9 @@ export const moonpieChatHandler: TwitchChatHandler<
         logger,
         tags.id,
         [tags.username ? `#${tags.username}` : "undefined", message],
-        LOG_ID_COMMAND_MOONPIE,
+        LOG_ID_CHAT_HANDLER_MOONPIE,
         MoonpieCommands.COMMANDS,
-        LOG_ID_MODULE_MOONPIE
+        LOG_ID_CHAT_HANDLER_MOONPIE
       );
       await commandCommands(
         client,
@@ -194,9 +185,9 @@ export const moonpieChatHandler: TwitchChatHandler<
         logger,
         tags.id,
         [tags.username ? `#${tags.username}` : "undefined", message],
-        LOG_ID_COMMAND_MOONPIE,
+        LOG_ID_CHAT_HANDLER_MOONPIE,
         MoonpieCommands.LEADERBOARD,
-        LOG_ID_MODULE_MOONPIE
+        LOG_ID_CHAT_HANDLER_MOONPIE
       );
       await commandLeaderboard(
         client,
@@ -219,9 +210,9 @@ export const moonpieChatHandler: TwitchChatHandler<
         logger,
         tags.id,
         [tags.username ? `#${tags.username}` : "undefined", message],
-        LOG_ID_COMMAND_MOONPIE,
+        LOG_ID_CHAT_HANDLER_MOONPIE,
         MoonpieCommands.ABOUT,
-        LOG_ID_MODULE_MOONPIE
+        LOG_ID_CHAT_HANDLER_MOONPIE
       );
       await commandAbout(
         client,
@@ -246,9 +237,9 @@ export const moonpieChatHandler: TwitchChatHandler<
         logger,
         tags.id,
         [tags.username ? `#${tags.username}` : "undefined", message],
-        LOG_ID_COMMAND_MOONPIE,
+        LOG_ID_CHAT_HANDLER_MOONPIE,
         MoonpieCommands.DELETE,
-        LOG_ID_MODULE_MOONPIE
+        LOG_ID_CHAT_HANDLER_MOONPIE
       );
       const match = regexMoonpieDelete.exec(message);
       if (match && match.length >= 2) {
@@ -278,9 +269,9 @@ export const moonpieChatHandler: TwitchChatHandler<
         logger,
         tags.id,
         [tags.username ? `#${tags.username}` : "undefined", message],
-        LOG_ID_COMMAND_MOONPIE,
+        LOG_ID_CHAT_HANDLER_MOONPIE,
         MoonpieCommands.GET,
-        LOG_ID_MODULE_MOONPIE
+        LOG_ID_CHAT_HANDLER_MOONPIE
       );
       const match = regexMoonpieGet.exec(message);
       if (match && match.length >= 2) {
@@ -309,9 +300,9 @@ export const moonpieChatHandler: TwitchChatHandler<
         logger,
         tags.id,
         [tags.username ? `#${tags.username}` : "undefined", message],
-        LOG_ID_COMMAND_MOONPIE,
+        LOG_ID_CHAT_HANDLER_MOONPIE,
         MoonpieCommands.SET,
-        LOG_ID_MODULE_MOONPIE
+        LOG_ID_CHAT_HANDLER_MOONPIE
       );
       const match = regexMoonpieSet.exec(message);
       // eslint-disable-next-line no-magic-numbers
@@ -344,9 +335,9 @@ export const moonpieChatHandler: TwitchChatHandler<
         logger,
         tags.id,
         [tags.username ? `#${tags.username}` : "undefined", message],
-        LOG_ID_COMMAND_MOONPIE,
+        LOG_ID_CHAT_HANDLER_MOONPIE,
         MoonpieCommands.ADD,
-        LOG_ID_MODULE_MOONPIE
+        LOG_ID_CHAT_HANDLER_MOONPIE
       );
       const match = regexMoonpieAdd.exec(message);
       // eslint-disable-next-line no-magic-numbers
@@ -379,9 +370,9 @@ export const moonpieChatHandler: TwitchChatHandler<
         logger,
         tags.id,
         [tags.username ? `#${tags.username}` : "undefined", message],
-        LOG_ID_COMMAND_MOONPIE,
+        LOG_ID_CHAT_HANDLER_MOONPIE,
         MoonpieCommands.REMOVE,
-        LOG_ID_MODULE_MOONPIE
+        LOG_ID_CHAT_HANDLER_MOONPIE
       );
       const match = regexMoonpieRemove.exec(message);
       // eslint-disable-next-line no-magic-numbers
@@ -414,9 +405,9 @@ export const moonpieChatHandler: TwitchChatHandler<
         logger,
         tags.id,
         [tags.username ? `#${tags.username}` : "undefined", message],
-        LOG_ID_COMMAND_MOONPIE,
+        LOG_ID_CHAT_HANDLER_MOONPIE,
         MoonpieCommands.CLAIM,
-        LOG_ID_MODULE_MOONPIE
+        LOG_ID_CHAT_HANDLER_MOONPIE
       );
       await commandClaim(
         client,

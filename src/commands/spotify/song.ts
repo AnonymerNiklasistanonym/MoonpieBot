@@ -3,10 +3,12 @@ import {
   errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
 } from "../../commands";
-import { LOG_ID_COMMAND_SPOTIFY } from "../spotify";
+import {
+  LOG_ID_CHAT_HANDLER_SPOTIFY,
+  SpotifyCommands,
+} from "../../info/commands";
 import { messageParserById } from "../../messageParser";
 import { spotifyCommandReplySong } from "../../strings/spotify/commandReply";
-import { SpotifyCommands } from "../../info/commands";
 // Type imports
 import type { TwitchMessageCommandHandler } from "../../twitch";
 
@@ -28,7 +30,7 @@ export const regexSong = /^\s*!song(?:\s*|\s.*)$/i;
 export const commandSong: TwitchMessageCommandHandler<Record<never, never>> = {
   info: {
     id: SpotifyCommands.SONG,
-    groupId: LOG_ID_COMMAND_SPOTIFY,
+    groupId: LOG_ID_CHAT_HANDLER_SPOTIFY,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
