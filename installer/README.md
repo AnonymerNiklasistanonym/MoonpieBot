@@ -28,7 +28,7 @@ cd installer
 makensis windows_installer.nsi
 ```
 
-# MAN page
+## MAN page
 
 With the following page the man page can be updated and viewed for testing.
 
