@@ -107,9 +107,11 @@ export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
     globalMacros,
     logger
   ) => {
-    const logCmdNp = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU, {
-      subsection: OsuCommands.NP,
-    });
+    const logCmdNp = createLogFunc(
+      logger,
+      LOG_ID_CHAT_HANDLER_OSU,
+      OsuCommands.NP
+    );
 
     let msg = await messageParserById(
       osuCommandReplyNpNoMap.id,

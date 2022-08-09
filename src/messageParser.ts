@@ -698,9 +698,11 @@ export const parseTreeNode = async (
   macros: Macros,
   logger: Logger
 ): Promise<string> => {
-  const logMessageParser = createLogFunc(logger, LOG_ID_MODULE_MESSAGE_PARSER, {
-    subsection: "parse_tree_node",
-  });
+  const logMessageParser = createLogFunc(
+    logger,
+    LOG_ID_MODULE_MESSAGE_PARSER,
+    "parse_tree_node"
+  );
 
   switch (treeNode.type) {
     case "text":

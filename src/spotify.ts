@@ -34,9 +34,11 @@ export const setupSpotifyAuthentication = async (
   spotifyRefreshToken: string | undefined,
   logger: Logger
 ) => {
-  const logSpotify = createLogFunc(logger, LOG_ID_MODULE_SPOTIFY, {
-    subsection: "setup_authentication",
-  });
+  const logSpotify = createLogFunc(
+    logger,
+    LOG_ID_MODULE_SPOTIFY,
+    "authentication"
+  );
 
   const spotifyApi = new SpotifyWebApi({
     clientId: spotifyClientId,
@@ -160,9 +162,11 @@ export const spotifyGetCurrentAndRecentSongs = async (
   spotifyApi: SpotifyWebApi,
   logger: Logger
 ) => {
-  const logSpotify = createLogFunc(logger, LOG_ID_MODULE_SPOTIFY, {
-    subsection: "get_current_and_recent_songs",
-  });
+  const logSpotify = createLogFunc(
+    logger,
+    LOG_ID_MODULE_SPOTIFY,
+    "get_current_and_recent_songs"
+  );
 
   try {
     if (spotifyApi.getRefreshToken() === undefined) {

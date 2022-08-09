@@ -32,9 +32,7 @@ interface LoggerDatabaseOptions {
 const LOG_ID_DATABASE_MANAGEMENT = "database_management";
 
 const logDatabase = (logger: Logger, options?: LoggerDatabaseOptions) =>
-  createLogFunc(logger, LOG_ID_DATABASE_MANAGEMENT, {
-    subsection: options?.subsection,
-  });
+  createLogFunc(logger, LOG_ID_DATABASE_MANAGEMENT, options?.subsection);
 
 export const open = async (
   dbNamePath: string,

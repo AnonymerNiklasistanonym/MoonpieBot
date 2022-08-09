@@ -15,9 +15,7 @@ export const createAndSetupTables = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {
-  const loggerDatabase = createLogFunc(logger, "database", {
-    subsection: "setup",
-  });
+  const loggerDatabase = createLogFunc(logger, "database", "setup");
   loggerDatabase.debug("Setup database...");
 
   // Create database if not already existing
@@ -123,9 +121,11 @@ export const setupInitialData = async (
   databasePath: string,
   logger: Logger
 ): Promise<void> => {
-  const loggerDatabase = createLogFunc(logger, "database", {
-    subsection: "setup_initial_data",
-  });
+  const loggerDatabase = createLogFunc(
+    logger,
+    "database",
+    "setup_initial_data"
+  );
   // Add initial account
   try {
     await moonpie.create(

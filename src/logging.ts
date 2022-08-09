@@ -104,13 +104,10 @@ export const createConsoleLogger = (
     },
   });
 
-export interface LogMessageInfo {
-  /**
-   * The subsection of the logger (like a function in a module).
-   */
-  subsection?: string;
-}
-
+/**
+ * The log function object returned when creating a log function with section
+ * information.
+ */
 export interface LogFunc {
   info: (message: string) => void;
   debug: (message: string) => void;
@@ -123,15 +120,14 @@ export interface LogFunc {
  *
  * @param logger The logger.
  * @param section The section which the log function should log.
- * @param info Additional log information like a subsection.
+ * @param subsection Additional section information (subsection).
  * @returns Log function with hardcoded section.
  */
 export const createLogFunc = (
   logger: Logger,
   section: string,
-  info: LogMessageInfo = {}
+  subsection?: string
 ): LogFunc => {
-  const subsection = info.subsection ? info.subsection : undefined;
   const baseLogFunc = (level: LoggerLevel) => (message: string) => {
     logger.log({ level, message, section, subsection });
   };

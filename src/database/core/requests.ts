@@ -53,9 +53,7 @@ interface LoggerDatabaseOptions {
 const LOG_ID_DATABASE_REQUESTS = "database_requests";
 
 const logDatabase = (logger: Logger, options?: LoggerDatabaseOptions) =>
-  createLogFunc(logger, LOG_ID_DATABASE_REQUESTS, {
-    subsection: options?.subsection,
-  });
+  createLogFunc(logger, LOG_ID_DATABASE_REQUESTS, options?.subsection);
 
 /**
  * Get one result from the database.

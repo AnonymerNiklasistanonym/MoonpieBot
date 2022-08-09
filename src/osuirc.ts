@@ -73,9 +73,7 @@ export const createOsuIrcConnection = (
   id: string,
   logger: Logger
 ) => {
-  const logOsuIrc = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU_IRC, {
-    subsection: id,
-  });
+  const logOsuIrc = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU_IRC, id);
 
   // TODO Handle authentication errors
   const creationDate = new Date().toISOString();
@@ -96,9 +94,7 @@ export const createOsuIrcConnection = (
       const logOsuIrcMsgListener = createLogFunc(
         logger,
         LOG_ID_CHAT_HANDLER_OSU_IRC,
-        {
-          subsection: `${id}:message_listener`,
-        }
+        `${id}:message_listener`
       );
       logOsuIrcMsgListener.debug(
         JSON.stringify({ creationDate, from, to, text, message })
@@ -111,9 +107,7 @@ export const createOsuIrcConnection = (
       const logOsuIrcPmListener = createLogFunc(
         logger,
         LOG_ID_CHAT_HANDLER_OSU_IRC,
-        {
-          subsection: `${id}:pm_listener`,
-        }
+        `${id}:pm_listener`
       );
       logOsuIrcPmListener.debug(
         JSON.stringify({ creationDate, from, text, message })
@@ -124,9 +118,7 @@ export const createOsuIrcConnection = (
     const logOsuIrcErrorListener = createLogFunc(
       logger,
       LOG_ID_CHAT_HANDLER_OSU_IRC,
-      {
-        subsection: `${id}:error_listener`,
-      }
+      `${id}:error_listener`
     );
     logOsuIrcErrorListener.error(
       Error(JSON.stringify({ creationDate, message }))
@@ -141,9 +133,7 @@ export const createOsuIrcConnection = (
     const logOsuIrcRegListener = createLogFunc(
       logger,
       LOG_ID_CHAT_HANDLER_OSU_IRC,
-      {
-        subsection: `${id}:registered_listener`,
-      }
+      `${id}:registered_listener`
     );
     logOsuIrcRegListener.debug(JSON.stringify({ creationDate, message }));
   });
@@ -152,9 +142,7 @@ export const createOsuIrcConnection = (
     const logOsuIrcSelfMsgListener = createLogFunc(
       logger,
       LOG_ID_CHAT_HANDLER_OSU_IRC,
-      {
-        subsection: `${id}:self_message_listener`,
-      }
+      `${id}:self_message_listener`
     );
     logOsuIrcSelfMsgListener.info(
       `osu! IRC message was sent to '${to}': '${text}'`
@@ -173,9 +161,7 @@ export const tryToSendOsuIrcMessage = async (
   message: string,
   logger: Logger
 ) => {
-  const logOsuIrc = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU_IRC, {
-    subsection: id,
-  });
+  const logOsuIrc = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU_IRC, id);
 
   let osuIrcBotInstance: undefined | irc.Client = osuIrcBot(id);
   await new Promise<void>((resolve, reject) => {

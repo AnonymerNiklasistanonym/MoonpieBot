@@ -69,9 +69,7 @@ export const createTwitchClient = (
   debug = false,
   logger: Logger
 ): Client => {
-  const logTwitchClient = createLogFunc(logger, LOG_ID_MODULE_TWITCH, {
-    subsection: "client",
-  });
+  const logTwitchClient = createLogFunc(logger, LOG_ID_MODULE_TWITCH, "client");
 
   // Throw an error if Twitch name,token or channels were not defined or empty
   if (twitchName === undefined) {

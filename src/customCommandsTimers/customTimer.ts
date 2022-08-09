@@ -57,9 +57,11 @@ export const isCustomTimer = (
 ): arg is CustomTimer => {
   let logFunc: LogFunc | undefined;
   if (logger) {
-    logFunc = createLogFunc(logger, LOG_ID_MODULE_CUSTOM_TIMER, {
-      subsection: "is_custom_timer",
-    });
+    logFunc = createLogFunc(
+      logger,
+      LOG_ID_MODULE_CUSTOM_TIMER,
+      "is_custom_timer"
+    );
   }
   if (typeof arg !== "object") {
     logFunc?.warn(typeGuardLog("object", arg));
@@ -108,9 +110,11 @@ export const isCustomTimersJson = (
 ): arg is CustomTimersJson => {
   let logFunc: LogFunc | undefined;
   if (logger) {
-    logFunc = createLogFunc(logger, LOG_ID_MODULE_CUSTOM_TIMER, {
-      subsection: "is_custom_timers_json",
-    });
+    logFunc = createLogFunc(
+      logger,
+      LOG_ID_MODULE_CUSTOM_TIMER,
+      "is_custom_timers_json"
+    );
   }
   if (typeof arg !== "object") {
     logFunc?.warn(typeGuardLog("object", arg));
@@ -150,9 +154,11 @@ export const registerTimer = (
   globalMacros: Macros,
   logger: Logger
 ): cron.ScheduledTask => {
-  const logCustomTimer = createLogFunc(logger, LOG_ID_MODULE_CUSTOM_TIMER, {
-    subsection: "register_timer",
-  });
+  const logCustomTimer = createLogFunc(
+    logger,
+    LOG_ID_MODULE_CUSTOM_TIMER,
+    "register_timer"
+  );
 
   if (!cron.validate(cronString)) {
     throw Error(`Cron string '${cronString}' not valid`);
@@ -172,9 +178,11 @@ export const registerTimer = (
 };
 
 export const removeTimer = (cronTask: cron.ScheduledTask, logger: Logger) => {
-  const logCustomTimer = createLogFunc(logger, LOG_ID_MODULE_CUSTOM_TIMER, {
-    subsection: "remove_timer",
-  });
+  const logCustomTimer = createLogFunc(
+    logger,
+    LOG_ID_MODULE_CUSTOM_TIMER,
+    "remove_timer"
+  );
 
   cronTask.stop();
   logCustomTimer.debug(`Timer was stopped`);

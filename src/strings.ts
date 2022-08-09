@@ -73,9 +73,11 @@ export const updateStringsMapWithCustomEnvStrings = (
   strings: Strings = new Map(defaultStrings),
   logger: Logger
 ) => {
-  const logStrings = createLogFunc(logger, LOG_ID_MODULE_STRINGS, {
-    subsection: "update_strings_with_custom_env_strings",
-  });
+  const logStrings = createLogFunc(
+    logger,
+    LOG_ID_MODULE_STRINGS,
+    "update_strings_with_custom_env_strings"
+  );
 
   let foundCustomStringsCounter = 0;
   let foundCustomNonDefaultStringsCounter = 0;

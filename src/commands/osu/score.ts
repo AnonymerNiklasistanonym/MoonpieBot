@@ -125,9 +125,11 @@ export const commandScore: TwitchChatCommandHandler<
       ])
     );
 
-    const logCmdBeatmap = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU, {
-      subsection: OsuCommands.SCORE,
-    });
+    const logCmdBeatmap = createLogFunc(
+      logger,
+      LOG_ID_CHAT_HANDLER_OSU,
+      OsuCommands.SCORE
+    );
 
     const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
       data.osuApiV2Credentials.clientId,
