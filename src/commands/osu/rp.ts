@@ -5,7 +5,7 @@ import { ScoresType } from "osu-api-v2/lib/users/scores";
 import {
   errorMessageEnabledCommandsUndefined,
   errorMessageOsuApiCredentialsUndefined,
-} from "../../commands";
+} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuRpRequest,
@@ -18,7 +18,7 @@ import {
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { CommandDetectorPpRpData, CommandHandlerPpRpData } from "./pp";
-import type { TwitchMessageCommandHandler } from "../../twitch";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!rp` command.
@@ -58,13 +58,13 @@ export const regexRpCustomName = /^\s*!rp\s+(\S+)\s*.*$/i;
  * RP (recently played) command:
  * Send the map that was most recently played in osu (via the web api).
  */
-export const commandRp: TwitchMessageCommandHandler<
+export const commandRp: TwitchChatCommandHandler<
   CommandHandlerPpRpData,
   CommandDetectorPpRpData
 > = {
   info: {
     id: OsuCommands.RP,
-    groupId: LOG_ID_CHAT_HANDLER_OSU,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -87,7 +87,7 @@ export const commandRp: TwitchMessageCommandHandler<
       },
     };
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     _tags,

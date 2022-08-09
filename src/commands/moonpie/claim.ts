@@ -4,7 +4,7 @@ import {
   errorMessageIdUndefined,
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
-} from "../../commands";
+} from "../../error";
 import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
@@ -31,7 +31,7 @@ import { moonpieDb } from "../../database/moonpieDb";
 import { regexMoonpieAbout } from "./about";
 // Type imports
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
-import type { TwitchMessageCommandHandler } from "../../twitch";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!moonpie` command.
@@ -55,10 +55,10 @@ export interface CommandClaimData extends CommandGenericDataMoonpieDbPath {
  * Claim command: Claim a moonpie if no moonpie was claimed in the last 24
  * hours.
  */
-export const commandClaim: TwitchMessageCommandHandler<CommandClaimData> = {
+export const commandClaim: TwitchChatCommandHandler<CommandClaimData> = {
   info: {
     id: MoonpieCommands.CLAIM,
-    groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -83,7 +83,7 @@ export const commandClaim: TwitchMessageCommandHandler<CommandClaimData> = {
     }
     return { data: {} };
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     tags,

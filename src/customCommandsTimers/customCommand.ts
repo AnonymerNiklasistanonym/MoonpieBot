@@ -11,7 +11,7 @@ import type { CustomJson } from "./createExampleFiles";
 import type { LogFunc } from "../logging";
 import type { Logger } from "winston";
 import type { Plugins } from "../messageParser";
-import type { TwitchMessageCommandHandler } from "../twitch";
+import type { TwitchChatCommandHandler } from "../twitch";
 
 /**
  * The logging ID of this command.
@@ -295,13 +295,13 @@ export interface CommandHandleCustomCommandData {
 
 export const getCustomCommand = (
   customCommand: CustomCommand
-): TwitchMessageCommandHandler<
+): TwitchChatCommandHandler<
   Record<never, never>,
   CommandHandleCustomCommandData
 > => {
   return {
     info: {
-      groupId: LOG_ID_COMMAND_CUSTOM_COMMAND,
+      chatHandlerId: LOG_ID_COMMAND_CUSTOM_COMMAND,
       id: customCommand.id,
     },
     detect: (tags, message) => {
@@ -355,7 +355,7 @@ export const getCustomCommand = (
 
       return { data: { regexGroups: match } };
     },
-    handle: async (
+    createReply: async (
       client,
       channel,
       _tags,

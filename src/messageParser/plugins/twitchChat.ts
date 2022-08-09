@@ -2,7 +2,7 @@
 import {
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
-} from "../../commands";
+} from "../../error";
 // Type imports
 import type { MessageParserPluginGenerator } from "../plugins";
 

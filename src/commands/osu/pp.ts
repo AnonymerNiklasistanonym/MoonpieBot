@@ -4,7 +4,7 @@ import osuApiV2, { GameMode } from "osu-api-v2";
 import {
   errorMessageEnabledCommandsUndefined,
   errorMessageOsuApiCredentialsUndefined,
-} from "../../commands";
+} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuPpRequest,
@@ -14,7 +14,7 @@ import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
-import type { TwitchMessageCommandHandler } from "../../twitch";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
 export interface CommandHandlerPpRpDataBase {
   /**
@@ -82,13 +82,13 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
  * PP (from performance points) command:
  * Get performance/general information of an Osu account.
  */
-export const commandPp: TwitchMessageCommandHandler<
+export const commandPp: TwitchChatCommandHandler<
   CommandHandlerPpRpData,
   CommandDetectorPpRpData
 > = {
   info: {
     id: OsuCommands.PP,
-    groupId: LOG_ID_CHAT_HANDLER_OSU,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -111,7 +111,7 @@ export const commandPp: TwitchMessageCommandHandler<
       },
     };
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     _tags,

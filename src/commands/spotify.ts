@@ -1,5 +1,5 @@
 // Type imports
-import { handleTwitchCommand, TwitchChatHandler } from "../twitch";
+import { runTwitchCommandHandler, TwitchChatHandler } from "../twitch";
 import { commandSong } from "./spotify/song";
 
 export const spotifyChatHandler: TwitchChatHandler<
@@ -20,7 +20,7 @@ export const spotifyChatHandler: TwitchChatHandler<
   const commands = [commandSong];
   await Promise.all(
     commands.map((command) =>
-      handleTwitchCommand(
+      runTwitchCommandHandler(
         client,
         channel,
         tags,

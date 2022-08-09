@@ -3,7 +3,7 @@ import { commandDelete, commandGet, commandSet } from "./moonpie/user";
 import { commandAbout } from "./moonpie/about";
 import { commandClaim } from "./moonpie/claim";
 import { commandLeaderboard } from "./moonpie/leaderboard";
-import { handleTwitchCommand } from "../twitch";
+import { runTwitchCommandHandler } from "../twitch";
 // Type imports
 import type { CommandClaimData } from "./moonpie/claim";
 import type { CommandCommandsData } from "./moonpie/commands";
@@ -39,7 +39,7 @@ export const moonpieChatHandler: TwitchChatHandler<
   const commands = [commandAbout, commandClaim, commandLeaderboard];
   await Promise.all(
     commands.map((command) =>
-      handleTwitchCommand(
+      runTwitchCommandHandler(
         client,
         channel,
         tags,
@@ -57,7 +57,7 @@ export const moonpieChatHandler: TwitchChatHandler<
   const commands2 = [commandSet];
   await Promise.all(
     commands2.map((command) =>
-      handleTwitchCommand(
+      runTwitchCommandHandler(
         client,
         channel,
         tags,
@@ -75,7 +75,7 @@ export const moonpieChatHandler: TwitchChatHandler<
   const commands3 = [commandGet, commandDelete];
   await Promise.all(
     commands3.map((command) =>
-      handleTwitchCommand(
+      runTwitchCommandHandler(
         client,
         channel,
         tags,

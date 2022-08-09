@@ -16,10 +16,10 @@ import {
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
 import { BeatmapRequestsInfo } from "../osu";
-import { errorMessageEnabledCommandsUndefined } from "../../commands";
+import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 // Type imports
-import type { TwitchMessageCommandHandler } from "../../twitch";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the !osuRequests enable command.
@@ -72,13 +72,13 @@ export interface CommandDetectorBeatmapRequestsData {
  * Post information about a osu Beatmap in the chat and if existing also show
  * the current top score of the default osu User in the chat.
  */
-export const commandBeatmapRequests: TwitchMessageCommandHandler<
+export const commandBeatmapRequests: TwitchChatCommandHandler<
   CommandHandlerBeatmapRequestsData,
   CommandDetectorBeatmapRequestsData
 > = {
   info: {
     id: OsuCommands.REQUESTS,
-    groupId: LOG_ID_CHAT_HANDLER_OSU,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -114,7 +114,7 @@ export const commandBeatmapRequests: TwitchMessageCommandHandler<
     }
     return false;
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     tags,

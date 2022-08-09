@@ -5,7 +5,7 @@ import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
 import { commandScore } from "./osu/score";
-import { handleTwitchCommand } from "../twitch";
+import { runTwitchCommandHandler } from "../twitch";
 // Type imports
 import type { CommandHandlerBeatmapDataBase } from "./osu/beatmap";
 import type { CommandHandlerNpDataBase } from "./osu/np";
@@ -50,7 +50,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   const commands = [commandNp, commandPp, commandRp];
   await Promise.all(
     commands.map((command) =>
-      handleTwitchCommand(
+      runTwitchCommandHandler(
         client,
         channel,
         tags,
@@ -69,7 +69,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   const commands2 = [commandScore];
   await Promise.all(
     commands2.map((command) =>
-      handleTwitchCommand(
+      runTwitchCommandHandler(
         client,
         channel,
         tags,
@@ -84,7 +84,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
       )
     )
   );
-  await handleTwitchCommand(
+  await runTwitchCommandHandler(
     client,
     channel,
     tags,
@@ -98,7 +98,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
     enabled
   );
   if (globalBeatmapRequestObject.beatmapRequestsOn !== false) {
-    await handleTwitchCommand(
+    await runTwitchCommandHandler(
       client,
       channel,
       tags,

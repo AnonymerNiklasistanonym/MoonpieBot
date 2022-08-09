@@ -11,13 +11,13 @@ import {
   moonpieCommandReplyLeaderboardEntry,
   moonpieCommandReplyLeaderboardPrefix,
 } from "../../strings/moonpie/commandReply";
-import { errorMessageEnabledCommandsUndefined } from "../../commands";
+import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../info/other";
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
-import type { TwitchMessageCommandHandler } from "../../twitch";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!moonpie leaderboard` command.
@@ -34,11 +34,11 @@ const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 15;
 /**
  * Leaderboard command: Reply with the moonpie count leaderboard list (top 15).
  */
-export const commandLeaderboard: TwitchMessageCommandHandler<CommandGenericDataMoonpieDbPath> =
+export const commandLeaderboard: TwitchChatCommandHandler<CommandGenericDataMoonpieDbPath> =
   {
     info: {
       id: MoonpieCommands.LEADERBOARD,
-      groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+      chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
     },
     detect: (_tags, message, enabledCommands) => {
       if (enabledCommands === undefined) {
@@ -52,7 +52,7 @@ export const commandLeaderboard: TwitchMessageCommandHandler<CommandGenericDataM
       }
       return { data: {} };
     },
-    handle: async (
+    createReply: async (
       client,
       channel,
       _tags,

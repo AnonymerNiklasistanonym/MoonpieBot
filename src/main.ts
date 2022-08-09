@@ -8,7 +8,7 @@ import path from "path";
 import { StaticAuthProvider } from "@twurple/auth";
 // Local imports
 import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuirc";
-import { createTwitchClient, handleTwitchCommand } from "./twitch";
+import { createTwitchClient, runTwitchCommandHandler } from "./twitch";
 import { defaultPlugins, generatePlugin } from "./messageParser/plugins";
 import {
   defaultStrings,
@@ -530,7 +530,7 @@ export const main = async (
           pluginsCustomCommand.set(plugin.id, plugin.func);
         });
 
-        handleTwitchCommand(
+        runTwitchCommandHandler(
           twitchClient,
           channel,
           tags,

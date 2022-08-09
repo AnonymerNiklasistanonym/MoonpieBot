@@ -105,6 +105,9 @@ export const createConsoleLogger = (
   });
 
 export interface LogMessageInfo {
+  /**
+   * The subsection of the logger (like a function in a module).
+   */
   subsection?: string;
 }
 

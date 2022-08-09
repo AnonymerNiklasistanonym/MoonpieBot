@@ -3,11 +3,11 @@ import {
   LOG_ID_CHAT_HANDLER_SPOTIFY,
   SpotifyCommands,
 } from "../../info/commands";
-import { errorMessageEnabledCommandsUndefined } from "../../commands";
+import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { spotifyCommandReplySong } from "../../strings/spotify/commandReply";
 // Type imports
-import type { TwitchMessageCommandHandler } from "../../twitch";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!song` command.
@@ -24,10 +24,10 @@ export const regexSong = /^\s*!song(?:\s*|\s.*)$/i;
  * Send a message about the currently played and last played song on Spotify
  * (or only the last played song if currently no song is played).
  */
-export const commandSong: TwitchMessageCommandHandler<Record<never, never>> = {
+export const commandSong: TwitchChatCommandHandler<Record<never, never>> = {
   info: {
     id: SpotifyCommands.SONG,
-    groupId: LOG_ID_CHAT_HANDLER_SPOTIFY,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_SPOTIFY,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -43,7 +43,7 @@ export const commandSong: TwitchMessageCommandHandler<Record<never, never>> = {
       data: {},
     };
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     _tags,

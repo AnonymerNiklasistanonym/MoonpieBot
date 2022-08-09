@@ -18,7 +18,7 @@ import {
 } from "../../strings/osu/beatmapRequest";
 import { convertOsuBeatmapToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
-import { errorMessageOsuApiCredentialsUndefined } from "../../commands";
+import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { messageParserById } from "../../messageParser";
 import { pluginOsuBeatmapId } from "../../messageParser/plugins/osuApi";
@@ -26,8 +26,8 @@ import { tryToSendOsuIrcMessage } from "../../osuirc";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {
-  TwitchChatHandlerSuccessfulReply,
-  TwitchMessageCommandHandler,
+  TwitchChatCommandHandler,
+  TwitchChatCommandHandlerReply,
 } from "../../twitch";
 import type { Beatmap } from "osu-api-v2";
 import type { Client as IrcClient } from "irc";
@@ -87,13 +87,13 @@ export interface CommandDetectorBeatmapData {
  * Post information about a osu Beatmap in the chat and if existing also show
  * the current top score of the default osu User in the chat.
  */
-export const commandBeatmap: TwitchMessageCommandHandler<
+export const commandBeatmap: TwitchChatCommandHandler<
   CommandHandlerBeatmapData,
   CommandDetectorBeatmapData
 > = {
   info: {
     id: "beatmap",
-    groupId: LOG_ID_CHAT_HANDLER_OSU,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message) => {
     if (!message.match(regexBeatmapUrl)) {
@@ -124,7 +124,7 @@ export const commandBeatmap: TwitchMessageCommandHandler<
     }
     return { data: { beatmapRequests } };
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     _tags,
@@ -171,7 +171,7 @@ export const commandBeatmap: TwitchMessageCommandHandler<
       return { sentMessage };
     }
 
-    const commandReplies: TwitchChatHandlerSuccessfulReply[] = [];
+    const commandReplies: TwitchChatCommandHandlerReply[] = [];
 
     for (const beatmapRequest of data.beatmapRequests) {
       const osuBeatmapRequestMacros = new Map(globalMacros);
@@ -277,7 +277,6 @@ export const commandBeatmap: TwitchMessageCommandHandler<
           logger
         );
       }
-
       commandReplies.push({ sentMessage });
     }
     return commandReplies;

@@ -4,7 +4,7 @@ import osuApiV2 from "osu-api-v2";
 import {
   errorMessageEnabledCommandsUndefined,
   errorMessageOsuApiCredentialsUndefined,
-} from "../../commands";
+} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuWindowTitle,
@@ -23,7 +23,7 @@ import { messageParserById } from "../../messageParser";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type { StreamCompanionConnection } from "../../streamcompanion";
-import type { TwitchMessageCommandHandler } from "../../twitch";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!np` command.
@@ -81,10 +81,10 @@ export interface CommandHandlerNpData extends CommandHandlerNpDataBase {
  * Send the map that is currently being played in osu (via the window title
  * because the web api is not supporting it).
  */
-export const commandNp: TwitchMessageCommandHandler<CommandHandlerNpData> = {
+export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
   info: {
     id: OsuCommands.NP,
-    groupId: LOG_ID_CHAT_HANDLER_OSU,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -97,7 +97,7 @@ export const commandNp: TwitchMessageCommandHandler<CommandHandlerNpData> = {
     }
     return false;
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     _tags,

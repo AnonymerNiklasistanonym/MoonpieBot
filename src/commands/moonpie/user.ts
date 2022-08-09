@@ -25,12 +25,12 @@ import {
   parseTwitchBadgeLevel,
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
-import { errorMessageEnabledCommandsUndefined } from "../../commands";
+import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
-import type { TwitchMessageCommandHandler } from "../../twitch";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!moonpie get $USER` command.
@@ -100,13 +100,13 @@ interface CommandDetectorGetData {
   userNameMoonpieDb: string;
 }
 
-export const commandGet: TwitchMessageCommandHandler<
+export const commandGet: TwitchChatCommandHandler<
   CommandGenericDataMoonpieDbPath,
   CommandDetectorGetData
 > = {
   info: {
     id: MoonpieCommands.GET,
-    groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -121,7 +121,7 @@ export const commandGet: TwitchMessageCommandHandler<
     }
     return { data: { userNameMoonpieDb: match[1] } };
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     _tags,
@@ -206,13 +206,13 @@ interface CommandDetectorSetData {
 /**
  * Set command: Set the moonpie count of someone (multiple operations available).
  */
-export const commandSet: TwitchMessageCommandHandler<
+export const commandSet: TwitchChatCommandHandler<
   CommandGenericDataMoonpieDbPath,
   CommandDetectorSetData
 > = {
   info: {
     id: MoonpieCommands.SET,
-    groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -250,7 +250,7 @@ export const commandSet: TwitchMessageCommandHandler<
     }
     return false;
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     tags,
@@ -383,13 +383,13 @@ interface CommandDetectorDeleteData {
 /**
  * Delete command: Remove a moonpie database entry from the database.
  */
-export const commandDelete: TwitchMessageCommandHandler<
+export const commandDelete: TwitchChatCommandHandler<
   CommandGenericDataMoonpieDbPath,
   CommandDetectorDeleteData
 > = {
   info: {
     id: MoonpieCommands.ABOUT,
-    groupId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -404,7 +404,7 @@ export const commandDelete: TwitchMessageCommandHandler<
     }
     return { data: { userNameMoonpieDb: match[1] } };
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     tags,

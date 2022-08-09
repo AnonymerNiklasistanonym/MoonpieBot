@@ -1,5 +1,5 @@
 // Local imports
-import { errorMessageUserIdUndefined } from "../../commands";
+import { errorMessageUserIdUndefined } from "../../error";
 // Type imports
 import type { ApiClient } from "@twurple/api/lib";
 import type { MessageParserPluginGenerator } from "../plugins";

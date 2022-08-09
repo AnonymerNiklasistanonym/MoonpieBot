@@ -4,7 +4,7 @@ import osuApiV2 from "osu-api-v2";
 import {
   errorMessageEnabledCommandsUndefined,
   errorMessageOsuApiCredentialsUndefined,
-} from "../../commands";
+} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuScoreRequest,
@@ -23,7 +23,7 @@ import { pluginOsuScoreId } from "../../messageParser/plugins/osuApi";
 // Type imports
 import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
-import type { TwitchMessageCommandHandler } from "../../twitch";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
@@ -63,13 +63,13 @@ export interface CommandDetectorScoreData {
  * Get the score of the last requested map of either the default user or a
  * custom supplied user.
  */
-export const commandScore: TwitchMessageCommandHandler<
+export const commandScore: TwitchChatCommandHandler<
   CommandHandlerScoreData,
   CommandDetectorScoreData
 > = {
   info: {
     id: OsuCommands.SCORE,
-    groupId: LOG_ID_CHAT_HANDLER_OSU,
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
   },
   detect: (_tags, message, enabledCommands) => {
     if (enabledCommands === undefined) {
@@ -91,7 +91,7 @@ export const commandScore: TwitchMessageCommandHandler<
       },
     };
   },
-  handle: async (
+  createReply: async (
     client,
     channel,
     _tags,
