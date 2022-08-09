@@ -18,6 +18,11 @@ import type { CliEnvVariableInformation } from "../cli";
 export const ENV_VARIABLE_PREFIX = "MOONPIE_CONFIG_";
 
 /**
+ * Environment variable prefix for custom strings.
+ */
+export const ENV_STRINGS_VARIABLE_PREFIX = "MOONPIE_CUSTOM_STRING_";
+
+/**
  * Environment variable values for ON/OFF.
  */
 export enum EnvVariableOnOff {

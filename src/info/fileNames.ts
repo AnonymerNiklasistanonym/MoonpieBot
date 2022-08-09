@@ -1,3 +1,5 @@
+import path from "path";
+
 const EXAMPLE_SUFFIX = ".example";
 
 export const fileNameEnv = ".env";
@@ -16,6 +18,8 @@ export const fileNameCustomCommandsExample = `${customCommandsString}${EXAMPLE_S
 export const fileNameCustomTimersExample = `${customTimersString}${EXAMPLE_SUFFIX}.json`;
 export const fileNameCustomCommandsSchema = `${customCommandsString}${JSON_SCHEMA_SUFFIX}.json`;
 export const fileNameCustomTimersSchema = `${customTimersString}${JSON_SCHEMA_SUFFIX}.json`;
+
+export const fileNameManPage = path.join("installer", "man.md");
 
 export const fileNameDatabaseBackups = (date: Date = new Date()) => {
   const PAD_DAY_MONTH_TO_2_DIGITS_FACTOR = 2;

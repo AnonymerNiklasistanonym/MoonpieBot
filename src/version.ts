@@ -1,5 +1,5 @@
 /*
- * Version structure
+ * Version structure.
  */
 
 /**
@@ -9,6 +9,7 @@ export interface Version {
   major: number;
   minor: number;
   patch: number;
+  /** Set true for beta builds/versions. */
   beta?: boolean;
 }
 

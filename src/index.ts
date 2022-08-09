@@ -16,7 +16,6 @@ import {
   getEnvVariableValueOrDefault,
   printEnvVariablesToConsole,
 } from "./env";
-import { createStringsVariableDocumentation, defaultStrings } from "./strings";
 import { defaultMacros, defaultMacrosOptional } from "./messageParser/macros";
 import {
   defaultPlugins,
@@ -33,7 +32,8 @@ import {
 } from "./info/fileNames";
 import { cliHelpGenerator } from "./cli";
 import { createCustomCommandTimerExampleFiles } from "./customCommandsTimers/createExampleFiles";
-
+import { createStringsVariableDocumentation } from "./documentation/strings";
+import { defaultStrings } from "./strings";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getVersionFromObject } from "./version";
 import { main } from "./main";

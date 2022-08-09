@@ -2,10 +2,6 @@
 import path from "path";
 // Local imports
 import {
-  createStringsVariableDocumentation,
-  defaultStrings,
-} from "../src/strings";
-import {
   defaultMacros,
   defaultMacrosOptional,
 } from "../src/messageParser/macros";
@@ -19,8 +15,10 @@ import {
 } from "../src/info/fileNames";
 import { createConsoleLogger } from "../src/logging";
 import { createEnvVariableDocumentation } from "../src/env";
+import { createStringsVariableDocumentation } from "../src/documentation/strings";
+import { defaultStrings } from "../src/strings";
 
-const logger = createConsoleLogger("example_files");
+const logger = createConsoleLogger("create_example_files");
 
 const configDir = path.join(__dirname, "..");
 createEnvVariableDocumentation(
