@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 // Type imports
-import type { MessageParserPlugin } from "../plugins";
+import type { MessageParserPluginGenerator } from "../plugins";
 import type { StreamCompanionConnection } from "../../streamcompanion";
 
 export const pluginOsuStreamCompanionId = "OSU_STREAMCOMPANION";
@@ -21,20 +21,22 @@ export enum MacroOsuStreamCompanion {
   MODS = "MODS",
 }
 
-export const getPluginOsuStreamCompanion = (
-  streamCompanionDataFunc: StreamCompanionConnection
-): MessageParserPlugin => {
-  return {
+export interface PluginOsuStreamCompanionData {
+  streamCompanionDataFunc: StreamCompanionConnection;
+}
+
+export const pluginOsuStreamCompanionGenerator: MessageParserPluginGenerator<PluginOsuStreamCompanionData> =
+  {
     id: pluginOsuStreamCompanionId,
-    func: (_, __, signature) => {
-      if (signature === true) {
-        return {
-          type: "signature",
-          exportsMacro: true,
-          exportedMacroKeys: Object.values(MacroOsuStreamCompanion),
-        };
-      }
-      const streamCompanionData = streamCompanionDataFunc();
+    description:
+      "Available in all strings that are responses and will insert the name of the user that is responded to",
+    signature: {
+      type: "signature",
+      exportsMacro: true,
+      exportedMacroKeys: Object.values(MacroOsuStreamCompanion),
+    },
+    generate: (data) => () => {
+      const streamCompanionData = data.streamCompanionDataFunc();
       if (streamCompanionData === undefined) {
         return [];
       }
@@ -69,4 +71,3 @@ export const getPluginOsuStreamCompanion = (
       ];
     },
   };
-};

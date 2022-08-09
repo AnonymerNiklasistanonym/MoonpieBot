@@ -38,13 +38,13 @@ import { defaultMacros } from "./messageParser/macros";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { fileNameDatabaseBackups } from "./info/fileNames";
 import { generatePluginsAndMacrosMap } from "./messageParser";
-import { getPluginOsuStreamCompanion } from "./messageParser/plugins/streamcompanion";
 import { getVersionFromObject } from "./version";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
+import { pluginOsuStreamCompanionGenerator } from "./messageParser/plugins/streamcompanion";
 import { pluginsOsuGenerator } from "./messageParser/plugins/osu";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
 import { pluginsTwitchApi } from "./messageParser/plugins/twitchApi";
@@ -311,8 +311,9 @@ export const main = async (
     });
   }
   if (osuStreamCompanionCurrentMapData !== undefined) {
-    const pluginStreamCompanionReady = getPluginOsuStreamCompanion(
-      osuStreamCompanionCurrentMapData
+    const pluginStreamCompanionReady = generatePlugin(
+      pluginOsuStreamCompanionGenerator,
+      { streamCompanionDataFunc: osuStreamCompanionCurrentMapData }
     );
     plugins.set(pluginStreamCompanionReady.id, pluginStreamCompanionReady.func);
   }

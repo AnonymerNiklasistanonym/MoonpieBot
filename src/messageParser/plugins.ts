@@ -25,6 +25,7 @@ import { pluginsOsuGenerator } from "./plugins/osu";
 import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 // Type imports
 import type { PluginFunc, PluginSignature } from "../messageParser";
+import { pluginOsuStreamCompanionGenerator } from "./plugins/streamcompanion";
 
 export interface MessageParserPluginExample {
   before?: string;
@@ -103,4 +104,5 @@ export interface MessageParserPluginInfo extends MessageParserPluginBase {
 export const defaultPluginsOptional: MessageParserPluginInfo[] = [
   ...pluginsTwitchChatGenerator.map(generatePluginInfo),
   ...pluginsOsuGenerator.map(generatePluginInfo),
+  generatePluginInfo(pluginOsuStreamCompanionGenerator),
 ];
