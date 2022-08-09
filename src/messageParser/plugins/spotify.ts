@@ -1,7 +1,7 @@
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 // Type imports
 import type { MacroDictionaryEntry } from "../../messageParser";
-import type { MessageParserPlugin } from "../plugins";
+import type { MessageParserPluginGenerator } from "../plugins";
 import type SpotifyWebApi from "spotify-web-api-node";
 
 interface Album {
@@ -22,7 +22,6 @@ interface Artist {
   name: string;
 }
 
-export const pluginSpotifySongId = "SPOTIFY_SONG";
 export enum SpotifySongMacro {
   HAS_CURRENT = "HAS_CURRENT",
   CURRENT_TITLE = "CURRENT_TITLE",
@@ -38,22 +37,25 @@ export enum SpotifySongMacro {
   PREVIOUS_URL = "PREVIOUS_URL",
 }
 
-export const pluginSpotifyCurrentPreviousSong = (
-  spotifyWebApi: SpotifyWebApi
-): MessageParserPlugin => {
-  return {
+export interface PluginSpotifyData {
+  spotifyWebApi: SpotifyWebApi;
+}
+
+export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyData> =
+  {
     id: "SPOTIFY_SONG",
-    func: async (logger, _, signature) => {
-      if (signature === true) {
-        return {
-          type: "signature",
-          exportsMacro: true,
-          exportedMacroKeys: Object.values(SpotifySongMacro),
-        };
-      }
-      const data = await spotifyGetCurrentAndRecentSongs(spotifyWebApi, logger);
+    signature: {
+      type: "signature",
+      exportsMacro: true,
+      exportedMacroKeys: Object.values(SpotifySongMacro),
+    },
+    generate: (data) => async (logger) => {
+      const spotifyData = await spotifyGetCurrentAndRecentSongs(
+        data.spotifyWebApi,
+        logger
+      );
       const macros: MacroDictionaryEntry[] = [];
-      const currData = data?.currentlyPlaying.body.item;
+      const currData = spotifyData?.currentlyPlaying.body.item;
       const hasCurrent = currData != null && currData !== undefined;
       macros.push([
         SpotifySongMacro.HAS_CURRENT,
@@ -79,7 +81,7 @@ export const pluginSpotifyCurrentPreviousSong = (
           currData.external_urls.spotify,
         ]);
       }
-      const recentData = data?.recentlyPlayedTracks.body.items;
+      const recentData = spotifyData?.recentlyPlayedTracks.body.items;
       const hasRecent =
         recentData != null && recentData !== undefined && recentData.length > 0;
       macros.push([
@@ -111,4 +113,3 @@ export const pluginSpotifyCurrentPreviousSong = (
       return macros;
     },
   };
-};

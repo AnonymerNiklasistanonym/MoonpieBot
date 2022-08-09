@@ -46,7 +46,7 @@ import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
 import { pluginOsuStreamCompanionGenerator } from "./messageParser/plugins/streamcompanion";
 import { pluginsOsuGenerator } from "./messageParser/plugins/osu";
-import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
+import { pluginSpotifyGenerator } from "./messageParser/plugins/spotify";
 import { pluginsTwitchApi } from "./messageParser/plugins/twitchApi";
 import { pluginsTwitchChatGenerator } from "./messageParser/plugins/twitchChat";
 import { pyramidSpammer } from "./other/pyramidSpammer";
@@ -318,7 +318,9 @@ export const main = async (
     plugins.set(pluginStreamCompanionReady.id, pluginStreamCompanionReady.func);
   }
   if (spotifyWebApi !== undefined) {
-    const pluginSpotifyReady = pluginSpotifyCurrentPreviousSong(spotifyWebApi);
+    const pluginSpotifyReady = generatePlugin(pluginSpotifyGenerator, {
+      spotifyWebApi,
+    });
     plugins.set(pluginSpotifyReady.id, pluginSpotifyReady.func);
   }
 
