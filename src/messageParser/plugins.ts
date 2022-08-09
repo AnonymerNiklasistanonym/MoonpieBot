@@ -21,9 +21,15 @@ import {
   pluginTimeInSToStopwatchString,
   pluginUppercase,
 } from "./plugins/general";
+import {
+  pluginOsuBeatmapGenerator,
+  pluginOsuMostRecentPlayGenerator,
+  pluginOsuScoreGenerator,
+  pluginOsuUserGenerator,
+} from "./plugins/osu";
+import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 // Type imports
 import type { PluginFunc, PluginSignature } from "../messageParser";
-import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 
 export interface MessageParserPluginExample {
   before?: string;
@@ -63,6 +69,12 @@ export const generatePlugin = <DATA>(
   },
 });
 
+export const generatePluginInfo = <DATA>(
+  generator: MessageParserPluginGenerator<DATA>
+): MessageParserPluginInfo => ({
+  ...generator,
+});
+
 /**
  * The default values for all plugins.
  */
@@ -89,4 +101,14 @@ export const defaultPlugins: MessageParserPlugin[] = [
   pluginUppercase,
 ];
 
-export const defaultPluginsOptional = [...pluginsTwitchChatGenerator];
+export interface MessageParserPluginInfo extends MessageParserPluginBase {
+  signature?: PluginSignature;
+}
+
+export const defaultPluginsOptional: MessageParserPluginInfo[] = [
+  ...pluginsTwitchChatGenerator.map(generatePluginInfo),
+  generatePluginInfo(pluginOsuBeatmapGenerator),
+  generatePluginInfo(pluginOsuScoreGenerator),
+  generatePluginInfo(pluginOsuMostRecentPlayGenerator),
+  generatePluginInfo(pluginOsuUserGenerator),
+];

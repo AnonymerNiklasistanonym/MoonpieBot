@@ -13,7 +13,7 @@ import type {
 } from "./messageParser/macros";
 import type {
   MessageParserPlugin,
-  MessageParserPluginGenerator,
+  MessageParserPluginInfo,
 } from "./messageParser/plugins";
 import type { Logger } from "winston";
 
@@ -926,11 +926,11 @@ export const generatePluginsAndMacrosMap = (
   };
 };
 
-export const generatePluginAndMacroDocumentation = async <ANY>(
+export const generatePluginAndMacroDocumentation = async (
   strings: Strings,
   plugins: MessageParserPlugin[],
   macros: MessageParserMacro[],
-  optionalPlugins: undefined | MessageParserPluginGenerator<ANY>[],
+  optionalPlugins: undefined | MessageParserPluginInfo[],
   optionalMacros: undefined | MessageParserMacroDocumentation[],
   logger: Logger
 ) => {

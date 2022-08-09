@@ -19,8 +19,9 @@ import {
   pluginOsuScoreId,
   pluginOsuUserId,
 } from "./osuApi";
+// Type imports
 import type { MacroDictionaryEntry } from "../../messageParser";
-import type { MessageParserPlugin } from "../plugins";
+import type { MessageParserPluginGenerator } from "../plugins";
 import type { OsuApiV2Credentials } from "../../commands/osu";
 
 const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
@@ -91,27 +92,27 @@ export const convertOsuBeatmapToMacros = (
   ];
 };
 
-export const pluginOsuBeatmap = (
-  osuApiV2Credentials: OsuApiV2Credentials
-): MessageParserPlugin => {
-  return {
+export interface PluginOsuBeatmapGeneratorData {
+  osuApiV2Credentials: OsuApiV2Credentials;
+}
+
+export const pluginOsuBeatmapGenerator: MessageParserPluginGenerator<PluginOsuBeatmapGeneratorData> =
+  {
     id: pluginOsuBeatmapId,
-    func: async (_logger, beatmapId, signature) => {
-      if (signature === true) {
-        return {
-          type: "signature",
-          argument: "osuBeatmapID",
-          exportsMacro: true,
-          exportedMacroKeys: Object.values(MacroOsuBeatmap),
-        };
-      }
+    signature: {
+      type: "signature",
+      argument: "osuBeatmapID",
+      exportsMacro: true,
+      exportedMacroKeys: Object.values(MacroOsuBeatmap),
+    },
+    generate: (data) => async (_, beatmapId) => {
       if (beatmapId === undefined || beatmapId.trim().length === 0) {
         throw Error("osu! beatmap ID was empty");
       }
       const beatmapIdNumber = parseInt(beatmapId);
       const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
-        osuApiV2Credentials.clientId,
-        osuApiV2Credentials.clientSecret
+        data.osuApiV2Credentials.clientId,
+        data.osuApiV2Credentials.clientSecret
       );
       const beatmap = await osuApiV2.beatmaps.get(
         oauthAccessToken,
@@ -120,7 +121,6 @@ export const pluginOsuBeatmap = (
       return convertOsuBeatmapToMacros(beatmap);
     },
   };
-};
 
 const ROUND_TO_2_DIGITS_FACTOR = 100;
 
@@ -176,20 +176,20 @@ export const convertOsuScoreToMacros = (
 
 const STATUS_CODE_NOT_FOUND = 404;
 
-export const pluginOsuScore = (
-  osuApiV2Credentials: OsuApiV2Credentials
-): MessageParserPlugin => {
-  return {
+export interface PluginOsuScoreGeneratorData {
+  osuApiV2Credentials: OsuApiV2Credentials;
+}
+
+export const pluginOsuScoreGenerator: MessageParserPluginGenerator<PluginOsuScoreGeneratorData> =
+  {
     id: pluginOsuScoreId,
-    func: async (_logger, beatmapIdAndUserId, signature) => {
-      if (signature === true) {
-        return {
-          type: "signature",
-          argument: "osuBeatmapId osuUserId",
-          exportsMacro: true,
-          exportedMacroKeys: Object.values(MacroOsuScore),
-        };
-      }
+    signature: {
+      type: "signature",
+      argument: "osuBeatmapId osuUserId",
+      exportsMacro: true,
+      exportedMacroKeys: Object.values(MacroOsuScore),
+    },
+    generate: (data) => async (_, beatmapIdAndUserId) => {
       if (
         beatmapIdAndUserId === undefined ||
         beatmapIdAndUserId.trim().length === 0
@@ -203,8 +203,8 @@ export const pluginOsuScore = (
         throw Error("osu! beatmap or user ID missing");
       }
       const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
-        osuApiV2Credentials.clientId,
-        osuApiV2Credentials.clientSecret
+        data.osuApiV2Credentials.clientId,
+        data.osuApiV2Credentials.clientSecret
       );
       try {
         const beatmapScore = await osuApiV2.beatmaps.scores.users(
@@ -224,29 +224,28 @@ export const pluginOsuScore = (
       }
     },
   };
-};
 
-export const pluginOsuMostRecentPlay = (
-  osuApiV2Credentials: OsuApiV2Credentials
-): MessageParserPlugin => {
-  return {
+export interface PluginOsuMostRecentPlayGeneratorData {
+  osuApiV2Credentials: OsuApiV2Credentials;
+}
+
+export const pluginOsuMostRecentPlayGenerator: MessageParserPluginGenerator<PluginOsuMostRecentPlayGeneratorData> =
+  {
     id: pluginOsuMostRecentPlayId,
-    func: async (_logger, userId, signature) => {
-      if (signature === true) {
-        return {
-          type: "signature",
-          argument: "osuUserId",
-          exportsMacro: true,
-          exportedMacroKeys: Object.values(MacroOsuMostRecentPlay),
-        };
-      }
+    signature: {
+      type: "signature",
+      argument: "osuUserId",
+      exportsMacro: true,
+      exportedMacroKeys: Object.values(MacroOsuMostRecentPlay),
+    },
+    generate: (data) => async (_, userId) => {
       if (userId === undefined || userId.trim().length === 0) {
         throw Error("osu! user ID was empty");
       }
       const userIdNumber = parseInt(userId);
       const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
-        osuApiV2Credentials.clientId,
-        osuApiV2Credentials.clientSecret
+        data.osuApiV2Credentials.clientId,
+        data.osuApiV2Credentials.clientSecret
       );
       const lastPlay = await osuApiV2.users.scores(
         oauthAccessToken,
@@ -301,32 +300,31 @@ export const pluginOsuMostRecentPlay = (
       return [["FOUND", "false"]];
     },
   };
-};
 
 const OSU_ACHIEVEMENT_ID_TUTEL = 151;
 const OSU_ACHIEVEMENT_ID_BUNNY = 6;
 
-export const pluginOsuUser = (
-  osuApiV2Credentials: OsuApiV2Credentials
-): MessageParserPlugin => {
-  return {
+export interface PluginOsuUserGeneratorData {
+  osuApiV2Credentials: OsuApiV2Credentials;
+}
+
+export const pluginOsuUserGenerator: MessageParserPluginGenerator<PluginOsuUserGeneratorData> =
+  {
     id: pluginOsuUserId,
-    func: async (_logger, userId, signature) => {
-      if (signature === true) {
-        return {
-          type: "signature",
-          argument: "osuUserId",
-          exportsMacro: true,
-          exportedMacroKeys: Object.values(MacroOsuUser),
-        };
-      }
+    signature: {
+      type: "signature",
+      argument: "osuUserId",
+      exportsMacro: true,
+      exportedMacroKeys: Object.values(MacroOsuUser),
+    },
+    generate: (data) => async (_, userId) => {
       if (userId === undefined || userId.trim().length === 0) {
         throw Error("osu! user ID was empty");
       }
       const userIdNumber = parseInt(userId);
       const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
-        osuApiV2Credentials.clientId,
-        osuApiV2Credentials.clientSecret
+        data.osuApiV2Credentials.clientId,
+        data.osuApiV2Credentials.clientSecret
       );
       const user = await osuApiV2.users.id(
         oauthAccessToken,
@@ -406,4 +404,3 @@ export const pluginOsuUser = (
       ];
     },
   };
-};

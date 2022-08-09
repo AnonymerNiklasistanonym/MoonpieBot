@@ -33,10 +33,10 @@ import {
 } from "./customCommandsTimers/customTimer";
 import { MacroOsuApi, macroOsuApi } from "./messageParser/macros/osuApi";
 import {
-  pluginOsuBeatmap,
-  pluginOsuMostRecentPlay,
-  pluginOsuScore,
-  pluginOsuUser,
+  pluginOsuBeatmapGenerator,
+  pluginOsuMostRecentPlayGenerator,
+  pluginOsuScoreGenerator,
+  pluginOsuUserGenerator,
 } from "./messageParser/plugins/osu";
 import { createLogFunc } from "./logging";
 import { createStreamCompanionConnection } from "./streamcompanion";
@@ -305,21 +305,32 @@ export const main = async (
     );
   }
   if (osuApiClientId && osuApiClientSecret) {
-    const pluginOsuBeatmapReady = pluginOsuBeatmap({
-      clientId: parseInt(osuApiClientId),
-      clientSecret: osuApiClientSecret,
+    const pluginOsuBeatmapReady = generatePlugin(pluginOsuBeatmapGenerator, {
+      osuApiV2Credentials: {
+        clientId: parseInt(osuApiClientId),
+        clientSecret: osuApiClientSecret,
+      },
     });
-    const pluginOsuScoreReady = pluginOsuScore({
-      clientId: parseInt(osuApiClientId),
-      clientSecret: osuApiClientSecret,
+    const pluginOsuScoreReady = generatePlugin(pluginOsuScoreGenerator, {
+      osuApiV2Credentials: {
+        clientId: parseInt(osuApiClientId),
+        clientSecret: osuApiClientSecret,
+      },
     });
-    const pluginOsuMostRecentPlayReady = pluginOsuMostRecentPlay({
-      clientId: parseInt(osuApiClientId),
-      clientSecret: osuApiClientSecret,
-    });
-    const pluginOsuUserReady = pluginOsuUser({
-      clientId: parseInt(osuApiClientId),
-      clientSecret: osuApiClientSecret,
+    const pluginOsuMostRecentPlayReady = generatePlugin(
+      pluginOsuMostRecentPlayGenerator,
+      {
+        osuApiV2Credentials: {
+          clientId: parseInt(osuApiClientId),
+          clientSecret: osuApiClientSecret,
+        },
+      }
+    );
+    const pluginOsuUserReady = generatePlugin(pluginOsuUserGenerator, {
+      osuApiV2Credentials: {
+        clientId: parseInt(osuApiClientId),
+        clientSecret: osuApiClientSecret,
+      },
     });
     plugins.set(pluginOsuBeatmapReady.id, pluginOsuBeatmapReady.func);
     plugins.set(pluginOsuScoreReady.id, pluginOsuScoreReady.func);

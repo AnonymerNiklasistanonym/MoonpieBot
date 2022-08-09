@@ -29,7 +29,7 @@ import type {
 } from "./messageParser/macros";
 import type {
   MessageParserPlugin,
-  MessageParserPluginGenerator,
+  MessageParserPluginInfo,
 } from "./messageParser/plugins";
 import type { Logger } from "winston";
 
@@ -118,12 +118,12 @@ export const updateStringsMapWithCustomEnvStrings = (
   return strings;
 };
 
-export const createStringsVariableDocumentation = async <ANY>(
+export const createStringsVariableDocumentation = async (
   path: string,
   strings: Strings,
   plugins?: MessageParserPlugin[],
   macros?: MessageParserMacro[],
-  optionalPlugins?: MessageParserPluginGenerator<ANY>[],
+  optionalPlugins?: MessageParserPluginInfo[],
   optionalMacros?: MessageParserMacroDocumentation[],
   logger?: Logger
 ) => {
