@@ -100,6 +100,8 @@ jobs:
         os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_URL_REPO: https://github.com/AnonymerNiklasistanonym/MoonpieBot/blob/main
 
     # Only update documentation if the build didn't fail and happened on the main branch
     needs: build
@@ -126,7 +128,10 @@ jobs:
       run: |
         mkdir -p docs/res/icons
         cp res/icons/moonpiebot.png docs/res/icons/
-        cp *.example* docs
+        # Rename paths to example files
+        sed -i "s#href=\"./.env#href=\"$GITHUB_URL_REPO/.env#g" docs/index.html
+        sed -i "s#href=\"./installer#href=\"$GITHUB_URL_REPO/installer#g" docs/index.html
+        sed -i "s#href=\"./custom#href=\"$GITHUB_URL_REPO/custom#g" docs/index.html
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4.2.5
       with:
