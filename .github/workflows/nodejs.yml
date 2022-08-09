@@ -124,8 +124,9 @@ jobs:
     - name: Copy moonpiebot icon
       if: matrix.os == 'ubuntu-latest'
       run: |
-        mkdir -p ./docs/res/icons
-        cp res/icons/moonpiebot.png ./docs/res/icons/
+        mkdir -p docs/res/icons
+        cp res/icons/moonpiebot.png docs/res/icons/
+        cp *.example* docs
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4.2.5
       with:
