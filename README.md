@@ -34,6 +34,7 @@ A custom Twitch chat bot.
   - [Configuration files](#configuration-files)
   - [How to handle versions](#how-to-handle-versions)
   - [Documentation](#documentation)
+- [Profiling](#profiling)
 - [Credits](#credits)
 
 ## Features
@@ -540,6 +541,35 @@ For documentation purposes several plugins can be used:
    * @param a A
    */
   export const name
+  ```
+
+## Profiling
+
+- Simple profiling: https://nodejs.org/en/docs/guides/simple-profiling/
+
+  ```sh
+  # Track all calls
+  NODE_ENV=production node --prof .
+  # Then take the created file "isolate-0x558b5a308560-178958-v8.log" for analysis
+  node --prof-process isolate-0x55e4675df560-178103-v8.log > processed.txt
+        "profile_perf": "perf record -e cycles:u -g -- node --perf-basic-prof .",
+        "profile_perf_data": "perf script > perfs.out",
+        "profile_perf_flamegraph": "stackvis perf < perfs.out > flamegraph.htm",
+  ```
+
+- Flamegraph: https://nodejs.org/en/docs/guides/diagnostics-flamegraph/
+
+  ```sh
+  # Track all calls using perf
+  perf record -e cycles:u -g -- node --perf-basic-prof .
+  # Create perf output and edit it to remove internal calls
+  perf script > perfs.out
+  sed -i \
+    -e "/( __libc_start| LazyCompile | v8::internal::| Builtin:| Stub:| LoadIC:|\[unknown\]| LoadPolymorphicIC:)/d" \
+    -e 's/ LazyCompile:[*~]\?/ /' \
+    ./perfs.out
+  # Create flamegraph that can be viewed in the browser
+  stackvis perf < perfs.out > flamegraph.htm
   ```
 
 ## Credits
