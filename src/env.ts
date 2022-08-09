@@ -7,6 +7,7 @@ import {
 } from "./other/splitTextAtLength";
 // Type imports
 import {
+  ENV_LIST_SPLIT_CHARACTER,
   ENV_VARIABLE_PREFIX,
   EnvVariable,
   EnvVariableBlock,
@@ -66,8 +67,8 @@ export const printEnvVariablesToConsole = (
       envVariableValueString += ` (example="${envVariableInformation.example}")`;
     }
 
-    if (envVariableInformation.necessary) {
-      envVariableValueString += " (NECESSARY!)";
+    if (envVariableInformation.required) {
+      envVariableValueString += " (REQUIRED!)";
     }
 
     console.log(`${envVariableName}=${envVariableValueString}`);
@@ -90,30 +91,97 @@ export interface EnvVariableValue {
   legacy?: boolean;
 }
 
+/**
+ * Get the value of an environment variable or throw an error if it's value is
+ * provided multiple times (via legacy variables) or does not match the
+ * supported values.
+ *
+ * @param envVariable The ENV variable (name).
+ * @returns The value and which environment variable it's derived from or
+ * undefined values if not found.
+ */
 export const getEnvVariableValue = (
   envVariable: EnvVariable | string
 ): EnvVariableValue => {
-  const value = process.env[getEnvVariableName(envVariable)];
-  if (value === undefined) {
-    // Check legacy values
-    const envVariableInformation = getEnvVariableValueInformation(envVariable);
-    if (
-      envVariableInformation.legacyNames &&
-      envVariableInformation.legacyNames.length > 0
-    ) {
-      for (const legacyName of envVariableInformation.legacyNames) {
-        const legacyValue = process.env[getEnvVariableName(legacyName)];
-        if (legacyValue) {
-          return {
-            value: legacyValue,
-            legacy: true,
-            envVariableName: legacyName,
-          };
-        }
+  let value = process.env[getEnvVariableName(envVariable)];
+  let legacy = false;
+  let envVariableName = envVariable;
+
+  let legacyValue: string | undefined;
+  let legacyEnvVariableName: string | undefined;
+
+  const envVariableInfo = getEnvVariableValueInformation(envVariable);
+
+  // Check for legacy values (and throw errors if multiple values are found)
+  if (envVariableInfo.legacyNames && envVariableInfo.legacyNames.length > 0) {
+    for (const legacyName of envVariableInfo.legacyNames) {
+      const foundLegacyValue = process.env[getEnvVariableName(legacyName)];
+      if (foundLegacyValue === undefined) {
+        continue;
       }
+      if (value !== undefined) {
+        throw Error(
+          `Found a value for "${envVariable}" and it's legacy variable "${envVariable}" but only one is allowed`
+        );
+      }
+      if (legacyValue !== undefined && legacyEnvVariableName !== undefined) {
+        throw Error(
+          `Found multiple legacy values for "${envVariable}" ("${legacyEnvVariableName}", "${legacyName}") but only one is allowed`
+        );
+      }
+      legacyValue = foundLegacyValue;
+      legacyEnvVariableName = legacyName;
     }
   }
-  return { value, envVariableName: envVariable.toString() };
+  // Determine the final values
+  if (
+    value === undefined &&
+    legacyValue !== undefined &&
+    legacyEnvVariableName !== undefined
+  ) {
+    value = legacyValue;
+    envVariableName = legacyEnvVariableName;
+    legacy = true;
+  }
+
+  // If there are supported values check if the value matches them
+  const supportedValues = envVariableInfo.supportedValues;
+  if (value !== undefined && supportedValues !== undefined) {
+    if (
+      supportedValues.canBeJoinedAsList === true &&
+      !value
+        .split(ENV_LIST_SPLIT_CHARACTER)
+        .filter((a) => a.length > 0)
+        .every((a) => supportedValues.values.includes(a)) &&
+      value !== supportedValues.emptyListValue
+    ) {
+      throw Error(
+        `The provided value list for "${envVariableName}" is not supported (${supportedValues.values
+          .map((a) => `"${a}"`)
+          .join(ENV_LIST_SPLIT_CHARACTER)})${
+          supportedValues.emptyListValue !== undefined
+            ? ` [empty list value "${supportedValues.emptyListValue}"]`
+            : ""
+        }`
+      );
+    }
+    if (
+      supportedValues.canBeJoinedAsList !== true &&
+      !supportedValues.values.includes(value)
+    ) {
+      throw Error(
+        `The provided value for "${envVariableName}" is not supported (${supportedValues.values
+          .map((a) => `"${a}"`)
+          .join(",")})`
+      );
+    }
+  }
+  if (envVariableInfo.required === true && value === undefined) {
+    throw Error(
+      `No value was found for the required ENV variable "${envVariableName}"`
+    );
+  }
+  return { value, envVariableName, legacy };
 };
 
 export const getEnvVariableValueOrCustomDefault = <T>(
@@ -227,7 +295,7 @@ export const envVariableStructure: (
     block: EnvVariableBlock.TWITCH,
     name: "TWITCH",
     description:
-      "Necessary variables that need to be set for ANY configuration to connect to Twitch chat.",
+      "Required variables that need to be set for ANY configuration to connect to Twitch chat.",
   },
   {
     block: EnvVariableBlock.MOONPIE,
@@ -310,20 +378,31 @@ export const createEnvVariableDocumentation = async (
           };
           if (
             envVariableInfo.supportedValues &&
-            envVariableInfo.supportedValues.length > 0
+            envVariableInfo.supportedValues.values.length > 0
           ) {
             if (envVariableEntry.properties === undefined) {
               envVariableEntry.properties = [];
             }
             envVariableEntry.properties.push([
-              "Supported values",
-              envVariableInfo.supportedValues
+              `Supported ${
+                envVariableInfo.supportedValues.canBeJoinedAsList ? "list " : ""
+              }values`,
+              envVariableInfo.supportedValues.values
                 .map((a) => `'${a}'`)
                 .sort()
                 .join(", "),
             ]);
+            if (envVariableInfo.supportedValues.emptyListValue) {
+              envVariableEntry.properties.push([
+                "Empty list value",
+                `'${envVariableInfo.supportedValues.emptyListValue}'`,
+              ]);
+            }
           }
           envVariableEntry.infos = [];
+          if (envVariableInfo.required) {
+            envVariableEntry.infos.push("THIS VARIABLE IS REQUIRED!");
+          }
           if (envVariableInfo.censor) {
             envVariableEntry.infos.push("KEEP THIS VARIABLE PRIVATE!");
           }
@@ -334,13 +413,13 @@ export const createEnvVariableDocumentation = async (
                 ? defaultStrOrFunc(configDir)
                 : defaultStrOrFunc
             }`;
-            envVariableEntry.isComment = !envVariableInfo.necessary;
+            envVariableEntry.isComment = !envVariableInfo.required;
           } else if (envVariableInfo.example) {
             envVariableEntry.infos.push(
               "(The following line is only an example!)"
             );
             envVariableEntry.value = `${ENV_VARIABLE_PREFIX}${envVariable}=${envVariableInfo.example}`;
-            envVariableEntry.isComment = !envVariableInfo.necessary;
+            envVariableEntry.isComment = !envVariableInfo.required;
           } else {
             envVariableEntry.value = `ERROR`;
           }

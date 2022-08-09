@@ -26,7 +26,7 @@ const rootPath = path.join(__dirname, "..");
 const manPageOutputPath = path.join(rootPath, "installer", "man.md");
 
 const createManPageFile = (outputPath: string) => {
-  console.log(`Create MAN page file '${outputPath}'...`);
+  console.log(`Create MAN page file "${outputPath}"...`);
 
   let outputString = "";
   // Header
@@ -96,10 +96,23 @@ const createManPageFile = (outputPath: string) => {
     if (envVariable.example) {
       outputString += `Example: "*${envVariable.example}*"\n`;
     }
-    if (envVariable.supportedValues && envVariable.supportedValues.length > 0) {
-      outputString += `Supported values: ${envVariable.supportedValues
-        .map((a) => `"*${a}*"`)
-        .join(", ")}\n`;
+    if (
+      envVariable.supportedValues &&
+      envVariable.supportedValues.values.length > 0
+    ) {
+      if (envVariable.supportedValues.canBeJoinedAsList === true) {
+        outputString += `Supported list values: ${envVariable.supportedValues.values
+          .map((b) => `"*${b}*"`)
+          .join(", ")}`;
+        if (envVariable.supportedValues.emptyListValue) {
+          outputString += ` (empty list value: "*${envVariable.supportedValues.emptyListValue}*")`;
+        }
+      } else {
+        outputString += `Supported values: ${envVariable.supportedValues.values
+          .map((b) => `"*${b}*"`)
+          .join(", ")}`;
+      }
+      outputString += `\n`;
     }
     outputString += `\n`;
   }

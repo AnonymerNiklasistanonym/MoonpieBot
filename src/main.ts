@@ -120,7 +120,7 @@ export const main = async (
 
   const loggerMain = createLogFunc(logger, LOG_ID_MODULE_MAIN);
 
-  // Read in necessary paths/values from environment variables
+  // Read in paths/values from environment variables
   // Twitch connection
   const twitchName = getEnvVariableValueOrUndefined(EnvVariable.TWITCH_NAME);
   const twitchOAuthToken = getEnvVariableValueOrUndefined(
@@ -129,6 +129,9 @@ export const main = async (
   const twitchChannels = getEnvVariableValueOrUndefined(
     EnvVariable.TWITCH_CHANNELS
   );
+  const twitchDebug =
+    getEnvVariableValueOrUndefined(EnvVariable.TWITCH_DEBUG) ===
+    EnvVariableOnOff.ON;
   // Twitch API
   const twitchApiClientId = getEnvVariableValueOrUndefined(
     EnvVariable.TWITCH_API_CLIENT_ID
@@ -181,14 +184,16 @@ export const main = async (
   const osuApiDefaultId = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_API_DEFAULT_ID
   );
-  const osuApiBeatmapRequests = getEnvVariableValueOrDefault(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS,
-    configDir
-  );
-  const osuApiBeatmapRequestsDetailed = getEnvVariableValueOrDefault(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
-    configDir
-  );
+  const osuApiBeatmapRequests =
+    getEnvVariableValueOrDefault(
+      EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS,
+      configDir
+    ) === EnvVariableOnOff.ON;
+  const osuApiBeatmapRequestsDetailed =
+    getEnvVariableValueOrDefault(
+      EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
+      configDir
+    ) === EnvVariableOnOff.ON;
   const osuIrcPassword = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_IRC_PASSWORD
   );
@@ -213,7 +218,7 @@ export const main = async (
     twitchName,
     twitchOAuthToken,
     twitchChannels?.split(" ").filter((a) => a.trim().length !== 0),
-    false,
+    twitchDebug,
     logger
   );
   // Twitch API
@@ -240,10 +245,8 @@ export const main = async (
   // > osu! API
   const enableOsu = osuApiClientId && osuApiClientSecret && osuApiDefaultId;
   const enableOsuIrc = osuIrcPassword && osuIrcUsername && osuIrcRequestTarget;
-  const enableOsuBeatmapRequests =
-    osuApiBeatmapRequests === EnvVariableOnOff.ON;
-  const enableOsuBeatmapRequestsDetailed =
-    osuApiBeatmapRequestsDetailed === EnvVariableOnOff.ON;
+  const enableOsuBeatmapRequests = osuApiBeatmapRequests;
+  const enableOsuBeatmapRequestsDetailed = osuApiBeatmapRequestsDetailed;
   let osuIrcBot: undefined | OsuIrcBotSendMessageFunc;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
     osuIrcBot = (id: string) =>

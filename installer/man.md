@@ -58,9 +58,13 @@ Example: "*twitch_channel_name*"
 : A Twitch OAuth token (get it from: https://twitchapps.com/tmi/).
 Example: "*oauth:abcdefghijklmnop*"
 
+**MOONPIE_CONFIG_TWITCH_DEBUG**="*OFF*"
+: Turn on debug logs for the Twitch client to see all messages, joins, reconnects and more.
+Supported values: "*ON*", "*OFF*"
+
 **MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS**="*about,add,claim,commands,delete,get,leaderboard,remove,set*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
-Supported values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", "*get*", "*leaderboard*", "*remove*", "*set*", "*none*"
+Supported list values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", "*get*", "*leaderboard*", "*remove*", "*set*" (empty list value: "*none*")
 
 **MOONPIE_CONFIG_MOONPIE_DATABASE_PATH**="*moonpie.db*"
 : The database file path that contains the persistent moonpie data.
@@ -70,7 +74,7 @@ Supported values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", "*get
 
 **MOONPIE_CONFIG_OSU_ENABLE_COMMANDS**="*np,pp,requests,rp,score*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!
-Supported values: "*pp*", "*np*", "*rp*", "*score*", "*requests*", "*none*"
+Supported list values: "*pp*", "*np*", "*rp*", "*score*", "*requests*" (empty list value: "*none*")
 
 **MOONPIE_CONFIG_OSU_API_CLIENT_ID**
 : The osu! client ID (and client secret) to use the osu! api v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).
@@ -95,12 +99,10 @@ Supported values: "*ON*", "*OFF*"
 **MOONPIE_CONFIG_OSU_IRC_PASSWORD**
 : The osu! irc server password and senderUserName. To get them go to https://osu.ppy.sh/p/irc and login (in case that clicking the 'Begin Email Verification' button does not reveal a text input refresh the page and click the button again -> this also means you get a new code!)
 Example: "*senderServerPassword*"
-Supported values: "*ON*", "*OFF*"
 
 **MOONPIE_CONFIG_OSU_IRC_USERNAME**
 : Check the description of MOONPIE_CONFIG_OSU_IRC_PASSWORD.
 Example: "*senderUserName*"
-Supported values: "*ON*", "*OFF*"
 
 **MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET**
 : The osu! account name that should receive the requests (can be the same account as the sender!).
@@ -112,7 +114,7 @@ Example: "*localhost:20727*"
 
 **MOONPIE_CONFIG_SPOTIFY_ENABLE_COMMANDS**="*song*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide Spotify API credentials the commands won't be enabled!
-Supported values: "*song*", "*none*"
+Supported list values: "*song*" (empty list value: "*none*")
 
 **MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID**
 : Provide client id/secret to enable Twitch api calls in commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application).

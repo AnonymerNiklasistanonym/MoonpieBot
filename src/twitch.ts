@@ -74,7 +74,6 @@ export const createTwitchClient = (
       "Could not create Twitch client: twitchName was undefined"
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_NAME_UNDEFINED;
-    logTwitch.error(error);
     throw error;
   }
   if (twitchOAuthToken === undefined) {
@@ -82,7 +81,6 @@ export const createTwitchClient = (
       "Could not create Twitch client: twitchOAuthToken was undefined"
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_OAUTH_TOKEN_UNDEFINED;
-    logTwitch.error(error);
     throw error;
   }
   if (twitchChannels === undefined) {
@@ -90,7 +88,6 @@ export const createTwitchClient = (
       "Could not create Twitch client: twitchChannels was undefined"
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_CHANNELS_UNDEFINED;
-    logTwitch.error(error);
     throw error;
   }
   if (twitchChannels.length === 0) {
@@ -98,14 +95,13 @@ export const createTwitchClient = (
       "Could not create Twitch client: twitchChannels list was empty"
     ) as CreateTwitchClientError;
     error.code = CreateTwitchClientErrorCode.TWITCH_CHANNELS_EMPTY;
-    logTwitch.error(error);
     throw error;
   }
 
   logTwitch.info(
     `Create Twitch client for the account "${twitchName}" in the channels: ${twitchChannels
-      .map((a) => '"' + a + '"')
-      .join(",")}`
+      .map((a) => `"${a}"`)
+      .join(", ")}`
   );
 
   // Create Twitch client that can listen to all specified channels

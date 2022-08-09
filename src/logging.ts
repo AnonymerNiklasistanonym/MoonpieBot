@@ -11,7 +11,12 @@ import type { Logger } from "winston";
 /**
  * The default log levels of the logger.
  */
-export type LoggerLevel = "error" | "warn" | "debug" | "info";
+export enum LoggerLevel {
+  ERROR = "error",
+  WARN = "warn",
+  DEBUG = "debug",
+  INFO = "info",
+}
 
 /**
  * The information the logger stores.
@@ -25,6 +30,12 @@ export interface LoggerInformation {
   subsection?: string;
 }
 
+/**
+ * Function that formats the log output.
+ *
+ * @param logInfo The information the logger provides.
+ * @returns Parsed string.
+ */
 export const logFormat = (logInfo: LoggerInformation) => {
   if (logInfo.timestamp && logInfo.service) {
     if (logInfo.section) {
@@ -98,15 +109,13 @@ export const createLogFunc = (
   info: LogMessageInfo = {}
 ): LogFunc => {
   const subsection = info.subsection ? info.subsection : undefined;
-  const baseLogFunc = (level: LoggerLevel) => {
-    return (message: string) => {
-      logger.log({ level, message, section, subsection });
-    };
+  const baseLogFunc = (level: LoggerLevel) => (message: string) => {
+    logger.log({ level, message, section, subsection });
   };
   return {
-    info: baseLogFunc("info"),
-    debug: baseLogFunc("debug"),
-    warn: baseLogFunc("warn"),
+    info: baseLogFunc(LoggerLevel.INFO),
+    debug: baseLogFunc(LoggerLevel.DEBUG),
+    warn: baseLogFunc(LoggerLevel.WARN),
     error: (err: Error) => {
       logger.log({ level: "error", message: err.message, section, subsection });
     },

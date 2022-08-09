@@ -1,6 +1,7 @@
 // Package imports
 import path from "path";
 // Local imports
+import { LoggerLevel } from "../logging";
 import { MoonpieCommands } from "./commands";
 import { OsuCommands } from "./commands";
 import { SpotifyCommands } from "./commands";
@@ -41,6 +42,7 @@ export enum EnvVariable {
   TWITCH_CHANNELS = "TWITCH_CHANNELS",
   TWITCH_NAME = "TWITCH_NAME",
   TWITCH_OAUTH_TOKEN = "TWITCH_OAUTH_TOKEN",
+  TWITCH_DEBUG = "TWITCH_DEBUG",
   /** Disable/Enable !moonpie commands. */
   MOONPIE_ENABLE_COMMANDS = "MOONPIE_ENABLE_COMMANDS",
   /** The path to the moonpie database. */
@@ -64,6 +66,8 @@ export enum EnvVariable {
   TWITCH_API_ACCESS_TOKEN = "TWITCH_API_ACCESS_TOKEN",
   TWITCH_API_CLIENT_ID = "TWITCH_API_CLIENT_ID",
 }
+
+export const ENV_LIST_SPLIT_CHARACTER = ",";
 
 /**
  * Environment variables are grouped in blocks.
@@ -92,8 +96,8 @@ export interface EnvVariableData
   legacyNames?: string[];
   /** The default value for example to display relative paths in 'default' but use absolute path as 'defaultValue'. */
   defaultValue?: string | ((configDir: string) => string);
-  /** Is necessary to run the program. */
-  necessary?: boolean;
+  /** Is required to run the program. */
+  required?: boolean;
   /** Censor variable per default to prevent leaks. */
   censor?: boolean;
 }
@@ -107,7 +111,7 @@ export const envVariableInformation: EnvVariableData[] = [
     default: "info",
     description:
       "The log level of the log messages that are printed to the console.",
-    supportedValues: ["error", "warn", "debug", "info"],
+    supportedValues: { values: Object.values(LoggerLevel) },
     block: EnvVariableBlock.LOGGING,
   },
   {
@@ -124,7 +128,7 @@ export const envVariableInformation: EnvVariableData[] = [
     default: "debug",
     description:
       "The log level of the log messages that are written to the log files.",
-    supportedValues: ["error", "warn", "debug", "info"],
+    supportedValues: { values: Object.values(LoggerLevel) },
     block: EnvVariableBlock.LOGGING,
     legacyNames: ["FILE_LOG_LEVEL"],
   },
@@ -134,7 +138,7 @@ export const envVariableInformation: EnvVariableData[] = [
     description:
       "A with a space separated list of all the channels the bot should be active.",
     block: EnvVariableBlock.TWITCH,
-    necessary: true,
+    required: true,
     legacyNames: ["TWITCH_CHANNEL"],
   },
   {
@@ -142,7 +146,7 @@ export const envVariableInformation: EnvVariableData[] = [
     example: "twitch_channel_name",
     description: "The name of the twitch account that should be imitated.",
     block: EnvVariableBlock.TWITCH,
-    necessary: true,
+    required: true,
   },
   {
     name: EnvVariable.TWITCH_OAUTH_TOKEN,
@@ -150,13 +154,25 @@ export const envVariableInformation: EnvVariableData[] = [
     description:
       "A Twitch OAuth token (get it from: https://twitchapps.com/tmi/).",
     block: EnvVariableBlock.TWITCH,
-    necessary: true,
+    required: true,
     censor: true,
+  },
+  {
+    name: EnvVariable.TWITCH_DEBUG,
+    default: EnvVariableOnOff.OFF,
+    supportedValues: { values: Object.values(EnvVariableOnOff) },
+    description:
+      "Turn on debug logs for the Twitch client to see all messages, joins, reconnects and more.",
+    block: EnvVariableBlock.TWITCH,
   },
   {
     name: EnvVariable.MOONPIE_ENABLE_COMMANDS,
     default: Object.values(MoonpieCommands).sort().join(","),
-    supportedValues: [...Object.values(MoonpieCommands), EnvVariableNone.NONE],
+    supportedValues: {
+      values: Object.values(MoonpieCommands),
+      canBeJoinedAsList: true,
+      emptyListValue: EnvVariableNone.NONE,
+    },
     description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
     block: EnvVariableBlock.MOONPIE,
     legacyNames: ["ENABLE_COMMANDS"],
@@ -183,7 +199,11 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     name: EnvVariable.OSU_ENABLE_COMMANDS,
     default: Object.values(OsuCommands).sort().join(","),
-    supportedValues: [...Object.values(OsuCommands), EnvVariableNone.NONE],
+    supportedValues: {
+      values: Object.values(OsuCommands),
+      canBeJoinedAsList: true,
+      emptyListValue: EnvVariableNone.NONE,
+    },
     description: `${ENABLE_COMMANDS_DEFAULT_DESCRIPTION} If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!`,
     block: EnvVariableBlock.OSU,
   },
@@ -215,7 +235,7 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS,
     default: EnvVariableOnOff.OFF,
-    supportedValues: Object.values(EnvVariableOnOff),
+    supportedValues: { values: Object.values(EnvVariableOnOff) },
     description:
       "Automatically recognize osu! beatmap links (=requests) in chat.",
     block: EnvVariableBlock.OSU_API,
@@ -224,7 +244,7 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
     default: EnvVariableOnOff.OFF,
-    supportedValues: Object.values(EnvVariableOnOff),
+    supportedValues: { values: Object.values(EnvVariableOnOff) },
     description: `If recognizing is enabled (${ENV_VARIABLE_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=ON) additionally output more detailed information about the map in the chat.`,
     block: EnvVariableBlock.OSU_API,
     legacyNames: ["OSU_RECOGNIZE_MAP_REQUESTS_DETAILED"],
@@ -232,7 +252,6 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     name: EnvVariable.OSU_IRC_PASSWORD,
     example: "senderServerPassword",
-    supportedValues: Object.values(EnvVariableOnOff),
     description:
       "The osu! irc server password and senderUserName. To get them go to https://osu.ppy.sh/p/irc and login (in case that clicking the 'Begin Email Verification' button does not reveal a text input refresh the page and click the button again -> this also means you get a new code!)",
     block: EnvVariableBlock.OSU_IRC,
@@ -241,7 +260,6 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     name: EnvVariable.OSU_IRC_USERNAME,
     example: "senderUserName",
-    supportedValues: Object.values(EnvVariableOnOff),
     description: `Check the description of ${ENV_VARIABLE_PREFIX}${EnvVariable.OSU_IRC_PASSWORD}.`,
     block: EnvVariableBlock.OSU_IRC,
   },
@@ -262,7 +280,11 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     name: EnvVariable.SPOTIFY_ENABLE_COMMANDS,
     default: Object.values(SpotifyCommands).sort().join(","),
-    supportedValues: [...Object.values(SpotifyCommands), EnvVariableNone.NONE],
+    supportedValues: {
+      values: Object.values(SpotifyCommands),
+      canBeJoinedAsList: true,
+      emptyListValue: EnvVariableNone.NONE,
+    },
     description: `${ENABLE_COMMANDS_DEFAULT_DESCRIPTION} If you don't provide Spotify API credentials the commands won't be enabled!`,
     block: EnvVariableBlock.SPOTIFY,
   },
@@ -300,7 +322,6 @@ export const envVariableInformation: EnvVariableData[] = [
     name: EnvVariable.TWITCH_API_CLIENT_ID,
     example: "abcdefghijklmnop",
     description: `Check the description of ${ENV_VARIABLE_PREFIX}${EnvVariable.TWITCH_API_ACCESS_TOKEN}.`,
-
     block: EnvVariableBlock.TWITCH_API,
     censor: true,
   },
@@ -343,7 +364,7 @@ export const envVariableStructure: (
     block: EnvVariableBlock.TWITCH,
     name: "TWITCH",
     description:
-      "Necessary variables that need to be set for ANY configuration to connect to Twitch chat.",
+      "Required variables that need to be set for ANY configuration to connect to Twitch chat.",
   },
   {
     block: EnvVariableBlock.MOONPIE,

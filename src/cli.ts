@@ -44,6 +44,12 @@ export interface CliOptionInformation<NAME = string> {
   example?: string;
 }
 
+export interface CliEnvVariableInformationSupportedValues {
+  canBeJoinedAsList?: boolean;
+  emptyListValue?: string;
+  values: string[];
+}
+
 /**
  * Generic information about a CLI environment variable.
  */
@@ -57,7 +63,7 @@ export interface CliEnvVariableInformation<NAME = string> {
   /** Usage example. */
   example?: string;
   /** The supported values. */
-  supportedValues?: string[];
+  supportedValues?: CliEnvVariableInformationSupportedValues;
 }
 
 /**
@@ -188,10 +194,22 @@ export const cliHelpGenerator = (
         if (a.example) {
           description += `\nExample: '${a.example}'`;
         }
-        if (a.supportedValues && a.supportedValues.length > 0) {
-          description += `\nSupported Values: ${a.supportedValues
-            .map((b) => `'${b}'`)
-            .join(", ")}`;
+        if (
+          a.supportedValues !== undefined &&
+          a.supportedValues.values.length > 0
+        ) {
+          if (a.supportedValues.canBeJoinedAsList === true) {
+            description += `\nSupported list values: ${a.supportedValues.values
+              .map((b) => `'${b}'`)
+              .join(", ")}`;
+            if (a.supportedValues.emptyListValue) {
+              description += ` (empty list value: '${a.supportedValues.emptyListValue}')`;
+            }
+          } else {
+            description += `\nSupported values: ${a.supportedValues.values
+              .map((b) => `'${b}'`)
+              .join(", ")}`;
+          }
         }
         return {
           content,
