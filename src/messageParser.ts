@@ -1037,6 +1037,10 @@ export const generatePluginAndMacroDocumentation = async (
 
   if (optionalPlugins !== undefined && optionalPlugins.length > 0) {
     output.push({
+      type: FileDocumentationPartType.NEWLINE,
+      count: 1,
+    });
+    output.push({
       type: FileDocumentationPartType.HEADING,
       title: "Other Plugins (not generally available in all strings)",
     });
@@ -1095,6 +1099,10 @@ export const generatePluginAndMacroDocumentation = async (
   }
 
   if (optionalMacros !== undefined && optionalMacros.length > 0) {
+    output.push({
+      type: FileDocumentationPartType.NEWLINE,
+      count: 1,
+    });
     output.push({
       type: FileDocumentationPartType.HEADING,
       title: "Other Macros (not generally available in all strings)",
