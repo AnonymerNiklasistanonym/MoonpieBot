@@ -433,6 +433,12 @@ export const osuCommandReplyRp = {
                 {
                   type: "macro",
                   name: pluginOsuBeatmapId,
+                  key: MacroOsuBeatmap.URL,
+                },
+                ", ",
+                {
+                  type: "macro",
+                  name: pluginOsuBeatmapId,
                   key: MacroOsuBeatmap.DIFFICULTY_RATING,
                 },
                 "* ",
