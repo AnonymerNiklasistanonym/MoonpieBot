@@ -32,12 +32,6 @@ import {
   registerTimer,
 } from "./customCommandsTimers/customTimer";
 import { MacroOsuApi, macroOsuApi } from "./messageParser/macros/osuApi";
-import {
-  pluginOsuBeatmapGenerator,
-  pluginOsuMostRecentPlayGenerator,
-  pluginOsuScoreGenerator,
-  pluginOsuUserGenerator,
-} from "./messageParser/plugins/osu";
 import { createLogFunc } from "./logging";
 import { createStreamCompanionConnection } from "./streamcompanion";
 import { defaultMacros } from "./messageParser/macros";
@@ -51,6 +45,7 @@ import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
+import { pluginsOsuGenerator } from "./messageParser/plugins/osu";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
 import { pluginsTwitchApi } from "./messageParser/plugins/twitchApi";
 import { pluginsTwitchChatGenerator } from "./messageParser/plugins/twitchChat";
@@ -305,40 +300,15 @@ export const main = async (
     );
   }
   if (osuApiClientId && osuApiClientSecret) {
-    const pluginOsuBeatmapReady = generatePlugin(pluginOsuBeatmapGenerator, {
-      osuApiV2Credentials: {
-        clientId: parseInt(osuApiClientId),
-        clientSecret: osuApiClientSecret,
-      },
-    });
-    const pluginOsuScoreReady = generatePlugin(pluginOsuScoreGenerator, {
-      osuApiV2Credentials: {
-        clientId: parseInt(osuApiClientId),
-        clientSecret: osuApiClientSecret,
-      },
-    });
-    const pluginOsuMostRecentPlayReady = generatePlugin(
-      pluginOsuMostRecentPlayGenerator,
-      {
+    pluginsOsuGenerator.map((plugin) => {
+      const pluginReady = generatePlugin(plugin, {
         osuApiV2Credentials: {
           clientId: parseInt(osuApiClientId),
           clientSecret: osuApiClientSecret,
         },
-      }
-    );
-    const pluginOsuUserReady = generatePlugin(pluginOsuUserGenerator, {
-      osuApiV2Credentials: {
-        clientId: parseInt(osuApiClientId),
-        clientSecret: osuApiClientSecret,
-      },
+      });
+      plugins.set(pluginReady.id, pluginReady.func);
     });
-    plugins.set(pluginOsuBeatmapReady.id, pluginOsuBeatmapReady.func);
-    plugins.set(pluginOsuScoreReady.id, pluginOsuScoreReady.func);
-    plugins.set(
-      pluginOsuMostRecentPlayReady.id,
-      pluginOsuMostRecentPlayReady.func
-    );
-    plugins.set(pluginOsuUserReady.id, pluginOsuUserReady.func);
   }
   if (osuStreamCompanionCurrentMapData !== undefined) {
     const pluginStreamCompanionReady = getPluginOsuStreamCompanion(

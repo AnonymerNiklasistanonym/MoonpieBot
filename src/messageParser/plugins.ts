@@ -21,12 +21,7 @@ import {
   pluginTimeInSToStopwatchString,
   pluginUppercase,
 } from "./plugins/general";
-import {
-  pluginOsuBeatmapGenerator,
-  pluginOsuMostRecentPlayGenerator,
-  pluginOsuScoreGenerator,
-  pluginOsuUserGenerator,
-} from "./plugins/osu";
+import { pluginsOsuGenerator } from "./plugins/osu";
 import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 // Type imports
 import type { PluginFunc, PluginSignature } from "../messageParser";
@@ -107,8 +102,5 @@ export interface MessageParserPluginInfo extends MessageParserPluginBase {
 
 export const defaultPluginsOptional: MessageParserPluginInfo[] = [
   ...pluginsTwitchChatGenerator.map(generatePluginInfo),
-  generatePluginInfo(pluginOsuBeatmapGenerator),
-  generatePluginInfo(pluginOsuScoreGenerator),
-  generatePluginInfo(pluginOsuMostRecentPlayGenerator),
-  generatePluginInfo(pluginOsuUserGenerator),
+  ...pluginsOsuGenerator.map(generatePluginInfo),
 ];
