@@ -8,12 +8,12 @@ import path from "path";
 import { StaticAuthProvider } from "@twurple/auth";
 // Local imports
 import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuirc";
+import { createTwitchClient, handleTwitchCommand } from "./twitch";
+import { defaultPlugins, generatePlugin } from "./messageParser/plugins";
 import {
-  createStringsVariableDocumentation,
   defaultStrings,
   updateStringsMapWithCustomEnvStrings,
 } from "./strings";
-import { createTwitchClient, handleTwitchCommand } from "./twitch";
 import { EnvVariable, EnvVariableNone, EnvVariableOnOff } from "./info/env";
 import {
   getCustomCommand,
@@ -31,29 +31,7 @@ import {
   loadCustomTimersFromFile,
   registerTimer,
 } from "./customCommandsTimers/customTimer";
-import { MacroOsuApi, macroOsuApiId } from "./messageParser/macros/osuApi";
-import {
-  pluginConvertToShortNumber,
-  pluginHelp,
-  pluginIfEmpty,
-  pluginIfEqual,
-  pluginIfFalse,
-  pluginIfGreater,
-  pluginIfNotEmpty,
-  pluginIfNotEqual,
-  pluginIfNotGreater,
-  pluginIfNotSmaller,
-  pluginIfNotUndefined,
-  pluginIfSmaller,
-  pluginIfTrue,
-  pluginIfUndefined,
-  pluginLowercase,
-  pluginRandomNumber,
-  pluginTimeInSToHumanReadableString,
-  pluginTimeInSToHumanReadableStringShort,
-  pluginTimeInSToStopwatchString,
-  pluginUppercase,
-} from "./messageParser/plugins/general";
+import { MacroOsuApi, macroOsuApi } from "./messageParser/macros/osuApi";
 import {
   pluginOsuBeatmap,
   pluginOsuMostRecentPlay,
@@ -62,11 +40,12 @@ import {
 } from "./messageParser/plugins/osu";
 import { createLogFunc } from "./logging";
 import { createStreamCompanionConnection } from "./streamcompanion";
+import { defaultMacros } from "./messageParser/macros";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
+import { fileNameDatabaseBackups } from "./info/fileNames";
 import { generatePluginsAndMacrosMap } from "./messageParser";
 import { getPluginOsuStreamCompanion } from "./messageParser/plugins/streamcompanion";
 import { getVersionFromObject } from "./version";
-import { macroMoonpieBot } from "./messageParser/macros/moonpiebot";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
@@ -74,7 +53,7 @@ import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
 import { pluginSpotifyCurrentPreviousSong } from "./messageParser/plugins/spotify";
 import { pluginsTwitchApi } from "./messageParser/plugins/twitchApi";
-import { pluginsTwitchChat } from "./messageParser/plugins/twitchChat";
+import { pluginsTwitchChatGenerator } from "./messageParser/plugins/twitchChat";
 import { pyramidSpammer } from "./other/pyramidSpammer";
 import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
@@ -304,19 +283,7 @@ export const main = async (
         pathDatabase,
         logger
       );
-      const PAD_DAY_MONTH_TO_2_DIGITS_FACTOR = 2;
-      const dateObject = new Date();
-      const dateDay = `0${dateObject.getDate()}`.slice(
-        -PAD_DAY_MONTH_TO_2_DIGITS_FACTOR
-      );
-      const DateMonth = `0${dateObject.getMonth() + 1}`.slice(
-        -PAD_DAY_MONTH_TO_2_DIGITS_FACTOR
-      );
-      const dateYear = dateObject.getFullYear();
-      const pathDatabaseBackup = path.join(
-        logDir,
-        `db_backup_moonpie_${dateYear}-${DateMonth}-${dateDay}.json`
-      );
+      const pathDatabaseBackup = path.join(logDir, fileNameDatabaseBackups());
       await writeJsonFile(pathDatabaseBackup, databaseBackupData);
     } catch (err) {
       loggerMain.error(err as Error);
@@ -324,46 +291,16 @@ export const main = async (
   }
 
   // Setup message parser
-  const pluginsList = [
-    pluginConvertToShortNumber,
-    pluginHelp,
-    pluginIfEmpty,
-    pluginIfEqual,
-    pluginIfFalse,
-    pluginIfGreater,
-    pluginIfNotEmpty,
-    pluginIfNotEqual,
-    pluginIfNotGreater,
-    pluginIfNotSmaller,
-    pluginIfNotUndefined,
-    pluginIfSmaller,
-    pluginIfTrue,
-    pluginIfUndefined,
-    pluginLowercase,
-    pluginRandomNumber,
-    pluginTimeInSToHumanReadableString,
-    pluginTimeInSToHumanReadableStringShort,
-    pluginTimeInSToStopwatchString,
-    pluginUppercase,
-  ];
-  const macrosList = [macroMoonpieBot];
-  await createStringsVariableDocumentation(
-    path.join(configDir, ".env.plugins"),
-    new Map(),
-    pluginsList,
-    macrosList,
-    logger
-  );
   const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
   const pluginsAndMacrosMap = generatePluginsAndMacrosMap(
-    pluginsList,
-    macrosList
+    defaultPlugins,
+    defaultMacros
   );
   const plugins = pluginsAndMacrosMap.pluginsMap;
   const macros = pluginsAndMacrosMap.macrosMap;
   if (osuApiDefaultId) {
     macros.set(
-      macroOsuApiId,
+      macroOsuApi.id,
       new Map([[MacroOsuApi.DEFAULT_USER_ID, `${osuApiDefaultId}`]])
     );
   }
@@ -450,10 +387,12 @@ export const main = async (
         }
       );
     }
-    const generalChannelPlugins = pluginsTwitchChat(
-      tags["user-id"],
-      tags.username,
-      channel.slice(1)
+    const generalChannelPlugins = pluginsTwitchChatGenerator.map((a) =>
+      generatePlugin(a, {
+        userId: tags["user-id"],
+        userName: tags.username,
+        channel: channel.slice(1),
+      })
     );
     for (const generalChannelPlugin of generalChannelPlugins) {
       pluginsChannel.set(generalChannelPlugin.id, generalChannelPlugin.func);

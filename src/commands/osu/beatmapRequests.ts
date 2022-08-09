@@ -2,7 +2,7 @@
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuBeatmapRequests,
-  macroOsuBeatmapRequestsId,
+  macroOsuBeatmapRequests,
 } from "../../messageParser/macros/osuBeatmapRequest";
 import {
   osuBeatmapRequestCurrentlyOff,
@@ -150,7 +150,7 @@ export const commandBeatmapRequests: TwitchMessageCommandHandler<
         data.beatmapRequestsInfo.beatmapRequestsOffMessage =
           data.beatmapRequestsOffMessage;
         macros.set(
-          macroOsuBeatmapRequestsId,
+          macroOsuBeatmapRequests.id,
           new Map([
             [
               MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
@@ -190,7 +190,7 @@ export const commandBeatmapRequests: TwitchMessageCommandHandler<
         } else {
           // TODO Fix message not being displayed
           macros.set(
-            macroOsuBeatmapRequestsId,
+            macroOsuBeatmapRequests.id,
             new Map([
               [
                 MacroOsuBeatmapRequests.CUSTOM_MESSAGE,

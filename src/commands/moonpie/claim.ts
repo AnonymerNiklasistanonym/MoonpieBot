@@ -11,9 +11,9 @@ import {
 } from "../../info/commands";
 import {
   MacroMoonpieClaim,
-  macroMoonpieClaimId,
+  macroMoonpieClaim,
   MacroMoonpieLeaderboardEntry,
-  macroMoonpieLeaderboardEntryId,
+  macroMoonpieLeaderboardEntry,
 } from "../../messageParser/macros/moonpie";
 import {
   moonpieCommandReplyAlreadyClaimed,
@@ -160,7 +160,7 @@ export const commandClaim: TwitchMessageCommandHandler<CommandClaimData> = {
 
     const macros = new Map(globalMacros);
     macros.set(
-      macroMoonpieClaimId,
+      macroMoonpieClaim.id,
       new Map([
         [MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S, `${msSinceLastClaim / 1000}`],
         [
@@ -171,7 +171,7 @@ export const commandClaim: TwitchMessageCommandHandler<CommandClaimData> = {
       ])
     );
     macros.set(
-      macroMoonpieLeaderboardEntryId,
+      macroMoonpieLeaderboardEntry.id,
       new Map([
         [MacroMoonpieLeaderboardEntry.COUNT, `${newMoonpieCount}`],
         [

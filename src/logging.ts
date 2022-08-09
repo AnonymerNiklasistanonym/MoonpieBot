@@ -84,6 +84,26 @@ export const createLogger = (
     },
   });
 
+/**
+ * Create a global logger.
+ *
+ * @param name The name of the logger.
+ * @param logLevelConsole The log level of the console logger.
+ * @returns Logger.
+ */
+export const createConsoleLogger = (
+  name: string,
+  logLevelConsole: LoggerLevel | string = "info"
+) =>
+  createWinstonLogger({
+    exitOnError: false,
+    transports: [new transports.Console({ level: logLevelConsole })],
+    format: format.combine(format.timestamp(), format.printf(logFormat)),
+    defaultMeta: {
+      service: name,
+    },
+  });
+
 export interface LogMessageInfo {
   subsection?: string;
 }

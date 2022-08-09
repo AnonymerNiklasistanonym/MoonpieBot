@@ -5,7 +5,7 @@ import {
 } from "../../info/commands";
 import {
   MacroMoonpieLeaderboardEntry,
-  macroMoonpieLeaderboardEntryId,
+  macroMoonpieLeaderboardEntry,
 } from "../../messageParser/macros/moonpie";
 import {
   moonpieCommandReplyLeaderboardEntry,
@@ -79,7 +79,7 @@ export const commandLeaderboard: TwitchMessageCommandHandler<CommandGenericDataM
       for (const moonpieEntry of moonpieEntries) {
         const macros = new Map(globalMacros);
         macros.set(
-          macroMoonpieLeaderboardEntryId,
+          macroMoonpieLeaderboardEntry.id,
           new Map([
             [MacroMoonpieLeaderboardEntry.NAME, `${moonpieEntry.name}`],
             [MacroMoonpieLeaderboardEntry.COUNT, `${moonpieEntry.count}`],

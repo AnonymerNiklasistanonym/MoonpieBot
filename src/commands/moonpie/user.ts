@@ -5,13 +5,13 @@ import {
 } from "../../info/commands";
 import {
   MacroMoonpieLeaderboardEntry,
-  macroMoonpieLeaderboardEntryId,
+  macroMoonpieLeaderboardEntry,
   MacroMoonpieUserDelete,
-  macroMoonpieUserDeleteId,
+  macroMoonpieUserDelete,
   MacroMoonpieUserNeverClaimed,
-  macroMoonpieUserNeverClaimedId,
+  macroMoonpieUserNeverClaimed,
   MacroMoonpieUserSet,
-  macroMoonpieUserSetId,
+  macroMoonpieUserSet,
 } from "../../messageParser/macros/moonpie";
 import {
   moonpieUserDelete,
@@ -155,7 +155,7 @@ export const commandGet: TwitchMessageCommandHandler<
 
       const macros = new Map(globalMacros);
       macros.set(
-        macroMoonpieLeaderboardEntryId,
+        macroMoonpieLeaderboardEntry.id,
         new Map([
           [MacroMoonpieLeaderboardEntry.NAME, `${data.userNameMoonpieDb}`],
           [
@@ -178,7 +178,7 @@ export const commandGet: TwitchMessageCommandHandler<
     } else {
       const macros = new Map(globalMacros);
       macros.set(
-        macroMoonpieUserNeverClaimedId,
+        macroMoonpieUserNeverClaimed.id,
         new Map([
           [MacroMoonpieUserNeverClaimed.NAME, `${data.userNameMoonpieDb}`],
         ])
@@ -273,7 +273,7 @@ export const commandSet: TwitchMessageCommandHandler<
     }
     const macros = new Map(globalMacros);
     macros.set(
-      macroMoonpieUserSetId,
+      macroMoonpieUserSet.id,
       new Map([
         [MacroMoonpieUserSet.NAME, `${data.userNameMoonpieDb}`],
         [MacroMoonpieUserSet.SET_COUNT, `${data.setCount}`],
@@ -300,7 +300,7 @@ export const commandSet: TwitchMessageCommandHandler<
       ))
     ) {
       macros.set(
-        macroMoonpieUserNeverClaimedId,
+        macroMoonpieUserNeverClaimed.id,
         new Map([
           [MacroMoonpieUserNeverClaimed.NAME, `${data.userNameMoonpieDb}`],
         ])
@@ -354,7 +354,7 @@ export const commandSet: TwitchMessageCommandHandler<
       );
 
     macros.set(
-      macroMoonpieLeaderboardEntryId,
+      macroMoonpieLeaderboardEntry.id,
       new Map([
         [MacroMoonpieLeaderboardEntry.NAME, `${data.userNameMoonpieDb}`],
         [MacroMoonpieLeaderboardEntry.COUNT, `${newCount}`],
@@ -436,7 +436,7 @@ export const commandDelete: TwitchMessageCommandHandler<
     ) {
       const macros = new Map(globalMacros);
       macros.set(
-        macroMoonpieUserNeverClaimedId,
+        macroMoonpieUserNeverClaimed.id,
         new Map([
           [MacroMoonpieUserNeverClaimed.NAME, `${data.userNameMoonpieDb}`],
         ])
@@ -459,7 +459,7 @@ export const commandDelete: TwitchMessageCommandHandler<
 
     const macros = new Map(globalMacros);
     macros.set(
-      macroMoonpieUserDeleteId,
+      macroMoonpieUserDelete.id,
       new Map([[MacroMoonpieUserDelete.NAME, `${data.userNameMoonpieDb}`]])
     );
     const message = await messageParserById(

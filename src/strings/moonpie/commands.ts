@@ -1,6 +1,6 @@
 import { createMessageForMessageParser } from "../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
-import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
+import { PluginsTwitchChat } from "../../messageParser/plugins/twitchChat";
 
 export const MOONPIE_COMMANDS_STRING_ID = `${MOONPIE_STRING_ID}_COMMANDS`;
 
@@ -69,7 +69,7 @@ export const moonpieCommandsPrefix = {
   default: createMessageForMessageParser(
     [
       "@",
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       " The following commands are supported:",
     ],
     true

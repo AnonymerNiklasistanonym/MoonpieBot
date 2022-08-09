@@ -4,21 +4,18 @@ import {
 } from "../../messageParser/macros/moonpiebot";
 import {
   MacroMoonpieClaim,
-  macroMoonpieClaimId,
+  macroMoonpieClaim,
   MacroMoonpieLeaderboardEntry,
-  macroMoonpieLeaderboardEntryId,
+  macroMoonpieLeaderboardEntry,
 } from "../../messageParser/macros/moonpie";
 import {
   pluginIfEqual,
   pluginIfNotEqual,
   pluginTimeInSToHumanReadableStringShort,
 } from "../../messageParser/plugins/general";
-import {
-  pluginTwitchChatUserId,
-  pluginTwitchChatUserIdId,
-} from "../../messageParser/plugins/twitchChat";
 import { createMessageForMessageParser } from "../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
+import { PluginsTwitchChat } from "../../messageParser/plugins/twitchChat";
 
 export const MOONPIE_COMMAND_REPLY_STRING_ID = `${MOONPIE_STRING_ID}_COMMAND_REPLY`;
 
@@ -26,7 +23,7 @@ export const moonpieCommandReplyAbout = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ABOUT`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " ",
     { type: "macro", name: macroMoonpieBot.id, key: MacroMoonpieBot.NAME },
     " ",
@@ -41,11 +38,11 @@ export const moonpieCommandReplyClaim = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIM`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " You just claimed a moonpie! You have now ",
     {
       type: "macro",
-      name: macroMoonpieLeaderboardEntryId,
+      name: macroMoonpieLeaderboardEntry.id,
       key: MacroMoonpieLeaderboardEntry.COUNT,
     },
     " moonpie",
@@ -55,7 +52,7 @@ export const moonpieCommandReplyClaim = {
       args: [
         {
           type: "macro",
-          name: macroMoonpieLeaderboardEntryId,
+          name: macroMoonpieLeaderboardEntry.id,
           key: MacroMoonpieLeaderboardEntry.COUNT,
         },
         "!==1",
@@ -65,7 +62,7 @@ export const moonpieCommandReplyClaim = {
     " and are rank ",
     {
       type: "macro",
-      name: macroMoonpieLeaderboardEntryId,
+      name: macroMoonpieLeaderboardEntry.id,
       key: MacroMoonpieLeaderboardEntry.RANK,
     },
     " on the leaderboard!",
@@ -82,7 +79,7 @@ export const moonpieCommandReplyAlreadyClaimedRefNormal = {
         name: pluginTimeInSToHumanReadableStringShort.id,
         args: {
           type: "macro",
-          name: macroMoonpieClaimId,
+          name: macroMoonpieClaim.id,
           key: MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S,
         },
       },
@@ -92,14 +89,14 @@ export const moonpieCommandReplyAlreadyClaimedRefNormal = {
         name: pluginTimeInSToHumanReadableStringShort.id,
         args: {
           type: "macro",
-          name: macroMoonpieClaimId,
+          name: macroMoonpieClaim.id,
           key: MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S,
         },
       },
       ") and are rank ",
       {
         type: "macro",
-        name: macroMoonpieLeaderboardEntryId,
+        name: macroMoonpieLeaderboardEntry.id,
         key: MacroMoonpieLeaderboardEntry.RANK,
       },
       " on the leaderboard!",
@@ -124,7 +121,7 @@ export const moonpieCommandReplyAlreadyClaimed = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " ",
     {
       type: "plugin",
@@ -132,7 +129,7 @@ export const moonpieCommandReplyAlreadyClaimed = {
       args: [
         {
           type: "plugin",
-          name: pluginTwitchChatUserIdId,
+          name: PluginsTwitchChat.USER_ID,
         },
         `===${starTwitchId}`,
       ],
@@ -147,7 +144,7 @@ export const moonpieCommandReplyAlreadyClaimed = {
       args: [
         {
           type: "plugin",
-          name: pluginTwitchChatUserIdId,
+          name: PluginsTwitchChat.USER_ID,
         },
         `!==${starTwitchId}`,
       ],
@@ -162,7 +159,7 @@ export const moonpieCommandReplyAlreadyClaimed = {
 export const moonpieCommandReplyLeaderboardPrefix = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_PREFIX`,
   default: createMessageForMessageParser(
-    ["@", { type: "plugin", name: pluginTwitchChatUserId }, " "],
+    ["@", { type: "plugin", name: PluginsTwitchChat.USER }, " "],
     true
   ),
 };
@@ -173,19 +170,19 @@ export const moonpieCommandReplyLeaderboardEntry = {
     [
       {
         type: "macro",
-        name: macroMoonpieLeaderboardEntryId,
+        name: macroMoonpieLeaderboardEntry.id,
         key: MacroMoonpieLeaderboardEntry.RANK,
       },
       ". ",
       {
         type: "macro",
-        name: macroMoonpieLeaderboardEntryId,
+        name: macroMoonpieLeaderboardEntry.id,
         key: MacroMoonpieLeaderboardEntry.NAME,
       },
       " (",
       {
         type: "macro",
-        name: macroMoonpieLeaderboardEntryId,
+        name: macroMoonpieLeaderboardEntry.id,
         key: MacroMoonpieLeaderboardEntry.COUNT,
       },
       ")",

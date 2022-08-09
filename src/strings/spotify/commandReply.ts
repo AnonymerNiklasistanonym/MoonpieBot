@@ -8,7 +8,7 @@ import {
   SpotifySongMacro,
 } from "../../messageParser/plugins/spotify";
 import { createMessageForMessageParser } from "../../messageParser";
-import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
+import { PluginsTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
 
 export const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
@@ -102,7 +102,7 @@ export const spotifyCommandReplySong = {
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " ",
     {
       type: "plugin",

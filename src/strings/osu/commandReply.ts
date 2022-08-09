@@ -8,15 +8,15 @@ import {
 } from "../../messageParser/plugins/osuApi";
 import {
   MacroOsuPpRequest,
-  macroOsuPpRequestId,
+  macroOsuPpRequest,
 } from "../../messageParser/macros/osuPpRequest";
 import {
   MacroOsuRpRequest,
-  macroOsuRpRequestId,
+  macroOsuRpRequest,
 } from "../../messageParser/macros/osuRpRequest";
 import {
   MacroOsuScoreRequest,
-  macroOsuScoreRequestId,
+  macroOsuScoreRequest,
 } from "../../messageParser/macros/osuScoreRequest";
 import {
   MacroOsuStreamCompanion,
@@ -24,7 +24,7 @@ import {
 } from "../../messageParser/plugins/streamcompanion";
 import {
   MacroOsuWindowTitle,
-  macroOsuWindowTitleId,
+  macroOsuWindowTitle,
 } from "../../messageParser/macros/osuWindowTitle";
 import {
   pluginIfFalse,
@@ -39,7 +39,7 @@ import {
 import { createMessageForMessageParser } from "../../messageParser";
 import { OSU_STRING_ID } from "../osu";
 import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
-import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
+import { PluginsTwitchChat } from "../../messageParser/plugins/twitchChat";
 
 export const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
 
@@ -47,23 +47,23 @@ export const osuCommandReplyNp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " Currently playing '",
     {
       type: "macro",
-      name: macroOsuWindowTitleId,
+      name: macroOsuWindowTitle.id,
       key: MacroOsuWindowTitle.TITLE,
     },
     "' from '",
     {
       type: "macro",
-      name: macroOsuWindowTitleId,
+      name: macroOsuWindowTitle.id,
       key: MacroOsuWindowTitle.ARTIST,
     },
     "' [",
     {
       type: "macro",
-      name: macroOsuWindowTitleId,
+      name: macroOsuWindowTitle.id,
       key: MacroOsuWindowTitle.VERSION,
     },
     "]",
@@ -72,14 +72,14 @@ export const osuCommandReplyNp = {
       name: pluginIfNotUndefined.id,
       args: {
         type: "macro",
-        name: macroOsuWindowTitleId,
+        name: macroOsuWindowTitle.id,
         key: MacroOsuWindowTitle.MAP_ID_VIA_API,
       },
       scope: [
         " (https://osu.ppy.sh/beatmaps/",
         {
           type: "macro",
-          name: macroOsuWindowTitleId,
+          name: macroOsuWindowTitle.id,
           key: MacroOsuWindowTitle.MAP_ID_VIA_API,
         },
         ")",
@@ -92,7 +92,7 @@ export const osuCommandReplyNpStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " Currently playing ",
     {
       type: "plugin",
@@ -253,7 +253,7 @@ export const osuCommandReplyNpNoMap = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " No map is currently being played",
   ]),
 };
@@ -262,7 +262,7 @@ export const osuCommandReplyNpNoMapStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP_STREAMCOMPANION`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " No map is currently being played (This is either a custom map or you need to wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
   ]),
 };
@@ -271,7 +271,7 @@ export const osuCommandReplyNpStreamCompanionNotRunning = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_NOT_RUNNING`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " No map is currently being played (StreamCompanion was configured but not found running!)",
   ]),
 };
@@ -280,14 +280,14 @@ export const osuCommandReplyRp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_RP`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " ",
     {
       type: "plugin",
       name: pluginOsuMostRecentPlayId,
       args: {
         type: "macro",
-        name: macroOsuRpRequestId,
+        name: macroOsuRpRequest.id,
         key: MacroOsuRpRequest.ID,
       },
       scope: [
@@ -551,7 +551,7 @@ export const osuCommandReplyRpNotFound = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_RP_NOT_FOUND`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " No recent play was found",
   ]),
 };
@@ -560,14 +560,14 @@ export const osuCommandReplyPp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_PP`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " ",
     {
       type: "plugin",
       name: pluginOsuUserId,
       args: {
         type: "macro",
-        name: macroOsuPpRequestId,
+        name: macroOsuPpRequest.id,
         key: MacroOsuPpRequest.ID,
       },
       scope: [
@@ -737,7 +737,7 @@ export const osuScoreErrorNotFound = {
     "No score was found of the user ",
     {
       type: "macro",
-      name: macroOsuScoreRequestId,
+      name: macroOsuScoreRequest.id,
       key: MacroOsuScoreRequest.USER_NAME,
     },
     " on the map",
@@ -748,11 +748,11 @@ export const osuScore = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " ",
     {
       type: "macro",
-      name: macroOsuScoreRequestId,
+      name: macroOsuScoreRequest.id,
       key: MacroOsuScoreRequest.USER_NAME,
     },
     " has a ",

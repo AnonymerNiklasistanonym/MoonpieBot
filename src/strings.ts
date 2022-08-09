@@ -23,9 +23,15 @@ import type {
   FileDocumentationParts,
   FileDocumentationPartValue,
 } from "./other/splitTextAtLength";
+import type {
+  MessageParserMacro,
+  MessageParserMacroDocumentation,
+} from "./messageParser/macros";
+import type {
+  MessageParserPlugin,
+  MessageParserPluginGenerator,
+} from "./messageParser/plugins";
 import type { Logger } from "winston";
-import type { MessageParserMacro } from "./messageParser/macros";
-import type { MessageParserPlugin } from "./messageParser/plugins";
 
 /**
  * The global Strings data structure that maps from a unique string ID to a
@@ -112,11 +118,13 @@ export const updateStringsMapWithCustomEnvStrings = (
   return strings;
 };
 
-export const createStringsVariableDocumentation = async (
+export const createStringsVariableDocumentation = async <ANY>(
   path: string,
   strings: Strings,
   plugins?: MessageParserPlugin[],
   macros?: MessageParserMacro[],
+  optionalPlugins?: MessageParserPluginGenerator<ANY>[],
+  optionalMacros?: MessageParserMacroDocumentation[],
   logger?: Logger
 ) => {
   const data: FileDocumentationParts[] = [];
@@ -134,6 +142,8 @@ export const createStringsVariableDocumentation = async (
         strings,
         plugins,
         macros,
+        optionalPlugins,
+        optionalMacros,
         logger
       );
     data.push(...pluginsAndMacroDocumentation);

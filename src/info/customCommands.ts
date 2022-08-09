@@ -27,7 +27,7 @@ import {
   pluginTwitchApiSetTitleId,
 } from "../messageParser/plugins/twitchApi";
 import { createMessageForMessageParser } from "../messageParser";
-import { pluginTwitchChatUserId } from "../messageParser/plugins/twitchChat";
+import { PluginsTwitchChat } from "../messageParser/plugins/twitchChat";
 // Type imports
 import type { CustomCommand } from "../customCommandsTimers/customCommand";
 
@@ -48,11 +48,11 @@ const convertRegexToString = (regex: RegExp) => {
 
 export const customCommandsInformation: CustomCommand[] = [
   {
-    id: `Reply > ${pluginTwitchChatUserId}`,
+    id: `Reply > ${PluginsTwitchChat.USER}`,
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       " pong",
     ]),
     regexString: convertRegexToString(/^\s*!ping(?:\s|$)/),
@@ -140,7 +140,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       {
         type: "plugin",
         name: pluginIfNotUndefined.id,
@@ -172,7 +172,7 @@ export const customCommandsInformation: CustomCommand[] = [
             args: {
               type: "plugin",
               name: pluginTwitchApiGetFollowAgeId,
-              args: { type: "plugin", name: pluginTwitchChatUserId },
+              args: { type: "plugin", name: PluginsTwitchChat.USER },
             },
           },
         ],
@@ -185,7 +185,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       {
         type: "plugin",
         name: pluginIfNotUndefined.id,
@@ -222,7 +222,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       " ",
       {
         type: "plugin",
@@ -260,7 +260,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       " death was added, streamer died ",
       {
         type: "plugin",
@@ -290,7 +290,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       " streamer died ",
       {
         type: "plugin",
@@ -319,7 +319,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       " ",
       {
         type: "plugin",
@@ -375,7 +375,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       " death was removed, streamer died ",
       {
         type: "plugin",

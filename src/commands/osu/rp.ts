@@ -9,7 +9,7 @@ import {
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuRpRequest,
-  macroOsuRpRequestId,
+  macroOsuRpRequest,
 } from "../../messageParser/macros/osuRpRequest";
 import {
   osuCommandReplyRp,
@@ -135,7 +135,7 @@ export const commandRp: TwitchMessageCommandHandler<
 
     const osuRpRequestMacros = new Map(globalMacros);
     osuRpRequestMacros.set(
-      macroOsuRpRequestId,
+      macroOsuRpRequest.id,
       new Map([
         [
           MacroOsuRpRequest.ID,

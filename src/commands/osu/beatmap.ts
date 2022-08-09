@@ -3,9 +3,9 @@ import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
   MacroOsuBeatmapRequest,
-  macroOsuBeatmapRequestId,
+  macroOsuBeatmapRequest,
   MacroOsuBeatmapRequests,
-  macroOsuBeatmapRequestsId,
+  macroOsuBeatmapRequests,
 } from "../../messageParser/macros/osuBeatmapRequest";
 import { NOT_FOUND_STATUS_CODE, notUndefined } from "../../info/other";
 import {
@@ -150,7 +150,7 @@ export const commandBeatmap: TwitchMessageCommandHandler<
     if (!data.enableOsuBeatmapRequests) {
       const macros = new Map(globalMacros);
       macros.set(
-        macroOsuBeatmapRequestsId,
+        macroOsuBeatmapRequests.id,
         new Map([
           [
             MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
@@ -176,7 +176,7 @@ export const commandBeatmap: TwitchMessageCommandHandler<
     for (const beatmapRequest of data.beatmapRequests) {
       const osuBeatmapRequestMacros = new Map(globalMacros);
       osuBeatmapRequestMacros.set(
-        macroOsuBeatmapRequestId,
+        macroOsuBeatmapRequest.id,
         new Map([
           [MacroOsuBeatmapRequest.ID, `${beatmapRequest.beatmapId}`],
           [

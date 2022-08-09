@@ -4,48 +4,50 @@ import {
   errorMessageUserNameUndefined,
 } from "../../commands";
 // Type imports
-import type { MessageParserPlugin } from "../plugins";
+import type { MessageParserPluginGenerator } from "../plugins";
 
-export const pluginTwitchChatUserIdId = "USER_ID";
-export const pluginTwitchChatUserId = "USER";
-export const pluginTwitchChatChannelId = "CHANNEL";
+export enum PluginsTwitchChat {
+  USER_ID = "USER_ID",
+  USER = "USER",
+  CHANNEL = "CHANNEL",
+}
 
-export const pluginsTwitchChat = (
-  userId: string | undefined,
-  userName: string | undefined,
-  channel: string
-): MessageParserPlugin[] => [
-  {
-    id: pluginTwitchChatUserId,
-    func: (_, __, signature) => {
-      if (signature) {
-        return { type: "signature" };
-      }
-      if (userName === undefined) {
-        throw errorMessageUserNameUndefined();
-      }
-      return userName;
+export interface PluginsTwitchChatData {
+  userId: string | undefined;
+  userName: string | undefined;
+  channel: string;
+}
+
+export const pluginsTwitchChatGenerator: MessageParserPluginGenerator<PluginsTwitchChatData>[] =
+  [
+    {
+      id: PluginsTwitchChat.USER,
+      description:
+        "Available in all strings that are responses and will insert the name of the user that is responded to",
+      generate: (data) => () => {
+        if (data.userName === undefined) {
+          throw errorMessageUserNameUndefined();
+        }
+        return data.userName;
+      },
     },
-  },
-  {
-    id: pluginTwitchChatUserIdId,
-    func: (_, __, signature) => {
-      if (signature) {
-        return { type: "signature" };
-      }
-      if (userId === undefined) {
-        throw errorMessageUserIdUndefined();
-      }
-      return userId;
+    {
+      id: PluginsTwitchChat.USER_ID,
+      description:
+        "Available in all strings that are responses and will insert the Twitch ID of the user that is responded to",
+      generate: (data) => () => {
+        if (data.userId === undefined) {
+          throw errorMessageUserIdUndefined();
+        }
+        return data.userId;
+      },
     },
-  },
-  {
-    id: pluginTwitchChatChannelId,
-    func: (_, __, signature) => {
-      if (signature) {
-        return { type: "signature" };
-      }
-      return channel.slice(1);
+    {
+      id: PluginsTwitchChat.CHANNEL,
+      description:
+        "Available in all strings that are responses and will insert the Channel name of the channel where the original message is from",
+      generate: (data) => () => {
+        return data.channel.slice(1);
+      },
     },
-  },
-];
+  ];

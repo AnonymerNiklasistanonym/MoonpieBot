@@ -1,4 +1,4 @@
-import { MacroOsuApi, macroOsuApiId } from "../../messageParser/macros/osuApi";
+import { MacroOsuApi, macroOsuApi } from "../../messageParser/macros/osuApi";
 import {
   MacroOsuBeatmap,
   MacroOsuScore,
@@ -7,9 +7,9 @@ import {
 } from "../../messageParser/plugins/osuApi";
 import {
   MacroOsuBeatmapRequest,
-  macroOsuBeatmapRequestId,
+  macroOsuBeatmapRequest,
   MacroOsuBeatmapRequests,
-  macroOsuBeatmapRequestsId,
+  macroOsuBeatmapRequests,
 } from "../../messageParser/macros/osuBeatmapRequest";
 import {
   pluginConvertToShortNumber,
@@ -23,7 +23,7 @@ import {
 import { createMessageForMessageParser } from "../../messageParser";
 import { OSU_IRC_NEWLINE } from "../../osuirc";
 import { OSU_STRING_ID } from "../osu";
-import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
+import { PluginsTwitchChat } from "../../messageParser/plugins/twitchChat";
 
 export const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
 
@@ -100,7 +100,7 @@ export const osuBeatmapRequestRefTopScore = {
 export const osuBeatmapRequest = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}`,
   default: createMessageForMessageParser([
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " requested ",
     { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.TITLE },
     " '",
@@ -114,13 +114,13 @@ export const osuBeatmapRequest = {
       args: [
         {
           type: "macro",
-          name: macroOsuBeatmapRequestId,
+          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.ID,
         },
         " ",
         {
           type: "macro",
-          name: macroOsuApiId,
+          name: macroOsuApi.id,
           key: MacroOsuApi.DEFAULT_USER_ID,
         },
       ],
@@ -198,7 +198,7 @@ export const osuBeatmapRequestRefDetailedStats = {
 export const osuBeatmapRequestDetailed = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_DETAILED`,
   default: createMessageForMessageParser([
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " requested ",
     {
       type: "macro",
@@ -263,13 +263,13 @@ export const osuBeatmapRequestDetailed = {
       args: [
         {
           type: "macro",
-          name: macroOsuBeatmapRequestId,
+          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.ID,
         },
         " ",
         {
           type: "macro",
-          name: macroOsuApiId,
+          name: macroOsuApi.id,
           key: MacroOsuApi.DEFAULT_USER_ID,
         },
       ],
@@ -308,7 +308,7 @@ export const osuBeatmapRequestNotFound = {
     "osu! beatmap was not found :( (ID='",
     {
       type: "macro",
-      name: macroOsuBeatmapRequestId,
+      name: macroOsuBeatmapRequest.id,
       key: MacroOsuBeatmapRequest.ID,
     },
     "')",
@@ -319,7 +319,7 @@ export const osuBeatmapRequestRefIrcRequestString = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_REF_REQUEST_STRING`,
   default: createMessageForMessageParser(
     [
-      { type: "plugin", name: pluginTwitchChatUserId },
+      { type: "plugin", name: PluginsTwitchChat.USER },
       " requested ",
       "[https://osu.ppy.sh/beatmapsets/",
       { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.SET_ID },
@@ -347,13 +347,13 @@ export const osuBeatmapRequestIrc = {
       args: [
         {
           type: "macro",
-          name: macroOsuBeatmapRequestId,
+          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.ID,
         },
         " ",
         {
           type: "macro",
-          name: macroOsuApiId,
+          name: macroOsuApi.id,
           key: MacroOsuApi.DEFAULT_USER_ID,
         },
       ],
@@ -379,14 +379,14 @@ export const osuBeatmapRequestIrc = {
           name: pluginIfNotEmpty.id,
           args: {
             type: "macro",
-            name: macroOsuBeatmapRequestId,
+            name: macroOsuBeatmapRequest.id,
             key: MacroOsuBeatmapRequest.COMMENT,
           },
           scope: [
             `${OSU_IRC_NEWLINE} > Comment: `,
             {
               type: "macro",
-              name: macroOsuBeatmapRequestId,
+              name: macroOsuBeatmapRequest.id,
               key: MacroOsuBeatmapRequest.COMMENT,
             },
           ],
@@ -421,13 +421,13 @@ export const osuBeatmapRequestIrcDetailed = {
       args: [
         {
           type: "macro",
-          name: macroOsuBeatmapRequestId,
+          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.ID,
         },
         " ",
         {
           type: "macro",
-          name: macroOsuApiId,
+          name: macroOsuApi.id,
           key: MacroOsuApi.DEFAULT_USER_ID,
         },
       ],
@@ -450,14 +450,14 @@ export const osuBeatmapRequestIrcDetailed = {
       name: pluginIfNotEmpty.id,
       args: {
         type: "macro",
-        name: macroOsuBeatmapRequestId,
+        name: macroOsuBeatmapRequest.id,
         key: MacroOsuBeatmapRequest.COMMENT,
       },
       scope: [
         `${OSU_IRC_NEWLINE} > Comment: `,
         {
           type: "macro",
-          name: macroOsuBeatmapRequestId,
+          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.COMMENT,
         },
       ],
@@ -476,21 +476,21 @@ export const osuBeatmapRequestTurnedOff = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_OFF`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " Beatmap requests: Off",
     {
       type: "plugin",
       name: pluginIfNotEmpty.id,
       args: {
         type: "macro",
-        name: macroOsuBeatmapRequestsId,
+        name: macroOsuBeatmapRequests.id,
         key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
       },
       scope: [
         " (",
         {
           type: "macro",
-          name: macroOsuBeatmapRequestsId,
+          name: macroOsuBeatmapRequests.id,
           key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
         },
         ")",
@@ -502,7 +502,7 @@ export const osuBeatmapRequestTurnedOn = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_ON`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " Beatmap requests: On",
   ]),
 };
@@ -510,21 +510,21 @@ export const osuBeatmapRequestCurrentlyOff = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_OFF`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " Beatmap requests are currently off",
     {
       type: "plugin",
       name: pluginIfNotEmpty.id,
       args: {
         type: "macro",
-        name: macroOsuBeatmapRequestsId,
+        name: macroOsuBeatmapRequests.id,
         key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
       },
       scope: [
         " (",
         {
           type: "macro",
-          name: macroOsuBeatmapRequestsId,
+          name: macroOsuBeatmapRequests.id,
           key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
         },
         ")",
@@ -536,7 +536,7 @@ export const osuBeatmapRequestCurrentlyOn = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " Beatmap requests are currently on",
   ]),
 };

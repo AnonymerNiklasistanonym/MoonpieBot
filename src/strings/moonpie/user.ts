@@ -1,17 +1,17 @@
 import {
   MacroMoonpieLeaderboardEntry,
-  macroMoonpieLeaderboardEntryId,
+  macroMoonpieLeaderboardEntry,
   MacroMoonpieUserDelete,
-  macroMoonpieUserDeleteId,
+  macroMoonpieUserDelete,
   MacroMoonpieUserNeverClaimed,
-  macroMoonpieUserNeverClaimedId,
+  macroMoonpieUserNeverClaimed,
   MacroMoonpieUserSet,
-  macroMoonpieUserSetId,
+  macroMoonpieUserSet,
 } from "../../messageParser/macros/moonpie";
 import { createMessageForMessageParser } from "../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { pluginIfNotEqual } from "../../messageParser/plugins/general";
-import { pluginTwitchChatUserId } from "../../messageParser/plugins/twitchChat";
+import { PluginsTwitchChat } from "../../messageParser/plugins/twitchChat";
 
 export const MOONPIE_USER_STRING_ID = `${MOONPIE_STRING_ID}_USER`;
 
@@ -19,17 +19,17 @@ export const moonpieUserGet = {
   id: `${MOONPIE_USER_STRING_ID}_GET`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " The user ",
     {
       type: "macro",
-      name: macroMoonpieLeaderboardEntryId,
+      name: macroMoonpieLeaderboardEntry.id,
       key: MacroMoonpieLeaderboardEntry.NAME,
     },
     " has ",
     {
       type: "macro",
-      name: macroMoonpieLeaderboardEntryId,
+      name: macroMoonpieLeaderboardEntry.id,
       key: MacroMoonpieLeaderboardEntry.COUNT,
     },
     " moonpie",
@@ -39,7 +39,7 @@ export const moonpieUserGet = {
       args: [
         {
           type: "macro",
-          name: macroMoonpieLeaderboardEntryId,
+          name: macroMoonpieLeaderboardEntry.id,
           key: MacroMoonpieLeaderboardEntry.COUNT,
         },
         "!==1",
@@ -49,7 +49,7 @@ export const moonpieUserGet = {
     " and is rank ",
     {
       type: "macro",
-      name: macroMoonpieLeaderboardEntryId,
+      name: macroMoonpieLeaderboardEntry.id,
       key: MacroMoonpieLeaderboardEntry.RANK,
     },
     " on the leaderboard!",
@@ -61,7 +61,7 @@ export const moonpieUserNeverClaimedError = {
     "The user ",
     {
       type: "macro",
-      name: macroMoonpieUserNeverClaimedId,
+      name: macroMoonpieUserNeverClaimed.id,
       key: MacroMoonpieUserNeverClaimed.NAME,
     },
     " has never claimed a moonpie!",
@@ -79,13 +79,13 @@ export const moonpieUserSetNaNError = {
     "The given moonpie count (",
     {
       type: "macro",
-      name: macroMoonpieUserSetId,
+      name: macroMoonpieUserSet.id,
       key: MacroMoonpieUserSet.SET_OPERATION,
     },
     ") '",
     {
       type: "macro",
-      name: macroMoonpieUserSetId,
+      name: macroMoonpieUserSet.id,
       key: MacroMoonpieUserSet.SET_COUNT,
     },
     "' is not a valid number!",
@@ -96,17 +96,17 @@ export const moonpieUserSet = {
   id: `${MOONPIE_USER_STRING_ID}_SET`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " You have set the number of moonpies for the user ",
     {
       type: "macro",
-      name: macroMoonpieUserSetId,
+      name: macroMoonpieUserSet.id,
       key: MacroMoonpieUserSet.NAME,
     },
     " to ",
     {
       type: "macro",
-      name: macroMoonpieLeaderboardEntryId,
+      name: macroMoonpieLeaderboardEntry.id,
       key: MacroMoonpieLeaderboardEntry.COUNT,
     },
     " moonpie",
@@ -116,7 +116,7 @@ export const moonpieUserSet = {
       args: [
         {
           type: "macro",
-          name: macroMoonpieLeaderboardEntryId,
+          name: macroMoonpieLeaderboardEntry.id,
           key: MacroMoonpieLeaderboardEntry.COUNT,
         },
         "!==1",
@@ -126,18 +126,18 @@ export const moonpieUserSet = {
     " (",
     {
       type: "macro",
-      name: macroMoonpieUserSetId,
+      name: macroMoonpieUserSet.id,
       key: MacroMoonpieUserSet.SET_OPERATION,
     },
     {
       type: "macro",
-      name: macroMoonpieUserSetId,
+      name: macroMoonpieUserSet.id,
       key: MacroMoonpieUserSet.SET_COUNT,
     },
     ") and they are now rank ",
     {
       type: "macro",
-      name: macroMoonpieLeaderboardEntryId,
+      name: macroMoonpieLeaderboardEntry.id,
       key: MacroMoonpieLeaderboardEntry.RANK,
     },
     " on the leaderboard!",
@@ -148,11 +148,11 @@ export const moonpieUserDelete = {
   id: `${MOONPIE_USER_STRING_ID}_DELETE`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: pluginTwitchChatUserId },
+    { type: "plugin", name: PluginsTwitchChat.USER },
     " You deleted the entry of the user ",
     {
       type: "macro",
-      name: macroMoonpieUserDeleteId,
+      name: macroMoonpieUserDelete.id,
       key: MacroMoonpieUserDelete.NAME,
     },
   ]),

@@ -16,3 +16,13 @@ export const fileNameCustomCommandsExample = `${customCommandsString}${EXAMPLE_S
 export const fileNameCustomTimersExample = `${customTimersString}${EXAMPLE_SUFFIX}.json`;
 export const fileNameCustomCommandsSchema = `${customCommandsString}${JSON_SCHEMA_SUFFIX}.json`;
 export const fileNameCustomTimersSchema = `${customTimersString}${JSON_SCHEMA_SUFFIX}.json`;
+
+export const fileNameDatabaseBackups = (date: Date = new Date()) => {
+  const PAD_DAY_MONTH_TO_2_DIGITS_FACTOR = 2;
+  const dateDay = `0${date.getDate()}`.slice(-PAD_DAY_MONTH_TO_2_DIGITS_FACTOR);
+  const DateMonth = `0${date.getMonth() + 1}`.slice(
+    -PAD_DAY_MONTH_TO_2_DIGITS_FACTOR
+  );
+  const dateYear = date.getFullYear();
+  return `db_backup_moonpie_${dateYear}-${DateMonth}-${dateDay}.json`;
+};

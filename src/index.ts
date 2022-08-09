@@ -10,13 +10,18 @@ import path from "path";
 // Local imports
 import { binaryName, name, usages } from "./info/general";
 import { CliOption, cliOptionInformation } from "./info/cli";
+import { createConsoleLogger, createLogFunc, createLogger } from "./logging";
 import {
   createEnvVariableDocumentation,
   getEnvVariableValueOrDefault,
   printEnvVariablesToConsole,
 } from "./env";
-import { createLogFunc, createLogger } from "./logging";
 import { createStringsVariableDocumentation, defaultStrings } from "./strings";
+import { defaultMacros, defaultMacrosOptional } from "./messageParser/macros";
+import {
+  defaultPlugins,
+  defaultPluginsOptional,
+} from "./messageParser/plugins";
 import {
   ENV_VARIABLE_PREFIX,
   EnvVariable,
@@ -28,6 +33,7 @@ import {
 } from "./info/fileNames";
 import { cliHelpGenerator } from "./cli";
 import { createCustomCommandTimerExampleFiles } from "./customCommandsTimers/createExampleFiles";
+
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getVersionFromObject } from "./version";
 import { main } from "./main";
@@ -104,13 +110,25 @@ const entryPoint = async () => {
 
     // Catch CLI create example files option
     if (cliArgs.includes(CliOption.CREATE_EXAMPLE_FILES)) {
+      const logger = createConsoleLogger(
+        name,
+        getEnvVariableValueOrDefault(
+          EnvVariable.LOGGING_CONSOLE_LOG_LEVEL,
+          configDir
+        )
+      );
       await createEnvVariableDocumentation(
         path.join(configDir, fileNameEnvExample),
         configDir
       );
       await createStringsVariableDocumentation(
         path.join(configDir, fileNameEnvStringsExample),
-        defaultStrings
+        defaultStrings,
+        defaultPlugins,
+        defaultMacros,
+        defaultPluginsOptional,
+        defaultMacrosOptional,
+        logger
       );
       await createCustomCommandTimerExampleFiles(configDir);
       process.exit(0);

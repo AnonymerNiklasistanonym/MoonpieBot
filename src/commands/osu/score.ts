@@ -8,7 +8,7 @@ import {
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuScoreRequest,
-  macroOsuScoreRequestId,
+  macroOsuScoreRequest,
 } from "../../messageParser/macros/osuScoreRequest";
 import {
   osuScore,
@@ -118,7 +118,7 @@ export const commandScore: TwitchMessageCommandHandler<
 
     const osuBeatmapRequestMacros = new Map(globalMacros);
     osuBeatmapRequestMacros.set(
-      macroOsuScoreRequestId,
+      macroOsuScoreRequest.id,
       new Map([
         [MacroOsuScoreRequest.BEATMAP_ID, `${data.beatmapId}`],
         [MacroOsuScoreRequest.USER_NAME, data.osuUserName],

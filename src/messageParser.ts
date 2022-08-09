@@ -7,9 +7,16 @@ import {
 import { createLogFunc } from "./logging";
 import { genericStringSorter } from "./other/genericStringSorter";
 // Type imports
+import type {
+  MessageParserMacro,
+  MessageParserMacroDocumentation,
+} from "./messageParser/macros";
+import type {
+  MessageParserPlugin,
+  MessageParserPluginGenerator,
+} from "./messageParser/plugins";
 import type { Logger } from "winston";
-import type { MessageParserMacro } from "./messageParser/macros";
-import type { MessageParserPlugin } from "./messageParser/plugins";
+
 import type { Strings } from "./strings";
 
 /**
@@ -619,13 +626,20 @@ const replaceMacros = (text: string, macros: Macros) => {
 export const createPluginSignatureString = async (
   logger: Logger,
   pluginName: string,
-  pluginFunc: PluginFunc
+  pluginFunc?: PluginFunc,
+  pluginSignatureObject?: PluginSignature
 ) => {
   // Check for plugin signature
   const argumentSignatures: string[] = [];
   let scopeSignature: string | undefined;
   try {
-    const pluginSignature = await pluginFunc(logger, undefined, true);
+    let pluginSignature;
+    if (pluginFunc !== undefined) {
+      pluginSignature = await pluginFunc(logger, undefined, true);
+    }
+    if (pluginSignatureObject !== undefined) {
+      pluginSignature = pluginSignatureObject;
+    }
     if (
       typeof pluginSignature === "object" &&
       !Array.isArray(pluginSignature) &&
@@ -912,10 +926,12 @@ export const generatePluginsAndMacrosMap = (
   };
 };
 
-export const generatePluginAndMacroDocumentation = async (
+export const generatePluginAndMacroDocumentation = async <ANY>(
   strings: Strings,
   plugins: MessageParserPlugin[],
   macros: MessageParserMacro[],
+  optionalPlugins: undefined | MessageParserPluginGenerator<ANY>[],
+  optionalMacros: undefined | MessageParserMacroDocumentation[],
   logger: Logger
 ) => {
   const maps = generatePluginsAndMacrosMap(plugins, macros);
@@ -1018,6 +1034,94 @@ export const generatePluginAndMacroDocumentation = async (
   output.push(
     ...macroEntries.sort((a, b) => genericStringSorter(a.title, b.title))
   );
+
+  if (optionalPlugins !== undefined && optionalPlugins.length > 0) {
+    output.push({
+      type: FileDocumentationPartType.HEADING,
+      title: "Other Plugins (not generally available in all strings)",
+    });
+    const optionalPluginEntries: FileDocumentationPartValue[] = [];
+    for (const plugin of optionalPlugins) {
+      const pluginEntry: FileDocumentationPartValue = {
+        type: FileDocumentationPartType.VALUE,
+        prefix: ">",
+        description: plugin.description,
+        title: await createPluginSignatureString(
+          logger,
+          plugin.id,
+          undefined,
+          plugin.signature
+        ),
+      };
+      if (plugin.examples && plugin.examples.length > 0) {
+        pluginEntry.lists = [];
+        const pluginListExamples = [];
+        for (const example of plugin.examples) {
+          let exampleString = "";
+          if (example.before) {
+            exampleString += example.before;
+          }
+          exampleString += `$(${plugin.id}`;
+          if (example.argument) {
+            exampleString += `=${example.argument}`;
+          }
+          if (example.scope) {
+            exampleString += `|${example.scope}`;
+          }
+          exampleString += ")";
+          if (example.after) {
+            exampleString += example.after;
+          }
+          const exampleStringOutput = await messageParser(
+            exampleString,
+            strings,
+            pluginsMap,
+            macrosMap,
+            logger
+          );
+          pluginListExamples.push(
+            `"${exampleString}" => "${exampleStringOutput}"`
+          );
+        }
+        pluginEntry.lists.push(["Examples", pluginListExamples]);
+      }
+      optionalPluginEntries.push(pluginEntry);
+    }
+    output.push(
+      ...optionalPluginEntries.sort((a, b) =>
+        genericStringSorter(a.title, b.title)
+      )
+    );
+  }
+
+  if (optionalMacros !== undefined && optionalMacros.length > 0) {
+    output.push({
+      type: FileDocumentationPartType.HEADING,
+      title: "Other Macros (not generally available in all strings)",
+    });
+    const optionalMacroEntries: FileDocumentationPartValue[] = [];
+    for (const optionalMacro of optionalMacros) {
+      const macroEntry: FileDocumentationPartValue = {
+        type: FileDocumentationPartType.VALUE,
+        prefix: ">",
+        description: optionalMacro.description,
+        title: `%${optionalMacro.id}:KEY%`,
+      };
+      macroEntry.lists = [];
+      const macroListKeys = [];
+      for (const key of optionalMacro.keys) {
+        const macroString = `%${optionalMacro.id}:${key}%`;
+        macroListKeys.push(`"${macroString}"`);
+      }
+      macroEntry.lists.push(["Keys", macroListKeys]);
+      optionalMacroEntries.push(macroEntry);
+    }
+    output.push(
+      ...optionalMacroEntries.sort((a, b) =>
+        genericStringSorter(a.title, b.title)
+      )
+    );
+  }
 
   return output;
 };

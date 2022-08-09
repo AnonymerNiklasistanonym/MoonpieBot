@@ -8,7 +8,7 @@ import {
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuWindowTitle,
-  macroOsuWindowTitleId,
+  macroOsuWindowTitle,
 } from "../../messageParser/macros/osuWindowTitle";
 import {
   osuCommandReplyNp,
@@ -211,7 +211,7 @@ export const commandNp: TwitchMessageCommandHandler<CommandHandlerNpData> = {
           }
           const customMacros = new Map(globalMacros);
           customMacros.set(
-            macroOsuWindowTitleId,
+            macroOsuWindowTitle.id,
             new Map([
               [MacroOsuWindowTitle.TITLE, `${match[2]}`],
               [MacroOsuWindowTitle.ARTIST, `${match[1]}`],
