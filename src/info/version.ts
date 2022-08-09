@@ -11,6 +11,6 @@ import type { Version } from "../version";
 export const version: Version = {
   major: 1,
   minor: 0,
-  patch: 16,
-  beta: false,
+  patch: 17,
+  beta: true,
 };
