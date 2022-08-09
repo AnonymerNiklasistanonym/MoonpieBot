@@ -24,14 +24,14 @@ import {
   getEnvVariableValueOrUndefined,
 } from "./env";
 import {
-  getPluginsCustomCommand,
-  getPluginsCustomCommandData,
-} from "./messageParser/plugins/customCommand";
-import {
   loadCustomTimersFromFile,
   registerTimer,
 } from "./customCommandsTimers/customTimer";
 import { MacroOsuApi, macroOsuApi } from "./messageParser/macros/osuApi";
+import {
+  pluginsCustomCommandDataGenerator,
+  pluginsCustomCommandGenerator,
+} from "./messageParser/plugins/customCommand";
 import { createLogFunc } from "./logging";
 import { createStreamCompanionConnection } from "./streamcompanion";
 import { defaultMacros } from "./messageParser/macros";
@@ -47,7 +47,7 @@ import { OsuCommands } from "./info/commands";
 import { pluginOsuStreamCompanionGenerator } from "./messageParser/plugins/streamcompanion";
 import { pluginsOsuGenerator } from "./messageParser/plugins/osu";
 import { pluginSpotifyGenerator } from "./messageParser/plugins/spotify";
-import { pluginsTwitchApi } from "./messageParser/plugins/twitchApi";
+import { pluginsTwitchApiGenerator } from "./messageParser/plugins/twitchApi";
 import { pluginsTwitchChatGenerator } from "./messageParser/plugins/twitchChat";
 import { pyramidSpammer } from "./other/pyramidSpammer";
 import { setupSpotifyAuthentication } from "./spotify";
@@ -364,23 +364,25 @@ export const main = async (
     // TODO Think about how to document client dependent plugins
     const pluginsChannel = new Map(plugins);
     const macrosChannel = new Map(macros);
-    if (twitchApiClient) {
-      pluginsTwitchApi(twitchApiClient, channel, tags["user-id"]).forEach(
-        (plugin) => {
-          pluginsChannel.set(plugin.id, plugin.func);
-        }
-      );
+    const tempTwitchApiClient = twitchApiClient;
+    if (tempTwitchApiClient !== undefined) {
+      pluginsTwitchApiGenerator.forEach((a) => {
+        const plugin = generatePlugin(a, {
+          twitchApiClient: tempTwitchApiClient,
+          channelName: channel.slice(1),
+          twitchUserId: tags["user-id"],
+        });
+        pluginsChannel.set(plugin.id, plugin.func);
+      });
     }
-    const generalChannelPlugins = pluginsTwitchChatGenerator.map((a) =>
-      generatePlugin(a, {
+    pluginsTwitchChatGenerator.forEach((a) => {
+      const plugin = generatePlugin(a, {
         userId: tags["user-id"],
         userName: tags.username,
         channel: channel.slice(1),
-      })
-    );
-    for (const generalChannelPlugin of generalChannelPlugins) {
-      pluginsChannel.set(generalChannelPlugin.id, generalChannelPlugin.func);
-    }
+      });
+      pluginsChannel.set(plugin.id, plugin.func);
+    });
 
     // Handle all bot commands
     moonpieChatHandler(
@@ -514,26 +516,20 @@ export const main = async (
     try {
       const pluginsCustomCommands = new Map(pluginsChannel);
       // Add plugins to manipulate custom command global data
-      const genPluginsCustomCommandData =
-        getPluginsCustomCommandData(customCommands);
-      for (const pluginCustomCommandData of genPluginsCustomCommandData) {
-        pluginsCustomCommands.set(
-          pluginCustomCommandData.id,
-          pluginCustomCommandData.func
-        );
-      }
+      pluginsCustomCommandDataGenerator.forEach((a) => {
+        const plugin = generatePlugin(a, { customCommands });
+        pluginsCustomCommands.set(plugin.id, plugin.func);
+      });
       for (const customCommand of customCommands.commands.filter((a) =>
         a.channels.includes(channel.slice(1))
       )) {
         const pluginsCustomCommand = new Map(pluginsCustomCommands);
         // Add plugins to manipulate custom command
-        const genPluginsCustomCommand = getPluginsCustomCommand(customCommand);
-        for (const pluginCustomCommand of genPluginsCustomCommand) {
-          pluginsCustomCommand.set(
-            pluginCustomCommand.id,
-            pluginCustomCommand.func
-          );
-        }
+        pluginsCustomCommandGenerator.forEach((a) => {
+          const plugin = generatePlugin(a, { customCommand });
+          pluginsCustomCommand.set(plugin.id, plugin.func);
+        });
+
         handleTwitchCommand(
           twitchClient,
           channel,

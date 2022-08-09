@@ -3,24 +3,24 @@ import type {
   CustomCommand,
   CustomCommandsJson,
 } from "../../customCommandsTimers/customCommand";
-import type { MessageParserPlugin } from "../plugins";
+import type { MessageParserPluginGenerator } from "../plugins";
 
 export const pluginCustomCommandCountId = "COUNT";
 
-export const getPluginsCustomCommand = (
-  customCommand: CustomCommand
-): MessageParserPlugin[] => [
-  {
-    id: pluginCustomCommandCountId,
-    description: "Set a global custom command data value",
-    func: (_, __, signature) => {
-      if (signature === true) {
-        return { type: "signature" };
-      }
-      return `${customCommand.count ? customCommand.count + 1 : 1}`;
+export interface PluginsCustomCommandData {
+  customCommand: CustomCommand;
+}
+
+export const pluginsCustomCommandGenerator: MessageParserPluginGenerator<PluginsCustomCommandData>[] =
+  [
+    {
+      id: pluginCustomCommandCountId,
+      description: "Set a global custom command data value",
+      signature: { type: "signature" },
+      generate: (data) => () =>
+        `${data.customCommand.count ? data.customCommand.count + 1 : 1}`,
     },
-  },
-];
+  ];
 
 const customCommandDataLogic = (
   content: undefined | string,
@@ -135,72 +135,55 @@ export const pluginCustomCommandDataGetId = `${CUSTOM_COMMAND_DATA_PLUGIN_PREFIX
 export const pluginCustomCommandDataAddId = `${CUSTOM_COMMAND_DATA_PLUGIN_PREFIX}ADD`;
 export const pluginCustomCommandDataRemoveId = `${CUSTOM_COMMAND_DATA_PLUGIN_PREFIX}REMOVE`;
 
-export const getPluginsCustomCommandData = (
-  customCommands: CustomCommandsJson
-): MessageParserPlugin[] => [
-  {
-    id: pluginCustomCommandDataSetId,
-    description: "Set a global custom command data value",
-    func: (_logger, content, signature) => {
-      const separator = "==";
-      if (signature === true) {
-        return {
-          type: "signature",
-          argument: `id${separator}numberOrString`,
-        };
-      }
-      return customCommandDataLogic(content, separator, customCommands);
+export interface PluginsCustomCommandDataData {
+  customCommands: CustomCommandsJson;
+}
+
+export const pluginsCustomCommandDataGenerator: MessageParserPluginGenerator<PluginsCustomCommandDataData>[] =
+  [
+    {
+      id: pluginCustomCommandDataSetId,
+      description: "Set a global custom command data value",
+      signature: {
+        type: "signature",
+        argument: "id==numberOrString",
+      },
+      generate: (data) => (_, content) =>
+        customCommandDataLogic(content, "==", data.customCommands),
     },
-  },
-  {
-    id: pluginCustomCommandDataSetNumberId,
-    description:
-      "Set a global custom command data value [only numbers allowed]",
-    func: (_logger, content, signature) => {
-      const separator = "=#=";
-      if (signature === true) {
-        return {
-          type: "signature",
-          argument: `id${separator}number`,
-        };
-      }
-      return customCommandDataLogic(content, separator, customCommands);
+    {
+      id: pluginCustomCommandDataSetNumberId,
+      description:
+        "Set a global custom command data value [only numbers allowed]",
+      signature: {
+        type: "signature",
+        argument: "id=#=number",
+      },
+      generate: (data) => (_, content) =>
+        customCommandDataLogic(content, "=#=", data.customCommands),
     },
-  },
-  {
-    id: pluginCustomCommandDataGetId,
-    description: "Get a global custom command data value",
-    func: (_logger, content, signature) => {
-      const separator = "<>";
-      if (signature === true) {
-        return {
-          type: "signature",
-          argument: `id${separator}valueIfNotFound`,
-        };
-      }
-      return customCommandDataLogic(content, separator, customCommands);
+    {
+      id: pluginCustomCommandDataGetId,
+      description: "Get a global custom command data value",
+      signature: {
+        type: "signature",
+        argument: "id<>valueIfNotFound",
+      },
+      generate: (data) => (_, content) =>
+        customCommandDataLogic(content, "<>", data.customCommands),
     },
-  },
-  {
-    id: pluginCustomCommandDataAddId,
-    description: "Add a global custom command data value if its a number",
-    func: (_, content, signature) => {
-      const separator = "+=";
-      if (signature === true) {
-        return { type: "signature", argument: `id${separator}number` };
-      }
-      return customCommandDataLogic(content, separator, customCommands);
+    {
+      id: pluginCustomCommandDataAddId,
+      description: "Add a global custom command data value if its a number",
+      signature: { type: "signature", argument: "id+=number" },
+      generate: (data) => (_, content) =>
+        customCommandDataLogic(content, "+=", data.customCommands),
     },
-  },
-  {
-    id: pluginCustomCommandDataRemoveId,
-    description: "Remove a global custom command data value if its a number",
-    func: (_, content, signature) => {
-      const separator = "-=";
-      if (signature === true) {
-        return { type: "signature", argument: `id${separator}number` };
-      }
-      return customCommandDataLogic(content, separator, customCommands);
+    {
+      id: pluginCustomCommandDataRemoveId,
+      description: "Remove a global custom command data value if its a number",
+      signature: { type: "signature", argument: "id-=number" },
+      generate: (data) => (_, content) =>
+        customCommandDataLogic(content, "-=", data.customCommands),
     },
-  },
-];
+  ];

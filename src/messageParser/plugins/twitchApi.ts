@@ -2,7 +2,7 @@
 import { errorMessageUserIdUndefined } from "../../commands";
 // Type imports
 import type { ApiClient } from "@twurple/api/lib";
-import type { MessageParserPlugin } from "../plugins";
+import type { MessageParserPluginGenerator } from "../plugins";
 
 const TWITCH_API_PREFIX = "TWITCH_API_";
 
@@ -12,41 +12,43 @@ export const pluginTwitchApiSetTitleId = `${TWITCH_API_PREFIX}SET_TITLE`;
 export const pluginTwitchApiGetTitleId = `${TWITCH_API_PREFIX}GET_TITLE`;
 export const pluginTwitchApiGetFollowAgeId = `${TWITCH_API_PREFIX}GET_FOLLOW_AGE`;
 
-export const pluginsTwitchApi: (
-  twitchApiClient: ApiClient,
-  channelName: string,
-  twitchUserId?: string
-) => MessageParserPlugin[] = (twitchApiClient, channelName, twitchUserId) => {
-  return [
+export interface PluginsTwitchApiData {
+  twitchApiClient: ApiClient;
+  channelName: string;
+  twitchUserId?: string;
+}
+
+export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginsTwitchApiData>[] =
+  [
     {
       id: pluginTwitchApiSetGameId,
-      func: async (_, gameName, signature) => {
-        if (signature === true) {
-          return {
-            type: "signature",
-            argument: "gameName",
-          };
-        }
+      signature: {
+        type: "signature",
+        argument: "gameName",
+      },
+      generate: (data) => async (_, gameName) => {
         if (gameName === undefined || gameName.length === 0) {
           throw Error("Game name was undefined or empty");
         }
 
         try {
-          const gameNameApi = await twitchApiClient.games.getGameByName(
+          const gameNameApi = await data.twitchApiClient.games.getGameByName(
             gameName
           );
           if (gameNameApi?.id === undefined) {
             throw Error("Twitch API client request getGameByName failed");
           }
-          const channelUserInfo = await twitchApiClient.users.getUserByName(
-            channelName.slice(1)
-          );
+          const channelUserInfo =
+            await data.twitchApiClient.users.getUserByName(data.channelName);
           if (channelUserInfo?.id === undefined) {
             throw Error("Twitch API client request getUserByName failed");
           }
-          await twitchApiClient.channels.updateChannelInfo(channelUserInfo.id, {
-            gameId: gameNameApi.id,
-          });
+          await data.twitchApiClient.channels.updateChannelInfo(
+            channelUserInfo.id,
+            {
+              gameId: gameNameApi.id,
+            }
+          );
           return gameNameApi.name;
         } catch (err) {
           throw Error(`Game could not be updated '${(err as Error).message}'`);
@@ -55,22 +57,24 @@ export const pluginsTwitchApi: (
     },
     {
       id: pluginTwitchApiGetGameId,
-      func: async (_, __, signature) => {
-        if (signature === true) {
-          return {
-            type: "signature",
-          };
+      signature: {
+        type: "signature",
+        argument: ["", "channelName"],
+      },
+      generate: (data) => async (_, channelName) => {
+        if (channelName === undefined || channelName.length === 0) {
+          channelName = data.channelName;
         }
         try {
-          const channelUserInfo = await twitchApiClient.users.getUserByName(
-            channelName.slice(1)
-          );
+          const channelUserInfo =
+            await data.twitchApiClient.users.getUserByName(channelName);
           if (channelUserInfo?.id === undefined) {
             throw Error("Twitch API client request getUserByName failed");
           }
-          const channelInfo = await twitchApiClient.channels.getChannelInfoById(
-            channelUserInfo.id
-          );
+          const channelInfo =
+            await data.twitchApiClient.channels.getChannelInfoById(
+              channelUserInfo.id
+            );
           if (channelInfo?.gameName === undefined) {
             throw Error("Twitch API client request getChannelInfoById failed");
           }
@@ -82,22 +86,24 @@ export const pluginsTwitchApi: (
     },
     {
       id: pluginTwitchApiGetTitleId,
-      func: async (_, __, signature) => {
-        if (signature === true) {
-          return {
-            type: "signature",
-          };
+      signature: {
+        type: "signature",
+        argument: ["", "channelName"],
+      },
+      generate: (data) => async (_, channelName) => {
+        if (channelName === undefined || channelName.length === 0) {
+          channelName = data.channelName;
         }
         try {
-          const channelUserInfo = await twitchApiClient.users.getUserByName(
-            channelName.slice(1)
-          );
+          const channelUserInfo =
+            await data.twitchApiClient.users.getUserByName(channelName);
           if (channelUserInfo?.id === undefined) {
             throw Error("Twitch API client request getUserByName failed");
           }
-          const channelInfo = await twitchApiClient.channels.getChannelInfoById(
-            channelUserInfo.id
-          );
+          const channelInfo =
+            await data.twitchApiClient.channels.getChannelInfoById(
+              channelUserInfo.id
+            );
           if (channelInfo?.title === undefined) {
             throw Error("Twitch API client request getChannelInfoById failed");
           }
@@ -109,27 +115,27 @@ export const pluginsTwitchApi: (
     },
     {
       id: pluginTwitchApiSetTitleId,
-      func: async (_, title, signature) => {
-        if (signature === true) {
-          return {
-            type: "signature",
-            argument: "title",
-          };
-        }
+      signature: {
+        type: "signature",
+        argument: "title",
+      },
+      generate: (data) => async (_, title) => {
         if (title === undefined || title.length === 0) {
           throw Error("Game name was undefined or empty");
         }
 
         try {
-          const channelUserInfo = await twitchApiClient.users.getUserByName(
-            channelName.slice(1)
-          );
+          const channelUserInfo =
+            await data.twitchApiClient.users.getUserByName(data.channelName);
           if (channelUserInfo?.id === undefined) {
             throw Error("Twitch API client request getUserByName failed");
           }
-          await twitchApiClient.channels.updateChannelInfo(channelUserInfo.id, {
-            title,
-          });
+          await data.twitchApiClient.channels.updateChannelInfo(
+            channelUserInfo.id,
+            {
+              title,
+            }
+          );
           return title;
         } catch (err) {
           throw Error(`Title could not be updated '${(err as Error).message}'`);
@@ -138,34 +144,30 @@ export const pluginsTwitchApi: (
     },
     {
       id: pluginTwitchApiGetFollowAgeId,
-      func: async (_, userName, signature) => {
-        if (signature === true) {
-          return {
-            type: "signature",
-            argument: "userName",
-          };
-        }
+      signature: {
+        type: "signature",
+        argument: "userName",
+      },
+      generate: (data) => async (_, userName) => {
         try {
-          const channelUserInfo = await twitchApiClient.users.getUserByName(
-            channelName.slice(1)
-          );
+          const channelUserInfo =
+            await data.twitchApiClient.users.getUserByName(data.channelName);
           if (channelUserInfo?.id === undefined) {
             throw Error("Twitch API client request getUserByName failed");
           }
           let userId;
           if (userName !== undefined && userName.length > 0) {
-            const twitchUserInfo = await twitchApiClient.users.getUserByName(
-              userName
-            );
+            const twitchUserInfo =
+              await data.twitchApiClient.users.getUserByName(userName);
             if (twitchUserInfo?.id === undefined) {
               throw Error("Twitch API client request getUserByName failed");
             }
             userId = twitchUserInfo.id;
           } else {
-            if (twitchUserId === undefined) {
+            if (data.twitchUserId === undefined) {
               throw errorMessageUserIdUndefined();
             }
-            userId = twitchUserId;
+            userId = data.twitchUserId;
           }
           // Check if the user is the broadcaster
           if (channelUserInfo.id === userId) {
@@ -174,7 +176,7 @@ export const pluginsTwitchApi: (
             return `${(currentTimestamp - followStartTimestamp) / 1000}`;
           }
           const follow =
-            await twitchApiClient.users.getFollowFromUserToBroadcaster(
+            await data.twitchApiClient.users.getFollowFromUserToBroadcaster(
               channelUserInfo.id,
               userId
             );
@@ -192,4 +194,3 @@ export const pluginsTwitchApi: (
       },
     },
   ];
-};

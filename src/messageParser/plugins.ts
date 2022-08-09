@@ -21,11 +21,17 @@ import {
   pluginTimeInSToStopwatchString,
   pluginUppercase,
 } from "./plugins/general";
+import {
+  pluginsCustomCommandDataGenerator,
+  pluginsCustomCommandGenerator,
+} from "./plugins/customCommand";
+import { pluginOsuStreamCompanionGenerator } from "./plugins/streamcompanion";
 import { pluginsOsuGenerator } from "./plugins/osu";
+import { pluginSpotifyGenerator } from "./plugins/spotify";
 import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 // Type imports
 import type { PluginFunc, PluginSignature } from "../messageParser";
-import { pluginOsuStreamCompanionGenerator } from "./plugins/streamcompanion";
+import { pluginsTwitchApiGenerator } from "./plugins/twitchApi";
 
 export interface MessageParserPluginExample {
   before?: string;
@@ -105,4 +111,9 @@ export const defaultPluginsOptional: MessageParserPluginInfo[] = [
   ...pluginsTwitchChatGenerator.map(generatePluginInfo),
   ...pluginsOsuGenerator.map(generatePluginInfo),
   generatePluginInfo(pluginOsuStreamCompanionGenerator),
+  generatePluginInfo(pluginSpotifyGenerator),
+  generatePluginInfo(pluginSpotifyGenerator),
+  ...pluginsCustomCommandGenerator.map(generatePluginInfo),
+  ...pluginsCustomCommandDataGenerator.map(generatePluginInfo),
+  ...pluginsTwitchApiGenerator.map(generatePluginInfo),
 ];
