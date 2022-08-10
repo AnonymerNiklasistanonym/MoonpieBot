@@ -20,6 +20,11 @@ export const fileNameCustomCommandsSchema = `${customCommandsString}${JSON_SCHEM
 export const fileNameCustomTimersSchema = `${customTimersString}${JSON_SCHEMA_SUFFIX}.json`;
 
 export const fileNameManPage = path.join("installer", "man.md");
+export const fileNameWindowsInstallerConfig = path.join(
+  "installer",
+  "windows_installer",
+  "windows_installer_config.nsi"
+);
 
 export const fileNameDatabaseBackups = (date: Date = new Date()) => {
   const PAD_DAY_MONTH_TO_2_DIGITS_FACTOR = 2;
