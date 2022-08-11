@@ -39,7 +39,7 @@ import {
 import { createMessageForMessageParser } from "../../messageParser";
 import { OSU_STRING_ID } from "../osu";
 import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
-import { PluginsTwitchChat } from "../../messageParser/plugins/twitchChat";
+import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 
 export const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
 
@@ -47,7 +47,7 @@ export const osuCommandReplyNp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " Currently playing '",
     {
       type: "macro",
@@ -92,7 +92,7 @@ export const osuCommandReplyNpStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " Currently playing ",
     {
       type: "plugin",
@@ -253,7 +253,7 @@ export const osuCommandReplyNpNoMap = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " No map is currently being played",
   ]),
 };
@@ -262,7 +262,7 @@ export const osuCommandReplyNpNoMapStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP_STREAMCOMPANION`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " No map is currently being played (This is either a custom map or you need to wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
   ]),
 };
@@ -271,7 +271,7 @@ export const osuCommandReplyNpStreamCompanionNotRunning = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_NOT_RUNNING`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " No map is currently being played (StreamCompanion was configured but not found running!)",
   ]),
 };
@@ -280,7 +280,7 @@ export const osuCommandReplyRp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_RP`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " ",
     {
       type: "plugin",
@@ -557,7 +557,7 @@ export const osuCommandReplyRpNotFound = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_RP_NOT_FOUND`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " No recent play was found",
   ]),
 };
@@ -566,7 +566,7 @@ export const osuCommandReplyPp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_PP`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " ",
     {
       type: "plugin",
@@ -754,7 +754,7 @@ export const osuScore = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " ",
     {
       type: "macro",

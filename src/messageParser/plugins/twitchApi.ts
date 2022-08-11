@@ -4,24 +4,24 @@ import { errorMessageUserIdUndefined } from "../../error";
 import type { ApiClient } from "@twurple/api/lib";
 import type { MessageParserPluginGenerator } from "../plugins";
 
-const TWITCH_API_PREFIX = "TWITCH_API_";
+export enum PluginTwitchApi {
+  SET_GAME = "TWITCH_API_SET_GAME",
+  GET_GAME = "TWITCH_API_GET_GAME",
+  SET_TITLE = "TWITCH_API_SET_TITLE",
+  GET_TITLE = "TWITCH_API_GET_TITLE",
+  GET_FOLLOW_AGE = "TWITCH_API_GET_FOLLOW_AGE",
+}
 
-export const pluginTwitchApiSetGameId = `${TWITCH_API_PREFIX}SET_GAME`;
-export const pluginTwitchApiGetGameId = `${TWITCH_API_PREFIX}GET_GAME`;
-export const pluginTwitchApiSetTitleId = `${TWITCH_API_PREFIX}SET_TITLE`;
-export const pluginTwitchApiGetTitleId = `${TWITCH_API_PREFIX}GET_TITLE`;
-export const pluginTwitchApiGetFollowAgeId = `${TWITCH_API_PREFIX}GET_FOLLOW_AGE`;
-
-export interface PluginsTwitchApiData {
+export interface PluginTwitchApiData {
   twitchApiClient: ApiClient;
   channelName: string;
   twitchUserId?: string;
 }
 
-export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginsTwitchApiData>[] =
+export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitchApiData>[] =
   [
     {
-      id: pluginTwitchApiSetGameId,
+      id: PluginTwitchApi.SET_GAME,
       signature: {
         type: "signature",
         argument: "gameName",
@@ -56,7 +56,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginsTwit
       },
     },
     {
-      id: pluginTwitchApiGetGameId,
+      id: PluginTwitchApi.GET_GAME,
       signature: {
         type: "signature",
         argument: ["", "channelName"],
@@ -85,7 +85,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginsTwit
       },
     },
     {
-      id: pluginTwitchApiGetTitleId,
+      id: PluginTwitchApi.GET_TITLE,
       signature: {
         type: "signature",
         argument: ["", "channelName"],
@@ -114,7 +114,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginsTwit
       },
     },
     {
-      id: pluginTwitchApiSetTitleId,
+      id: PluginTwitchApi.SET_TITLE,
       signature: {
         type: "signature",
         argument: "title",
@@ -143,7 +143,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginsTwit
       },
     },
     {
-      id: pluginTwitchApiGetFollowAgeId,
+      id: PluginTwitchApi.GET_FOLLOW_AGE,
       signature: {
         type: "signature",
         argument: "userName",

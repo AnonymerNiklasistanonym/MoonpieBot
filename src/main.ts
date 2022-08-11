@@ -60,6 +60,8 @@ import type { CustomTimer } from "./customCommandsTimers/customTimer";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
 import type { OsuIrcBotSendMessageFunc } from "./osuirc";
+import type { PluginTwitchApiData } from "./messageParser/plugins/twitchApi";
+import type { PluginTwitchChatData } from "./messageParser/plugins/twitchChat";
 import type SpotifyWebApi from "spotify-web-api-node";
 import type { StreamCompanionConnection } from "./streamcompanion";
 
@@ -367,7 +369,7 @@ export const main = async (
     const tempTwitchApiClient = twitchApiClient;
     if (tempTwitchApiClient !== undefined) {
       pluginsTwitchApiGenerator.forEach((a) => {
-        const plugin = generatePlugin(a, {
+        const plugin = generatePlugin<PluginTwitchApiData>(a, {
           twitchApiClient: tempTwitchApiClient,
           channelName: channel.slice(1),
           twitchUserId: tags["user-id"],
@@ -376,10 +378,10 @@ export const main = async (
       });
     }
     pluginsTwitchChatGenerator.forEach((a) => {
-      const plugin = generatePlugin(a, {
+      const plugin = generatePlugin<PluginTwitchChatData>(a, {
         userId: tags["user-id"],
         userName: tags.username,
-        channel: channel.slice(1),
+        channelName: channel.slice(1),
       });
       pluginsChannel.set(plugin.id, plugin.func);
     });

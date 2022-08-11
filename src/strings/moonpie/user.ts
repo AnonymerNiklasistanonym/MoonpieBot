@@ -11,7 +11,7 @@ import {
 import { createMessageForMessageParser } from "../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { pluginIfNotEqual } from "../../messageParser/plugins/general";
-import { PluginsTwitchChat } from "../../messageParser/plugins/twitchChat";
+import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 
 export const MOONPIE_USER_STRING_ID = `${MOONPIE_STRING_ID}_USER`;
 
@@ -19,7 +19,7 @@ export const moonpieUserGet = {
   id: `${MOONPIE_USER_STRING_ID}_GET`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " The user ",
     {
       type: "macro",
@@ -96,7 +96,7 @@ export const moonpieUserSet = {
   id: `${MOONPIE_USER_STRING_ID}_SET`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " You have set the number of moonpies for the user ",
     {
       type: "macro",
@@ -148,7 +148,7 @@ export const moonpieUserDelete = {
   id: `${MOONPIE_USER_STRING_ID}_DELETE`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " You deleted the entry of the user ",
     {
       type: "macro",

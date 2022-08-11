@@ -23,7 +23,7 @@ import {
 import { createMessageForMessageParser } from "../../messageParser";
 import { OSU_IRC_NEWLINE } from "../../osuirc";
 import { OSU_STRING_ID } from "../osu";
-import { PluginsTwitchChat } from "../../messageParser/plugins/twitchChat";
+import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 
 export const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
 
@@ -100,7 +100,7 @@ export const osuBeatmapRequestRefTopScore = {
 export const osuBeatmapRequest = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}`,
   default: createMessageForMessageParser([
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " requested ",
     { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.TITLE },
     " '",
@@ -198,7 +198,7 @@ export const osuBeatmapRequestRefDetailedStats = {
 export const osuBeatmapRequestDetailed = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_DETAILED`,
   default: createMessageForMessageParser([
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " requested ",
     {
       type: "macro",
@@ -319,7 +319,7 @@ export const osuBeatmapRequestRefIrcRequestString = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_REF_REQUEST_STRING`,
   default: createMessageForMessageParser(
     [
-      { type: "plugin", name: PluginsTwitchChat.USER },
+      { type: "plugin", name: PluginTwitchChat.USER },
       " requested ",
       "[https://osu.ppy.sh/beatmapsets/",
       { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.SET_ID },
@@ -476,7 +476,7 @@ export const osuBeatmapRequestTurnedOff = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_OFF`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " Beatmap requests: Off",
     {
       type: "plugin",
@@ -502,7 +502,7 @@ export const osuBeatmapRequestTurnedOn = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_ON`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " Beatmap requests: On",
   ]),
 };
@@ -510,7 +510,7 @@ export const osuBeatmapRequestCurrentlyOff = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_OFF`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " Beatmap requests are currently off",
     {
       type: "plugin",
@@ -536,7 +536,7 @@ export const osuBeatmapRequestCurrentlyOn = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginsTwitchChat.USER },
+    { type: "plugin", name: PluginTwitchChat.USER },
     " Beatmap requests are currently on",
   ]),
 };

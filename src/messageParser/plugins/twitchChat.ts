@@ -6,22 +6,25 @@ import {
 // Type imports
 import type { MessageParserPluginGenerator } from "../plugins";
 
-export enum PluginsTwitchChat {
+export enum PluginTwitchChat {
   USER_ID = "USER_ID",
   USER = "USER",
   CHANNEL = "CHANNEL",
 }
 
-export interface PluginsTwitchChatData {
-  userId: string | undefined;
-  userName: string | undefined;
-  channel: string;
+export interface PluginTwitchChatData {
+  /** The Twitch user ID of the user that wrote the current message. */
+  userId?: string;
+  /** The Twitch user name of the user that wrote the current message. */
+  userName?: string;
+  /** The Twitch channel name in which the current message was written. */
+  channelName: string;
 }
 
-export const pluginsTwitchChatGenerator: MessageParserPluginGenerator<PluginsTwitchChatData>[] =
+export const pluginsTwitchChatGenerator: MessageParserPluginGenerator<PluginTwitchChatData>[] =
   [
     {
-      id: PluginsTwitchChat.USER,
+      id: PluginTwitchChat.USER,
       description:
         "Available in all strings that are responses and will insert the name of the user that is responded to",
       generate: (data) => () => {
@@ -32,7 +35,7 @@ export const pluginsTwitchChatGenerator: MessageParserPluginGenerator<PluginsTwi
       },
     },
     {
-      id: PluginsTwitchChat.USER_ID,
+      id: PluginTwitchChat.USER_ID,
       description:
         "Available in all strings that are responses and will insert the Twitch ID of the user that is responded to",
       generate: (data) => () => {
@@ -43,11 +46,11 @@ export const pluginsTwitchChatGenerator: MessageParserPluginGenerator<PluginsTwi
       },
     },
     {
-      id: PluginsTwitchChat.CHANNEL,
+      id: PluginTwitchChat.CHANNEL,
       description:
         "Available in all strings that are responses and will insert the Channel name of the channel where the original message is from",
       generate: (data) => () => {
-        return data.channel.slice(1);
+        return data.channelName.slice(1);
       },
     },
   ];

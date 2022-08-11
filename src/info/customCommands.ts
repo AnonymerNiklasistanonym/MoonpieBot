@@ -19,15 +19,9 @@ import {
   pluginRandomNumber,
   pluginTimeInSToHumanReadableStringShort,
 } from "../messageParser/plugins/general";
-import {
-  pluginTwitchApiGetFollowAgeId,
-  pluginTwitchApiGetGameId,
-  pluginTwitchApiGetTitleId,
-  pluginTwitchApiSetGameId,
-  pluginTwitchApiSetTitleId,
-} from "../messageParser/plugins/twitchApi";
 import { createMessageForMessageParser } from "../messageParser";
-import { PluginsTwitchChat } from "../messageParser/plugins/twitchChat";
+import { PluginTwitchChat } from "../messageParser/plugins/twitchChat";
+import { PluginTwitchApi } from "../messageParser/plugins/twitchApi";
 // Type imports
 import type { CustomCommand } from "../customCommandsTimers/customCommand";
 
@@ -48,11 +42,11 @@ const convertRegexToString = (regex: RegExp) => {
 
 export const customCommandsInformation: CustomCommand[] = [
   {
-    id: `Reply > ${PluginsTwitchChat.USER}`,
+    id: `Reply > ${PluginTwitchChat.USER}`,
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginsTwitchChat.USER },
+      { type: "plugin", name: PluginTwitchChat.USER },
       " pong",
     ]),
     regexString: convertRegexToString(/^\s*!ping(?:\s|$)/),
@@ -117,7 +111,7 @@ export const customCommandsInformation: CustomCommand[] = [
     regexString: convertRegexToString(/^\s*!regex(?:\s+(.*?)\s*$|\s|$)/),
   },
   {
-    id: `Use Twitch API for more specific shout outs > ${pluginRegexGroupId},${pluginTwitchApiGetGameId}`,
+    id: `Use Twitch API for more specific shout outs > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME}`,
     channels,
     message: createMessageForMessageParser([
       "/announce Go check out ",
@@ -127,7 +121,7 @@ export const customCommandsInformation: CustomCommand[] = [
       " <3 They were last playing ",
       {
         type: "plugin",
-        name: pluginTwitchApiGetGameId,
+        name: PluginTwitchApi.GET_GAME,
         args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
       },
     ]),
@@ -136,11 +130,11 @@ export const customCommandsInformation: CustomCommand[] = [
     userLevel: CustomCommandUserLevel.MOD,
   },
   {
-    id: `Use Twitch API to get the follow age > ${pluginRegexGroupId},${pluginTwitchApiGetFollowAgeId},${pluginTimeInSToHumanReadableStringShort.id}`,
+    id: `Use Twitch API to get the follow age > ${pluginRegexGroupId},${PluginTwitchApi.GET_FOLLOW_AGE},${pluginTimeInSToHumanReadableStringShort.id}`,
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginsTwitchChat.USER },
+      { type: "plugin", name: PluginTwitchChat.USER },
       {
         type: "plugin",
         name: pluginIfNotUndefined.id,
@@ -154,7 +148,7 @@ export const customCommandsInformation: CustomCommand[] = [
             name: pluginTimeInSToHumanReadableStringShort.id,
             args: {
               type: "plugin",
-              name: pluginTwitchApiGetFollowAgeId,
+              name: PluginTwitchApi.GET_FOLLOW_AGE,
               args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
             },
           },
@@ -171,8 +165,8 @@ export const customCommandsInformation: CustomCommand[] = [
             name: pluginTimeInSToHumanReadableStringShort.id,
             args: {
               type: "plugin",
-              name: pluginTwitchApiGetFollowAgeId,
-              args: { type: "plugin", name: PluginsTwitchChat.USER },
+              name: PluginTwitchApi.GET_FOLLOW_AGE,
+              args: { type: "plugin", name: PluginTwitchChat.USER },
             },
           },
         ],
@@ -181,11 +175,11 @@ export const customCommandsInformation: CustomCommand[] = [
     regexString: convertRegexToString(/^\s*!followage(?:\s+(.*?)\s*$|\s|$)/),
   },
   {
-    id: `Use Twitch API to get/set the title > ${pluginRegexGroupId},${pluginTwitchApiGetTitleId},${pluginTwitchApiSetTitleId} [user:edit:broadcast scope necessary to set the title]`,
+    id: `Use Twitch API to get/set the title > ${pluginRegexGroupId},${PluginTwitchApi.GET_TITLE},${PluginTwitchApi.SET_TITLE} [user:edit:broadcast scope necessary to set the title]`,
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginsTwitchChat.USER },
+      { type: "plugin", name: PluginTwitchChat.USER },
       {
         type: "plugin",
         name: pluginIfNotUndefined.id,
@@ -194,7 +188,7 @@ export const customCommandsInformation: CustomCommand[] = [
           " You updated the title to '",
           {
             type: "plugin",
-            name: pluginTwitchApiSetTitleId,
+            name: PluginTwitchApi.SET_TITLE,
             args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
           },
           "'",
@@ -208,7 +202,7 @@ export const customCommandsInformation: CustomCommand[] = [
           " The current title is '",
           {
             type: "plugin",
-            name: pluginTwitchApiGetTitleId,
+            name: PluginTwitchApi.GET_TITLE,
           },
           "'",
         ],
@@ -218,11 +212,11 @@ export const customCommandsInformation: CustomCommand[] = [
     userLevel: CustomCommandUserLevel.MOD,
   },
   {
-    id: `Use Twitch API to get/set the game > ${pluginRegexGroupId},${pluginTwitchApiGetGameId},${pluginTwitchApiSetGameId} [user:edit:broadcast scope necessary to set the game]`,
+    id: `Use Twitch API to get/set the game > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME},${PluginTwitchApi.SET_GAME} [user:edit:broadcast scope necessary to set the game]`,
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginsTwitchChat.USER },
+      { type: "plugin", name: PluginTwitchChat.USER },
       " ",
       {
         type: "plugin",
@@ -232,7 +226,7 @@ export const customCommandsInformation: CustomCommand[] = [
           "You updated the game to '",
           {
             type: "plugin",
-            name: pluginTwitchApiSetGameId,
+            name: PluginTwitchApi.SET_GAME,
             args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
           },
           "'",
@@ -246,7 +240,7 @@ export const customCommandsInformation: CustomCommand[] = [
           "The current game is '",
           {
             type: "plugin",
-            name: pluginTwitchApiGetGameId,
+            name: PluginTwitchApi.GET_GAME,
           },
           "'",
         ],
@@ -260,7 +254,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginsTwitchChat.USER },
+      { type: "plugin", name: PluginTwitchChat.USER },
       " death was added, streamer died ",
       {
         type: "plugin",
@@ -290,7 +284,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginsTwitchChat.USER },
+      { type: "plugin", name: PluginTwitchChat.USER },
       " streamer died ",
       {
         type: "plugin",
@@ -319,7 +313,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginsTwitchChat.USER },
+      { type: "plugin", name: PluginTwitchChat.USER },
       " ",
       {
         type: "plugin",
@@ -375,7 +369,7 @@ export const customCommandsInformation: CustomCommand[] = [
     channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginsTwitchChat.USER },
+      { type: "plugin", name: PluginTwitchChat.USER },
       " death was removed, streamer died ",
       {
         type: "plugin",
