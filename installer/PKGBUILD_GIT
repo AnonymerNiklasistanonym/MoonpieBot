@@ -12,6 +12,7 @@ license=('MIT')
 depends=('nodejs')
 #depends=()
 makedepends=('pandoc')
+#makedepends=()
 provides=("$pkgname")
 conflicts=("$_applicationname" "$_applicationname-bin" "$_applicationname-git")
 _gitname="$_applicationname.git"
