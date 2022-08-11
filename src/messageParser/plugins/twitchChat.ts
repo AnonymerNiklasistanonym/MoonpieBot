@@ -7,8 +7,11 @@ import {
 import type { MessageParserPluginGenerator } from "../plugins";
 
 export enum PluginTwitchChat {
+  /** Insert the Twitch user id of the user that wrote the current message. */
   USER_ID = "USER_ID",
+  /** Insert the Twitch user name of the user that wrote the current message. */
   USER = "USER",
+  /** Insert the Twitch channel name where the current message was written. */
   CHANNEL = "CHANNEL",
 }
 

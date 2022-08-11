@@ -1,14 +1,18 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-
+// Local imports
+import { roundNumber } from "../../other/round";
 // Type imports
 import type { MessageParserPluginGenerator } from "../plugins";
 import type { StreamCompanionConnection } from "../../streamcompanion";
 
-export const pluginOsuStreamCompanionId = "OSU_STREAMCOMPANION";
-export enum MacroOsuStreamCompanion {
+export enum PluginOsuStreamCompanion {
+  /** Get the current osu! Map data via StreamCompanion. */
+  CURRENT_MAP = "OSU_STREAMCOMPANION_CURRENT_MAP",
+}
+
+export enum PluginMacroOsuStreamCompanionCurrentMap {
   ARTIST_ROMAN = "ARTIST_ROMAN",
   TITLE_ROMAN = "TITLE_ROMAN",
-  VERSION = "VERSION",
+  DIFF_NAME = "VERSION",
   ID = "ID",
   SET_ID = "SET_ID",
   CS = "CS",
@@ -27,47 +31,80 @@ export interface PluginOsuStreamCompanionData {
 
 export const pluginOsuStreamCompanionGenerator: MessageParserPluginGenerator<PluginOsuStreamCompanionData> =
   {
-    id: pluginOsuStreamCompanionId,
-    description:
-      "Available in all strings that are responses and will insert the name of the user that is responded to",
+    id: PluginOsuStreamCompanion.CURRENT_MAP,
+    description: "Get the current osu! map data via StreamCompanion.",
     signature: {
       type: "signature",
       exportsMacro: true,
-      exportedMacroKeys: Object.values(MacroOsuStreamCompanion),
+      exportedMacroKeys: Object.values(PluginMacroOsuStreamCompanionCurrentMap),
     },
     generate: (data) => () => {
-      const streamCompanionData = data.streamCompanionDataFunc();
-      if (streamCompanionData === undefined) {
+      const currentMap = data.streamCompanionDataFunc();
+      if (currentMap === undefined) {
         return [];
       }
-      return [
-        [
-          MacroOsuStreamCompanion.ARTIST_ROMAN,
-          `${streamCompanionData.artistRoman}`,
-        ],
-        [
-          MacroOsuStreamCompanion.TITLE_ROMAN,
-          `${streamCompanionData.titleRoman}`,
-        ],
-        [MacroOsuStreamCompanion.VERSION, `${streamCompanionData.diffName}`],
-        [MacroOsuStreamCompanion.ID, `${streamCompanionData.mapid}`],
-        [MacroOsuStreamCompanion.SET_ID, `${streamCompanionData.mapsetid}`],
-        [MacroOsuStreamCompanion.CS, `${streamCompanionData.mCS}`],
-        [MacroOsuStreamCompanion.AR, `${streamCompanionData.mAR}`],
-        [MacroOsuStreamCompanion.OD, `${streamCompanionData.mOD}`],
-        [MacroOsuStreamCompanion.HP, `${streamCompanionData.mHP}`],
-        [MacroOsuStreamCompanion.BPM, `${streamCompanionData.mBpm}`],
-        [
-          MacroOsuStreamCompanion.DIFFICULTY_RATING,
-          `${
-            streamCompanionData.mStars !== undefined
-              ? Math.round(streamCompanionData.mStars * 100 + Number.EPSILON) /
-                100
-              : undefined
-          }`,
-        ],
-        [MacroOsuStreamCompanion.MAX_COMBO, `${streamCompanionData.maxCombo}`],
-        [MacroOsuStreamCompanion.MODS, `${streamCompanionData.mods}`],
-      ];
+      return Object.values(PluginMacroOsuStreamCompanionCurrentMap).map<
+        [PluginMacroOsuStreamCompanionCurrentMap, string]
+      >((macroId) => {
+        let macroValue;
+        switch (macroId) {
+          case PluginMacroOsuStreamCompanionCurrentMap.ARTIST_ROMAN:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.artistRoman}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.TITLE_ROMAN:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.titleRoman}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.DIFF_NAME:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.diffName}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.ID:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.mapid}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.SET_ID:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.mapsetid}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.CS:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.mCS}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.AR:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.mAR}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.OD:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.mOD}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.HP:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.mHP}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.BPM:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.mBpm}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.DIFFICULTY_RATING:
+            macroValue = `${
+              currentMap.mStars !== undefined
+                ? `${roundNumber(currentMap.mStars, 2)}`
+                : "undefined"
+            }`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.MAX_COMBO:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.maxCombo}`;
+            break;
+          case PluginMacroOsuStreamCompanionCurrentMap.MODS:
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            macroValue = `${currentMap.mods}`;
+            break;
+        }
+        return [macroId, macroValue];
+      });
     },
   };

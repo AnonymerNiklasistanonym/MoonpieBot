@@ -25,6 +25,7 @@
     "project": "./tsconfig.eslint.json"
   },
   "rules": {
+    "@typescript-eslint/switch-exhaustiveness-check": "error",
     "prettier/prettier": "error",
     "curly": "error",
     "eqeqeq": [
