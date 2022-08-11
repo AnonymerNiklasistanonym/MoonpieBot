@@ -22,7 +22,7 @@ import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { messageParserById } from "../../messageParser";
 import { pluginOsuBeatmapId } from "../../messageParser/plugins/osuApi";
-import { tryToSendOsuIrcMessage } from "../../osuirc";
+import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {

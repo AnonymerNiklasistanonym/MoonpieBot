@@ -2,7 +2,7 @@
 import { roundNumber } from "../../other/round";
 // Type imports
 import type { MessageParserPluginGenerator } from "../plugins";
-import type { StreamCompanionConnection } from "../../streamcompanion";
+import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 
 export enum PluginOsuStreamCompanion {
   /** Get the current osu! Map data via StreamCompanion. */

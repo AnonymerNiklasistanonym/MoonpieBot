@@ -21,7 +21,7 @@ import {
   pluginTimeInSToStopwatchString,
 } from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../messageParser";
-import { OSU_IRC_NEWLINE } from "../../osuirc";
+import { OSU_IRC_NEWLINE } from "../../osuIrc";
 import { OSU_STRING_ID } from "../osu";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 

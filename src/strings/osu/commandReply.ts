@@ -35,7 +35,7 @@ import {
 import {
   PluginMacroOsuStreamCompanionCurrentMap,
   PluginOsuStreamCompanion,
-} from "../../messageParser/plugins/streamcompanion";
+} from "../../messageParser/plugins/osuStreamCompanion";
 import { createMessageForMessageParser } from "../../messageParser";
 import { OSU_STRING_ID } from "../osu";
 import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";

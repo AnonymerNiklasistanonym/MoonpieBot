@@ -7,7 +7,7 @@ import { ApiClient } from "@twurple/api";
 import path from "path";
 import { StaticAuthProvider } from "@twurple/auth";
 // Local imports
-import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuirc";
+import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuIrc";
 import { createTwitchClient, runTwitchCommandHandler } from "./twitch";
 import { defaultPlugins, generatePlugin } from "./messageParser/plugins";
 import {
@@ -33,7 +33,7 @@ import {
   pluginsCustomCommandGenerator,
 } from "./messageParser/plugins/customCommand";
 import { createLogFunc } from "./logging";
-import { createStreamCompanionConnection } from "./streamcompanion";
+import { createStreamCompanionConnection } from "./osuStreamCompanion";
 import { defaultMacros } from "./messageParser/macros";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { fileNameDatabaseBackups } from "./info/fileNames";
@@ -44,7 +44,7 @@ import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
-import { pluginOsuStreamCompanionGenerator } from "./messageParser/plugins/streamcompanion";
+import { pluginOsuStreamCompanionGenerator } from "./messageParser/plugins/osuStreamCompanion";
 import { pluginsOsuGenerator } from "./messageParser/plugins/osu";
 import { pluginSpotifyGenerator } from "./messageParser/plugins/spotify";
 import { pluginsTwitchApiGenerator } from "./messageParser/plugins/twitchApi";
@@ -59,11 +59,11 @@ import type { CustomCommandsJson } from "./customCommandsTimers/customCommand";
 import type { CustomTimer } from "./customCommandsTimers/customTimer";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
-import type { OsuIrcBotSendMessageFunc } from "./osuirc";
+import type { OsuIrcBotSendMessageFunc } from "./osuIrc";
 import type { PluginTwitchApiData } from "./messageParser/plugins/twitchApi";
 import type { PluginTwitchChatData } from "./messageParser/plugins/twitchChat";
 import type SpotifyWebApi from "spotify-web-api-node";
-import type { StreamCompanionConnection } from "./streamcompanion";
+import type { StreamCompanionConnection } from "./osuStreamCompanion";
 
 /**
  * The logging ID of this module.

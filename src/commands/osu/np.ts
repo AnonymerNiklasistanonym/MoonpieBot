@@ -22,7 +22,7 @@ import { getProcessWindowTitle } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
-import type { StreamCompanionConnection } from "../../streamcompanion";
+import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
