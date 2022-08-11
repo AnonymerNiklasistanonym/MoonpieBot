@@ -34,13 +34,13 @@ export const createStringsVariableDocumentation = async (
 ) => {
   const data: FileDocumentationParts[] = [];
   data.push({
-    type: FileDocumentationPartType.TEXT,
     content:
       "This program allows to customize certain strings listed in this file. " +
       "To use a customized value instead of the default one uncomment the line. " +
       "Additionally there are plugins and macros that help with adding logic:",
+    type: FileDocumentationPartType.TEXT,
   });
-  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+  data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   if (plugins !== undefined && macros !== undefined && logger !== undefined) {
     const pluginsAndMacroDocumentation =
       await generatePluginAndMacroDocumentation(
@@ -52,48 +52,48 @@ export const createStringsVariableDocumentation = async (
         logger
       );
     data.push(...pluginsAndMacroDocumentation);
-    data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+    data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
     data.push({
-      type: FileDocumentationPartType.TEXT,
       content:
         "Sometimes there are additional plugins/macros like $(USER). " +
         "These plugins/macros can only be used when they are provided. " +
         "So be sure to compare the default values plugins/macros for them.",
+      type: FileDocumentationPartType.TEXT,
     });
-    data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+    data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   }
   data.push({
-    type: FileDocumentationPartType.TEXT,
     content:
       "To use a customized value instead of the default one uncomment the line. " +
       `(The lines that start with ${ENV_STRINGS_VARIABLE_PREFIX})`,
-  });
-  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
-  data.push({
     type: FileDocumentationPartType.TEXT,
+  });
+  data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
+  data.push({
     content:
       "You can also reference other strings via $[REFERENCE]. " +
       `This will then be replaced by the string saved in ${ENV_STRINGS_VARIABLE_PREFIX}REFERENCE.`,
+    type: FileDocumentationPartType.TEXT,
   });
-  data.push({ type: FileDocumentationPartType.NEWLINE, count: 1 });
+  data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
 
   const dataDefaultStrings: FileDocumentationPartValue[] = [];
   for (const [key, defaultValue] of defaultStrings.entries()) {
     if (defaultValue.endsWith(" ") || defaultValue.startsWith(" ")) {
       dataDefaultStrings.push({
-        type: FileDocumentationPartType.VALUE,
-        value: `${ENV_STRINGS_VARIABLE_PREFIX}${key}="${defaultValue}"`,
-        prefix: ">",
         description: undefined,
         isComment: true,
+        prefix: ">",
+        type: FileDocumentationPartType.VALUE,
+        value: `${ENV_STRINGS_VARIABLE_PREFIX}${key}="${defaultValue}"`,
       });
     } else {
       dataDefaultStrings.push({
-        type: FileDocumentationPartType.VALUE,
-        value: `${ENV_STRINGS_VARIABLE_PREFIX}${key}=${defaultValue}`,
-        prefix: ">",
         description: undefined,
         isComment: true,
+        prefix: ">",
+        type: FileDocumentationPartType.VALUE,
+        value: `${ENV_STRINGS_VARIABLE_PREFIX}${key}=${defaultValue}`,
       });
     }
   }

@@ -207,9 +207,9 @@ export default (databaseDirPath: string): Mocha.Suite => {
         await moonpieDb.update(
           databasePath,
           {
+            count: 10,
             id: "3",
             name: "four",
-            count: 10,
           },
           logger
         );
@@ -229,9 +229,9 @@ export default (databaseDirPath: string): Mocha.Suite => {
       await moonpieDb.update(
         databasePath,
         {
+          count: 10,
           id: "3",
           name: "four",
-          count: 10,
         },
         logger
       );
@@ -249,9 +249,9 @@ export default (databaseDirPath: string): Mocha.Suite => {
       await moonpieDb.update(
         databasePath,
         {
+          count: 11,
           id: "3",
           name: "five",
-          count: 11,
           timestamp: 111,
         },
         logger
@@ -340,18 +340,18 @@ export default (databaseDirPath: string): Mocha.Suite => {
         await moonpieDb.update(
           databasePath,
           {
+            count: 10,
             id: "8",
             name: "eight",
-            count: 10,
           },
           logger
         );
         await moonpieDb.update(
           databasePath,
           {
+            count: 1,
             id: "6",
             name: "six_new_name",
-            count: 1,
           },
           logger
         );
@@ -422,9 +422,9 @@ export default (databaseDirPath: string): Mocha.Suite => {
         await moonpieDb.update(
           databasePath,
           {
+            count: 5,
             id: "4",
             name: "four",
-            count: 5,
           },
           logger
         );
@@ -441,9 +441,9 @@ export default (databaseDirPath: string): Mocha.Suite => {
         await moonpieDb.update(
           databasePath,
           {
+            count: 10,
             id: "1",
             name: "one",
-            count: 10,
           },
           logger
         );

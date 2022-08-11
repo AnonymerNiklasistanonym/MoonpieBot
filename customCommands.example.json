@@ -2,18 +2,18 @@
     "$schema": "./customCommands.schema.json",
     "commands": [
         {
-            "id": "Reply > USER",
             "channels": [
                 "salk1n616"
             ],
+            "id": "Reply > USER",
             "message": "@$(USER) pong",
             "regexString": "^\\s*!ping(?:\\s|$)"
         },
         {
-            "id": "Random numbers > RANDOM_NUMBER",
             "channels": [
                 "salk1n616"
             ],
+            "id": "Random numbers > RANDOM_NUMBER",
             "message": "$(RANDOM_NUMBER=0<->100)%",
             "regexString": "^\\s*!random(?:\\s|$)"
         },
@@ -26,12 +26,12 @@
             "regexString": "^\\s*!count(?:\\s|$)"
         },
         {
+            "cooldownInS": 30,
             "id": "Add a cooldown to a command",
             "channels": [
                 "salk1n616"
             ],
             "message": "This command can only be executed every 30s",
-            "cooldownInS": 30,
             "regexString": "^\\s*!cooldown(?:\\s|$)"
         },
         {

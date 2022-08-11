@@ -56,13 +56,13 @@ export const exists = (tableName: string, whereColumnName = "id"): string => {
 
 export interface SelectQueryInnerJoin {
   /**
-   * Name of linked table.
-   */
-  otherTableName: string;
-  /**
    * Name of linked column of linked table.
    */
   otherColumn: string;
+  /**
+   * Name of linked table.
+   */
+  otherTableName: string;
   /**
    * Name of column that it should be linked to.
    */
@@ -81,13 +81,13 @@ export interface SelectQueryInnerJoin {
  */
 export interface SelectQueryOrderBy {
   /**
-   * Name of the column that should be sorted.
-   */
-  column: string;
-  /**
    * True if ascending sort, false if descending.
    */
   ascending: boolean;
+  /**
+   * Name of the column that should be sorted.
+   */
+  column: string;
 }
 
 export interface SelectWhereColumn {
@@ -103,6 +103,14 @@ export interface SelectQueryOptions {
   limit?: number;
   offset?: number;
   /**
+   * Additionally order the results by some columns.
+   */
+  orderBy?: SelectQueryOrderBy[];
+  /**
+   * Only get back unique results.
+   */
+  unique?: boolean;
+  /**
    * Describe a specification of which value a row needs to have to be included
    * `WHERE column = ?`.
    */
@@ -111,14 +119,6 @@ export interface SelectQueryOptions {
    * Describe a complicated where information: overwrites whereColumn if defined.
    */
   whereCustom?: string;
-  /**
-   * Only get back unique results.
-   */
-  unique?: boolean;
-  /**
-   * Additionally order the results by some columns.
-   */
-  orderBy?: SelectQueryOrderBy[];
 }
 
 export interface SelectColumn {
@@ -229,11 +229,11 @@ export const select = (
  * Source: {@link https://www.sqlite.org/lang_createtable.html}.
  */
 export enum CreateTableColumnType {
-  TEXT = "TEXT",
-  NUMERIC = "NUMERIC",
-  INTEGER = "INTEGER",
-  REAL = "REAL",
   BLOB = "BLOB",
+  INTEGER = "INTEGER",
+  NUMERIC = "NUMERIC",
+  REAL = "REAL",
+  TEXT = "TEXT",
 }
 
 export interface CreateTableColumnOptions {
@@ -244,28 +244,24 @@ export interface CreateTableColumnOptions {
 
 export interface CreateTableColumn {
   /**
+   * Foreign key options.
+   */
+  foreign?: CreateTableColumnForeign;
+  /**
    * Column name.
    */
   name: string;
-  /**
-   * Column type (`INTEGER`, `TEXT`).
-   */
-  type: CreateTableColumnType;
   /**
    * Column options (`NOT NULL`, `UNIQUE`, `PRIMARY KEY`).
    */
   options?: CreateTableColumnOptions;
   /**
-   * Foreign key options.
+   * Column type (`INTEGER`, `TEXT`).
    */
-  foreign?: CreateTableColumnForeign;
+  type: CreateTableColumnType;
 }
 
 export interface CreateTableColumnForeign {
-  /**
-   * Foreign key table name.
-   */
-  tableName: string;
   /**
    * Foreign key table column name.
    */
@@ -274,6 +270,10 @@ export interface CreateTableColumnForeign {
    * Options for foreign key (`ON DELETE CASCADE ON UPDATE NO ACTION`).
    */
   options?: string[];
+  /**
+   * Foreign key table name.
+   */
+  tableName: string;
 }
 
 /**

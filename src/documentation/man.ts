@@ -44,26 +44,26 @@ export const createManPageFile = async (outputPath: string) => {
   ];
   const monthString = monthNames[currentDate.getMonth()];
   outputString += `% ${monthString} ${currentDate.getFullYear()}\n`;
-  outputString += `\n`;
+  outputString += "\n";
   // Name
-  outputString += `# NAME\n\n`;
+  outputString += "# NAME\n\n";
   outputString += `${binaryName} - ${description}.\n`;
-  outputString += `\n`;
+  outputString += "\n";
   // SYNOPSIS
-  outputString += `# SYNOPSIS\n\n`;
+  outputString += "# SYNOPSIS\n\n";
   for (const usage of usages) {
     outputString += `**${binaryName}** ${usage.signature.replace(
       /OPTIONS/g,
       "*OPTIONS*"
     )}\n`;
   }
-  outputString += `\n`;
+  outputString += "\n";
   // DESCRIPTION
-  outputString += `# DESCRIPTION\n\n`;
+  outputString += "# DESCRIPTION\n\n";
   outputString += `${longDescription}\n\n${packageDescription(false)}\n`;
-  outputString += `\n`;
+  outputString += "\n";
   // OPTIONS
-  outputString += `# OPTIONS\n\n`;
+  outputString += "# OPTIONS\n\n";
   for (const cliOption of cliOptionInformation) {
     outputString += `${cliOption.name}`;
     if (cliOption.signature) {
@@ -75,7 +75,7 @@ export const createManPageFile = async (outputPath: string) => {
     outputString += `\n: ${cliOption.description}\n\n`;
   }
   // ENVIRONMENT VARIABLES
-  outputString += `# ENVIRONMENT VARIABLES\n\n`;
+  outputString += "# ENVIRONMENT VARIABLES\n\n";
   for (const envVariable of envVariableInformation) {
     outputString += `**${ENV_VARIABLE_PREFIX}${envVariable.name}**`;
     if (envVariable.default) {
@@ -105,21 +105,21 @@ export const createManPageFile = async (outputPath: string) => {
           .map((b) => `"*${b}*"`)
           .join(", ")}`;
       }
-      outputString += `\n`;
+      outputString += "\n";
     }
-    outputString += `\n`;
+    outputString += "\n";
   }
   // BUGS
-  outputString += `# BUGS\n\n`;
+  outputString += "# BUGS\n\n";
   outputString += `Bugs are tracked in GitHub Issues: ${bugTrackerUrl}\n`;
-  outputString += `\n`;
+  outputString += "\n";
   // COPYRIGHT
-  outputString += `# COPYRIGHT\n\n`;
+  outputString += "# COPYRIGHT\n\n";
   outputString += `${name} is available under the ${license} license.\n\n`;
   outputString += `See ${licenseUrl} for the full license text.\n`;
-  outputString += `\n`;
+  outputString += "\n";
   // SEE ALSO
-  outputString += `# SEE ALSO\n\n`;
+  outputString += "# SEE ALSO\n\n";
   outputString += `Website and Documentation: ${websiteUrl}\n\n`;
   outputString += `GitHub repository and issue tracker: ${sourceCodeUrl}\n`;
 

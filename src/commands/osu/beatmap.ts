@@ -33,6 +33,8 @@ import type { Beatmap } from "osu-api-v2";
 import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 
+export type OsuIrcBotSendMessageFunc = (logId: string) => IrcClient;
+
 /**
  * Regex that matches osu beatmap URLs in any message.
  *
@@ -55,16 +57,16 @@ export const regexBeatmapUrl =
 
 export interface CommandHandlerBeatmapDataBase {
   /**
-   * The osu API (v2) credentials.
-   */
-  osuApiV2Credentials?: OsuApiV2Credentials;
-  /**
    * The default osu user ID.
    */
   defaultOsuId?: number;
   enableOsuBeatmapRequests?: boolean;
   enableOsuBeatmapRequestsDetailed?: boolean;
-  osuIrcBot?: (id: string) => IrcClient;
+  /**
+   * The osu API (v2) credentials.
+   */
+  osuApiV2Credentials?: OsuApiV2Credentials;
+  osuIrcBot?: OsuIrcBotSendMessageFunc;
   osuIrcRequestTarget?: string;
 }
 export interface CommandHandlerBeatmapData
@@ -91,39 +93,6 @@ export const commandBeatmap: TwitchChatCommandHandler<
   CommandHandlerBeatmapData,
   CommandDetectorBeatmapData
 > = {
-  info: {
-    id: "beatmap",
-    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
-  },
-  detect: (_tags, message) => {
-    if (!message.match(regexBeatmapUrl)) {
-      return false;
-    }
-    if (message.startsWith("@")) {
-      // Ignore map replies
-      return false;
-    }
-    const osuBeatmapUrlBegin = "https://osu.ppy.sh/beatmaps";
-    const beatmapRequests: BeatmapRequest[] = message
-      .split(osuBeatmapUrlBegin)
-      .map((a) => `${osuBeatmapUrlBegin}${a}`)
-      .map((a) => {
-        const match = a.match(regexBeatmapUrl);
-        if (!match) {
-          return;
-        }
-        const beatmapId =
-          match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]);
-        // eslint-disable-next-line no-magic-numbers
-        const comment: string | undefined = match[3] ? match[3] : undefined;
-        return { beatmapId, comment };
-      })
-      .filter(notUndefined);
-    if (beatmapRequests.length === 0) {
-      return false;
-    }
-    return { data: { beatmapRequests } };
-  },
   createReply: async (
     client,
     channel,
@@ -282,5 +251,38 @@ export const commandBeatmap: TwitchChatCommandHandler<
       commandReplies.push({ sentMessage });
     }
     return commandReplies;
+  },
+  detect: (_tags, message) => {
+    if (!message.match(regexBeatmapUrl)) {
+      return false;
+    }
+    if (message.startsWith("@")) {
+      // Ignore map replies
+      return false;
+    }
+    const osuBeatmapUrlBegin = "https://osu.ppy.sh/beatmaps";
+    const beatmapRequests: BeatmapRequest[] = message
+      .split(osuBeatmapUrlBegin)
+      .map((a) => `${osuBeatmapUrlBegin}${a}`)
+      .map((a) => {
+        const match = a.match(regexBeatmapUrl);
+        if (!match) {
+          return;
+        }
+        const beatmapId =
+          match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]);
+        // eslint-disable-next-line no-magic-numbers
+        const comment: string | undefined = match[3] ? match[3] : undefined;
+        return { beatmapId, comment };
+      })
+      .filter(notUndefined);
+    if (beatmapRequests.length === 0) {
+      return false;
+    }
+    return { data: { beatmapRequests } };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
+    id: "beatmap",
   },
 };

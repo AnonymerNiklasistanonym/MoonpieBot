@@ -32,16 +32,16 @@ export interface CliUsageInformation {
  * Generic information about a CLI option.
  */
 export interface CliOptionInformation<NAME = string> {
+  /** The default value. */
+  default?: string | ((configDir: string) => string);
+  /** The description of the option. */
+  description: string;
+  /** Usage example. */
+  example?: string;
   /** The name of the option. */
   name: NAME;
   /** The signature of the option. */
   signature?: string;
-  /** The description of the option. */
-  description: string;
-  /** The default value. */
-  default?: string | ((configDir: string) => string);
-  /** Usage example. */
-  example?: string;
 }
 
 export interface CliEnvVariableInformationSupportedValues {
@@ -54,14 +54,14 @@ export interface CliEnvVariableInformationSupportedValues {
  * Generic information about a CLI environment variable.
  */
 export interface CliEnvVariableInformation<NAME = string> {
-  /** The name of the environment variable. */
-  name: NAME;
-  /** The description of the environment variable. */
-  description: string;
   /** The default value. */
   default?: string | ((configDir: string) => string);
+  /** The description of the environment variable. */
+  description: string;
   /** Usage example. */
   example?: string;
+  /** The name of the environment variable. */
+  name: NAME;
   /** The supported values. */
   supportedValues?: CliEnvVariableInformationSupportedValues;
 }
@@ -97,10 +97,10 @@ export interface CliOutputElementListElement {
  * Generic information about a CLI output element represents a list.
  */
 export interface CliOutputElementList extends CliOutputElement {
-  /** The title of the list. */
-  title: string;
   /** The elements of the list. */
   elements: CliOutputElementListElement[];
+  /** The title of the list. */
+  title: string;
   type: "list";
 }
 
@@ -133,28 +133,26 @@ export const cliHelpGenerator = (
   // Add usage information
   if (cliUsagesInformation.length === 0) {
     helpOutput.push({
-      type: "list",
-      title: "Usage",
       elements: [{ content: programName }],
+      title: "Usage",
+      type: "list",
     });
   } else {
     helpOutput.push({
-      type: "list",
-      title: "Usage",
       elements: cliUsagesInformation.map((a) => ({
         content: `${programName}${a.signature.length > 0 ? " " : ""}${
           a.signature
         }`,
       })),
+      title: "Usage",
+      type: "list",
     });
   }
 
   // Add options
   if (cliOptionsInformation.length > 0) {
-    helpOutput.push({ type: "text", content: "" });
+    helpOutput.push({ content: "", type: "text" });
     helpOutput.push({
-      type: "list",
-      title: "Options",
       elements: cliOptionsInformation.map((a) => {
         let description = a.description;
         let content = a.name;
@@ -174,15 +172,15 @@ export const cliHelpGenerator = (
           description,
         };
       }),
+      title: "Options",
+      type: "list",
     });
   }
 
   // Add environment variables
   if (cliEnvVariableInformation.length > 0) {
-    helpOutput.push({ type: "text", content: "" });
+    helpOutput.push({ content: "", type: "text" });
     helpOutput.push({
-      type: "list",
-      title: "Environment variables",
       elements: cliEnvVariableInformation.map((a) => {
         let content = a.name;
         if (a.default) {
@@ -216,6 +214,8 @@ export const cliHelpGenerator = (
           description,
         };
       }),
+      title: "Environment variables",
+      type: "list",
     });
   }
 

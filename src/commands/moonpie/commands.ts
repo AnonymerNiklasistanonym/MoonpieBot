@@ -38,22 +38,6 @@ export interface CommandCommandsData {
  * Commands command: Send all available commands of the bot in chat.
  */
 export const commandCommands: TwitchChatCommandHandler<CommandCommandsData> = {
-  info: {
-    id: MoonpieCommands.COMMANDS,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!message.match(regexMoonpieCommands)) {
-      return false;
-    }
-    if (!enabledCommands.includes(MoonpieCommands.COMMANDS)) {
-      return false;
-    }
-    return { data: {} };
-  },
   createReply: async (
     client,
     channel,
@@ -121,5 +105,21 @@ export const commandCommands: TwitchChatCommandHandler<CommandCommandsData> = {
     const message = `${messagePrefix} ${commands.join(", ")}`;
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!message.match(regexMoonpieCommands)) {
+      return false;
+    }
+    if (!enabledCommands.includes(MoonpieCommands.COMMANDS)) {
+      return false;
+    }
+    return { data: {} };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    id: MoonpieCommands.COMMANDS,
   },
 };

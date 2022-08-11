@@ -12,13 +12,13 @@ import { version } from "../../info/version";
 import type { MessageParserMacro } from "../macros";
 
 export enum MacroMoonpieBot {
-  NAME = "NAME",
-  VERSION = "VERSION",
   AUTHOR = "AUTHOR",
-  DESCRIPTION = "DESCRIPTION",
-  URL = "URL",
-  LICENSE = "LICENSE",
   BUG_TRACKER = "BUG_TRACKER",
+  DESCRIPTION = "DESCRIPTION",
+  LICENSE = "LICENSE",
+  NAME = "NAME",
+  URL = "URL",
+  VERSION = "VERSION",
 }
 
 export const macroMoonpieBot: MessageParserMacro = {

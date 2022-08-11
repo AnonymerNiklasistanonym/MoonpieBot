@@ -1,25 +1,25 @@
 import type { MessageParserMacroDocumentation } from "../macros";
 
 export enum MacroMoonpieClaim {
+  COOLDOWN_HOURS = "COOLDOWN_HOURS",
   TIME_SINCE_CLAIM_IN_S = "TIME_SINCE_CLAIM_IN_S",
   TIME_TILL_NEXT_CLAIM_IN_S = "TIME_TILL_NEXT_CLAIM_IN_S",
-  COOLDOWN_HOURS = "COOLDOWN_HOURS",
 }
 export const macroMoonpieClaim: MessageParserMacroDocumentation = {
-  id: "MOONPIE_CLAIM",
   description: "Available in strings from successful moonpie claims",
+  id: "MOONPIE_CLAIM",
   keys: Object.values(MacroMoonpieClaim),
 };
 
 export enum MacroMoonpieLeaderboardEntry {
-  NAME = "NAME",
   COUNT = "COUNT",
+  NAME = "NAME",
   RANK = "RANK",
 }
 export const macroMoonpieLeaderboardEntry: MessageParserMacroDocumentation = {
-  id: "MOONPIE_LEADERBOARD_ENTRY",
   description:
     "Available in strings from successful moonpie claims or leaderboard entries",
+  id: "MOONPIE_LEADERBOARD_ENTRY",
   keys: Object.values(MacroMoonpieLeaderboardEntry),
 };
 
@@ -33,8 +33,8 @@ export const macroMoonpieUserGet: MessageParserMacroDocumentation = {
 
 export enum MacroMoonpieUserSet {
   NAME = "NAME",
-  SET_OPERATION = "SET_OPERATION",
   SET_COUNT = "SET_COUNT",
+  SET_OPERATION = "SET_OPERATION",
 }
 export const macroMoonpieUserSet: MessageParserMacroDocumentation = {
   id: "MOONPIE_USER_SET",

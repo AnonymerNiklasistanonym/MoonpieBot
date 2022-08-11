@@ -58,9 +58,9 @@ export const setupSpotifyAuthentication = async (
   const server = http.createServer((req, res) => {
     logSpotify.debug(
       `Spotify API redirect was detected ${JSON.stringify({
-        method: req.method,
         host: req.headers.host,
         location: req.headers.location,
+        method: req.method,
         referer: req.headers.referer,
         url: req.url,
       })}`
@@ -69,7 +69,7 @@ export const setupSpotifyAuthentication = async (
       if (req.url.endsWith("/")) {
         res.writeHead(OK_STATUS_CODE);
         res.end(
-          `<html><body></body><script>window.location = window.location.href.replace('#', '?');</script></html>`
+          "<html><body></body><script>window.location = window.location.href.replace('#', '?');</script></html>"
         );
       } else {
         const url = new URL(req.headers.host + req.url);
@@ -114,7 +114,7 @@ export const setupSpotifyAuthentication = async (
         } else {
           res.writeHead(FORBIDDEN_STATUS_CODE);
           res.end(
-            `<html><body>Spotify API connection was not successful: Code was not found!</body></html>`
+            "<html><body>Spotify API connection was not successful: Code was not found!</body></html>"
           );
         }
       }

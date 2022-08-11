@@ -22,17 +22,17 @@ const LOG_ID_MODULE_CUSTOM_TIMER = "custom_timer";
  * Represents a custom timer.
  */
 export interface CustomTimer {
-  /** ID of the timer. */
-  id: string;
   /** The channels where the timer should be active. */
   channels: string[];
-  /** The message that should be sent (will be parsed by the message parser). */
-  message: string;
   /**
    * The cron(job) string.
    * For more information/help you can for example use this website: https://crontab.cronhub.io/.
    */
   cronString: string;
+  /** ID of the timer. */
+  id: string;
+  /** The message that should be sent (will be parsed by the message parser). */
+  message: string;
 }
 
 /**
@@ -185,7 +185,7 @@ export const removeTimer = (cronTask: cron.ScheduledTask, logger: Logger) => {
   );
 
   cronTask.stop();
-  logCustomTimer.debug(`Timer was stopped`);
+  logCustomTimer.debug("Timer was stopped");
 };
 
 export const loadCustomTimersFromFile = async (

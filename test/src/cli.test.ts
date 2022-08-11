@@ -23,23 +23,25 @@ describe("cli", () => {
   beforeEach(() => {
     sinon.stub(console, "log");
     sandbox.stub(process, "env").value({
-      MOONPIE_CONFIG_LOGGING_DIRECTORY_PATH: "logs_expected",
       MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL: "info",
+      MOONPIE_CONFIG_LOGGING_DIRECTORY_PATH: "logs_expected",
       MOONPIE_CONFIG_LOGGING_FILE_LOG_LEVEL: "error",
+      MOONPIE_CONFIG_MOONPIE_DATABASE_PATH: "dbFilepath_expected",
+      MOONPIE_CONFIG_TWITCH_CHANNELS: "twitchChannels_expected",
       MOONPIE_CONFIG_TWITCH_NAME: "twitchName_expected",
       MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN: "twitchOAuthToken_expected",
-      MOONPIE_CONFIG_TWITCH_CHANNELS: "twitchChannels_expected",
-      MOONPIE_CONFIG_MOONPIE_DATABASE_PATH: "dbFilepath_expected",
     });
   });
 
   afterEach(() => {
     sandbox.restore();
+    // eslint-disable-next-line no-console
     (console.log as unknown as ConsoleLogRestore).restore();
   });
 
   it("printCliVariablesToConsole", () => {
     printEnvVariablesToConsole(process.cwd());
+    // eslint-disable-next-line no-console
     chai.expect(console.log).to.be.called;
   });
 

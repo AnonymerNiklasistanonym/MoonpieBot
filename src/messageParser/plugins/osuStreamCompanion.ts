@@ -10,19 +10,19 @@ export enum PluginOsuStreamCompanion {
 }
 
 export enum PluginMacroOsuStreamCompanionCurrentMap {
-  ARTIST_ROMAN = "ARTIST_ROMAN",
-  TITLE_ROMAN = "TITLE_ROMAN",
-  DIFF_NAME = "VERSION",
-  ID = "ID",
-  SET_ID = "SET_ID",
-  CS = "CS",
   AR = "AR",
-  OD = "OD",
-  HP = "HP",
+  ARTIST_ROMAN = "ARTIST_ROMAN",
   BPM = "BPM",
+  CS = "CS",
   DIFFICULTY_RATING = "DIFFICULTY_RATING",
+  DIFF_NAME = "VERSION",
+  HP = "HP",
+  ID = "ID",
   MAX_COMBO = "MAX_COMBO",
   MODS = "MODS",
+  OD = "OD",
+  SET_ID = "SET_ID",
+  TITLE_ROMAN = "TITLE_ROMAN",
 }
 
 export interface PluginOsuStreamCompanionData {
@@ -31,13 +31,7 @@ export interface PluginOsuStreamCompanionData {
 
 export const pluginOsuStreamCompanionGenerator: MessageParserPluginGenerator<PluginOsuStreamCompanionData> =
   {
-    id: PluginOsuStreamCompanion.CURRENT_MAP,
     description: "Get the current osu! map data via StreamCompanion.",
-    signature: {
-      type: "signature",
-      exportsMacro: true,
-      exportedMacroKeys: Object.values(PluginMacroOsuStreamCompanionCurrentMap),
-    },
     generate: (data) => () => {
       const currentMap = data.streamCompanionDataFunc();
       if (currentMap === undefined) {
@@ -106,5 +100,11 @@ export const pluginOsuStreamCompanionGenerator: MessageParserPluginGenerator<Plu
         }
         return [macroId, macroValue];
       });
+    },
+    id: PluginOsuStreamCompanion.CURRENT_MAP,
+    signature: {
+      exportedMacroKeys: Object.values(PluginMacroOsuStreamCompanionCurrentMap),
+      exportsMacro: true,
+      type: "signature",
     },
   };

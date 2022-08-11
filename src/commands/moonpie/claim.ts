@@ -56,33 +56,6 @@ export interface CommandClaimData extends CommandGenericDataMoonpieDbPath {
  * hours.
  */
 export const commandClaim: TwitchChatCommandHandler<CommandClaimData> = {
-  info: {
-    id: MoonpieCommands.CLAIM,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!enabledCommands.includes(MoonpieCommands.CLAIM)) {
-      return false;
-    }
-    if (!message.match(regexMoonpieClaim)) {
-      return false;
-    }
-    // If regex also matches moonpie about/add/delete/get/remove/set ignore
-    if (
-      message.match(regexMoonpieAbout) ||
-      message.match(regexMoonpieAdd) ||
-      message.match(regexMoonpieDelete) ||
-      message.match(regexMoonpieGet) ||
-      message.match(regexMoonpieRemove) ||
-      message.match(regexMoonpieSet)
-    ) {
-      return false;
-    }
-    return { data: {} };
-  },
   createReply: async (
     client,
     channel,
@@ -143,9 +116,9 @@ export const commandClaim: TwitchChatCommandHandler<CommandClaimData> = {
     await moonpieDb.update(
       data.moonpieDbPath,
       {
+        count: newMoonpieCount,
         id: tags["user-id"],
         name: tags.username,
-        count: newMoonpieCount,
         timestamp: newTimestamp,
       },
       logger
@@ -202,5 +175,32 @@ export const commandClaim: TwitchChatCommandHandler<CommandClaimData> = {
 
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!enabledCommands.includes(MoonpieCommands.CLAIM)) {
+      return false;
+    }
+    if (!message.match(regexMoonpieClaim)) {
+      return false;
+    }
+    // If regex also matches moonpie about/add/delete/get/remove/set ignore
+    if (
+      message.match(regexMoonpieAbout) ||
+      message.match(regexMoonpieAdd) ||
+      message.match(regexMoonpieDelete) ||
+      message.match(regexMoonpieGet) ||
+      message.match(regexMoonpieRemove) ||
+      message.match(regexMoonpieSet)
+    ) {
+      return false;
+    }
+    return { data: {} };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    id: MoonpieCommands.CLAIM,
   },
 };

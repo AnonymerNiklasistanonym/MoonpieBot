@@ -27,10 +27,10 @@ const LOG_ID_MODULE_TWITCH = "twitch";
  * Errorcodes that can be attached to @CreateTwitchClientError.
  */
 export enum CreateTwitchClientErrorCode {
+  TWITCH_CHANNELS_EMPTY = "TWITCH_CHANNELS_EMPTY",
+  TWITCH_CHANNELS_UNDEFINED = "TWITCH_CHANNELS_UNDEFINED",
   TWITCH_NAME_UNDEFINED = "TWITCH_NAME_UNDEFINED",
   TWITCH_OAUTH_TOKEN_UNDEFINED = "TWITCH_OAUTH_TOKEN_UNDEFINED",
-  TWITCH_CHANNELS_UNDEFINED = "TWITCH_CHANNELS_UNDEFINED",
-  TWITCH_CHANNELS_EMPTY = "TWITCH_CHANNELS_EMPTY",
 }
 
 /**
@@ -108,22 +108,22 @@ export const createTwitchClient = (
 
   // Create Twitch client that can listen to all specified channels
   return new tmiClient({
-    options: { debug },
+    channels: twitchChannels,
     connection: {
-      secure: true,
       reconnect: true,
+      secure: true,
     },
     identity: {
-      username: twitchName,
       password: twitchOAuthToken,
+      username: twitchName,
     },
-    channels: twitchChannels,
     logger: {
       error: (message) => logTwitchClient.error(Error(message)),
       // Only log Twitch messages if enabled for privacy reasons
       info: debug ? logTwitchClient.debug : () => undefined,
       warn: logTwitchClient.warn,
     },
+    options: { debug },
   });
 };
 
@@ -232,25 +232,25 @@ export interface TwitchChatCommandHandler<
   DATA_HANDLE extends object = EMPTY_OBJECT,
   DETECTED_DATA extends object = EMPTY_OBJECT
 > {
-  /** Information about the command handler. */
-  info: TwitchChatCommandHandlerInfo;
-  /** The method that detects if something should be handled. */
-  detect: TwitchChatCommandHandlerDetect<DETECTED_DATA>;
   /**
    * The method that handles the detected command with additional and forwarded
    * data from the detector.
    */
   createReply: TwitchChatCommandHandlerCreateReply<DATA_HANDLE & DETECTED_DATA>;
+  /** The method that detects if something should be handled. */
+  detect: TwitchChatCommandHandlerDetect<DETECTED_DATA>;
+  /** Information about the command handler. */
+  info: TwitchChatCommandHandlerInfo;
 }
 
 /**
  * Information about the Twitch chat command manager.
  */
 export interface TwitchChatCommandHandlerInfo {
-  /** The ID of the command manager. */
-  id: string;
   /** The ID of the chat handler that this command belongs to. */
   chatHandlerId: string;
+  /** The ID of the command manager. */
+  id: string;
 }
 
 // LOG TWITCH RELATED ACTIONS

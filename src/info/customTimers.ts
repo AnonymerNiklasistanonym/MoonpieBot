@@ -9,25 +9,25 @@ const channels = ["salk1n616"];
 
 export const customTimersInformation: CustomTimer[] = [
   {
-    id: "Custom timer 1",
     channels,
+    cronString: "*/30 * * * * *",
+    id: "Custom timer 1",
     message: createMessageForMessageParser([
       "Test every 30 seconds: ",
-      { type: "plugin", name: pluginRandomNumber.id },
+      { name: pluginRandomNumber.id, type: "plugin" },
       "%",
     ]),
-    cronString: "*/30 * * * * *",
   },
   {
-    id: "Custom timer 2",
     channels,
-    message: createMessageForMessageParser(["Test every 15 minutes"]),
     cronString: "*/15 * * * *",
+    id: "Custom timer 2",
+    message: createMessageForMessageParser(["Test every 15 minutes"]),
   },
   {
-    id: "Custom timer 3",
     channels,
-    message: createMessageForMessageParser(["Test every hour"]),
     cronString: "0 */1 * * *",
+    id: "Custom timer 3",
+    message: createMessageForMessageParser(["Test every hour"]),
   },
 ];

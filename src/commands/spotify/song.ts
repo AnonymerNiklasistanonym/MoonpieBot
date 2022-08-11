@@ -25,24 +25,6 @@ export const regexSong = /^\s*!song(?:\s*|\s.*)$/i;
  * (or only the last played song if currently no song is played).
  */
 export const commandSong: TwitchChatCommandHandler<Record<never, never>> = {
-  info: {
-    id: SpotifyCommands.SONG,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_SPOTIFY,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!message.match(regexSong)) {
-      return false;
-    }
-    if (!enabledCommands.includes(SpotifyCommands.SONG)) {
-      return false;
-    }
-    return {
-      data: {},
-    };
-  },
   createReply: async (
     client,
     channel,
@@ -65,5 +47,23 @@ export const commandSong: TwitchChatCommandHandler<Record<never, never>> = {
     return {
       sentMessage: await client.say(channel, msg),
     };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!message.match(regexSong)) {
+      return false;
+    }
+    if (!enabledCommands.includes(SpotifyCommands.SONG)) {
+      return false;
+    }
+    return {
+      data: {},
+    };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_SPOTIFY,
+    id: SpotifyCommands.SONG,
   },
 };

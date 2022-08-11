@@ -9,9 +9,11 @@ const filePathWindowsInstallConfig = path.join(
   "..",
   fileNameWindowsInstallerConfig
 );
+// eslint-disable-next-line no-console
 console.log(
   `Create Windows installer config file '${filePathWindowsInstallConfig}'...`
 );
 createWindowsInstallerConfigFile(filePathWindowsInstallConfig).catch(
+  // eslint-disable-next-line no-console
   console.error
 );

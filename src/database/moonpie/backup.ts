@@ -6,9 +6,9 @@ import { createLogFunc } from "../../logging";
 import type { Logger } from "winston";
 
 export interface DatabaseStructure {
+  count: number;
   id: string;
   name: string;
-  count: number;
   timestamp: number;
 }
 

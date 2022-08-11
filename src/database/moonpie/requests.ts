@@ -8,23 +8,23 @@ export enum CreateError {
 
 /** Errors that can happen during moonpie requests. */
 export enum GeneralError {
-  NO_ACCESS = "MOONPIE_NO_ACCESS",
   NOT_EXISTING = "MOONPIE_NOT_EXISTING",
   NOT_FOUND = "NOT_FOUND",
+  NO_ACCESS = "MOONPIE_NO_ACCESS",
 }
 
 /** Information about the SQlite table for moonpies. */
 export const table = {
   /** SQlite column names for moonpie table. */
   column: {
-    /** The *unique* Twitch ID. */
-    twitchId: "id",
-    /** The *current* Twitch account name at the last time of the claim (for the leaderboard). */
-    twitchName: "name",
     /** The timestamp at the last time of the claim (for time based claims). */
     date: "timestamp",
     /** The current number of moonpies. */
     moonpieCount: "count",
+    /** The *unique* Twitch ID. */
+    twitchId: "id",
+    /** The *current* Twitch account name at the last time of the claim (for the leaderboard). */
+    twitchName: "name",
   },
   /** SQlite table name for moonpies. */
   name: "moonpie",
@@ -34,14 +34,14 @@ export const table = {
 export const viewLeaderboard = {
   /** SQlite column names for moonpie table. */
   column: {
-    /** The *unique* Twitch ID. */
-    twitchId: "id",
-    /** The *current* Twitch account name at the last time of the claim (for the leaderboard). */
-    twitchName: "name",
     /** The current number of moonpies. */
     moonpieCount: "count",
     /** The current rank on the leaderboard. */
     rank: "rank",
+    /** The *unique* Twitch ID. */
+    twitchId: "id",
+    /** The *current* Twitch account name at the last time of the claim (for the leaderboard). */
+    twitchName: "name",
   },
   /** SQlite table name for moonpies. */
   name: "moonpieleaderboard",
@@ -224,16 +224,16 @@ export const removeName = async (
 // -----------------------------------------------------------------------------
 
 export interface GetMoonpieDbOut {
+  count: number;
   id: string;
   name: string;
-  count: number;
   timestamp: number;
 }
 
 export interface GetMoonpieOut {
+  count: number;
   id: string;
   name: string;
-  count: number;
   timestamp: number;
 }
 
@@ -327,14 +327,14 @@ export const getMoonpieName = async (
 // -----------------------------------------------------------------------------
 
 export interface GetMoonpieLeaderboardDbOut {
-  name: string;
   count: number;
+  name: string;
   rank: number;
 }
 
 export interface GetMoonpieLeaderboardOut {
-  name: string;
   count: number;
+  name: string;
   rank: number;
 }
 
@@ -422,9 +422,9 @@ export const getMoonpieLeaderboardEntry = async (
 // -----------------------------------------------------------------------------
 
 export interface UpdateInput {
+  count: number;
   id: string;
   name: string;
-  count: number;
   timestamp?: number;
 }
 

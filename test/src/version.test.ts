@@ -13,10 +13,10 @@ describe("version", () => {
     chai
       .expect(
         getVersionFromObject({
+          beta: true,
           major: 1,
           minor: 0,
           patch: 1,
-          beta: true,
         })
       )
       .to.be.equal("v1.0.1b");

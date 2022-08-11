@@ -82,21 +82,6 @@ export interface CommandHandlerNpData extends CommandHandlerNpDataBase {
  * because the web api is not supporting it).
  */
 export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
-  info: {
-    id: OsuCommands.NP,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (message.match(regexNp) && enabledCommands.includes(OsuCommands.NP)) {
-      return {
-        data: {},
-      };
-    }
-    return false;
-  },
   createReply: async (
     client,
     channel,
@@ -235,5 +220,20 @@ export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
     }
     const sentMessage = await client.say(channel, msg);
     return { sentMessage };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (message.match(regexNp) && enabledCommands.includes(OsuCommands.NP)) {
+      return {
+        data: {},
+      };
+    }
+    return false;
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
+    id: OsuCommands.NP,
   },
 };

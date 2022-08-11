@@ -6,11 +6,11 @@
  * The Version structure.
  */
 export interface Version {
+  /** Set true for beta builds/versions. */
+  beta?: boolean;
   major: number;
   minor: number;
   patch: number;
-  /** Set true for beta builds/versions. */
-  beta?: boolean;
 }
 
 /**

@@ -38,19 +38,19 @@ const OSU_STREAMCOMPANION_DATA = [
  * A representation of the data that StreamCompanion should watch for changes.
  */
 export interface StreamCompanionData {
-  titleRoman?: string;
   artistRoman?: string;
   diffName?: string;
+  mAR?: number;
+  mBpm?: string;
+  mCS?: number;
+  mHP?: number;
+  mOD?: number;
+  mStars?: number;
   mapid?: number;
   mapsetid?: number;
   maxCombo?: number;
   mods?: string;
-  mAR?: number;
-  mCS?: number;
-  mOD?: number;
-  mHP?: number;
-  mStars?: number;
-  mBpm?: string;
+  titleRoman?: string;
 }
 
 /** Interface which helps to get the hidden websocket URL. */

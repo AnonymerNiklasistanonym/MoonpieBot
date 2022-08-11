@@ -62,31 +62,6 @@ export const commandRp: TwitchChatCommandHandler<
   CommandHandlerPpRpData,
   CommandDetectorPpRpData
 > = {
-  info: {
-    id: OsuCommands.RP,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!message.match(regexRp)) {
-      return false;
-    }
-    if (!enabledCommands.includes(OsuCommands.RP)) {
-      return false;
-    }
-    const matchId = regexRpCustomId.exec(message);
-    const matchName = regexRpCustomName.exec(message);
-    return {
-      data: {
-        customOsuId:
-          matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
-        customOsuName:
-          matchName && matchName.length >= 2 ? matchName[1] : undefined,
-      },
-    };
-  },
   createReply: async (
     client,
     channel,
@@ -171,5 +146,30 @@ export const commandRp: TwitchChatCommandHandler<
     }
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!message.match(regexRp)) {
+      return false;
+    }
+    if (!enabledCommands.includes(OsuCommands.RP)) {
+      return false;
+    }
+    const matchId = regexRpCustomId.exec(message);
+    const matchName = regexRpCustomName.exec(message);
+    return {
+      data: {
+        customOsuId:
+          matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
+        customOsuName:
+          matchName && matchName.length >= 2 ? matchName[1] : undefined,
+      },
+    };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
+    id: OsuCommands.RP,
   },
 };

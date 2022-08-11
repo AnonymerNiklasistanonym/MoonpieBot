@@ -22,10 +22,10 @@ export const splitTextAtLength = (textInput: string, splitLength: number) => {
 };
 
 export enum FileDocumentationPartType {
-  TEXT = "TEXT",
   HEADING = "HEADING",
-  VALUE = "VALUE",
   NEWLINE = "NEWLINE",
+  TEXT = "TEXT",
+  VALUE = "VALUE",
 }
 
 export interface FileDocumentationPart<Type extends FileDocumentationPartType> {
@@ -38,19 +38,19 @@ export interface FileDocumentationPartText
 }
 export interface FileDocumentationPartHeading
   extends FileDocumentationPart<FileDocumentationPartType.HEADING> {
-  title: string;
   description?: string;
+  title: string;
 }
 export interface FileDocumentationPartValue
   extends FileDocumentationPart<FileDocumentationPartType.VALUE> {
-  isComment?: boolean;
   description?: string;
-  value?: string;
-  title?: string;
-  prefix: string;
-  lists?: [string, string[]][];
-  properties?: [string, string][];
   infos?: string[];
+  isComment?: boolean;
+  lists?: [string, string[]][];
+  prefix: string;
+  properties?: [string, string][];
+  title?: string;
+  value?: string;
 }
 export interface FileDocumentationPartNewline
   extends FileDocumentationPart<FileDocumentationPartType.NEWLINE> {

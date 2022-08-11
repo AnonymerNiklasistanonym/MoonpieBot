@@ -28,30 +28,30 @@ export interface CliOptionData extends CliOptionInformation<CliOption> {
  */
 export const cliOptionInformation: CliOptionData[] = [
   {
-    name: CliOption.CONFIG_DIRECTORY,
     default: (configDir) =>
       process.cwd() === path.resolve(configDir) ? "." + path.sep : configDir,
     defaultValue: (configDir) => path.resolve(configDir),
     description:
       "The directory that should contain all configurations and databases if not configured otherwise",
+    name: CliOption.CONFIG_DIRECTORY,
     signature: "CONFIG_DIR",
   },
   {
-    name: CliOption.DISABLE_CENSORING,
     description:
       "Disabling the censoring stops the censoring of private tokens which is helpful to debug if the inputs are read correctly but should otherwise be avoided",
+    name: CliOption.DISABLE_CENSORING,
   },
   {
-    name: CliOption.CREATE_EXAMPLE_FILES,
     description:
       "Creates example files (for custom commands and timers) in the specified configuration directory",
+    name: CliOption.CREATE_EXAMPLE_FILES,
   },
   {
-    name: CliOption.HELP,
     description: "Get instructions on how to run and configure this program",
+    name: CliOption.HELP,
   },
   {
-    name: CliOption.VERSION,
     description: "Get the version of the program",
+    name: CliOption.VERSION,
   },
 ];

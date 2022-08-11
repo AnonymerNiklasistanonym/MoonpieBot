@@ -9,7 +9,7 @@ import moonpie from "./database/moonpie.test";
 
 describe("database", () => {
   const databaseDirPath = path.join(os.tmpdir(), "moonpiebot");
-  rm(databaseDirPath, { recursive: true, force: true });
+  rm(databaseDirPath, { force: true, recursive: true });
   mkdirSync(databaseDirPath, { recursive: true });
 
   core(databaseDirPath);

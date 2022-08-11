@@ -12,10 +12,10 @@ import type { Logger } from "winston";
  * The default log levels of the logger.
  */
 export enum LoggerLevel {
-  ERROR = "error",
-  WARN = "warn",
   DEBUG = "debug",
+  ERROR = "error",
   INFO = "info",
+  WARN = "warn",
 }
 
 /**
@@ -24,10 +24,10 @@ export enum LoggerLevel {
 export interface LoggerInformation {
   level: LoggerLevel | string;
   message: string;
-  timestamp?: string;
-  service?: string;
   section?: string;
+  service?: string;
   subsection?: string;
+  timestamp?: string;
 }
 
 /**
@@ -65,23 +65,21 @@ export const createLogger = (
   logLevelFile: LoggerLevel | string = "debug"
 ) =>
   createWinstonLogger({
+    defaultMeta: { service: name },
     exitOnError: false,
+    format: format.combine(format.timestamp(), format.printf(logFormat)),
     transports: [
       new DailyRotateFile({
+        datePattern: "YYYY-MM-DD-HH",
         dirname: logDir,
         filename: `${name.toLowerCase()}-%DATE%.log`,
-        datePattern: "YYYY-MM-DD-HH",
-        zippedArchive: false,
-        maxSize: "100m",
-        maxFiles: "28d",
         level: logLevelFile,
+        maxFiles: "28d",
+        maxSize: "100m",
+        zippedArchive: false,
       }),
       new transports.Console({ level: logLevelConsole }),
     ],
-    format: format.combine(format.timestamp(), format.printf(logFormat)),
-    defaultMeta: {
-      service: name,
-    },
   });
 
 /**
@@ -96,12 +94,10 @@ export const createConsoleLogger = (
   logLevelConsole: LoggerLevel | string = "info"
 ) =>
   createWinstonLogger({
+    defaultMeta: { service: name },
     exitOnError: false,
-    transports: [new transports.Console({ level: logLevelConsole })],
     format: format.combine(format.timestamp(), format.printf(logFormat)),
-    defaultMeta: {
-      service: name,
-    },
+    transports: [new transports.Console({ level: logLevelConsole })],
   });
 
 /**
@@ -109,10 +105,10 @@ export const createConsoleLogger = (
  * information.
  */
 export interface LogFunc {
-  info: (message: string) => void;
   debug: (message: string) => void;
-  warn: (message: string) => void;
   error: (err: Error) => void;
+  info: (message: string) => void;
+  warn: (message: string) => void;
 }
 
 /**
@@ -132,12 +128,12 @@ export const createLogFunc = (
     logger.log({ level, message, section, subsection });
   };
   return {
-    info: baseLogFunc(LoggerLevel.INFO),
     debug: baseLogFunc(LoggerLevel.DEBUG),
-    warn: baseLogFunc(LoggerLevel.WARN),
     error: (err: Error) => {
       logger.log({ level: "error", message: err.message, section, subsection });
     },
+    info: baseLogFunc(LoggerLevel.INFO),
+    warn: baseLogFunc(LoggerLevel.WARN),
   };
 };
 

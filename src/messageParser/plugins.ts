@@ -34,16 +34,16 @@ import type { PluginFunc, PluginSignature } from "../messageParser";
 import { pluginsTwitchApiGenerator } from "./plugins/twitchApi";
 
 export interface MessageParserPluginExample {
-  before?: string;
-  argument?: string;
-  scope?: string;
   after?: string;
+  argument?: string;
+  before?: string;
+  scope?: string;
 }
 
 interface MessageParserPluginBase {
-  id: string;
   description?: string;
   examples?: MessageParserPluginExample[];
+  id: string;
 }
 
 export interface MessageParserPlugin extends MessageParserPluginBase {
@@ -52,8 +52,8 @@ export interface MessageParserPlugin extends MessageParserPluginBase {
 
 export interface MessageParserPluginGenerator<DATA>
   extends MessageParserPluginBase {
-  signature?: PluginSignature;
   generate: (data: DATA) => PluginFunc;
+  signature?: PluginSignature;
 }
 
 export const generatePlugin = <DATA>(

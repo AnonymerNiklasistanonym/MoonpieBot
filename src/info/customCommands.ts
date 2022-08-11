@@ -20,12 +20,14 @@ import {
   pluginTimeInSToHumanReadableStringShort,
 } from "../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../messageParser";
-import { PluginTwitchChat } from "../messageParser/plugins/twitchChat";
 import { PluginTwitchApi } from "../messageParser/plugins/twitchApi";
+import { PluginTwitchChat } from "../messageParser/plugins/twitchChat";
 // Type imports
 import type { CustomCommand } from "../customCommandsTimers/customCommand";
 
-const channels = ["salk1n616"];
+const defaultExampleCommandValues = {
+  channels: ["salk1n616"],
+};
 
 /**
  * This method converts a regex to a string.
@@ -42,87 +44,87 @@ const convertRegexToString = (regex: RegExp) => {
 
 export const customCommandsInformation: CustomCommand[] = [
   {
+    ...defaultExampleCommandValues,
     id: `Reply > ${PluginTwitchChat.USER}`,
-    channels,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginTwitchChat.USER },
+      { name: PluginTwitchChat.USER, type: "plugin" },
       " pong",
     ]),
     regexString: convertRegexToString(/^\s*!ping(?:\s|$)/),
   },
   {
+    ...defaultExampleCommandValues,
     id: `Random numbers > ${pluginRandomNumber.id}`,
-    channels,
     message: createMessageForMessageParser([
-      { type: "plugin", name: pluginRandomNumber.id, args: "0<->100" },
+      { args: "0<->100", name: pluginRandomNumber.id, type: "plugin" },
       "%",
     ]),
     regexString: convertRegexToString(/^\s*!random(?:\s|$)/),
   },
   {
     id: `Count command calls > ${pluginRegexGroupId}`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "the test command was called ",
-      { type: "plugin", name: pluginRegexGroupId },
+      { name: pluginRegexGroupId, type: "plugin" },
       " time",
       {
-        type: "plugin",
+        args: [{ name: pluginRegexGroupId, type: "plugin" }, ">1"],
         name: pluginIfGreater.id,
-        args: [{ type: "plugin", name: pluginRegexGroupId }, ">1"],
         scope: "s",
+        type: "plugin",
       },
     ]),
     regexString: convertRegexToString(/^\s*!count(?:\s|$)/),
   },
   {
+    cooldownInS: 30,
     id: "Add a cooldown to a command",
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "This command can only be executed every 30s",
     ]),
-    cooldownInS: 30,
     regexString: convertRegexToString(/^\s*!cooldown(?:\s|$)/),
   },
   {
     id: `Reference parts of a message > ${pluginRegexGroupId},${pluginIfNotUndefined.id}`,
-    channels,
+    ...defaultExampleCommandValues,
     count: 20,
     message: createMessageForMessageParser([
       "Detected the command !regex with ",
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfNotUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: [
           "'",
-          { type: "plugin", name: pluginRegexGroupId, args: "1" },
+          { args: "1", name: pluginRegexGroupId, type: "plugin" },
           "' as query",
         ],
+        type: "plugin",
       },
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: "no query after the command :(",
+        type: "plugin",
       },
     ]),
     regexString: convertRegexToString(/^\s*!regex(?:\s+(.*?)\s*$|\s|$)/),
   },
   {
     id: `Use Twitch API for more specific shout outs > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME}`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "/announce Go check out ",
-      { type: "plugin", name: pluginRegexGroupId, args: "1" },
+      { args: "1", name: pluginRegexGroupId, type: "plugin" },
       " at https://www.twitch.tv/",
-      { type: "plugin", name: pluginRegexGroupId, args: "1" },
+      { args: "1", name: pluginRegexGroupId, type: "plugin" },
       " <3 They were last playing ",
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: PluginTwitchApi.GET_GAME,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
+        type: "plugin",
       },
     ]),
     // TODO double check regex later
@@ -131,81 +133,78 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     id: `Use Twitch API to get the follow age > ${pluginRegexGroupId},${PluginTwitchApi.GET_FOLLOW_AGE},${pluginTimeInSToHumanReadableStringShort.id}`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginTwitchChat.USER },
+      { name: PluginTwitchChat.USER, type: "plugin" },
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfNotUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: [
           " ",
-          { type: "plugin", name: pluginRegexGroupId, args: "1" },
+          { args: "1", name: pluginRegexGroupId, type: "plugin" },
           " followed the channel since ",
           {
-            type: "plugin",
-            name: pluginTimeInSToHumanReadableStringShort.id,
             args: {
-              type: "plugin",
+              args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
               name: PluginTwitchApi.GET_FOLLOW_AGE,
-              args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
+              type: "plugin",
             },
+            name: pluginTimeInSToHumanReadableStringShort.id,
+            type: "plugin",
           },
         ],
+        type: "plugin",
       },
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: [
           " You followed the channel since ",
           {
-            type: "plugin",
-            name: pluginTimeInSToHumanReadableStringShort.id,
             args: {
-              type: "plugin",
+              args: { name: PluginTwitchChat.USER, type: "plugin" },
               name: PluginTwitchApi.GET_FOLLOW_AGE,
-              args: { type: "plugin", name: PluginTwitchChat.USER },
+              type: "plugin",
             },
+            name: pluginTimeInSToHumanReadableStringShort.id,
+            type: "plugin",
           },
         ],
+        type: "plugin",
       },
     ]),
     regexString: convertRegexToString(/^\s*!followage(?:\s+(.*?)\s*$|\s|$)/),
   },
   {
     id: `Use Twitch API to get/set the title > ${pluginRegexGroupId},${PluginTwitchApi.GET_TITLE},${PluginTwitchApi.SET_TITLE} [user:edit:broadcast scope necessary to set the title]`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginTwitchChat.USER },
+      { name: PluginTwitchChat.USER, type: "plugin" },
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfNotUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: [
           " You updated the title to '",
           {
-            type: "plugin",
+            args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
             name: PluginTwitchApi.SET_TITLE,
-            args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
+            type: "plugin",
           },
           "'",
         ],
+        type: "plugin",
       },
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: [
           " The current title is '",
-          {
-            type: "plugin",
-            name: PluginTwitchApi.GET_TITLE,
-          },
+          { name: PluginTwitchApi.GET_TITLE, type: "plugin" },
           "'",
         ],
+        type: "plugin",
       },
     ]),
     regexString: convertRegexToString(/^\s*!title(?:\s+(.*?)\s*$|\s|$)/),
@@ -213,37 +212,34 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     id: `Use Twitch API to get/set the game > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME},${PluginTwitchApi.SET_GAME} [user:edit:broadcast scope necessary to set the game]`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginTwitchChat.USER },
+      { name: PluginTwitchChat.USER, type: "plugin" },
       " ",
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfNotUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: [
           "You updated the game to '",
           {
-            type: "plugin",
+            args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
             name: PluginTwitchApi.SET_GAME,
-            args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
+            type: "plugin",
           },
           "'",
         ],
+        type: "plugin",
       },
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: [
           "The current game is '",
-          {
-            type: "plugin",
-            name: PluginTwitchApi.GET_GAME,
-          },
+          { name: PluginTwitchApi.GET_GAME, type: "plugin" },
           "'",
         ],
+        type: "plugin",
       },
     ]),
     regexString: convertRegexToString(/^\s*!game(?:\s+(.*?)\s*$|\s|$)/),
@@ -251,29 +247,25 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     id: `Death counter that works across commands [1/4] > ${pluginCustomCommandDataAddId}`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginTwitchChat.USER },
+      { name: PluginTwitchChat.USER, type: "plugin" },
       " death was added, streamer died ",
-      {
-        type: "plugin",
-        name: pluginCustomCommandDataAddId,
-        args: "death+=1",
-      },
+      { args: "death+=1", name: pluginCustomCommandDataAddId, type: "plugin" },
       " time",
       {
-        type: "plugin",
-        name: pluginIfNotEqual.id,
         args: [
           {
-            type: "plugin",
-            name: pluginCustomCommandDataGetId,
             args: "death<>0",
+            name: pluginCustomCommandDataGetId,
+            type: "plugin",
           },
           "!==1",
         ],
+        name: pluginIfNotEqual.id,
         scope: "s",
+        type: "plugin",
       },
     ]),
     regexString: convertRegexToString(/^\s*!death(?:\s|$)/),
@@ -281,84 +273,84 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     id: `Death counter that works across commands [2/4] > ${pluginCustomCommandDataGetId}`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginTwitchChat.USER },
+      { name: PluginTwitchChat.USER, type: "plugin" },
       " streamer died ",
       {
-        type: "plugin",
-        name: pluginCustomCommandDataGetId,
         args: "death<>0",
+        name: pluginCustomCommandDataGetId,
+        type: "plugin",
       },
       " time",
       {
-        type: "plugin",
-        name: pluginIfNotEqual.id,
         args: [
           {
-            type: "plugin",
-            name: pluginCustomCommandDataGetId,
             args: "death<>0",
+            name: pluginCustomCommandDataGetId,
+            type: "plugin",
           },
           "!==1",
         ],
+        name: pluginIfNotEqual.id,
         scope: "s",
+        type: "plugin",
       },
     ]),
     regexString: convertRegexToString(/^\s*!deaths(?:\s|$)/),
   },
   {
     id: `Death counter that works across commands [3/4] > ${pluginCustomCommandDataSetId}`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginTwitchChat.USER },
+      { name: PluginTwitchChat.USER, type: "plugin" },
       " ",
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfNotUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: [
           "deaths were set to '",
-          { type: "plugin", name: pluginRegexGroupId, args: "1" },
+          { args: "1", name: pluginRegexGroupId, type: "plugin" },
           "', streamer died ",
           {
-            type: "plugin",
-            name: pluginCustomCommandDataSetNumberId,
             args: [
               "death=#=",
-              { type: "plugin", name: pluginRegexGroupId, args: "1" },
+              { args: "1", name: pluginRegexGroupId, type: "plugin" },
             ],
+            name: pluginCustomCommandDataSetNumberId,
+            type: "plugin",
           },
         ],
+        type: "plugin",
       },
       {
-        type: "plugin",
+        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfUndefined.id,
-        args: { type: "plugin", name: pluginRegexGroupId, args: "1" },
         scope: [
           "deaths were reset to 0, streamer died ",
           {
-            type: "plugin",
-            name: pluginCustomCommandDataSetNumberId,
             args: "death=#=0",
+            name: pluginCustomCommandDataSetNumberId,
+            type: "plugin",
           },
         ],
+        type: "plugin",
       },
       " time",
       {
-        type: "plugin",
-        name: pluginIfNotEqual.id,
         args: [
           {
-            type: "plugin",
-            name: pluginCustomCommandDataGetId,
             args: "death<>0",
+            name: pluginCustomCommandDataGetId,
+            type: "plugin",
           },
           "!==1",
         ],
+        name: pluginIfNotEqual.id,
         scope: "s",
+        type: "plugin",
       },
     ]),
     regexString: convertRegexToString(/^\s*!resetDeaths(?:\s+(.*?)\s*$|\s|$)/),
@@ -366,29 +358,29 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     id: `Death counter that works across commands [4/4] > ${pluginCustomCommandDataRemoveId}`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
       "@",
-      { type: "plugin", name: PluginTwitchChat.USER },
+      { name: PluginTwitchChat.USER, type: "plugin" },
       " death was removed, streamer died ",
       {
-        type: "plugin",
-        name: pluginCustomCommandDataRemoveId,
         args: "death-=1",
+        name: pluginCustomCommandDataRemoveId,
+        type: "plugin",
       },
       " time",
       {
-        type: "plugin",
-        name: pluginIfNotEqual.id,
         args: [
           {
-            type: "plugin",
-            name: pluginCustomCommandDataGetId,
             args: "death<>0",
+            name: pluginCustomCommandDataGetId,
+            type: "plugin",
           },
           "!==1",
         ],
+        name: pluginIfNotEqual.id,
         scope: "s",
+        type: "plugin",
       },
     ]),
     regexString: convertRegexToString(/^\s*!removeDeath(?:\s|$)/),
@@ -396,9 +388,9 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     id: `List all available macros and plugins for debugging > ${pluginHelp.id}`,
-    channels,
+    ...defaultExampleCommandValues,
     message: createMessageForMessageParser([
-      { type: "plugin", name: pluginHelp.id },
+      { name: pluginHelp.id, type: "plugin" },
     ]),
     regexString: convertRegexToString(/^\s*!help(?:\s|$)/),
     userLevel: CustomCommandUserLevel.MOD,

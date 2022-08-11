@@ -23,17 +23,17 @@ interface Artist {
 }
 
 export enum SpotifySongMacro {
-  HAS_CURRENT = "HAS_CURRENT",
-  CURRENT_TITLE = "CURRENT_TITLE",
+  CURRENT_ALBUM = "CURRENT_ALBUM",
   CURRENT_ARTISTS = "CURRENT_ARTISTS",
   CURRENT_IS_SINGLE = "CURRENT_IS_SINGLE",
-  CURRENT_ALBUM = "CURRENT_ALBUM",
+  CURRENT_TITLE = "CURRENT_TITLE",
   CURRENT_URL = "CURRENT_URL",
+  HAS_CURRENT = "HAS_CURRENT",
   HAS_PREVIOUS = "HAS_PREVIOUS",
-  PREVIOUS_TITLE = "PREVIOUS_TITLE",
+  PREVIOUS_ALBUM = "PREVIOUS_ALBUM",
   PREVIOUS_ARTISTS = "PREVIOUS_ARTISTS",
   PREVIOUS_IS_SINGLE = "PREVIOUS_IS_SINGLE",
-  PREVIOUS_ALBUM = "PREVIOUS_ALBUM",
+  PREVIOUS_TITLE = "PREVIOUS_TITLE",
   PREVIOUS_URL = "PREVIOUS_URL",
 }
 
@@ -43,12 +43,6 @@ export interface PluginSpotifyData {
 
 export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyData> =
   {
-    id: "SPOTIFY_SONG",
-    signature: {
-      type: "signature",
-      exportsMacro: true,
-      exportedMacroKeys: Object.values(SpotifySongMacro),
-    },
     generate: (data) => async (logger) => {
       const spotifyData = await spotifyGetCurrentAndRecentSongs(
         data.spotifyWebApi,
@@ -111,5 +105,11 @@ export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyD
         ]);
       }
       return macros;
+    },
+    id: "SPOTIFY_SONG",
+    signature: {
+      exportedMacroKeys: Object.values(SpotifySongMacro),
+      exportsMacro: true,
+      type: "signature",
     },
   };

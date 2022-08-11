@@ -4,6 +4,7 @@
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:@typescript-eslint/recommended",
+    "plugin:typescript-sort-keys/recommended",
     "plugin:jsdoc/recommended",
     "plugin:prettier/recommended",
     "plugin:security/recommended"
@@ -16,6 +17,7 @@
   "parser": "@typescript-eslint/parser",
   "plugins": [
     "@typescript-eslint",
+    "typescript-sort-keys",
     "jsdoc",
     "prettier",
     "security"
@@ -26,6 +28,18 @@
   },
   "rules": {
     "@typescript-eslint/switch-exhaustiveness-check": "error",
+    "@typescript-eslint/prefer-for-of": "error",
+    "@typescript-eslint/prefer-function-type": "error",
+    "@typescript-eslint/quotes": [ "error", "double" ],
+    "@typescript-eslint/no-shadow": ["error"],
+    "no-console": [ "error" ],
+    "arrow-spacing": "error",
+    "template-curly-spacing": [ "error", "never" ],
+    "use-isnan": "error",
+    "block-spacing": [ "error", "always" ],
+    "brace-style": [ "error", "1tbs", { "allowSingleLine": true } ],
+    "sort-keys": "error",
+        "space-before-blocks": [ "error", "always" ],
     "prettier/prettier": "error",
     "curly": "error",
     "eqeqeq": [

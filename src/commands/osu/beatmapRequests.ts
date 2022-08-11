@@ -64,8 +64,8 @@ enum BeatmapRequestsType {
 }
 
 export interface CommandDetectorBeatmapRequestsData {
-  beatmapRequestsType: BeatmapRequestsType;
   beatmapRequestsOffMessage?: string;
+  beatmapRequestsType: BeatmapRequestsType;
 }
 
 /**
@@ -76,44 +76,6 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
   CommandHandlerBeatmapRequestsData,
   CommandDetectorBeatmapRequestsData
 > = {
-  info: {
-    id: OsuCommands.REQUESTS,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!enabledCommands.includes(OsuCommands.REQUESTS)) {
-      return false;
-    }
-    const matchEnable = message.match(regexEnableBeatmapRequests);
-    if (matchEnable) {
-      return {
-        data: {
-          beatmapRequestsType: BeatmapRequestsType.TURN_ON,
-        },
-      };
-    }
-    const matchDisable = message.match(regexDisableBeatmapRequests);
-    if (matchDisable) {
-      return {
-        data: {
-          beatmapRequestsType: BeatmapRequestsType.TURN_OFF,
-          beatmapRequestsOffMessage: matchDisable[1],
-        },
-      };
-    }
-    const matchStatus = message.match(regexBeatmapRequestsStatus);
-    if (matchStatus) {
-      return {
-        data: {
-          beatmapRequestsType: BeatmapRequestsType.INFO,
-        },
-      };
-    }
-    return false;
-  },
   createReply: async (
     client,
     channel,
@@ -213,5 +175,43 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
 
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!enabledCommands.includes(OsuCommands.REQUESTS)) {
+      return false;
+    }
+    const matchEnable = message.match(regexEnableBeatmapRequests);
+    if (matchEnable) {
+      return {
+        data: {
+          beatmapRequestsType: BeatmapRequestsType.TURN_ON,
+        },
+      };
+    }
+    const matchDisable = message.match(regexDisableBeatmapRequests);
+    if (matchDisable) {
+      return {
+        data: {
+          beatmapRequestsOffMessage: matchDisable[1],
+          beatmapRequestsType: BeatmapRequestsType.TURN_OFF,
+        },
+      };
+    }
+    const matchStatus = message.match(regexBeatmapRequestsStatus);
+    if (matchStatus) {
+      return {
+        data: {
+          beatmapRequestsType: BeatmapRequestsType.INFO,
+        },
+      };
+    }
+    return false;
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
+    id: OsuCommands.REQUESTS,
   },
 };

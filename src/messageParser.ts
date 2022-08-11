@@ -37,13 +37,13 @@ const LOG_ID_MODULE_MESSAGE_PARSER = "message_parser";
  * 3. Children: Then there is a list of child nodes.
  */
 export interface ParseTreeNode {
-  originalString: string;
-  type: "text" | "children" | "plugin";
+  children?: ParseTreeNode[];
   content?: string;
+  originalString: string;
+  pluginContent?: ParseTreeNode;
   pluginName?: string;
   pluginValue?: ParseTreeNode;
-  pluginContent?: ParseTreeNode;
-  children?: ParseTreeNode[];
+  type: "text" | "children" | "plugin";
 }
 
 /**
@@ -64,6 +64,22 @@ export interface ParseTreeNode {
  */
 enum ParseState {
   /**
+   * Currently parsing a plugin content scope.
+   */
+  PLUGIN_CONTENT = "PLUGIN_CONTENT",
+  /**
+   * Currently parsing a plugin name.
+   */
+  PLUGIN_NAME = "PLUGIN_NAME",
+  /**
+   * Currently parsing a plugin value.
+   */
+  PLUGIN_VALUE = "PLUGIN_VALUE",
+  /**
+   * Currently parsing a reference name.
+   */
+  REFERENCE_NAME = "REFERENCE_NAME",
+  /**
    * Currently parsing simple text.
    */
   TEXT = "TEXT",
@@ -78,22 +94,6 @@ enum ParseState {
    * text. If now a `(` symbol is found a plugin is detected.
    */
   TEXT_UNESCAPED_DOLLAR = "TEXT_UNESCAPED_DOLLAR",
-  /**
-   * Currently parsing a plugin name.
-   */
-  PLUGIN_NAME = "PLUGIN_NAME",
-  /**
-   * Currently parsing a plugin value.
-   */
-  PLUGIN_VALUE = "PLUGIN_VALUE",
-  /**
-   * Currently parsing a plugin content scope.
-   */
-  PLUGIN_CONTENT = "PLUGIN_CONTENT",
-  /**
-   * Currently parsing a reference name.
-   */
-  REFERENCE_NAME = "REFERENCE_NAME",
 }
 /**
  * There are multiple subroutines during certain parse states.
@@ -104,14 +104,6 @@ enum ParseStateHelper {
    */
   NOTHING = "NOTHING",
   /**
-   * Subroutine if a plugin scope is detected.
-   */
-  PLUGIN_WAS_OPENED = "PLUGIN_WAS_OPENED",
-  /**
-   * Subroutine if a plugin scope close is detected.
-   */
-  PLUGIN_WAS_CLOSED = "PLUGIN_WAS_CLOSED",
-  /**
    * Subroutine if plugin content is detected since this requires a recursive call.
    */
   PLUGIN_CONTENT_FOUND = "PLUGIN_CONTENT_FOUND",
@@ -120,13 +112,21 @@ enum ParseStateHelper {
    */
   PLUGIN_VALUE_FOUND = "PLUGIN_VALUE_FOUND",
   /**
-   * Subroutine if a reference is detected.
+   * Subroutine if a plugin scope close is detected.
    */
-  REFERENCE_WAS_OPENED = "REFERENCE_WAS_OPENED",
+  PLUGIN_WAS_CLOSED = "PLUGIN_WAS_CLOSED",
+  /**
+   * Subroutine if a plugin scope is detected.
+   */
+  PLUGIN_WAS_OPENED = "PLUGIN_WAS_OPENED",
   /**
    * Subroutine if a reference closing is detected.
    */
   REFERENCE_WAS_CLOSED = "REFERENCE_WAS_CLOSED",
+  /**
+   * Subroutine if a reference is detected.
+   */
+  REFERENCE_WAS_OPENED = "REFERENCE_WAS_OPENED",
 }
 
 const MAX_STRING_DEPTH = 15;
@@ -163,18 +163,18 @@ export const createParseTree = (
    * The root node of the parse tree to return.
    */
   const rootNode: ParseTreeNode = {
-    type: "children",
     children: [],
     originalString: messageString,
+    type: "children",
   };
   /**
    * A walking child node to process the input string which is per default
    * a text node.
    */
   let currentChildNode: ParseTreeNode = {
-    type: "text",
     content: "",
     originalString: "",
+    type: "text",
   };
   // The following walking variables help to parse the string:
   /**
@@ -361,10 +361,10 @@ export const createParseTree = (
         // Now that all previously recorded content was pushed to the root node
         // we can reset the current child node as a plugin node:
         currentChildNode = {
-          type: "plugin",
-          pluginName: "",
           // Add the begin of the plugin scope open to the string
           originalString: "$(",
+          pluginName: "",
+          type: "plugin",
         };
         break;
       case ParseStateHelper.PLUGIN_VALUE_FOUND:
@@ -428,9 +428,9 @@ export const createParseTree = (
         rootNode.children?.push({ ...currentChildNode });
         // Now prepare the current child node for new text content
         currentChildNode = {
-          type: "text",
           content: "",
           originalString: "",
+          type: "text",
         };
         break;
       case ParseStateHelper.REFERENCE_WAS_OPENED:
@@ -492,9 +492,9 @@ export const createParseTree = (
         // If a reference scope close was detected parse now text
         parseState = ParseState.TEXT;
         currentChildNode = {
-          type: "text",
           content: "",
           originalString: "",
+          type: "text",
         };
         break;
     }
@@ -519,7 +519,7 @@ export const createParseTree = (
   if (parseState !== ParseState.TEXT) {
     throw Error(
       `Message is invalid! Final parse state was "${parseState}" (${JSON.stringify(
-        { rootNode, currentChildNode }
+        { currentChildNode, rootNode }
       )})`
     );
   }
@@ -559,16 +559,16 @@ export const createParseTree = (
 };
 
 export interface RequestHelp {
-  type: "help";
-  plugins?: boolean;
   macros?: boolean;
+  plugins?: boolean;
+  type: "help";
 }
 export interface PluginSignature {
-  type: "signature";
   argument?: string | string[];
-  scope?: string;
-  exportsMacro?: boolean;
   exportedMacroKeys?: string[];
+  exportsMacro?: boolean;
+  scope?: string;
+  type: "signature";
 }
 
 // A plugin can have a scope in which special plugins can be defined
@@ -822,9 +822,13 @@ export const parseTreeNode = async (
         }
         if (pluginOutput.plugins && plugins) {
           const stringsPlugins: string[] = [];
-          for (const plugin of plugins.entries()) {
+          for (const pluginForSignature of plugins.entries()) {
             stringsPlugins.push(
-              await createPluginSignatureString(logger, plugin[0], plugin[1])
+              await createPluginSignatureString(
+                logger,
+                pluginForSignature[0],
+                pluginForSignature[1]
+              )
             );
           }
           if (helpOutput.length > 0) {
@@ -922,10 +926,7 @@ export const generatePluginsAndMacrosMap = (
   for (const macro of macros) {
     macrosMap.set(macro.id, macro.values);
   }
-  return {
-    pluginsMap,
-    macrosMap,
-  };
+  return { macrosMap, pluginsMap };
 };
 
 export const generatePluginAndMacroDocumentation = async (
@@ -941,22 +942,22 @@ export const generatePluginAndMacroDocumentation = async (
   const macrosMap = maps.macrosMap;
   const output: FileDocumentationParts[] = [];
   output.push({
-    type: FileDocumentationPartType.HEADING,
     title: "Supported Plugins",
+    type: FileDocumentationPartType.HEADING,
   });
   if (plugins.length === 0) {
     output.push({
-      type: FileDocumentationPartType.TEXT,
       content: "None",
+      type: FileDocumentationPartType.TEXT,
     });
   }
   const pluginEntries: FileDocumentationPartValue[] = [];
   for (const plugin of plugins) {
     const pluginEntry: FileDocumentationPartValue = {
-      type: FileDocumentationPartType.VALUE,
-      prefix: ">",
       description: plugin.description,
+      prefix: ">",
       title: await createPluginSignatureString(logger, plugin.id, plugin.func),
+      type: FileDocumentationPartType.VALUE,
     };
     if (plugin.examples && plugin.examples.length > 0) {
       pluginEntry.lists = [];
@@ -995,27 +996,24 @@ export const generatePluginAndMacroDocumentation = async (
   output.push(
     ...pluginEntries.sort((a, b) => genericStringSorter(a.title, b.title))
   );
+  output.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   output.push({
-    type: FileDocumentationPartType.NEWLINE,
-    count: 1,
-  });
-  output.push({
-    type: FileDocumentationPartType.HEADING,
     title: "Supported Macros",
+    type: FileDocumentationPartType.HEADING,
   });
   if (macros.length === 0) {
     output.push({
-      type: FileDocumentationPartType.TEXT,
       content: "None",
+      type: FileDocumentationPartType.TEXT,
     });
   }
   const macroEntries: FileDocumentationPartValue[] = [];
   for (const macro of macros) {
     const macroEntry: FileDocumentationPartValue = {
-      type: FileDocumentationPartType.VALUE,
-      prefix: ">",
       description: macro.description,
+      prefix: ">",
       title: `%${macro.id}:KEY%`,
+      type: FileDocumentationPartType.VALUE,
     };
     macroEntry.lists = [];
     const macroListKeys = [];
@@ -1038,26 +1036,23 @@ export const generatePluginAndMacroDocumentation = async (
   );
 
   if (optionalPlugins !== undefined && optionalPlugins.length > 0) {
+    output.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
     output.push({
-      type: FileDocumentationPartType.NEWLINE,
-      count: 1,
-    });
-    output.push({
-      type: FileDocumentationPartType.HEADING,
       title: "Other Plugins (not generally available in all strings)",
+      type: FileDocumentationPartType.HEADING,
     });
     const optionalPluginEntries: FileDocumentationPartValue[] = [];
     for (const plugin of optionalPlugins) {
       const pluginEntry: FileDocumentationPartValue = {
-        type: FileDocumentationPartType.VALUE,
-        prefix: ">",
         description: plugin.description,
+        prefix: ">",
         title: await createPluginSignatureString(
           logger,
           plugin.id,
           undefined,
           plugin.signature
         ),
+        type: FileDocumentationPartType.VALUE,
       };
       if (plugin.examples && plugin.examples.length > 0) {
         pluginEntry.lists = [];
@@ -1101,21 +1096,18 @@ export const generatePluginAndMacroDocumentation = async (
   }
 
   if (optionalMacros !== undefined && optionalMacros.length > 0) {
+    output.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
     output.push({
-      type: FileDocumentationPartType.NEWLINE,
-      count: 1,
-    });
-    output.push({
-      type: FileDocumentationPartType.HEADING,
       title: "Other Macros (not generally available in all strings)",
+      type: FileDocumentationPartType.HEADING,
     });
     const optionalMacroEntries: FileDocumentationPartValue[] = [];
     for (const optionalMacro of optionalMacros) {
       const macroEntry: FileDocumentationPartValue = {
-        type: FileDocumentationPartType.VALUE,
-        prefix: ">",
         description: optionalMacro.description,
+        prefix: ">",
         title: `%${optionalMacro.id}:KEY%`,
+        type: FileDocumentationPartType.VALUE,
       };
       macroEntry.lists = [];
       const macroListKeys = [];
@@ -1147,16 +1139,16 @@ export type MessageForMessageElements =
 
 export interface MessageForMessageElementPlugin
   extends MessageForMessageElement {
-  name: string;
   args?: MessageForMessageElements[] | MessageForMessageElements;
+  name: string;
   scope?: MessageForMessageElements[] | MessageForMessageElements;
   type: "plugin";
 }
 
 export interface MessageForMessageElementMacro
   extends MessageForMessageElement {
-  name: string;
   key: string;
+  name: string;
   type: "macro";
 }
 

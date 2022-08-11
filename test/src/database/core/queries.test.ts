@@ -195,9 +195,9 @@ export default (): Mocha.Suite => {
             thisColumn: "id",
           },
         ],
-        whereColumn: { columnName: "id", tableName: "test" },
         limit: 10,
         offset: 2,
+        whereColumn: { columnName: "id", tableName: "test" },
       });
       chai.expect(querySelect5).to.be.a("string");
       chai.expect(querySelect5.length).to.be.above(0, "Query not empty");

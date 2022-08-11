@@ -28,517 +28,517 @@ import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 export const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
 
 export const osuBeatmapRequestRefTopScoreShort = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE_SHORT`,
   default: createMessageForMessageParser(
     [
-      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.RANK },
+      { key: MacroOsuScore.RANK, name: pluginOsuScoreId, type: "macro" },
       {
-        type: "plugin",
-        name: pluginIfNotEmpty.id,
         args: {
-          type: "macro",
-          name: pluginOsuScoreId,
           key: MacroOsuScore.MODS,
+          name: pluginOsuScoreId,
+          type: "macro",
         },
+        name: pluginIfNotEmpty.id,
         scope: [
           " using ",
-          { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.MODS },
+          { key: MacroOsuScore.MODS, name: pluginOsuScoreId, type: "macro" },
         ],
+        type: "plugin",
       },
     ],
     true
   ),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE_SHORT`,
 };
 
 export const osuBeatmapRequestRefTopScore = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE`,
   default: createMessageForMessageParser(
     [
-      { type: "reference", name: osuBeatmapRequestRefTopScoreShort.id },
+      { name: osuBeatmapRequestRefTopScoreShort.id, type: "reference" },
       {
-        type: "plugin",
+        args: { key: MacroOsuScore.PP, name: pluginOsuScoreId, type: "macro" },
         name: pluginIfNotUndefined.id,
-        args: { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.PP },
         scope: [
           " with ",
-          { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.PP },
+          { key: MacroOsuScore.PP, name: pluginOsuScoreId, type: "macro" },
           "pp",
         ],
+        type: "plugin",
       },
       " (",
-      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.COUNT_300 },
+      { key: MacroOsuScore.COUNT_300, name: pluginOsuScoreId, type: "macro" },
       "/",
-      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.COUNT_100 },
+      { key: MacroOsuScore.COUNT_100, name: pluginOsuScoreId, type: "macro" },
       "/",
-      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.COUNT_50 },
+      { key: MacroOsuScore.COUNT_50, name: pluginOsuScoreId, type: "macro" },
       "/",
-      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.COUNT_MISS },
+      { key: MacroOsuScore.COUNT_MISS, name: pluginOsuScoreId, type: "macro" },
       ") [mc=",
-      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.MAX_COMBO },
+      { key: MacroOsuScore.MAX_COMBO, name: pluginOsuScoreId, type: "macro" },
       ", acc=",
-      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.ACC },
+      { key: MacroOsuScore.ACC, name: pluginOsuScoreId, type: "macro" },
       "%] from ",
-      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.DATE_MONTH },
+      { key: MacroOsuScore.DATE_MONTH, name: pluginOsuScoreId, type: "macro" },
       " ",
-      { type: "macro", name: pluginOsuScoreId, key: MacroOsuScore.DATE_YEAR },
+      { key: MacroOsuScore.DATE_YEAR, name: pluginOsuScoreId, type: "macro" },
       " ",
       {
-        type: "plugin",
-        name: pluginIfTrue.id,
         args: {
-          type: "macro",
-          name: pluginOsuScoreId,
           key: MacroOsuScore.HAS_REPLAY,
+          name: pluginOsuScoreId,
+          type: "macro",
         },
+        name: pluginIfTrue.id,
         scope: " (replay available)",
+        type: "plugin",
       },
     ],
     true
   ),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE`,
 };
 
 export const osuBeatmapRequest = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}`,
   default: createMessageForMessageParser([
-    { type: "plugin", name: PluginTwitchChat.USER },
+    { name: PluginTwitchChat.USER, type: "plugin" },
     " requested ",
-    { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.TITLE },
+    { key: MacroOsuBeatmap.TITLE, name: pluginOsuBeatmapId, type: "macro" },
     " '",
-    { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.VERSION },
+    { key: MacroOsuBeatmap.VERSION, name: pluginOsuBeatmapId, type: "macro" },
     "' by '",
-    { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.ARTIST },
+    { key: MacroOsuBeatmap.ARTIST, name: pluginOsuBeatmapId, type: "macro" },
     "'",
     {
-      type: "plugin",
-      name: pluginOsuScoreId,
       args: [
         {
-          type: "macro",
-          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.ID,
+          name: macroOsuBeatmapRequest.id,
+          type: "macro",
         },
         " ",
         {
-          type: "macro",
-          name: macroOsuApi.id,
           key: MacroOsuApi.DEFAULT_USER_ID,
+          name: macroOsuApi.id,
+          type: "macro",
         },
       ],
+      name: pluginOsuScoreId,
       scope: [
         " - ",
         {
-          type: "plugin",
-          name: pluginIfTrue.id,
           args: {
-            type: "macro",
-            name: pluginOsuScoreId,
             key: MacroOsuScore.EXISTS,
+            name: pluginOsuScoreId,
+            type: "macro",
           },
+          name: pluginIfTrue.id,
           scope: [
             "Current top score is a ",
-            { type: "reference", name: osuBeatmapRequestRefTopScoreShort.id },
+            { name: osuBeatmapRequestRefTopScoreShort.id, type: "reference" },
           ],
+          type: "plugin",
         },
         {
-          type: "plugin",
-          name: pluginIfFalse.id,
           args: {
-            type: "macro",
-            name: pluginOsuScoreId,
             key: MacroOsuScore.EXISTS,
+            name: pluginOsuScoreId,
+            type: "macro",
           },
+          name: pluginIfFalse.id,
           scope: "No score found",
+          type: "plugin",
         },
       ],
+      type: "plugin",
     },
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}`,
 };
 
 export const osuBeatmapRequestRefDetailedStats = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_DETAILED_STATS`,
   default: createMessageForMessageParser(
     [
       "FC=",
       {
-        type: "macro",
-        name: pluginOsuBeatmapId,
         key: MacroOsuBeatmap.MAX_COMBO,
+        name: pluginOsuBeatmapId,
+        type: "macro",
       },
       ", CS=",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.CS },
+      { key: MacroOsuBeatmap.CS, name: pluginOsuBeatmapId, type: "macro" },
       ", DRAIN=",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.DRAIN },
+      { key: MacroOsuBeatmap.DRAIN, name: pluginOsuBeatmapId, type: "macro" },
       ", ACC=",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.ACC },
+      { key: MacroOsuBeatmap.ACC, name: pluginOsuBeatmapId, type: "macro" },
       ", AR=",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.AR },
+      { key: MacroOsuBeatmap.AR, name: pluginOsuBeatmapId, type: "macro" },
       ", BPM=",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.BPM },
+      { key: MacroOsuBeatmap.BPM, name: pluginOsuBeatmapId, type: "macro" },
       ", CC=",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.CC },
+      { key: MacroOsuBeatmap.CC, name: pluginOsuBeatmapId, type: "macro" },
       ", SLC=",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.SLC },
+      { key: MacroOsuBeatmap.SLC, name: pluginOsuBeatmapId, type: "macro" },
       ", SPC=",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.SPC },
+      { key: MacroOsuBeatmap.SPC, name: pluginOsuBeatmapId, type: "macro" },
       ", PLAYS=",
       {
-        type: "plugin",
-        name: pluginConvertToShortNumber.id,
         args: {
-          type: "macro",
-          name: pluginOsuBeatmapId,
           key: MacroOsuBeatmap.PLAY_COUNT,
+          name: pluginOsuBeatmapId,
+          type: "macro",
         },
+        name: pluginConvertToShortNumber.id,
+        type: "plugin",
       },
     ],
     true
   ),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_DETAILED_STATS`,
 };
 
 export const osuBeatmapRequestDetailed = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_DETAILED`,
   default: createMessageForMessageParser([
-    { type: "plugin", name: PluginTwitchChat.USER },
+    { name: PluginTwitchChat.USER, type: "plugin" },
     " requested ",
     {
-      type: "macro",
-      name: pluginOsuBeatmapId,
       key: MacroOsuBeatmap.TITLE,
+      name: pluginOsuBeatmapId,
+      type: "macro",
     },
     " '",
     {
-      type: "macro",
-      name: pluginOsuBeatmapId,
       key: MacroOsuBeatmap.VERSION,
+      name: pluginOsuBeatmapId,
+      type: "macro",
     },
     "' by '",
     {
-      type: "macro",
-      name: pluginOsuBeatmapId,
       key: MacroOsuBeatmap.ARTIST,
+      name: pluginOsuBeatmapId,
+      type: "macro",
     },
     "' [",
     {
-      type: "macro",
-      name: pluginOsuBeatmapId,
       key: MacroOsuBeatmap.DIFFICULTY_RATING,
+      name: pluginOsuBeatmapId,
+      type: "macro",
     },
     "* ",
     {
-      type: "plugin",
-      name: pluginTimeInSToStopwatchString.id,
       args: {
-        type: "macro",
-        name: pluginOsuBeatmapId,
         key: MacroOsuBeatmap.LENGTH_IN_S,
+        name: pluginOsuBeatmapId,
+        type: "macro",
       },
+      name: pluginTimeInSToStopwatchString.id,
+      type: "plugin",
     },
     " ",
     {
-      type: "macro",
-      name: pluginOsuBeatmapId,
       key: MacroOsuBeatmap.RANKED_STATUS,
+      name: pluginOsuBeatmapId,
+      type: "macro",
     },
     "] from ",
     {
-      type: "macro",
-      name: pluginOsuBeatmapId,
       key: MacroOsuBeatmap.LAST_UPDATED_MONTH,
+      name: pluginOsuBeatmapId,
+      type: "macro",
     },
     " ",
     {
-      type: "macro",
-      name: pluginOsuBeatmapId,
       key: MacroOsuBeatmap.LAST_UPDATED_YEAR,
+      name: pluginOsuBeatmapId,
+      type: "macro",
     },
     " {",
     {
-      type: "reference",
       name: osuBeatmapRequestRefDetailedStats.id,
+      type: "reference",
     },
     "}",
     {
-      type: "plugin",
-      name: pluginOsuScoreId,
       args: [
         {
-          type: "macro",
-          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.ID,
+          name: macroOsuBeatmapRequest.id,
+          type: "macro",
         },
         " ",
         {
-          type: "macro",
-          name: macroOsuApi.id,
           key: MacroOsuApi.DEFAULT_USER_ID,
+          name: macroOsuApi.id,
+          type: "macro",
         },
       ],
+      name: pluginOsuScoreId,
       scope: [
         {
-          type: "plugin",
-          name: pluginIfTrue.id,
           args: {
-            type: "macro",
-            name: pluginOsuScoreId,
             key: MacroOsuScore.EXISTS,
+            name: pluginOsuScoreId,
+            type: "macro",
           },
+          name: pluginIfTrue.id,
           scope: [
             " - Current top score is a ",
-            { type: "reference", name: osuBeatmapRequestRefTopScore.id },
+            { name: osuBeatmapRequestRefTopScore.id, type: "reference" },
           ],
+          type: "plugin",
         },
         {
-          type: "plugin",
-          name: pluginIfFalse.id,
           args: {
-            type: "macro",
-            name: pluginOsuScoreId,
             key: MacroOsuScore.EXISTS,
+            name: pluginOsuScoreId,
+            type: "macro",
           },
+          name: pluginIfFalse.id,
           scope: " - No score found",
+          type: "plugin",
         },
       ],
+      type: "plugin",
     },
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_DETAILED`,
 };
 
 export const osuBeatmapRequestNotFound = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NOT_FOUND`,
   default: createMessageForMessageParser([
     "osu! beatmap was not found :( (ID='",
     {
-      type: "macro",
-      name: macroOsuBeatmapRequest.id,
       key: MacroOsuBeatmapRequest.ID,
+      name: macroOsuBeatmapRequest.id,
+      type: "macro",
     },
     "')",
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NOT_FOUND`,
 };
 
 export const osuBeatmapRequestRefIrcRequestString = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_REF_REQUEST_STRING`,
   default: createMessageForMessageParser(
     [
-      { type: "plugin", name: PluginTwitchChat.USER },
+      { name: PluginTwitchChat.USER, type: "plugin" },
       " requested ",
       "[https://osu.ppy.sh/beatmapsets/",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.SET_ID },
+      { key: MacroOsuBeatmap.SET_ID, name: pluginOsuBeatmapId, type: "macro" },
       "#osu/",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.ID },
+      { key: MacroOsuBeatmap.ID, name: pluginOsuBeatmapId, type: "macro" },
       " ",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.TITLE },
+      { key: MacroOsuBeatmap.TITLE, name: pluginOsuBeatmapId, type: "macro" },
       " '",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.VERSION },
+      { key: MacroOsuBeatmap.VERSION, name: pluginOsuBeatmapId, type: "macro" },
       "' by '",
-      { type: "macro", name: pluginOsuBeatmapId, key: MacroOsuBeatmap.ARTIST },
+      { key: MacroOsuBeatmap.ARTIST, name: pluginOsuBeatmapId, type: "macro" },
       "']",
     ],
     true
   ),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_REF_REQUEST_STRING`,
 };
 
 export const osuBeatmapRequestIrc = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC`,
   default: createMessageForMessageParser([
-    { type: "reference", name: osuBeatmapRequestRefIrcRequestString.id },
+    { name: osuBeatmapRequestRefIrcRequestString.id, type: "reference" },
     {
-      type: "plugin",
-      name: pluginOsuScoreId,
       args: [
         {
-          type: "macro",
-          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.ID,
+          name: macroOsuBeatmapRequest.id,
+          type: "macro",
         },
         " ",
         {
-          type: "macro",
-          name: macroOsuApi.id,
           key: MacroOsuApi.DEFAULT_USER_ID,
+          name: macroOsuApi.id,
+          type: "macro",
         },
       ],
+      name: pluginOsuScoreId,
       scope: [
         {
-          type: "plugin",
-          name: pluginIfEqual.id,
           args: [
             {
-              type: "macro",
-              name: pluginOsuScoreId,
               key: MacroOsuScore.EXISTS,
+              name: pluginOsuScoreId,
+              type: "macro",
             },
             "===true",
           ],
+          name: pluginIfEqual.id,
           scope: [
             `${OSU_IRC_NEWLINE} > Top score: `,
-            { type: "reference", name: osuBeatmapRequestRefTopScoreShort.id },
+            { name: osuBeatmapRequestRefTopScoreShort.id, type: "reference" },
           ],
+          type: "plugin",
         },
         {
-          type: "plugin",
-          name: pluginIfNotEmpty.id,
           args: {
-            type: "macro",
-            name: macroOsuBeatmapRequest.id,
             key: MacroOsuBeatmapRequest.COMMENT,
+            name: macroOsuBeatmapRequest.id,
+            type: "macro",
           },
+          name: pluginIfNotEmpty.id,
           scope: [
             `${OSU_IRC_NEWLINE} > Comment: `,
             {
-              type: "macro",
-              name: macroOsuBeatmapRequest.id,
               key: MacroOsuBeatmapRequest.COMMENT,
+              name: macroOsuBeatmapRequest.id,
+              type: "macro",
             },
           ],
+          type: "plugin",
         },
       ],
+      type: "plugin",
     },
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC`,
 };
 
 export const osuBeatmapRequestIrcDetailed = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_DETAILED`,
   default: createMessageForMessageParser([
-    { type: "reference", name: osuBeatmapRequestRefIrcRequestString.id },
+    { name: osuBeatmapRequestRefIrcRequestString.id, type: "reference" },
     `${OSU_IRC_NEWLINE}from `,
     {
-      type: "macro",
-      name: pluginOsuBeatmapId,
       key: MacroOsuBeatmap.LAST_UPDATED_MONTH,
+      name: pluginOsuBeatmapId,
+      type: "macro",
     },
     " ",
     {
-      type: "macro",
-      name: pluginOsuBeatmapId,
       key: MacroOsuBeatmap.LAST_UPDATED_YEAR,
+      name: pluginOsuBeatmapId,
+      type: "macro",
     },
     " {",
-    { type: "reference", name: osuBeatmapRequestRefDetailedStats.id },
+    { name: osuBeatmapRequestRefDetailedStats.id, type: "reference" },
     "}",
     {
-      type: "plugin",
-      name: pluginOsuScoreId,
       args: [
         {
-          type: "macro",
-          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.ID,
+          name: macroOsuBeatmapRequest.id,
+          type: "macro",
         },
         " ",
         {
-          type: "macro",
-          name: macroOsuApi.id,
           key: MacroOsuApi.DEFAULT_USER_ID,
+          name: macroOsuApi.id,
+          type: "macro",
         },
       ],
+      name: pluginOsuScoreId,
       scope: {
-        type: "plugin",
-        name: pluginIfTrue.id,
         args: {
-          type: "macro",
-          name: pluginOsuScoreId,
           key: MacroOsuScore.EXISTS,
+          name: pluginOsuScoreId,
+          type: "macro",
         },
+        name: pluginIfTrue.id,
         scope: [
           `${OSU_IRC_NEWLINE} > Top score: `,
-          { type: "reference", name: osuBeatmapRequestRefTopScore.id },
+          { name: osuBeatmapRequestRefTopScore.id, type: "reference" },
         ],
+        type: "plugin",
       },
+      type: "plugin",
     },
     {
-      type: "plugin",
-      name: pluginIfNotEmpty.id,
       args: {
-        type: "macro",
-        name: macroOsuBeatmapRequest.id,
         key: MacroOsuBeatmapRequest.COMMENT,
+        name: macroOsuBeatmapRequest.id,
+        type: "macro",
       },
+      name: pluginIfNotEmpty.id,
       scope: [
         `${OSU_IRC_NEWLINE} > Comment: `,
         {
-          type: "macro",
-          name: macroOsuBeatmapRequest.id,
           key: MacroOsuBeatmapRequest.COMMENT,
+          name: macroOsuBeatmapRequest.id,
+          type: "macro",
         },
       ],
+      type: "plugin",
     },
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_DETAILED`,
 };
 
 export const osuBeatmapRequestPermissionError = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_PERMISSION_ERROR`,
   default: createMessageForMessageParser([
     "You are not a broadcaster and thus are not allowed to use this command!",
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_PERMISSION_ERROR`,
 };
 
 export const osuBeatmapRequestTurnedOff = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_OFF`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginTwitchChat.USER },
+    { name: PluginTwitchChat.USER, type: "plugin" },
     " Beatmap requests: Off",
     {
-      type: "plugin",
-      name: pluginIfNotEmpty.id,
       args: {
-        type: "macro",
-        name: macroOsuBeatmapRequests.id,
         key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+        name: macroOsuBeatmapRequests.id,
+        type: "macro",
       },
+      name: pluginIfNotEmpty.id,
       scope: [
         " (",
         {
-          type: "macro",
-          name: macroOsuBeatmapRequests.id,
           key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+          name: macroOsuBeatmapRequests.id,
+          type: "macro",
         },
         ")",
       ],
+      type: "plugin",
     },
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_OFF`,
 };
 export const osuBeatmapRequestTurnedOn = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_ON`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginTwitchChat.USER },
+    { name: PluginTwitchChat.USER, type: "plugin" },
     " Beatmap requests: On",
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_ON`,
 };
 export const osuBeatmapRequestCurrentlyOff = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_OFF`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginTwitchChat.USER },
+    { name: PluginTwitchChat.USER, type: "plugin" },
     " Beatmap requests are currently off",
     {
-      type: "plugin",
-      name: pluginIfNotEmpty.id,
       args: {
-        type: "macro",
-        name: macroOsuBeatmapRequests.id,
         key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+        name: macroOsuBeatmapRequests.id,
+        type: "macro",
       },
+      name: pluginIfNotEmpty.id,
       scope: [
         " (",
         {
-          type: "macro",
-          name: macroOsuBeatmapRequests.id,
           key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+          name: macroOsuBeatmapRequests.id,
+          type: "macro",
         },
         ")",
       ],
+      type: "plugin",
     },
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_OFF`,
 };
 export const osuBeatmapRequestCurrentlyOn = {
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
   default: createMessageForMessageParser([
     "@",
-    { type: "plugin", name: PluginTwitchChat.USER },
+    { name: PluginTwitchChat.USER, type: "plugin" },
     " Beatmap requests are currently on",
   ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
 };
 
 export const osuBeatmapRequests = [

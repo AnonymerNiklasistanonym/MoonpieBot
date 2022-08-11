@@ -19,8 +19,8 @@ export interface OsuApiV2Credentials {
 }
 
 export interface BeatmapRequestsInfo {
-  beatmapRequestsOn: boolean;
   beatmapRequestsOffMessage?: string;
+  beatmapRequestsOn: boolean;
   lastBeatmapId?: number;
 }
 

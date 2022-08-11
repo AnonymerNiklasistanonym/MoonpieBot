@@ -23,22 +23,6 @@ export const regexMoonpieAbout = /^\s*!moonpie\s+about(?:\s|$)/i;
  * About command: Send the name, version and source code link of the bot.
  */
 export const commandAbout: TwitchChatCommandHandler = {
-  info: {
-    id: MoonpieCommands.ABOUT,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!message.match(regexMoonpieAbout)) {
-      return false;
-    }
-    if (!enabledCommands.includes(MoonpieCommands.ABOUT)) {
-      return false;
-    }
-    return { data: {} };
-  },
   createReply: async (
     client,
     channel,
@@ -58,5 +42,21 @@ export const commandAbout: TwitchChatCommandHandler = {
     );
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!message.match(regexMoonpieAbout)) {
+      return false;
+    }
+    if (!enabledCommands.includes(MoonpieCommands.ABOUT)) {
+      return false;
+    }
+    return { data: {} };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    id: MoonpieCommands.ABOUT,
   },
 };

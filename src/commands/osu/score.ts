@@ -67,30 +67,6 @@ export const commandScore: TwitchChatCommandHandler<
   CommandHandlerScoreData,
   CommandDetectorScoreData
 > = {
-  info: {
-    id: OsuCommands.SCORE,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!message.match(regexScore)) {
-      return false;
-    }
-    if (!enabledCommands.includes(OsuCommands.SCORE)) {
-      return false;
-    }
-    const match = regexScore.exec(message);
-    if (!match) {
-      return false;
-    }
-    return {
-      data: {
-        osuUserName: match[1],
-      },
-    };
-  },
   createReply: async (
     client,
     channel,
@@ -182,5 +158,29 @@ export const commandScore: TwitchChatCommandHandler<
 
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!message.match(regexScore)) {
+      return false;
+    }
+    if (!enabledCommands.includes(OsuCommands.SCORE)) {
+      return false;
+    }
+    const match = regexScore.exec(message);
+    if (!match) {
+      return false;
+    }
+    return {
+      data: {
+        osuUserName: match[1],
+      },
+    };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
+    id: OsuCommands.SCORE,
   },
 };

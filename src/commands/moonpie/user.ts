@@ -104,23 +104,6 @@ export const commandGet: TwitchChatCommandHandler<
   CommandGenericDataMoonpieDbPath,
   CommandDetectorGetData
 > = {
-  info: {
-    id: MoonpieCommands.GET,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!enabledCommands.includes(MoonpieCommands.GET)) {
-      return false;
-    }
-    const match = message.match(regexMoonpieGet);
-    if (!match) {
-      return false;
-    }
-    return { data: { userNameMoonpieDb: match[1] } };
-  },
   createReply: async (
     client,
     channel,
@@ -195,12 +178,29 @@ export const commandGet: TwitchChatCommandHandler<
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!enabledCommands.includes(MoonpieCommands.GET)) {
+      return false;
+    }
+    const match = message.match(regexMoonpieGet);
+    if (!match) {
+      return false;
+    }
+    return { data: { userNameMoonpieDb: match[1] } };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    id: MoonpieCommands.GET,
+  },
 };
 
 interface CommandDetectorSetData {
-  userNameMoonpieDb: string;
   operation: "+" | "-" | "=";
   setCount: number;
+  userNameMoonpieDb: string;
 }
 
 /**
@@ -210,46 +210,6 @@ export const commandSet: TwitchChatCommandHandler<
   CommandGenericDataMoonpieDbPath,
   CommandDetectorSetData
 > = {
-  info: {
-    id: MoonpieCommands.SET,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    const matchSet = message.match(regexMoonpieSet);
-    if (matchSet && enabledCommands.includes(MoonpieCommands.SET)) {
-      return {
-        data: {
-          operation: "=",
-          userNameMoonpieDb: matchSet[1],
-          setCount: parseInt(matchSet[2]),
-        },
-      };
-    }
-    const matchAdd = message.match(regexMoonpieAdd);
-    if (matchAdd && enabledCommands.includes(MoonpieCommands.ADD)) {
-      return {
-        data: {
-          operation: "+",
-          userNameMoonpieDb: matchAdd[1],
-          setCount: parseInt(matchAdd[2]),
-        },
-      };
-    }
-    const matchRemove = message.match(regexMoonpieRemove);
-    if (matchRemove && enabledCommands.includes(MoonpieCommands.REMOVE)) {
-      return {
-        data: {
-          operation: "-",
-          userNameMoonpieDb: matchRemove[1],
-          setCount: parseInt(matchRemove[2]),
-        },
-      };
-    }
-    return false;
-  },
   createReply: async (
     client,
     channel,
@@ -338,9 +298,9 @@ export const commandSet: TwitchChatCommandHandler<
     await moonpieDb.update(
       data.moonpieDbPath,
       {
+        count: newCount,
         id: moonpieEntry.id,
         name: moonpieEntry.name,
-        count: newCount,
         timestamp: moonpieEntry.timestamp,
       },
       logger
@@ -374,6 +334,46 @@ export const commandSet: TwitchChatCommandHandler<
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    const matchSet = message.match(regexMoonpieSet);
+    if (matchSet && enabledCommands.includes(MoonpieCommands.SET)) {
+      return {
+        data: {
+          operation: "=",
+          setCount: parseInt(matchSet[2]),
+          userNameMoonpieDb: matchSet[1],
+        },
+      };
+    }
+    const matchAdd = message.match(regexMoonpieAdd);
+    if (matchAdd && enabledCommands.includes(MoonpieCommands.ADD)) {
+      return {
+        data: {
+          operation: "+",
+          setCount: parseInt(matchAdd[2]),
+          userNameMoonpieDb: matchAdd[1],
+        },
+      };
+    }
+    const matchRemove = message.match(regexMoonpieRemove);
+    if (matchRemove && enabledCommands.includes(MoonpieCommands.REMOVE)) {
+      return {
+        data: {
+          operation: "-",
+          setCount: parseInt(matchRemove[2]),
+          userNameMoonpieDb: matchRemove[1],
+        },
+      };
+    }
+    return false;
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    id: MoonpieCommands.SET,
+  },
 };
 
 interface CommandDetectorDeleteData {
@@ -387,23 +387,6 @@ export const commandDelete: TwitchChatCommandHandler<
   CommandGenericDataMoonpieDbPath,
   CommandDetectorDeleteData
 > = {
-  info: {
-    id: MoonpieCommands.ABOUT,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!enabledCommands.includes(MoonpieCommands.DELETE)) {
-      return false;
-    }
-    const match = message.match(regexMoonpieDelete);
-    if (!match) {
-      return false;
-    }
-    return { data: { userNameMoonpieDb: match[1] } };
-  },
   createReply: async (
     client,
     channel,
@@ -471,5 +454,22 @@ export const commandDelete: TwitchChatCommandHandler<
     );
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!enabledCommands.includes(MoonpieCommands.DELETE)) {
+      return false;
+    }
+    const match = message.match(regexMoonpieDelete);
+    if (!match) {
+      return false;
+    }
+    return { data: { userNameMoonpieDb: match[1] } };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
+    id: MoonpieCommands.ABOUT,
   },
 };

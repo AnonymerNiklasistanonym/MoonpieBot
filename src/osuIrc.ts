@@ -17,17 +17,11 @@ export const OSU_IRC_NEWLINE = "%NEWLINE%";
 
 export interface IrcMessage {
   /**
-   * IRC message prefix.
+   * The arguments which means the *to* and the *message*.
    *
-   * @example cho.ppy.sh
+   * @example ["osuId","Bad authentication token."]
    */
-  prefix: string;
-  /**
-   * IRC server URL.
-   *
-   * @example cho.ppy.sh
-   */
-  server: string;
+  args: [string, string];
   /**
    * The command/reason of a message.
    *
@@ -35,26 +29,30 @@ export interface IrcMessage {
    */
   command: string;
   /**
-   * The integer value of the command.
-   *
-   * @example 464
-   */
-  rawCommand: string;
-  /**
    * The type of the command.
    *
    * @example error
    */
   commandType: string;
   /**
-   * The arguments which means the *to* and the *message*.
+   * IRC message prefix.
    *
-   * @example ["osuId","Bad authentication token."]
+   * @example cho.ppy.sh
    */
-  args: [string, string];
+  prefix: string;
+  /**
+   * The integer value of the command.
+   *
+   * @example 464
+   */
+  rawCommand: string;
+  /**
+   * IRC server URL.
+   *
+   * @example cho.ppy.sh
+   */
+  server: string;
 }
-
-export type OsuIrcBotSendMessageFunc = (id: string) => irc.Client;
 
 /**
  * Establish a osu irc connection which can then be used to send messages.
@@ -81,12 +79,12 @@ export const createOsuIrcConnection = (
     `Trying to connect to ${OSU_IRC_URL}:${OSU_IRC_PORT} as ${osuIrcUsername} (creationDate=${creationDate})`
   );
   const osuIrcBotInstance = new irc.Client(OSU_IRC_URL, osuIrcUsername, {
+    autoConnect: false,
     channels: [
       /*"#osu"*/
     ],
     password: osuIrcPassword,
     port: OSU_IRC_PORT,
-    autoConnect: false,
   });
   osuIrcBotInstance.addListener(
     "message",
@@ -97,7 +95,7 @@ export const createOsuIrcConnection = (
         `${id}:message_listener`
       );
       logOsuIrcMsgListener.debug(
-        JSON.stringify({ creationDate, from, to, text, message })
+        JSON.stringify({ creationDate, from, message, text, to })
       );
     }
   );
@@ -110,7 +108,7 @@ export const createOsuIrcConnection = (
         `${id}:pm_listener`
       );
       logOsuIrcPmListener.debug(
-        JSON.stringify({ creationDate, from, text, message })
+        JSON.stringify({ creationDate, from, message, text })
       );
     }
   );
@@ -147,7 +145,7 @@ export const createOsuIrcConnection = (
     logOsuIrcSelfMsgListener.info(
       `osu! IRC message was sent to '${to}': '${text}'`
     );
-    logOsuIrcSelfMsgListener.debug(JSON.stringify({ creationDate, to, text }));
+    logOsuIrcSelfMsgListener.debug(JSON.stringify({ creationDate, text, to }));
   });
   return osuIrcBotInstance;
 };
@@ -183,10 +181,10 @@ export const tryToSendOsuIrcMessage = async (
         });
       }
     );
-    osuIrcBotInstance?.on("error", (message: IrcMessage) => {
-      logOsuIrc.info(`osu! IRC error: ${JSON.stringify(message)}`);
-      if (message.command === "err_passwdmismatch") {
-        reject(Error(`osu!IRC password missmatch: ${message.args.join(",")}`));
+    osuIrcBotInstance?.on("error", (ircMessage: IrcMessage) => {
+      logOsuIrc.info(`osu! IRC error: ${JSON.stringify(ircMessage)}`);
+      if (ircMessage.command === "err_passwdmismatch") {
+        reject(Error(`osu! IRC password wrong: ${ircMessage.args.join(",")}`));
       }
     });
   }).catch(async (err) => {

@@ -68,23 +68,23 @@ export const createAndSetupTables = async (
       moonpie.table.name,
       [
         {
+          alias: moonpie.viewLeaderboard.column.twitchId,
           columnName: moonpie.table.column.twitchId,
           tableName: moonpie.table.name,
-          alias: moonpie.viewLeaderboard.column.twitchId,
         },
         {
+          alias: moonpie.viewLeaderboard.column.twitchName,
           columnName: moonpie.table.column.twitchName,
           tableName: moonpie.table.name,
-          alias: moonpie.viewLeaderboard.column.twitchName,
         },
         {
+          alias: moonpie.viewLeaderboard.column.moonpieCount,
           columnName: moonpie.table.column.moonpieCount,
           tableName: moonpie.table.name,
-          alias: moonpie.viewLeaderboard.column.moonpieCount,
         },
         {
-          columnName: `ROW_NUMBER () OVER (ORDER BY ${moonpie.table.name}.${moonpie.table.column.moonpieCount} DESC, ${moonpie.table.name}.${moonpie.table.column.date} ASC, ${moonpie.table.name}.${moonpie.table.column.twitchName} ASC)`,
           alias: moonpie.viewLeaderboard.column.rank,
+          columnName: `ROW_NUMBER () OVER (ORDER BY ${moonpie.table.name}.${moonpie.table.column.moonpieCount} DESC, ${moonpie.table.name}.${moonpie.table.column.date} ASC, ${moonpie.table.name}.${moonpie.table.column.twitchName} ASC)`,
         },
       ],
       {
@@ -139,9 +139,9 @@ export const setupInitialData = async (
     await moonpie.update(
       databasePath,
       {
+        count: 727,
         id: "533005638",
         name: "Boss727",
-        count: 727,
         timestamp: new Date().getTime(),
       },
       logger
@@ -157,9 +157,9 @@ export const setupInitialData = async (
     await moonpie.update(
       databasePath,
       {
+        count: 42,
         id: "533005639",
         name: "Boss42",
-        count: 42,
         timestamp: new Date().getTime(),
       },
       logger

@@ -32,11 +32,11 @@ export const printEnvVariablesToConsole = (
     const envVariableValue = getEnvVariableValue(envVariable);
     let legacyString;
 
-    const envVariableInformation = getEnvVariableValueInformation(envVariable);
+    const envVariableInfo = getEnvVariableValueInformation(envVariable);
     let envVariableValueString = "Not found!";
     if (envVariableValue.value) {
       envVariableValueString = `"${envVariableValue.value}"`;
-      if (censor && envVariableInformation.censor) {
+      if (censor && envVariableInfo.censor) {
         // Censor secret variables per default
         envVariableValueString = "*******[secret]********";
       }
@@ -56,26 +56,29 @@ export const printEnvVariablesToConsole = (
           "THE VALUE WAS DERIVED FROM A DEPRECATED NAME!\n" +
           `Please change the name '${legacyEnvVariableName}'\nto '${envVariableName}'`;
       }
-    } else if (envVariableInformation.default) {
-      const defaultStringOrFunc = envVariableInformation.default;
+    } else if (envVariableInfo.default) {
+      const defaultStringOrFunc = envVariableInfo.default;
       envVariableValueString += ` (default="${
         typeof defaultStringOrFunc === "function"
           ? defaultStringOrFunc(configDir)
           : defaultStringOrFunc
       }")`;
-    } else if (envVariableInformation.example) {
-      envVariableValueString += ` (example="${envVariableInformation.example}")`;
+    } else if (envVariableInfo.example) {
+      envVariableValueString += ` (example="${envVariableInfo.example}")`;
     }
 
-    if (envVariableInformation.required) {
+    if (envVariableInfo.required) {
       envVariableValueString += " (REQUIRED!)";
     }
 
+    // eslint-disable-next-line no-console
     console.log(`${envVariableName}=${envVariableValueString}`);
     if (legacyString) {
       const legacyStrings = legacyString.split("\n");
+      // eslint-disable-next-line no-console
       console.log(`\tWARNING: ${legacyStrings[0]}`);
       for (const legacyStringParts of legacyStrings.slice(1)) {
+        // eslint-disable-next-line no-console
         console.log(`\t> ${legacyStringParts}`);
       }
     }
@@ -83,12 +86,12 @@ export const printEnvVariablesToConsole = (
 };
 
 export interface EnvVariableValue {
-  /** Undefined if not found. */
-  value: string | undefined;
   /** The name of the ENV variable if a value was found. */
   envVariableName: string | undefined;
   /** True if the variable was derived from a legacy variable name. */
   legacy?: boolean;
+  /** Undefined if not found. */
+  value: string | undefined;
 }
 
 /**
@@ -181,7 +184,7 @@ export const getEnvVariableValue = (
       `No value was found for the required ENV variable "${envVariableName}"`
     );
   }
-  return { value, envVariableName, legacy };
+  return { envVariableName, legacy, value };
 };
 
 export const getEnvVariableValueOrCustomDefault = <T>(
@@ -259,13 +262,13 @@ export const getEnvVariableName = (
 };
 
 export interface EnvVariableStructureTextBlock {
-  name: string;
   content: string;
+  name: string;
 }
 export interface EnvVariableStructureVariablesBlock {
   block: EnvVariableBlock;
-  name: string;
   description: string;
+  name: string;
 }
 
 export const envVariableStructure: (
@@ -273,69 +276,69 @@ export const envVariableStructure: (
   | EnvVariableStructureVariablesBlock
 )[] = [
   {
-    name: "File description",
     content:
       "This is an example config file for the MoonpieBot that contains all environment variables that the bot uses.",
+    name: "File description",
   },
   {
-    name: "File purpose",
     content:
       "You can either set the variables yourself or copy this file, rename it from `.env.example` to `.env` and edit it with your own values since this is just an example to show how it should look.",
+    name: "File purpose",
   },
   {
-    name: "How to edit file",
     content: `If a line that starts with '${ENV_VARIABLE_PREFIX}' has the symbol '#' in front of it that means it will be ignored as a comment. This means you can add custom comments and easily enable/disable any '${ENV_VARIABLE_PREFIX}' option by adding or removing that symbol.`,
+    name: "How to edit file",
   },
   {
     block: EnvVariableBlock.LOGGING,
-    name: "LOGGING",
     description: "Customize how much and where should be logged.",
+    name: "LOGGING",
   },
   {
     block: EnvVariableBlock.TWITCH,
-    name: "TWITCH",
     description:
       "Required variables that need to be set for ANY configuration to connect to Twitch chat.",
+    name: "TWITCH",
   },
   {
     block: EnvVariableBlock.MOONPIE,
-    name: "MOONPIE",
     description:
       "Customize the moonpie functionality that is enabled per default.",
+    name: "MOONPIE",
   },
   {
     block: EnvVariableBlock.OSU,
-    name: "OSU",
     description: "Optional osu! commands that can be enabled.",
+    name: "OSU",
   },
   {
     block: EnvVariableBlock.OSU_API,
-    name: "OSU API",
     description:
       "Optional osu! API connection that can be enabled to use more osu! commands or detect beatmap requests.",
+    name: "OSU API",
   },
   {
     block: EnvVariableBlock.OSU_STREAM_COMPANION,
-    name: "OSU STREAM COMPANION",
     description:
       "Optional osu! StreamCompanion connection that can be enabled for a much better !np command.",
+    name: "OSU STREAM COMPANION",
   },
   {
     block: EnvVariableBlock.SPOTIFY,
-    name: "SPOTIFY",
     description: "Optional Spotify commands that can be enabled.",
+    name: "SPOTIFY",
   },
   {
     block: EnvVariableBlock.SPOTIFY_API,
-    name: "SPOTIFY API",
     description:
       "Optional Spotify API connection that can be enabled to use Spotify commands.",
+    name: "SPOTIFY API",
   },
   {
     block: EnvVariableBlock.TWITCH_API,
-    name: "Twitch API",
     description:
       "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
+    name: "Twitch API",
   },
 ];
 
@@ -350,21 +353,21 @@ export const createEnvVariableDocumentation = async (
       // Just a text block
       const structurePartText = structurePart as EnvVariableStructureTextBlock;
       data.push({
-        type: FileDocumentationPartType.TEXT,
         content: structurePartText.content,
+        type: FileDocumentationPartType.TEXT,
       });
     } else {
       // Variable documentation block
       const structurePartVariables =
         structurePart as EnvVariableStructureVariablesBlock;
       data.push({
-        type: FileDocumentationPartType.NEWLINE,
         count: 1,
+        type: FileDocumentationPartType.NEWLINE,
       });
       data.push({
-        type: FileDocumentationPartType.HEADING,
-        title: structurePartVariables.name,
         description: structurePartVariables.description,
+        title: structurePartVariables.name,
+        type: FileDocumentationPartType.HEADING,
       });
 
       // Now add for each variable of the block the documentation
@@ -372,9 +375,9 @@ export const createEnvVariableDocumentation = async (
         const envVariableInfo = getEnvVariableValueInformation(envVariable);
         if (envVariableInfo?.block === structurePartVariables.block) {
           const envVariableEntry: FileDocumentationPartValue = {
-            type: FileDocumentationPartType.VALUE,
             description: envVariableInfo.description,
             prefix: ">",
+            type: FileDocumentationPartType.VALUE,
           };
           if (
             envVariableInfo.supportedValues &&
@@ -421,7 +424,7 @@ export const createEnvVariableDocumentation = async (
             envVariableEntry.value = `${ENV_VARIABLE_PREFIX}${envVariable}=${envVariableInfo.example}`;
             envVariableEntry.isComment = !envVariableInfo.required;
           } else {
-            envVariableEntry.value = `ERROR`;
+            envVariableEntry.value = "ERROR";
           }
 
           if (

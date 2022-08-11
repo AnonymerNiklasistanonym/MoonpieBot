@@ -1,11 +1,11 @@
 export const LOG_ID_CHAT_HANDLER_OSU = "osu_chat_handler";
 
 export enum OsuCommands {
-  PP = "pp",
   NP = "np",
+  PP = "pp",
+  REQUESTS = "requests",
   RP = "rp",
   SCORE = "score",
-  REQUESTS = "requests",
 }
 
 export const LOG_ID_CHAT_HANDLER_SPOTIFY = "spotify_chat_handler";

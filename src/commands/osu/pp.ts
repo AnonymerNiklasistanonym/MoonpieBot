@@ -18,13 +18,13 @@ import type { TwitchChatCommandHandler } from "../../twitch";
 
 export interface CommandHandlerPpRpDataBase {
   /**
-   * The osu API (v2) credentials.
-   */
-  osuApiV2Credentials?: OsuApiV2Credentials;
-  /**
    * Default osu Account ID (used for checking for existing scores).
    */
   defaultOsuId?: number;
+  /**
+   * The osu API (v2) credentials.
+   */
+  osuApiV2Credentials?: OsuApiV2Credentials;
 }
 
 export interface CommandHandlerPpRpData extends CommandHandlerPpRpDataBase {
@@ -86,31 +86,6 @@ export const commandPp: TwitchChatCommandHandler<
   CommandHandlerPpRpData,
   CommandDetectorPpRpData
 > = {
-  info: {
-    id: OsuCommands.PP,
-    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
-  },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!message.match(regexPp)) {
-      return false;
-    }
-    if (!enabledCommands.includes(OsuCommands.PP)) {
-      return false;
-    }
-    const matchId = regexPpCustomId.exec(message);
-    const matchName = regexPpCustomName.exec(message);
-    return {
-      data: {
-        customOsuId:
-          matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
-        customOsuName:
-          matchName && matchName.length >= 2 ? matchName[1] : undefined,
-      },
-    };
-  },
   createReply: async (
     client,
     channel,
@@ -178,5 +153,30 @@ export const commandPp: TwitchChatCommandHandler<
 
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
+  },
+  detect: (_tags, message, enabledCommands) => {
+    if (enabledCommands === undefined) {
+      throw errorMessageEnabledCommandsUndefined();
+    }
+    if (!message.match(regexPp)) {
+      return false;
+    }
+    if (!enabledCommands.includes(OsuCommands.PP)) {
+      return false;
+    }
+    const matchId = regexPpCustomId.exec(message);
+    const matchName = regexPpCustomName.exec(message);
+    return {
+      data: {
+        customOsuId:
+          matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
+        customOsuName:
+          matchName && matchName.length >= 2 ? matchName[1] : undefined,
+      },
+    };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
+    id: OsuCommands.PP,
   },
 };

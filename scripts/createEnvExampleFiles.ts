@@ -24,6 +24,7 @@ const configDir = path.join(__dirname, "..");
 createEnvVariableDocumentation(
   path.join(configDir, fileNameEnvExample),
   configDir
+  // eslint-disable-next-line no-console
 ).catch(console.error);
 createStringsVariableDocumentation(
   path.join(configDir, fileNameEnvStringsExample),
@@ -33,4 +34,5 @@ createStringsVariableDocumentation(
   defaultPluginsOptional,
   defaultMacrosOptional,
   logger
+  // eslint-disable-next-line no-console
 ).catch(console.error);

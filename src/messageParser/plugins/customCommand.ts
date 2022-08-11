@@ -14,11 +14,11 @@ export interface PluginsCustomCommandData {
 export const pluginsCustomCommandGenerator: MessageParserPluginGenerator<PluginsCustomCommandData>[] =
   [
     {
-      id: pluginCustomCommandCountId,
       description: "Set a global custom command data value",
-      signature: { type: "signature" },
       generate: (data) => () =>
         `${data.customCommand.count ? data.customCommand.count + 1 : 1}`,
+      id: pluginCustomCommandCountId,
+      signature: { type: "signature" },
     },
   ];
 
@@ -142,48 +142,48 @@ export interface PluginsCustomCommandDataData {
 export const pluginsCustomCommandDataGenerator: MessageParserPluginGenerator<PluginsCustomCommandDataData>[] =
   [
     {
-      id: pluginCustomCommandDataSetId,
       description: "Set a global custom command data value",
-      signature: {
-        type: "signature",
-        argument: "id==numberOrString",
-      },
       generate: (data) => (_, content) =>
         customCommandDataLogic(content, "==", data.customCommands),
+      id: pluginCustomCommandDataSetId,
+      signature: {
+        argument: "id==numberOrString",
+        type: "signature",
+      },
     },
     {
-      id: pluginCustomCommandDataSetNumberId,
       description:
         "Set a global custom command data value [only numbers allowed]",
-      signature: {
-        type: "signature",
-        argument: "id=#=number",
-      },
       generate: (data) => (_, content) =>
         customCommandDataLogic(content, "=#=", data.customCommands),
+      id: pluginCustomCommandDataSetNumberId,
+      signature: {
+        argument: "id=#=number",
+        type: "signature",
+      },
     },
     {
-      id: pluginCustomCommandDataGetId,
       description: "Get a global custom command data value",
-      signature: {
-        type: "signature",
-        argument: "id<>valueIfNotFound",
-      },
       generate: (data) => (_, content) =>
         customCommandDataLogic(content, "<>", data.customCommands),
+      id: pluginCustomCommandDataGetId,
+      signature: {
+        argument: "id<>valueIfNotFound",
+        type: "signature",
+      },
     },
     {
-      id: pluginCustomCommandDataAddId,
       description: "Add a global custom command data value if its a number",
-      signature: { type: "signature", argument: "id+=number" },
       generate: (data) => (_, content) =>
         customCommandDataLogic(content, "+=", data.customCommands),
+      id: pluginCustomCommandDataAddId,
+      signature: { argument: "id+=number", type: "signature" },
     },
     {
-      id: pluginCustomCommandDataRemoveId,
       description: "Remove a global custom command data value if its a number",
-      signature: { type: "signature", argument: "id-=number" },
       generate: (data) => (_, content) =>
         customCommandDataLogic(content, "-=", data.customCommands),
+      id: pluginCustomCommandDataRemoveId,
+      signature: { argument: "id-=number", type: "signature" },
     },
   ];

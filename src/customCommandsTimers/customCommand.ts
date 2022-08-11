@@ -28,45 +28,45 @@ const LOG_ID_MODULE_CUSTOM_COMMAND = "custom_command";
  */
 export enum CustomCommandUserLevel {
   BROADCASTER = "broadcaster",
+  EVERYONE = "everyone",
   MOD = "mod",
   VIP = "vip",
-  EVERYONE = "everyone",
 }
 
 /**
  * Represents a custom command.
  */
 export interface CustomCommand {
-  /** ID of the command. */
-  id: string;
   /** The channels where the timer should be active. */
   channels: string[];
+  /** The number of seconds between a command can not be used after it was used. */
+  cooldownInS?: number;
+  /** The number of times the command got called. */
+  count?: number;
+  /** A description for the command. */
+  description?: string;
+  /** ID of the command. */
+  id: string;
   /** The message that should be sent. */
   message: string;
   /** The regex string that is used to check for the command. */
   regexString: string;
-  /** The allowed user level. */
-  userLevel?: CustomCommandUserLevel;
-  /** The number of times the command got called. */
-  count?: number;
   /** The timestamp of the last time the command was executed. */
   timestampLastExecution?: number;
-  /** The number of seconds between a command can not be used after it was used. */
-  cooldownInS?: number;
-  /** A description for the command. */
-  description?: string;
+  /** The allowed user level. */
+  userLevel?: CustomCommandUserLevel;
 }
 
 /**
  * Represents a custom command data value.
  */
 export interface CustomCommandData {
+  /** A description. */
+  description?: string;
   /** The unique ID. */
   id: string;
   /** The actual value. */
   value: string | number;
-  /** A description. */
-  description?: string;
 }
 
 /**
@@ -114,7 +114,7 @@ export const isCustomCommand = (
   if (
     !arg.channels.every((a, index) => {
       if (typeof a !== "string") {
-        logFunc?.warn(typeGuardLog(`string`, a, "channels", index));
+        logFunc?.warn(typeGuardLog("string", a, "channels", index));
         return false;
       }
       return true;
@@ -259,7 +259,7 @@ export const isCustomCommandsJson = (
     !arg.commands
       .map((a, index) => {
         if (!isCustomCommand(a, logger)) {
-          logFunc?.warn(typeGuardLog(`CustomCommand`, a, "commands", index));
+          logFunc?.warn(typeGuardLog("CustomCommand", a, "commands", index));
           return false;
         }
         return true;
@@ -306,9 +306,43 @@ export const getCustomCommand = (
   CommandHandleCustomCommandData
 > => {
   return {
-    info: {
-      chatHandlerId: LOG_ID_COMMAND_CUSTOM_COMMAND,
-      id: customCommand.id,
+    createReply: async (
+      client,
+      channel,
+      _tags,
+      data,
+      globalStrings,
+      globalPlugins,
+      globalMacros,
+      logger
+    ) => {
+      const pluginsCommand: Plugins = new Map(globalPlugins);
+      pluginsCommand.set(
+        pluginRegexGroupId,
+        (_, regexGroupIndex, signature) => {
+          if (signature === true) {
+            return {
+              argument: "regexGroupIndex",
+              type: "signature",
+            };
+          }
+          if (regexGroupIndex === undefined || regexGroupIndex.length === 0) {
+            throw Error("Regex group index was undefined or empty");
+          }
+          return `${data.regexGroups[parseInt(regexGroupIndex)]}`;
+        }
+      );
+
+      const parsedMessage = await messageParser(
+        customCommand.message,
+        globalStrings,
+        pluginsCommand,
+        globalMacros,
+        logger
+      );
+      const sentMessage = await client.say(channel, parsedMessage);
+
+      return { sentMessage };
     },
     detect: (tags, message) => {
       // Check if the user is allowed to run the command (level)
@@ -361,43 +395,9 @@ export const getCustomCommand = (
 
       return { data: { regexGroups: match } };
     },
-    createReply: async (
-      client,
-      channel,
-      _tags,
-      data,
-      globalStrings,
-      globalPlugins,
-      globalMacros,
-      logger
-    ) => {
-      const pluginsCommand: Plugins = new Map(globalPlugins);
-      pluginsCommand.set(
-        pluginRegexGroupId,
-        (_, regexGroupIndex, signature) => {
-          if (signature === true) {
-            return {
-              type: "signature",
-              argument: "regexGroupIndex",
-            };
-          }
-          if (regexGroupIndex === undefined || regexGroupIndex.length === 0) {
-            throw Error("Regex group index was undefined or empty");
-          }
-          return `${data.regexGroups[parseInt(regexGroupIndex)]}`;
-        }
-      );
-
-      const parsedMessage = await messageParser(
-        customCommand.message,
-        globalStrings,
-        pluginsCommand,
-        globalMacros,
-        logger
-      );
-      const sentMessage = await client.say(channel, parsedMessage);
-
-      return { sentMessage };
+    info: {
+      chatHandlerId: LOG_ID_COMMAND_CUSTOM_COMMAND,
+      id: customCommand.id,
     },
   };
 };
@@ -450,7 +450,7 @@ export const loadCustomCommandsFromFile = async (
   }
 
   return {
-    customCommandsGlobalData,
     customCommands,
+    customCommandsGlobalData,
   };
 };

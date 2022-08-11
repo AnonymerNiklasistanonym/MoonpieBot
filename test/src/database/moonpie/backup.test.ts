@@ -52,9 +52,9 @@ export default (databaseDirPath: string): Mocha.Suite => {
       await moonpieDb.update(
         databasePath,
         {
+          count: 20,
           id: "3",
           name: "four",
-          count: 20,
           timestamp: 42,
         },
         logger

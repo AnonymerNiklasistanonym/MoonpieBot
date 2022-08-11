@@ -103,13 +103,6 @@ export interface PluginsOsuGeneratorData {
 export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGeneratorData>[] =
   [
     {
-      id: pluginOsuBeatmapId,
-      signature: {
-        type: "signature",
-        argument: "osuBeatmapID",
-        exportsMacro: true,
-        exportedMacroKeys: Object.values(MacroOsuBeatmap),
-      },
       generate: (data) => async (_, beatmapId) => {
         if (beatmapId === undefined || beatmapId.trim().length === 0) {
           throw Error("osu! beatmap ID was empty");
@@ -125,15 +118,15 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
         );
         return convertOsuBeatmapToMacros(beatmap);
       },
+      id: pluginOsuBeatmapId,
+      signature: {
+        argument: "osuBeatmapID",
+        exportedMacroKeys: Object.values(MacroOsuBeatmap),
+        exportsMacro: true,
+        type: "signature",
+      },
     },
     {
-      id: pluginOsuScoreId,
-      signature: {
-        type: "signature",
-        argument: "osuBeatmapId osuUserId",
-        exportsMacro: true,
-        exportedMacroKeys: Object.values(MacroOsuScore),
-      },
       generate: (data) => async (_, beatmapIdAndUserId) => {
         if (
           beatmapIdAndUserId === undefined ||
@@ -169,15 +162,15 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
           }
         }
       },
+      id: pluginOsuScoreId,
+      signature: {
+        argument: "osuBeatmapId osuUserId",
+        exportedMacroKeys: Object.values(MacroOsuScore),
+        exportsMacro: true,
+        type: "signature",
+      },
     },
     {
-      id: pluginOsuMostRecentPlayId,
-      signature: {
-        type: "signature",
-        argument: "osuUserId",
-        exportsMacro: true,
-        exportedMacroKeys: Object.values(MacroOsuMostRecentPlay),
-      },
       generate: (data) => async (_, userId) => {
         if (userId === undefined || userId.trim().length === 0) {
           throw Error("osu! user ID was empty");
@@ -249,15 +242,15 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
         }
         return [["FOUND", "false"]];
       },
+      id: pluginOsuMostRecentPlayId,
+      signature: {
+        argument: "osuUserId",
+        exportedMacroKeys: Object.values(MacroOsuMostRecentPlay),
+        exportsMacro: true,
+        type: "signature",
+      },
     },
     {
-      id: pluginOsuUserId,
-      signature: {
-        type: "signature",
-        argument: "osuUserId",
-        exportsMacro: true,
-        exportedMacroKeys: Object.values(MacroOsuUser),
-      },
       generate: (data) => async (_, userId) => {
         if (userId === undefined || userId.trim().length === 0) {
           throw Error("osu! user ID was empty");
@@ -287,7 +280,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
           [MacroOsuUser.ID, `${user.id}`],
           [MacroOsuUser.NAME, `${user.username}`],
           [
-            MacroOsuUser.PLAYSTYLE,
+            MacroOsuUser.PLAY_STYLE,
             `${
               user.playstyle != null && user.playstyle.length > 0
                 ? user.playstyle.join(", ")
@@ -343,6 +336,13 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
             }`,
           ],
         ];
+      },
+      id: pluginOsuUserId,
+      signature: {
+        argument: "osuUserId",
+        exportedMacroKeys: Object.values(MacroOsuUser),
+        exportsMacro: true,
+        type: "signature",
       },
     },
   ];

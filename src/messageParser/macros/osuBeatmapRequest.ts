@@ -1,8 +1,8 @@
 import type { MessageParserMacroDocumentation } from "../macros";
 
 export enum MacroOsuBeatmapRequest {
-  ID = "ID",
   COMMENT = "COMMENT",
+  ID = "ID",
 }
 export const macroOsuBeatmapRequest: MessageParserMacroDocumentation = {
   id: "OSU_BEATMAP_REQUEST",

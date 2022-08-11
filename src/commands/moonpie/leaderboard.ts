@@ -36,22 +36,6 @@ const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 15;
  */
 export const commandLeaderboard: TwitchChatCommandHandler<CommandGenericDataMoonpieDbPath> =
   {
-    info: {
-      id: MoonpieCommands.LEADERBOARD,
-      chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
-    },
-    detect: (_tags, message, enabledCommands) => {
-      if (enabledCommands === undefined) {
-        throw errorMessageEnabledCommandsUndefined();
-      }
-      if (!message.match(regexMoonpieLeaderboard)) {
-        return false;
-      }
-      if (!enabledCommands.includes(MoonpieCommands.LEADERBOARD)) {
-        return false;
-      }
-      return { data: {} };
-    },
     createReply: async (
       client,
       channel,
@@ -108,5 +92,21 @@ export const commandLeaderboard: TwitchChatCommandHandler<CommandGenericDataMoon
           : messageLeaderboard;
       const sentMessage = await client.say(channel, message);
       return { sentMessage };
+    },
+    detect: (_tags, message, enabledCommands) => {
+      if (enabledCommands === undefined) {
+        throw errorMessageEnabledCommandsUndefined();
+      }
+      if (!message.match(regexMoonpieLeaderboard)) {
+        return false;
+      }
+      if (!enabledCommands.includes(MoonpieCommands.LEADERBOARD)) {
+        return false;
+      }
+      return { data: {} };
+    },
+    info: {
+      chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
+      id: MoonpieCommands.LEADERBOARD,
     },
   };

@@ -4,7 +4,6 @@ const pluginIfEmptyLogic = (content?: string): boolean =>
   content === undefined || content.trim().length === 0;
 
 export const pluginIfEmpty: MessageParserPlugin = {
-  id: "IF_EMPTY",
   description:
     "Plugin that only displays text inside of its scope if the supplied value is empty",
   examples: [
@@ -13,14 +12,14 @@ export const pluginIfEmpty: MessageParserPlugin = {
   ],
   func: (_, content, signature) => {
     if (signature === true) {
-      return { type: "signature", argument: "value", scope: "showIfEmpty" };
+      return { argument: "value", scope: "showIfEmpty", type: "signature" };
     }
     return pluginIfEmptyLogic(content) ? [] : "";
   },
+  id: "IF_EMPTY",
 };
 
 export const pluginIfNotEmpty: MessageParserPlugin = {
-  id: "IF_NOT_EMPTY",
   description: `Opposite of ${pluginIfEmpty.id}`,
   examples: [
     { argument: "not empty", scope: "Will be shown" },
@@ -28,10 +27,11 @@ export const pluginIfNotEmpty: MessageParserPlugin = {
   ],
   func: (_, content, signature) => {
     if (signature === true) {
-      return { type: "signature", argument: "value", scope: "showIfNotEmpty" };
+      return { argument: "value", scope: "showIfNotEmpty", type: "signature" };
     }
     return !pluginIfEmptyLogic(content) ? [] : "";
   },
+  id: "IF_NOT_EMPTY",
 };
 
 const pluginIfNotUndefinedAndMatchesStringLogic = (
@@ -41,27 +41,26 @@ const pluginIfNotUndefinedAndMatchesStringLogic = (
   content !== undefined && content.trim().toLowerCase() === shouldMatch;
 
 export const pluginIfTrue: MessageParserPlugin = {
-  id: "IF_TRUE",
+  description:
+    "Plugin that only displays text inside of its scope if the supplied value is 'true'",
   examples: [
     { argument: "true", scope: "Will be shown" },
     { argument: "false", scope: "Will not be shown" },
   ],
-  description:
-    "Plugin that only displays text inside of its scope if the supplied value is 'true'",
   func: (_, content, signature) => {
     if (signature === true) {
       return {
-        type: "signature",
         argument: "value",
         scope: "showIfTrue",
+        type: "signature",
       };
     }
     return pluginIfNotUndefinedAndMatchesStringLogic("true", content) ? [] : "";
   },
+  id: "IF_TRUE",
 };
 
 export const pluginIfFalse: MessageParserPlugin = {
-  id: "IF_FALSE",
   description:
     "Plugin that only displays text inside of its scope if the supplied value is 'false'",
   examples: [
@@ -71,19 +70,19 @@ export const pluginIfFalse: MessageParserPlugin = {
   func: (_, content, signature) => {
     if (signature === true) {
       return {
-        type: "signature",
         argument: "value",
         scope: "showIfFalse",
+        type: "signature",
       };
     }
     return pluginIfNotUndefinedAndMatchesStringLogic("false", content)
       ? []
       : "";
   },
+  id: "IF_FALSE",
 };
 
 export const pluginIfUndefined: MessageParserPlugin = {
-  id: "IF_UNDEFINED",
   description:
     "Plugin that only displays text inside of its scope if the supplied value is 'undefined'",
   examples: [
@@ -93,19 +92,19 @@ export const pluginIfUndefined: MessageParserPlugin = {
   func: (_, content, signature) => {
     if (signature === true) {
       return {
-        type: "signature",
         argument: "value",
         scope: "showIfUndefined",
+        type: "signature",
       };
     }
     return pluginIfNotUndefinedAndMatchesStringLogic("undefined", content)
       ? []
       : "";
   },
+  id: "IF_UNDEFINED",
 };
 
 export const pluginIfNotUndefined: MessageParserPlugin = {
-  id: "IF_NOT_UNDEFINED",
   description: `Opposite of ${pluginIfUndefined.id}`,
   examples: [
     { argument: "undefined", scope: "Will not be shown" },
@@ -114,15 +113,16 @@ export const pluginIfNotUndefined: MessageParserPlugin = {
   func: (_, content, signature) => {
     if (signature === true) {
       return {
-        type: "signature",
         argument: "value",
         scope: "showIfNotUndefined",
+        type: "signature",
       };
     }
     return !pluginIfNotUndefinedAndMatchesStringLogic("undefined", content)
       ? []
       : "";
   },
+  id: "IF_NOT_UNDEFINED",
 };
 
 const pluginIfEqualLogic = (
@@ -147,7 +147,6 @@ const pluginIfEqualLogic = (
 };
 
 export const pluginIfEqual: MessageParserPlugin = {
-  id: "IF_EQUAL",
   description:
     "Plugin that only displays text inside of its scope if the two supplied strings separated by '===' are the same",
   examples: [
@@ -158,17 +157,17 @@ export const pluginIfEqual: MessageParserPlugin = {
     const separator = "===";
     if (signature === true) {
       return {
-        type: "signature",
         argument: `string${separator}string`,
         scope: "showIfEqual",
+        type: "signature",
       };
     }
     return pluginIfEqualLogic(separator, aStringEqualsBString) ? [] : "";
   },
+  id: "IF_EQUAL",
 };
 
 export const pluginIfNotEqual: MessageParserPlugin = {
-  id: "IF_NOT_EQUAL",
   description:
     "Plugin that only displays text inside of its scope if the two supplied strings separated by '!==' are not the same",
   examples: [
@@ -179,13 +178,14 @@ export const pluginIfNotEqual: MessageParserPlugin = {
     const separator = "!==";
     if (signature === true) {
       return {
-        type: "signature",
         argument: `string${separator}string`,
         scope: "showIfNotEqual",
+        type: "signature",
       };
     }
     return !pluginIfEqualLogic(separator, aStringEqualsBString) ? [] : "";
   },
+  id: "IF_NOT_EQUAL",
 };
 
 const pluginIfCompareNumbersLogic = (
@@ -214,7 +214,6 @@ const pluginIfCompareNumbersLogic = (
 };
 
 export const pluginIfGreater: MessageParserPlugin = {
-  id: "IF_GREATER",
   description:
     "Plugin that only displays text inside of its scope if the first of the two supplied numbers separated by '>' is greater than the second one",
   examples: [
@@ -226,9 +225,9 @@ export const pluginIfGreater: MessageParserPlugin = {
     const separator = ">";
     if (signature === true) {
       return {
-        type: "signature",
         argument: `number${separator}number`,
         scope: "showIfGreater",
+        type: "signature",
       };
     }
     return pluginIfCompareNumbersLogic(
@@ -239,10 +238,10 @@ export const pluginIfGreater: MessageParserPlugin = {
       ? []
       : "";
   },
+  id: "IF_GREATER",
 };
 
 export const pluginIfNotGreater: MessageParserPlugin = {
-  id: "IF_NOT_GREATER",
   description: `Opposite of ${pluginIfGreater.id}`,
   examples: [
     { argument: "10<=1", scope: "Will not be shown" },
@@ -253,9 +252,9 @@ export const pluginIfNotGreater: MessageParserPlugin = {
     const separator = "<=";
     if (signature === true) {
       return {
-        type: "signature",
         argument: `number${separator}number`,
         scope: "showIfNotGreater",
+        type: "signature",
       };
     }
     return pluginIfCompareNumbersLogic(
@@ -266,10 +265,10 @@ export const pluginIfNotGreater: MessageParserPlugin = {
       ? []
       : "";
   },
+  id: "IF_NOT_GREATER",
 };
 
 export const pluginIfSmaller: MessageParserPlugin = {
-  id: "IF_SMALLER",
   description:
     "Plugin that only displays text inside of its scope if the first of the two supplied numbers separated by '<' is smaller than the second one",
   examples: [
@@ -281,9 +280,9 @@ export const pluginIfSmaller: MessageParserPlugin = {
     const separator = "<";
     if (signature === true) {
       return {
-        type: "signature",
         argument: `number${separator}number`,
         scope: "showIfSmaller",
+        type: "signature",
       };
     }
     return pluginIfCompareNumbersLogic(
@@ -294,10 +293,10 @@ export const pluginIfSmaller: MessageParserPlugin = {
       ? []
       : "";
   },
+  id: "IF_SMALLER",
 };
 
 export const pluginIfNotSmaller: MessageParserPlugin = {
-  id: "IF_NOT_SMALLER",
   description: `Opposite of ${pluginIfSmaller.id}`,
   examples: [
     { argument: "10>=1", scope: "Will be shown" },
@@ -308,9 +307,9 @@ export const pluginIfNotSmaller: MessageParserPlugin = {
     const separator = ">=";
     if (signature === true) {
       return {
-        type: "signature",
         argument: `number${separator}number`,
         scope: "showIfSmaller",
+        type: "signature",
       };
     }
     return pluginIfCompareNumbersLogic(
@@ -321,36 +320,37 @@ export const pluginIfNotSmaller: MessageParserPlugin = {
       ? []
       : "";
   },
+  id: "IF_NOT_SMALLER",
 };
 
 export const pluginLowercase: MessageParserPlugin = {
-  id: "LOWERCASE",
   description: "Converts the plugin argument to lowercase letters",
   examples: [{ argument: "Hello World!" }],
   func: (_, content, signature) => {
     if (signature === true) {
       return {
+        argument: "string",
         type: "signature",
-        argument: `string`,
       };
     }
     return content === undefined ? "" : content.toLowerCase();
   },
+  id: "LOWERCASE",
 };
 
 export const pluginUppercase: MessageParserPlugin = {
-  id: "UPPERCASE",
   description: "Converts the plugin argument to uppercase letters",
   examples: [{ argument: "Hello World!" }],
   func: (_, content, signature) => {
     if (signature === true) {
       return {
+        argument: "string",
         type: "signature",
-        argument: `string`,
       };
     }
     return content === undefined ? "" : content.toUpperCase();
   },
+  id: "UPPERCASE",
 };
 
 const randomIntFromInterval = (min: number, max: number) => {
@@ -358,18 +358,17 @@ const randomIntFromInterval = (min: number, max: number) => {
 };
 
 export const pluginRandomNumber: MessageParserPlugin = {
-  id: "RANDOM_NUMBER",
   description: "Returns a random number between 1 and 100 or a custom range",
   examples: [
     { before: "Random number between 1 and 100: " },
-    { before: "Random number between 1 and 10: ", argument: "10" },
-    { before: "Random number between -100 and 0: ", argument: "-100<->0" },
+    { argument: "10", before: "Random number between 1 and 10: " },
+    { argument: "-100<->0", before: "Random number between -100 and 0: " },
   ],
   func: (_logger, interval, signature) => {
     if (signature === true) {
       return {
-        type: "signature",
         argument: ["", "number", "number<->number"],
+        type: "signature",
       };
     }
     // If no interval string is given assume number between 0 an 100
@@ -392,6 +391,7 @@ export const pluginRandomNumber: MessageParserPlugin = {
     }
     throw Error("More than 2 numbers were given");
   },
+  id: "RANDOM_NUMBER",
 };
 
 const minuteInSeconds = 60;
@@ -421,24 +421,23 @@ const secondsToObject = (seconds: number) => {
   );
 
   return {
-    seconds: secondsNumber,
-    minutes: minutesNumber,
-    hours: hoursNumber,
     days: daysNumber,
+    hours: hoursNumber,
+    minutes: minutesNumber,
+    seconds: secondsNumber,
     years: yearsNumber,
   };
 };
 
 export const pluginTimeInSToStopwatchString: MessageParserPlugin = {
-  id: "TIME_IN_S_TO_STOPWATCH_STRING",
   description: "Converts a seconds number to a stopwatch like string",
   examples: [
-    { before: "3600s will be converted to ", argument: "3600" },
-    { before: "62s will be converted to ", argument: "62" },
+    { argument: "3600", before: "3600s will be converted to " },
+    { argument: "62", before: "62s will be converted to " },
   ],
   func: (_logger, timeInS, signature) => {
     if (signature === true) {
-      return { type: "signature", argument: "timeInS" };
+      return { argument: "timeInS", type: "signature" };
     }
     if (timeInS === undefined) {
       throw Error("Time was undefined");
@@ -465,19 +464,19 @@ export const pluginTimeInSToStopwatchString: MessageParserPlugin = {
       timeList.map((a) => `${a}`.padStart(2, "0")).join(":") + ` ${timeUnit}`
     );
   },
+  id: "TIME_IN_S_TO_STOPWATCH_STRING",
 };
 
 export const pluginTimeInSToHumanReadableString: MessageParserPlugin = {
-  id: "TIME_IN_S_TO_HUMAN_READABLE_STRING",
   description: "Converts a seconds number to a human readable string",
   examples: [
-    { before: "3600234s will be converted to ", argument: "3600234" },
-    { before: "3600s will be converted to ", argument: "3600" },
-    { before: "62s will be converted to ", argument: "62" },
+    { argument: "3600234", before: "3600234s will be converted to " },
+    { argument: "3600", before: "3600s will be converted to " },
+    { argument: "62", before: "62s will be converted to " },
   ],
   func: (_logger, timeInS, signature) => {
     if (signature === true) {
-      return { type: "signature", argument: "timeInS" };
+      return { argument: "timeInS", type: "signature" };
     }
     if (timeInS === undefined) {
       throw Error("Time was undefined");
@@ -525,6 +524,7 @@ export const pluginTimeInSToHumanReadableString: MessageParserPlugin = {
     }, "");
     return finalString;
   },
+  id: "TIME_IN_S_TO_HUMAN_READABLE_STRING",
 };
 
 const MIN_COUNT_UNTIL_S_HIDDEN = 2;
@@ -532,16 +532,15 @@ const D_COUNT_UNTIL_H_HIDDEN = 1;
 const H_COUNT_UNTIL_MIN_HIDDEN = 1;
 
 export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
-  id: "TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT",
   description: `Short version of ${pluginTimeInSToHumanReadableString.id} that discards smaller time units if bigger ones are given`,
   examples: [
-    { before: "3600234s will be converted to ", argument: "3600234" },
-    { before: "3600s will be converted to ", argument: "3600" },
-    { before: "62s will be converted to ", argument: "62" },
+    { argument: "3600234", before: "3600234s will be converted to " },
+    { argument: "3600", before: "3600s will be converted to " },
+    { argument: "62", before: "62s will be converted to " },
   ],
   func: (_logger, timeInS, signature) => {
     if (signature === true) {
-      return { type: "signature", argument: "timeInS" };
+      return { argument: "timeInS", type: "signature" };
     }
     if (timeInS === undefined) {
       throw Error("Time was undefined");
@@ -601,11 +600,11 @@ export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
     }, "");
     return finalString;
   },
+  id: "TIME_IN_S_TO_HUMAN_READABLE_STRING_SHORT",
 };
 
 export const pluginConvertToShortNumber: MessageParserPlugin = {
-  id: "CONVERT_TO_SHORT_NUMBER",
-  description: `Shorten a long number into a short number string`,
+  description: "Shorten a long number into a short number string",
   examples: [
     { argument: "26934111" },
     { argument: "0" },
@@ -615,8 +614,8 @@ export const pluginConvertToShortNumber: MessageParserPlugin = {
   func: (_logger, numberString, signature) => {
     if (signature === true) {
       return {
-        type: "signature",
         argument: "number",
+        type: "signature",
       };
     }
     if (numberString === undefined) {
@@ -625,19 +624,20 @@ export const pluginConvertToShortNumber: MessageParserPlugin = {
     const number = parseInt(numberString);
     return Intl.NumberFormat("en", { notation: "compact" }).format(number);
   },
+  id: "CONVERT_TO_SHORT_NUMBER",
 };
 
 export const pluginHelp: MessageParserPlugin = {
-  id: "HELP",
   description: "Print all available plugins and macros",
   examples: [{}],
   func: (_, __, signature) => {
     if (signature === true) {
       return {
-        type: "signature",
         argument: "",
+        type: "signature",
       };
     }
-    return { type: "help", macros: true, plugins: true };
+    return { macros: true, plugins: true, type: "help" };
   },
+  id: "HELP",
 };

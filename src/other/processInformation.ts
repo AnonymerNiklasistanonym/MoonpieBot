@@ -4,14 +4,14 @@ import { exec } from "child_process";
 import { Readable } from "stream";
 
 interface WindowsTasklistVOutputElement {
+  cpuTime: string;
   imageName: string;
+  memUsage: string;
   pid: string;
   sessionName: string;
   sessionNumber: string;
-  memUsage: string;
   status: string;
   userName: string;
-  cpuTime: string;
   windowTitle: string;
 }
 
@@ -25,10 +25,15 @@ export const getProcessWindowTitle = async (
       break;
     case "darwin":
       // TODO
-      return undefined;
+      throw Error("Get window title was not yet implemented on darwin");
     case "linux":
       // TODO
-      return undefined;
+      throw Error("Get window title was not yet implemented on linux");
+    default:
+      // Ignore other platforms
+      throw Error(
+        `Unsupported platform to get window title: "${process.platform}"`
+      );
   }
 
   if (cmd === "") {
@@ -71,8 +76,8 @@ export const getProcessWindowTitle = async (
             )?.windowTitle
           );
         })
-        .on("error", (err) => {
-          return reject(err);
+        .on("error", (pipeErr) => {
+          return reject(pipeErr);
         });
     });
   });
@@ -90,8 +95,13 @@ export const isProcessRunning = async (
       cmd = `ps -ax | grep ${processName}`;
       break;
     case "linux":
-      cmd = `ps -A`;
+      cmd = "ps -A";
       break;
+    default:
+      // Throw errors on other platforms
+      throw Error(
+        `Unsupported platform to check if process "${processName}" is running: "${process.platform}"`
+      );
   }
 
   if (cmd === "") {

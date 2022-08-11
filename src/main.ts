@@ -59,7 +59,7 @@ import type { CustomCommandsJson } from "./customCommandsTimers/customCommand";
 import type { CustomTimer } from "./customCommandsTimers/customTimer";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
-import type { OsuIrcBotSendMessageFunc } from "./osuIrc";
+import type { OsuIrcBotSendMessageFunc } from "./commands/osu/beatmap";
 import type { PluginTwitchApiData } from "./messageParser/plugins/twitchApi";
 import type { PluginTwitchChatData } from "./messageParser/plugins/twitchChat";
 import type SpotifyWebApi from "spotify-web-api-node";
@@ -223,7 +223,7 @@ export const main = async (
   const enableOsuIrc = osuIrcPassword && osuIrcUsername && osuIrcRequestTarget;
   const enableOsuBeatmapRequests = osuApiBeatmapRequests;
   const enableOsuBeatmapRequestsDetailed = osuApiBeatmapRequestsDetailed;
-  let osuIrcBot: undefined | OsuIrcBotSendMessageFunc;
+  let osuIrcBot: OsuIrcBotSendMessageFunc | undefined;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
     osuIrcBot = (id: string) =>
       createOsuIrcConnection(osuIrcUsername, osuIrcPassword, id, logger);
@@ -370,8 +370,8 @@ export const main = async (
     if (tempTwitchApiClient !== undefined) {
       pluginsTwitchApiGenerator.forEach((a) => {
         const plugin = generatePlugin<PluginTwitchApiData>(a, {
-          twitchApiClient: tempTwitchApiClient,
           channelName: channel.slice(1),
+          twitchApiClient: tempTwitchApiClient,
           twitchUserId: tags["user-id"],
         });
         pluginsChannel.set(plugin.id, plugin.func);
@@ -379,9 +379,9 @@ export const main = async (
     }
     pluginsTwitchChatGenerator.forEach((a) => {
       const plugin = generatePlugin<PluginTwitchChatData>(a, {
+        channelName: channel.slice(1),
         userId: tags["user-id"],
         userName: tags.username,
-        channelName: channel.slice(1),
       });
       pluginsChannel.set(plugin.id, plugin.func);
     });
@@ -393,9 +393,9 @@ export const main = async (
       tags,
       message,
       {
-        moonpieDbPath: pathDatabase,
-        moonpieClaimCooldownHours: moonpieClaimCooldownHoursNumber,
         enabledCommands: moonpieEnableCommands,
+        moonpieClaimCooldownHours: moonpieClaimCooldownHoursNumber,
+        moonpieDbPath: pathDatabase,
       },
       moonpieEnableCommands,
       strings,
@@ -423,13 +423,13 @@ export const main = async (
         tags,
         message,
         {
+          defaultOsuId: parseInt(osuApiDefaultId),
+          enableOsuBeatmapRequests,
+          enableOsuBeatmapRequestsDetailed,
           osuApiV2Credentials: {
             clientId: parseInt(osuApiClientId),
             clientSecret: osuApiClientSecret,
           },
-          defaultOsuId: parseInt(osuApiDefaultId),
-          enableOsuBeatmapRequests,
-          enableOsuBeatmapRequestsDetailed,
           osuIrcBot,
           osuIrcRequestTarget,
           osuStreamCompanionCurrentMapData,

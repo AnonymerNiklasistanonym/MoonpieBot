@@ -69,6 +69,7 @@ const entryPoint = async () => {
 
     // Catch CLI version option
     if (cliArgs.includes(CliOption.VERSION)) {
+      // eslint-disable-next-line no-console
       console.log(versionString);
       process.exit(0);
     }
@@ -92,6 +93,7 @@ const entryPoint = async () => {
 
     // Catch CLI help option
     if (cliArgs.includes(CliOption.HELP)) {
+      // eslint-disable-next-line no-console
       console.log(
         cliHelpGenerator(
           binaryName,
@@ -188,8 +190,11 @@ const entryPoint = async () => {
       throw err;
     }
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err);
+    // eslint-disable-next-line no-console
     console.log("Application was terminated because of a run time error");
+    // eslint-disable-next-line no-console
     console.log("For more detailed information check the log files");
     process.exit(1);
   }

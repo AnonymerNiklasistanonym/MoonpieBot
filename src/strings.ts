@@ -31,13 +31,13 @@ const LOG_ID_MODULE_STRINGS = "strings";
  */
 export interface StringEntry {
   /**
-   * The unique ID of the string entry.
-   */
-  id: string;
-  /**
    * The default value.
    */
   default: string;
+  /**
+   * The unique ID of the string entry.
+   */
+  id: string;
 }
 
 /**
