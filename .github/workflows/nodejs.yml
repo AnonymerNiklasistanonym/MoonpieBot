@@ -18,6 +18,9 @@ on:
 jobs:
 
 
+  # Check if the project can be built without errors
+  # Linting, tests and documentation generation is allowed to fail so that in
+  # case of an error in them the core build and scripts are still verified
   build:
 
     strategy:
@@ -41,13 +44,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install dependencies (apt)
+    - name: Install dependencies (apt - Linux)
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt install graphviz pandoc
-    - name: Install dependencies (choco)
+    - name: Install dependencies (choco - Windows)
       if: matrix.os == 'windows-latest'
       run: choco install graphviz nsis pandoc
-    - name: Install dependencies (nsis-plugins)
+    - name: Install dependencies (NSIS-plugins - Windows)
       if: matrix.os == 'windows-latest'
       run: |
         $EnVarPluginArchive = Join-Path "installer" (Join-Path "windows_installer" "EnVar.zip")
@@ -55,15 +58,18 @@ jobs:
         Expand-Archive $EnVarPluginArchive -DestinationPath $NsisDir -Force
     - name: Install dependencies (npm)
       run: npm ci
-    - name: Run tests and see code coverage
+    - name: Run tests
       run: npm run test
-    - name: Build the bot
-      run: npm run build
-    - name: Lint the code
+      continue-on-error: true
+    - name: Lint
       run: npm run lint
+      continue-on-error: true
+    - name: Build
+      run: npm run build
     - name: Create documentation
       run: npm run docs
-    - name: Create files
+      continue-on-error: true
+    - name: Run other scripts that create project related files
       run: |
         npm run create:envExamples
         npm run create:jsonSchemas
@@ -71,18 +77,18 @@ jobs:
         npm run create:windowsInstallerConfig
     - name: Create binary release
       run: npm run package:${{ matrix.os-name }}
-    - name: Save binary artifact [standalone]
+    - name: Save binary artifact [binary]
       uses: actions/upload-artifact@v3
       with:
         name: moonpiebot-${{ matrix.os-name }}-node-${{ matrix.node-version }}
         path: bin/${{ matrix.binary-name }}
         retention-days: 14
         if-no-files-found: error
-    - name: Create installer
+    - name: Create installer (Windows)
       if: matrix.os == 'windows-latest'
       run: makensis .\windows_installer.nsi
       working-directory: .\installer\windows_installer
-    - name: Save binary artifact [installer]
+    - name: Save binary artifact [binary+installer]
       if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v3
       with:
@@ -92,6 +98,7 @@ jobs:
         if-no-files-found: error
 
 
+  # Update the online (HTML) documentation
   update-documentation:
 
     strategy:
@@ -104,6 +111,7 @@ jobs:
       GITHUB_URL_REPO: https://github.com/AnonymerNiklasistanonym/MoonpieBot/blob/main
 
     # Only update documentation if the build didn't fail and happened on the main branch
+    # That way changes on other branches won't override the current stable version
     needs: build
     if: github.ref == 'refs/heads/main'
 
@@ -113,17 +121,17 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install dependencies (apt)
+    - name: Install dependencies (apt - Linux)
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt install graphviz
-    - name: Install dependencies (choco)
+    - name: Install dependencies (choco - Windows)
       if: matrix.os == 'windows-latest'
-      run: choco install graphviz
+      run: choco install graphviz nsis
     - name: Install dependencies (npm)
       run: npm ci
     - name: Create documentation
       run: npm run docs
-    - name: Copy moonpiebot icon
+    - name: Modify documentation
       if: matrix.os == 'ubuntu-latest'
       run: |
         # Add application icon
