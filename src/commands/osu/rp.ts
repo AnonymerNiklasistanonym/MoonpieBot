@@ -1,6 +1,5 @@
 // Package imports
-import osuApiV2, { GameMode } from "osu-api-v2";
-import { ScoresType } from "osu-api-v2/lib/users/scores";
+import osuApiV2, { GameMode, ScoresType } from "osu-api-v2";
 // Local imports
 import {
   errorMessageEnabledCommandsUndefined,

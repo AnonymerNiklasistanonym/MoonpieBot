@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 // Package imports
-import osuApiV2, { GameMode, RankedStatus } from "osu-api-v2";
-import { ScoresType } from "osu-api-v2/lib/users/scores";
+import osuApiV2, { GameMode, RankedStatus, ScoresType } from "osu-api-v2";
 // Type imports
 import type {
   Beatmap,

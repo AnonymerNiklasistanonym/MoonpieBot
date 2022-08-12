@@ -96,7 +96,7 @@
         "irc": "github:AnonymerNiklasistanonym/node-irc#91abd89",
         "node-cron": "^3.0.1",
         "open": "^8.4.0",
-        "osu-api-v2": "^0.0.19",
+        "osu-api-v2": "^0.0.20",
         "reconnecting-websocket": "^4.4.0",
         "spotify-web-api-node": "^5.0.2",
         "sqlite3": "5.0.11",
