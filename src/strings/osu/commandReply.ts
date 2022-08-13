@@ -284,6 +284,24 @@ export const osuCommandReplyNpStreamCompanionFile = {
           ],
           type: "plugin",
         },
+        {
+          args: {
+            key: MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DL,
+            name: macroOsuStreamCompanionCurrentMapFile.id,
+            type: "macro",
+          },
+          name: pluginIfNotEmpty.id,
+          scope: [
+            " [",
+            {
+              key: MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DL,
+              name: macroOsuStreamCompanionCurrentMapFile.id,
+              type: "macro",
+            },
+            "]",
+          ],
+          type: "plugin",
+        },
       ],
       type: "plugin",
     },
