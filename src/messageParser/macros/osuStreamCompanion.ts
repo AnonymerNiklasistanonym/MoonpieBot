@@ -93,9 +93,10 @@ export const macroOsuStreamCompanionCurrentMapWebSocketLogic = (
   });
 
 export enum MacroOsuStreamCompanionCurrentMapFile {
+  CURRENT_MODS = "CURRENT_MODS",
   NP_ALL = "NP_ALL",
-  NP_DETAIL = "NP_DETAIL",
-  NP_DOWNLOAD = "NP_DOWNLOAD",
+  NP_PLAYING_DETAILS = "NP_PLAYING_DETAILS",
+  NP_PLAYING_DL = "NP_PLAYING_DL",
 }
 
 export const macroOsuStreamCompanionCurrentMapFile: MessageParserMacroDocumentation =
@@ -115,11 +116,14 @@ export const macroOsuStreamCompanionCurrentMapFileLogic = (
       case MacroOsuStreamCompanionCurrentMapFile.NP_ALL:
         macroValue = currentMap.npAll;
         break;
-      case MacroOsuStreamCompanionCurrentMapFile.NP_DETAIL:
-        macroValue = currentMap.npDetail;
+      case MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DETAILS:
+        macroValue = currentMap.npPlayingDetails;
         break;
-      case MacroOsuStreamCompanionCurrentMapFile.NP_DOWNLOAD:
-        macroValue = currentMap.npDownload;
+      case MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DL:
+        macroValue = currentMap.npPlayingDl;
+        break;
+      case MacroOsuStreamCompanionCurrentMapFile.CURRENT_MODS:
+        macroValue = currentMap.currentMods;
         break;
     }
     if (typeof macroValue === "undefined") {

@@ -284,7 +284,7 @@ export const envVariableInformation: EnvVariableData[] = [
   },
   {
     block: EnvVariableBlock.OSU_STREAM_COMPANION,
-    description: `osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods. (If ${EnvVariable.OSU_STREAM_COMPANION_URL} is provided this will be ignored)`,
+    description: `osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods. You can't really configure the details via the integrated message parser but since it uses the output of StreamCompanion you can just configure it in there under the section 'Output Patterns' and then edit the used cell 'np_all'. (If ${EnvVariable.OSU_STREAM_COMPANION_URL} is provided this will be ignored)`,
     example: "C:\\Program Files (x86)\\StreamCompanion\\Files",
     name: EnvVariable.OSU_STREAM_COMPANION_DIR_PATH,
   },

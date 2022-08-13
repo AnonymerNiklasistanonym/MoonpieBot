@@ -57,9 +57,10 @@ export interface StreamCompanionWebSocketData extends StreamCompanionDataBase {
 }
 
 export interface StreamCompanionFileData extends StreamCompanionDataBase {
-  npAll?: string;
-  npDetail?: string;
-  npDownload?: string;
+  currentMods: string;
+  npAll: string;
+  npPlayingDetails: string;
+  npPlayingDl: string;
   type: "file";
 }
 
@@ -77,9 +78,10 @@ export type StreamCompanionConnection = () =>
   | StreamCompanionWebSocketData
   | undefined;
 
-const fileNameNpAll = "np.all";
-const fileNameNpDetail = "np.detail";
-const fileNameNpDownload = "np.download";
+const fileNameNpAll = "np_all.txt";
+const fileNameNpPlayingDetails = "np_playing_details.txt";
+const fileNameNpPlayingDl = "np_playing_DL.txt";
+const fileNameCurrentMods = "current_mods.txt";
 
 /**
  * This method will setup an infinite loop that will continuously try to connect
@@ -105,17 +107,22 @@ export const createStreamCompanionFileConnection = (
       path.join(streamCompanionDirPath, fileNameNpAll)
     );
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const npDetail = await fs.readFile(
-      path.join(streamCompanionDirPath, fileNameNpDetail)
+    const npPlayingDetails = await fs.readFile(
+      path.join(streamCompanionDirPath, fileNameNpPlayingDetails)
     );
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const npDownload = await fs.readFile(
-      path.join(streamCompanionDirPath, fileNameNpDownload)
+    const npPlayingDl = await fs.readFile(
+      path.join(streamCompanionDirPath, fileNameNpPlayingDl)
+    );
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const currentMods = await fs.readFile(
+      path.join(streamCompanionDirPath, fileNameCurrentMods)
     );
     return {
+      currentMods: currentMods.toString(),
       npAll: npAll.toString(),
-      npDetail: npDetail.toString(),
-      npDownload: npDownload.toString(),
+      npPlayingDetails: npPlayingDetails.toString(),
+      npPlayingDl: npPlayingDl.toString(),
       type: "file",
     };
   };

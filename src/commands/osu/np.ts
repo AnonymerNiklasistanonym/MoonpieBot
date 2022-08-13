@@ -135,9 +135,10 @@ export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
         }
       } else if (
         currMapData !== undefined &&
-        currMapData.type === "websocket" &&
-        currMapData.mapid !== undefined &&
-        currMapData.mapid === 0
+        ((currMapData.type === "websocket" &&
+          currMapData.mapid !== undefined &&
+          currMapData.mapid === 0) ||
+          (currMapData.type === "file" && currMapData.npAll === ""))
       ) {
         msg = await messageParserById(
           osuCommandReplyNpNoMapStreamCompanion.id,

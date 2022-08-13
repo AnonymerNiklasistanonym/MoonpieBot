@@ -266,6 +266,24 @@ export const osuCommandReplyNpStreamCompanionFile = {
           name: macroOsuStreamCompanionCurrentMapFile.id,
           type: "macro",
         },
+        {
+          args: {
+            key: MacroOsuStreamCompanionCurrentMapFile.CURRENT_MODS,
+            name: macroOsuStreamCompanionCurrentMapFile.id,
+            type: "macro",
+          },
+          name: pluginIfNotEmpty.id,
+          scope: [
+            " (currently playing with ",
+            {
+              key: MacroOsuStreamCompanionCurrentMapFile.CURRENT_MODS,
+              name: macroOsuStreamCompanionCurrentMapFile.id,
+              type: "macro",
+            },
+            ")",
+          ],
+          type: "plugin",
+        },
       ],
       type: "plugin",
     },
@@ -793,13 +811,14 @@ export const osuScore = {
 export const osuCommandReply = [
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
-  osuCommandReplyNpStreamCompanionWebSocket,
   osuCommandReplyNpNoMapStreamCompanion,
+  osuCommandReplyNpStreamCompanionFile,
   osuCommandReplyNpStreamCompanionNotRunning,
+  osuCommandReplyNpStreamCompanionWebSocket,
+  osuCommandReplyPp,
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
-  osuCommandReplyPp,
+  osuScore,
   osuScoreErrorNoBeatmap,
   osuScoreErrorNotFound,
-  osuScore,
 ];
