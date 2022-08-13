@@ -23,6 +23,7 @@ $ApplicationName = "moonpiebot"
 $ArtifactWindowsInstaller18 = Join-Path $BinaryDir "$ApplicationName-installer-windows-node-18.x.zip"
 $ArtifactLinux18 = Join-Path $BinaryDir "$ApplicationName-linux-node-18.x.zip"
 $ArtifactWindows18 = Join-Path $BinaryDir "$ApplicationName-windows-node-18.x.zip"
+$ArtifactManPage = Join-Path $BinaryDir "$ApplicationName-man-page.zip"
 # Extract binary files from the downloaded artifacts
 $ArtifactWindowsInstallerBinary = Join-Path $BinaryDir "${ApplicationName}_setup.exe"
 $ArtifactWindowsInstaller18BinaryOut = "$ApplicationName-installer-v$CurrentVersion-win64-node-18.exe"
@@ -30,10 +31,13 @@ $ArtifactWindowsBinary = Join-Path $BinaryDir "$ApplicationName.exe"
 $ArtifactWindows18BinaryOut = "$ApplicationName-v$CurrentVersion-win64-node-18.exe"
 $ArtifactLinuxBinary = Join-Path $BinaryDir "$ApplicationName"
 $ArtifactLinux18BinaryOut = "$ApplicationName-v$CurrentVersion-linux64-node-18"
+$ArtifactManPageBinary = Join-Path $BinaryDir "$ApplicationName-man.1"
+$ArtifactManPageBinaryOut = "$ApplicationName-v$CurrentVersion-man.1"
 # Remove old binary files
 Remove-Item (Join-Path $BinaryDir $ArtifactWindowsInstaller18BinaryOut) -ErrorAction Ignore
 Remove-Item (Join-Path $BinaryDir $ArtifactWindows18BinaryOut) -ErrorAction Ignore
 Remove-Item (Join-Path $BinaryDir $ArtifactLinux18BinaryOut) -ErrorAction Ignore
+Remove-Item (Join-Path $BinaryDir $ArtifactManPageBinaryOut) -ErrorAction Ignore
 # Extract binary files and rename them
 Expand-Archive $ArtifactWindowsInstaller18 -DestinationPath $BinaryDir -Force
 Rename-Item -Path $ArtifactWindowsInstallerBinary -NewName $ArtifactWindowsInstaller18BinaryOut
@@ -41,6 +45,8 @@ Expand-Archive $ArtifactLinux18 -DestinationPath $BinaryDir -Force
 Rename-Item -Path $ArtifactLinuxBinary -NewName $ArtifactLinux18BinaryOut
 Expand-Archive $ArtifactWindows18 -DestinationPath $BinaryDir -Force
 Rename-Item -Path $ArtifactWindowsBinary -NewName $ArtifactWindows18BinaryOut
+Expand-Archive $ArtifactManPage -DestinationPath $BinaryDir -Force
+Rename-Item -Path $ArtifactManPageBinary -NewName $ArtifactManPageBinaryOut
 
 # Go back to the call directory
 Set-Location $CallDir

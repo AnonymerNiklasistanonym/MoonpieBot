@@ -31,6 +31,7 @@ jobs:
           - os: ubuntu-latest
             os-name: linux
             binary-name: moonpiebot
+            man-page-name: moonpiebot-man.1
           - os: windows-latest
             os-name: windows
             binary-name: moonpiebot.exe
@@ -88,12 +89,24 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: makensis .\windows_installer.nsi
       working-directory: .\installer\windows_installer
-    - name: Save binary artifact [binary+installer]
+    - name: Save binary artifact [binary+installer] (Windows)
       if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v3
       with:
         name: moonpiebot-installer-${{ matrix.os-name }}-node-${{ matrix.node-version }}
         path: bin/${{ matrix.binary-name-installer }}
+        retention-days: 14
+        if-no-files-found: error
+    - name: Create man page (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: pandoc "man.md" -s -t man -o "${{ matrix.man-page-name }}"
+      working-directory: installer
+    - name: Save man page (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v3
+      with:
+        name: moonpiebot-man-page
+        path: installer/${{ matrix.man-page-name }}
         retention-days: 14
         if-no-files-found: error
 
