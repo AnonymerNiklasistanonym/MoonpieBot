@@ -74,9 +74,7 @@ export const printEnvVariablesToConsole = (
     }
 
     // eslint-disable-next-line no-console
-    console.log(
-      `${envVariableName}=${escapeStringIfWhiteSpace(envVariableValueString)}`
-    );
+    console.log(`${envVariableName}=${envVariableValueString}`);
     if (legacyString) {
       const legacyStrings = legacyString.split("\n");
       // eslint-disable-next-line no-console
