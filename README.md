@@ -75,7 +75,7 @@ It also can recognize beatmap links in chat and print map information (and if ex
 (This can be temporarily turned off/on with the commands `!osuRequests on`/`!osuRequests off [Optional reason]` and `!osuRequests` can be used to get the current status)
 Given an osu! IRC login it can even send these beatmap links to the osu! client.
 
-It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) can be found in the configuration even if no other osu! related configurations is set.
+It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) or a directory path (`C:\Program Files (x86)\StreamCompanion\Files`) can be found in the configuration even if no other osu! related configurations is set.
 
 *Everything is currently optimized and written for osu! standard which means you need to open an issue if you want to use it with another game mode!*
 

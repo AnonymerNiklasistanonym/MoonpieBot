@@ -5,6 +5,7 @@ import {
   FileDocumentationPartType,
   generateFileDocumentation,
 } from "./other/splitTextAtLength";
+import { escapeStringIfWhiteSpace } from "./other/whiteSpaceChecker";
 // Type imports
 import {
   ENV_LIST_SPLIT_CHARACTER,
@@ -73,7 +74,9 @@ export const printEnvVariablesToConsole = (
     }
 
     // eslint-disable-next-line no-console
-    console.log(`${envVariableName}=${envVariableValueString}`);
+    console.log(
+      `${envVariableName}=${escapeStringIfWhiteSpace(envVariableValueString)}`
+    );
     if (legacyString) {
       const legacyStrings = legacyString.split("\n");
       // eslint-disable-next-line no-console
@@ -416,15 +419,17 @@ export const createEnvVariableDocumentation = async (
             const defaultStrOrFunc = envVariableInfo.default;
             envVariableEntry.value = `${ENV_VARIABLE_PREFIX}${envVariable}=${
               typeof defaultStrOrFunc === "function"
-                ? defaultStrOrFunc(configDir)
-                : defaultStrOrFunc
+                ? escapeStringIfWhiteSpace(defaultStrOrFunc(configDir))
+                : escapeStringIfWhiteSpace(defaultStrOrFunc)
             }`;
             envVariableEntry.isComment = !envVariableInfo.required;
           } else if (envVariableInfo.example) {
             envVariableEntry.infos.push(
               "(The following line is only an example!)"
             );
-            envVariableEntry.value = `${ENV_VARIABLE_PREFIX}${envVariable}=${envVariableInfo.example}`;
+            envVariableEntry.value = `${ENV_VARIABLE_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
+              envVariableInfo.example
+            )}`;
             envVariableEntry.isComment = !envVariableInfo.required;
           } else {
             envVariableEntry.value = "ERROR";
