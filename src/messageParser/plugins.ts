@@ -25,8 +25,8 @@ import {
   pluginsCustomCommandDataGenerator,
   pluginsCustomCommandGenerator,
 } from "./plugins/customCommand";
-import { pluginOsuStreamCompanionGenerator } from "./plugins/osuStreamCompanion";
 import { pluginsOsuGenerator } from "./plugins/osuApi";
+import { pluginsOsuStreamCompanionGenerator } from "./plugins/osuStreamCompanion";
 import { pluginSpotifyGenerator } from "./plugins/spotify";
 import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 // Type imports
@@ -110,7 +110,7 @@ export interface MessageParserPluginInfo extends MessageParserPluginBase {
 export const defaultPluginsOptional: MessageParserPluginInfo[] = [
   ...pluginsTwitchChatGenerator.map(generatePluginInfo),
   ...pluginsOsuGenerator.map(generatePluginInfo),
-  generatePluginInfo(pluginOsuStreamCompanionGenerator),
+  ...pluginsOsuStreamCompanionGenerator.map(generatePluginInfo),
   generatePluginInfo(pluginSpotifyGenerator),
   generatePluginInfo(pluginSpotifyGenerator),
   ...pluginsCustomCommandGenerator.map(generatePluginInfo),

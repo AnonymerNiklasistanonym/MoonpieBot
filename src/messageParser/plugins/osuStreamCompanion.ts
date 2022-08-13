@@ -1,39 +1,78 @@
 // Type imports
 import {
-  macroOsuStreamCompanionCurrentMap,
-  macroOsuStreamCompanionCurrentMapLogic,
+  macroOsuStreamCompanionCurrentMapFile,
+  macroOsuStreamCompanionCurrentMapFileLogic,
+  macroOsuStreamCompanionCurrentMapWebSocket,
+  macroOsuStreamCompanionCurrentMapWebSocketLogic,
 } from "../macros/osuStreamCompanion";
-import type { Macros } from "../../messageParser";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 
 export enum PluginOsuStreamCompanion {
-  /** Get the current osu! Map data via StreamCompanion. */
-  CURRENT_MAP = "OSU_STREAMCOMPANION_CURRENT_MAP",
+  /** Get the current osu! Map data via StreamCompanion files. */
+  CURRENT_MAP_FILE = "OSU_STREAMCOMPANION_CURRENT_MAP_FILE",
+  /** Get the current osu! Map data via StreamCompanion websocket. */
+  CURRENT_MAP_WEBSOCKET = "OSU_STREAMCOMPANION_CURRENT_MAP_WEBSOCKET",
 }
 
 export interface PluginOsuStreamCompanionData {
   streamCompanionDataFunc: StreamCompanionConnection;
 }
 
-export const pluginOsuStreamCompanionGenerator: MessageParserPluginGenerator<PluginOsuStreamCompanionData> =
-  {
-    description: "Get the current osu! map data via StreamCompanion.",
-    generate: (data) => (): Macros => {
-      const currentMap = data.streamCompanionDataFunc();
-      if (currentMap === undefined) {
-        return new Map();
-      }
-      return new Map([
-        [
-          macroOsuStreamCompanionCurrentMap.id,
-          new Map(macroOsuStreamCompanionCurrentMapLogic(currentMap)),
-        ],
-      ]);
+export const pluginsOsuStreamCompanionGenerator: MessageParserPluginGenerator<PluginOsuStreamCompanionData>[] =
+  [
+    {
+      description:
+        "Get the current osu! map data via StreamCompanion (websocket interface).",
+      generate: (data) => async () => {
+        const currentMap = await data.streamCompanionDataFunc();
+        if (currentMap === undefined) {
+          return new Map();
+        }
+        if (currentMap.type !== "websocket") {
+          throw Error(
+            `No web socket connection was found (type='${currentMap.type}')`
+          );
+        }
+        return new Map([
+          [
+            macroOsuStreamCompanionCurrentMapWebSocket.id,
+            new Map(
+              macroOsuStreamCompanionCurrentMapWebSocketLogic(currentMap)
+            ),
+          ],
+        ]);
+      },
+      id: PluginOsuStreamCompanion.CURRENT_MAP_WEBSOCKET,
+      signature: {
+        exportedMacros: [macroOsuStreamCompanionCurrentMapWebSocket],
+        type: "signature",
+      },
     },
-    id: PluginOsuStreamCompanion.CURRENT_MAP,
-    signature: {
-      exportedMacros: [macroOsuStreamCompanionCurrentMap],
-      type: "signature",
+    {
+      description:
+        "Get the current osu! map data via StreamCompanion (file interface).",
+      generate: (data) => async () => {
+        const currentMap = await data.streamCompanionDataFunc();
+        if (currentMap === undefined) {
+          return new Map();
+        }
+        if (currentMap.type !== "file") {
+          throw Error(
+            `No file connection was found (type='${currentMap.type}')`
+          );
+        }
+        return new Map([
+          [
+            macroOsuStreamCompanionCurrentMapFile.id,
+            new Map(macroOsuStreamCompanionCurrentMapFileLogic(currentMap)),
+          ],
+        ]);
+      },
+      id: PluginOsuStreamCompanion.CURRENT_MAP_FILE,
+      signature: {
+        exportedMacros: [macroOsuStreamCompanionCurrentMapFile],
+        type: "signature",
+      },
     },
-  };
+  ];

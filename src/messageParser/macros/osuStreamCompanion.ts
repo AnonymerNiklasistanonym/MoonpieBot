@@ -1,11 +1,14 @@
 // Local imports
 import { roundNumber } from "../../other/round";
 // Type imports
+import type {
+  StreamCompanionFileData,
+  StreamCompanionWebSocketData,
+} from "../../osuStreamCompanion";
 import type { MacroDictionaryEntry } from "../../messageParser";
 import type { MessageParserMacroDocumentation } from "../macros";
-import type { StreamCompanionData } from "../../osuStreamCompanion";
 
-export enum MacroOsuStreamCompanionCurrentMap {
+export enum MacroOsuStreamCompanionCurrentMapWebSocket {
   AR = "AR",
   ARTIST_ROMAN = "ARTIST_ROMAN",
   BPM = "BPM",
@@ -21,59 +24,59 @@ export enum MacroOsuStreamCompanionCurrentMap {
   TITLE_ROMAN = "TITLE_ROMAN",
 }
 
-export const macroOsuStreamCompanionCurrentMap: MessageParserMacroDocumentation =
+export const macroOsuStreamCompanionCurrentMapWebSocket: MessageParserMacroDocumentation =
   {
     id: "OSU_STREAMCOMPANION_CURRENT_MAP",
-    keys: Object.values(MacroOsuStreamCompanionCurrentMap),
+    keys: Object.values(MacroOsuStreamCompanionCurrentMapWebSocket),
   };
 
-export const macroOsuStreamCompanionCurrentMapLogic = (
-  currentMap: StreamCompanionData
+export const macroOsuStreamCompanionCurrentMapWebSocketLogic = (
+  currentMap: StreamCompanionWebSocketData
 ): MacroDictionaryEntry[] =>
-  Object.values(MacroOsuStreamCompanionCurrentMap).map<
-    [MacroOsuStreamCompanionCurrentMap, string]
+  Object.values(MacroOsuStreamCompanionCurrentMapWebSocket).map<
+    [MacroOsuStreamCompanionCurrentMapWebSocket, string]
   >((macroId) => {
     let macroValue;
     switch (macroId) {
-      case MacroOsuStreamCompanionCurrentMap.ARTIST_ROMAN:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.ARTIST_ROMAN:
         macroValue = currentMap.artistRoman;
         break;
-      case MacroOsuStreamCompanionCurrentMap.TITLE_ROMAN:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.TITLE_ROMAN:
         macroValue = currentMap.titleRoman;
         break;
-      case MacroOsuStreamCompanionCurrentMap.DIFF_NAME:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.DIFF_NAME:
         macroValue = currentMap.diffName;
         break;
-      case MacroOsuStreamCompanionCurrentMap.ID:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.ID:
         macroValue = currentMap.mapid;
         break;
-      case MacroOsuStreamCompanionCurrentMap.SET_ID:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.SET_ID:
         macroValue = currentMap.mapsetid;
         break;
-      case MacroOsuStreamCompanionCurrentMap.CS:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.CS:
         macroValue = currentMap.mCS;
         break;
-      case MacroOsuStreamCompanionCurrentMap.AR:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.AR:
         macroValue = currentMap.mAR;
         break;
-      case MacroOsuStreamCompanionCurrentMap.OD:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.OD:
         macroValue = currentMap.mOD;
         break;
-      case MacroOsuStreamCompanionCurrentMap.HP:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.HP:
         macroValue = currentMap.mHP;
         break;
-      case MacroOsuStreamCompanionCurrentMap.BPM:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.BPM:
         macroValue = currentMap.mBpm;
         break;
-      case MacroOsuStreamCompanionCurrentMap.DIFFICULTY_RATING:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.DIFFICULTY_RATING:
         if (currentMap.mStars !== undefined) {
           macroValue = roundNumber(currentMap.mStars, 2);
         }
         break;
-      case MacroOsuStreamCompanionCurrentMap.MAX_COMBO:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.MAX_COMBO:
         macroValue = currentMap.maxCombo;
         break;
-      case MacroOsuStreamCompanionCurrentMap.MODS:
+      case MacroOsuStreamCompanionCurrentMapWebSocket.MODS:
         macroValue = currentMap.mods;
         break;
     }
@@ -85,6 +88,42 @@ export const macroOsuStreamCompanionCurrentMapLogic = (
     }
     if (typeof macroValue === "number") {
       macroValue = `${macroValue}`;
+    }
+    return [macroId, macroValue];
+  });
+
+export enum MacroOsuStreamCompanionCurrentMapFile {
+  NP_ALL = "NP_ALL",
+  NP_DETAIL = "NP_DETAIL",
+  NP_DOWNLOAD = "NP_DOWNLOAD",
+}
+
+export const macroOsuStreamCompanionCurrentMapFile: MessageParserMacroDocumentation =
+  {
+    id: "OSU_STREAMCOMPANION_CURRENT_MAP_FILE",
+    keys: Object.values(MacroOsuStreamCompanionCurrentMapFile),
+  };
+
+export const macroOsuStreamCompanionCurrentMapFileLogic = (
+  currentMap: StreamCompanionFileData
+): MacroDictionaryEntry[] =>
+  Object.values(MacroOsuStreamCompanionCurrentMapFile).map<
+    [MacroOsuStreamCompanionCurrentMapFile, string]
+  >((macroId) => {
+    let macroValue;
+    switch (macroId) {
+      case MacroOsuStreamCompanionCurrentMapFile.NP_ALL:
+        macroValue = currentMap.npAll;
+        break;
+      case MacroOsuStreamCompanionCurrentMapFile.NP_DETAIL:
+        macroValue = currentMap.npDetail;
+        break;
+      case MacroOsuStreamCompanionCurrentMapFile.NP_DOWNLOAD:
+        macroValue = currentMap.npDownload;
+        break;
+    }
+    if (typeof macroValue === "undefined") {
+      macroValue = "undefined";
     }
     return [macroId, macroValue];
   });

@@ -3,6 +3,8 @@
  */
 
 // Package imports
+import { promises as fs } from "fs";
+import path from "path";
 import ReconnectingWebSocket from "reconnecting-websocket";
 import WebSocket from "ws";
 // Local imports
@@ -37,7 +39,7 @@ const OSU_STREAMCOMPANION_DATA = [
 /**
  * A representation of the data that StreamCompanion should watch for changes.
  */
-export interface StreamCompanionData {
+export interface StreamCompanionWebSocketData extends StreamCompanionDataBase {
   artistRoman?: string;
   diffName?: string;
   mAR?: number;
@@ -51,6 +53,18 @@ export interface StreamCompanionData {
   maxCombo?: number;
   mods?: string;
   titleRoman?: string;
+  type: "websocket";
+}
+
+export interface StreamCompanionFileData extends StreamCompanionDataBase {
+  npAll?: string;
+  npDetail?: string;
+  npDownload?: string;
+  type: "file";
+}
+
+export interface StreamCompanionDataBase {
+  type: string;
 }
 
 /** Interface which helps to get the hidden websocket URL. */
@@ -58,7 +72,54 @@ interface ReconnectingWebSocketHelper {
   _url: string;
 }
 
-export type StreamCompanionConnection = () => StreamCompanionData | undefined;
+export type StreamCompanionConnection = () =>
+  | Promise<StreamCompanionFileData>
+  | StreamCompanionWebSocketData
+  | undefined;
+
+const fileNameNpAll = "np.all";
+const fileNameNpDetail = "np.detail";
+const fileNameNpDownload = "np.download";
+
+/**
+ * This method will setup an infinite loop that will continuously try to connect
+ * to StreamCompanion.
+ *
+ * @param streamCompanionDirPath The directory of the StreamCompanion files.
+ * @param _logger Global logger.
+ * @returns A function that will use the file system interface to get the
+ * StreamCompanion data.
+ */
+export const createStreamCompanionFileConnection = (
+  streamCompanionDirPath: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _logger: Logger
+): StreamCompanionConnection => {
+  //const logStreamCompanion = createLogFunc(
+  //  logger,
+  //  LOG_ID_MODULE_STREAMCOMPANION
+  //);
+  return async (): Promise<StreamCompanionFileData> => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const npAll = await fs.readFile(
+      path.join(streamCompanionDirPath, fileNameNpAll)
+    );
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const npDetail = await fs.readFile(
+      path.join(streamCompanionDirPath, fileNameNpDetail)
+    );
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const npDownload = await fs.readFile(
+      path.join(streamCompanionDirPath, fileNameNpDownload)
+    );
+    return {
+      npAll: npAll.toString(),
+      npDetail: npDetail.toString(),
+      npDownload: npDownload.toString(),
+      type: "file",
+    };
+  };
+};
 
 /**
  * This method will setup an infinite loop that will continuously try to connect
@@ -69,7 +130,7 @@ export type StreamCompanionConnection = () => StreamCompanionData | undefined;
  * @returns A function that will if there is a connection and data available
  * return that data. Otherwise it will just return undefined.
  */
-export const createStreamCompanionConnection = (
+export const createStreamCompanionWebSocketConnection = (
   streamCompanionUrl: string,
   logger: Logger
 ): StreamCompanionConnection => {
@@ -101,11 +162,11 @@ export const createStreamCompanionConnection = (
     // TODO: Check what happens for invalid/custom maps
     ws.send(JSON.stringify(OSU_STREAMCOMPANION_DATA));
   };
-  const cache: StreamCompanionData = {};
+  const cache: StreamCompanionWebSocketData = { type: "websocket" };
   ws.onmessage = (wsEvent) => {
     Object.assign(
       cache,
-      JSON.parse(wsEvent.data as string) as StreamCompanionData
+      JSON.parse(wsEvent.data as string) as StreamCompanionWebSocketData
     );
     logStreamCompanion.debug(
       `New StreamCompanion data: '${wsEvent.data as string}'`

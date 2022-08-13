@@ -19,8 +19,10 @@ import {
   macroOsuScoreRequest,
 } from "../../messageParser/macros/osuScoreRequest";
 import {
-  macroOsuStreamCompanionCurrentMap,
-  MacroOsuStreamCompanionCurrentMap,
+  macroOsuStreamCompanionCurrentMapFile,
+  MacroOsuStreamCompanionCurrentMapFile,
+  macroOsuStreamCompanionCurrentMapWebSocket,
+  MacroOsuStreamCompanionCurrentMapWebSocket,
 } from "../../messageParser/macros/osuStreamCompanion";
 import {
   MacroOsuWindowTitle,
@@ -90,45 +92,45 @@ export const osuCommandReplyNp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP`,
 };
 
-export const osuCommandReplyNpStreamCompanion = {
+export const osuCommandReplyNpStreamCompanionWebSocket = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " Currently playing ",
     {
-      name: PluginOsuStreamCompanion.CURRENT_MAP,
+      name: PluginOsuStreamCompanion.CURRENT_MAP_WEBSOCKET,
       scope: [
         "'",
         {
-          key: MacroOsuStreamCompanionCurrentMap.TITLE_ROMAN,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.TITLE_ROMAN,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         "' from '",
         {
-          key: MacroOsuStreamCompanionCurrentMap.ARTIST_ROMAN,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.ARTIST_ROMAN,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         "' [",
         {
-          key: MacroOsuStreamCompanionCurrentMap.DIFF_NAME,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.DIFF_NAME,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         "]",
         {
           args: {
-            key: MacroOsuStreamCompanionCurrentMap.MODS,
-            name: macroOsuStreamCompanionCurrentMap.id,
+            key: MacroOsuStreamCompanionCurrentMapWebSocket.MODS,
+            name: macroOsuStreamCompanionCurrentMapWebSocket.id,
             type: "macro",
           },
           name: pluginIfNotUndefined.id,
           scope: {
             args: [
               {
-                key: MacroOsuStreamCompanionCurrentMap.MODS,
-                name: macroOsuStreamCompanionCurrentMap.id,
+                key: MacroOsuStreamCompanionCurrentMapWebSocket.MODS,
+                name: macroOsuStreamCompanionCurrentMapWebSocket.id,
                 type: "macro",
               },
               "!==None",
@@ -137,8 +139,8 @@ export const osuCommandReplyNpStreamCompanion = {
             scope: [
               " using ",
               {
-                key: MacroOsuStreamCompanionCurrentMap.MODS,
-                name: macroOsuStreamCompanionCurrentMap.id,
+                key: MacroOsuStreamCompanionCurrentMapWebSocket.MODS,
+                name: macroOsuStreamCompanionCurrentMapWebSocket.id,
                 type: "macro",
               },
             ],
@@ -148,52 +150,52 @@ export const osuCommandReplyNpStreamCompanion = {
         },
         " - CS=",
         {
-          key: MacroOsuStreamCompanionCurrentMap.CS,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.CS,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         ", AR=",
         {
-          key: MacroOsuStreamCompanionCurrentMap.AR,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.AR,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         ", OD=",
         {
-          key: MacroOsuStreamCompanionCurrentMap.OD,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.OD,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         ", HP=",
         {
-          key: MacroOsuStreamCompanionCurrentMap.HP,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.HP,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         ", BPM=",
         {
-          key: MacroOsuStreamCompanionCurrentMap.BPM,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.BPM,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         ", ",
         {
-          key: MacroOsuStreamCompanionCurrentMap.MAX_COMBO,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.MAX_COMBO,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         "x, ",
         {
-          key: MacroOsuStreamCompanionCurrentMap.DIFFICULTY_RATING,
-          name: macroOsuStreamCompanionCurrentMap.id,
+          key: MacroOsuStreamCompanionCurrentMapWebSocket.DIFFICULTY_RATING,
+          name: macroOsuStreamCompanionCurrentMapWebSocket.id,
           type: "macro",
         },
         "* (",
         {
           args: [
             {
-              key: MacroOsuStreamCompanionCurrentMap.ID,
-              name: macroOsuStreamCompanionCurrentMap.id,
+              key: MacroOsuStreamCompanionCurrentMapWebSocket.ID,
+              name: macroOsuStreamCompanionCurrentMapWebSocket.id,
               type: "macro",
             },
             ">0",
@@ -202,8 +204,8 @@ export const osuCommandReplyNpStreamCompanion = {
           scope: [
             "https://osu.ppy.sh/beatmaps/",
             {
-              key: MacroOsuStreamCompanionCurrentMap.ID,
-              name: macroOsuStreamCompanionCurrentMap.id,
+              key: MacroOsuStreamCompanionCurrentMapWebSocket.ID,
+              name: macroOsuStreamCompanionCurrentMapWebSocket.id,
               type: "macro",
             },
             " - ",
@@ -213,8 +215,8 @@ export const osuCommandReplyNpStreamCompanion = {
         {
           args: [
             {
-              key: MacroOsuStreamCompanionCurrentMap.ID,
-              name: macroOsuStreamCompanionCurrentMap.id,
+              key: MacroOsuStreamCompanionCurrentMapWebSocket.ID,
+              name: macroOsuStreamCompanionCurrentMapWebSocket.id,
               type: "macro",
             },
             "<=0",
@@ -223,8 +225,8 @@ export const osuCommandReplyNpStreamCompanion = {
           scope: {
             args: [
               {
-                key: MacroOsuStreamCompanionCurrentMap.SET_ID,
-                name: macroOsuStreamCompanionCurrentMap.id,
+                key: MacroOsuStreamCompanionCurrentMapWebSocket.SET_ID,
+                name: macroOsuStreamCompanionCurrentMapWebSocket.id,
                 type: "macro",
               },
               ">0",
@@ -233,8 +235,8 @@ export const osuCommandReplyNpStreamCompanion = {
             scope: [
               "https://osu.ppy.sh/beatmapsets/",
               {
-                key: MacroOsuStreamCompanionCurrentMap.SET_ID,
-                name: macroOsuStreamCompanionCurrentMap.id,
+                key: MacroOsuStreamCompanionCurrentMapWebSocket.SET_ID,
+                name: macroOsuStreamCompanionCurrentMapWebSocket.id,
                 type: "macro",
               },
               " - ",
@@ -248,7 +250,27 @@ export const osuCommandReplyNpStreamCompanion = {
       type: "plugin",
     },
   ]),
-  id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION`,
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_WEBSOCKET`,
+};
+
+export const osuCommandReplyNpStreamCompanionFile = {
+  default: createMessageForMessageParser([
+    "@",
+    { name: PluginTwitchChat.USER, type: "plugin" },
+    " Currently playing ",
+    {
+      name: PluginOsuStreamCompanion.CURRENT_MAP_FILE,
+      scope: [
+        {
+          key: MacroOsuStreamCompanionCurrentMapFile.NP_ALL,
+          name: macroOsuStreamCompanionCurrentMapFile.id,
+          type: "macro",
+        },
+      ],
+      type: "plugin",
+    },
+  ]),
+  id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_FILE`,
 };
 
 export const osuCommandReplyNpNoMap = {
@@ -771,7 +793,7 @@ export const osuScore = {
 export const osuCommandReply = [
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
-  osuCommandReplyNpStreamCompanion,
+  osuCommandReplyNpStreamCompanionWebSocket,
   osuCommandReplyNpNoMapStreamCompanion,
   osuCommandReplyNpStreamCompanionNotRunning,
   osuCommandReplyRp,

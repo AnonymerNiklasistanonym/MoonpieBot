@@ -8,6 +8,10 @@ import path from "path";
 import { StaticAuthProvider } from "@twurple/auth";
 // Local imports
 import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuIrc";
+import {
+  createStreamCompanionFileConnection,
+  createStreamCompanionWebSocketConnection,
+} from "./osuStreamCompanion";
 import { createTwitchClient, runTwitchCommandHandler } from "./twitch";
 import { defaultPlugins, generatePlugin } from "./messageParser/plugins";
 import {
@@ -33,7 +37,6 @@ import {
   pluginsCustomCommandGenerator,
 } from "./messageParser/plugins/customCommand";
 import { createLogFunc } from "./logging";
-import { createStreamCompanionConnection } from "./osuStreamCompanion";
 import { defaultMacros } from "./messageParser/macros";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { fileNameDatabaseBackups } from "./info/fileNames";
@@ -44,7 +47,7 @@ import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
-import { pluginOsuStreamCompanionGenerator } from "./messageParser/plugins/osuStreamCompanion";
+import { pluginsOsuStreamCompanionGenerator } from "./messageParser/plugins/osuStreamCompanion";
 import { pluginsOsuGenerator } from "./messageParser/plugins/osuApi";
 import { pluginSpotifyGenerator } from "./messageParser/plugins/spotify";
 import { pluginsTwitchApiGenerator } from "./messageParser/plugins/twitchApi";
@@ -187,6 +190,9 @@ export const main = async (
   const osuStreamCompanionUrl = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_STREAM_COMPANION_URL
   );
+  const osuStreamCompanionDirPath = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_STREAM_COMPANION_DIR_PATH
+  );
 
   // Initialize global objects
   // Twitch connection
@@ -231,8 +237,13 @@ export const main = async (
   // > osu! StreamCompanion
   let osuStreamCompanionCurrentMapData: undefined | StreamCompanionConnection;
   if (osuStreamCompanionUrl) {
-    osuStreamCompanionCurrentMapData = createStreamCompanionConnection(
+    osuStreamCompanionCurrentMapData = createStreamCompanionWebSocketConnection(
       osuStreamCompanionUrl,
+      logger
+    );
+  } else if (osuStreamCompanionDirPath) {
+    osuStreamCompanionCurrentMapData = createStreamCompanionFileConnection(
+      osuStreamCompanionDirPath,
       logger
     );
   }
@@ -312,12 +323,14 @@ export const main = async (
       plugins.set(pluginReady.id, pluginReady.func);
     });
   }
-  if (osuStreamCompanionCurrentMapData !== undefined) {
-    const pluginStreamCompanionReady = generatePlugin(
-      pluginOsuStreamCompanionGenerator,
-      { streamCompanionDataFunc: osuStreamCompanionCurrentMapData }
-    );
-    plugins.set(pluginStreamCompanionReady.id, pluginStreamCompanionReady.func);
+  const temp = osuStreamCompanionCurrentMapData;
+  if (temp !== undefined) {
+    pluginsOsuStreamCompanionGenerator.map((plugin) => {
+      const pluginReady = generatePlugin(plugin, {
+        streamCompanionDataFunc: temp,
+      });
+      plugins.set(pluginReady.id, pluginReady.func);
+    });
   }
   if (spotifyWebApi !== undefined) {
     const pluginSpotifyReady = generatePlugin(pluginSpotifyGenerator, {

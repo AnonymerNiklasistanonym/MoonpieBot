@@ -14,8 +14,9 @@ import {
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
   osuCommandReplyNpNoMapStreamCompanion,
-  osuCommandReplyNpStreamCompanion,
+  osuCommandReplyNpStreamCompanionFile,
   osuCommandReplyNpStreamCompanionNotRunning,
+  osuCommandReplyNpStreamCompanionWebSocket,
 } from "../../strings/osu/commandReply";
 import { createLogFunc } from "../../logging";
 import { getProcessWindowTitle } from "../../other/processInformation";
@@ -98,24 +99,45 @@ export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
     );
 
     if (data.osuStreamCompanionCurrentMapData !== undefined) {
-      const currentMapData = data.osuStreamCompanionCurrentMapData();
+      const currMapData = await data.osuStreamCompanionCurrentMapData();
       if (
-        currentMapData !== undefined &&
-        currentMapData.mapid !== undefined &&
-        currentMapData.mapid !== 0
+        currMapData !== undefined &&
+        ((currMapData.type === "websocket" &&
+          currMapData.mapid !== undefined &&
+          currMapData.mapid !== 0) ||
+          (currMapData.type === "file" &&
+            currMapData.npAll !== undefined &&
+            currMapData.npAll.length > 0))
       ) {
-        data.beatmapRequestsInfo.lastBeatmapId = currentMapData.mapid;
-        msg = await messageParserById(
-          osuCommandReplyNpStreamCompanion.id,
-          globalStrings,
-          globalPlugins,
-          globalMacros,
-          logger
-        );
+        switch (currMapData.type) {
+          case "websocket":
+            data.beatmapRequestsInfo.lastBeatmapId = currMapData.mapid;
+            // TODO Insert macro in here so no plugin has to be used!
+            msg = await messageParserById(
+              osuCommandReplyNpStreamCompanionWebSocket.id,
+              globalStrings,
+              globalPlugins,
+              globalMacros,
+              logger
+            );
+            break;
+          case "file":
+            // TODO Insert macro in here so no plugin has to be used!
+            //data.beatmapRequestsInfo.lastBeatmapId = currMapData.mapid;
+            msg = await messageParserById(
+              osuCommandReplyNpStreamCompanionFile.id,
+              globalStrings,
+              globalPlugins,
+              globalMacros,
+              logger
+            );
+            break;
+        }
       } else if (
-        currentMapData !== undefined &&
-        currentMapData.mapid !== undefined &&
-        currentMapData.mapid === 0
+        currMapData !== undefined &&
+        currMapData.type === "websocket" &&
+        currMapData.mapid !== undefined &&
+        currMapData.mapid === 0
       ) {
         msg = await messageParserById(
           osuCommandReplyNpNoMapStreamCompanion.id,

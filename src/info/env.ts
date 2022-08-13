@@ -59,6 +59,7 @@ export enum EnvVariable {
   OSU_IRC_PASSWORD = "OSU_IRC_PASSWORD",
   OSU_IRC_REQUEST_TARGET = "OSU_IRC_REQUEST_TARGET",
   OSU_IRC_USERNAME = "OSU_IRC_USERNAME",
+  OSU_STREAM_COMPANION_DIR_PATH = "OSU_STREAM_COMPANION_DIR_PATH",
   OSU_STREAM_COMPANION_URL = "OSU_STREAM_COMPANION_URL",
   SPOTIFY_API_CLIENT_ID = "SPOTIFY_API_CLIENT_ID",
   SPOTIFY_API_CLIENT_SECRET = "SPOTIFY_API_CLIENT_SECRET",
@@ -277,10 +278,15 @@ export const envVariableInformation: EnvVariableData[] = [
   },
   {
     block: EnvVariableBlock.OSU_STREAM_COMPANION,
-    description:
-      "osu! StreamCompanion URL to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods.",
+    description: `osu! StreamCompanion URL (websocket interface) to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods. (If ${EnvVariable.OSU_STREAM_COMPANION_DIR_PATH} is provided this will be preferred)`,
     example: "localhost:20727",
     name: EnvVariable.OSU_STREAM_COMPANION_URL,
+  },
+  {
+    block: EnvVariableBlock.OSU_STREAM_COMPANION,
+    description: `osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods. (If ${EnvVariable.OSU_STREAM_COMPANION_URL} is provided this will be ignored)`,
+    example: "C:\\Program Files (x86)\\StreamCompanion\\Files",
+    name: EnvVariable.OSU_STREAM_COMPANION_DIR_PATH,
   },
   {
     block: EnvVariableBlock.SPOTIFY,
