@@ -26,7 +26,7 @@ export enum MacroOsuStreamCompanionCurrentMapWebSocket {
 
 export const macroOsuStreamCompanionCurrentMapWebSocket: MessageParserMacroDocumentation =
   {
-    id: "OSU_STREAMCOMPANION_CURRENT_MAP",
+    id: "OSU_STREAMCOMPANION_CURRENT_MAP_WEB_SOCKET",
     keys: Object.values(MacroOsuStreamCompanionCurrentMapWebSocket),
   };
 

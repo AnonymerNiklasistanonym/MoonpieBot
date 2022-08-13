@@ -18,15 +18,18 @@ import {
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequests,
 } from "./macros/osuBeatmapRequest";
+import {
+  macroOsuStreamCompanionCurrentMapFile,
+  macroOsuStreamCompanionCurrentMapWebSocket,
+} from "./macros/osuStreamCompanion";
 import { macroMoonpieBot } from "./macros/moonpiebot";
 import { macroOsuPpRequest } from "./macros/osuPpRequest";
 import { macroOsuRpRequest } from "./macros/osuRpRequest";
 import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
 import { macroOsuWindowTitle } from "./macros/osuWindowTitle";
+import { macroSpotifySong } from "./macros/spotify";
 // Type imports
 import type { MacroDictionary } from "../messageParser";
-import { macroOsuStreamCompanionCurrentMapWebSocket } from "./macros/osuStreamCompanion";
-import { macroSpotifySong } from "./macros/spotify";
 
 export interface MessageParserMacro {
   description?: string;
@@ -64,8 +67,9 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] = [
   macroOsuRpRequest,
   macroOsuScore,
   macroOsuScoreRequest,
-  macroOsuUser,
-  macroSpotifySong,
+  macroOsuStreamCompanionCurrentMapFile,
   macroOsuStreamCompanionCurrentMapWebSocket,
+  macroOsuUser,
   macroOsuWindowTitle,
+  macroSpotifySong,
 ];
