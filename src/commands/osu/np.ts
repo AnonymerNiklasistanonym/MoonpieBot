@@ -7,8 +7,8 @@ import {
 } from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
-  MacroOsuWindowTitle,
   macroOsuWindowTitle,
+  macroOsuWindowTitleLogic,
 } from "../../messageParser/macros/osuWindowTitle";
 import {
   osuCommandReplyNp,
@@ -213,14 +213,10 @@ export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
           const customMacros = new Map(globalMacros);
           customMacros.set(
             macroOsuWindowTitle.id,
-            new Map([
-              [MacroOsuWindowTitle.TITLE, `${match[2]}`],
-              [MacroOsuWindowTitle.ARTIST, `${match[1]}`],
+            new Map(
               // eslint-disable-next-line no-magic-numbers
-              [MacroOsuWindowTitle.VERSION, `${match[3]}`],
-              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              [MacroOsuWindowTitle.MAP_ID_VIA_API, `${mapId}`],
-            ])
+              macroOsuWindowTitleLogic(match[1], match[2], match[3], mapId)
+            )
           );
           msg = await messageParserById(
             osuCommandReplyNp.id,
