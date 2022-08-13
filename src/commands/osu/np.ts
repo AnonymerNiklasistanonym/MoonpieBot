@@ -52,15 +52,6 @@ export const regexNp = /^\s*!np(?:\s*|\s.*)$/i;
 export const regexNowPlaying =
   /^(?:.+?)\s-\s\s*(.+?)\s*\s-\s\s*(.+?)\s*\[\s*([^\s[\]]+?)\s*\]$/;
 
-const ROUND_TO_1_DIGIT_FACTOR = 10;
-
-export const roundToOneDecimalPlace = (num: undefined | number) => {
-  if (num === undefined) {
-    return 0;
-  }
-  return Math.round(num * ROUND_TO_1_DIGIT_FACTOR) / ROUND_TO_1_DIGIT_FACTOR;
-};
-
 export interface CommandHandlerNpDataBase {
   /**
    * The osu API (v2) credentials.

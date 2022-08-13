@@ -1,26 +1,11 @@
-import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
+import {
+  SpotifyGetCurrentAndRecentSongs,
+  spotifyGetCurrentAndRecentSongs,
+} from "../../spotify";
 // Type imports
 import type { MacroDictionaryEntry } from "../../messageParser";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type SpotifyWebApi from "spotify-web-api-node";
-
-interface Album {
-  album_type: string;
-  artists: AlbumArtist[];
-  name: string;
-}
-interface ItemAlbum {
-  album: Album;
-}
-interface AlbumArtist {
-  name: string;
-}
-interface ItemArtist {
-  artists: Artist[];
-}
-interface Artist {
-  name: string;
-}
 
 export enum SpotifySongMacro {
   CURRENT_ALBUM = "CURRENT_ALBUM",
@@ -41,71 +26,101 @@ export interface PluginSpotifyData {
   spotifyWebApi: SpotifyWebApi;
 }
 
+export const pluginSpotifySongMacroLogic = (
+  spotifyData: SpotifyGetCurrentAndRecentSongs
+): MacroDictionaryEntry[] => {
+  const currData = spotifyData.currentlyPlaying.body.item;
+  const hasCurrent = currData != null;
+
+  const recentData = spotifyData.recentlyPlayedTracks.body.items;
+  const hasPrevious = recentData.length > 0;
+  const prevData = recentData[0];
+
+  return Object.values(SpotifySongMacro).map<[SpotifySongMacro, string]>(
+    (macroId) => {
+      let macroValue;
+      switch (macroId) {
+        case SpotifySongMacro.CURRENT_ALBUM:
+          if (
+            hasCurrent &&
+            currData.type === "track" &&
+            currData.album.album_type !== "single"
+          ) {
+            macroValue = currData.album.name;
+          }
+          break;
+        case SpotifySongMacro.CURRENT_ARTISTS:
+          if (hasCurrent && currData.type === "track") {
+            macroValue = currData.artists.map((a) => a.name).join(", ");
+          }
+          break;
+        case SpotifySongMacro.CURRENT_IS_SINGLE:
+          macroValue =
+            hasCurrent &&
+            currData.type === "track" &&
+            currData.album.album_type === "single";
+          break;
+        case SpotifySongMacro.CURRENT_TITLE:
+          if (hasCurrent && currData.type === "track") {
+            macroValue = currData.name;
+          }
+          break;
+        case SpotifySongMacro.CURRENT_URL:
+          if (hasCurrent) {
+            macroValue = currData.external_urls.spotify;
+          }
+          break;
+        case SpotifySongMacro.HAS_CURRENT:
+          macroValue = hasCurrent;
+          break;
+        case SpotifySongMacro.HAS_PREVIOUS:
+          macroValue = hasPrevious;
+          break;
+        case SpotifySongMacro.PREVIOUS_ALBUM:
+          if (hasPrevious) {
+            macroValue = prevData.track.album.name;
+          }
+          break;
+        case SpotifySongMacro.PREVIOUS_ARTISTS:
+          macroValue = hasPrevious
+            ? prevData.track.artists.map((a) => a.name).join(", ")
+            : undefined;
+          break;
+        case SpotifySongMacro.PREVIOUS_IS_SINGLE:
+          macroValue =
+            hasPrevious && prevData.track.album.album_type === "single";
+          break;
+        case SpotifySongMacro.PREVIOUS_TITLE:
+          macroValue = hasPrevious ? prevData.track.name : undefined;
+          break;
+        case SpotifySongMacro.PREVIOUS_URL:
+          macroValue = hasPrevious
+            ? prevData.track.external_urls.spotify
+            : undefined;
+          break;
+      }
+      if (typeof macroValue === "boolean") {
+        macroValue = macroValue ? "true" : "false";
+      }
+      if (typeof macroValue === "undefined") {
+        macroValue = "undefined";
+      }
+      return [macroId, macroValue];
+    }
+  );
+};
+
 export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyData> =
   {
-    generate: (data) => async (logger) => {
-      const spotifyData = await spotifyGetCurrentAndRecentSongs(
-        data.spotifyWebApi,
-        logger
-      );
-      const macros: MacroDictionaryEntry[] = [];
-      const currData = spotifyData?.currentlyPlaying.body.item;
-      const hasCurrent = currData != null && currData !== undefined;
-      macros.push([
-        SpotifySongMacro.HAS_CURRENT,
-        hasCurrent ? "true" : "false",
-      ]);
-      if (hasCurrent) {
-        const album = (currData as unknown as ItemAlbum).album;
-        const artist = (currData as unknown as ItemArtist).artists;
-        macros.push([SpotifySongMacro.CURRENT_TITLE, currData.name]);
-        macros.push([
-          SpotifySongMacro.CURRENT_ARTISTS,
-          artist?.map((a) => a.name).join(", "),
-        ]);
-        macros.push([
-          SpotifySongMacro.CURRENT_IS_SINGLE,
-          album.album_type === "single" ? "true" : "false",
-        ]);
-        if (album.album_type !== "single") {
-          macros.push([SpotifySongMacro.CURRENT_ALBUM, album.name]);
-        }
-        macros.push([
-          SpotifySongMacro.CURRENT_URL,
-          currData.external_urls.spotify,
-        ]);
-      }
-      const recentData = spotifyData?.recentlyPlayedTracks.body.items;
-      const hasRecent =
-        recentData != null && recentData !== undefined && recentData.length > 0;
-      macros.push([
-        SpotifySongMacro.HAS_PREVIOUS,
-        hasRecent ? "true" : "false",
-      ]);
-      if (hasRecent) {
-        const previousSong = recentData[0];
-        macros.push([SpotifySongMacro.PREVIOUS_TITLE, previousSong.track.name]);
-        macros.push([
-          SpotifySongMacro.PREVIOUS_ARTISTS,
-          previousSong.track.artists?.map((a) => a.name).join(", "),
-        ]);
-        macros.push([
-          SpotifySongMacro.PREVIOUS_IS_SINGLE,
-          previousSong.track.album.album_type === "single" ? "true" : "false",
-        ]);
-        if (previousSong.track.album.album_type !== "single") {
-          macros.push([
-            SpotifySongMacro.PREVIOUS_ALBUM,
-            previousSong.track.album.name,
-          ]);
-        }
-        macros.push([
-          SpotifySongMacro.PREVIOUS_URL,
-          previousSong.track.external_urls.spotify,
-        ]);
-      }
-      return macros;
-    },
+    generate:
+      (data) =>
+      async (logger): Promise<MacroDictionaryEntry[]> => {
+        const spotifyData = await spotifyGetCurrentAndRecentSongs(
+          data.spotifyWebApi,
+          logger
+        );
+        return pluginSpotifySongMacroLogic(spotifyData);
+      },
     id: "SPOTIFY_SONG",
     signature: {
       exportedMacroKeys: Object.values(SpotifySongMacro),

@@ -31,7 +31,7 @@ export const createStringsVariableDocumentation = async (
   optionalPlugins?: MessageParserPluginInfo[],
   optionalMacros?: MessageParserMacroDocumentation[],
   logger?: Logger
-) => {
+): Promise<void> => {
   const data: FileDocumentationParts[] = [];
   data.push({
     content:

@@ -36,7 +36,7 @@ export interface LoggerInformation {
  * @param logInfo The information the logger provides.
  * @returns Parsed string.
  */
-export const logFormat = (logInfo: LoggerInformation) => {
+export const logFormat = (logInfo: LoggerInformation): string => {
   if (logInfo.timestamp && logInfo.service) {
     if (logInfo.section) {
       if (logInfo.subsection) {
@@ -63,7 +63,7 @@ export const createLogger = (
   logDir: string,
   logLevelConsole: LoggerLevel | string = "info",
   logLevelFile: LoggerLevel | string = "debug"
-) =>
+): Logger =>
   createWinstonLogger({
     defaultMeta: { service: name },
     exitOnError: false,
@@ -92,7 +92,7 @@ export const createLogger = (
 export const createConsoleLogger = (
   name: string,
   logLevelConsole: LoggerLevel | string = "info"
-) =>
+): Logger =>
   createWinstonLogger({
     defaultMeta: { service: name },
     exitOnError: false,
@@ -151,7 +151,7 @@ export const typeGuardLog = <T>(
   value: T,
   property?: string,
   index?: number
-) =>
+): string =>
   `${
     property ? `'${property}'${index !== undefined ? `[${index}]` : ""}: ` : ""
   }expected ${expectedMessage} ('${typeof value}'/'${JSON.stringify(value)}')`;

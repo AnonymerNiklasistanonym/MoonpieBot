@@ -268,7 +268,7 @@ export const logTwitchMessageReply = (
   messageId: string,
   sentMessage: string[],
   replySourceId: string
-) => {
+): void => {
   logger.log({
     level: "debug",
     message: `Successfully replied to message ${messageId}: '${JSON.stringify(
@@ -290,7 +290,7 @@ export const logTwitchMessageBroadcast = (
   logger: Logger,
   sentMessage: string[],
   broadcastSourceId: string
-) => {
+): void => {
   logger.log({
     level: "debug",
     message: `Successfully broadcasted: '${JSON.stringify(sentMessage)}'`,
@@ -312,7 +312,7 @@ export const logTwitchMessageCommandDetected = (
   messageId: string,
   message: Readonly<string[]>,
   detectedCommand: TwitchChatCommandHandlerInfo
-) => {
+): void => {
   logger.log({
     level: "debug",
     message: `Detected command "${detectedCommand.chatHandlerId}:${
@@ -335,7 +335,7 @@ export const logTwitchMessageCommandReply = (
   detectedCommand: TwitchChatCommandHandlerInfo,
   commandReply: TwitchChatCommandHandlerReply,
   replyToMessageId: string
-) => {
+): void => {
   logger.log({
     level: "debug",
     message: `Successfully replied to message ${replyToMessageId} using the command "${

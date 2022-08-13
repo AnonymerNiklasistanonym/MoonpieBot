@@ -23,7 +23,9 @@ export enum TwitchBadgeLevels {
  * @param tags Twitch message user state.
  * @returns Highest twitch badge level.
  */
-export const parseTwitchBadgeLevel = (tags: ChatUserstate) => {
+export const parseTwitchBadgeLevel = (
+  tags: ChatUserstate
+): TwitchBadgeLevels => {
   if (tags?.badges?.broadcaster === "1") {
     return TwitchBadgeLevels.BROADCASTER;
   }

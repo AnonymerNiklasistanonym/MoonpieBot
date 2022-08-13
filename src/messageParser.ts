@@ -152,7 +152,7 @@ export const createParseTree = (
   earlyExitBecausePluginValue = false,
   stringDepth = 0,
   logger: Logger
-) => {
+): ParseTreeNode => {
   //console.log(`Generate parse tree of '${messageString}'`);
   //if (pluginDepth > 0) {
   //  console.log(`Early exit if a plugin close is found (${pluginDepth})`);
@@ -628,7 +628,7 @@ export const createPluginSignatureString = async (
   pluginName: string,
   pluginFunc?: PluginFunc,
   pluginSignatureObject?: PluginSignature
-) => {
+): Promise<string> => {
   // Check for plugin signature
   const argumentSignatures: string[] = [];
   let scopeSignature: string | undefined;
@@ -868,7 +868,7 @@ export const messageParser = async (
   plugins: Plugins = new Map(),
   macros: Macros = new Map(),
   logger: Logger
-) => {
+): Promise<string> => {
   const logMessageParser = createLogFunc(logger, LOG_ID_MODULE_MESSAGE_PARSER);
 
   if (messageString === undefined) {
@@ -906,7 +906,7 @@ export const messageParserById = async (
   plugins: Plugins = new Map(),
   macros: Macros = new Map(),
   logger: Logger
-) => {
+): Promise<string> => {
   const stringFromId = strings.get(stringId);
   if (stringFromId === undefined) {
     throw Error(`Message string could not be found via its ID '${stringId}'`);
@@ -914,10 +914,15 @@ export const messageParserById = async (
   return await messageParser(stringFromId, strings, plugins, macros, logger);
 };
 
+export interface MacroPluginMap {
+  macrosMap: Macros;
+  pluginsMap: Plugins;
+}
+
 export const generatePluginsAndMacrosMap = (
   plugins: MessageParserPlugin[],
   macros: MessageParserMacro[]
-) => {
+): MacroPluginMap => {
   const pluginsMap: Plugins = new Map();
   for (const plugin of plugins) {
     pluginsMap.set(plugin.id, plugin.func);
@@ -936,7 +941,7 @@ export const generatePluginAndMacroDocumentation = async (
   optionalPlugins: undefined | MessageParserPluginInfo[],
   optionalMacros: undefined | MessageParserMacroDocumentation[],
   logger: Logger
-) => {
+): Promise<FileDocumentationParts[]> => {
   const maps = generatePluginsAndMacrosMap(plugins, macros);
   const pluginsMap = maps.pluginsMap;
   const macrosMap = maps.macrosMap;

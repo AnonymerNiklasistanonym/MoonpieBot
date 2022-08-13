@@ -5,7 +5,9 @@ import { name, sourceCodeUrl } from "../info/general";
 import { getVersionFromObject } from "../version";
 import { version } from "../info/version";
 
-export const createWindowsInstallerConfigFile = async (outputPath: string) => {
+export const createWindowsInstallerConfigFile = async (
+  outputPath: string
+): Promise<void> => {
   let outputString = "";
   outputString += ";Define name and lowercase name of the product\n";
   outputString += `!define PRODUCT "${name}"\n`;

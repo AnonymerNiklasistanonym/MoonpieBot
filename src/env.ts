@@ -11,6 +11,7 @@ import {
   ENV_VARIABLE_PREFIX,
   EnvVariable,
   EnvVariableBlock,
+  EnvVariableData,
   envVariableInformation,
 } from "./info/env";
 import type {
@@ -25,7 +26,7 @@ import type {
 export const printEnvVariablesToConsole = (
   configDir: string,
   censor = true
-) => {
+): void => {
   for (const envVariable in EnvVariable) {
     // eslint-disable-next-line security/detect-object-injection
     const envVariableName = getEnvVariableName(envVariable);
@@ -209,7 +210,7 @@ export const getEnvVariableValueOrUndefined = (
 
 export const getEnvVariableValueInformation = (
   envVariable: EnvVariable | string
-) => {
+): EnvVariableData => {
   const info = envVariableInformation.find((a) => a.name === envVariable);
   if (info) {
     return info;
@@ -345,7 +346,7 @@ export const envVariableStructure: (
 export const createEnvVariableDocumentation = async (
   path: string,
   configDir: string
-) => {
+): Promise<void> => {
   const data: FileDocumentationParts[] = [];
 
   for (const structurePart of envVariableStructure) {

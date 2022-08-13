@@ -3,6 +3,7 @@ import irc from "irc";
 // Local imports
 import { createLogFunc } from "./logging";
 // Type imports
+import type { Client as IrcClient } from "irc";
 import type { Logger } from "winston";
 
 /**
@@ -70,7 +71,7 @@ export const createOsuIrcConnection = (
   osuIrcPassword: string,
   id: string,
   logger: Logger
-) => {
+): IrcClient => {
   const logOsuIrc = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU_IRC, id);
 
   // TODO Handle authentication errors
@@ -158,7 +159,7 @@ export const tryToSendOsuIrcMessage = async (
   osuIrcRequestTarget: string,
   message: string,
   logger: Logger
-) => {
+): Promise<void> => {
   const logOsuIrc = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU_IRC, id);
 
   let osuIrcBotInstance: undefined | irc.Client = osuIrcBot(id);

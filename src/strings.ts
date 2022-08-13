@@ -72,7 +72,7 @@ export const defaultStrings: Strings = new Map([
 export const updateStringsMapWithCustomEnvStrings = (
   strings: Strings = new Map(defaultStrings),
   logger: Logger
-) => {
+): Strings => {
   const logStrings = createLogFunc(
     logger,
     LOG_ID_MODULE_STRINGS,

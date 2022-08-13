@@ -13,7 +13,7 @@ export enum ErrorWithCodeCode {
   USER_NAME_UNDEFINED = "USER_NAME_UNDEFINED",
 }
 
-export const errorMessageIdUndefined = () => {
+export const errorMessageIdUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to reply to message! (messageId is undefined)"
   );
@@ -21,7 +21,7 @@ export const errorMessageIdUndefined = () => {
   return error;
 };
 
-export const errorMessageUserNameUndefined = () => {
+export const errorMessageUserNameUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to reply to message! (userName is undefined)"
   );
@@ -29,7 +29,7 @@ export const errorMessageUserNameUndefined = () => {
   return error;
 };
 
-export const errorMessageUserIdUndefined = () => {
+export const errorMessageUserIdUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to reply to message! (userId is undefined)"
   );
@@ -37,7 +37,7 @@ export const errorMessageUserIdUndefined = () => {
   return error;
 };
 
-export const errorMessageEnabledCommandsUndefined = () => {
+export const errorMessageEnabledCommandsUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to detect message! (enabled commands is undefined)"
   );
@@ -45,7 +45,7 @@ export const errorMessageEnabledCommandsUndefined = () => {
   return error;
 };
 
-export const errorMessageOsuApiCredentialsUndefined = () => {
+export const errorMessageOsuApiCredentialsUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to reply to message! (osuApiV2Credentials is undefined)"
   );

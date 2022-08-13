@@ -26,7 +26,7 @@ export const fileNameWindowsInstallerConfig = path.join(
   "windows_installer_config.nsi"
 );
 
-export const fileNameDatabaseBackups = (date: Date = new Date()) => {
+export const fileNameDatabaseBackups = (date: Date = new Date()): string => {
   const PAD_DAY_MONTH_TO_2_DIGITS_FACTOR = 2;
   const dateDay = `0${date.getDate()}`.slice(-PAD_DAY_MONTH_TO_2_DIGITS_FACTOR);
   const DateMonth = `0${date.getMonth() + 1}`.slice(

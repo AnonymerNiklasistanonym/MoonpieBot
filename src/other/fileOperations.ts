@@ -7,7 +7,7 @@ import { promises as fs } from "fs";
  * @param filePath Path of file/directory.
  * @returns True if exists, False if not.
  */
-export const fileExists = async (filePath: string) =>
+export const fileExists = async (filePath: string): Promise<boolean> =>
   !!(await fs.stat(filePath).catch(() => false));
 
 /**
@@ -17,7 +17,9 @@ export const fileExists = async (filePath: string) =>
  * @template OUTPUT The type of the JSON file.
  * @returns The content of the JSON file (the format is not checked!).
  */
-export const readJsonFile = async <OUTPUT>(filePath: string) => {
+export const readJsonFile = async <OUTPUT>(
+  filePath: string
+): Promise<OUTPUT> => {
   const content = await fs.readFile(filePath);
   return JSON.parse(content.toString()) as OUTPUT;
 };
@@ -31,5 +33,8 @@ const JSON_SPACING = 4;
  * @param data The new data of the JSON file.
  * @template INPUT The type of the JSON file to validate the data.
  */
-export const writeJsonFile = async <INPUT>(filePath: string, data: INPUT) =>
+export const writeJsonFile = async <INPUT>(
+  filePath: string,
+  data: INPUT
+): Promise<void> =>
   await fs.writeFile(filePath, JSON.stringify(data, undefined, JSON_SPACING));

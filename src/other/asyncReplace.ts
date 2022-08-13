@@ -12,7 +12,7 @@ export const asyncReplace = async (
   regex: RegExp,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callback: (substring: string, ...groups: any[]) => Promise<string>
-) => {
+): Promise<string> => {
   // Since the replace function is not async first all the replace data must be
   // collected in an array:
   const replaceData: Promise<string>[] = [];

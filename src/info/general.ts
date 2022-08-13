@@ -32,7 +32,7 @@ export const longDescription = `Running this program will start a Twitch connect
  * @param windows True if Windows paths should be used otherwise it will use Linux paths.
  * @returns String that has either the paths for the Windows installer or Linux package.
  */
-export const packageDescription = (windows: boolean) =>
+export const packageDescription = (windows: boolean): string =>
   `If this program is installed via a ${
     windows ? "installer" : "package"
   } it will use ${

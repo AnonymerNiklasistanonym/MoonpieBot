@@ -19,7 +19,7 @@ export interface Version {
  * @param version The version that should be used.
  * @returns "1.2.3b" or "1.2.3" if not in beta.
  */
-export const getVersionFromObject = (version: Version) =>
+export const getVersionFromObject = (version: Version): string =>
   `v${version.major}.${version.minor}.${version.patch}${
     version.beta ? "b" : ""
   }`;

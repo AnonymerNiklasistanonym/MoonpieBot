@@ -24,7 +24,7 @@ export interface CustomJson {
 
 export const createCustomCommandTimerExampleFiles = async (
   configDir: string
-) => {
+): Promise<void> => {
   await writeJsonFile<CustomCommandsJson>(
     path.join(configDir, fileNameCustomCommandsExample),
     {

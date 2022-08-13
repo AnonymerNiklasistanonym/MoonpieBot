@@ -6,7 +6,10 @@
  * @param splitLength The maximum length of each text string in the output array.
  * @returns Array of text strings that never exceed the split length.
  */
-export const splitTextAtLength = (textInput: string, splitLength: number) => {
+export const splitTextAtLength = (
+  textInput: string,
+  splitLength: number
+): string[] => {
   const allWords = textInput.split(" ");
   const out = [""];
   let first = true;
@@ -74,7 +77,7 @@ const COMMENT_CHARACTER_AND_SPACING = `${COMMENT_CHARACTER}${SPACING_CHARACTER}`
 export const generateFileDocumentation = (
   input: FileDocumentationParts[],
   maxLineLength = DEFAULT_MAX_LINE_LENGTH
-) => {
+): string => {
   let data = "";
 
   for (const inputPart of input) {

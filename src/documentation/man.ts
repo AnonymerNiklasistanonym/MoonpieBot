@@ -20,7 +20,7 @@ import { cliOptionInformation } from "../info/cli";
 import { getVersionFromObject } from "../version";
 import { version } from "../info/version";
 
-export const createManPageFile = async (outputPath: string) => {
+export const createManPageFile = async (outputPath: string): Promise<void> => {
   let outputString = "";
   // Header
   outputString += `% ${name}(1) ${binaryName} ${getVersionFromObject(

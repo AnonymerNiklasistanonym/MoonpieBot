@@ -410,7 +410,7 @@ export interface CustomCommandsData {
 export const loadCustomCommandsFromFile = async (
   filePath: string,
   logger: Logger
-) => {
+): Promise<CustomCommandsData> => {
   const customCommands: CustomCommand[] = [];
   const customCommandsGlobalData: CustomCommandData[] = [];
   const loggerCustomCommands = createLogFunc(logger, "custom_command");

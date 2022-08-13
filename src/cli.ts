@@ -234,7 +234,7 @@ const MINIMUM_DESCRIPTION_LENGTH_ON_THE_SIDE = 30;
 export const cliOutputGenerator = (
   cliOutputLines: CliOutputElements[],
   outputOptions: CliOutputOptions = {}
-) => {
+): string => {
   const options = {
     ...defaultCliOutputOptions,
     ...outputOptions,

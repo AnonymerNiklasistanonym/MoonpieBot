@@ -19,6 +19,7 @@ import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
 import { macroOsuWindowTitle } from "./macros/osuWindowTitle";
 // Type imports
 import type { MacroDictionary } from "../messageParser";
+import { macroOsuStreamCompanionCurrentMap } from "./macros/osuStreamCompanion";
 
 export interface MessageParserMacro {
   description?: string;
@@ -43,15 +44,16 @@ export const defaultMacros: MessageParserMacro[] = [macroMoonpieBot];
 export const defaultMacrosOptional: MessageParserMacroDocumentation[] = [
   macroMoonpieClaim,
   macroMoonpieLeaderboardEntry,
-  macroMoonpieUserGet,
-  macroMoonpieUserSet,
   macroMoonpieUserDelete,
+  macroMoonpieUserGet,
   macroMoonpieUserNeverClaimed,
+  macroMoonpieUserSet,
   macroOsuApi,
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequests,
-  macroOsuRpRequest,
   macroOsuPpRequest,
+  macroOsuRpRequest,
   macroOsuScoreRequest,
+  macroOsuStreamCompanionCurrentMap,
   macroOsuWindowTitle,
 ];

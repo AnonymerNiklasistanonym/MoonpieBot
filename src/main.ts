@@ -90,7 +90,7 @@ export const main = async (
   logger: Logger,
   configDir: string,
   logDir: string
-) => {
+): Promise<void> => {
   const pathCustomTimers = path.join(configDir, "customTimers.json");
   const pathCustomCommands = path.join(configDir, "customCommands.json");
 

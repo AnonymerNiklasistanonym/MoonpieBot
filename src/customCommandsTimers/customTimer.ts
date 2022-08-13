@@ -177,7 +177,10 @@ export const registerTimer = (
   });
 };
 
-export const removeTimer = (cronTask: cron.ScheduledTask, logger: Logger) => {
+export const removeTimer = (
+  cronTask: cron.ScheduledTask,
+  logger: Logger
+): void => {
   const logCustomTimer = createLogFunc(
     logger,
     LOG_ID_MODULE_CUSTOM_TIMER,
@@ -191,7 +194,7 @@ export const removeTimer = (cronTask: cron.ScheduledTask, logger: Logger) => {
 export const loadCustomTimersFromFile = async (
   filePath: string,
   logger: Logger
-) => {
+): Promise<CustomTimer[]> => {
   const customTimers: CustomTimer[] = [];
   const loggerCustomTimers = createLogFunc(logger, "custom_timer");
 
