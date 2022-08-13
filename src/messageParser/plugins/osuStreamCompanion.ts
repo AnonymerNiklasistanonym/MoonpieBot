@@ -1,7 +1,7 @@
 // Type imports
 import {
   MacroOsuStreamCompanionCurrentMap,
-  pluginOsuStreamCompanionMacroLogic,
+  macroOsuStreamCompanionCurrentMapLogic,
 } from "../macros/osuStreamCompanion";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
@@ -23,7 +23,7 @@ export const pluginOsuStreamCompanionGenerator: MessageParserPluginGenerator<Plu
       if (currentMap === undefined) {
         return [];
       }
-      return pluginOsuStreamCompanionMacroLogic(currentMap);
+      return macroOsuStreamCompanionCurrentMapLogic(currentMap);
     },
     id: PluginOsuStreamCompanion.CURRENT_MAP,
     signature: {

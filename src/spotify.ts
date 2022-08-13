@@ -153,7 +153,7 @@ export const setupSpotifyAuthentication = async (
 
 interface AlbumObjectSimplified extends ContextObject {
   /**
-   * The field is present when getting an artist’s albums.
+   * The field is present when getting an artist's albums.
    * Possible values are "album", "single", "compilation", "appears_on".
    * Compare to album_type this field represents relationship between the artist and the album.
    */

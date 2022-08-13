@@ -20,6 +20,7 @@ import { macroOsuWindowTitle } from "./macros/osuWindowTitle";
 // Type imports
 import type { MacroDictionary } from "../messageParser";
 import { macroOsuStreamCompanionCurrentMap } from "./macros/osuStreamCompanion";
+import { macroSpotifySong } from "./macros/spotify";
 
 export interface MessageParserMacro {
   description?: string;
@@ -54,6 +55,7 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] = [
   macroOsuPpRequest,
   macroOsuRpRequest,
   macroOsuScoreRequest,
+  macroSpotifySong,
   macroOsuStreamCompanionCurrentMap,
   macroOsuWindowTitle,
 ];

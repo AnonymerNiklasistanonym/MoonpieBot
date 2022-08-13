@@ -27,7 +27,7 @@ export const macroOsuStreamCompanionCurrentMap: MessageParserMacroDocumentation 
     keys: Object.values(MacroOsuStreamCompanionCurrentMap),
   };
 
-export const pluginOsuStreamCompanionMacroLogic = (
+export const macroOsuStreamCompanionCurrentMapLogic = (
   currentMap: StreamCompanionData
 ): MacroDictionaryEntry[] =>
   Object.values(MacroOsuStreamCompanionCurrentMap).map<

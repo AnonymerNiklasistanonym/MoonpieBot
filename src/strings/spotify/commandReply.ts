@@ -3,13 +3,11 @@ import {
   pluginIfFalse,
   pluginIfTrue,
 } from "../../messageParser/plugins/general";
-import {
-  pluginSpotifyGenerator,
-  SpotifySongMacro,
-} from "../../messageParser/plugins/spotify";
 import { createMessageForMessageParser } from "../../messageParser";
+import { macroSpotifySong } from "../../messageParser/macros/spotify";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
+import { SpotifySongMacro } from "../../messageParser/macros/spotify";
 
 export const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
 
@@ -24,20 +22,20 @@ export const spotifyCommandReplyRefSongCurrent = {
       "Currently playing '",
       {
         key: SpotifySongMacro.CURRENT_TITLE,
-        name: pluginSpotifyGenerator.id,
+        name: macroSpotifySong.id,
         type: "macro",
       },
       "' by '",
       {
         key: SpotifySongMacro.CURRENT_ARTISTS,
-        name: pluginSpotifyGenerator.id,
+        name: macroSpotifySong.id,
         type: "macro",
       },
       "'",
       {
         args: {
           key: SpotifySongMacro.CURRENT_IS_SINGLE,
-          name: pluginSpotifyGenerator.id,
+          name: macroSpotifySong.id,
           type: "macro",
         },
         name: pluginIfFalse.id,
@@ -45,7 +43,7 @@ export const spotifyCommandReplyRefSongCurrent = {
           " from '",
           {
             key: SpotifySongMacro.CURRENT_ALBUM,
-            name: pluginSpotifyGenerator.id,
+            name: macroSpotifySong.id,
             type: "macro",
           },
           "'",
@@ -64,20 +62,20 @@ export const spotifyCommandReplyRefSongPrevious = {
       ", previously played '",
       {
         key: SpotifySongMacro.PREVIOUS_TITLE,
-        name: pluginSpotifyGenerator.id,
+        name: macroSpotifySong.id,
         type: "macro",
       },
       "' by '",
       {
         key: SpotifySongMacro.PREVIOUS_ARTISTS,
-        name: pluginSpotifyGenerator.id,
+        name: macroSpotifySong.id,
         type: "macro",
       },
       "'",
       {
         args: {
           key: SpotifySongMacro.PREVIOUS_IS_SINGLE,
-          name: pluginSpotifyGenerator.id,
+          name: macroSpotifySong.id,
           type: "macro",
         },
         name: pluginIfFalse.id,
@@ -85,7 +83,7 @@ export const spotifyCommandReplyRefSongPrevious = {
           " from '",
           {
             key: SpotifySongMacro.PREVIOUS_ALBUM,
-            name: pluginSpotifyGenerator.id,
+            name: macroSpotifySong.id,
             type: "macro",
           },
           "'",
@@ -104,12 +102,12 @@ export const spotifyCommandReplySong = {
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",
     {
-      name: pluginSpotifyGenerator.id,
+      name: macroSpotifySong.id,
       scope: [
         {
           args: {
             key: SpotifySongMacro.HAS_CURRENT,
-            name: pluginSpotifyGenerator.id,
+            name: macroSpotifySong.id,
             type: "macro",
           },
           name: pluginIfTrue.id,
@@ -122,7 +120,7 @@ export const spotifyCommandReplySong = {
         {
           args: {
             key: SpotifySongMacro.HAS_CURRENT,
-            name: pluginSpotifyGenerator.id,
+            name: macroSpotifySong.id,
             type: "macro",
           },
           name: pluginIfFalse.id,
@@ -132,7 +130,7 @@ export const spotifyCommandReplySong = {
         {
           args: {
             key: SpotifySongMacro.HAS_PREVIOUS,
-            name: pluginSpotifyGenerator.id,
+            name: macroSpotifySong.id,
             type: "macro",
           },
           name: pluginIfTrue.id,
