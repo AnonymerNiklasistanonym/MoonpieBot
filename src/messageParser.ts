@@ -563,10 +563,13 @@ export interface RequestHelp {
   plugins?: boolean;
   type: "help";
 }
+export interface ExportedMacroInformation {
+  id: string;
+  keys: string[];
+}
 export interface PluginSignature {
   argument?: string | string[];
-  exportedMacroKeys?: string[];
-  exportsMacro?: boolean;
+  exportedMacros?: ExportedMacroInformation[];
   scope?: string;
   type: "signature";
 }
@@ -588,7 +591,7 @@ export type PluginFunc = (
   | PluginSignature;
 export type Plugins = Map<string, PluginFunc>;
 // A macro is a simple text replace dictionary
-export type MacroDictionaryEntry = [string, string];
+export type MacroDictionaryEntry<KEY = string> = [KEY, string];
 export type MacroDictionary = Map<string, string>;
 export type Macros = Map<string, MacroDictionary>;
 
@@ -655,22 +658,20 @@ export const createPluginSignatureString = async (
       if (pluginSignature.scope) {
         scopeSignature = pluginSignature.scope;
       }
-      if (pluginSignature.exportsMacro) {
+      if (
+        pluginSignature.exportedMacros &&
+        pluginSignature.exportedMacros.length > 0
+      ) {
         if (scopeSignature === undefined) {
           scopeSignature = "";
         }
         if (scopeSignature.length > 0) {
           scopeSignature += ";";
         }
-        if (
-          pluginSignature.exportedMacroKeys &&
-          pluginSignature.exportedMacroKeys.length > 0
-        ) {
-          scopeSignature += `%${pluginName}:[${pluginSignature.exportedMacroKeys
+        for (const exportedMacro of pluginSignature.exportedMacros) {
+          scopeSignature += `%${exportedMacro.id}:[${exportedMacro.keys
             .sort(genericStringSorter)
             .join(",")}]%`;
-        } else {
-          scopeSignature += `%${pluginName}:KEYS%`;
         }
       }
     }

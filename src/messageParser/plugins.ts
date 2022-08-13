@@ -26,7 +26,7 @@ import {
   pluginsCustomCommandGenerator,
 } from "./plugins/customCommand";
 import { pluginOsuStreamCompanionGenerator } from "./plugins/osuStreamCompanion";
-import { pluginsOsuGenerator } from "./plugins/osu";
+import { pluginsOsuGenerator } from "./plugins/osuApi";
 import { pluginSpotifyGenerator } from "./plugins/spotify";
 import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 // Type imports

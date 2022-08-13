@@ -7,6 +7,10 @@ import {
 } from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
+  macroOsuScore,
+  macroOsuScoreLogic,
+} from "../../messageParser/macros/osuApi";
+import {
   MacroOsuScoreRequest,
   macroOsuScoreRequest,
 } from "../../messageParser/macros/osuScoreRequest";
@@ -15,11 +19,9 @@ import {
   osuScoreErrorNoBeatmap,
   osuScoreErrorNotFound,
 } from "../../strings/osu/commandReply";
-import { convertOsuScoreToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
 import { messageParserById } from "../../messageParser";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
-import { pluginOsuScoreId } from "../../messageParser/plugins/osuApi";
 // Type imports
 import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
@@ -126,8 +128,8 @@ export const commandScore: TwitchChatCommandHandler<
         userId
       );
       osuBeatmapRequestMacros.set(
-        pluginOsuScoreId,
-        new Map(convertOsuScoreToMacros(beatmapScore))
+        macroOsuScore.id,
+        new Map(macroOsuScoreLogic(beatmapScore))
       );
       // Check for user score
     } catch (err) {

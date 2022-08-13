@@ -45,7 +45,7 @@ import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
 import { pluginOsuStreamCompanionGenerator } from "./messageParser/plugins/osuStreamCompanion";
-import { pluginsOsuGenerator } from "./messageParser/plugins/osu";
+import { pluginsOsuGenerator } from "./messageParser/plugins/osuApi";
 import { pluginSpotifyGenerator } from "./messageParser/plugins/spotify";
 import { pluginsTwitchApiGenerator } from "./messageParser/plugins/twitchApi";
 import { pluginsTwitchChatGenerator } from "./messageParser/plugins/twitchChat";

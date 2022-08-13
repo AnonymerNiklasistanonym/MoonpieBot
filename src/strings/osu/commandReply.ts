@@ -1,11 +1,11 @@
 import {
+  macroOsuBeatmap,
   MacroOsuBeatmap,
+  macroOsuMostRecentPlay,
   MacroOsuMostRecentPlay,
+  macroOsuUser,
   MacroOsuUser,
-  pluginOsuBeatmapId,
-  pluginOsuMostRecentPlayId,
-  pluginOsuUserId,
-} from "../../messageParser/plugins/osuApi";
+} from "../../messageParser/macros/osuApi";
 import {
   MacroOsuPpRequest,
   macroOsuPpRequest,
@@ -37,9 +37,9 @@ import {
   pluginTimeInSToStopwatchString,
 } from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../messageParser";
-
 import { OSU_STRING_ID } from "../osu";
 import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
+import { PluginOsuApi } from "../../messageParser/plugins/osuApi";
 import { PluginOsuStreamCompanion } from "../../messageParser/plugins/osuStreamCompanion";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 
@@ -289,12 +289,12 @@ export const osuCommandReplyRp = {
         name: macroOsuRpRequest.id,
         type: "macro",
       },
-      name: pluginOsuMostRecentPlayId,
+      name: PluginOsuApi.MOST_RECENT_PLAY,
       scope: [
         {
           args: {
             key: MacroOsuMostRecentPlay.FOUND,
-            name: pluginOsuMostRecentPlayId,
+            name: macroOsuMostRecentPlay.id,
             type: "macro",
           },
           name: pluginIfTrue.id,
@@ -302,20 +302,20 @@ export const osuCommandReplyRp = {
             "Most recent play of ",
             {
               key: MacroOsuMostRecentPlay.USER_NAME,
-              name: pluginOsuMostRecentPlayId,
+              name: macroOsuMostRecentPlay.id,
               type: "macro",
             },
             ": ",
             {
               args: {
                 key: MacroOsuMostRecentPlay.PASSED,
-                name: pluginOsuMostRecentPlayId,
+                name: macroOsuMostRecentPlay.id,
                 type: "macro",
               },
               name: pluginIfTrue.id,
               scope: {
                 key: MacroOsuMostRecentPlay.RANK,
-                name: pluginOsuMostRecentPlayId,
+                name: macroOsuMostRecentPlay.id,
                 type: "macro",
               },
               type: "plugin",
@@ -323,7 +323,7 @@ export const osuCommandReplyRp = {
             {
               args: {
                 key: MacroOsuMostRecentPlay.PASSED,
-                name: pluginOsuMostRecentPlayId,
+                name: macroOsuMostRecentPlay.id,
                 type: "macro",
               },
               name: pluginIfFalse.id,
@@ -333,7 +333,7 @@ export const osuCommandReplyRp = {
             {
               args: {
                 key: MacroOsuMostRecentPlay.MODS,
-                name: pluginOsuMostRecentPlayId,
+                name: macroOsuMostRecentPlay.id,
                 type: "macro",
               },
               name: pluginIfNotEmpty.id,
@@ -341,7 +341,7 @@ export const osuCommandReplyRp = {
                 " using ",
                 {
                   key: MacroOsuMostRecentPlay.MODS,
-                  name: pluginOsuMostRecentPlayId,
+                  name: macroOsuMostRecentPlay.id,
                   type: "macro",
                 },
               ],
@@ -350,7 +350,7 @@ export const osuCommandReplyRp = {
             {
               args: {
                 key: MacroOsuMostRecentPlay.PP,
-                name: pluginOsuMostRecentPlayId,
+                name: macroOsuMostRecentPlay.id,
                 type: "macro",
               },
               name: pluginIfNotUndefined.id,
@@ -358,7 +358,7 @@ export const osuCommandReplyRp = {
                 " with ",
                 {
                   key: MacroOsuMostRecentPlay.PP,
-                  name: pluginOsuMostRecentPlayId,
+                  name: macroOsuMostRecentPlay.id,
                   type: "macro",
                 },
                 "pp",
@@ -368,82 +368,82 @@ export const osuCommandReplyRp = {
             " (",
             {
               key: MacroOsuMostRecentPlay.COUNT_300,
-              name: pluginOsuMostRecentPlayId,
+              name: macroOsuMostRecentPlay.id,
               type: "macro",
             },
             "/",
             {
               key: MacroOsuMostRecentPlay.COUNT_100,
-              name: pluginOsuMostRecentPlayId,
+              name: macroOsuMostRecentPlay.id,
               type: "macro",
             },
             "/",
             {
               key: MacroOsuMostRecentPlay.COUNT_50,
-              name: pluginOsuMostRecentPlayId,
+              name: macroOsuMostRecentPlay.id,
               type: "macro",
             },
             "/",
             {
               key: MacroOsuMostRecentPlay.COUNT_MISS,
-              name: pluginOsuMostRecentPlayId,
+              name: macroOsuMostRecentPlay.id,
               type: "macro",
             },
             ") [mc=",
             {
               key: MacroOsuMostRecentPlay.MAX_COMBO,
-              name: pluginOsuMostRecentPlayId,
+              name: macroOsuMostRecentPlay.id,
               type: "macro",
             },
             ", acc=",
             {
               key: MacroOsuMostRecentPlay.ACC,
-              name: pluginOsuMostRecentPlayId,
+              name: macroOsuMostRecentPlay.id,
               type: "macro",
             },
             "] on ",
             {
               args: {
                 key: MacroOsuMostRecentPlay.MAP_ID,
-                name: pluginOsuMostRecentPlayId,
+                name: macroOsuMostRecentPlay.id,
                 type: "macro",
               },
-              name: pluginOsuBeatmapId,
+              name: PluginOsuApi.BEATMAP,
               scope: [
                 {
                   key: MacroOsuBeatmap.TITLE,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 " '",
                 {
                   key: MacroOsuBeatmap.VERSION,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 "' by '",
                 {
                   key: MacroOsuBeatmap.ARTIST,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 "' [",
                 {
                   key: MacroOsuBeatmap.URL,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 ", ",
                 {
                   key: MacroOsuBeatmap.DIFFICULTY_RATING,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 "* ",
                 {
                   args: {
                     key: MacroOsuBeatmap.LENGTH_IN_S,
-                    name: pluginOsuBeatmapId,
+                    name: macroOsuBeatmap.id,
                     type: "macro",
                   },
                   name: pluginTimeInSToStopwatchString.id,
@@ -452,73 +452,73 @@ export const osuCommandReplyRp = {
                 " ",
                 {
                   key: MacroOsuBeatmap.RANKED_STATUS,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 "] from ",
                 {
                   key: MacroOsuBeatmap.LAST_UPDATED_MONTH,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 " ",
                 {
                   key: MacroOsuBeatmap.LAST_UPDATED_YEAR,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 " {FC=",
                 {
                   key: MacroOsuBeatmap.MAX_COMBO,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 ", CS=",
                 {
                   key: MacroOsuBeatmap.CS,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 ", DRAIN=",
                 {
                   key: MacroOsuBeatmap.DRAIN,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 ", ACC=",
                 {
                   key: MacroOsuBeatmap.ACC,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 ", AR=",
                 {
                   key: MacroOsuBeatmap.AR,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 ", BPM=",
                 {
                   key: MacroOsuBeatmap.BPM,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 ", CC=",
                 {
                   key: MacroOsuBeatmap.CC,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 ", SLC=",
                 {
                   key: MacroOsuBeatmap.SLC,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 ", SPC=",
                 {
                   key: MacroOsuBeatmap.SPC,
-                  name: pluginOsuBeatmapId,
+                  name: macroOsuBeatmap.id,
                   type: "macro",
                 },
                 "}",
@@ -528,7 +528,7 @@ export const osuCommandReplyRp = {
             {
               args: {
                 key: MacroOsuMostRecentPlay.HAS_REPLAY,
-                name: pluginOsuMostRecentPlayId,
+                name: macroOsuMostRecentPlay.id,
                 type: "macro",
               },
               name: pluginIfTrue.id,
@@ -541,7 +541,7 @@ export const osuCommandReplyRp = {
         {
           args: {
             key: MacroOsuMostRecentPlay.FOUND,
-            name: pluginOsuMostRecentPlayId,
+            name: macroOsuMostRecentPlay.id,
             type: "macro",
           },
           name: pluginIfFalse.id,
@@ -575,18 +575,18 @@ export const osuCommandReplyPp = {
         name: macroOsuPpRequest.id,
         type: "macro",
       },
-      name: pluginOsuUserId,
+      name: PluginOsuApi.USER,
       scope: [
-        { key: MacroOsuUser.NAME, name: pluginOsuUserId, type: "macro" },
+        { key: MacroOsuUser.NAME, name: macroOsuUser.id, type: "macro" },
         " (https://osu.ppy.sh/users/",
-        { key: MacroOsuUser.ID, name: pluginOsuUserId, type: "macro" },
+        { key: MacroOsuUser.ID, name: macroOsuUser.id, type: "macro" },
         ") from ",
-        { key: MacroOsuUser.COUNTRY, name: pluginOsuUserId, type: "macro" },
+        { key: MacroOsuUser.COUNTRY, name: macroOsuUser.id, type: "macro" },
         " plays ",
         {
           args: {
             key: MacroOsuUser.PLAY_STYLE,
-            name: pluginOsuUserId,
+            name: macroOsuUser.id,
             type: "macro",
           },
           name: pluginIfNotUndefined.id,
@@ -594,7 +594,7 @@ export const osuCommandReplyPp = {
             "with ",
             {
               key: MacroOsuUser.PLAY_STYLE,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             " ",
@@ -604,19 +604,19 @@ export const osuCommandReplyPp = {
         "since ",
         {
           key: MacroOsuUser.JOIN_DATE_MONTH,
-          name: pluginOsuUserId,
+          name: macroOsuUser.id,
           type: "macro",
         },
         " ",
         {
           key: MacroOsuUser.JOIN_DATE_YEAR,
-          name: pluginOsuUserId,
+          name: macroOsuUser.id,
           type: "macro",
         },
         {
           args: {
             key: MacroOsuUser.HAS_STATISTICS,
-            name: pluginOsuUserId,
+            name: macroOsuUser.id,
             type: "macro",
           },
           name: pluginIfTrue.id,
@@ -624,68 +624,68 @@ export const osuCommandReplyPp = {
             " and reached rank #",
             {
               key: MacroOsuUser.GLOBAL_RANK,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             " [country #",
             {
               key: MacroOsuUser.COUNTRY_RANK,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             "] with ",
             {
               key: MacroOsuUser.PP,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             "pp, ",
             {
               key: MacroOsuUser.ACC,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             "%, a max combo of ",
             {
               key: MacroOsuUser.MAX_COMBO,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             ", ",
             {
               key: MacroOsuUser.COUNTS_SSH,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             " SSH, ",
             {
               key: MacroOsuUser.COUNTS_SS,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             " SS, ",
             {
               key: MacroOsuUser.COUNTS_SH,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             " SH, ",
             {
               key: MacroOsuUser.COUNTS_S,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             " S, ",
             {
               key: MacroOsuUser.COUNTS_A,
-              name: pluginOsuUserId,
+              name: macroOsuUser.id,
               type: "macro",
             },
             " A (bunny=",
             {
               args: {
                 key: MacroOsuUser.HAS_BUNNY,
-                name: pluginOsuUserId,
+                name: macroOsuUser.id,
                 type: "macro",
               },
               name: pluginIfTrue.id,
@@ -695,7 +695,7 @@ export const osuCommandReplyPp = {
             {
               args: {
                 key: MacroOsuUser.HAS_BUNNY,
-                name: pluginOsuUserId,
+                name: macroOsuUser.id,
                 type: "macro",
               },
               name: pluginIfFalse.id,
@@ -706,7 +706,7 @@ export const osuCommandReplyPp = {
             {
               args: {
                 key: MacroOsuUser.HAS_TUTEL,
-                name: pluginOsuUserId,
+                name: macroOsuUser.id,
                 type: "macro",
               },
               name: pluginIfTrue.id,
@@ -716,7 +716,7 @@ export const osuCommandReplyPp = {
             {
               args: {
                 key: MacroOsuUser.HAS_TUTEL,
-                name: pluginOsuUserId,
+                name: macroOsuUser.id,
                 type: "macro",
               },
               name: pluginIfFalse.id,

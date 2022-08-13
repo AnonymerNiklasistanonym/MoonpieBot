@@ -1,6 +1,6 @@
 // Type imports
 import {
-  MacroOsuStreamCompanionCurrentMap,
+  macroOsuStreamCompanionCurrentMap,
   macroOsuStreamCompanionCurrentMapLogic,
 } from "../macros/osuStreamCompanion";
 import type { MessageParserPluginGenerator } from "../plugins";
@@ -27,8 +27,7 @@ export const pluginOsuStreamCompanionGenerator: MessageParserPluginGenerator<Plu
     },
     id: PluginOsuStreamCompanion.CURRENT_MAP,
     signature: {
-      exportedMacroKeys: Object.values(MacroOsuStreamCompanionCurrentMap),
-      exportsMacro: true,
+      exportedMacros: [macroOsuStreamCompanionCurrentMap],
       type: "signature",
     },
   };

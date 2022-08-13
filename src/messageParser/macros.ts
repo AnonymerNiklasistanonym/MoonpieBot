@@ -8,11 +8,17 @@ import {
   macroMoonpieUserSet,
 } from "./macros/moonpie";
 import {
+  macroOsuApi,
+  macroOsuBeatmap,
+  macroOsuMostRecentPlay,
+  macroOsuScore,
+  macroOsuUser,
+} from "./macros/osuApi";
+import {
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequests,
 } from "./macros/osuBeatmapRequest";
 import { macroMoonpieBot } from "./macros/moonpiebot";
-import { macroOsuApi } from "./macros/osuApi";
 import { macroOsuPpRequest } from "./macros/osuPpRequest";
 import { macroOsuRpRequest } from "./macros/osuRpRequest";
 import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
@@ -50,11 +56,15 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] = [
   macroMoonpieUserNeverClaimed,
   macroMoonpieUserSet,
   macroOsuApi,
+  macroOsuBeatmap,
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequests,
+  macroOsuMostRecentPlay,
   macroOsuPpRequest,
   macroOsuRpRequest,
+  macroOsuScore,
   macroOsuScoreRequest,
+  macroOsuUser,
   macroSpotifySong,
   macroOsuStreamCompanionCurrentMap,
   macroOsuWindowTitle,

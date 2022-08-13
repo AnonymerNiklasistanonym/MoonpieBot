@@ -1,10 +1,10 @@
 import { MacroOsuApi, macroOsuApi } from "../../messageParser/macros/osuApi";
 import {
   MacroOsuBeatmap,
+  macroOsuBeatmap,
   MacroOsuScore,
-  pluginOsuBeatmapId,
-  pluginOsuScoreId,
-} from "../../messageParser/plugins/osuApi";
+  macroOsuScore,
+} from "../../messageParser/macros/osuApi";
 import {
   MacroOsuBeatmapRequest,
   macroOsuBeatmapRequest,
@@ -23,6 +23,7 @@ import {
 import { createMessageForMessageParser } from "../../messageParser";
 import { OSU_IRC_NEWLINE } from "../../osuIrc";
 import { OSU_STRING_ID } from "../osu";
+import { PluginOsuApi } from "../../messageParser/plugins/osuApi";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 
 export const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
@@ -30,17 +31,17 @@ export const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
 export const osuBeatmapRequestRefTopScoreShort = {
   default: createMessageForMessageParser(
     [
-      { key: MacroOsuScore.RANK, name: pluginOsuScoreId, type: "macro" },
+      { key: MacroOsuScore.RANK, name: macroOsuScore.id, type: "macro" },
       {
         args: {
           key: MacroOsuScore.MODS,
-          name: pluginOsuScoreId,
+          name: macroOsuScore.id,
           type: "macro",
         },
         name: pluginIfNotEmpty.id,
         scope: [
           " using ",
-          { key: MacroOsuScore.MODS, name: pluginOsuScoreId, type: "macro" },
+          { key: MacroOsuScore.MODS, name: macroOsuScore.id, type: "macro" },
         ],
         type: "plugin",
       },
@@ -55,36 +56,36 @@ export const osuBeatmapRequestRefTopScore = {
     [
       { name: osuBeatmapRequestRefTopScoreShort.id, type: "reference" },
       {
-        args: { key: MacroOsuScore.PP, name: pluginOsuScoreId, type: "macro" },
+        args: { key: MacroOsuScore.PP, name: macroOsuScore.id, type: "macro" },
         name: pluginIfNotUndefined.id,
         scope: [
           " with ",
-          { key: MacroOsuScore.PP, name: pluginOsuScoreId, type: "macro" },
+          { key: MacroOsuScore.PP, name: macroOsuScore.id, type: "macro" },
           "pp",
         ],
         type: "plugin",
       },
       " (",
-      { key: MacroOsuScore.COUNT_300, name: pluginOsuScoreId, type: "macro" },
+      { key: MacroOsuScore.COUNT_300, name: macroOsuScore.id, type: "macro" },
       "/",
-      { key: MacroOsuScore.COUNT_100, name: pluginOsuScoreId, type: "macro" },
+      { key: MacroOsuScore.COUNT_100, name: macroOsuScore.id, type: "macro" },
       "/",
-      { key: MacroOsuScore.COUNT_50, name: pluginOsuScoreId, type: "macro" },
+      { key: MacroOsuScore.COUNT_50, name: macroOsuScore.id, type: "macro" },
       "/",
-      { key: MacroOsuScore.COUNT_MISS, name: pluginOsuScoreId, type: "macro" },
+      { key: MacroOsuScore.COUNT_MISS, name: macroOsuScore.id, type: "macro" },
       ") [mc=",
-      { key: MacroOsuScore.MAX_COMBO, name: pluginOsuScoreId, type: "macro" },
+      { key: MacroOsuScore.MAX_COMBO, name: macroOsuScore.id, type: "macro" },
       ", acc=",
-      { key: MacroOsuScore.ACC, name: pluginOsuScoreId, type: "macro" },
+      { key: MacroOsuScore.ACC, name: macroOsuScore.id, type: "macro" },
       "%] from ",
-      { key: MacroOsuScore.DATE_MONTH, name: pluginOsuScoreId, type: "macro" },
+      { key: MacroOsuScore.DATE_MONTH, name: macroOsuScore.id, type: "macro" },
       " ",
-      { key: MacroOsuScore.DATE_YEAR, name: pluginOsuScoreId, type: "macro" },
+      { key: MacroOsuScore.DATE_YEAR, name: macroOsuScore.id, type: "macro" },
       " ",
       {
         args: {
           key: MacroOsuScore.HAS_REPLAY,
-          name: pluginOsuScoreId,
+          name: macroOsuScore.id,
           type: "macro",
         },
         name: pluginIfTrue.id,
@@ -101,11 +102,11 @@ export const osuBeatmapRequest = {
   default: createMessageForMessageParser([
     { name: PluginTwitchChat.USER, type: "plugin" },
     " requested ",
-    { key: MacroOsuBeatmap.TITLE, name: pluginOsuBeatmapId, type: "macro" },
+    { key: MacroOsuBeatmap.TITLE, name: macroOsuBeatmap.id, type: "macro" },
     " '",
-    { key: MacroOsuBeatmap.VERSION, name: pluginOsuBeatmapId, type: "macro" },
+    { key: MacroOsuBeatmap.VERSION, name: macroOsuBeatmap.id, type: "macro" },
     "' by '",
-    { key: MacroOsuBeatmap.ARTIST, name: pluginOsuBeatmapId, type: "macro" },
+    { key: MacroOsuBeatmap.ARTIST, name: macroOsuBeatmap.id, type: "macro" },
     "'",
     {
       args: [
@@ -121,13 +122,13 @@ export const osuBeatmapRequest = {
           type: "macro",
         },
       ],
-      name: pluginOsuScoreId,
+      name: PluginOsuApi.SCORE,
       scope: [
         " - ",
         {
           args: {
             key: MacroOsuScore.EXISTS,
-            name: pluginOsuScoreId,
+            name: macroOsuScore.id,
             type: "macro",
           },
           name: pluginIfTrue.id,
@@ -140,7 +141,7 @@ export const osuBeatmapRequest = {
         {
           args: {
             key: MacroOsuScore.EXISTS,
-            name: pluginOsuScoreId,
+            name: macroOsuScore.id,
             type: "macro",
           },
           name: pluginIfFalse.id,
@@ -160,30 +161,30 @@ export const osuBeatmapRequestRefDetailedStats = {
       "FC=",
       {
         key: MacroOsuBeatmap.MAX_COMBO,
-        name: pluginOsuBeatmapId,
+        name: macroOsuBeatmap.id,
         type: "macro",
       },
       ", CS=",
-      { key: MacroOsuBeatmap.CS, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.CS, name: macroOsuBeatmap.id, type: "macro" },
       ", DRAIN=",
-      { key: MacroOsuBeatmap.DRAIN, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.DRAIN, name: macroOsuBeatmap.id, type: "macro" },
       ", ACC=",
-      { key: MacroOsuBeatmap.ACC, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.ACC, name: macroOsuBeatmap.id, type: "macro" },
       ", AR=",
-      { key: MacroOsuBeatmap.AR, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.AR, name: macroOsuBeatmap.id, type: "macro" },
       ", BPM=",
-      { key: MacroOsuBeatmap.BPM, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.BPM, name: macroOsuBeatmap.id, type: "macro" },
       ", CC=",
-      { key: MacroOsuBeatmap.CC, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.CC, name: macroOsuBeatmap.id, type: "macro" },
       ", SLC=",
-      { key: MacroOsuBeatmap.SLC, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.SLC, name: macroOsuBeatmap.id, type: "macro" },
       ", SPC=",
-      { key: MacroOsuBeatmap.SPC, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.SPC, name: macroOsuBeatmap.id, type: "macro" },
       ", PLAYS=",
       {
         args: {
           key: MacroOsuBeatmap.PLAY_COUNT,
-          name: pluginOsuBeatmapId,
+          name: macroOsuBeatmap.id,
           type: "macro",
         },
         name: pluginConvertToShortNumber.id,
@@ -201,32 +202,32 @@ export const osuBeatmapRequestDetailed = {
     " requested ",
     {
       key: MacroOsuBeatmap.TITLE,
-      name: pluginOsuBeatmapId,
+      name: macroOsuBeatmap.id,
       type: "macro",
     },
     " '",
     {
       key: MacroOsuBeatmap.VERSION,
-      name: pluginOsuBeatmapId,
+      name: macroOsuBeatmap.id,
       type: "macro",
     },
     "' by '",
     {
       key: MacroOsuBeatmap.ARTIST,
-      name: pluginOsuBeatmapId,
+      name: macroOsuBeatmap.id,
       type: "macro",
     },
     "' [",
     {
       key: MacroOsuBeatmap.DIFFICULTY_RATING,
-      name: pluginOsuBeatmapId,
+      name: macroOsuBeatmap.id,
       type: "macro",
     },
     "* ",
     {
       args: {
         key: MacroOsuBeatmap.LENGTH_IN_S,
-        name: pluginOsuBeatmapId,
+        name: macroOsuBeatmap.id,
         type: "macro",
       },
       name: pluginTimeInSToStopwatchString.id,
@@ -235,19 +236,19 @@ export const osuBeatmapRequestDetailed = {
     " ",
     {
       key: MacroOsuBeatmap.RANKED_STATUS,
-      name: pluginOsuBeatmapId,
+      name: macroOsuBeatmap.id,
       type: "macro",
     },
     "] from ",
     {
       key: MacroOsuBeatmap.LAST_UPDATED_MONTH,
-      name: pluginOsuBeatmapId,
+      name: macroOsuBeatmap.id,
       type: "macro",
     },
     " ",
     {
       key: MacroOsuBeatmap.LAST_UPDATED_YEAR,
-      name: pluginOsuBeatmapId,
+      name: macroOsuBeatmap.id,
       type: "macro",
     },
     " {",
@@ -270,12 +271,12 @@ export const osuBeatmapRequestDetailed = {
           type: "macro",
         },
       ],
-      name: pluginOsuScoreId,
+      name: PluginOsuApi.SCORE,
       scope: [
         {
           args: {
             key: MacroOsuScore.EXISTS,
-            name: pluginOsuScoreId,
+            name: macroOsuScore.id,
             type: "macro",
           },
           name: pluginIfTrue.id,
@@ -288,7 +289,7 @@ export const osuBeatmapRequestDetailed = {
         {
           args: {
             key: MacroOsuScore.EXISTS,
-            name: pluginOsuScoreId,
+            name: macroOsuScore.id,
             type: "macro",
           },
           name: pluginIfFalse.id,
@@ -321,15 +322,15 @@ export const osuBeatmapRequestRefIrcRequestString = {
       { name: PluginTwitchChat.USER, type: "plugin" },
       " requested ",
       "[https://osu.ppy.sh/beatmapsets/",
-      { key: MacroOsuBeatmap.SET_ID, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.SET_ID, name: macroOsuBeatmap.id, type: "macro" },
       "#osu/",
-      { key: MacroOsuBeatmap.ID, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.ID, name: macroOsuBeatmap.id, type: "macro" },
       " ",
-      { key: MacroOsuBeatmap.TITLE, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.TITLE, name: macroOsuBeatmap.id, type: "macro" },
       " '",
-      { key: MacroOsuBeatmap.VERSION, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.VERSION, name: macroOsuBeatmap.id, type: "macro" },
       "' by '",
-      { key: MacroOsuBeatmap.ARTIST, name: pluginOsuBeatmapId, type: "macro" },
+      { key: MacroOsuBeatmap.ARTIST, name: macroOsuBeatmap.id, type: "macro" },
       "']",
     ],
     true
@@ -354,13 +355,13 @@ export const osuBeatmapRequestIrc = {
           type: "macro",
         },
       ],
-      name: pluginOsuScoreId,
+      name: PluginOsuApi.SCORE,
       scope: [
         {
           args: [
             {
               key: MacroOsuScore.EXISTS,
-              name: pluginOsuScoreId,
+              name: macroOsuScore.id,
               type: "macro",
             },
             "===true",
@@ -402,13 +403,13 @@ export const osuBeatmapRequestIrcDetailed = {
     `${OSU_IRC_NEWLINE}from `,
     {
       key: MacroOsuBeatmap.LAST_UPDATED_MONTH,
-      name: pluginOsuBeatmapId,
+      name: macroOsuBeatmap.id,
       type: "macro",
     },
     " ",
     {
       key: MacroOsuBeatmap.LAST_UPDATED_YEAR,
-      name: pluginOsuBeatmapId,
+      name: macroOsuBeatmap.id,
       type: "macro",
     },
     " {",
@@ -428,11 +429,11 @@ export const osuBeatmapRequestIrcDetailed = {
           type: "macro",
         },
       ],
-      name: pluginOsuScoreId,
+      name: PluginOsuApi.SCORE,
       scope: {
         args: {
           key: MacroOsuScore.EXISTS,
-          name: pluginOsuScoreId,
+          name: macroOsuScore.id,
           type: "macro",
         },
         name: pluginIfTrue.id,

@@ -2,6 +2,10 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
+  macroOsuBeatmap,
+  macroOsuBeatmapLogic,
+} from "../../messageParser/macros/osuApi";
+import {
   MacroOsuBeatmapRequest,
   macroOsuBeatmapRequest,
   MacroOsuBeatmapRequests,
@@ -16,12 +20,11 @@ import {
   osuBeatmapRequestIrcDetailed,
   osuBeatmapRequestNotFound,
 } from "../../strings/osu/beatmapRequest";
-import { convertOsuBeatmapToMacros } from "../../messageParser/plugins/osu";
 import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { messageParserById } from "../../messageParser";
-import { pluginOsuBeatmapId } from "../../messageParser/plugins/osuApi";
+
 import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
@@ -175,8 +178,8 @@ export const commandBeatmap: TwitchChatCommandHandler<
           data.beatmapRequestsInfo.lastBeatmapId = beatmap.id;
         }
         osuBeatmapRequestMacros.set(
-          pluginOsuBeatmapId,
-          new Map(convertOsuBeatmapToMacros(beatmap))
+          macroOsuBeatmap.id,
+          new Map(macroOsuBeatmapLogic(beatmap))
         );
         // Check for user score
       } catch (err) {

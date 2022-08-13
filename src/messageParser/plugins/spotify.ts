@@ -1,4 +1,4 @@
-import { macroSpotifySongLogic, SpotifySongMacro } from "../macros/spotify";
+import { macroSpotifySong, macroSpotifySongLogic } from "../macros/spotify";
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 // Type imports
 import type { MacroDictionaryEntry } from "../../messageParser";
@@ -22,8 +22,7 @@ export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyD
       },
     id: "SPOTIFY_SONG",
     signature: {
-      exportedMacroKeys: Object.values(SpotifySongMacro),
-      exportsMacro: true,
+      exportedMacros: [macroSpotifySong],
       type: "signature",
     },
   };
