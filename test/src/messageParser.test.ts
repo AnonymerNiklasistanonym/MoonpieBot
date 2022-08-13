@@ -113,7 +113,7 @@ describe("messageParser", () => {
         ["reference2", "$(plugin_uppercase=World) UwU!"],
       ]);
       const plugins: Plugins = new Map<string, PluginFunc>([
-        ["plugin_one", () => []],
+        ["plugin_one", () => new Map()],
         [
           "plugin_uppercase",
           (_logger, content?: string) => {
@@ -206,7 +206,7 @@ describe("messageParser", () => {
       // eslint-disable-next-line @typescript-eslint/require-await
       plugins.set("TWITCH_GAME", (_logger, value) => {
         if (value === "geo") {
-          return [["GEO", "osu!"]];
+          return new Map([["TWITCH_GAME", new Map([["GEO", "osu!"]])]]);
         } else {
           throw Error;
         }
@@ -227,9 +227,9 @@ describe("messageParser", () => {
       // eslint-disable-next-line @typescript-eslint/require-await
       plugins.set("TWITCH_GAME", async (_logger, value?: string) => {
         if (value === "geo") {
-          return [["GEO", "osu!"]];
+          return new Map([["TWITCH_GAME", new Map([["GEO", "osu!"]])]]);
         } else if (value === "lune") {
-          return [["LUNE", "osu!"]];
+          return new Map([["TWITCH_GAME", new Map([["LUNE", "osu!"]])]]);
         } else {
           throw Error;
         }
