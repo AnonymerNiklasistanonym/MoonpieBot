@@ -1,8 +1,10 @@
 // Package imports
-import { RankedStatus } from "osu-api-v2";
+import { RankedStatus, Score, User } from "osu-api-v2";
+//import path from "path";
 // Local imports
 import { monthNames } from "../../other/monthNames";
 import { roundNumber } from "../../other/round";
+//import { writeJsonFile } from "../../other/fileOperations";
 // Type imports
 import type { Beatmap, BeatmapUserScore } from "osu-api-v2";
 import type { MacroDictionaryEntry } from "../../messageParser";
@@ -285,6 +287,7 @@ export const macroOsuScoreLogic = (
 
 export enum MacroOsuMostRecentPlay {
   ACC = "ACC",
+  ARTIST = "ARTIST",
   COUNT_100 = "COUNT_100",
   COUNT_300 = "COUNT_300",
   COUNT_50 = "COUNT_50",
@@ -302,13 +305,126 @@ export enum MacroOsuMostRecentPlay {
   PP = "PP",
   RANK = "RANK",
   TIME_IN_S_AGO = "TIME_IN_S_AGO",
+  TITLE = "TITLE",
   USER_ID = "USER_ID",
   USER_NAME = "USER_NAME",
+  VERSION = "VERSION",
 }
 
 export const macroOsuMostRecentPlay: MessageParserMacroDocumentation = {
   id: "OSU_MOST_RECENT_PLAY",
   keys: Object.values(MacroOsuMostRecentPlay),
+};
+
+export const macroOsuMostRecentPlayLogic = (
+  score: Score
+): MacroDictionaryEntry<MacroOsuMostRecentPlay>[] => {
+  const scoreDate = new Date(score.created_at);
+  const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
+
+  const macroEntries = Object.values(MacroOsuMostRecentPlay).map<
+    [MacroOsuMostRecentPlay, string]
+  >((macroId) => {
+    let macroValue;
+    switch (macroId) {
+      case MacroOsuMostRecentPlay.ACC:
+        macroValue = roundNumber(score.accuracy * 100, 2);
+        break;
+      case MacroOsuMostRecentPlay.ARTIST:
+        macroValue = score.beatmapset?.artist;
+        break;
+      case MacroOsuMostRecentPlay.COUNT_100:
+        macroValue = score.statistics.count_100;
+        break;
+      case MacroOsuMostRecentPlay.COUNT_300:
+        macroValue = score.statistics.count_300;
+        break;
+      case MacroOsuMostRecentPlay.COUNT_50:
+        macroValue = score.statistics.count_50;
+        break;
+      case MacroOsuMostRecentPlay.COUNT_MISS:
+        macroValue = score.statistics.count_miss;
+        break;
+      case MacroOsuMostRecentPlay.DATE_MONTH:
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        macroValue = monthNames[scoreDate.getMonth()];
+        break;
+      case MacroOsuMostRecentPlay.DATE_YEAR:
+        macroValue = scoreDate.getFullYear();
+        break;
+      case MacroOsuMostRecentPlay.FOUND:
+        macroValue = true;
+        break;
+      case MacroOsuMostRecentPlay.FC:
+        macroValue = score.perfect;
+        break;
+      case MacroOsuMostRecentPlay.HAS_REPLAY:
+        macroValue = score.replay;
+        break;
+      case MacroOsuMostRecentPlay.ID:
+        macroValue = score.id;
+        break;
+      case MacroOsuMostRecentPlay.MAP_ID:
+        macroValue = score.beatmap?.id;
+        break;
+      case MacroOsuMostRecentPlay.MAX_COMBO:
+        macroValue = score.max_combo;
+        break;
+      case MacroOsuMostRecentPlay.MODS:
+        macroValue = score.mods.join(",");
+        break;
+      case MacroOsuMostRecentPlay.PASSED:
+        macroValue = score.passed;
+        break;
+      case MacroOsuMostRecentPlay.PP:
+        macroValue = roundNumber(score.pp, 2);
+        break;
+      case MacroOsuMostRecentPlay.RANK:
+        macroValue = score.rank;
+        break;
+      case MacroOsuMostRecentPlay.TIME_IN_S_AGO:
+        macroValue = roundNumber(scoreDateRangeMs / 1000, 0);
+        break;
+      case MacroOsuMostRecentPlay.TITLE:
+        macroValue = score.beatmapset?.title;
+        break;
+      case MacroOsuMostRecentPlay.USER_ID:
+        macroValue = score.user?.id;
+        break;
+      case MacroOsuMostRecentPlay.USER_NAME:
+        macroValue = score.user?.username;
+        break;
+      case MacroOsuMostRecentPlay.VERSION:
+        macroValue = score.beatmap?.version;
+        break;
+    }
+    if (typeof macroValue === "boolean") {
+      macroValue = macroValue ? "true" : "false";
+    }
+    if (typeof macroValue === "undefined") {
+      macroValue = "undefined";
+    }
+    if (typeof macroValue === "number") {
+      macroValue = `${macroValue}`;
+    }
+    return [macroId, macroValue];
+  });
+
+  /*
+  writeJsonFile(
+    path.join(
+      __dirname,
+      "..",
+      "..",
+      "..",
+      `macro_cache_${macroOsuMostRecentPlay.id}.json`
+    ),
+    { macroEntries, macroOsuMostRecentPlay, score }
+    // eslint-disable-next-line no-console
+  ).catch(console.error);
+  */
+
+  return macroEntries;
 };
 
 export enum MacroOsuUser {
@@ -336,4 +452,118 @@ export enum MacroOsuUser {
 export const macroOsuUser: MessageParserMacroDocumentation = {
   id: "OSU_USER",
   keys: Object.values(MacroOsuUser),
+};
+
+const OSU_ACHIEVEMENT_ID_TUTEL = 151;
+const OSU_ACHIEVEMENT_ID_BUNNY = 6;
+
+export const macroOsuUserLogic = (
+  user: User
+): MacroDictionaryEntry<MacroOsuUser>[] => {
+  const joinDate = new Date(user.join_date);
+  const joinDateMonth = joinDate.getMonth();
+  const joinDateYear = joinDate.getFullYear();
+  const userAchievements = user.user_achievements;
+
+  const hasAchievement = (achievementId: number): boolean =>
+    userAchievements !== undefined &&
+    userAchievements.findIndex((a) => a.achievement_id === achievementId) > -1;
+
+  const macroEntries = Object.values(MacroOsuUser).map<[MacroOsuUser, string]>(
+    (macroId) => {
+      let macroValue;
+      switch (macroId) {
+        case MacroOsuUser.ACC:
+          if (user.statistics) {
+            macroValue = roundNumber(user.statistics.hit_accuracy, 2);
+          }
+          break;
+        case MacroOsuUser.COUNTRY:
+          macroValue = user.country.name;
+          break;
+        case MacroOsuUser.COUNTRY_RANK:
+          macroValue = user.statistics?.country_rank;
+          break;
+        case MacroOsuUser.COUNTS_A:
+          macroValue = user.statistics?.grade_counts.a;
+          break;
+        case MacroOsuUser.COUNTS_S:
+          macroValue = user.statistics?.grade_counts.s;
+          break;
+        case MacroOsuUser.COUNTS_SH:
+          macroValue = user.statistics?.grade_counts.sh;
+          break;
+        case MacroOsuUser.COUNTS_SS:
+          macroValue = user.statistics?.grade_counts.ss;
+          break;
+        case MacroOsuUser.COUNTS_SSH:
+          macroValue = user.statistics?.grade_counts.ssh;
+          break;
+        case MacroOsuUser.GLOBAL_RANK:
+          macroValue = user.statistics?.global_rank;
+          break;
+        case MacroOsuUser.HAS_BUNNY:
+          macroValue = hasAchievement(OSU_ACHIEVEMENT_ID_BUNNY);
+          break;
+        case MacroOsuUser.HAS_STATISTICS:
+          macroValue = user.statistics !== undefined;
+          break;
+        case MacroOsuUser.HAS_TUTEL:
+          macroValue = hasAchievement(OSU_ACHIEVEMENT_ID_TUTEL);
+          break;
+        case MacroOsuUser.ID:
+          macroValue = user.id;
+          break;
+        case MacroOsuUser.JOIN_DATE_MONTH:
+          // eslint-disable-next-line security/detect-object-injection
+          macroValue = monthNames[joinDateMonth];
+          break;
+        case MacroOsuUser.JOIN_DATE_YEAR:
+          macroValue = joinDateYear;
+          break;
+        case MacroOsuUser.MAX_COMBO:
+          macroValue = user.statistics?.maximum_combo;
+          break;
+        case MacroOsuUser.NAME:
+          macroValue = user.username;
+          break;
+        case MacroOsuUser.PLAY_STYLE:
+          if (user.playstyle != null && user.playstyle.length > 0) {
+            macroValue = user.playstyle.join(", ");
+          }
+          break;
+        case MacroOsuUser.PP:
+          if (user.statistics) {
+            macroValue = roundNumber(user.statistics.pp, 2);
+          }
+          break;
+      }
+      if (typeof macroValue === "boolean") {
+        macroValue = macroValue ? "true" : "false";
+      }
+      if (typeof macroValue === "undefined") {
+        macroValue = "undefined";
+      }
+      if (typeof macroValue === "number") {
+        macroValue = `${macroValue}`;
+      }
+      return [macroId, macroValue];
+    }
+  );
+
+  /*
+  writeJsonFile(
+    path.join(
+      __dirname,
+      "..",
+      "..",
+      "..",
+      `macro_cache_${macroOsuUser.id}.json`
+    ),
+    { macroEntries, macroOsuUser, user }
+    // eslint-disable-next-line no-console
+  ).catch(console.error);
+  */
+
+  return macroEntries;
 };

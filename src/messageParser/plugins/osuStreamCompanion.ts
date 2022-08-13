@@ -3,6 +3,7 @@ import {
   macroOsuStreamCompanionCurrentMap,
   macroOsuStreamCompanionCurrentMapLogic,
 } from "../macros/osuStreamCompanion";
+import type { Macros } from "../../messageParser";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 
@@ -18,12 +19,17 @@ export interface PluginOsuStreamCompanionData {
 export const pluginOsuStreamCompanionGenerator: MessageParserPluginGenerator<PluginOsuStreamCompanionData> =
   {
     description: "Get the current osu! map data via StreamCompanion.",
-    generate: (data) => () => {
+    generate: (data) => (): Macros => {
       const currentMap = data.streamCompanionDataFunc();
       if (currentMap === undefined) {
-        return [];
+        return new Map();
       }
-      return macroOsuStreamCompanionCurrentMapLogic(currentMap);
+      return new Map([
+        [
+          macroOsuStreamCompanionCurrentMap.id,
+          new Map(macroOsuStreamCompanionCurrentMapLogic(currentMap)),
+        ],
+      ]);
     },
     id: PluginOsuStreamCompanion.CURRENT_MAP,
     signature: {

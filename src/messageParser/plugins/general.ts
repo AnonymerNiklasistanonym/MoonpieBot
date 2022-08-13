@@ -1,3 +1,4 @@
+// Type imports
 import type { MessageParserPlugin } from "../plugins";
 
 const pluginIfEmptyLogic = (content?: string): boolean =>
@@ -14,7 +15,7 @@ export const pluginIfEmpty: MessageParserPlugin = {
     if (signature === true) {
       return { argument: "value", scope: "showIfEmpty", type: "signature" };
     }
-    return pluginIfEmptyLogic(content) ? [] : "";
+    return pluginIfEmptyLogic(content) ? new Map() : "";
   },
   id: "IF_EMPTY",
 };
@@ -29,7 +30,7 @@ export const pluginIfNotEmpty: MessageParserPlugin = {
     if (signature === true) {
       return { argument: "value", scope: "showIfNotEmpty", type: "signature" };
     }
-    return !pluginIfEmptyLogic(content) ? [] : "";
+    return !pluginIfEmptyLogic(content) ? new Map() : "";
   },
   id: "IF_NOT_EMPTY",
 };
@@ -55,7 +56,9 @@ export const pluginIfTrue: MessageParserPlugin = {
         type: "signature",
       };
     }
-    return pluginIfNotUndefinedAndMatchesStringLogic("true", content) ? [] : "";
+    return pluginIfNotUndefinedAndMatchesStringLogic("true", content)
+      ? new Map()
+      : "";
   },
   id: "IF_TRUE",
 };
@@ -76,7 +79,7 @@ export const pluginIfFalse: MessageParserPlugin = {
       };
     }
     return pluginIfNotUndefinedAndMatchesStringLogic("false", content)
-      ? []
+      ? new Map()
       : "";
   },
   id: "IF_FALSE",
@@ -98,7 +101,7 @@ export const pluginIfUndefined: MessageParserPlugin = {
       };
     }
     return pluginIfNotUndefinedAndMatchesStringLogic("undefined", content)
-      ? []
+      ? new Map()
       : "";
   },
   id: "IF_UNDEFINED",
@@ -119,7 +122,7 @@ export const pluginIfNotUndefined: MessageParserPlugin = {
       };
     }
     return !pluginIfNotUndefinedAndMatchesStringLogic("undefined", content)
-      ? []
+      ? new Map()
       : "";
   },
   id: "IF_NOT_UNDEFINED",
@@ -162,7 +165,7 @@ export const pluginIfEqual: MessageParserPlugin = {
         type: "signature",
       };
     }
-    return pluginIfEqualLogic(separator, aStringEqualsBString) ? [] : "";
+    return pluginIfEqualLogic(separator, aStringEqualsBString) ? new Map() : "";
   },
   id: "IF_EQUAL",
 };
@@ -183,7 +186,9 @@ export const pluginIfNotEqual: MessageParserPlugin = {
         type: "signature",
       };
     }
-    return !pluginIfEqualLogic(separator, aStringEqualsBString) ? [] : "";
+    return !pluginIfEqualLogic(separator, aStringEqualsBString)
+      ? new Map()
+      : "";
   },
   id: "IF_NOT_EQUAL",
 };
@@ -235,7 +240,7 @@ export const pluginIfGreater: MessageParserPlugin = {
       (a, b) => a > b,
       aNumGreaterBNum
     )
-      ? []
+      ? new Map()
       : "";
   },
   id: "IF_GREATER",
@@ -262,7 +267,7 @@ export const pluginIfNotGreater: MessageParserPlugin = {
       (a, b) => a <= b,
       aNumGreaterBNum
     )
-      ? []
+      ? new Map()
       : "";
   },
   id: "IF_NOT_GREATER",
@@ -290,7 +295,7 @@ export const pluginIfSmaller: MessageParserPlugin = {
       (a, b) => a < b,
       aNumSmallerBNum
     )
-      ? []
+      ? new Map()
       : "";
   },
   id: "IF_SMALLER",
@@ -317,7 +322,7 @@ export const pluginIfNotSmaller: MessageParserPlugin = {
       (a, b) => a >= b,
       aNumNotSmallerBNum
     )
-      ? []
+      ? new Map()
       : "";
   },
   id: "IF_NOT_SMALLER",

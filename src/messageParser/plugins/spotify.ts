@@ -1,7 +1,7 @@
 import { macroSpotifySong, macroSpotifySongLogic } from "../macros/spotify";
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 // Type imports
-import type { MacroDictionaryEntry } from "../../messageParser";
+import type { Macros } from "../../messageParser";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type SpotifyWebApi from "spotify-web-api-node";
 
@@ -13,12 +13,14 @@ export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyD
   {
     generate:
       (data) =>
-      async (logger): Promise<MacroDictionaryEntry[]> => {
+      async (logger): Promise<Macros> => {
         const spotifyData = await spotifyGetCurrentAndRecentSongs(
           data.spotifyWebApi,
           logger
         );
-        return macroSpotifySongLogic(spotifyData);
+        return new Map([
+          [macroSpotifySong.id, new Map(macroSpotifySongLogic(spotifyData))],
+        ]);
       },
     id: "SPOTIFY_SONG",
     signature: {

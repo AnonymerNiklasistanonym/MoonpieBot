@@ -584,8 +584,8 @@ export type PluginFunc = (
    */
   signature?: boolean
 ) =>
-  | Promise<MacroDictionaryEntry[] | string | RequestHelp | PluginSignature>
-  | MacroDictionaryEntry[]
+  | Promise<Macros | string | RequestHelp | PluginSignature>
+  | Macros
   | string
   | RequestHelp
   | PluginSignature;
@@ -645,7 +645,7 @@ export const createPluginSignatureString = async (
     }
     if (
       typeof pluginSignature === "object" &&
-      !Array.isArray(pluginSignature) &&
+      !(pluginSignature instanceof Map) &&
       pluginSignature?.type === "signature"
     ) {
       if (pluginSignature.argument) {
@@ -783,12 +783,14 @@ export const parseTreeNode = async (
         );
         throw err;
       }
-      if (Array.isArray(pluginOutput)) {
-        for (const macro of pluginOutput) {
-          if (!macros.has(pluginName)) {
-            macros.set(pluginName, new Map());
+      if (pluginOutput instanceof Map) {
+        for (const [macroId, macroValues] of pluginOutput) {
+          if (!macros.has(macroId)) {
+            macros.set(macroId, new Map());
           }
-          macros.get(pluginName)?.set(macro[0], macro[1]);
+          for (const [macroName, macroValue] of macroValues) {
+            macros.get(macroId)?.set(macroName, macroValue);
+          }
         }
         const pluginContentNode = treeNode.pluginContent;
         if (pluginContentNode === undefined) {
