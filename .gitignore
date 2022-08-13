@@ -196,3 +196,6 @@ installer/moonpiebot*
 installer/pkg
 installer/src
 installer/*.1
+
+# Macro cache files
+macro_cache_*
