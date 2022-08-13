@@ -14,6 +14,7 @@ import {
   EnvVariableBlock,
   EnvVariableData,
   envVariableInformation,
+  envVariableStructure,
 } from "./info/env";
 import type {
   FileDocumentationParts,
@@ -274,77 +275,6 @@ export interface EnvVariableStructureVariablesBlock {
   description: string;
   name: string;
 }
-
-export const envVariableStructure: (
-  | EnvVariableStructureTextBlock
-  | EnvVariableStructureVariablesBlock
-)[] = [
-  {
-    content:
-      "This is an example config file for the MoonpieBot that contains all environment variables that the bot uses.",
-    name: "File description",
-  },
-  {
-    content:
-      "You can either set the variables yourself or copy this file, rename it from `.env.example` to `.env` and edit it with your own values since this is just an example to show how it should look.",
-    name: "File purpose",
-  },
-  {
-    content: `If a line that starts with '${ENV_VARIABLE_PREFIX}' has the symbol '#' in front of it that means it will be ignored as a comment. This means you can add custom comments and easily enable/disable any '${ENV_VARIABLE_PREFIX}' option by adding or removing that symbol.`,
-    name: "How to edit file",
-  },
-  {
-    block: EnvVariableBlock.LOGGING,
-    description: "Customize how much and where should be logged.",
-    name: "LOGGING",
-  },
-  {
-    block: EnvVariableBlock.TWITCH,
-    description:
-      "Required variables that need to be set for ANY configuration to connect to Twitch chat.",
-    name: "TWITCH",
-  },
-  {
-    block: EnvVariableBlock.MOONPIE,
-    description:
-      "Customize the moonpie functionality that is enabled per default.",
-    name: "MOONPIE",
-  },
-  {
-    block: EnvVariableBlock.OSU,
-    description: "Optional osu! commands that can be enabled.",
-    name: "OSU",
-  },
-  {
-    block: EnvVariableBlock.OSU_API,
-    description:
-      "Optional osu! API connection that can be enabled to use more osu! commands or detect beatmap requests.",
-    name: "OSU API",
-  },
-  {
-    block: EnvVariableBlock.OSU_STREAM_COMPANION,
-    description:
-      "Optional osu! StreamCompanion connection that can be enabled for a much better !np command.",
-    name: "OSU STREAM COMPANION",
-  },
-  {
-    block: EnvVariableBlock.SPOTIFY,
-    description: "Optional Spotify commands that can be enabled.",
-    name: "SPOTIFY",
-  },
-  {
-    block: EnvVariableBlock.SPOTIFY_API,
-    description:
-      "Optional Spotify API connection that can be enabled to use Spotify commands.",
-    name: "SPOTIFY API",
-  },
-  {
-    block: EnvVariableBlock.TWITCH_API,
-    description:
-      "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
-    name: "Twitch API",
-  },
-];
 
 export const createEnvVariableDocumentation = async (
   path: string,

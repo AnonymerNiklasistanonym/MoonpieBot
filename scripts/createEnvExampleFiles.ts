@@ -21,13 +21,20 @@ import { defaultStrings } from "../src/strings";
 const logger = createConsoleLogger("create_example_files");
 
 const configDir = path.join(__dirname, "..");
+const envExampleFile = path.join(configDir, fileNameEnvExample);
+// eslint-disable-next-line no-console
+console.log(`Create example file '${envExampleFile}'`);
 createEnvVariableDocumentation(
-  path.join(configDir, fileNameEnvExample),
+  envExampleFile,
   configDir
   // eslint-disable-next-line no-console
 ).catch(console.error);
+
+const envStringsExampleFile = path.join(configDir, fileNameEnvStringsExample);
+// eslint-disable-next-line no-console
+console.log(`Create example file '${envStringsExampleFile}'`);
 createStringsVariableDocumentation(
-  path.join(configDir, fileNameEnvStringsExample),
+  envStringsExampleFile,
   defaultStrings,
   defaultPlugins,
   defaultMacros,
