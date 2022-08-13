@@ -37,6 +37,7 @@ export interface MessageParserPluginExample {
   after?: string;
   argument?: string;
   before?: string;
+  hideOutput?: boolean;
   scope?: string;
 }
 

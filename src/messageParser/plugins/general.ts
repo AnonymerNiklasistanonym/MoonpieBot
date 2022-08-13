@@ -365,9 +365,17 @@ const randomIntFromInterval = (min: number, max: number) => {
 export const pluginRandomNumber: MessageParserPlugin = {
   description: "Returns a random number between 1 and 100 or a custom range",
   examples: [
-    { before: "Random number between 1 and 100: " },
-    { argument: "10", before: "Random number between 1 and 10: " },
-    { argument: "-100<->0", before: "Random number between -100 and 0: " },
+    { before: "Random number between 1 and 100: ", hideOutput: true },
+    {
+      argument: "10",
+      before: "Random number between 1 and 10: ",
+      hideOutput: true,
+    },
+    {
+      argument: "-100<->0",
+      before: "Random number between -100 and 0: ",
+      hideOutput: true,
+    },
   ],
   func: (_logger, interval, signature) => {
     if (signature === true) {

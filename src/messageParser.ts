@@ -16,7 +16,6 @@ import type {
   MessageParserPluginInfo,
 } from "./messageParser/plugins";
 import type { Logger } from "winston";
-
 import type { Strings } from "./strings";
 
 /**
@@ -986,16 +985,21 @@ export const generatePluginAndMacroDocumentation = async (
         if (example.after) {
           exampleString += example.after;
         }
-        const exampleStringOutput = await messageParser(
-          exampleString,
-          strings,
-          pluginsMap,
-          macrosMap,
-          logger
-        );
-        pluginListExamples.push(
-          `"${exampleString}" => "${exampleStringOutput}"`
-        );
+        // Don't render random number output because there is no seed
+        if (example.hideOutput) {
+          pluginListExamples.push(`"${exampleString}"`);
+        } else {
+          const exampleStringOutput = await messageParser(
+            exampleString,
+            strings,
+            pluginsMap,
+            macrosMap,
+            logger
+          );
+          pluginListExamples.push(
+            `"${exampleString}" => "${exampleStringOutput}"`
+          );
+        }
       }
       pluginEntry.lists.push(["Examples", pluginListExamples]);
     }
