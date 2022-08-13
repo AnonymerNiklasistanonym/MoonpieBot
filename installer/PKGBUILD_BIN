@@ -19,7 +19,7 @@ _gitname="$_applicationname.git"
 #source=("$_gitname::git+$url#tag=v$pkgver")
 #source=("$_gitname::git+$url#branch=main")
 source=("$_applicationname.bin::$url/releases/download/v$pkgver/$_applicationname-v$pkgver-linux64-node-18"
-        "$_applicationname.1::$url/releases/download/v$pkgver/${_applicationname}_man.1"
+        "$_applicationname.1::$url/releases/download/v$pkgver/${_applicationname}-v$pkgver-man.1"
         "$_applicationname.svg::$url/releases/download/v$pkgver/$_applicationname.svg")
 #sha1sums=('SKIP')
 # Run the command 'sha1sum filename' to update them
