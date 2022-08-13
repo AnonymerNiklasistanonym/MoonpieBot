@@ -278,13 +278,13 @@ export const envVariableInformation: EnvVariableData[] = [
   },
   {
     block: EnvVariableBlock.OSU_STREAM_COMPANION,
-    description: `osu! StreamCompanion URL (websocket interface) to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods. (If ${EnvVariable.OSU_STREAM_COMPANION_DIR_PATH} is provided this will be preferred)`,
+    description: `osu! StreamCompanion URL (websocket interface) to use a running StreamCompanion instance to always get the currently being played beatmap and used mods. (If ${EnvVariable.OSU_STREAM_COMPANION_DIR_PATH} is provided this interface will be used over it)`,
     example: "localhost:20727",
     name: EnvVariable.OSU_STREAM_COMPANION_URL,
   },
   {
     block: EnvVariableBlock.OSU_STREAM_COMPANION,
-    description: `osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods. You can't really configure the details via the integrated message parser but since it uses the output of StreamCompanion you can just configure it in there under the section 'Output Patterns' and then edit the used cell 'np_all'. (If ${EnvVariable.OSU_STREAM_COMPANION_URL} is provided this will be ignored)`,
+    description: `osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance to always get the currently being played beatmap and used mods. You can configure the details via the integrated message parser but since it uses the output of StreamCompanion you can just configure it in there. Go to the section 'Output Patterns' and then edit the used rows (like 'np_all'). You can also change the 'Save event' of a row like for the current mods so the mods will be live updated even if no song is played. (If ${EnvVariable.OSU_STREAM_COMPANION_URL} is provided this interface will not be used)`,
     example: "C:\\Program Files (x86)\\StreamCompanion\\Files",
     name: EnvVariable.OSU_STREAM_COMPANION_DIR_PATH,
   },
@@ -397,7 +397,7 @@ export const envVariableStructure: (
   {
     block: EnvVariableBlock.OSU_STREAM_COMPANION,
     description:
-      "Optional osu! StreamCompanion connection that can be enabled for a much better !np command.",
+      "Optional osu! StreamCompanion (https://github.com/Piotrekol/StreamCompanion) connection that can be enabled for a much better !np command via either a websocket or file interface.",
     name: "OSU STREAM COMPANION",
   },
   {

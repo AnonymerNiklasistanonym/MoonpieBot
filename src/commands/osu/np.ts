@@ -68,6 +68,8 @@ export interface CommandHandlerNpData extends CommandHandlerNpDataBase {
   beatmapRequestsInfo: BeatmapRequestsInfo;
 }
 
+export const regexBeatmapDownloadUrl = /https?:\/\/osu\.ppy\.sh\/b\/(\d+)/;
+
 /**
  * NP (now playing) command:
  * Send the map that is currently being played in osu (via the window title
@@ -122,8 +124,16 @@ export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
             );
             break;
           case "file":
+            // eslint-disable-next-line no-case-declarations
+            const beatmapIdMatch = currMapData.npPlayingDl.match(
+              regexBeatmapDownloadUrl
+            );
+            if (beatmapIdMatch && beatmapIdMatch.length > 1) {
+              data.beatmapRequestsInfo.lastBeatmapId = parseInt(
+                beatmapIdMatch[1]
+              );
+            }
             // TODO Insert macro in here so no plugin has to be used!
-            //data.beatmapRequestsInfo.lastBeatmapId = currMapData.mapid;
             msg = await messageParserById(
               osuCommandReplyNpStreamCompanionFile.id,
               globalStrings,
