@@ -99,9 +99,9 @@ A file called `customCommands.json` can be provided that enables to write custom
 
 ```json
 {
-    "name": "Command name",
+    "id": "Command name",
     "channels": [
-        "#channelName"
+        "channelName"
     ],
     "message": "Text $(macroName) $(macroName-macroArg-macroArg=macroValue)",
     "regexString": "!regexExpression",
@@ -116,9 +116,9 @@ A file called `customTimers.json` can be provided that enables to write custom t
 
 ```json
 {
-    "name": "Timer name (will broadcast message every 30s)",
+    "id": "Timer name (will broadcast message every 30s)",
     "channels": [
-        "#channelName"
+        "channelName"
     ],
     "message": "Text $(macroName) $(macroName-macroArg-macroArg=macroValue)",
     "cronString": "*/30 * * * * *"
