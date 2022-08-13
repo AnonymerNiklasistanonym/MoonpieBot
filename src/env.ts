@@ -160,7 +160,9 @@ export const getEnvVariableValue = (
       value !== supportedValues.emptyListValue
     ) {
       throw Error(
-        `The provided value list for "${envVariableName}" is not supported (${supportedValues.values
+        `The provided value list${
+          envVariableInfo.censor ? "" : ` "${value}"`
+        } for "${envVariableName}" is not supported (${supportedValues.values
           .map((a) => `"${a}"`)
           .join(ENV_LIST_SPLIT_CHARACTER)})${
           supportedValues.emptyListValue !== undefined
