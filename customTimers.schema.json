@@ -26,10 +26,6 @@
         "CustomTimer": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "string",
-                    "description": "ID of the timer."
-                },
                 "channels": {
                     "type": "array",
                     "items": {
@@ -37,20 +33,24 @@
                     },
                     "description": "The channels where the timer should be active."
                 },
-                "message": {
-                    "type": "string",
-                    "description": "The message that should be sent (will be parsed by the message parser)."
-                },
                 "cronString": {
                     "type": "string",
                     "description": "The cron(job) string. For more information/help you can for example use this website: https://crontab.cronhub.io/."
+                },
+                "id": {
+                    "type": "string",
+                    "description": "ID of the timer."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "The message that should be sent (will be parsed by the message parser)."
                 }
             },
             "required": [
-                "id",
                 "channels",
-                "message",
-                "cronString"
+                "cronString",
+                "id",
+                "message"
             ],
             "additionalProperties": false,
             "description": "Represents a custom timer."

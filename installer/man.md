@@ -37,14 +37,14 @@ If this program is installed via a package it will use *$HOME/.local/share/moonp
 
 **MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL**="*info*"
 : The log level of the log messages that are printed to the console.
-Supported values: "*error*", "*warn*", "*debug*", "*info*"
+Supported values: "*debug*", "*error*", "*info*", "*warn*"
 
 **MOONPIE_CONFIG_LOGGING_DIRECTORY_PATH**="*logs*"
 : The directory file path of the log files
 
 **MOONPIE_CONFIG_LOGGING_FILE_LOG_LEVEL**="*debug*"
 : The log level of the log messages that are written to the log files.
-Supported values: "*error*", "*warn*", "*debug*", "*info*"
+Supported values: "*debug*", "*error*", "*info*", "*warn*"
 
 **MOONPIE_CONFIG_TWITCH_CHANNELS**
 : A with a space separated list of all the channels the bot should be active.
@@ -60,7 +60,7 @@ Example: "*oauth:abcdefghijklmnop*"
 
 **MOONPIE_CONFIG_TWITCH_DEBUG**="*OFF*"
 : Turn on debug logs for the Twitch client to see all messages, joins, reconnects and more.
-Supported values: "*ON*", "*OFF*"
+Supported values: "*OFF*", "*ON*"
 
 **MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS**="*about,add,claim,commands,delete,get,leaderboard,remove,set*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
@@ -74,7 +74,7 @@ Supported list values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", 
 
 **MOONPIE_CONFIG_OSU_ENABLE_COMMANDS**="*np,pp,requests,rp,score*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!
-Supported list values: "*pp*", "*np*", "*rp*", "*score*", "*requests*" (empty list value: "*none*")
+Supported list values: "*np*", "*pp*", "*requests*", "*rp*", "*score*" (empty list value: "*none*")
 
 **MOONPIE_CONFIG_OSU_API_CLIENT_ID**
 : The osu! client ID (and client secret) to use the osu! api v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).
@@ -90,11 +90,11 @@ Example: "*1185432*"
 
 **MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS**="*OFF*"
 : Automatically recognize osu! beatmap links (=requests) in chat.
-Supported values: "*ON*", "*OFF*"
+Supported values: "*OFF*", "*ON*"
 
 **MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED**="*OFF*"
 : If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) additionally output more detailed information about the map in the chat.
-Supported values: "*ON*", "*OFF*"
+Supported values: "*OFF*", "*ON*"
 
 **MOONPIE_CONFIG_OSU_IRC_PASSWORD**
 : The osu! irc server password and senderUserName. To get them go to https://osu.ppy.sh/p/irc and login (in case that clicking the 'Begin Email Verification' button does not reveal a text input refresh the page and click the button again -> this also means you get a new code!)
@@ -109,8 +109,12 @@ Example: "*senderUserName*"
 Example: "*receiverUserName*"
 
 **MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL**
-: osu! StreamCompanion URL to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods.
+: osu! StreamCompanion URL (websocket interface) to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods. (If OSU_STREAM_COMPANION_DIR_PATH is provided this will be preferred)
 Example: "*localhost:20727*"
+
+**MOONPIE_CONFIG_OSU_STREAM_COMPANION_DIR_PATH**
+: osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance (https://github.com/Piotrekol/StreamCompanion) to always get the currently being played beatmap and used mods. You can't really configure the details via the integrated message parser but since it uses the output of StreamCompanion you can just configure it in there under the section 'Output Patterns' and then edit the used cell 'np_all'. (If OSU_STREAM_COMPANION_URL is provided this will be ignored)
+Example: "*C:\Program Files (x86)\StreamCompanion\Files*"
 
 **MOONPIE_CONFIG_SPOTIFY_ENABLE_COMMANDS**="*song*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide Spotify API credentials the commands won't be enabled!
