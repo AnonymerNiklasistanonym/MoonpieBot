@@ -18,6 +18,7 @@ import {
   osuBeatmapRequestDetailed,
   osuBeatmapRequestIrc,
   osuBeatmapRequestIrcDetailed,
+  osuBeatmapRequestNoRedeem,
   osuBeatmapRequestNotFound,
 } from "../../strings/osu/beatmapRequest";
 import { createLogFunc } from "../../logging";
@@ -66,6 +67,11 @@ export interface CommandHandlerBeatmapDataBase {
   enableOsuBeatmapRequests?: boolean;
   enableOsuBeatmapRequestsDetailed?: boolean;
   /**
+   * If string not empty/undefined check if the beatmap request was redeemed or
+   * just a normal chat message.
+   */
+  enableOsuBeatmapRequestsRedeemId?: string;
+  /**
    * The osu API (v2) credentials.
    */
   osuApiV2Credentials?: OsuApiV2Credentials;
@@ -99,7 +105,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
   createReply: async (
     client,
     channel,
-    _tags,
+    tags,
     data,
     globalStrings,
     globalPlugins,
@@ -115,6 +121,21 @@ export const commandBeatmap: TwitchChatCommandHandler<
       LOG_ID_CHAT_HANDLER_OSU,
       "beatmap"
     );
+
+    if (
+      data.enableOsuBeatmapRequestsRedeemId !== undefined &&
+      tags["custom-reward-id"] !== data.enableOsuBeatmapRequestsRedeemId
+    ) {
+      const message = await messageParserById(
+        osuBeatmapRequestNoRedeem.id,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger
+      );
+      const sentMessage = await client.say(channel, message);
+      return { sentMessage };
+    }
 
     const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
       data.osuApiV2Credentials.clientId,

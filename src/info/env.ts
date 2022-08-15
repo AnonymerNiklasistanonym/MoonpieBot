@@ -55,6 +55,7 @@ export enum EnvVariable {
   OSU_API_DEFAULT_ID = "OSU_API_DEFAULT_ID",
   OSU_API_RECOGNIZE_MAP_REQUESTS = "OSU_API_RECOGNIZE_MAP_REQUESTS",
   OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED = "OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED",
+  OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID = "OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID",
   OSU_ENABLE_COMMANDS = "OSU_ENABLE_COMMANDS",
   OSU_IRC_PASSWORD = "OSU_IRC_PASSWORD",
   OSU_IRC_REQUEST_TARGET = "OSU_IRC_REQUEST_TARGET",
@@ -250,10 +251,16 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     block: EnvVariableBlock.OSU_API,
     default: EnvVariableOnOff.OFF,
-    description: `If recognizing is enabled (${ENV_VARIABLE_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=ON) additionally output more detailed information about the map in the chat.`,
+    description: `If recognizing is enabled (${ENV_VARIABLE_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) additionally output more detailed information about the map in the chat.`,
     legacyNames: ["OSU_RECOGNIZE_MAP_REQUESTS_DETAILED"],
     name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
     supportedValues: { values: Object.values(EnvVariableOnOff) },
+  },
+  {
+    block: EnvVariableBlock.OSU_API,
+    description: `If recognizing is enabled (${ENV_VARIABLE_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) make it that only messages that used a channel point redeem will be recognized as requests.`,
+    example: "651f5474-07c2-4406-9e59-37d66fd34069",
+    name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID,
   },
   {
     block: EnvVariableBlock.OSU_IRC,

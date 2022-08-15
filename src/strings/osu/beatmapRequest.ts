@@ -541,6 +541,14 @@ export const osuBeatmapRequestCurrentlyOn = {
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
 };
+export const osuBeatmapRequestNoRedeem = {
+  default: createMessageForMessageParser([
+    "@",
+    { name: PluginTwitchChat.USER, type: "plugin" },
+    " Please only submit map requests via the channel point redeem",
+  ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NO_REDEEM`,
+};
 
 export const osuBeatmapRequests = [
   osuBeatmapRequest,
@@ -550,6 +558,7 @@ export const osuBeatmapRequests = [
   osuBeatmapRequestIrc,
   osuBeatmapRequestIrcDetailed,
   osuBeatmapRequestNotFound,
+  osuBeatmapRequestNoRedeem,
   osuBeatmapRequestPermissionError,
   osuBeatmapRequestRefDetailedStats,
   osuBeatmapRequestRefIrcRequestString,

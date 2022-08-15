@@ -40,6 +40,36 @@ export interface CreateTwitchClientError extends Error {
   code?: CreateTwitchClientErrorCode;
 }
 
+/**
+ * A list of all available channels that can be listened to by the Twitch client.
+ */
+export enum TwitchClientListener {
+  /**
+   * Triggers when the Twitch client was disconnected from Twitch.
+   */
+  CLIENT_CONNECTED_TO_TWITCH = "connected",
+  /**
+   * Triggers when the Twitch client was disconnected from Twitch.
+   */
+  CLIENT_CONNECTING_TO_TWITCH = "connecting",
+  /**
+   * Triggers when the Twitch client was disconnected from Twitch.
+   */
+  CLIENT_DISCONNECTED_FROM_TWITCH = "disconnected",
+  /**
+   * Triggers when a new message is being sent in a Twitch channel that is being listened to.
+   */
+  NEW_MESSAGE = "message",
+  /**
+   * Triggers when a Twitch user joins a Twitch channel that is being listened to.
+   */
+  NEW_REDEEM = "redeem",
+  /**
+   * Triggers when a Twitch user joins a Twitch channel that is being listened to.
+   */
+  USER_JOINED_CHANNEL = "join",
+}
+
 /**.
  * Create a Twitch client/connection.
  *

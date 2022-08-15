@@ -96,6 +96,10 @@ Supported values: "*OFF*", "*ON*"
 : If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) additionally output more detailed information about the map in the chat.
 Supported values: "*OFF*", "*ON*"
 
+**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID**
+: If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) make it that only messages that used a channel point redeem will be recognized as requests.
+Example: "*651f5474-07c2-4406-9e59-37d66fd34069*"
+
 **MOONPIE_CONFIG_OSU_IRC_PASSWORD**
 : The osu! irc server password and senderUserName. To get them go to https://osu.ppy.sh/p/irc and login (in case that clicking the 'Begin Email Verification' button does not reveal a text input refresh the page and click the button again -> this also means you get a new code!)
 Example: "*senderServerPassword*"
