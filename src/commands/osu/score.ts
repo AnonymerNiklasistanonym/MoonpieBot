@@ -1,10 +1,6 @@
 // Package imports
 import osuApiV2 from "osu-api-v2";
 // Local imports
-import {
-  errorMessageEnabledCommandsUndefined,
-  errorMessageOsuApiCredentialsUndefined,
-} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   macroOsuScore,
@@ -20,6 +16,7 @@ import {
   osuScoreErrorNotFound,
 } from "../../strings/osu/commandReply";
 import { createLogFunc } from "../../logging";
+import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 // Type imports
@@ -53,7 +50,11 @@ export interface CommandHandlerScoreData extends CommandHandlerScoreDataBase {
   beatmapId?: number;
 }
 
-export interface CommandDetectorScoreData {
+export interface CommandDetectorScoreDataIn {
+  enabledCommands: string[];
+}
+
+export interface CommandDetectorScoreDataOut {
   /**
    * The osu account name for which the score should be fetched.
    */
@@ -67,7 +68,8 @@ export interface CommandDetectorScoreData {
  */
 export const commandScore: TwitchChatCommandHandler<
   CommandHandlerScoreData,
-  CommandDetectorScoreData
+  CommandDetectorScoreDataIn,
+  CommandDetectorScoreDataOut
 > = {
   createReply: async (
     client,
@@ -161,14 +163,11 @@ export const commandScore: TwitchChatCommandHandler<
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
+  detect: (_tags, message, data) => {
     if (!message.match(regexScore)) {
       return false;
     }
-    if (!enabledCommands.includes(OsuCommands.SCORE)) {
+    if (!data.enabledCommands.includes(OsuCommands.SCORE)) {
       return false;
     }
     const match = regexScore.exec(message);

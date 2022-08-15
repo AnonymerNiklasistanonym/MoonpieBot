@@ -5,7 +5,7 @@ import type { ChatUserstate } from "tmi.js";
  * Twitch badge levels.
  * The numbers are taken from the API.
  */
-export enum TwitchBadgeLevels {
+export const enum TwitchBadgeLevels {
   // eslint-disable-next-line no-magic-numbers
   BROADCASTER = 3,
   // eslint-disable-next-line no-magic-numbers

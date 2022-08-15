@@ -3,11 +3,15 @@ import {
   LOG_ID_CHAT_HANDLER_SPOTIFY,
   SpotifyCommands,
 } from "../../info/commands";
-import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { spotifyCommandReplySong } from "../../strings/spotify/commandReply";
 // Type imports
+import type { EMPTY_OBJECT } from "../../info/other";
 import type { TwitchChatCommandHandler } from "../../twitch";
+
+export interface CommandDetectorSpotifySongDataIn {
+  enabledCommands: string[];
+}
 
 /**
  * Regex to recognize the `!song` command.
@@ -24,7 +28,10 @@ export const regexSong = /^\s*!song(?:\s*|\s.*)$/i;
  * Send a message about the currently played and last played song on Spotify
  * (or only the last played song if currently no song is played).
  */
-export const commandSong: TwitchChatCommandHandler<Record<never, never>> = {
+export const commandSong: TwitchChatCommandHandler<
+  EMPTY_OBJECT,
+  CommandDetectorSpotifySongDataIn
+> = {
   createReply: async (
     client,
     channel,
@@ -48,14 +55,11 @@ export const commandSong: TwitchChatCommandHandler<Record<never, never>> = {
       sentMessage: await client.say(channel, msg),
     };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
+  detect: (_tags, message, data) => {
     if (!message.match(regexSong)) {
       return false;
     }
-    if (!enabledCommands.includes(SpotifyCommands.SONG)) {
+    if (!data.enabledCommands.includes(SpotifyCommands.SONG)) {
       return false;
     }
     return {

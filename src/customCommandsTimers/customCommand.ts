@@ -8,6 +8,7 @@ import {
 import { messageParser } from "../messageParser";
 // Type imports
 import type { CustomJson } from "./createExampleFiles";
+import type { EMPTY_OBJECT } from "../info/other";
 import type { LogFunc } from "../logging";
 import type { Logger } from "winston";
 import type { PluginMap } from "../messageParser";
@@ -278,9 +279,10 @@ export const isCustomCommandsJson = (
   return true;
 };
 
+// TODO Externalize plugin to generator
 export const pluginRegexGroupId = "REGEX_GROUP";
 
-export interface CommandHandleCustomCommandData {
+export interface CommandHandleCustomCommandDetectorDataOut {
   /**
    * The regex groups matched by the custom command regex.
    */
@@ -290,8 +292,9 @@ export interface CommandHandleCustomCommandData {
 export const getCustomCommand = (
   customCommand: CustomCommand
 ): TwitchChatCommandHandler<
-  Record<never, never>,
-  CommandHandleCustomCommandData
+  EMPTY_OBJECT,
+  EMPTY_OBJECT,
+  CommandHandleCustomCommandDetectorDataOut
 > => {
   return {
     createReply: async (

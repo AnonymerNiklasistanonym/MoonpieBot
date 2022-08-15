@@ -1,10 +1,6 @@
 // Package imports
 import osuApiV2 from "osu-api-v2";
 // Local imports
-import {
-  errorMessageEnabledCommandsUndefined,
-  errorMessageOsuApiCredentialsUndefined,
-} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   macroOsuWindowTitle,
@@ -19,12 +15,16 @@ import {
   osuCommandReplyNpStreamCompanionWebSocket,
 } from "../../strings/osu/commandReply";
 import { createLogFunc } from "../../logging";
+import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { getProcessWindowTitle } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
+import type {
+  TwitchChatCommandHandler,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+} from "../../twitch";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
-import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!np` command.
@@ -75,7 +75,10 @@ export const regexBeatmapDownloadUrl = /https?:\/\/osu\.ppy\.sh\/b\/(\d+)/;
  * Send the map that is currently being played in osu (via the window title
  * because the web api is not supporting it).
  */
-export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
+export const commandNp: TwitchChatCommandHandler<
+  CommandHandlerNpData,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn
+> = {
   createReply: async (
     client,
     channel,
@@ -241,11 +244,11 @@ export const commandNp: TwitchChatCommandHandler<CommandHandlerNpData> = {
     const sentMessage = await client.say(channel, msg);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (message.match(regexNp) && enabledCommands.includes(OsuCommands.NP)) {
+  detect: (_tags, message, data) => {
+    if (
+      message.match(regexNp) &&
+      data.enabledCommands.includes(OsuCommands.NP)
+    ) {
       return {
         data: {},
       };

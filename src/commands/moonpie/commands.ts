@@ -15,10 +15,12 @@ import {
   moonpieCommandsRemove,
   moonpieCommandsSet,
 } from "../../strings/moonpie/commands";
-import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 // Type imports
-import type { TwitchChatCommandHandler } from "../../twitch";
+import type {
+  TwitchChatCommandHandler,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+} from "../../twitch";
 
 /**
  * Regex to recognize the `!moonpie commands` command.
@@ -30,14 +32,13 @@ import type { TwitchChatCommandHandler } from "../../twitch";
  */
 export const regexMoonpieCommands = /^\s*!moonpie\s+commands\s*$/i;
 
-export interface CommandCommandsData {
-  enabledCommands: Readonly<string[]>;
-}
-
 /**
  * Commands command: Send all available commands of the bot in chat.
  */
-export const commandCommands: TwitchChatCommandHandler<CommandCommandsData> = {
+export const commandCommands: TwitchChatCommandHandler<
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn
+> = {
   createReply: async (
     client,
     channel,
@@ -48,9 +49,6 @@ export const commandCommands: TwitchChatCommandHandler<CommandCommandsData> = {
     globalMacros,
     logger
   ) => {
-    if (data.enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
     const commandsStringIds = [];
 
     if (data.enabledCommands.includes(MoonpieCommands.CLAIM)) {
@@ -106,14 +104,11 @@ export const commandCommands: TwitchChatCommandHandler<CommandCommandsData> = {
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
+  detect: (_tags, message, data) => {
     if (!message.match(regexMoonpieCommands)) {
       return false;
     }
-    if (!enabledCommands.includes(MoonpieCommands.COMMANDS)) {
+    if (!data.enabledCommands.includes(MoonpieCommands.COMMANDS)) {
       return false;
     }
     return { data: {} };

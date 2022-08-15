@@ -3,11 +3,14 @@ import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
 } from "../../info/commands";
-import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
 // Type imports
-import type { TwitchChatCommandHandler } from "../../twitch";
+import type {
+  TwitchChatCommandHandler,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+} from "../../twitch";
+import type { EMPTY_OBJECT } from "../../info/other";
 
 /**
  * Regex to recognize the `!moonpie about` command.
@@ -22,7 +25,10 @@ export const regexMoonpieAbout = /^\s*!moonpie\s+about(?:\s|$)/i;
 /**
  * About command: Send the name, version and source code link of the bot.
  */
-export const commandAbout: TwitchChatCommandHandler = {
+export const commandAbout: TwitchChatCommandHandler<
+  EMPTY_OBJECT,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn
+> = {
   createReply: async (
     client,
     channel,
@@ -43,14 +49,11 @@ export const commandAbout: TwitchChatCommandHandler = {
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
+  detect: (_tags, message, data) => {
     if (!message.match(regexMoonpieAbout)) {
       return false;
     }
-    if (!enabledCommands.includes(MoonpieCommands.ABOUT)) {
+    if (!data.enabledCommands.includes(MoonpieCommands.ABOUT)) {
       return false;
     }
     return { data: {} };

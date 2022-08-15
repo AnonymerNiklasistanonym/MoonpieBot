@@ -1,15 +1,12 @@
 // Package imports
 import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
-import {
-  errorMessageEnabledCommandsUndefined,
-  errorMessageOsuApiCredentialsUndefined,
-} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuPpRequest,
   macroOsuPpRequest,
 } from "../../messageParser/macros/osuPpRequest";
+import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 // Type imports
@@ -31,7 +28,11 @@ export interface CommandHandlerPpRpData extends CommandHandlerPpRpDataBase {
   beatmapRequestsInfo: BeatmapRequestsInfo;
 }
 
-export interface CommandDetectorPpRpData {
+export interface CommandDetectorPpRpDataIn {
+  enabledCommands: string[];
+}
+
+export interface CommandDetectorPpRpDataOut {
   /**
    * Custom osu account ID (use this over the default osu
    * account ID and over the not undefined custom osu name if not undefined).
@@ -84,7 +85,8 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
  */
 export const commandPp: TwitchChatCommandHandler<
   CommandHandlerPpRpData,
-  CommandDetectorPpRpData
+  CommandDetectorPpRpDataIn,
+  CommandDetectorPpRpDataOut
 > = {
   createReply: async (
     client,
@@ -154,14 +156,11 @@ export const commandPp: TwitchChatCommandHandler<
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
+  detect: (_tags, message, data) => {
     if (!message.match(regexPp)) {
       return false;
     }
-    if (!enabledCommands.includes(OsuCommands.PP)) {
+    if (!data.enabledCommands.includes(OsuCommands.PP)) {
       return false;
     }
     const matchId = regexPpCustomId.exec(message);

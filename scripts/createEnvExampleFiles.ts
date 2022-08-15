@@ -27,10 +27,7 @@ const envExampleFile = path.join(configDir, fileNameEnvExample);
 const envStringsExampleFile = path.join(configDir, fileNameEnvStringsExample);
 
 console.log(`Create ENV example file '${envExampleFile}'`);
-createEnvVariableDocumentation(
-  envExampleFile,
-  configDir
-).catch(console.error);
+createEnvVariableDocumentation(envExampleFile, configDir).catch(console.error);
 
 console.log(`Create strings ENV example file '${envStringsExampleFile}'`);
 createStringsVariableDocumentation(

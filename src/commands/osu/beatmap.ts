@@ -87,11 +87,15 @@ export interface BeatmapRequest {
   comment?: string;
 }
 
-export interface CommandDetectorBeatmapData {
+export interface CommandDetectorBeatmapDataOut {
   /**
    * The found beatmap requests.
    */
   beatmapRequests: BeatmapRequest[];
+}
+export interface CommandDetectorBeatmapDataIn {
+  beatmapRequestsOn: boolean;
+  enabledCommands: string[];
 }
 
 /**
@@ -100,7 +104,8 @@ export interface CommandDetectorBeatmapData {
  */
 export const commandBeatmap: TwitchChatCommandHandler<
   CommandHandlerBeatmapData,
-  CommandDetectorBeatmapData
+  CommandDetectorBeatmapDataIn,
+  CommandDetectorBeatmapDataOut
 > = {
   createReply: async (
     client,
@@ -276,7 +281,10 @@ export const commandBeatmap: TwitchChatCommandHandler<
     }
     return commandReplies;
   },
-  detect: (_tags, message) => {
+  detect: (_tags, message, data) => {
+    if (!data.beatmapRequestsOn) {
+      return false;
+    }
     if (!message.match(regexBeatmapUrl)) {
       return false;
     }

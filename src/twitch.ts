@@ -180,8 +180,6 @@ export type TwitchChatHandler<DATA extends object = EMPTY_OBJECT> = (
   message: Readonly<string>,
   /** The additional data necessary for execution. */
   data: DATA,
-  /** The enabled commands for this chat handler. */
-  enabledCommands: Readonly<string[]>,
   /** The global strings object to get strings for parsing. */
   globalStrings: Readonly<StringMap>,
   /** The global plugin object to generate text from strings. */
@@ -228,6 +226,10 @@ export interface TwitchChatCommandHandlerReply {
   sentMessage: string[];
 }
 
+export interface TwitchChatCommandHandlerEnabledCommandsDetectorDataIn {
+  enabledCommands: string[];
+}
+
 /**
  * A global type for a method that detects a command and return data about what
  * was detected or return false if nothing was detected.
@@ -235,12 +237,14 @@ export interface TwitchChatCommandHandlerReply {
  * @tparam DATA The additional data the command detector needs for execution.
  * @returns Either false or an object with information from the detection.
  */
-export type TwitchChatCommandHandlerDetect<DATA extends object = EMPTY_OBJECT> =
-  (
-    tags: Readonly<ChatUserstate>,
-    message: Readonly<string>,
-    enabledCommands?: Readonly<string[]>
-  ) => false | TwitchChatCommandDetectorDataForHandler<DATA>;
+export type TwitchChatCommandHandlerDetect<
+  INPUT_DATA extends object = EMPTY_OBJECT,
+  OUTPUT_DATA extends object = EMPTY_OBJECT
+> = (
+  tags: Readonly<ChatUserstate>,
+  message: Readonly<string>,
+  data: Readonly<INPUT_DATA>
+) => false | TwitchChatCommandDetectorDataForHandler<OUTPUT_DATA>;
 
 /**
  * The data that was parsed from a successful detected command by a message.
@@ -260,15 +264,21 @@ export interface TwitchChatCommandDetectorDataForHandler<
  */
 export interface TwitchChatCommandHandler<
   DATA_HANDLE extends object = EMPTY_OBJECT,
-  DETECTED_DATA extends object = EMPTY_OBJECT
+  DETECTED_INPUT_DATA extends object = EMPTY_OBJECT,
+  DETECTED_OUTPUT_DATA extends object = EMPTY_OBJECT
 > {
   /**
    * The method that handles the detected command with additional and forwarded
    * data from the detector.
    */
-  createReply: TwitchChatCommandHandlerCreateReply<DATA_HANDLE & DETECTED_DATA>;
+  createReply: TwitchChatCommandHandlerCreateReply<
+    DATA_HANDLE & DETECTED_OUTPUT_DATA
+  >;
   /** The method that detects if something should be handled. */
-  detect: TwitchChatCommandHandlerDetect<DETECTED_DATA>;
+  detect: TwitchChatCommandHandlerDetect<
+    DETECTED_INPUT_DATA,
+    DETECTED_OUTPUT_DATA
+  >;
   /** Information about the command handler. */
   info: TwitchChatCommandHandlerInfo;
 }
@@ -390,13 +400,13 @@ export const logTwitchMessageCommandReply = (
  * @param globalMacros Global macros.
  * @param logger Global logger.
  * @param twitchCommandHandler The Twitch command handler.
- * @param enabledCommands The enabled commands.
  * @returns True if the command was detected and a reply was sent.
  */
 export const runTwitchCommandHandler = async <
-  DATA extends DATA_HANDLE,
-  DATA_HANDLE extends object,
-  DATA_DETECT extends object
+  DATA extends DATA_HANDLE & DETECTOR_INPUT_DATA,
+  DATA_HANDLE extends object = EMPTY_OBJECT,
+  DETECTOR_INPUT_DATA extends object = EMPTY_OBJECT,
+  DETECTOR_OUTPUT_DATA extends object = EMPTY_OBJECT
 >(
   client: Readonly<Client>,
   channel: Readonly<string>,
@@ -407,13 +417,16 @@ export const runTwitchCommandHandler = async <
   globalPlugins: Readonly<PluginMap>,
   globalMacros: Readonly<MacroMap>,
   logger: Readonly<Logger>,
-  twitchCommandHandler: TwitchChatCommandHandler<DATA_HANDLE, DATA_DETECT>,
-  enabledCommands?: Readonly<string[]>
+  twitchCommandHandler: TwitchChatCommandHandler<
+    DATA_HANDLE,
+    DETECTOR_INPUT_DATA,
+    DETECTOR_OUTPUT_DATA
+  >
 ): Promise<boolean> => {
   const twitchCommandDetected = twitchCommandHandler.detect(
     tags,
     message,
-    enabledCommands
+    data
   );
   if (twitchCommandDetected) {
     if (tags.id === undefined) {

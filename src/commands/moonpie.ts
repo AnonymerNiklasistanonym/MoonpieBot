@@ -5,9 +5,11 @@ import { commandClaim } from "./moonpie/claim";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { runTwitchCommandHandler } from "../twitch";
 // Type imports
+import type {
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+  TwitchChatHandler,
+} from "../twitch";
 import type { CommandClaimData } from "./moonpie/claim";
-import type { CommandCommandsData } from "./moonpie/commands";
-import type { TwitchChatHandler } from "../twitch";
 
 export interface CommandGenericDataMoonpieDbPath {
   /**
@@ -18,7 +20,7 @@ export interface CommandGenericDataMoonpieDbPath {
 
 export interface MoonpieChatHandlerData
   extends CommandClaimData,
-    CommandCommandsData,
+    TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
     CommandGenericDataMoonpieDbPath {}
 
 export const moonpieChatHandler: TwitchChatHandler<
@@ -29,7 +31,6 @@ export const moonpieChatHandler: TwitchChatHandler<
   tags,
   message,
   data,
-  enabled,
   globalStrings,
   globalPlugins,
   globalMacros,
@@ -49,8 +50,7 @@ export const moonpieChatHandler: TwitchChatHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command,
-        enabled
+        command
       )
     )
   );
@@ -67,8 +67,7 @@ export const moonpieChatHandler: TwitchChatHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command,
-        enabled
+        command
       )
     )
   );
@@ -85,8 +84,7 @@ export const moonpieChatHandler: TwitchChatHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command,
-        enabled
+        command
       )
     )
   );

@@ -434,7 +434,6 @@ export const main = async (
           moonpieClaimCooldownHours: moonpieClaimCooldownHoursNumber,
           moonpieDbPath: pathDatabase,
         },
-        moonpieEnableCommands,
         stringMap,
         pluginMapChannel,
         macroMapChannel,
@@ -464,6 +463,7 @@ export const main = async (
             enableOsuBeatmapRequests,
             enableOsuBeatmapRequestsDetailed,
             enableOsuBeatmapRequestsRedeemId,
+            enabledCommands: osuEnableCommands,
             osuApiV2Credentials: {
               clientId: parseInt(osuApiClientId),
               clientSecret: osuApiClientSecret,
@@ -472,7 +472,6 @@ export const main = async (
             osuIrcRequestTarget,
             osuStreamCompanionCurrentMapData,
           },
-          osuEnableCommands,
           stringMap,
           pluginMapChannel,
           macroMapChannel,
@@ -503,9 +502,11 @@ export const main = async (
           message,
           {
             // TODO Fix this later - either create a new handler or block the commands automatically
+            enabledCommands: osuEnableCommands.filter(
+              (a) => a === OsuCommands.NP
+            ),
             osuStreamCompanionCurrentMapData,
           },
-          osuEnableCommands.filter((a) => a === OsuCommands.NP),
           stringMap,
           pluginMapChannel,
           macroMapChannel,
@@ -531,8 +532,9 @@ export const main = async (
           channel,
           tags,
           message,
-          {},
-          spotifyEnableCommands,
+          {
+            enabledCommands: spotifyEnableCommands,
+          },
           stringMap,
           pluginMapChannel,
           macroMapChannel,

@@ -1,6 +1,5 @@
 // Local imports
 import {
-  errorMessageEnabledCommandsUndefined,
   errorMessageIdUndefined,
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
@@ -30,8 +29,11 @@ import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
 import { regexMoonpieAbout } from "./about";
 // Type imports
+import type {
+  TwitchChatCommandHandler,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+} from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
-import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!moonpie` command.
@@ -55,7 +57,10 @@ export interface CommandClaimData extends CommandGenericDataMoonpieDbPath {
  * Claim command: Claim a moonpie if no moonpie was claimed in the last 24
  * hours.
  */
-export const commandClaim: TwitchChatCommandHandler<CommandClaimData> = {
+export const commandClaim: TwitchChatCommandHandler<
+  CommandClaimData,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn
+> = {
   createReply: async (
     client,
     channel,
@@ -176,11 +181,8 @@ export const commandClaim: TwitchChatCommandHandler<CommandClaimData> = {
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!enabledCommands.includes(MoonpieCommands.CLAIM)) {
+  detect: (_tags, message, data) => {
+    if (!data.enabledCommands.includes(MoonpieCommands.CLAIM)) {
       return false;
     }
     if (!message.match(regexMoonpieClaim)) {

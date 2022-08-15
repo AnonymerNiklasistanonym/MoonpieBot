@@ -32,7 +32,9 @@ export interface OsuChatHandlerData
   extends CommandHandlerPpRpDataBase,
     CommandHandlerNpDataBase,
     CommandHandlerScoreDataBase,
-    CommandHandlerBeatmapDataBase {}
+    CommandHandlerBeatmapDataBase {
+  enabledCommands: string[];
+}
 
 export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   client,
@@ -40,7 +42,6 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   tags,
   message,
   data,
-  enabled,
   globalStrings,
   globalPlugins,
   globalMacros,
@@ -60,29 +61,22 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         globalPlugins,
         globalMacros,
         logger,
-        command,
-        enabled
+        command
       )
     )
   );
   // Why is this throwing an error?
-  const commands2 = [commandScore];
-  await Promise.all(
-    commands2.map((command) =>
-      runTwitchCommandHandler(
-        client,
-        channel,
-        tags,
-        message,
-        { ...data, beatmapId: globalBeatmapRequestObject.lastBeatmapId },
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger,
-        command,
-        enabled
-      )
-    )
+  await runTwitchCommandHandler(
+    client,
+    channel,
+    tags,
+    message,
+    { ...data, beatmapId: globalBeatmapRequestObject.lastBeatmapId },
+    globalStrings,
+    globalPlugins,
+    globalMacros,
+    logger,
+    commandScore
   );
   await runTwitchCommandHandler(
     client,
@@ -94,25 +88,22 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
     globalPlugins,
     globalMacros,
     logger,
-    commandBeatmapRequests,
-    enabled
+    commandBeatmapRequests
   );
-  if (globalBeatmapRequestObject.beatmapRequestsOn !== false) {
-    await runTwitchCommandHandler(
-      client,
-      channel,
-      tags,
-      message,
-      {
-        ...data,
-        beatmapRequestsInfo: globalBeatmapRequestObject,
-      },
-      globalStrings,
-      globalPlugins,
-      globalMacros,
-      logger,
-      commandBeatmap,
-      enabled
-    );
-  }
+  await runTwitchCommandHandler(
+    client,
+    channel,
+    tags,
+    message,
+    {
+      ...data,
+      beatmapRequestsInfo: globalBeatmapRequestObject,
+      beatmapRequestsOn: globalBeatmapRequestObject.beatmapRequestsOn,
+    },
+    globalStrings,
+    globalPlugins,
+    globalMacros,
+    logger,
+    commandBeatmap
+  );
 };

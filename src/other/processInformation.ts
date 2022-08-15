@@ -15,6 +15,12 @@ interface WindowsTasklistVOutputElement {
   windowTitle: string;
 }
 
+/**
+ * Get the window title of a process.
+ *
+ * @param processName The name of the process.
+ * @returns The window title of that process.
+ */
 export const getProcessWindowTitle = async (
   processName: string
 ): Promise<undefined | string> => {
@@ -64,9 +70,7 @@ export const getProcessWindowTitle = async (
           "windowTitle",
         ])
       )
-        .on("data", (data) =>
-          results.push(data as WindowsTasklistVOutputElement)
-        )
+        .on("data", (data: WindowsTasklistVOutputElement) => results.push(data))
         .on("end", () => {
           resolve(
             results.find(
@@ -76,7 +80,7 @@ export const getProcessWindowTitle = async (
             )?.windowTitle
           );
         })
-        .on("error", (pipeErr) => {
+        .on("error", (pipeErr: Error) => {
           return reject(pipeErr);
         });
     });

@@ -25,12 +25,14 @@ import {
   parseTwitchBadgeLevel,
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
-import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
+import type {
+  TwitchChatCommandHandler,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+} from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
-import type { TwitchChatCommandHandler } from "../../twitch";
 
 /**
  * Regex to recognize the `!moonpie get $USER` command.
@@ -102,6 +104,7 @@ interface CommandDetectorGetData {
 
 export const commandGet: TwitchChatCommandHandler<
   CommandGenericDataMoonpieDbPath,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
   CommandDetectorGetData
 > = {
   createReply: async (
@@ -178,11 +181,8 @@ export const commandGet: TwitchChatCommandHandler<
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!enabledCommands.includes(MoonpieCommands.GET)) {
+  detect: (_tags, message, data) => {
+    if (!data.enabledCommands.includes(MoonpieCommands.GET)) {
       return false;
     }
     const match = message.match(regexMoonpieGet);
@@ -208,6 +208,7 @@ interface CommandDetectorSetData {
  */
 export const commandSet: TwitchChatCommandHandler<
   CommandGenericDataMoonpieDbPath,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
   CommandDetectorSetData
 > = {
   createReply: async (
@@ -334,12 +335,9 @@ export const commandSet: TwitchChatCommandHandler<
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
+  detect: (_tags, message, data) => {
     const matchSet = message.match(regexMoonpieSet);
-    if (matchSet && enabledCommands.includes(MoonpieCommands.SET)) {
+    if (matchSet && data.enabledCommands.includes(MoonpieCommands.SET)) {
       return {
         data: {
           operation: "=",
@@ -349,7 +347,7 @@ export const commandSet: TwitchChatCommandHandler<
       };
     }
     const matchAdd = message.match(regexMoonpieAdd);
-    if (matchAdd && enabledCommands.includes(MoonpieCommands.ADD)) {
+    if (matchAdd && data.enabledCommands.includes(MoonpieCommands.ADD)) {
       return {
         data: {
           operation: "+",
@@ -359,7 +357,7 @@ export const commandSet: TwitchChatCommandHandler<
       };
     }
     const matchRemove = message.match(regexMoonpieRemove);
-    if (matchRemove && enabledCommands.includes(MoonpieCommands.REMOVE)) {
+    if (matchRemove && data.enabledCommands.includes(MoonpieCommands.REMOVE)) {
       return {
         data: {
           operation: "-",
@@ -376,7 +374,7 @@ export const commandSet: TwitchChatCommandHandler<
   },
 };
 
-interface CommandDetectorDeleteData {
+interface CommandDetectorDeleteDataOut {
   userNameMoonpieDb: string;
 }
 
@@ -385,7 +383,8 @@ interface CommandDetectorDeleteData {
  */
 export const commandDelete: TwitchChatCommandHandler<
   CommandGenericDataMoonpieDbPath,
-  CommandDetectorDeleteData
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+  CommandDetectorDeleteDataOut
 > = {
   createReply: async (
     client,
@@ -455,11 +454,8 @@ export const commandDelete: TwitchChatCommandHandler<
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
-    if (!enabledCommands.includes(MoonpieCommands.DELETE)) {
+  detect: (_tags, message, data) => {
+    if (!data.enabledCommands.includes(MoonpieCommands.DELETE)) {
       return false;
     }
     const match = message.match(regexMoonpieDelete);

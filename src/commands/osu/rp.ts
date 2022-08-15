@@ -1,10 +1,6 @@
 // Package imports
 import osuApiV2, { GameMode, ScoresType } from "osu-api-v2";
 // Local imports
-import {
-  errorMessageEnabledCommandsUndefined,
-  errorMessageOsuApiCredentialsUndefined,
-} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   MacroOsuRpRequest,
@@ -14,10 +10,14 @@ import {
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
 } from "../../strings/osu/commandReply";
+import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 // Type imports
-import type { CommandDetectorPpRpData, CommandHandlerPpRpData } from "./pp";
-import type { TwitchChatCommandHandler } from "../../twitch";
+import type { CommandDetectorPpRpDataOut, CommandHandlerPpRpData } from "./pp";
+import type {
+  TwitchChatCommandHandler,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+} from "../../twitch";
 
 /**
  * Regex to recognize the `!rp` command.
@@ -59,7 +59,8 @@ export const regexRpCustomName = /^\s*!rp\s+(\S+)\s*.*$/i;
  */
 export const commandRp: TwitchChatCommandHandler<
   CommandHandlerPpRpData,
-  CommandDetectorPpRpData
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+  CommandDetectorPpRpDataOut
 > = {
   createReply: async (
     client,
@@ -146,14 +147,11 @@ export const commandRp: TwitchChatCommandHandler<
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
+  detect: (_tags, message, data) => {
     if (!message.match(regexRp)) {
       return false;
     }
-    if (!enabledCommands.includes(OsuCommands.RP)) {
+    if (!data.enabledCommands.includes(OsuCommands.RP)) {
       return false;
     }
     const matchId = regexRpCustomId.exec(message);

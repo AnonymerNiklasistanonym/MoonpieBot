@@ -63,9 +63,13 @@ enum BeatmapRequestsType {
   TURN_ON = "TURN_ON",
 }
 
-export interface CommandDetectorBeatmapRequestsData {
+export interface CommandDetectorBeatmapRequestsDetectorOutData {
   beatmapRequestsOffMessage?: string;
   beatmapRequestsType: BeatmapRequestsType;
+}
+
+export interface CommandDetectorBeatmapRequestsDetectorInData {
+  enabledCommands: string[];
 }
 
 /**
@@ -74,7 +78,8 @@ export interface CommandDetectorBeatmapRequestsData {
  */
 export const commandBeatmapRequests: TwitchChatCommandHandler<
   CommandHandlerBeatmapRequestsData,
-  CommandDetectorBeatmapRequestsData
+  CommandDetectorBeatmapRequestsDetectorInData,
+  CommandDetectorBeatmapRequestsDetectorOutData
 > = {
   createReply: async (
     client,
@@ -176,11 +181,11 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
-  detect: (_tags, message, enabledCommands) => {
-    if (enabledCommands === undefined) {
+  detect: (_tags, message, data) => {
+    if (data.enabledCommands === undefined) {
       throw errorMessageEnabledCommandsUndefined();
     }
-    if (!enabledCommands.includes(OsuCommands.REQUESTS)) {
+    if (!data.enabledCommands.includes(OsuCommands.REQUESTS)) {
       return false;
     }
     const matchEnable = message.match(regexEnableBeatmapRequests);

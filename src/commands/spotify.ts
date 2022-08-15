@@ -2,15 +2,18 @@
 import { runTwitchCommandHandler, TwitchChatHandler } from "../twitch";
 import { commandSong } from "./spotify/song";
 
+export interface SpotifyChatHandlerData {
+  enabledCommands: string[];
+}
+
 export const spotifyChatHandler: TwitchChatHandler<
-  Record<never, never>
+  SpotifyChatHandlerData
 > = async (
   client,
   channel,
   tags,
   message,
   data,
-  enabled,
   globalStrings,
   globalPlugins,
   globalMacros,
@@ -30,8 +33,7 @@ export const spotifyChatHandler: TwitchChatHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command,
-        enabled
+        command
       )
     )
   );
