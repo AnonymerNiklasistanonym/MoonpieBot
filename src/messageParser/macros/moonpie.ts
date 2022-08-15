@@ -23,14 +23,6 @@ export const macroMoonpieLeaderboardEntry: MessageParserMacroDocumentation = {
   keys: Object.values(MacroMoonpieLeaderboardEntry),
 };
 
-export enum MacroMoonpieUserGet {
-  NAME = "NAME",
-}
-export const macroMoonpieUserGet: MessageParserMacroDocumentation = {
-  id: "MOONPIE_USER_GET",
-  keys: Object.values(MacroMoonpieUserGet),
-};
-
 export enum MacroMoonpieUserSet {
   NAME = "NAME",
   SET_COUNT = "SET_COUNT",

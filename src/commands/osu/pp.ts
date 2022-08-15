@@ -11,7 +11,10 @@ import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
-import type { TwitchChatCommandHandler } from "../../twitch";
+import type {
+  TwitchChatCommandHandler,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
+} from "../../twitch";
 
 export interface CommandHandlerPpRpDataBase {
   /**
@@ -26,10 +29,6 @@ export interface CommandHandlerPpRpDataBase {
 
 export interface CommandHandlerPpRpData extends CommandHandlerPpRpDataBase {
   beatmapRequestsInfo: BeatmapRequestsInfo;
-}
-
-export interface CommandDetectorPpRpDataIn {
-  enabledCommands: string[];
 }
 
 export interface CommandDetectorPpRpDataOut {
@@ -85,7 +84,7 @@ export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
  */
 export const commandPp: TwitchChatCommandHandler<
   CommandHandlerPpRpData,
-  CommandDetectorPpRpDataIn,
+  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
   CommandDetectorPpRpDataOut
 > = {
   createReply: async (

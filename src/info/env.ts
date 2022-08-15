@@ -355,7 +355,9 @@ export interface EnvVariableStructureVariablesBlock {
   name: string;
 }
 
-export type EnvVariableStructureElement = EnvVariableStructureTextBlock | EnvVariableStructureVariablesBlock;
+export type EnvVariableStructureElement =
+  | EnvVariableStructureTextBlock
+  | EnvVariableStructureVariablesBlock;
 
 export const envVariableStructure: EnvVariableStructureElement[] = [
   {

@@ -3,7 +3,6 @@ import {
   macroMoonpieClaim,
   macroMoonpieLeaderboardEntry,
   macroMoonpieUserDelete,
-  macroMoonpieUserGet,
   macroMoonpieUserNeverClaimed,
   macroMoonpieUserSet,
 } from "./macros/moonpie";
@@ -55,7 +54,6 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] = [
   macroMoonpieClaim,
   macroMoonpieLeaderboardEntry,
   macroMoonpieUserDelete,
-  macroMoonpieUserGet,
   macroMoonpieUserNeverClaimed,
   macroMoonpieUserSet,
   macroOsuApi,

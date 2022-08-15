@@ -24,11 +24,11 @@ export const pyramidSpammer = async (
   const emoteToSpam = ` ${emote} `;
   // eslint-disable-next-line no-useless-catch
   try {
-    for (let i = 0; i < pyramidWidth - 1; i++) {
-      await twitchClient.say(channel, emoteToSpam.repeat(i + 1));
+    for (let i = 1; i < pyramidWidth - 1; i++) {
+      await twitchClient.say(channel, emoteToSpam.repeat(i));
     }
-    for (let i = 0; i < pyramidWidth; i++) {
-      await twitchClient.say(channel, emoteToSpam.repeat(pyramidWidth - i));
+    for (let i = pyramidWidth; i >= 1; i--) {
+      await twitchClient.say(channel, emoteToSpam.repeat(i));
     }
   } catch (err) {
     throw err;
