@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 // Package imports
 import path from "path";
 // Local imports
@@ -22,17 +24,15 @@ const logger = createConsoleLogger("create_example_files");
 
 const configDir = path.join(__dirname, "..");
 const envExampleFile = path.join(configDir, fileNameEnvExample);
-// eslint-disable-next-line no-console
-console.log(`Create example file '${envExampleFile}'`);
+const envStringsExampleFile = path.join(configDir, fileNameEnvStringsExample);
+
+console.log(`Create ENV example file '${envExampleFile}'`);
 createEnvVariableDocumentation(
   envExampleFile,
   configDir
-  // eslint-disable-next-line no-console
 ).catch(console.error);
 
-const envStringsExampleFile = path.join(configDir, fileNameEnvStringsExample);
-// eslint-disable-next-line no-console
-console.log(`Create example file '${envStringsExampleFile}'`);
+console.log(`Create strings ENV example file '${envStringsExampleFile}'`);
 createStringsVariableDocumentation(
   envStringsExampleFile,
   defaultStringMap,
@@ -41,5 +41,4 @@ createStringsVariableDocumentation(
   defaultPluginsOptional,
   defaultMacrosOptional,
   logger
-  // eslint-disable-next-line no-console
 ).catch(console.error);

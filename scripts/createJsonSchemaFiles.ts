@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 // Package imports
 import * as tsj from "ts-json-schema-generator";
 import path from "path";
@@ -11,47 +13,39 @@ import { writeJsonFile } from "../src/other/fileOperations";
 
 const rootPath = path.join(__dirname, "..");
 
-interface Config {
-  inputPath: string;
-  outputPath: string;
-  tsConfigPath: string;
-  type: string;
+interface TypescriptTypeToJsonSchemaConfig {
+  jsonSchemaOutputFilePath: string;
+  tsConfigFilePath: string;
+  typescriptTypeName: string;
 }
 
-const configs = [
-  {
-    inputPath: path.join(rootPath, "src", "other", "customCommand.ts"),
-    outputPath: path.join(rootPath, fileNameCustomCommandsSchema),
-    tsConfigPath: path.join(rootPath, "tsconfig.json"),
-    type: "CustomCommandsJson",
-  },
-  {
-    inputPath: path.join(rootPath, "src", "other", "customTimer.ts"),
-    outputPath: path.join(rootPath, fileNameCustomTimersSchema),
-    tsConfigPath: path.join(rootPath, "tsconfig.json"),
-    type: "CustomTimersJson",
-  },
-];
-
-const createJsonSchemaFile = (config: Config) => {
-  // eslint-disable-next-line no-console
+const createJsonSchemaFile = (config: TypescriptTypeToJsonSchemaConfig) => {
   console.log(
-    `Create JSON schema file '${config.outputPath}' of type '${config.type}'...`
+    `Create JSON schema file '${config.jsonSchemaOutputFilePath}' of type '${config.typescriptTypeName}'...`
   );
 
   const schema = tsj
     .createGenerator({
-      path: config.inputPath,
-      tsconfig: config.tsConfigPath,
-      type: config.type,
+      tsconfig: config.tsConfigFilePath,
+      type: config.typescriptTypeName,
     })
-    .createSchema(config.type);
+    .createSchema(config.typescriptTypeName);
 
-  // eslint-disable-next-line no-console
-  writeJsonFile(config.outputPath, schema).catch(console.error);
+  writeJsonFile(config.jsonSchemaOutputFilePath, schema).catch(console.error);
 };
 
+const configs: TypescriptTypeToJsonSchemaConfig[] = [
+  {
+    jsonSchemaOutputFilePath: path.join(rootPath, fileNameCustomCommandsSchema),
+    tsConfigFilePath: path.join(rootPath, "tsconfig.json"),
+    typescriptTypeName: "CustomCommandsJson",
+  },
+  {
+    jsonSchemaOutputFilePath: path.join(rootPath, fileNameCustomTimersSchema),
+    tsConfigFilePath: path.join(rootPath, "tsconfig.json"),
+    typescriptTypeName: "CustomTimersJson",
+  },
+];
+
 configs.forEach(createJsonSchemaFile);
-const configDir = path.join(__dirname, "..");
-// eslint-disable-next-line no-console
-createCustomCommandTimerExampleFiles(configDir).catch(console.error);
+createCustomCommandTimerExampleFiles(rootPath).catch(console.error);

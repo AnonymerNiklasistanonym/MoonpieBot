@@ -3,7 +3,6 @@
 $ErrorActionPreference = "Stop"
 
 # Install the following things first:
-# - Node.js
 # - NSIS
 
 Write-Host "---------------------------------------------------------"
