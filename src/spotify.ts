@@ -11,7 +11,7 @@ import type { Logger } from "winston";
 /**
  * The logging ID of this module.
  */
-const LOG_ID_MODULE_SPOTIFY = "spotify";
+const LOG_ID = "spotify";
 
 const REDIRECT_URL = "http://localhost";
 const REDIRECT_PORT = 8888;
@@ -34,11 +34,7 @@ export const setupSpotifyAuthentication = async (
   spotifyRefreshToken: string | undefined,
   logger: Logger
 ): Promise<SpotifyWebApi> => {
-  const logSpotify = createLogFunc(
-    logger,
-    LOG_ID_MODULE_SPOTIFY,
-    "authentication"
-  );
+  const logSpotify = createLogFunc(logger, LOG_ID, "authentication");
 
   const spotifyApi = new SpotifyWebApi({
     clientId: spotifyClientId,
@@ -289,7 +285,7 @@ export const spotifyGetCurrentAndRecentSongs = async (
 ): Promise<SpotifyGetCurrentAndRecentSongs> => {
   const logSpotify = createLogFunc(
     logger,
-    LOG_ID_MODULE_SPOTIFY,
+    LOG_ID,
     "get_current_and_recent_songs"
   );
 

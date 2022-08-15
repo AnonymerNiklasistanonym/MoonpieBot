@@ -21,7 +21,7 @@ const LOG_ID_COMMAND_CUSTOM_COMMAND = "custom_command";
 /**
  * The logging ID of this module.
  */
-const LOG_ID_MODULE_CUSTOM_COMMAND = "custom_command";
+const LOG_ID = "custom_command";
 
 /**
  * All the possible supported user levels of a single custom command.
@@ -93,11 +93,7 @@ export const isCustomCommand = (
 ): arg is CustomCommand => {
   let logFunc: LogFunc | undefined;
   if (logger) {
-    logFunc = createLogFunc(
-      logger,
-      LOG_ID_MODULE_CUSTOM_COMMAND,
-      "is_custom_command"
-    );
+    logFunc = createLogFunc(logger, LOG_ID, "is_custom_command");
   }
   if (typeof arg !== "object") {
     logFunc?.warn(typeGuardLog("object", arg));
@@ -194,11 +190,7 @@ export const isCustomCommandData = (
 ): arg is CustomCommandData => {
   let logFunc: LogFunc | undefined;
   if (logger) {
-    logFunc = createLogFunc(
-      logger,
-      LOG_ID_MODULE_CUSTOM_COMMAND,
-      "is_custom_command_data"
-    );
+    logFunc = createLogFunc(logger, LOG_ID, "is_custom_command_data");
   }
   if (typeof arg !== "object") {
     logFunc?.warn(typeGuardLog("object", arg));
@@ -237,11 +229,7 @@ export const isCustomCommandsJson = (
 ): arg is CustomCommandsJson => {
   let logFunc: LogFunc | undefined;
   if (logger) {
-    logFunc = createLogFunc(
-      logger,
-      LOG_ID_MODULE_CUSTOM_COMMAND,
-      "is_custom_commands_json"
-    );
+    logFunc = createLogFunc(logger, LOG_ID, "is_custom_commands_json");
   }
   if (typeof arg !== "object") {
     logFunc?.warn(typeGuardLog("object", arg));

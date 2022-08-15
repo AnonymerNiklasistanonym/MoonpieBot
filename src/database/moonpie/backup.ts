@@ -15,7 +15,7 @@ export interface DatabaseStructure {
 /**
  * The logging ID of this module.
  */
-const LOG_ID_MODULE_DB_BACKUP = "database_backup";
+const LOG_ID = "database_backup";
 
 /**
  * Create tables if not existing.
@@ -27,7 +27,7 @@ export const exportMoonpieCountTableToJson = async (
   databasePath: string,
   logger: Logger
 ): Promise<DatabaseStructure[]> => {
-  const logDbBackup = createLogFunc(logger, LOG_ID_MODULE_DB_BACKUP);
+  const logDbBackup = createLogFunc(logger, LOG_ID);
 
   logDbBackup.debug("Backup moonpie database...");
 

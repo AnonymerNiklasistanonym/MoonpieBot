@@ -15,7 +15,7 @@ import type { Logger } from "winston";
 /**
  * The logging ID of this module.
  */
-const LOG_ID_MODULE_STREAMCOMPANION = "osu_streamcompanion";
+const LOG_ID = "osu_streamcompanion";
 
 /**
  * The data that StreamCompanion should watch for changes.
@@ -99,7 +99,7 @@ export const createStreamCompanionFileConnection = (
 ): StreamCompanionConnection => {
   //const logStreamCompanion = createLogFunc(
   //  logger,
-  //  LOG_ID_MODULE_STREAMCOMPANION
+  //  LOG_ID
   //);
   return async (): Promise<StreamCompanionFileData> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -141,10 +141,7 @@ export const createStreamCompanionWebSocketConnection = (
   streamCompanionUrl: string,
   logger: Logger
 ): StreamCompanionConnection => {
-  const logStreamCompanion = createLogFunc(
-    logger,
-    LOG_ID_MODULE_STREAMCOMPANION
-  );
+  const logStreamCompanion = createLogFunc(logger, LOG_ID);
 
   // Automatically reconnect on loss of connection - this means StreamCompanion
   // does not need to be run all the time but only when needed

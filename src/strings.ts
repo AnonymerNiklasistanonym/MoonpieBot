@@ -23,7 +23,7 @@ export type Strings = Map<string, string>;
 /**
  * The logging ID of this module.
  */
-const LOG_ID_MODULE_STRINGS = "strings";
+const LOG_ID = "strings";
 
 /**
  * The data of a string entry (so that descriptions or other future data can be
@@ -47,19 +47,33 @@ export interface StringEntry {
  * @returns The resulting array can be inserted into a map for easy setup.
  */
 export const generateStringList = (
-  stringEntries: StringEntry[]
-): [string, string][] => stringEntries.map((a) => [a.id, a.default]);
+  ...stringEntries: StringEntry[]
+): [string, string][] => {
+  const mappedStringEntries = stringEntries.map<[string, string]>((a) => [
+    a.id,
+    a.default,
+  ]);
+  // Check for duplicated IDs
+  mappedStringEntries.forEach((value, index, array) => {
+    if (array.findIndex((a) => a[0] === value[0]) !== index) {
+      throw Error(`The string list contained the ID "${value[0]}" twice`);
+    }
+  });
+  return mappedStringEntries;
+};
 
 /**
  * The default values for all strings.
  */
 export const defaultStrings: Strings = new Map([
-  ...generateStringList(moonpieCommandReply),
-  ...generateStringList(moonpieCommands),
-  ...generateStringList(moonpieUser),
-  ...generateStringList(osuBeatmapRequests),
-  ...generateStringList(osuCommandReply),
-  ...generateStringList(spotifyCommandReply),
+  ...generateStringList(
+    ...moonpieCommandReply,
+    ...moonpieCommands,
+    ...moonpieUser,
+    ...osuBeatmapRequests,
+    ...osuCommandReply,
+    ...spotifyCommandReply
+  ),
 ]);
 
 /**
@@ -75,7 +89,7 @@ export const updateStringsMapWithCustomEnvStrings = (
 ): Strings => {
   const logStrings = createLogFunc(
     logger,
-    LOG_ID_MODULE_STRINGS,
+    LOG_ID,
     "update_strings_with_custom_env_strings"
   );
 

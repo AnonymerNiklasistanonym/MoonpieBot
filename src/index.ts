@@ -42,7 +42,7 @@ import { version } from "./info/version";
 /**
  * The logging ID of this module.
  */
-const LOG_ID_MODULE_INDEX = "index";
+const LOG_ID = "index";
 
 /**
  * The entry point of the bot.
@@ -175,7 +175,7 @@ const entryPoint = async () => {
         configDir
       )
     );
-    const logIndex = createLogFunc(logger, LOG_ID_MODULE_INDEX);
+    const logIndex = createLogFunc(logger, LOG_ID);
 
     // Call main method
     try {

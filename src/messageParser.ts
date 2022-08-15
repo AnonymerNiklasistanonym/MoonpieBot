@@ -21,7 +21,7 @@ import type { Strings } from "./strings";
 /**
  * The logging ID of this module.
  */
-const LOG_ID_MODULE_MESSAGE_PARSER = "message_parser";
+const LOG_ID = "message_parser";
 
 /**
  * A message parse tree node.
@@ -698,11 +698,7 @@ export const parseTreeNode = async (
   macros: Macros,
   logger: Logger
 ): Promise<string> => {
-  const logMessageParser = createLogFunc(
-    logger,
-    LOG_ID_MODULE_MESSAGE_PARSER,
-    "parse_tree_node"
-  );
+  const logMessageParser = createLogFunc(logger, LOG_ID, "parse_tree_node");
 
   switch (treeNode.type) {
     case "text":
@@ -871,7 +867,7 @@ export const messageParser = async (
   macros: Macros = new Map(),
   logger: Logger
 ): Promise<string> => {
-  const logMessageParser = createLogFunc(logger, LOG_ID_MODULE_MESSAGE_PARSER);
+  const logMessageParser = createLogFunc(logger, LOG_ID);
 
   if (messageString === undefined) {
     throw Error("Message string could not be parsed because it's undefined");

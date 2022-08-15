@@ -21,7 +21,7 @@ import type { Strings } from "./strings";
 /**
  * The logging ID of this module.
  */
-const LOG_ID_MODULE_TWITCH = "twitch";
+const LOG_ID = "twitch";
 
 /**
  * Errorcodes that can be attached to @CreateTwitchClientError.
@@ -99,7 +99,7 @@ export const createTwitchClient = (
   debug = false,
   logger: Logger
 ): Client => {
-  const logTwitchClient = createLogFunc(logger, LOG_ID_MODULE_TWITCH, "client");
+  const logTwitchClient = createLogFunc(logger, LOG_ID, "client");
 
   // Throw an error if Twitch name,token or channels were not defined or empty
   if (twitchName === undefined) {
