@@ -1,5 +1,7 @@
 #!/usr/bin/env pwsh
 
+param([string]$CustomVersion)
+
 $ErrorActionPreference = "Stop"
 
 Write-Host "---------------------------------------------------------"
@@ -14,39 +16,85 @@ Set-Location $PSScriptRoot
 # Go to the root directory of this repository
 Set-Location ..
 
-# Create directory for downloads
+# Create directory for binary files
 $BinaryDir = Join-Path "bin" "github_binaries"
+Remove-Item -Recurse -Force $BinaryDir -ErrorAction Ignore
 New-Item -ItemType Directory -Force -Path $BinaryDir
-# Downloaded file paths
-$CurrentVersion = "1.0.18b"
-$ApplicationName = "moonpiebot"
-$ArtifactWindowsInstaller18 = Join-Path $BinaryDir "$ApplicationName-installer-windows-node-18.x.zip"
-$ArtifactLinux18 = Join-Path $BinaryDir "$ApplicationName-linux-node-18.x.zip"
-$ArtifactWindows18 = Join-Path $BinaryDir "$ApplicationName-windows-node-18.x.zip"
-$ArtifactManPage = Join-Path $BinaryDir "$ApplicationName-man-page.zip"
-# Extract binary files from the downloaded artifacts
-$ArtifactWindowsInstallerBinary = Join-Path $BinaryDir "${ApplicationName}_setup.exe"
-$ArtifactWindowsInstaller18BinaryOut = "$ApplicationName-installer-v$CurrentVersion-win64-node-18.exe"
-$ArtifactWindowsBinary = Join-Path $BinaryDir "$ApplicationName.exe"
-$ArtifactWindows18BinaryOut = "$ApplicationName-v$CurrentVersion-win64-node-18.exe"
-$ArtifactLinuxBinary = Join-Path $BinaryDir "$ApplicationName"
-$ArtifactLinux18BinaryOut = "$ApplicationName-v$CurrentVersion-linux64-node-18"
-$ArtifactManPageBinary = Join-Path $BinaryDir "$ApplicationName-man.1"
-$ArtifactManPageBinaryOut = "$ApplicationName-v$CurrentVersion-man.1"
-# Remove old binary files
-Remove-Item (Join-Path $BinaryDir $ArtifactWindowsInstaller18BinaryOut) -ErrorAction Ignore
-Remove-Item (Join-Path $BinaryDir $ArtifactWindows18BinaryOut) -ErrorAction Ignore
-Remove-Item (Join-Path $BinaryDir $ArtifactLinux18BinaryOut) -ErrorAction Ignore
-Remove-Item (Join-Path $BinaryDir $ArtifactManPageBinaryOut) -ErrorAction Ignore
-# Extract binary files and rename them
-Expand-Archive $ArtifactWindowsInstaller18 -DestinationPath $BinaryDir -Force
-Rename-Item -Path $ArtifactWindowsInstallerBinary -NewName $ArtifactWindowsInstaller18BinaryOut
-Expand-Archive $ArtifactLinux18 -DestinationPath $BinaryDir -Force
-Rename-Item -Path $ArtifactLinuxBinary -NewName $ArtifactLinux18BinaryOut
-Expand-Archive $ArtifactWindows18 -DestinationPath $BinaryDir -Force
-Rename-Item -Path $ArtifactWindowsBinary -NewName $ArtifactWindows18BinaryOut
-Expand-Archive $ArtifactManPage -DestinationPath $BinaryDir -Force
-Rename-Item -Path $ArtifactManPageBinary -NewName $ArtifactManPageBinaryOut
+# Get the default download directory
+$DownloadDir = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
+# Application and version information
+$PackageJsonFile = "package.json"
+$JsonDataMoonpieBot = Get-Content $PackageJsonFile | ConvertFrom-Json
+$ApplicationName = $JsonDataMoonpieBot.name
+if ($CustomVersion) {
+    $CurrentVersion = $CustomVersion
+    Write-Output "Found custom version $CurrentVersion from command line argument"
+} else {
+    $CurrentVersion = $JsonDataMoonpieBot.version
+    Write-Output "Found version $CurrentVersion when reading $PackageJsonFile"
+}
+
+function Extract-Artifact {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [string]$ArtifactFileName,
+        [Parameter(Mandatory)]
+        [string]$ExtractedArtifactFileName,
+        [Parameter(Mandatory)]
+        [string]$BinaryOutputDir,
+        [Parameter(Mandatory)]
+        [string]$BinaryOutputFileName,
+        [Parameter(Mandatory,ValueFromRemainingArguments)]
+        [string[]]$ArtifactDirs
+    )
+
+    # Get artifact directory
+    $ArtifactDir = $null
+    Foreach ($Directory in $ArtifactDirs) {
+        if (Test-Path -Path (Join-Path $Directory $ArtifactFileName) -PathType Leaf) {
+            $ArtifactDir = $Directory
+        }
+    }
+    if (!$ArtifactDir) {
+        throw "$ArtifactFileName could not be located."
+    }
+    Write-Output "$ArtifactFileName was located in $ArtifactDir"
+
+    # Remove old extracted file
+    $BinaryFile = Join-Path $BinaryOutputDir $ExtractedArtifactFileName
+    $BinaryOutputFile = Join-Path $BinaryOutputDir $BinaryOutputFileName
+    Remove-Item $BinaryFile -ErrorAction Ignore
+    Remove-Item $BinaryOutputFile -ErrorAction Ignore
+    # Extract binary files and rename them
+    $ArtifactFile = Join-Path $ArtifactDir $ArtifactFileName
+    Write-Output "Extract $BinaryFile from $ArtifactFile"
+    Expand-Archive $ArtifactFile -DestinationPath $BinaryOutputDir -Force
+    Write-Output "Rename $BinaryFile to $BinaryOutputFile"
+    Rename-Item -Path $BinaryFile -NewName $BinaryOutputFileName
+}
+
+Extract-Artifact -ArtifactFileName "$ApplicationName-installer-windows-node-18.x.zip" `
+                 -ExtractedArtifactFileName "${ApplicationName}_setup.exe" `
+                 -BinaryOutputDir $BinaryDir  `
+                 -BinaryOutputFileName "$ApplicationName-installer-v$CurrentVersion-win64-node-18.exe" `
+                 $DownloadDir
+Extract-Artifact -ArtifactFileName "$ApplicationName-windows-node-18.x.zip" `
+                 -ExtractedArtifactFileName "$ApplicationName.exe" `
+                 -BinaryOutputDir $BinaryDir `
+                 -BinaryOutputFileName "$ApplicationName-v$CurrentVersion-win64-node-18.exe" `
+                 $DownloadDir
+Extract-Artifact -ArtifactFileName "$ApplicationName-linux-node-18.x.zip" `
+                 -ExtractedArtifactFileName "$ApplicationName" `
+                 -BinaryOutputDir $BinaryDir `
+                 -BinaryOutputFileName "$ApplicationName-v$CurrentVersion-linux64-node-18" `
+                 $DownloadDir
+Extract-Artifact -ArtifactFileName "$ApplicationName-man-page.zip" `
+                 -ExtractedArtifactFileName "$ApplicationName-man.1" `
+                 -BinaryOutputDir $BinaryDir `
+                 -BinaryOutputFileName "$ApplicationName-v$CurrentVersion-man.1" `
+                 $DownloadDir
 
 # Go back to the call directory
 Set-Location $CallDir
