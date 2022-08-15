@@ -6,12 +6,12 @@ import { fileExists, readJsonFile } from "../other/fileOperations";
 import { logTwitchMessageBroadcast } from "../twitch";
 import { messageParser } from "../messageParser";
 // Type imports
-import type { Macros, Plugins } from "../messageParser";
+import type { MacroMap, PluginMap } from "../messageParser";
 import type { Client } from "tmi.js";
 import type { CustomJson } from "./createExampleFiles";
 import type { LogFunc } from "../logging";
 import type { Logger } from "winston";
-import type { Strings } from "../strings";
+import type { StringMap } from "../strings";
 
 /**
  * The logging ID of this module.
@@ -141,9 +141,9 @@ export const registerTimer = (
   channels: string[],
   message: string,
   cronString: string,
-  globalStrings: Strings,
-  globalPlugins: Plugins,
-  globalMacros: Macros,
+  globalStrings: StringMap,
+  globalPlugins: PluginMap,
+  globalMacros: MacroMap,
   logger: Logger
 ): cron.ScheduledTask => {
   const logCustomTimer = createLogFunc(logger, LOG_ID, "register_timer");

@@ -17,7 +17,7 @@ import {
 } from "../macros/osuApi";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 // Type imports
-import type { Macros } from "../../messageParser";
+import type { MacroMap } from "../../messageParser";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type { OsuApiV2Credentials } from "../../commands/osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
@@ -42,7 +42,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
     {
       generate:
         (data) =>
-        async (_, beatmapId): Promise<Macros> => {
+        async (_, beatmapId): Promise<MacroMap> => {
           if (beatmapId === undefined || beatmapId.trim().length === 0) {
             throw Error("osu! beatmap ID was empty");
           }
@@ -69,7 +69,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
     {
       generate:
         (data) =>
-        async (_, beatmapIdAndUserId): Promise<Macros> => {
+        async (_, beatmapIdAndUserId): Promise<MacroMap> => {
           if (
             beatmapIdAndUserId === undefined ||
             beatmapIdAndUserId.trim().length === 0
@@ -118,7 +118,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
     {
       generate:
         (data) =>
-        async (_, userId): Promise<Macros> => {
+        async (_, userId): Promise<MacroMap> => {
           if (userId === undefined || userId.trim().length === 0) {
             throw Error("osu! user ID was empty");
           }
@@ -161,7 +161,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
     {
       generate:
         (data) =>
-        async (_, userId): Promise<Macros> => {
+        async (_, userId): Promise<MacroMap> => {
           if (userId === undefined || userId.trim().length === 0) {
             throw Error("osu! user ID was empty");
           }

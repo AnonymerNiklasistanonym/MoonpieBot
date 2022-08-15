@@ -1,7 +1,7 @@
 import { macroSpotifySong, macroSpotifySongLogic } from "../macros/spotify";
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 // Type imports
-import type { Macros } from "../../messageParser";
+import type { MacroMap } from "../../messageParser";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type SpotifyWebApi from "spotify-web-api-node";
 
@@ -13,7 +13,7 @@ export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyD
   {
     generate:
       (data) =>
-      async (logger): Promise<Macros> => {
+      async (logger): Promise<MacroMap> => {
         const spotifyData = await spotifyGetCurrentAndRecentSongs(
           data.spotifyWebApi,
           logger

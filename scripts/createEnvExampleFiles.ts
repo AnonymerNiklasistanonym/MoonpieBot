@@ -16,7 +16,7 @@ import {
 import { createConsoleLogger } from "../src/logging";
 import { createEnvVariableDocumentation } from "../src/env";
 import { createStringsVariableDocumentation } from "../src/documentation/strings";
-import { defaultStrings } from "../src/strings";
+import { defaultStringMap } from "../src/strings";
 
 const logger = createConsoleLogger("create_example_files");
 
@@ -35,7 +35,7 @@ const envStringsExampleFile = path.join(configDir, fileNameEnvStringsExample);
 console.log(`Create example file '${envStringsExampleFile}'`);
 createStringsVariableDocumentation(
   envStringsExampleFile,
-  defaultStrings,
+  defaultStringMap,
   defaultPlugins,
   defaultMacros,
   defaultPluginsOptional,

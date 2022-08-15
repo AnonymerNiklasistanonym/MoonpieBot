@@ -13,10 +13,10 @@ import {
 } from "./error";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
-import type { Macros, Plugins } from "./messageParser";
+import type { MacroMap, PluginMap } from "./messageParser";
 import type { EMPTY_OBJECT } from "./info/other";
 import type { Logger } from "winston";
-import type { Strings } from "./strings";
+import type { StringMap } from "./strings";
 
 /**
  * The logging ID of this module.
@@ -183,11 +183,11 @@ export type TwitchChatHandler<DATA extends object = EMPTY_OBJECT> = (
   /** The enabled commands for this chat handler. */
   enabledCommands: Readonly<string[]>,
   /** The global strings object to get strings for parsing. */
-  globalStrings: Readonly<Strings>,
+  globalStrings: Readonly<StringMap>,
   /** The global plugin object to generate text from strings. */
-  globalPlugins: Readonly<Plugins>,
+  globalPlugins: Readonly<PluginMap>,
   /** The global macro object to generate text from strings. */
-  globalMacros: Readonly<Macros>,
+  globalMacros: Readonly<MacroMap>,
   /** The global logger. */
   logger: Readonly<Logger>
 ) => Promise<void>;
@@ -211,11 +211,11 @@ export type TwitchChatCommandHandlerCreateReply<DATA = EMPTY_OBJECT> = (
   /** The additional data necessary for execution. */
   data: DATA,
   /** The global strings object to get strings for parsing. */
-  globalStrings: Readonly<Strings>,
+  globalStrings: Readonly<StringMap>,
   /** The global plugin object to generate text from strings. */
-  globalPlugins: Readonly<Plugins>,
+  globalPlugins: Readonly<PluginMap>,
   /** The global macro object to generate text from strings. */
-  globalMacros: Readonly<Macros>,
+  globalMacros: Readonly<MacroMap>,
   /** The global logger. */
   logger: Readonly<Logger>
 ) => Promise<TwitchChatCommandHandlerReply | TwitchChatCommandHandlerReply[]>;
@@ -403,9 +403,9 @@ export const runTwitchCommandHandler = async <
   tags: Readonly<ChatUserstate>,
   message: Readonly<string>,
   data: DATA,
-  globalStrings: Readonly<Strings>,
-  globalPlugins: Readonly<Plugins>,
-  globalMacros: Readonly<Macros>,
+  globalStrings: Readonly<StringMap>,
+  globalPlugins: Readonly<PluginMap>,
+  globalMacros: Readonly<MacroMap>,
   logger: Readonly<Logger>,
   twitchCommandHandler: TwitchChatCommandHandler<DATA_HANDLE, DATA_DETECT>,
   enabledCommands?: Readonly<string[]>

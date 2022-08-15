@@ -15,9 +15,9 @@ import {
 import { getTestLogger } from "./logger";
 import { messageParser } from "../../src/messageParser";
 // Type imports
-import type { Macros, Plugins } from "../../src/messageParser";
+import type { MacroMap, PluginMap } from "../../src/messageParser";
 import type { PluginFunc } from "../../src/messageParser";
-import type { Strings } from "../../src/strings";
+import type { StringMap } from "../../src/strings";
 
 describe("messageParser", () => {
   const logger = getTestLogger("messageParser");
@@ -74,7 +74,7 @@ describe("messageParser", () => {
   });
   context("references", () => {
     it("simple references", async () => {
-      const strings: Strings = new Map([["abc", "def"]]);
+      const strings: StringMap = new Map([["abc", "def"]]);
       const message0 = "$[abc]";
       const output0 = await messageParser(
         message0,
@@ -96,7 +96,7 @@ describe("messageParser", () => {
       expect(output1).to.be.equal("Hey def!");
     });
     it("loops", async () => {
-      const strings: Strings = new Map([["loop", "$[loop]"]]);
+      const strings: StringMap = new Map([["loop", "$[loop]"]]);
       const message0 = "$[loop]";
       let errorWasThrown = false;
       try {
@@ -108,11 +108,11 @@ describe("messageParser", () => {
       expect(errorWasThrown).to.be.equal(true);
     });
     it("plugins and macros inside reference", async () => {
-      const strings: Strings = new Map([
+      const strings: StringMap = new Map([
         ["reference", "$(plugin_one|Hello $[reference2])"],
         ["reference2", "$(plugin_uppercase=World) UwU!"],
       ]);
-      const plugins: Plugins = new Map<string, PluginFunc>([
+      const plugins: PluginMap = new Map<string, PluginFunc>([
         ["plugin_one", () => new Map()],
         [
           "plugin_uppercase",
@@ -144,7 +144,9 @@ describe("messageParser", () => {
   });
   context("macros", () => {
     it("simple maros", async () => {
-      const macros: Macros = new Map([["TWITCH", new Map([["NAME", "geo"]])]]);
+      const macros: MacroMap = new Map([
+        ["TWITCH", new Map([["NAME", "geo"]])],
+      ]);
       const message0 = "Hello %TWITCH:NAME%";
       const output0 = await messageParser(
         message0,
@@ -158,7 +160,7 @@ describe("messageParser", () => {
   });
   context("plugins", () => {
     it("plugins that return text", async () => {
-      const plugins: Plugins = new Map();
+      const plugins: PluginMap = new Map();
       // eslint-disable-next-line @typescript-eslint/require-await
       plugins.set("TWITCH_GAME", (_logger, value) => {
         if (value === "geo") {
@@ -177,7 +179,7 @@ describe("messageParser", () => {
       );
       expect(output0).to.be.equal("geo played on stream osu!");
 
-      const macros: Macros = new Map([["USER", new Map([["NAME", "geo"]])]]);
+      const macros: MacroMap = new Map([["USER", new Map([["NAME", "geo"]])]]);
       const message1 = "geo played on stream $(TWITCH_GAME=%USER:NAME%)";
       const output1 = await messageParser(
         message1,
@@ -188,7 +190,7 @@ describe("messageParser", () => {
       );
       expect(output1).to.be.equal("geo played on stream osu!");
 
-      const plugins2: Plugins = new Map();
+      const plugins2: PluginMap = new Map();
       // eslint-disable-next-line @typescript-eslint/require-await,@typescript-eslint/no-unused-vars
       plugins2.set("COUNT", () => "10");
       const message2 = "this command was called $(COUNT) times";
@@ -202,7 +204,7 @@ describe("messageParser", () => {
       expect(output2).to.be.equal("this command was called 10 times");
     });
     it("plugins that return macros", async () => {
-      const plugins: Plugins = new Map();
+      const plugins: PluginMap = new Map();
       // eslint-disable-next-line @typescript-eslint/require-await
       plugins.set("TWITCH_GAME", (_logger, value) => {
         if (value === "geo") {
@@ -223,7 +225,7 @@ describe("messageParser", () => {
       expect(output0).to.be.equal("geo played on stream osu!");
     });
     it("plugins within plugins", async () => {
-      const plugins: Plugins = new Map();
+      const plugins: PluginMap = new Map();
       // eslint-disable-next-line @typescript-eslint/require-await
       plugins.set("TWITCH_GAME", async (_logger, value?: string) => {
         if (value === "geo") {
@@ -248,7 +250,7 @@ describe("messageParser", () => {
       );
     });
     it("general plugins", async () => {
-      const plugins: Plugins = new Map();
+      const plugins: PluginMap = new Map();
       plugins.set(pluginLowercase.id, pluginLowercase.func);
       plugins.set(pluginUppercase.id, pluginUppercase.func);
       plugins.set(pluginRandomNumber.id, pluginRandomNumber.func);

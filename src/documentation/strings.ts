@@ -1,7 +1,7 @@
 // Package imports
 import { promises as fs } from "fs";
 // Local imports
-import { defaultStrings } from "../strings";
+import { defaultStringMap } from "../strings";
 import { ENV_STRINGS_VARIABLE_PREFIX } from "../info/env";
 import { generateFileDocumentation } from "../other/splitTextAtLength";
 import { generatePluginAndMacroDocumentation } from "../messageParser";
@@ -21,11 +21,11 @@ import type {
 } from "../messageParser/plugins";
 import type { FileDocumentationParts } from "../other/splitTextAtLength";
 import type { Logger } from "winston";
-import type { Strings } from "../strings";
+import type { StringMap } from "../strings";
 
 export const createStringsVariableDocumentation = async (
   path: string,
-  strings: Strings,
+  strings: StringMap,
   plugins?: MessageParserPlugin[],
   macros?: MessageParserMacro[],
   optionalPlugins?: MessageParserPluginInfo[],
@@ -78,7 +78,7 @@ export const createStringsVariableDocumentation = async (
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
 
   const dataDefaultStrings: FileDocumentationPartValue[] = [];
-  for (const [key, defaultValue] of defaultStrings.entries()) {
+  for (const [key, defaultValue] of defaultStringMap.entries()) {
     if (defaultValue.endsWith(" ") || defaultValue.startsWith(" ")) {
       dataDefaultStrings.push({
         description: undefined,

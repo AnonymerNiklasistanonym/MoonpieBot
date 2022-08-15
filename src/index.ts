@@ -33,7 +33,7 @@ import {
 import { cliHelpGenerator } from "./cli";
 import { createCustomCommandTimerExampleFiles } from "./customCommandsTimers/createExampleFiles";
 import { createStringsVariableDocumentation } from "./documentation/strings";
-import { defaultStrings } from "./strings";
+import { defaultStringMap } from "./strings";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getVersionFromObject } from "./version";
 import { main } from "./main";
@@ -125,7 +125,7 @@ const entryPoint = async () => {
       );
       await createStringsVariableDocumentation(
         path.join(configDir, fileNameEnvStringsExample),
-        defaultStrings,
+        defaultStringMap,
         defaultPlugins,
         defaultMacros,
         defaultPluginsOptional,

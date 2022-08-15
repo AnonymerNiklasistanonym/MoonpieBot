@@ -19,7 +19,7 @@ import {
 } from "./twitch";
 import { defaultPlugins, generatePlugin } from "./messageParser/plugins";
 import {
-  defaultStrings,
+  defaultStringMap,
   updateStringsMapWithCustomEnvStrings,
 } from "./strings";
 import { EnvVariable, EnvVariableNone, EnvVariableOnOff } from "./info/env";
@@ -48,7 +48,7 @@ import {
 import { createLogFunc } from "./logging";
 import { defaultMacros } from "./messageParser/macros";
 import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
-import { generatePluginsAndMacrosMap } from "./messageParser";
+import { generateMacroPluginMap } from "./messageParser";
 import { getVersionFromObject } from "./version";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { moonpieDbSetupTables } from "./database/moonpieDb";
@@ -310,15 +310,13 @@ export const main = async (
   ]);
 
   // Setup message parser
-  const strings = updateStringsMapWithCustomEnvStrings(defaultStrings, logger);
-  const pluginsAndMacrosMap = generatePluginsAndMacrosMap(
-    defaultPlugins,
-    defaultMacros
+  const stringMap = updateStringsMapWithCustomEnvStrings(
+    defaultStringMap,
+    logger
   );
-  const plugins = pluginsAndMacrosMap.pluginsMap;
-  const macros = pluginsAndMacrosMap.macrosMap;
+  const macroPluginMap = generateMacroPluginMap(defaultPlugins, defaultMacros);
   if (osuApiDefaultId) {
-    macros.set(
+    macroPluginMap.macroMap.set(
       macroOsuApi.id,
       new Map([[MacroOsuApi.DEFAULT_USER_ID, `${osuApiDefaultId}`]])
     );
@@ -331,7 +329,7 @@ export const main = async (
           clientSecret: osuApiClientSecret,
         },
       });
-      plugins.set(pluginReady.id, pluginReady.func);
+      macroPluginMap.pluginMap.set(pluginReady.id, pluginReady.func);
     });
   }
   const temp = osuStreamCompanionCurrentMapData;
@@ -340,14 +338,17 @@ export const main = async (
       const pluginReady = generatePlugin(plugin, {
         streamCompanionDataFunc: temp,
       });
-      plugins.set(pluginReady.id, pluginReady.func);
+      macroPluginMap.pluginMap.set(pluginReady.id, pluginReady.func);
     });
   }
   if (spotifyWebApi !== undefined) {
     const pluginSpotifyReady = generatePlugin(pluginSpotifyGenerator, {
       spotifyWebApi,
     });
-    plugins.set(pluginSpotifyReady.id, pluginSpotifyReady.func);
+    macroPluginMap.pluginMap.set(
+      pluginSpotifyReady.id,
+      pluginSpotifyReady.func
+    );
   }
 
   // Connect functionality to Twitch connection triggers
@@ -400,8 +401,8 @@ export const main = async (
         return;
       }
 
-      const pluginsChannel = new Map(plugins);
-      const macrosChannel = new Map(macros);
+      const pluginMapChannel = new Map(macroPluginMap.pluginMap);
+      const macroMapChannel = new Map(macroPluginMap.macroMap);
       const tempTwitchApiClient = twitchApiClient;
       if (tempTwitchApiClient !== undefined) {
         pluginsTwitchApiGenerator.forEach((a) => {
@@ -410,7 +411,7 @@ export const main = async (
             twitchApiClient: tempTwitchApiClient,
             twitchUserId: tags["user-id"],
           });
-          pluginsChannel.set(plugin.id, plugin.func);
+          pluginMapChannel.set(plugin.id, plugin.func);
         });
       }
       pluginsTwitchChatGenerator.forEach((a) => {
@@ -419,7 +420,7 @@ export const main = async (
           userId: tags["user-id"],
           userName: tags.username,
         });
-        pluginsChannel.set(plugin.id, plugin.func);
+        pluginMapChannel.set(plugin.id, plugin.func);
       });
 
       // Handle all bot commands
@@ -434,9 +435,9 @@ export const main = async (
           moonpieDbPath: pathDatabase,
         },
         moonpieEnableCommands,
-        strings,
-        pluginsChannel,
-        macrosChannel,
+        stringMap,
+        pluginMapChannel,
+        macroMapChannel,
         logger
       ).catch((err) => {
         loggerMain.error(err as Error);
@@ -472,9 +473,9 @@ export const main = async (
             osuStreamCompanionCurrentMapData,
           },
           osuEnableCommands,
-          strings,
-          pluginsChannel,
-          macrosChannel,
+          stringMap,
+          pluginMapChannel,
+          macroMapChannel,
           logger
         ).catch((err) => {
           loggerMain.error(err as Error);
@@ -505,9 +506,9 @@ export const main = async (
             osuStreamCompanionCurrentMapData,
           },
           osuEnableCommands.filter((a) => a === OsuCommands.NP),
-          strings,
-          pluginsChannel,
-          macrosChannel,
+          stringMap,
+          pluginMapChannel,
+          macroMapChannel,
           logger
         ).catch((err) => {
           loggerMain.error(err as Error);
@@ -532,9 +533,9 @@ export const main = async (
           message,
           {},
           spotifyEnableCommands,
-          strings,
-          pluginsChannel,
-          macrosChannel,
+          stringMap,
+          pluginMapChannel,
+          macroMapChannel,
           logger
         ).catch((err) => {
           loggerMain.error(err as Error);
@@ -555,7 +556,7 @@ export const main = async (
 
       // Check custom commands
       try {
-        const pluginsCustomCommands = new Map(pluginsChannel);
+        const pluginsCustomCommands = new Map(pluginMapChannel);
         // Add plugins to manipulate custom command global data
         pluginsCustomCommandDataGenerator.forEach((a) => {
           const plugin = generatePlugin(a, { customCommands });
@@ -577,9 +578,9 @@ export const main = async (
             tags,
             message,
             {},
-            strings,
+            stringMap,
             pluginsCustomCommand,
-            macrosChannel,
+            macroMapChannel,
             logger,
             getCustomCommand(customCommand)
           )
@@ -641,9 +642,9 @@ export const main = async (
         customTimer.channels,
         customTimer.message,
         customTimer.cronString,
-        strings,
-        plugins,
-        macros,
+        stringMap,
+        macroPluginMap.pluginMap,
+        macroPluginMap.macroMap,
         logger
       );
     }

@@ -18,7 +18,7 @@ import type { Logger } from "winston";
  * The global Strings data structure that maps from a unique string ID to a
  * string value that can be overridden.
  */
-export type Strings = Map<string, string>;
+export type StringMap = Map<string, string>;
 
 /**
  * The logging ID of this module.
@@ -65,7 +65,7 @@ export const generateStringList = (
 /**
  * The default values for all strings.
  */
-export const defaultStrings: Strings = new Map([
+export const defaultStringMap: StringMap = new Map([
   ...generateStringList(
     ...moonpieCommandReply,
     ...moonpieCommands,
@@ -84,9 +84,9 @@ export const defaultStrings: Strings = new Map([
  * @returns The updated strings map.
  */
 export const updateStringsMapWithCustomEnvStrings = (
-  strings: Strings = new Map(defaultStrings),
+  strings: StringMap = new Map(defaultStringMap),
   logger: Logger
-): Strings => {
+): StringMap => {
   const logStrings = createLogFunc(
     logger,
     LOG_ID,
@@ -96,7 +96,7 @@ export const updateStringsMapWithCustomEnvStrings = (
   let foundCustomStringsCounter = 0;
   let foundCustomNonDefaultStringsCounter = 0;
   // First check for the default string entries
-  for (const [key] of defaultStrings.entries()) {
+  for (const [key] of defaultStringMap.entries()) {
     const envValue = process.env[`${ENV_STRINGS_VARIABLE_PREFIX}${key}`];
     if (envValue !== undefined && envValue.trim().length > 0) {
       strings.set(key, envValue);

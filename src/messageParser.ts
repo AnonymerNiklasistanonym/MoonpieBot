@@ -16,7 +16,7 @@ import type {
   MessageParserPluginInfo,
 } from "./messageParser/plugins";
 import type { Logger } from "winston";
-import type { Strings } from "./strings";
+import type { StringMap } from "./strings";
 
 /**
  * The logging ID of this module.
@@ -146,7 +146,7 @@ const MAX_STRING_DEPTH = 15;
  */
 export const createParseTree = (
   messageString: string,
-  strings: Strings,
+  strings: StringMap,
   pluginDepth = 0,
   earlyExitBecausePluginValue = false,
   stringDepth = 0,
@@ -583,18 +583,18 @@ export type PluginFunc = (
    */
   signature?: boolean
 ) =>
-  | Promise<Macros | string | RequestHelp | PluginSignature>
-  | Macros
+  | Promise<MacroMap | string | RequestHelp | PluginSignature>
+  | MacroMap
   | string
   | RequestHelp
   | PluginSignature;
-export type Plugins = Map<string, PluginFunc>;
+export type PluginMap = Map<string, PluginFunc>;
 // A macro is a simple text replace dictionary
 export type MacroDictionaryEntry<KEY = string> = [KEY, string];
 export type MacroDictionary = Map<string, string>;
-export type Macros = Map<string, MacroDictionary>;
+export type MacroMap = Map<string, MacroDictionary>;
 
-const replaceMacros = (text: string, macros: Macros) => {
+const replaceMacros = (text: string, macros: MacroMap) => {
   return text.replace(
     /%([^:\s]+?):([^:\s]+?)%/g,
     (_fullMatch, macroName, macroValue) => {
@@ -694,8 +694,8 @@ export const createPluginSignatureString = async (
 
 export const parseTreeNode = async (
   treeNode: ParseTreeNode,
-  plugins: Plugins,
-  macros: Macros,
+  plugins: PluginMap,
+  macros: MacroMap,
   logger: Logger
 ): Promise<string> => {
   const logMessageParser = createLogFunc(logger, LOG_ID, "parse_tree_node");
@@ -862,9 +862,9 @@ export const parseTreeNode = async (
 
 export const messageParser = async (
   messageString: undefined | string,
-  strings: Strings = new Map(),
-  plugins: Plugins = new Map(),
-  macros: Macros = new Map(),
+  strings: StringMap = new Map(),
+  plugins: PluginMap = new Map(),
+  macros: MacroMap = new Map(),
   logger: Logger
 ): Promise<string> => {
   const logMessageParser = createLogFunc(logger, LOG_ID);
@@ -900,9 +900,9 @@ export const messageParser = async (
 
 export const messageParserById = async (
   stringId: string,
-  strings: Strings,
-  plugins: Plugins = new Map(),
-  macros: Macros = new Map(),
+  strings: StringMap,
+  plugins: PluginMap = new Map(),
+  macros: MacroMap = new Map(),
   logger: Logger
 ): Promise<string> => {
   const stringFromId = strings.get(stringId);
@@ -913,36 +913,36 @@ export const messageParserById = async (
 };
 
 export interface MacroPluginMap {
-  macrosMap: Macros;
-  pluginsMap: Plugins;
+  macroMap: MacroMap;
+  pluginMap: PluginMap;
 }
 
-export const generatePluginsAndMacrosMap = (
+export const generateMacroPluginMap = (
   plugins: MessageParserPlugin[],
   macros: MessageParserMacro[]
 ): MacroPluginMap => {
-  const pluginsMap: Plugins = new Map();
+  const pluginsMap: PluginMap = new Map();
   for (const plugin of plugins) {
     pluginsMap.set(plugin.id, plugin.func);
   }
-  const macrosMap: Macros = new Map();
+  const macrosMap: MacroMap = new Map();
   for (const macro of macros) {
     macrosMap.set(macro.id, macro.values);
   }
-  return { macrosMap, pluginsMap };
+  return { macroMap: macrosMap, pluginMap: pluginsMap };
 };
 
 export const generatePluginAndMacroDocumentation = async (
-  strings: Strings,
+  strings: StringMap,
   plugins: MessageParserPlugin[],
   macros: MessageParserMacro[],
   optionalPlugins: undefined | MessageParserPluginInfo[],
   optionalMacros: undefined | MessageParserMacroDocumentation[],
   logger: Logger
 ): Promise<FileDocumentationParts[]> => {
-  const maps = generatePluginsAndMacrosMap(plugins, macros);
-  const pluginsMap = maps.pluginsMap;
-  const macrosMap = maps.macrosMap;
+  const maps = generateMacroPluginMap(plugins, macros);
+  const pluginsMap = maps.pluginMap;
+  const macrosMap = maps.macroMap;
   const output: FileDocumentationParts[] = [];
   output.push({
     title: "Supported Plugins",

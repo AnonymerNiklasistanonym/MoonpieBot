@@ -10,7 +10,7 @@ import { messageParser } from "../messageParser";
 import type { CustomJson } from "./createExampleFiles";
 import type { LogFunc } from "../logging";
 import type { Logger } from "winston";
-import type { Plugins } from "../messageParser";
+import type { PluginMap } from "../messageParser";
 import type { TwitchChatCommandHandler } from "../twitch";
 
 /**
@@ -304,7 +304,7 @@ export const getCustomCommand = (
       globalMacros,
       logger
     ) => {
-      const pluginsCommand: Plugins = new Map(globalPlugins);
+      const pluginsCommand: PluginMap = new Map(globalPlugins);
       pluginsCommand.set(
         pluginRegexGroupId,
         (_, regexGroupIndex, signature) => {
