@@ -15,14 +15,15 @@ Set-Location $PSScriptRoot
 Set-Location ..
 
 # Remove temporary directories
-$DistDir = "dist"
 $BinaryDir = "bin"
+$DistDir = "dist"
 $DocsDir = "docs"
-$NodeModulesDir = "node_modules"
 $InstallerDir = "installer"
+$LogsDir = "logs"
+$NodeModulesDir = "node_modules"
 $TmpDir = "tmp"
 
-$DirectoriesToRemove = $DistDir,$BinaryDir,$DocsDir,$NodeModulesDir,$TmpDir
+$DirectoriesToRemove = $BinaryDir,$DistDir,$DocsDir,$LogsDir,$NodeModulesDir,$TmpDir
 $FilesToRemoveFromInstallerDir = Get-ChildItem -Recurse -Include "*.log","*.zst","*.log","*.bin","*.svg","*.git","*.pkg","*.tar","logpipe.*","*.log.*" $InstallerDir
 
 Remove-Item $DirectoriesToRemove -ErrorAction Ignore -Recurse -Force -Confirm:$false
