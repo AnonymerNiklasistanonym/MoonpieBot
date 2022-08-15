@@ -93,7 +93,7 @@ export enum EnvVariableBlock {
   TWITCH_API = "TWITCH_API",
 }
 
-export const ENABLE_COMMANDS_DEFAULT_DESCRIPTION = `You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to '${EnvVariableNone.NONE}' if no commands should be enabled).`;
+const ENABLE_COMMANDS_DEFAULT_DESCRIPTION = `You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to '${EnvVariableNone.NONE}' if no commands should be enabled).`;
 
 export interface EnvVariableData
   extends CliEnvVariableInformation<EnvVariable> {
@@ -355,10 +355,9 @@ export interface EnvVariableStructureVariablesBlock {
   name: string;
 }
 
-export const envVariableStructure: (
-  | EnvVariableStructureTextBlock
-  | EnvVariableStructureVariablesBlock
-)[] = [
+export type EnvVariableStructureElement = EnvVariableStructureTextBlock | EnvVariableStructureVariablesBlock;
+
+export const envVariableStructure: EnvVariableStructureElement[] = [
   {
     content:
       "This is an example config file for the MoonpieBot that contains all environment variables that the bot uses.",

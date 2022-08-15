@@ -13,7 +13,7 @@ import { MOONPIE_STRING_ID } from "../moonpie";
 import { pluginIfNotEqual } from "../../messageParser/plugins/general";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 
-export const MOONPIE_USER_STRING_ID = `${MOONPIE_STRING_ID}_USER`;
+const MOONPIE_USER_STRING_ID = `${MOONPIE_STRING_ID}_USER`;
 
 export const moonpieUserGet = {
   default: createMessageForMessageParser([

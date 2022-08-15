@@ -9,7 +9,7 @@ import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
 import { SpotifySongMacro } from "../../messageParser/macros/spotify";
 
-export const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
+const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
 
 export const spotifyCommandReplyRefSongNone = {
   default: createMessageForMessageParser(["Currently playing no song"], true),

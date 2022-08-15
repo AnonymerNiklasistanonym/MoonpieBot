@@ -45,7 +45,7 @@ import { PluginOsuApi } from "../../messageParser/plugins/osuApi";
 import { PluginOsuStreamCompanion } from "../../messageParser/plugins/osuStreamCompanion";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 
-export const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
+const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
 
 export const osuCommandReplyNp = {
   default: createMessageForMessageParser([

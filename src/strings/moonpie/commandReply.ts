@@ -17,7 +17,7 @@ import { createMessageForMessageParser } from "../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 
-export const MOONPIE_COMMAND_REPLY_STRING_ID = `${MOONPIE_STRING_ID}_COMMAND_REPLY`;
+const MOONPIE_COMMAND_REPLY_STRING_ID = `${MOONPIE_STRING_ID}_COMMAND_REPLY`;
 
 export const moonpieCommandReplyAbout = {
   default: createMessageForMessageParser([
