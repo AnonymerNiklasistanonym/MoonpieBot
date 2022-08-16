@@ -61,7 +61,7 @@ export interface CustomCommand {
 /**
  * Represents a custom command data value.
  */
-interface CustomCommandData {
+export interface CustomCommandData {
   /** A description. */
   description?: string;
   /** The unique ID. */

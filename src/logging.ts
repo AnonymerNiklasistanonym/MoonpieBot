@@ -36,7 +36,7 @@ export interface LoggerInformation {
  * @param logInfo The information the logger provides.
  * @returns Parsed string.
  */
-export const logFormat = (logInfo: LoggerInformation): string => {
+const logFormat = (logInfo: LoggerInformation): string => {
   if (logInfo.timestamp && logInfo.service) {
     if (logInfo.section) {
       if (logInfo.subsection) {

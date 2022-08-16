@@ -29,7 +29,7 @@
         "create:windowsInstallerConfig": "ts-node scripts/createWindowsInstallerConfigFile.ts",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",
         "docs": "typedoc --tsconfig tsconfig.json",
-        "findUnusedExports": "ts-unused-exports tsconfig.eslint.json --ignoreTestFiles --excludePathsFromReport=test",
+        "findUnusedExports": "ts-unused-exports tsconfig.eslint.json --ignoreTestFiles --showLineNumber --allowUnusedTypes --excludePathsFromReport=test",
         "lint:fix": "eslint --fix --ext .js,.ts .",
         "lint": "eslint --ext .js,.ts .",
         "mocha": "cross-env NODE_PATH=. mocha -r dotenv/config",
