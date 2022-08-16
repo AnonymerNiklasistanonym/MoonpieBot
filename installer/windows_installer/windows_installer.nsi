@@ -148,9 +148,12 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   SetOutPath "$INSTDIR"
   File ".\${PRODUCT_LOWERCASE}.bat"
   File "..\..\res\icons\${PRODUCT_LOWERCASE}.ico"
+  ;Create a separate directory for binaries that shold be available to the
+  ;terminal via the PATH environment variable
   CreateDirectory "$INSTDIR\${INSTDIR_BIN}"
   SetOutPath "$INSTDIR\${INSTDIR_BIN}"
   File "..\..\bin\${PRODUCT_LOWERCASE}.exe"
+  ;Reset the output path for shortcuts to the main install directory
   SetOutPath "$INSTDIR"
 
   ;Store installation folder in registry for future installs
