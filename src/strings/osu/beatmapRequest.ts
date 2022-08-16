@@ -27,7 +27,7 @@ import { OSU_STRING_ID } from "../osu";
 import { PluginOsuApi } from "../../messageParser/plugins/osuApi";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 // Type imports
-import type { StringEntry } from "src/strings";
+import type { StringEntry } from "../../strings";
 
 const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
 

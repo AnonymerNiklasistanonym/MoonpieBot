@@ -1,4 +1,5 @@
-import { MacroDictionaryEntry } from "src/messageParser";
+// Type imports
+import type { MacroDictionaryEntry } from "../../messageParser";
 import type { MessageParserMacroDocumentation } from "../macros";
 
 export enum MacroOsuWindowTitle {
