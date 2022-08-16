@@ -15,6 +15,7 @@ import {
   moonpieCommandsRemove,
   moonpieCommandsSet,
 } from "../../strings/moonpie/commands";
+import { genericStringSorter } from "../../other/genericStringSorter";
 import { messageParserById } from "../../messageParser";
 import { regexMoonpieChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
@@ -91,7 +92,9 @@ export const commandCommands: TwitchChatCommandHandler<
       globalMacros,
       logger
     );
-    const message = `${messagePrefix} ${commands.join(", ")}`;
+    const message = `${messagePrefix} ${commands
+      .sort(genericStringSorter)
+      .join(", ")}`;
     const sentMessage = await client.say(channel, message);
     return { sentMessage };
   },
