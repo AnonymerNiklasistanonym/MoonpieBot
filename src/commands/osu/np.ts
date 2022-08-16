@@ -15,6 +15,7 @@ import {
   osuCommandReplyNpStreamCompanionWebSocket,
 } from "../../strings/osu/commandReply";
 import {
+  regexOsuBeatmapDownloadUrlMatcher,
   regexOsuChatHandlerCommandNp,
   regexOsuWindowTitleNowPlaying,
 } from "../../info/regex";
@@ -24,7 +25,6 @@ import { getProcessInformationByName } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
-
 import type {
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
@@ -45,8 +45,6 @@ export interface CommandHandlerNpDataBase {
 interface CommandHandlerNpData extends CommandHandlerNpDataBase {
   beatmapRequestsInfo: BeatmapRequestsInfo;
 }
-
-export const regexBeatmapDownloadUrl = /https?:\/\/osu\.ppy\.sh\/b\/(\d+)/;
 
 /**
  * NP (now playing) command:
@@ -107,7 +105,7 @@ export const commandNp: TwitchChatCommandHandler<
           case "file":
             // eslint-disable-next-line no-case-declarations
             const beatmapIdMatch = currMapData.npPlayingDl.match(
-              regexBeatmapDownloadUrl
+              regexOsuBeatmapDownloadUrlMatcher
             );
             if (beatmapIdMatch && beatmapIdMatch.length > 1) {
               data.beatmapRequestsInfo.lastBeatmapId = parseInt(

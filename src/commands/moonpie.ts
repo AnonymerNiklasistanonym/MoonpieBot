@@ -10,6 +10,7 @@ import type {
   TwitchChatHandler,
 } from "../twitch";
 import type { CommandClaimData } from "./moonpie/claim";
+import { commandCommands } from "./moonpie/commands";
 
 export interface CommandGenericDataMoonpieDbPath {
   /**
@@ -87,5 +88,17 @@ export const moonpieChatHandler: TwitchChatHandler<
         command
       )
     )
+  );
+  await runTwitchCommandHandler(
+    client,
+    channel,
+    tags,
+    message,
+    data,
+    globalStrings,
+    globalPlugins,
+    globalMacros,
+    logger,
+    commandCommands
   );
 };

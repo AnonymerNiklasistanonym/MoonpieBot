@@ -19,22 +19,11 @@ import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
+import { regexOsuChatHandlerCommandScore } from "../../info/regex";
 // Type imports
 import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { TwitchChatCommandHandler } from "../../twitch";
-
-/**
- * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
- *
- * - The first group is the custom osu user name string.
- *
- * @example
- * ```text
- * !score osuName $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexScore = /^\s*!score\s+(\S+)\s*.*$/i;
 
 export interface CommandHandlerScoreDataBase {
   /**
@@ -164,13 +153,13 @@ export const commandScore: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexScore)) {
+    if (!message.match(regexOsuChatHandlerCommandScore)) {
       return false;
     }
     if (!data.enabledCommands.includes(OsuCommands.SCORE)) {
       return false;
     }
-    const match = regexScore.exec(message);
+    const match = regexOsuChatHandlerCommandScore.exec(message);
     if (!match) {
       return false;
     }

@@ -25,7 +25,7 @@ import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { messageParserById } from "../../messageParser";
-
+import { regexOsuBeatmapUrlMatcher } from "../../info/regex";
 import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
@@ -38,26 +38,6 @@ import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 
 export type OsuIrcBotSendMessageFunc = (logId: string) => IrcClient;
-
-/**
- * Regex that matches osu beatmap URLs in any message.
- *
- * - The first group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmaps/$ID`.
- * - The second group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmapsets/MAPSETID#osu/$ID`.
- * - The third group is the optional comment string.
- *
- * @example
- * ```text
- * $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES
- * ```
- * @example
- * ```text
- * $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587891 $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexBeatmapUrl =
-  // eslint-disable-next-line security/detect-unsafe-regex
-  /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+#\S+\/(\d+))\s*(?:\s+(.+?))?(?:\s*$|$)/i;
 
 export interface CommandHandlerBeatmapDataBase {
   /**
@@ -285,7 +265,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
     if (!data.beatmapRequestsOn) {
       return false;
     }
-    if (!message.match(regexBeatmapUrl)) {
+    if (!message.match(regexOsuBeatmapUrlMatcher)) {
       return false;
     }
     if (message.startsWith("@")) {
@@ -297,7 +277,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
       .split(osuBeatmapUrlBegin)
       .map((a) => `${osuBeatmapUrlBegin}${a}`)
       .map((a) => {
-        const match = a.match(regexBeatmapUrl);
+        const match = a.match(regexOsuBeatmapUrlMatcher);
         if (!match) {
           return;
         }

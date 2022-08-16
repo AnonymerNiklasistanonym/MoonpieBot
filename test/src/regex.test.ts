@@ -12,12 +12,12 @@ import {
   regexMoonpieChatHandlerCommandUserGet,
   regexMoonpieChatHandlerCommandUserRemove,
   regexMoonpieChatHandlerCommandUserSet,
+  regexOsuBeatmapUrlMatcher,
   regexOsuChatHandlerCommandNp,
   regexOsuChatHandlerCommandPp,
   regexOsuChatHandlerCommandRp,
   regexOsuWindowTitleNowPlaying,
 } from "../../src/info/regex";
-import { regexBeatmapUrl } from "../../src/commands/osu/beatmap";
 
 describe("regex", () => {
   context("!moonpie commands", () => {
@@ -523,7 +523,7 @@ describe("regex", () => {
     it("beatmap detection", () => {
       const message0 =
         "https://osu.ppy.sh/beatmaps/2587891 $OPTIONAL_TEXT_WITH_SPACES";
-      const matches0 = message0.match(regexBeatmapUrl);
+      const matches0 = message0.match(regexOsuBeatmapUrlMatcher);
       expect(matches0).to.be.not.null;
       if (matches0 != null) {
         expect(matches0[1]).to.be.equal("2587891");
@@ -531,7 +531,7 @@ describe("regex", () => {
         expect(matches0[3]).to.be.equal("$OPTIONAL_TEXT_WITH_SPACES");
       }
       const message1 = "https://osu.ppy.sh/beatmaps/2587891";
-      const matches1 = message1.match(regexBeatmapUrl);
+      const matches1 = message1.match(regexOsuBeatmapUrlMatcher);
       expect(matches1).to.be.not.null;
       if (matches1 != null) {
         expect(matches1[1]).to.be.equal("2587891");
@@ -539,7 +539,7 @@ describe("regex", () => {
         expect(matches1[3]).to.be.equal(undefined);
       }
       const message2 = "https://osu.ppy.sh/beatmaps/2587891 ";
-      const matches2 = message2.match(regexBeatmapUrl);
+      const matches2 = message2.match(regexOsuBeatmapUrlMatcher);
       expect(matches2).to.be.not.null;
       if (matches2 != null) {
         expect(matches2[1]).to.be.equal("2587891");
@@ -548,7 +548,7 @@ describe("regex", () => {
       }
       const message3 =
         "$OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES";
-      const matches3 = message3.match(regexBeatmapUrl);
+      const matches3 = message3.match(regexOsuBeatmapUrlMatcher);
       expect(matches3).to.be.not.null;
       if (matches3 != null) {
         expect(matches3[1]).to.be.equal(undefined);
@@ -559,7 +559,7 @@ describe("regex", () => {
         "https://osu.ppy.sh/beatmaps/2587891 https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587892 https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES";
       const messages4 = message4.split("https").map((a) => `https${a}`);
       expect(messages4.length).to.be.equal(5);
-      const matches4 = messages4.map((a) => a.match(regexBeatmapUrl));
+      const matches4 = messages4.map((a) => a.match(regexOsuBeatmapUrlMatcher));
       expect(matches4).to.be.not.null;
       const matches4Array = Array.from(matches4);
       expect(matches4Array.length).to.be.equal(5);

@@ -5,8 +5,6 @@ import type {
 } from "../../customCommandsTimers/customCommand";
 import type { MessageParserPluginGenerator } from "../plugins";
 
-export const pluginCustomCommandCountId = "COUNT";
-
 export interface PluginsCustomCommandData {
   customCommand: CustomCommand;
 }
@@ -17,7 +15,7 @@ export const pluginsCustomCommandGenerator: MessageParserPluginGenerator<Plugins
       description: "Set a global custom command data value",
       generate: (data) => () =>
         `${data.customCommand.count ? data.customCommand.count + 1 : 1}`,
-      id: pluginCustomCommandCountId,
+      id: "COUNT",
       signature: { type: "signature" },
     },
   ];

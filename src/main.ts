@@ -41,17 +41,16 @@ import {
   registerTimer,
 } from "./customCommandsTimers/customTimer";
 import { MacroOsuApi, macroOsuApi } from "./messageParser/macros/osuApi";
+import { moonpieDbBackup, moonpieDbSetupTables } from "./database/moonpieDb";
 import {
   pluginsCustomCommandDataGenerator,
   pluginsCustomCommandGenerator,
 } from "./messageParser/plugins/customCommand";
 import { createLogFunc } from "./logging";
 import { defaultMacros } from "./messageParser/macros";
-import { exportMoonpieCountTableToJson } from "./database/moonpie/backup";
 import { generateMacroPluginMap } from "./messageParser";
 import { getVersionFromObject } from "./version";
 import { moonpieChatHandler } from "./commands/moonpie";
-import { moonpieDbSetupTables } from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
@@ -293,10 +292,11 @@ export const main = async (
     ) {
       // Setup database tables (or do nothing if they already exist)
       await moonpieDbSetupTables(pathDatabase, logger);
-      const databaseBackupData = await exportMoonpieCountTableToJson(
-        pathDatabase,
-        logger
-      );
+      const databaseBackupData =
+        await moonpieDbBackup.exportMoonpieCountTableToJson(
+          pathDatabase,
+          logger
+        );
       const pathDatabaseBackup = path.join(logDir, fileNameDatabaseBackups());
       await writeJsonFile(pathDatabaseBackup, databaseBackupData);
     }

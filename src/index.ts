@@ -27,7 +27,9 @@ import {
   envVariableInformation,
 } from "./info/env";
 import {
+  fileNameEnv,
   fileNameEnvExample,
+  fileNameEnvStrings,
   fileNameEnvStringsExample,
 } from "./info/fileNames";
 import { cliHelpGenerator } from "./cli";
@@ -142,10 +144,10 @@ const entryPoint = async () => {
 
     // Load user specific environment variables from the .env files
     dotenv.config({
-      path: path.join(configDir, ".env"),
+      path: path.join(configDir, fileNameEnv),
     });
     dotenv.config({
-      path: path.join(configDir, ".env.strings"),
+      path: path.join(configDir, fileNameEnvStrings),
     });
 
     // Print for debugging the (private/secret) environment values to the console

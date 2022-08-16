@@ -2,6 +2,11 @@
  * MoonpieBot general information
  */
 
+import {
+  fileNameCustomCommands,
+  fileNameCustomTimers,
+  fileNameEnv,
+} from "./fileNames";
 import { CliOption } from "./cli";
 
 /** Name of the program. */
@@ -24,7 +29,7 @@ export const author = "AnonymerNiklasistanonym";
 export const description = "A custom Twitch chat bot";
 
 /** Long description of the program. */
-export const longDescription = `Running this program will start a Twitch connected bot using information provided by either environment variables, a .env file in the same directory or given a ${CliOption.CONFIG_DIRECTORY} argument a .env file in the specified directory. Additionally log files and the database are written to this directory if not specified otherwise. In this directory can optionally a JSON file for custom commands (customCommands.json) and custom timers (customTimers.json) be specified.`;
+export const longDescription = `Running this program will start a Twitch connected bot using information provided by either environment variables, a '${fileNameEnv}' file in the same directory or given a ${CliOption.CONFIG_DIRECTORY} argument a '${fileNameEnv}' file in the specified directory. Additionally log files and the database are written to this directory if not specified otherwise. In this directory can optionally a JSON file for custom commands ('${fileNameCustomCommands}') and custom timers ('${fileNameCustomTimers}') be specified.`;
 
 /**
  * Additional package description of the program.

@@ -212,7 +212,7 @@ export const getEnvVariableValueOrUndefined = (
   return envValue.value;
 };
 
-export const getEnvVariableValueInformation = (
+const getEnvVariableValueInformation = (
   envVariable: EnvVariable | string
 ): EnvVariableData => {
   const info = envVariableInformation.find((a) => a.name === envVariable);

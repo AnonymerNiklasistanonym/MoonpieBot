@@ -15,43 +15,16 @@ import {
   parseTwitchBadgeLevel,
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
+import {
+  regexMoonpieChatHandlerCommandRequests,
+  regexMoonpieChatHandlerCommandRequestsOff,
+  regexMoonpieChatHandlerCommandRequestsOn,
+} from "../../info/regex";
 import { BeatmapRequestsInfo } from "../osu";
 import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { TwitchChatCommandHandler } from "../../twitch";
-
-/**
- * Regex to recognize the !osuRequests enable command.
- *
- * @example
- * ```text
- * !osuRequests on
- * ```
- */
-export const regexEnableBeatmapRequests = /^\s*!osuRequests\s+on(?:\s|$)/i;
-
-/**
- * Regex to recognize the !osuRequests disable command.
- *
- * @example
- * ```text
- * !osuRequests off $OPTIONAL_TEXT
- * ```
- */
-export const regexDisableBeatmapRequests =
-  /^\s*!osuRequests\s+off(?:\s+(.*?)\s*$|\s|$)/i;
-
-/**
- * Regex to recognize the !osuRequests command.
- *
- * @example
- * ```text
- * !osuRequests $OPTIONAL_TEXT
- * ```
- */
-export const regexBeatmapRequestsStatus =
-  /^\s*!osuRequests(?:\s+(.*?)\s*$|\s|$)/i;
 
 export interface CommandHandlerBeatmapRequestsData {
   beatmapRequestsInfo: BeatmapRequestsInfo;
@@ -188,7 +161,7 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
     if (!data.enabledCommands.includes(OsuCommands.REQUESTS)) {
       return false;
     }
-    const matchEnable = message.match(regexEnableBeatmapRequests);
+    const matchEnable = message.match(regexMoonpieChatHandlerCommandRequestsOn);
     if (matchEnable) {
       return {
         data: {
@@ -196,7 +169,9 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
         },
       };
     }
-    const matchDisable = message.match(regexDisableBeatmapRequests);
+    const matchDisable = message.match(
+      regexMoonpieChatHandlerCommandRequestsOff
+    );
     if (matchDisable) {
       return {
         data: {
@@ -205,7 +180,7 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
         },
       };
     }
-    const matchStatus = message.match(regexBeatmapRequestsStatus);
+    const matchStatus = message.match(regexMoonpieChatHandlerCommandRequests);
     if (matchStatus) {
       return {
         data: {

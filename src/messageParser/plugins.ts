@@ -72,7 +72,7 @@ export const generatePlugin = <DATA>(
   },
 });
 
-export const generatePluginInfo = <DATA>(
+const generatePluginInfo = <DATA>(
   generator: MessageParserPluginGenerator<DATA>
 ): MessageParserPluginInfo => ({
   ...generator,

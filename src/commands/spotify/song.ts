@@ -4,6 +4,7 @@ import {
   SpotifyCommands,
 } from "../../info/commands";
 import { messageParserById } from "../../messageParser";
+import { regexSpotifyChatHandlerCommandSong } from "../../info/regex";
 import { spotifyCommandReplySong } from "../../strings/spotify/commandReply";
 // Type imports
 import type { EMPTY_OBJECT } from "../../info/other";
@@ -12,16 +13,6 @@ import type { TwitchChatCommandHandler } from "../../twitch";
 export interface CommandDetectorSpotifySongDataIn {
   enabledCommands: string[];
 }
-
-/**
- * Regex to recognize the `!song` command.
- *
- * @example
- * ```text
- * !song $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexSong = /^\s*!song(?:\s*|\s.*)$/i;
 
 /**
  * Song command:
@@ -56,7 +47,7 @@ export const commandSong: TwitchChatCommandHandler<
     };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexSong)) {
+    if (!message.match(regexSpotifyChatHandlerCommandSong)) {
       return false;
     }
     if (!data.enabledCommands.includes(SpotifyCommands.SONG)) {

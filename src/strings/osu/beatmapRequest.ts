@@ -31,7 +31,7 @@ import type { StringEntry } from "src/strings";
 
 const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
 
-export const osuBeatmapRequestRefTopScoreShort: StringEntry = {
+const osuBeatmapRequestRefTopScoreShort: StringEntry = {
   default: createMessageForMessageParser(
     [
       { key: MacroOsuScore.RANK, name: macroOsuScore.id, type: "macro" },
@@ -158,7 +158,7 @@ export const osuBeatmapRequest: StringEntry = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}`,
 };
 
-export const osuBeatmapRequestRefDetailedStats: StringEntry = {
+const osuBeatmapRequestRefDetailedStats: StringEntry = {
   default: createMessageForMessageParser(
     [
       "FC=",
@@ -319,7 +319,7 @@ export const osuBeatmapRequestNotFound: StringEntry = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NOT_FOUND`,
 };
 
-export const osuBeatmapRequestRefIrcRequestString: StringEntry = {
+const osuBeatmapRequestRefIrcRequestString: StringEntry = {
   default: createMessageForMessageParser(
     [
       { name: PluginTwitchChat.USER, type: "plugin" },

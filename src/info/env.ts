@@ -1,6 +1,7 @@
 // Package imports
 import path from "path";
 // Local imports
+import { fileNameEnv, fileNameEnvExample } from "./fileNames";
 import { LoggerLevel } from "../logging";
 import { MoonpieCommands } from "./commands";
 import { OsuCommands } from "./commands";
@@ -366,8 +367,7 @@ export const envVariableStructure: EnvVariableStructureElement[] = [
     name: "File description",
   },
   {
-    content:
-      "You can either set the variables yourself or copy this file, rename it from `.env.example` to `.env` and edit it with your own values since this is just an example to show how it should look.",
+    content: `You can either set the variables yourself or copy this file, rename it from \`${fileNameEnvExample}\` to \`${fileNameEnv}\` and edit it with your own values since this is just an example to show how it should look.`,
     name: "File purpose",
   },
   {

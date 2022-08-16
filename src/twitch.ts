@@ -26,7 +26,7 @@ const LOG_ID = "twitch";
 /**
  * Errorcodes that can be attached to @CreateTwitchClientError.
  */
-export enum CreateTwitchClientErrorCode {
+enum CreateTwitchClientErrorCode {
   TWITCH_CHANNELS_EMPTY = "TWITCH_CHANNELS_EMPTY",
   TWITCH_CHANNELS_UNDEFINED = "TWITCH_CHANNELS_UNDEFINED",
   TWITCH_NAME_UNDEFINED = "TWITCH_NAME_UNDEFINED",
@@ -296,30 +296,6 @@ export interface TwitchChatCommandHandlerInfo {
 // LOG TWITCH RELATED ACTIONS
 
 /**
- * Log a sent Twitch message reply.
- *
- * @param logger The global logger.
- * @param messageId The ID of the message that is replied to.
- * @param sentMessage The sent message information.
- * @param replySourceId The ID of the reply source.
- */
-export const logTwitchMessageReply = (
-  logger: Logger,
-  messageId: string,
-  sentMessage: string[],
-  replySourceId: string
-): void => {
-  logger.log({
-    level: "debug",
-    message: `Successfully replied to message ${messageId}: '${JSON.stringify(
-      sentMessage
-    )}'`,
-    section: "twitch_message:reply",
-    subsection: replySourceId,
-  } as LoggerInformation);
-};
-
-/**
  * Log a sent Twitch broadcast message.
  *
  * @param logger The global logger.
@@ -347,7 +323,7 @@ export const logTwitchMessageBroadcast = (
  * @param message The message that something was detected in.
  * @param detectedCommand The command that was detected.
  */
-export const logTwitchMessageCommandDetected = (
+const logTwitchMessageCommandDetected = (
   logger: Logger,
   messageId: string,
   message: Readonly<string[]>,
@@ -370,7 +346,7 @@ export const logTwitchMessageCommandDetected = (
  * @param commandReply The command reply.
  * @param replyToMessageId The ID of the message that is replied to.
  */
-export const logTwitchMessageCommandReply = (
+const logTwitchMessageCommandReply = (
   logger: Logger,
   detectedCommand: TwitchChatCommandHandlerInfo,
   commandReply: TwitchChatCommandHandlerReply,

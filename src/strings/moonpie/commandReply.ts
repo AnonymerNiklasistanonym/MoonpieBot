@@ -72,7 +72,7 @@ export const moonpieCommandReplyClaim: StringEntry = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIM`,
 };
 
-export const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
+const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
   default: createMessageForMessageParser(
     [
       "You already claimed a moonpie for today (",
@@ -108,7 +108,7 @@ export const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_REF_NORMAL`,
 };
 
-export const moonpieCommandReplyAlreadyClaimedRefStar: StringEntry = {
+const moonpieCommandReplyAlreadyClaimedRefStar: StringEntry = {
   default: createMessageForMessageParser(
     [
       "You are the cutest! You have 6969 moonpies and are rank 1 in my heart! <3",

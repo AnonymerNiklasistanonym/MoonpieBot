@@ -13,12 +13,12 @@ import type { StringEntry } from "../../strings";
 
 const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
 
-export const spotifyCommandReplyRefSongNone: StringEntry = {
+const spotifyCommandReplyRefSongNone: StringEntry = {
   default: createMessageForMessageParser(["Currently playing no song"], true),
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_NO_SONG`,
 };
 
-export const spotifyCommandReplyRefSongCurrent: StringEntry = {
+const spotifyCommandReplyRefSongCurrent: StringEntry = {
   default: createMessageForMessageParser(
     [
       "Currently playing '",
@@ -58,7 +58,7 @@ export const spotifyCommandReplyRefSongCurrent: StringEntry = {
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_CURRENT`,
 };
 
-export const spotifyCommandReplyRefSongPrevious: StringEntry = {
+const spotifyCommandReplyRefSongPrevious: StringEntry = {
   default: createMessageForMessageParser(
     [
       ", previously played '",
