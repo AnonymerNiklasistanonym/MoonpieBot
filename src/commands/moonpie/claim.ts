@@ -21,6 +21,8 @@ import {
 import {
   regexMoonpieChatHandlerCommandAbout,
   regexMoonpieChatHandlerCommandClaim,
+  regexMoonpieChatHandlerCommandCommands,
+  regexMoonpieChatHandlerCommandLeaderboard,
   regexMoonpieChatHandlerCommandUserAdd,
   regexMoonpieChatHandlerCommandUserDelete,
   regexMoonpieChatHandlerCommandUserGet,
@@ -181,6 +183,8 @@ export const commandClaim: TwitchChatCommandHandler<
     // If regex also matches moonpie about/add/delete/get/remove/set ignore
     if (
       message.match(regexMoonpieChatHandlerCommandAbout) ||
+      message.match(regexMoonpieChatHandlerCommandCommands) ||
+      message.match(regexMoonpieChatHandlerCommandLeaderboard) ||
       message.match(regexMoonpieChatHandlerCommandUserAdd) ||
       message.match(regexMoonpieChatHandlerCommandUserDelete) ||
       message.match(regexMoonpieChatHandlerCommandUserGet) ||
