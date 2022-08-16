@@ -16,21 +16,12 @@ import {
   moonpieCommandsSet,
 } from "../../strings/moonpie/commands";
 import { messageParserById } from "../../messageParser";
+import { regexMoonpieChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
-
-/**
- * Regex to recognize the `!moonpie commands` command.
- *
- * @example
- * ```text
- * !moonpie commands
- * ```
- */
-export const regexMoonpieCommands = /^\s*!moonpie\s+commands\s*$/i;
 
 /**
  * Commands command: Send all available commands of the bot in chat.
@@ -105,7 +96,7 @@ export const commandCommands: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexMoonpieCommands)) {
+    if (!message.match(regexMoonpieChatHandlerCommandCommands)) {
       return false;
     }
     if (!data.enabledCommands.includes(MoonpieCommands.COMMANDS)) {

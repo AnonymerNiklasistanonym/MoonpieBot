@@ -14,22 +14,13 @@ import {
 import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../info/other";
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
+import { regexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 // Type imports
 import type {
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
-
-/**
- * Regex to recognize the `!moonpie leaderboard` command.
- *
- * @example
- * ```text
- * !moonpie leaderboard
- * ```
- */
-export const regexMoonpieLeaderboard = /^\s*!moonpie\s+leaderboard\s*$/i;
 
 const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 15;
 
@@ -98,7 +89,7 @@ export const commandLeaderboard: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexMoonpieLeaderboard)) {
+    if (!message.match(regexMoonpieChatHandlerCommandLeaderboard)) {
       return false;
     }
     if (!data.enabledCommands.includes(MoonpieCommands.LEADERBOARD)) {

@@ -2,7 +2,7 @@
 import { runTwitchCommandHandler, TwitchChatHandler } from "../twitch";
 import { commandSong } from "./spotify/song";
 
-export interface SpotifyChatHandlerData {
+interface SpotifyChatHandlerData {
   enabledCommands: string[];
 }
 

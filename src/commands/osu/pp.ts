@@ -9,6 +9,7 @@ import {
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
+import { regexOsuChatHandlerCommandPp } from "../../info/regex";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {
@@ -43,40 +44,6 @@ export interface CommandDetectorPpRpDataOut {
    */
   customOsuName?: string;
 }
-
-/**
- * Regex to recognize the `!pp` command.
- *
- * @example
- * ```text
- * !pp $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexPp = /^\s*!pp(?:\s*|\s.*)$/i;
-
-/**
- * Regex to recognize the `!pp $OPTIONAL_OSU_USER_ID` command.
- *
- * - The first group is the custom osu ID number.
- *
- * @example
- * ```text
- * !pp 12345 $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexPpCustomId = /^\s*!pp\s+([0-9]+)\s*.*$/i;
-
-/**
- * Regex to recognize the `!pp $OPTIONAL_OSU_USER_NAME` command.
- *
- * - The first group is the custom osu user name string.
- *
- * @example
- * ```text
- * !pp osuName $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexPpCustomName = /^\s*!pp\s+(\S+)\s*.*$/i;
 
 /**
  * PP (from performance points) command:
@@ -156,20 +123,17 @@ export const commandPp: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexPp)) {
+    const match = message.match(regexOsuChatHandlerCommandPp);
+    if (!match) {
       return false;
     }
     if (!data.enabledCommands.includes(OsuCommands.PP)) {
       return false;
     }
-    const matchId = regexPpCustomId.exec(message);
-    const matchName = regexPpCustomName.exec(message);
     return {
       data: {
-        customOsuId:
-          matchId && matchId.length >= 2 ? parseInt(matchId[1]) : undefined,
-        customOsuName:
-          matchName && matchName.length >= 2 ? matchName[1] : undefined,
+        customOsuId: match[1] ? parseInt(match[1]) : undefined,
+        customOsuName: match[2],
       },
     };
   },

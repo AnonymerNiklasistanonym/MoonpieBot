@@ -1,3 +1,4 @@
+// Local imports
 import {
   macroOsuBeatmap,
   MacroOsuBeatmap,
@@ -44,10 +45,12 @@ import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
 import { PluginOsuApi } from "../../messageParser/plugins/osuApi";
 import { PluginOsuStreamCompanion } from "../../messageParser/plugins/osuStreamCompanion";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
+// Type imports
+import type { StringEntry } from "../../strings";
 
 const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
 
-export const osuCommandReplyNp = {
+export const osuCommandReplyNp: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -92,7 +95,7 @@ export const osuCommandReplyNp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP`,
 };
 
-export const osuCommandReplyNpStreamCompanionWebSocket = {
+export const osuCommandReplyNpStreamCompanionWebSocket: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -253,7 +256,7 @@ export const osuCommandReplyNpStreamCompanionWebSocket = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_WEBSOCKET`,
 };
 
-export const osuCommandReplyNpStreamCompanionFile = {
+export const osuCommandReplyNpStreamCompanionFile: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -309,7 +312,7 @@ export const osuCommandReplyNpStreamCompanionFile = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_FILE`,
 };
 
-export const osuCommandReplyNpNoMap = {
+export const osuCommandReplyNpNoMap: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -318,7 +321,7 @@ export const osuCommandReplyNpNoMap = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP`,
 };
 
-export const osuCommandReplyNpNoMapStreamCompanion = {
+export const osuCommandReplyNpNoMapStreamCompanion: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -327,7 +330,7 @@ export const osuCommandReplyNpNoMapStreamCompanion = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP_STREAMCOMPANION`,
 };
 
-export const osuCommandReplyNpStreamCompanionNotRunning = {
+export const osuCommandReplyNpStreamCompanionNotRunning: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -336,7 +339,7 @@ export const osuCommandReplyNpStreamCompanionNotRunning = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_NOT_RUNNING`,
 };
 
-export const osuCommandReplyRp = {
+export const osuCommandReplyRp: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -613,7 +616,7 @@ export const osuCommandReplyRp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_RP`,
 };
 
-export const osuCommandReplyRpNotFound = {
+export const osuCommandReplyRpNotFound: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -622,7 +625,7 @@ export const osuCommandReplyRpNotFound = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_RP_NOT_FOUND`,
 };
 
-export const osuCommandReplyPp = {
+export const osuCommandReplyPp: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -792,12 +795,12 @@ export const osuCommandReplyPp = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_PP`,
 };
 
-export const osuScoreErrorNoBeatmap = {
+export const osuScoreErrorNoBeatmap: StringEntry = {
   default: createMessageForMessageParser(["No beatmap was found"]),
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_BEATMAP`,
 };
 
-export const osuScoreErrorNotFound = {
+export const osuScoreErrorNotFound: StringEntry = {
   default: createMessageForMessageParser([
     "No score was found of the user ",
     {
@@ -810,7 +813,7 @@ export const osuScoreErrorNotFound = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_SCORE`,
 };
 
-export const osuScore = {
+export const osuScore: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -826,7 +829,7 @@ export const osuScore = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE`,
 };
 
-export const osuCommandReply = [
+export const osuCommandReply: StringEntry[] = [
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
   osuCommandReplyNpNoMapStreamCompanion,

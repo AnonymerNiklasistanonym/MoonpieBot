@@ -14,44 +14,22 @@ import {
   osuCommandReplyNpStreamCompanionNotRunning,
   osuCommandReplyNpStreamCompanionWebSocket,
 } from "../../strings/osu/commandReply";
+import {
+  regexOsuChatHandlerCommandNp,
+  regexOsuWindowTitleNowPlaying,
+} from "../../info/regex";
 import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
-import { getProcessWindowTitle } from "../../other/processInformation";
+import { getProcessInformationByName } from "../../other/processInformation";
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
+
 import type {
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
-
-/**
- * Regex to recognize the `!np` command.
- *
- * @example
- * ```text
- * !np $OPTIONAL_TEXT_WITH_SPACES
- * ```
- */
-export const regexNp = /^\s*!np(?:\s*|\s.*)$/i;
-
-/**
- * Regex to parse the now playing window title on Windows.
- * The first capture group is the artist, the second the title and the third
- * the name of the difficulty.
- *
- * @example
- * ```text
- * osu! - Artist - Title [Difficulty]
- * ```
- * @example
- * ```text
- * osu! - Artist - Title [TV Size] [Difficulty]
- * ```
- */
-export const regexNowPlaying =
-  /^(?:.+?)\s-\s\s*(.+?)\s*\s-\s\s*(.+?)\s*\[\s*([^\s[\]]+?)\s*\]$/;
 
 export interface CommandHandlerNpDataBase {
   /**
@@ -64,7 +42,7 @@ export interface CommandHandlerNpDataBase {
   osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
 }
 
-export interface CommandHandlerNpData extends CommandHandlerNpDataBase {
+interface CommandHandlerNpData extends CommandHandlerNpDataBase {
   beatmapRequestsInfo: BeatmapRequestsInfo;
 }
 
@@ -173,9 +151,16 @@ export const commandNp: TwitchChatCommandHandler<
       if (data.osuApiV2Credentials === undefined) {
         throw errorMessageOsuApiCredentialsUndefined();
       }
-      const windowTitle = await getProcessWindowTitle("osu");
-      if (windowTitle !== undefined && windowTitle !== "osu!") {
-        const match = windowTitle.match(regexNowPlaying);
+      const osuProcessInformation = await getProcessInformationByName("osu");
+      if (
+        osuProcessInformation.platform === "win32" &&
+        osuProcessInformation.processInformation !== undefined &&
+        osuProcessInformation.processInformation.windowTitle !== "osu!"
+      ) {
+        const match =
+          osuProcessInformation.processInformation.windowTitle.match(
+            regexOsuWindowTitleNowPlaying
+          );
         if (match != null) {
           let mapId;
           try {
@@ -246,7 +231,7 @@ export const commandNp: TwitchChatCommandHandler<
   },
   detect: (_tags, message, data) => {
     if (
-      message.match(regexNp) &&
+      message.match(regexOsuChatHandlerCommandNp) &&
       data.enabledCommands.includes(OsuCommands.NP)
     ) {
       return {

@@ -51,7 +51,7 @@ export interface CustomTimersJson extends CustomJson {
  * @param logger Optional logger for more detailed analysis.
  * @returns True if the object can be used as CustomTimer.
  */
-export const isCustomTimer = (
+const isCustomTimer = (
   arg: CustomTimer,
   logger?: Logger
 ): arg is CustomTimer => {
@@ -100,7 +100,7 @@ export const isCustomTimer = (
  * @param logger Optional logger for more detailed analysis.
  * @returns True if the object can be used as CustomTimersJson.
  */
-export const isCustomTimersJson = (
+const isCustomTimersJson = (
   arg: CustomTimersJson,
   logger?: Logger
 ): arg is CustomTimersJson => {
@@ -165,6 +165,7 @@ export const registerTimer = (
   });
 };
 
+/*
 export const removeTimer = (
   cronTask: cron.ScheduledTask,
   logger: Logger
@@ -174,6 +175,7 @@ export const removeTimer = (
   cronTask.stop();
   logCustomTimer.debug("Timer was stopped");
 };
+*/
 
 export const loadCustomTimersFromFile = async (
   filePath: string,

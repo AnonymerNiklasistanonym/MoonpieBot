@@ -28,7 +28,7 @@ const globalBeatmapRequestObject: BeatmapRequestsInfo = {
   beatmapRequestsOn: true,
 };
 
-export interface OsuChatHandlerData
+interface OsuChatHandlerData
   extends CommandHandlerPpRpDataBase,
     CommandHandlerNpDataBase,
     CommandHandlerScoreDataBase,

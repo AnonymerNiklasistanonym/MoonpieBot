@@ -1,3 +1,4 @@
+// Local imports
 import {
   MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntry,
@@ -12,10 +13,12 @@ import { createMessageForMessageParser } from "../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { pluginIfNotEqual } from "../../messageParser/plugins/general";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
+// Type imports
+import { StringEntry } from "../../strings";
 
 const MOONPIE_USER_STRING_ID = `${MOONPIE_STRING_ID}_USER`;
 
-export const moonpieUserGet = {
+export const moonpieUserGet: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -55,7 +58,7 @@ export const moonpieUserGet = {
   ]),
   id: `${MOONPIE_USER_STRING_ID}_GET`,
 };
-export const moonpieUserNeverClaimedError = {
+export const moonpieUserNeverClaimedError: StringEntry = {
   default: createMessageForMessageParser([
     "The user ",
     {
@@ -67,13 +70,13 @@ export const moonpieUserNeverClaimedError = {
   ]),
   id: `${MOONPIE_USER_STRING_ID}_NEVER_CLAIMED_ERROR`,
 };
-export const moonpieUserPermissionError = {
+export const moonpieUserPermissionError: StringEntry = {
   default: createMessageForMessageParser([
     "You are not a broadcaster and thus are not allowed to use this command!",
   ]),
   id: `${MOONPIE_USER_STRING_ID}_PERMISSION_ERROR`,
 };
-export const moonpieUserSetNaNError = {
+export const moonpieUserSetNaNError: StringEntry = {
   default: createMessageForMessageParser([
     "The given moonpie count (",
     {
@@ -92,7 +95,7 @@ export const moonpieUserSetNaNError = {
   id: `${MOONPIE_USER_STRING_ID}_SET_NAN_ERROR`,
 };
 
-export const moonpieUserSet = {
+export const moonpieUserSet: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -144,7 +147,7 @@ export const moonpieUserSet = {
   id: `${MOONPIE_USER_STRING_ID}_SET`,
 };
 
-export const moonpieUserDelete = {
+export const moonpieUserDelete: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -158,7 +161,7 @@ export const moonpieUserDelete = {
   id: `${MOONPIE_USER_STRING_ID}_DELETE`,
 };
 
-export const moonpieUser = [
+export const moonpieUser: StringEntry[] = [
   moonpieUserGet,
   moonpieUserNeverClaimedError,
   moonpieUserPermissionError,

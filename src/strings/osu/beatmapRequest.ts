@@ -1,3 +1,4 @@
+// Local imports
 import { MacroOsuApi, macroOsuApi } from "../../messageParser/macros/osuApi";
 import {
   MacroOsuBeatmap,
@@ -25,10 +26,12 @@ import { OSU_IRC_NEWLINE } from "../../osuIrc";
 import { OSU_STRING_ID } from "../osu";
 import { PluginOsuApi } from "../../messageParser/plugins/osuApi";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
+// Type imports
+import type { StringEntry } from "src/strings";
 
 const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
 
-export const osuBeatmapRequestRefTopScoreShort = {
+export const osuBeatmapRequestRefTopScoreShort: StringEntry = {
   default: createMessageForMessageParser(
     [
       { key: MacroOsuScore.RANK, name: macroOsuScore.id, type: "macro" },
@@ -51,7 +54,7 @@ export const osuBeatmapRequestRefTopScoreShort = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE_SHORT`,
 };
 
-export const osuBeatmapRequestRefTopScore = {
+export const osuBeatmapRequestRefTopScore: StringEntry = {
   default: createMessageForMessageParser(
     [
       { name: osuBeatmapRequestRefTopScoreShort.id, type: "reference" },
@@ -98,7 +101,7 @@ export const osuBeatmapRequestRefTopScore = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE`,
 };
 
-export const osuBeatmapRequest = {
+export const osuBeatmapRequest: StringEntry = {
   default: createMessageForMessageParser([
     { name: PluginTwitchChat.USER, type: "plugin" },
     " requested ",
@@ -155,7 +158,7 @@ export const osuBeatmapRequest = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}`,
 };
 
-export const osuBeatmapRequestRefDetailedStats = {
+export const osuBeatmapRequestRefDetailedStats: StringEntry = {
   default: createMessageForMessageParser(
     [
       "FC=",
@@ -196,7 +199,7 @@ export const osuBeatmapRequestRefDetailedStats = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_DETAILED_STATS`,
 };
 
-export const osuBeatmapRequestDetailed = {
+export const osuBeatmapRequestDetailed: StringEntry = {
   default: createMessageForMessageParser([
     { name: PluginTwitchChat.USER, type: "plugin" },
     " requested ",
@@ -303,7 +306,7 @@ export const osuBeatmapRequestDetailed = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_DETAILED`,
 };
 
-export const osuBeatmapRequestNotFound = {
+export const osuBeatmapRequestNotFound: StringEntry = {
   default: createMessageForMessageParser([
     "osu! beatmap was not found :( (ID='",
     {
@@ -316,7 +319,7 @@ export const osuBeatmapRequestNotFound = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NOT_FOUND`,
 };
 
-export const osuBeatmapRequestRefIrcRequestString = {
+export const osuBeatmapRequestRefIrcRequestString: StringEntry = {
   default: createMessageForMessageParser(
     [
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -338,7 +341,7 @@ export const osuBeatmapRequestRefIrcRequestString = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_REF_REQUEST_STRING`,
 };
 
-export const osuBeatmapRequestIrc = {
+export const osuBeatmapRequestIrc: StringEntry = {
   default: createMessageForMessageParser([
     { name: osuBeatmapRequestRefIrcRequestString.id, type: "reference" },
     {
@@ -397,7 +400,7 @@ export const osuBeatmapRequestIrc = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC`,
 };
 
-export const osuBeatmapRequestIrcDetailed = {
+export const osuBeatmapRequestIrcDetailed: StringEntry = {
   default: createMessageForMessageParser([
     { name: osuBeatmapRequestRefIrcRequestString.id, type: "reference" },
     `${OSU_IRC_NEWLINE}from `,
@@ -466,14 +469,14 @@ export const osuBeatmapRequestIrcDetailed = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_DETAILED`,
 };
 
-export const osuBeatmapRequestPermissionError = {
+export const osuBeatmapRequestPermissionError: StringEntry = {
   default: createMessageForMessageParser([
     "You are not a broadcaster and thus are not allowed to use this command!",
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_PERMISSION_ERROR`,
 };
 
-export const osuBeatmapRequestTurnedOff = {
+export const osuBeatmapRequestTurnedOff: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -499,7 +502,7 @@ export const osuBeatmapRequestTurnedOff = {
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_OFF`,
 };
-export const osuBeatmapRequestTurnedOn = {
+export const osuBeatmapRequestTurnedOn: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -507,7 +510,7 @@ export const osuBeatmapRequestTurnedOn = {
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_TURNED_ON`,
 };
-export const osuBeatmapRequestCurrentlyOff = {
+export const osuBeatmapRequestCurrentlyOff: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -533,7 +536,7 @@ export const osuBeatmapRequestCurrentlyOff = {
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_OFF`,
 };
-export const osuBeatmapRequestCurrentlyOn = {
+export const osuBeatmapRequestCurrentlyOn: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -541,7 +544,7 @@ export const osuBeatmapRequestCurrentlyOn = {
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
 };
-export const osuBeatmapRequestNoRedeem = {
+export const osuBeatmapRequestNoRedeem: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -550,7 +553,7 @@ export const osuBeatmapRequestNoRedeem = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NO_REDEEM`,
 };
 
-export const osuBeatmapRequests = [
+export const osuBeatmapRequests: StringEntry[] = [
   osuBeatmapRequest,
   osuBeatmapRequestCurrentlyOff,
   osuBeatmapRequestCurrentlyOn,

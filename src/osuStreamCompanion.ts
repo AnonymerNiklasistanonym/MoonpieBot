@@ -64,7 +64,7 @@ export interface StreamCompanionFileData extends StreamCompanionDataBase {
   type: "file";
 }
 
-export interface StreamCompanionDataBase {
+interface StreamCompanionDataBase {
   type: string;
 }
 

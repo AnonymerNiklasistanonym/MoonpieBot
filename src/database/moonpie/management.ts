@@ -117,6 +117,7 @@ export const createAndSetupTables = async (
  * @param databasePath Path to database.
  * @param logger Logger (used for logging).
  */
+/*
 export const setupInitialData = async (
   databasePath: string,
   logger: Logger
@@ -176,3 +177,4 @@ export const setupInitialData = async (
     loggerDatabase.error(err as Error);
   }
 };
+*/

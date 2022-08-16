@@ -15,7 +15,7 @@ export enum PluginOsuStreamCompanion {
   CURRENT_MAP_WEBSOCKET = "OSU_STREAMCOMPANION_CURRENT_MAP_WEBSOCKET",
 }
 
-export interface PluginOsuStreamCompanionData {
+interface PluginOsuStreamCompanionData {
   streamCompanionDataFunc: StreamCompanionConnection;
 }
 

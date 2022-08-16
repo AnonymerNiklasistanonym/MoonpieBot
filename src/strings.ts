@@ -46,7 +46,7 @@ export interface StringEntry {
  * @param stringEntries The string entries (with more information).
  * @returns The resulting array can be inserted into a map for easy setup.
  */
-export const generateStringList = (
+const generateStringList = (
   ...stringEntries: StringEntry[]
 ): [string, string][] => {
   const mappedStringEntries = stringEntries.map<[string, string]>((a) => [

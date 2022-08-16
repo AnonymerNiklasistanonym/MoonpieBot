@@ -35,7 +35,7 @@ const LOG_ID = "message_parser";
  * 2. Plugin: Then there is a plugin name, and optional a value or content
  * 3. Children: Then there is a list of child nodes.
  */
-export interface ParseTreeNode {
+interface ParseTreeNode {
   children?: ParseTreeNode[];
   content?: string;
   originalString: string;
@@ -144,7 +144,7 @@ const MAX_STRING_DEPTH = 15;
  * @param logger Global logger.
  * @returns Parse tree of the message string.
  */
-export const createParseTree = (
+const createParseTree = (
   messageString: string,
   strings: StringMap,
   pluginDepth = 0,
@@ -557,12 +557,12 @@ export const createParseTree = (
   return nodeToReturn;
 };
 
-export interface RequestHelp {
+interface RequestHelp {
   macros?: boolean;
   plugins?: boolean;
   type: "help";
 }
-export interface ExportedMacroInformation {
+interface ExportedMacroInformation {
   id: string;
   keys: string[];
 }
@@ -625,7 +625,7 @@ const replaceMacros = (text: string, macros: MacroMap) => {
   );
 };
 
-export const createPluginSignatureString = async (
+const createPluginSignatureString = async (
   logger: Logger,
   pluginName: string,
   pluginFunc?: PluginFunc,
@@ -692,7 +692,7 @@ export const createPluginSignatureString = async (
     .join(",");
 };
 
-export const parseTreeNode = async (
+const parseTreeNode = async (
   treeNode: ParseTreeNode,
   plugins: PluginMap,
   macros: MacroMap,
@@ -912,7 +912,7 @@ export const messageParserById = async (
   return await messageParser(stringFromId, strings, plugins, macros, logger);
 };
 
-export interface MacroPluginMap {
+interface MacroPluginMap {
   macroMap: MacroMap;
   pluginMap: PluginMap;
 }
@@ -1136,32 +1136,29 @@ export const generatePluginAndMacroDocumentation = async (
   return output;
 };
 
-export interface MessageForMessageElement {
+interface MessageForMessageElement {
   type: string;
 }
-export type MessageForMessageElements =
+type MessageForMessageElements =
   | string
   | MessageForMessageElementMacro
   | MessageForMessageElementPlugin
   | MessageForMessageElementReference;
 
-export interface MessageForMessageElementPlugin
-  extends MessageForMessageElement {
+interface MessageForMessageElementPlugin extends MessageForMessageElement {
   args?: MessageForMessageElements[] | MessageForMessageElements;
   name: string;
   scope?: MessageForMessageElements[] | MessageForMessageElements;
   type: "plugin";
 }
 
-export interface MessageForMessageElementMacro
-  extends MessageForMessageElement {
+interface MessageForMessageElementMacro extends MessageForMessageElement {
   key: string;
   name: string;
   type: "macro";
 }
 
-export interface MessageForMessageElementReference
-  extends MessageForMessageElement {
+interface MessageForMessageElementReference extends MessageForMessageElement {
   name: string;
   type: "reference";
 }

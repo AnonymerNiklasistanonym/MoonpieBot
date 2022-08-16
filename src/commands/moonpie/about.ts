@@ -5,22 +5,13 @@ import {
 } from "../../info/commands";
 import { messageParserById } from "../../messageParser";
 import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
+import { regexMoonpieChatHandlerCommandAbout } from "../../info/regex";
 // Type imports
 import type {
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { EMPTY_OBJECT } from "../../info/other";
-
-/**
- * Regex to recognize the `!moonpie about` command.
- *
- * @example
- * ```text
- * !moonpie about
- * ```
- */
-export const regexMoonpieAbout = /^\s*!moonpie\s+about(?:\s|$)/i;
 
 /**
  * About command: Send the name, version and source code link of the bot.
@@ -50,7 +41,7 @@ export const commandAbout: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexMoonpieAbout)) {
+    if (!message.match(regexMoonpieChatHandlerCommandAbout)) {
       return false;
     }
     if (!data.enabledCommands.includes(MoonpieCommands.ABOUT)) {

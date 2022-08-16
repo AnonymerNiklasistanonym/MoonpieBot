@@ -15,81 +15,24 @@ interface WindowsTasklistVOutputElement {
   windowTitle: string;
 }
 
+interface ProcessInformationBase {
+  platform: string;
+}
+
+interface ProcessInformationWindows extends ProcessInformationBase {
+  platform: "win32";
+  processInformation?: WindowsTasklistVOutputElement;
+}
+
 /**
- * Get the window title of a process.
+ * Get the information of a process.
  *
  * @param processName The name of the process.
- * @returns The window title of that process.
+ * @returns The information of that process.
  */
-export const getProcessWindowTitle = async (
+export const getProcessInformationByName = async (
   processName: string
-): Promise<undefined | string> => {
-  let cmd = "";
-  switch (process.platform) {
-    case "win32":
-      cmd = `tasklist /fi "imagename eq ${processName}*" /v /FO:CSV`;
-      break;
-    case "darwin":
-      // TODO
-      throw Error("Get window title was not yet implemented on darwin");
-    case "linux":
-      // TODO
-      throw Error("Get window title was not yet implemented on linux");
-    default:
-      // Ignore other platforms
-      throw Error(
-        `Unsupported platform to get window title: "${process.platform}"`
-      );
-  }
-
-  if (cmd === "") {
-    return undefined;
-  }
-
-  return new Promise((resolve, reject) => {
-    exec(cmd, (err, stdout /*, _stderr*/) => {
-      if (err) {
-        return reject(err);
-      }
-
-      const s = new Readable();
-      s.push(stdout);
-      s.push(null);
-
-      const results: WindowsTasklistVOutputElement[] = [];
-      s.pipe(
-        csv([
-          "imageName",
-          "pid",
-          "sessionName",
-          "sessionNumber",
-          "memUsage",
-          "status",
-          "userName",
-          "cpuTime",
-          "windowTitle",
-        ])
-      )
-        .on("data", (data: WindowsTasklistVOutputElement) => results.push(data))
-        .on("end", () => {
-          resolve(
-            results.find(
-              (a) =>
-                a.imageName.toLowerCase().indexOf(processName.toLowerCase()) >
-                -1
-            )?.windowTitle
-          );
-        })
-        .on("error", (pipeErr: Error) => {
-          return reject(pipeErr);
-        });
-    });
-  });
-};
-
-export const isProcessRunning = async (
-  processName: string
-): Promise<boolean> => {
+): Promise<ProcessInformationWindows> => {
   let cmd = "";
   switch (process.platform) {
     case "win32":
@@ -108,17 +51,56 @@ export const isProcessRunning = async (
       );
   }
 
-  if (cmd === "") {
-    return false;
-  }
-
   return new Promise((resolve, reject) => {
-    exec(cmd, (err, stdout /*, _stderr*/) => {
+    exec(cmd, (err, processInformationStdout /*, _stderr*/) => {
       if (err) {
         reject(err);
       }
-
-      resolve(stdout.toLowerCase().indexOf(processName.toLowerCase()) > -1);
+      switch (process.platform) {
+        case "win32":
+          // eslint-disable-next-line no-case-declarations
+          const resultsWin32: WindowsTasklistVOutputElement[] = [];
+          // eslint-disable-next-line no-case-declarations
+          const s = new Readable();
+          s.push(processInformationStdout);
+          s.push(null);
+          s.pipe(
+            csv([
+              "imageName",
+              "pid",
+              "sessionName",
+              "sessionNumber",
+              "memUsage",
+              "status",
+              "userName",
+              "cpuTime",
+              "windowTitle",
+            ])
+          )
+            .on("data", (data: WindowsTasklistVOutputElement) =>
+              resultsWin32.push(data)
+            )
+            .on("end", () => {
+              const processInformation = resultsWin32.find(
+                (a) =>
+                  a.imageName.toLowerCase().indexOf(processName.toLowerCase()) >
+                  -1
+              );
+              resolve({
+                platform: "win32",
+                processInformation,
+              });
+            })
+            .on("error", (pipeErr: Error) => {
+              return reject(pipeErr);
+            });
+          break;
+        default:
+          // Throw errors on other platforms
+          throw Error(
+            `Unsupported platform to check if process "${processName}" is running: "${process.platform}"`
+          );
+      }
     });
   });
 };

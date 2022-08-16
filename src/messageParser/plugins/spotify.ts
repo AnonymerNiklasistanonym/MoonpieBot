@@ -5,7 +5,7 @@ import type { MacroMap } from "../../messageParser";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type SpotifyWebApi from "spotify-web-api-node";
 
-export interface PluginSpotifyData {
+interface PluginSpotifyData {
   spotifyWebApi: SpotifyWebApi;
 }
 

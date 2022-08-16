@@ -2,10 +2,10 @@
  * Custom error interface with an optional error code.
  */
 export interface ErrorWithCode extends Error {
-  code?: string;
+  code?: ErrorWithCodeCode;
 }
 
-export enum ErrorWithCodeCode {
+enum ErrorWithCodeCode {
   ENABLED_COMMANDS_UNDEFINED = "ENABLED_COMMANDS_UNDEFINED",
   MESSAGE_ID_UNDEFINED = "MESSAGE_ID_UNDEFINED",
   OSU_API_V2_CREDENTIALS_UNDEFINED = "OSU_API_V2_CREDENTIALS_UNDEFINED",

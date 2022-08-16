@@ -8,7 +8,7 @@ import { splitTextAtLength } from "./other/splitTextAtLength";
 /**
  * CLI output generation options.
  */
-export interface CliOutputOptions {
+interface CliOutputOptions {
   /** The maximum length of the output. */
   maxLineLength?: number;
 }
@@ -16,14 +16,14 @@ export interface CliOutputOptions {
 /**
  * Default CLI output generation options.
  */
-export const defaultCliOutputOptions = {
+const defaultCliOutputOptions = {
   maxLineLength: 100,
 };
 
 /**
  * Generic information about the usage of the program.
  */
-export interface CliUsageInformation {
+interface CliUsageInformation {
   /** The signature of the usage option. */
   signature: string;
 }
@@ -44,7 +44,7 @@ export interface CliOptionInformation<NAME = string> {
   signature?: string;
 }
 
-export interface CliEnvVariableInformationSupportedValues {
+interface CliEnvVariableInformationSupportedValues {
   canBeJoinedAsList?: boolean;
   emptyListValue?: string;
   values: string[];
@@ -69,7 +69,7 @@ export interface CliEnvVariableInformation<NAME = string> {
 /**
  * Generic information about a CLI output element.
  */
-export interface CliOutputElement {
+interface CliOutputElement {
   /** The type of line. */
   type: string;
 }
@@ -77,7 +77,7 @@ export interface CliOutputElement {
 /**
  * Generic information about a CLI output element represents text.
  */
-export interface CliOutputElementText extends CliOutputElement {
+interface CliOutputElementText extends CliOutputElement {
   /** The text content. */
   content: string;
   type: "text";
@@ -86,7 +86,7 @@ export interface CliOutputElementText extends CliOutputElement {
 /**
  * Generic information about a CLI output element list element.
  */
-export interface CliOutputElementListElement {
+interface CliOutputElementListElement {
   /** The text content. */
   content: string;
   /** An optional description. */
@@ -96,7 +96,7 @@ export interface CliOutputElementListElement {
 /**
  * Generic information about a CLI output element represents a list.
  */
-export interface CliOutputElementList extends CliOutputElement {
+interface CliOutputElementList extends CliOutputElement {
   /** The elements of the list. */
   elements: CliOutputElementListElement[];
   /** The title of the list. */
@@ -107,7 +107,7 @@ export interface CliOutputElementList extends CliOutputElement {
 /**
  * All supported CLI output elements.
  */
-export type CliOutputElements = CliOutputElementText | CliOutputElementList;
+type CliOutputElements = CliOutputElementText | CliOutputElementList;
 
 /**
  * Generic method to generate CLI help output.
@@ -231,7 +231,7 @@ const MINIMUM_DESCRIPTION_LENGTH_ON_THE_SIDE = 30;
  * @param outputOptions CLI output options.
  * @returns CLI output string.
  */
-export const cliOutputGenerator = (
+const cliOutputGenerator = (
   cliOutputLines: CliOutputElements[],
   outputOptions: CliOutputOptions = {}
 ): string => {

@@ -18,7 +18,7 @@ export interface CommandGenericDataMoonpieDbPath {
   moonpieDbPath: string;
 }
 
-export interface MoonpieChatHandlerData
+interface MoonpieChatHandlerData
   extends CommandClaimData,
     TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
     CommandGenericDataMoonpieDbPath {}

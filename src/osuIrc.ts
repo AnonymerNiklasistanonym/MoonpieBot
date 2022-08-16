@@ -16,7 +16,7 @@ const OSU_IRC_PORT = 6667;
 
 export const OSU_IRC_NEWLINE = "%NEWLINE%";
 
-export interface IrcMessage {
+interface IrcMessage {
   /**
    * The arguments which means the *to* and the *message*.
    *

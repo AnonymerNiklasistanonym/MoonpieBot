@@ -25,6 +25,13 @@ import {
   parseTwitchBadgeLevel,
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
+import {
+  regexMoonpieChatHandlerCommandUserAdd,
+  regexMoonpieChatHandlerCommandUserDelete,
+  regexMoonpieChatHandlerCommandUserGet,
+  regexMoonpieChatHandlerCommandUserRemove,
+  regexMoonpieChatHandlerCommandUserSet,
+} from "../../info/regex";
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
@@ -33,70 +40,6 @@ import type {
   TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
-
-/**
- * Regex to recognize the `!moonpie get $USER` command.
- *
- * - The first group is the user name string.
- *
- * @example
- * ```text
- * !moonpie get alexa123
- * ```
- */
-export const regexMoonpieGet = /^\s*!moonpie\s+get\s+(\S+)\s*$/i;
-
-/**
- * Regex to recognize the `!moonpie set $USER $COUNT` command.
- *
- * - The first group is the user name string.
- * - The second group is the moonpie count that should be set.
- *
- * @example
- * ```text
- * !moonpie set alexa123 727
- * ```
- */
-export const regexMoonpieSet = /^\s*!moonpie\s+set\s+(\S+)\s+([0-9]+)\s*$/i;
-
-/**
- * Regex to recognize the `!moonpie add $USER $COUNT` command.
- *
- * - The first group is the user name string.
- * - The second group is the moonpie count that should be added.
- *
- * @example
- * ```text
- * !moonpie add alexa123 3
- * ```
- */
-export const regexMoonpieAdd = /^\s*!moonpie\s+add\s+(\S+)\s+([0-9]+)\s*$/i;
-
-/**
- * Regex to recognize the `!moonpie remove $USER $COUNT` command.
- *
- * - The first group is the user name string.
- * - The second group is the moonpie count that should be removed.
- *
- * @example
- * ```text
- * !moonpie remove alexa123 4
- * ```
- */
-export const regexMoonpieRemove =
-  /^\s*!moonpie\s+remove\s+(.*?)\s+([0-9]+)\s*$/i;
-
-/**
- * Regex to recognize the `!moonpie delete $USER` command.
- *
- * - The first group is the user name string.
- *
- * @example
- * ```text
- * !moonpie delete alexa123
- * ```
- */
-export const regexMoonpieDelete = /^\s*!moonpie\s+delete\s+(\S+)\s*$/i;
 
 interface CommandDetectorGetData {
   userNameMoonpieDb: string;
@@ -185,7 +128,7 @@ export const commandGet: TwitchChatCommandHandler<
     if (!data.enabledCommands.includes(MoonpieCommands.GET)) {
       return false;
     }
-    const match = message.match(regexMoonpieGet);
+    const match = message.match(regexMoonpieChatHandlerCommandUserGet);
     if (!match) {
       return false;
     }
@@ -336,7 +279,7 @@ export const commandSet: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    const matchSet = message.match(regexMoonpieSet);
+    const matchSet = message.match(regexMoonpieChatHandlerCommandUserSet);
     if (matchSet && data.enabledCommands.includes(MoonpieCommands.SET)) {
       return {
         data: {
@@ -346,7 +289,7 @@ export const commandSet: TwitchChatCommandHandler<
         },
       };
     }
-    const matchAdd = message.match(regexMoonpieAdd);
+    const matchAdd = message.match(regexMoonpieChatHandlerCommandUserAdd);
     if (matchAdd && data.enabledCommands.includes(MoonpieCommands.ADD)) {
       return {
         data: {
@@ -356,7 +299,7 @@ export const commandSet: TwitchChatCommandHandler<
         },
       };
     }
-    const matchRemove = message.match(regexMoonpieRemove);
+    const matchRemove = message.match(regexMoonpieChatHandlerCommandUserRemove);
     if (matchRemove && data.enabledCommands.includes(MoonpieCommands.REMOVE)) {
       return {
         data: {
@@ -458,7 +401,7 @@ export const commandDelete: TwitchChatCommandHandler<
     if (!data.enabledCommands.includes(MoonpieCommands.DELETE)) {
       return false;
     }
-    const match = message.match(regexMoonpieDelete);
+    const match = message.match(regexMoonpieChatHandlerCommandUserDelete);
     if (!match) {
       return false;
     }

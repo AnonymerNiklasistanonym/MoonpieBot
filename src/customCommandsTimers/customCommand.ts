@@ -61,7 +61,7 @@ export interface CustomCommand {
 /**
  * Represents a custom command data value.
  */
-export interface CustomCommandData {
+interface CustomCommandData {
   /** A description. */
   description?: string;
   /** The unique ID. */
@@ -88,7 +88,7 @@ export interface CustomCommandsJson extends CustomJson {
  * @param logger Optional logger for more detailed analysis.
  * @returns True if the object can be used as CustomCommand.
  */
-export const isCustomCommand = (
+const isCustomCommand = (
   arg: CustomCommand,
   logger?: Logger
 ): arg is CustomCommand => {
@@ -185,7 +185,7 @@ export const isCustomCommand = (
  * @param logger Optional logger for more detailed analysis.
  * @returns True if the object can be used as CustomCommandData.
  */
-export const isCustomCommandData = (
+const isCustomCommandData = (
   arg: CustomCommandData,
   logger?: Logger
 ): arg is CustomCommandData => {
@@ -224,7 +224,7 @@ export const isCustomCommandData = (
  * @param logger Optional logger for more detailed analysis.
  * @returns True if the object can be used as CustomCommandsJson.
  */
-export const isCustomCommandsJson = (
+const isCustomCommandsJson = (
   arg: CustomCommandsJson,
   logger?: Logger
 ): arg is CustomCommandsJson => {
@@ -282,7 +282,7 @@ export const isCustomCommandsJson = (
 // TODO Externalize plugin to generator
 export const pluginRegexGroupId = "REGEX_GROUP";
 
-export interface CommandHandleCustomCommandDetectorDataOut {
+interface CommandHandleCustomCommandDetectorDataOut {
   /**
    * The regex groups matched by the custom command regex.
    */
@@ -393,7 +393,7 @@ export const getCustomCommand = (
   };
 };
 
-export interface CustomCommandsData {
+interface CustomCommandsData {
   customCommands: CustomCommand[];
   customCommandsGlobalData: CustomCommandData[];
 }

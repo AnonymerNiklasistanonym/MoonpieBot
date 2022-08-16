@@ -8,15 +8,17 @@ import { macroSpotifySong } from "../../messageParser/macros/spotify";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
 import { SpotifySongMacro } from "../../messageParser/macros/spotify";
+// Type imports
+import type { StringEntry } from "../../strings";
 
 const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
 
-export const spotifyCommandReplyRefSongNone = {
+export const spotifyCommandReplyRefSongNone: StringEntry = {
   default: createMessageForMessageParser(["Currently playing no song"], true),
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_NO_SONG`,
 };
 
-export const spotifyCommandReplyRefSongCurrent = {
+export const spotifyCommandReplyRefSongCurrent: StringEntry = {
   default: createMessageForMessageParser(
     [
       "Currently playing '",
@@ -56,7 +58,7 @@ export const spotifyCommandReplyRefSongCurrent = {
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_CURRENT`,
 };
 
-export const spotifyCommandReplyRefSongPrevious = {
+export const spotifyCommandReplyRefSongPrevious: StringEntry = {
   default: createMessageForMessageParser(
     [
       ", previously played '",
@@ -96,7 +98,7 @@ export const spotifyCommandReplyRefSongPrevious = {
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_PREVIOUS`,
 };
 
-export const spotifyCommandReplySong = {
+export const spotifyCommandReplySong: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -147,7 +149,7 @@ export const spotifyCommandReplySong = {
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG`,
 };
 
-export const spotifyCommandReply = [
+export const spotifyCommandReply: StringEntry[] = [
   spotifyCommandReplySong,
   spotifyCommandReplyRefSongNone,
   spotifyCommandReplyRefSongCurrent,

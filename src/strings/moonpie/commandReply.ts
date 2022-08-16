@@ -1,3 +1,4 @@
+// Local imports
 import {
   MacroMoonpieBot,
   macroMoonpieBot,
@@ -16,10 +17,12 @@ import {
 import { createMessageForMessageParser } from "../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
+// Type imports
+import type { StringEntry } from "../../strings";
 
 const MOONPIE_COMMAND_REPLY_STRING_ID = `${MOONPIE_STRING_ID}_COMMAND_REPLY`;
 
-export const moonpieCommandReplyAbout = {
+export const moonpieCommandReplyAbout: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -34,7 +37,7 @@ export const moonpieCommandReplyAbout = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ABOUT`,
 };
 
-export const moonpieCommandReplyClaim = {
+export const moonpieCommandReplyClaim: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -69,7 +72,7 @@ export const moonpieCommandReplyClaim = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIM`,
 };
 
-export const moonpieCommandReplyAlreadyClaimedRefNormal = {
+export const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
   default: createMessageForMessageParser(
     [
       "You already claimed a moonpie for today (",
@@ -105,7 +108,7 @@ export const moonpieCommandReplyAlreadyClaimedRefNormal = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_REF_NORMAL`,
 };
 
-export const moonpieCommandReplyAlreadyClaimedRefStar = {
+export const moonpieCommandReplyAlreadyClaimedRefStar: StringEntry = {
   default: createMessageForMessageParser(
     [
       "You are the cutest! You have 6969 moonpies and are rank 1 in my heart! <3",
@@ -117,7 +120,7 @@ export const moonpieCommandReplyAlreadyClaimedRefStar = {
 
 const starTwitchId = 93818178;
 
-export const moonpieCommandReplyAlreadyClaimed = {
+export const moonpieCommandReplyAlreadyClaimed: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -150,7 +153,7 @@ export const moonpieCommandReplyAlreadyClaimed = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED`,
 };
 
-export const moonpieCommandReplyLeaderboardPrefix = {
+export const moonpieCommandReplyLeaderboardPrefix: StringEntry = {
   default: createMessageForMessageParser(
     ["@", { name: PluginTwitchChat.USER, type: "plugin" }, " "],
     true
@@ -158,7 +161,7 @@ export const moonpieCommandReplyLeaderboardPrefix = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_PREFIX`,
 };
 
-export const moonpieCommandReplyLeaderboardEntry = {
+export const moonpieCommandReplyLeaderboardEntry: StringEntry = {
   default: createMessageForMessageParser(
     [
       {
@@ -185,7 +188,7 @@ export const moonpieCommandReplyLeaderboardEntry = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_ENTRY`,
 };
 
-export const moonpieCommandReply = [
+export const moonpieCommandReply: StringEntry[] = [
   moonpieCommandReplyAbout,
   moonpieCommandReplyClaim,
   moonpieCommandReplyAlreadyClaimed,

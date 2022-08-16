@@ -19,32 +19,22 @@ import {
   moonpieCommandReplyClaim,
 } from "../../strings/moonpie/commandReply";
 import {
-  regexMoonpieAdd,
-  regexMoonpieDelete,
-  regexMoonpieGet,
-  regexMoonpieRemove,
-  regexMoonpieSet,
-} from "./user";
+  regexMoonpieChatHandlerCommandAbout,
+  regexMoonpieChatHandlerCommandClaim,
+  regexMoonpieChatHandlerCommandUserAdd,
+  regexMoonpieChatHandlerCommandUserDelete,
+  regexMoonpieChatHandlerCommandUserGet,
+  regexMoonpieChatHandlerCommandUserRemove,
+  regexMoonpieChatHandlerCommandUserSet,
+} from "../../info/regex";
 import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
-import { regexMoonpieAbout } from "./about";
 // Type imports
 import type {
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
-
-/**
- * Regex to recognize the `!moonpie` command.
- *
- * @example
- * ```text
- * !moonpie
- * !moonpie Give me moonpie pls
- * ```
- */
-export const regexMoonpieClaim = /^\s*!moonpie(\s*|\s.*)$/i;
 
 export interface CommandClaimData extends CommandGenericDataMoonpieDbPath {
   /**
@@ -185,17 +175,17 @@ export const commandClaim: TwitchChatCommandHandler<
     if (!data.enabledCommands.includes(MoonpieCommands.CLAIM)) {
       return false;
     }
-    if (!message.match(regexMoonpieClaim)) {
+    if (!message.match(regexMoonpieChatHandlerCommandClaim)) {
       return false;
     }
     // If regex also matches moonpie about/add/delete/get/remove/set ignore
     if (
-      message.match(regexMoonpieAbout) ||
-      message.match(regexMoonpieAdd) ||
-      message.match(regexMoonpieDelete) ||
-      message.match(regexMoonpieGet) ||
-      message.match(regexMoonpieRemove) ||
-      message.match(regexMoonpieSet)
+      message.match(regexMoonpieChatHandlerCommandAbout) ||
+      message.match(regexMoonpieChatHandlerCommandUserAdd) ||
+      message.match(regexMoonpieChatHandlerCommandUserDelete) ||
+      message.match(regexMoonpieChatHandlerCommandUserGet) ||
+      message.match(regexMoonpieChatHandlerCommandUserRemove) ||
+      message.match(regexMoonpieChatHandlerCommandUserSet)
     ) {
       return false;
     }
