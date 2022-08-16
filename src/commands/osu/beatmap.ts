@@ -268,7 +268,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
     if (!message.match(regexOsuBeatmapUrlMatcher)) {
       return false;
     }
-    if (message.startsWith("@")) {
+    if (message.trimStart().startsWith("@")) {
       // Ignore map replies
       return false;
     }
