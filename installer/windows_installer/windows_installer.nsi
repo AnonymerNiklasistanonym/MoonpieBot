@@ -32,6 +32,8 @@
   ;Set the default installation directory
   InstallDir "$PROGRAMFILES64\${PRODUCT}"
 
+  !define INSTDIR_BIN "bin"
+
   ;Overwrite $InstallDir value when a previous installation directory was found
   InstallDirRegKey HKLM "Software\${PRODUCT}" ""
 
@@ -144,9 +146,12 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   ;Set output path to the installation directory and list the files that should
   ;be put into it
   SetOutPath "$INSTDIR"
-  File "..\..\bin\${PRODUCT_LOWERCASE}.exe"
   File ".\${PRODUCT_LOWERCASE}.bat"
   File "..\..\res\icons\${PRODUCT_LOWERCASE}.ico"
+  CreateDirectory "$INSTDIR\${INSTDIR_BIN}"
+  SetOutPath "$INSTDIR\${INSTDIR_BIN}"
+  File "..\..\bin\${PRODUCT_LOWERCASE}.exe"
+  SetOutPath "$INSTDIR"
 
   ;Store installation folder in registry for future installs
   WriteRegStr HKLM "Software\${PRODUCT}" "" "$INSTDIR"
@@ -194,11 +199,11 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
       MessageBox MB_OK '$(LangStrErrorEnVarCheck) (EnVar::Check PATH => |$0|)'
   ${EndIf}
   ;Add the install directory to the 'PATH' if the variable was found
-  EnVar::AddValue "PATH" "$INSTDIR"
+  EnVar::AddValue "PATH" "$INSTDIR\${INSTDIR_BIN}"
   Pop $0
-  DetailPrint "EnVar::AddValue PATH+='$INSTDIR' returned=|$0|"
+  DetailPrint "EnVar::AddValue PATH+='$INSTDIR\${INSTDIR_BIN}' returned=|$0|"
   ${If} $0 != 0
-      MessageBox MB_OK '$(LangStrErrorEnVarAdd) (EnVar::AddValue PATH+="$INSTDIR" => |$0|)'
+      MessageBox MB_OK '$(LangStrErrorEnVarAdd) (EnVar::AddValue PATH+="$INSTDIR\${INSTDIR_BIN}" => |$0|)'
   ${EndIf}
 
   ;Dump install log to file
@@ -227,6 +232,8 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\${PRODUCT}"
 
   ;Remove the installation directory and all files within it
+  RMDir /r "$INSTDIR\${INSTDIR_BIN}\*.*"
+  RMDir "$INSTDIR\${INSTDIR_BIN}"
   RMDir /r "$INSTDIR\*.*"
   RMDir "$INSTDIR"
 
@@ -243,11 +250,11 @@ Section "Uninstall"
   DetailPrint "EnVar::Check PATH returned=|$0|"
   ${If} $0 == 0
       ;Remove the install directory from the 'PATH' if the variable was found
-      EnVar::DeleteValue "PATH" "$INSTDIR"
+      EnVar::DeleteValue "PATH" "$INSTDIR\${INSTDIR_BIN}"
       Pop $0
-      DetailPrint "EnVar::DeleteValue PATH-='$INSTDIR' returned=|$0|"
+      DetailPrint "EnVar::DeleteValue PATH-='$INSTDIR\${INSTDIR_BIN}' returned=|$0|"
       ${If} $0 != 0
-        MessageBox MB_OK '$(LangStrErrorEnVarDelete) (EnVar::DeleteValue PATH-="$INSTDIR" => |$0|)'
+        MessageBox MB_OK '$(LangStrErrorEnVarDelete) (EnVar::DeleteValue PATH-="$INSTDIR\${INSTDIR_BIN}" => |$0|)'
       ${EndIf}
   ${EndIf}
 
@@ -270,7 +277,7 @@ Function createDesktopShortcut
 
   ;Reset output file path to installation directory because CreateShortCut needs
   ;that information (https://nsis-dev.github.io/NSIS-Forums/html/t-299421.html)
-  SetOutPath $INSTDIR
+  SetOutPath "$INSTDIR\${INSTDIR_BIN}"
 
   ;Create Desktop shortcut to main component
   CreateShortCut "$DESKTOP\${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
