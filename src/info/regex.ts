@@ -230,7 +230,7 @@ export const regexOsuChatHandlerCommandScore = /^\s*!score\s+(\S+)(?:\s|$)/i;
  */
 export const regexOsuBeatmapUrlMatcher =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+\/#\S+\/(\d+))(?:\s*(.+))?/i;
+  /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+\/?#\S+\/(\d+))(?:\s+(.+?)\s*$)?/i;
 
 export const regexOsuBeatmapDownloadUrlMatcher =
   /https?:\/\/osu\.ppy\.sh\/b\/(\d+)/;

@@ -557,7 +557,9 @@ describe("regex", () => {
       }
       const message4 =
         "https://osu.ppy.sh/beatmaps/2587891 https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587892 https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES";
-      const messages4 = message4.split("https").map((a) => `https${a}`);
+      const messages4 = message4
+        .split("https://osu.ppy.sh/beatmap")
+        .map((a) => `https://osu.ppy.sh/beatmap${a}`);
       expect(messages4.length).to.be.equal(5);
       const matches4 = messages4.map((a) => a.match(regexOsuBeatmapUrlMatcher));
       expect(matches4).to.be.not.null;
