@@ -3,8 +3,7 @@ import {
   macroMoonpieClaim,
   macroMoonpieLeaderboard,
   macroMoonpieLeaderboardEntry,
-  macroMoonpieUserDelete,
-  macroMoonpieUserNeverClaimed,
+  macroMoonpieUser,
   macroMoonpieUserSet,
 } from "./macros/moonpie";
 import {
@@ -29,7 +28,8 @@ import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
 import { macroOsuWindowTitle } from "./macros/osuWindowTitle";
 import { macroSpotifySong } from "./macros/spotify";
 // Type imports
-import type { MacroDictionary } from "../messageParser";
+import type { MacroDictionary, MacroDictionaryEntry } from "../messageParser";
+import type { EMPTY_OBJECT } from "../info/other";
 
 export interface MessageParserMacro {
   description?: string;
@@ -41,6 +41,12 @@ export interface MessageParserMacroDocumentation {
   description?: string;
   id: string;
   keys: string[];
+}
+export interface MessageParserMacroGenerator<
+  GENERATE_DATA extends object = EMPTY_OBJECT
+> extends MessageParserMacroDocumentation {
+  /** Method to generate the macro entries. */
+  generate: (data: GENERATE_DATA) => MacroDictionaryEntry[];
 }
 
 /**
@@ -55,8 +61,7 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] = [
   macroMoonpieClaim,
   macroMoonpieLeaderboard,
   macroMoonpieLeaderboardEntry,
-  macroMoonpieUserDelete,
-  macroMoonpieUserNeverClaimed,
+  macroMoonpieUser,
   macroMoonpieUserSet,
   macroOsuApi,
   macroOsuBeatmap,

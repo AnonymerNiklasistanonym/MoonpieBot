@@ -9,9 +9,7 @@ import {
   MoonpieCommands,
 } from "../../info/commands";
 import {
-  MacroMoonpieClaim,
   macroMoonpieClaim,
-  MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntry,
 } from "../../messageParser/macros/moonpie";
 import {
@@ -131,25 +129,23 @@ export const commandClaim: TwitchChatCommandHandler<
     const macros = new Map(globalMacros);
     macros.set(
       macroMoonpieClaim.id,
-      new Map([
-        [MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S, `${msSinceLastClaim / 1000}`],
-        [
-          MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S,
-          `${msTillNextClaim / 1000}`,
-        ],
-        [MacroMoonpieClaim.COOLDOWN_HOURS, `${data.moonpieClaimCooldownHours}`],
-      ])
+      new Map(
+        macroMoonpieClaim.generate({
+          cooldownHours: data.moonpieClaimCooldownHours,
+          timeSinceLastClaimInS: msSinceLastClaim / 1000,
+          timeTillNextClaimInS: msTillNextClaim / 1000,
+        })
+      )
     );
     macros.set(
       macroMoonpieLeaderboardEntry.id,
-      new Map([
-        [MacroMoonpieLeaderboardEntry.COUNT, `${newMoonpieCount}`],
-        [
-          MacroMoonpieLeaderboardEntry.RANK,
-          `${currentMoonpieLeaderboardEntry.rank}`,
-        ],
-        [MacroMoonpieLeaderboardEntry.NAME, `${tags.username}`],
-      ])
+      new Map(
+        macroMoonpieLeaderboardEntry.generate({
+          count: newMoonpieCount,
+          name: tags.username,
+          rank: currentMoonpieLeaderboardEntry.rank,
+        })
+      )
     );
 
     let message = await messageParserById(

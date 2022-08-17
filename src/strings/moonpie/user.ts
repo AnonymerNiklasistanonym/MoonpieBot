@@ -2,10 +2,8 @@
 import {
   MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntry,
-  MacroMoonpieUserDelete,
-  macroMoonpieUserDelete,
-  MacroMoonpieUserNeverClaimed,
-  macroMoonpieUserNeverClaimed,
+  MacroMoonpieUser,
+  macroMoonpieUser,
   MacroMoonpieUserSet,
   macroMoonpieUserSet,
 } from "../../messageParser/macros/moonpie";
@@ -62,8 +60,8 @@ export const moonpieUserNeverClaimedError: StringEntry = {
   default: createMessageForMessageParser([
     "The user ",
     {
-      key: MacroMoonpieUserNeverClaimed.NAME,
-      name: macroMoonpieUserNeverClaimed.id,
+      key: MacroMoonpieUser.NAME,
+      name: macroMoonpieUser.id,
       type: "macro",
     },
     " has never claimed a moonpie!",
@@ -101,8 +99,8 @@ export const moonpieUserSet: StringEntry = {
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You have set the number of moonpies for the user ",
     {
-      key: MacroMoonpieUserSet.NAME,
-      name: macroMoonpieUserSet.id,
+      key: MacroMoonpieUser.NAME,
+      name: macroMoonpieUser.id,
       type: "macro",
     },
     " to ",
@@ -153,8 +151,8 @@ export const moonpieUserDelete: StringEntry = {
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You deleted the entry of the user ",
     {
-      key: MacroMoonpieUserDelete.NAME,
-      name: macroMoonpieUserDelete.id,
+      key: MacroMoonpieUser.NAME,
+      name: macroMoonpieUser.id,
       type: "macro",
     },
   ]),

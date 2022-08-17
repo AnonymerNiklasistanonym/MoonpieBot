@@ -4,13 +4,8 @@ import {
   MoonpieCommands,
 } from "../../info/commands";
 import {
-  MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntry,
-  MacroMoonpieUserDelete,
-  macroMoonpieUserDelete,
-  MacroMoonpieUserNeverClaimed,
-  macroMoonpieUserNeverClaimed,
-  MacroMoonpieUserSet,
+  macroMoonpieUser,
   macroMoonpieUserSet,
 } from "../../messageParser/macros/moonpie";
 import {
@@ -84,18 +79,18 @@ export const commandGet: TwitchChatCommandHandler<
 
       const macros = new Map(globalMacros);
       macros.set(
+        macroMoonpieUser.id,
+        new Map(macroMoonpieUser.generate({ name: data.userNameMoonpieDb }))
+      );
+      macros.set(
         macroMoonpieLeaderboardEntry.id,
-        new Map([
-          [MacroMoonpieLeaderboardEntry.NAME, `${data.userNameMoonpieDb}`],
-          [
-            MacroMoonpieLeaderboardEntry.COUNT,
-            `${currentMoonpieLeaderboardEntry.count}`,
-          ],
-          [
-            MacroMoonpieLeaderboardEntry.RANK,
-            `${currentMoonpieLeaderboardEntry.rank}`,
-          ],
-        ])
+        new Map(
+          macroMoonpieLeaderboardEntry.generate({
+            count: currentMoonpieLeaderboardEntry.count,
+            name: data.userNameMoonpieDb,
+            rank: currentMoonpieLeaderboardEntry.rank,
+          })
+        )
       );
       message = await messageParserById(
         moonpieUserGet.id,
@@ -107,10 +102,8 @@ export const commandGet: TwitchChatCommandHandler<
     } else {
       const macros = new Map(globalMacros);
       macros.set(
-        macroMoonpieUserNeverClaimed.id,
-        new Map([
-          [MacroMoonpieUserNeverClaimed.NAME, `${data.userNameMoonpieDb}`],
-        ])
+        macroMoonpieUser.id,
+        new Map(macroMoonpieUser.generate({ name: data.userNameMoonpieDb }))
       );
       message = await messageParserById(
         moonpieUserNeverClaimedError.id,
@@ -177,12 +170,21 @@ export const commandSet: TwitchChatCommandHandler<
     }
     const macros = new Map(globalMacros);
     macros.set(
+      macroMoonpieUser.id,
+      new Map(
+        macroMoonpieUser.generate({
+          name: data.userNameMoonpieDb,
+        })
+      )
+    );
+    macros.set(
       macroMoonpieUserSet.id,
-      new Map([
-        [MacroMoonpieUserSet.NAME, `${data.userNameMoonpieDb}`],
-        [MacroMoonpieUserSet.SET_COUNT, `${data.setCount}`],
-        [MacroMoonpieUserSet.SET_OPERATION, `${data.operation}`],
-      ])
+      new Map(
+        macroMoonpieUserSet.generate({
+          setCount: data.setCount,
+          setOperation: data.operation,
+        })
+      )
     );
     if (!Number.isInteger(data.setCount)) {
       const errorMessage = await messageParserById(
@@ -204,10 +206,8 @@ export const commandSet: TwitchChatCommandHandler<
       ))
     ) {
       macros.set(
-        macroMoonpieUserNeverClaimed.id,
-        new Map([
-          [MacroMoonpieUserNeverClaimed.NAME, `${data.userNameMoonpieDb}`],
-        ])
+        macroMoonpieUser.id,
+        new Map(macroMoonpieUser.generate({ name: data.userNameMoonpieDb }))
       );
       const errorMessage = await messageParserById(
         moonpieUserNeverClaimedError.id,
@@ -259,14 +259,13 @@ export const commandSet: TwitchChatCommandHandler<
 
     macros.set(
       macroMoonpieLeaderboardEntry.id,
-      new Map([
-        [MacroMoonpieLeaderboardEntry.NAME, `${data.userNameMoonpieDb}`],
-        [MacroMoonpieLeaderboardEntry.COUNT, `${newCount}`],
-        [
-          MacroMoonpieLeaderboardEntry.RANK,
-          `${currentMoonpieLeaderboardEntry.rank}`,
-        ],
-      ])
+      new Map(
+        macroMoonpieLeaderboardEntry.generate({
+          count: newCount,
+          name: data.userNameMoonpieDb,
+          rank: currentMoonpieLeaderboardEntry.rank,
+        })
+      )
     );
     const message = await messageParserById(
       moonpieUserSet.id,
@@ -351,6 +350,12 @@ export const commandDelete: TwitchChatCommandHandler<
       throw Error(errorMessage);
     }
 
+    const macros = new Map(globalMacros);
+    macros.set(
+      macroMoonpieUser.id,
+      new Map(macroMoonpieUser.generate({ name: data.userNameMoonpieDb }))
+    );
+
     // Check if a moonpie entry already exists
     if (
       !(await moonpieDb.existsName(
@@ -359,13 +364,6 @@ export const commandDelete: TwitchChatCommandHandler<
         logger
       ))
     ) {
-      const macros = new Map(globalMacros);
-      macros.set(
-        macroMoonpieUserNeverClaimed.id,
-        new Map([
-          [MacroMoonpieUserNeverClaimed.NAME, `${data.userNameMoonpieDb}`],
-        ])
-      );
       const errorMessage = await messageParserById(
         moonpieUserNeverClaimedError.id,
         globalStrings,
@@ -382,11 +380,6 @@ export const commandDelete: TwitchChatCommandHandler<
       logger
     );
 
-    const macros = new Map(globalMacros);
-    macros.set(
-      macroMoonpieUserDelete.id,
-      new Map([[MacroMoonpieUserDelete.NAME, `${data.userNameMoonpieDb}`]])
-    );
     const message = await messageParserById(
       moonpieUserDelete.id,
       globalStrings,

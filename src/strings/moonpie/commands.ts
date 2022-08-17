@@ -16,7 +16,7 @@ export const moonpieCommandsClaim: StringEntry = {
 };
 export const moonpieCommandsLeaderboard: StringEntry = {
   default: createMessageForMessageParser(
-    ["!moonpie leaderboard [get the top moonpie holder]"],
+    ["!moonpie leaderboard ($STARTING_RANK) [get the top moonpie holder]"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_LEADERBOARD`,
@@ -58,7 +58,7 @@ export const moonpieCommandsDelete: StringEntry = {
 };
 export const moonpieCommandsAbout: StringEntry = {
   default: createMessageForMessageParser(
-    ["!moonpie about [get version and source code]"],
+    ["!moonpie about [get version]"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_ABOUT`,
@@ -72,7 +72,7 @@ export const moonpieCommandsPrefix: StringEntry = {
     [
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
-      " The following commands are supported:",
+      " The following moonpie commands are supported: ",
     ],
     true
   ),

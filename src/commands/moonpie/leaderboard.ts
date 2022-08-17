@@ -4,9 +4,7 @@ import {
   MoonpieCommands,
 } from "../../info/commands";
 import {
-  MacroMoonpieLeaderboard,
   macroMoonpieLeaderboard,
-  MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntry,
 } from "../../messageParser/macros/moonpie";
 import {
@@ -59,14 +57,9 @@ export const commandLeaderboard: TwitchChatCommandHandler<
     const macros = new Map(globalMacros);
     macros.set(
       macroMoonpieLeaderboard.id,
-      new Map([
-        [
-          MacroMoonpieLeaderboard.STARTING_RANK,
-          `${
-            data.startingRank !== undefined ? data.startingRank : "undefined"
-          }`,
-        ],
-      ])
+      new Map(
+        macroMoonpieLeaderboard.generate({ startingRank: data.startingRank })
+      )
     );
 
     if (moonpieEntries.length === 0) {
@@ -92,11 +85,13 @@ export const commandLeaderboard: TwitchChatCommandHandler<
       const macrosLeaderboardEntry = new Map(macros);
       macrosLeaderboardEntry.set(
         macroMoonpieLeaderboardEntry.id,
-        new Map([
-          [MacroMoonpieLeaderboardEntry.NAME, `${moonpieEntry.name}`],
-          [MacroMoonpieLeaderboardEntry.COUNT, `${moonpieEntry.count}`],
-          [MacroMoonpieLeaderboardEntry.RANK, `${moonpieEntry.rank}`],
-        ])
+        new Map(
+          macroMoonpieLeaderboardEntry.generate({
+            count: moonpieEntry.count,
+            name: moonpieEntry.name,
+            rank: moonpieEntry.rank,
+          })
+        )
       );
       messageLeaderboardEntries.push(
         await messageParserById(
