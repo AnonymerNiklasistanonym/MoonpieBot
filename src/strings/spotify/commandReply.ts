@@ -104,45 +104,39 @@ export const spotifyCommandReplySong: StringEntry = {
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",
     {
-      name: macroSpotifySong.id,
-      scope: [
-        {
-          args: {
-            key: SpotifySongMacro.HAS_CURRENT,
-            name: macroSpotifySong.id,
-            type: "macro",
-          },
-          name: pluginIfTrue.id,
-          scope: {
-            name: spotifyCommandReplyRefSongCurrent.id,
-            type: "reference",
-          },
-          type: "plugin",
-        },
-        {
-          args: {
-            key: SpotifySongMacro.HAS_CURRENT,
-            name: macroSpotifySong.id,
-            type: "macro",
-          },
-          name: pluginIfFalse.id,
-          scope: { name: spotifyCommandReplyRefSongNone.id, type: "reference" },
-          type: "plugin",
-        },
-        {
-          args: {
-            key: SpotifySongMacro.HAS_PREVIOUS,
-            name: macroSpotifySong.id,
-            type: "macro",
-          },
-          name: pluginIfTrue.id,
-          scope: {
-            name: spotifyCommandReplyRefSongPrevious.id,
-            type: "reference",
-          },
-          type: "plugin",
-        },
-      ],
+      args: {
+        key: SpotifySongMacro.HAS_CURRENT,
+        name: macroSpotifySong.id,
+        type: "macro",
+      },
+      name: pluginIfTrue.id,
+      scope: {
+        name: spotifyCommandReplyRefSongCurrent.id,
+        type: "reference",
+      },
+      type: "plugin",
+    },
+    {
+      args: {
+        key: SpotifySongMacro.HAS_CURRENT,
+        name: macroSpotifySong.id,
+        type: "macro",
+      },
+      name: pluginIfFalse.id,
+      scope: { name: spotifyCommandReplyRefSongNone.id, type: "reference" },
+      type: "plugin",
+    },
+    {
+      args: {
+        key: SpotifySongMacro.HAS_PREVIOUS,
+        name: macroSpotifySong.id,
+        type: "macro",
+      },
+      name: pluginIfTrue.id,
+      scope: {
+        name: spotifyCommandReplyRefSongPrevious.id,
+        type: "reference",
+      },
       type: "plugin",
     },
   ]),

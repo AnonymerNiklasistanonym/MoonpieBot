@@ -31,25 +31,27 @@ import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
 import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
 
-export interface CommandClaimData extends CommandGenericDataMoonpieDbPath {
+export interface CommandClaimCreateReplyInput
+  extends CommandGenericDataMoonpieDbPath {
   /**
    * The number of hours between moonpie claims.
    */
   moonpieClaimCooldownHours: number;
 }
-
+export type CommandClaimDetectorInput =
+  CommandGenericDetectorInputEnabledCommands;
 /**
  * Claim command: Claim a moonpie if no moonpie was claimed in the last 24
  * hours.
  */
 export const commandClaim: TwitchChatCommandHandler<
-  CommandClaimData,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn
+  CommandClaimCreateReplyInput,
+  CommandClaimDetectorInput
 > = {
   createReply: async (
     client,

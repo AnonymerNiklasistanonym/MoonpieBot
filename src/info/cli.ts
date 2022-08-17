@@ -18,7 +18,7 @@ export enum CliOption {
   VERSION = "--version",
 }
 
-interface CliOptionData extends CliOptionInformation<CliOption> {
+export interface CliOptionData extends CliOptionInformation<CliOption> {
   /** The default value for example to display relative paths in 'default' but use absolute path as 'defaultValue'. */
   defaultValue?: string | ((configDir: string) => string);
 }

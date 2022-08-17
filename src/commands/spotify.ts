@@ -1,10 +1,13 @@
+// Local imports
+import { commandSong, CommandSongDetectorInput } from "./spotify/song";
+import { runTwitchCommandHandler } from "../twitch";
 // Type imports
-import { runTwitchCommandHandler, TwitchChatHandler } from "../twitch";
-import { commandSong } from "./spotify/song";
+import type { CommandSongCreateReplyInput } from "./spotify/song";
+import type { TwitchChatHandler } from "../twitch";
 
-interface SpotifyChatHandlerData {
-  enabledCommands: string[];
-}
+export interface SpotifyChatHandlerData
+  extends CommandSongCreateReplyInput,
+    CommandSongDetectorInput {}
 
 export const spotifyChatHandler: TwitchChatHandler<
   SpotifyChatHandlerData
@@ -20,9 +23,8 @@ export const spotifyChatHandler: TwitchChatHandler<
   logger
 ) => {
   // Handle commands
-  const commands = [commandSong];
   await Promise.all(
-    commands.map((command) =>
+    [commandSong].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,

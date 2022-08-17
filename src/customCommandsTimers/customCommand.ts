@@ -15,11 +15,6 @@ import type { PluginMap } from "../messageParser";
 import type { TwitchChatCommandHandler } from "../twitch";
 
 /**
- * The logging ID of this command.
- */
-const LOG_ID_COMMAND_CUSTOM_COMMAND = "custom_command";
-
-/**
  * The logging ID of this module.
  */
 const LOG_ID = "custom_command";
@@ -282,7 +277,7 @@ const isCustomCommandsJson = (
 // TODO Externalize plugin to generator
 export const pluginRegexGroupId = "REGEX_GROUP";
 
-interface CommandHandleCustomCommandDetectorDataOut {
+export interface CommandHandleCustomCommandDetectorDataOut {
   /**
    * The regex groups matched by the custom command regex.
    */
@@ -387,13 +382,13 @@ export const getCustomCommand = (
       return { data: { regexGroups: match } };
     },
     info: {
-      chatHandlerId: LOG_ID_COMMAND_CUSTOM_COMMAND,
+      chatHandlerId: LOG_ID,
       id: customCommand.id,
     },
   };
 };
 
-interface CustomCommandsData {
+export interface CustomCommandsData {
   customCommands: CustomCommand[];
   customCommandsGlobalData: CustomCommandData[];
 }

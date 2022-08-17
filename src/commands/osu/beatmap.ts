@@ -25,6 +25,7 @@ import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerReply,
 } from "../../twitch";
@@ -33,8 +34,12 @@ import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 
 export type OsuIrcBotSendMessageFunc = (logId: string) => IrcClient;
+export interface BeatmapRequest {
+  beatmapId: number;
+  comment?: string;
+}
 
-export interface CommandHandlerBeatmapDataBase {
+export interface CommandBeatmapCreateReplyInput {
   /**
    * The default osu user ID.
    */
@@ -53,34 +58,30 @@ export interface CommandHandlerBeatmapDataBase {
   osuIrcBot?: OsuIrcBotSendMessageFunc;
   osuIrcRequestTarget?: string;
 }
-export interface CommandHandlerBeatmapData
-  extends CommandHandlerBeatmapDataBase {
+export interface CommandBeatmapCreateReplyInputExtra
+  extends CommandBeatmapCreateReplyInput {
   beatmapRequestsInfo: BeatmapRequestsInfo;
 }
-export interface BeatmapRequest {
-  beatmapId: number;
-  comment?: string;
-}
-
-export interface CommandDetectorBeatmapDataOut {
+export interface CommandBeatmapDetectorOutput {
   /**
    * The found beatmap requests.
    */
   beatmapRequests: BeatmapRequest[];
 }
-export interface CommandDetectorBeatmapDataIn {
+export type CommandBeatmapDetectorInput =
+  CommandGenericDetectorInputEnabledCommands;
+export interface CommandBeatmapDetectorInputExtra
+  extends CommandBeatmapDetectorInput {
   beatmapRequestsOn: boolean;
-  enabledCommands: string[];
 }
-
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
  * the current top score of the default osu User in the chat.
  */
 export const commandBeatmap: TwitchChatCommandHandler<
-  CommandHandlerBeatmapData,
-  CommandDetectorBeatmapDataIn,
-  CommandDetectorBeatmapDataOut
+  CommandBeatmapCreateReplyInputExtra,
+  CommandBeatmapDetectorInputExtra,
+  CommandBeatmapDetectorOutput
 > = {
   createReply: async (
     client,

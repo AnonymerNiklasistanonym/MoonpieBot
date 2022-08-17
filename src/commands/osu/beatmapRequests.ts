@@ -24,35 +24,34 @@ import { BeatmapRequestsInfo } from "../osu";
 import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 // Type imports
+import type { EMPTY_OBJECT } from "../../info/other";
 import type { TwitchChatCommandHandler } from "../../twitch";
 
-export interface CommandHandlerBeatmapRequestsData {
+export type CommandBeatmapRequestsCreateReplyInput = EMPTY_OBJECT;
+export interface CommandBeatmapRequestsCreateReplyInputExtra
+  extends CommandBeatmapRequestsCreateReplyInput {
   beatmapRequestsInfo: BeatmapRequestsInfo;
 }
-
-enum BeatmapRequestsType {
+export enum BeatmapRequestsType {
   INFO = "INFO",
   TURN_OFF = "TURN_OFF",
   TURN_ON = "TURN_ON",
 }
-
-export interface CommandDetectorBeatmapRequestsDetectorOutData {
+export interface CommandBeatmapRequestsDetectorOutput {
   beatmapRequestsOffMessage?: string;
   beatmapRequestsType: BeatmapRequestsType;
 }
-
-export interface CommandDetectorBeatmapRequestsDetectorInData {
+export interface CommandBeatmapRequestsDetectorInput {
   enabledCommands: string[];
 }
-
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
  * the current top score of the default osu User in the chat.
  */
 export const commandBeatmapRequests: TwitchChatCommandHandler<
-  CommandHandlerBeatmapRequestsData,
-  CommandDetectorBeatmapRequestsDetectorInData,
-  CommandDetectorBeatmapRequestsDetectorOutData
+  CommandBeatmapRequestsCreateReplyInputExtra,
+  CommandBeatmapRequestsDetectorInput,
+  CommandBeatmapRequestsDetectorOutput
 > = {
   createReply: async (
     client,

@@ -147,7 +147,7 @@ export const setupSpotifyAuthentication = async (
   return spotifyApi;
 };
 
-interface AlbumObjectSimplified extends ContextObject {
+export interface AlbumObjectSimplified extends ContextObject {
   /**
    * The field is present when getting an artist's albums.
    * Possible values are "album", "single", "compilation", "appears_on".
@@ -175,11 +175,11 @@ interface AlbumObjectSimplified extends ContextObject {
   type: "album";
 }
 
-interface ExternalUrlObject {
+export interface ExternalUrlObject {
   spotify: string;
 }
 
-interface ContextObject {
+export interface ContextObject {
   /**
    * Known external URLs.
    */
@@ -190,7 +190,7 @@ interface ContextObject {
   type: "artist" | "playlist" | "album" | "show" | "episode";
 }
 
-interface ArtistObjectSimplified extends ContextObject {
+export interface ArtistObjectSimplified extends ContextObject {
   /**
    * The name of the artist.
    */
@@ -198,7 +198,7 @@ interface ArtistObjectSimplified extends ContextObject {
   type: "artist";
 }
 
-interface TrackObjectSimplified {
+export interface TrackObjectSimplified {
   /** The artists who performed the track. */
   artists: ArtistObjectSimplified[];
   /** The track length in milliseconds. */
@@ -219,14 +219,14 @@ interface TrackObjectSimplified {
   uri: string;
 }
 
-interface TrackObjectFull extends TrackObjectSimplified {
+export interface TrackObjectFull extends TrackObjectSimplified {
   /**
    * The album on which the track appears.
    */
   album: AlbumObjectSimplified;
 }
 
-interface EpisodeObject extends ContextObject {
+export interface EpisodeObject extends ContextObject {
   /** A description of the episode. */
   description: string;
   /** The episode length in milliseconds. */
@@ -240,7 +240,7 @@ interface EpisodeObject extends ContextObject {
   type: "episode";
 }
 
-interface SpotifyResponseCurrentlyPlayingBody {
+export interface SpotifyResponseCurrentlyPlayingBody {
   currently_playing_type: "track" | "episode" | "ad" | "unknown";
   is_playing: boolean;
   item: TrackObjectFull | EpisodeObject | null;
@@ -248,22 +248,22 @@ interface SpotifyResponseCurrentlyPlayingBody {
   timestamp: number;
 }
 
-interface SpotifyResponseCurrentlyPlaying {
+export interface SpotifyResponseCurrentlyPlaying {
   body: SpotifyResponseCurrentlyPlayingBody;
 }
 
-interface PlayHistoryObject {
+export interface PlayHistoryObject {
   played_at: string;
   track: TrackObjectFull;
 }
 
-interface SpotifyResponseRecentlyPlayedBody {
+export interface SpotifyResponseRecentlyPlayedBody {
   items: PlayHistoryObject[];
   next: string | null;
   total?: number | undefined;
 }
 
-interface SpotifyResponseRecentlyPlayed {
+export interface SpotifyResponseRecentlyPlayed {
   body: SpotifyResponseRecentlyPlayedBody;
 }
 

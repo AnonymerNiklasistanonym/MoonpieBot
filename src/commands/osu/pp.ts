@@ -8,13 +8,13 @@ import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 import { regexOsuChatHandlerCommandPp } from "../../info/regex";
 // Type imports
-import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
+import type { OsuApiV2Credentials } from "../osu";
 
-export interface CommandHandlerPpRpDataBase {
+export interface CommandPpRpCreateReplyInput {
   /**
    * Default osu Account ID (used for checking for existing scores).
    */
@@ -24,12 +24,9 @@ export interface CommandHandlerPpRpDataBase {
    */
   osuApiV2Credentials?: OsuApiV2Credentials;
 }
-
-export interface CommandHandlerPpRpData extends CommandHandlerPpRpDataBase {
-  beatmapRequestsInfo: BeatmapRequestsInfo;
-}
-
-export interface CommandDetectorPpRpDataOut {
+export type CommandPpRpDetectorInput =
+  CommandGenericDetectorInputEnabledCommands;
+export interface CommandPpRpDetectorOutput {
   /**
    * Custom osu account ID (use this over the default osu
    * account ID and over the not undefined custom osu name if not undefined).
@@ -47,9 +44,9 @@ export interface CommandDetectorPpRpDataOut {
  * Get performance/general information of an Osu account.
  */
 export const commandPp: TwitchChatCommandHandler<
-  CommandHandlerPpRpData,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-  CommandDetectorPpRpDataOut
+  CommandPpRpCreateReplyInput,
+  CommandPpRpDetectorInput,
+  CommandPpRpDetectorOutput
 > = {
   createReply: async (
     client,

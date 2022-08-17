@@ -16,7 +16,7 @@ export enum SpotifySongMacro {
   PREVIOUS_TITLE = "PREVIOUS_TITLE",
   PREVIOUS_URL = "PREVIOUS_URL",
 }
-interface MacroSpotifySongData {
+export interface MacroSpotifySongData {
   spotifyData: SpotifyGetCurrentAndRecentSongs;
 }
 export const macroSpotifySong: MessageParserMacroGenerator<MacroSpotifySongData> =

@@ -4,7 +4,7 @@ import type { MessageParserMacroGenerator } from "../macros";
 export enum MacroOsuPpRpRequest {
   ID = "ID",
 }
-interface MacroOsuPpRpRequestData {
+export interface MacroOsuPpRpRequestData {
   id: number;
 }
 export const macroOsuPpRpRequest: MessageParserMacroGenerator<MacroOsuPpRpRequestData> =

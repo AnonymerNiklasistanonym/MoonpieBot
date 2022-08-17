@@ -5,7 +5,7 @@ export interface ErrorWithCode extends Error {
   code?: ErrorWithCodeCode;
 }
 
-enum ErrorWithCodeCode {
+export enum ErrorWithCodeCode {
   ENABLED_COMMANDS_UNDEFINED = "ENABLED_COMMANDS_UNDEFINED",
   MESSAGE_ID_UNDEFINED = "MESSAGE_ID_UNDEFINED",
   OSU_API_V2_CREDENTIALS_UNDEFINED = "OSU_API_V2_CREDENTIALS_UNDEFINED",

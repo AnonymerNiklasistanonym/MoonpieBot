@@ -30,7 +30,7 @@ import { macroSpotifySong } from "./macros/spotify";
 import type { MacroDictionary, MacroDictionaryEntry } from "../messageParser";
 import type { EMPTY_OBJECT } from "../info/other";
 
-interface MessageParserMacroInfo {
+export interface MessageParserMacroInfo {
   description?: string;
   id: string;
 }
@@ -50,9 +50,7 @@ export interface MessageParserMacroGenerator<
   generate: (data: GENERATE_DATA) => MacroDictionaryEntry[];
 }
 
-export const checkMacrosForDuplicates = <
-  MACRO_TYPE extends MessageParserMacroInfo
->(
+const checkMacrosForDuplicates = <MACRO_TYPE extends MessageParserMacroInfo>(
   name: string,
   ...macros: MACRO_TYPE[]
 ): MACRO_TYPE[] => {

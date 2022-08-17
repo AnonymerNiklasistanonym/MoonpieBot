@@ -452,61 +452,33 @@ export const main = async (
           .catch(loggerMain.error);
       });
 
-      if (enableOsu) {
+      if (enableOsu || osuStreamCompanionCurrentMapData !== undefined) {
         osuChatHandler(
           twitchClient,
           channel,
           tags,
           message,
-          {
-            defaultOsuId: parseInt(osuApiDefaultId),
-            enableOsuBeatmapRequests,
-            enableOsuBeatmapRequestsDetailed,
-            enableOsuBeatmapRequestsRedeemId,
-            enabledCommands: osuEnableCommands,
-            osuApiV2Credentials: {
-              clientId: parseInt(osuApiClientId),
-              clientSecret: osuApiClientSecret,
-            },
-            osuIrcBot,
-            osuIrcRequestTarget,
-            osuStreamCompanionCurrentMapData,
-          },
-          stringMap,
-          pluginMapChannel,
-          macroMapChannel,
-          logger
-        ).catch((err) => {
-          loggerMain.error(err as Error);
-          // When the chat handler throws an error write the error message in chat
-          const errorInfo = err as ErrorWithCode;
-          twitchClient
-            .say(
-              channel,
-              `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
-                errorInfo.message
-              }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
-            )
-            .catch(loggerMain.error);
-        });
-      } else if (osuStreamCompanionCurrentMapData !== undefined) {
-        // If osu! is not enabled but StreamCompanion is found filter all osu!
-        // commands that need the osu API from the function
-        // This currently means only allow the NP command which uses
-        // StreamCompanion and nothing else
-        // TODO Dirty solution, refactor that better in the future
-        osuChatHandler(
-          twitchClient,
-          channel,
-          tags,
-          message,
-          {
-            // TODO Fix this later - either create a new handler or block the commands automatically
-            enabledCommands: osuEnableCommands.filter(
-              (a) => a === OsuCommands.NP
-            ),
-            osuStreamCompanionCurrentMapData,
-          },
+          enableOsu
+            ? {
+                defaultOsuId: parseInt(osuApiDefaultId),
+                enableOsuBeatmapRequests,
+                enableOsuBeatmapRequestsDetailed,
+                enableOsuBeatmapRequestsRedeemId,
+                enabledCommands: osuEnableCommands,
+                osuApiV2Credentials: {
+                  clientId: parseInt(osuApiClientId),
+                  clientSecret: osuApiClientSecret,
+                },
+                osuIrcBot,
+                osuIrcRequestTarget,
+                osuStreamCompanionCurrentMapData,
+              }
+            : {
+                enabledCommands: osuEnableCommands.filter(
+                  (a) => a === OsuCommands.NP
+                ),
+                osuStreamCompanionCurrentMapData,
+              },
           stringMap,
           pluginMapChannel,
           macroMapChannel,
@@ -534,6 +506,7 @@ export const main = async (
           message,
           {
             enabledCommands: spotifyEnableCommands,
+            spotifyWebApi,
           },
           stringMap,
           pluginMapChannel,

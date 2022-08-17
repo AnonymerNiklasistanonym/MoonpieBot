@@ -22,7 +22,7 @@ export enum MacroOsuStreamCompanionCurrentMapWebSocket {
   SET_ID = "SET_ID",
   TITLE_ROMAN = "TITLE_ROMAN",
 }
-interface MacroOsuStreamCompanionCurrentMapWebSocketData {
+export interface MacroOsuStreamCompanionCurrentMapWebSocketData {
   currentMap: StreamCompanionWebSocketData;
 }
 export const macroOsuStreamCompanionCurrentMapWebSocket: MessageParserMacroGenerator<MacroOsuStreamCompanionCurrentMapWebSocketData> =
@@ -96,7 +96,7 @@ export enum MacroOsuStreamCompanionCurrentMapFile {
   NP_PLAYING_DETAILS = "NP_PLAYING_DETAILS",
   NP_PLAYING_DL = "NP_PLAYING_DL",
 }
-interface MacroOsuStreamCompanionCurrentMapFileData {
+export interface MacroOsuStreamCompanionCurrentMapFileData {
   currentMap: StreamCompanionFileData;
 }
 export const macroOsuStreamCompanionCurrentMapFile: MessageParserMacroGenerator<MacroOsuStreamCompanionCurrentMapFileData> =

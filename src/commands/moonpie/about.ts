@@ -8,8 +8,8 @@ import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
 import { regexMoonpieChatHandlerCommandAbout } from "../../info/regex";
 // Type imports
 import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { EMPTY_OBJECT } from "../../info/other";
 
@@ -18,7 +18,7 @@ import type { EMPTY_OBJECT } from "../../info/other";
  */
 export const commandAbout: TwitchChatCommandHandler<
   EMPTY_OBJECT,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn
+  CommandGenericDetectorInputEnabledCommands
 > = {
   createReply: async (
     client,

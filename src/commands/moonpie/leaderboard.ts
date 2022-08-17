@@ -18,24 +18,27 @@ import { moonpieDb } from "../../database/moonpieDb";
 import { regexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 // Type imports
 import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
 
 const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 10;
 
-interface CommandLeaderboardDetectorDataOut {
+export type CommandLeaderboardCreateReplyInput =
+  CommandGenericDataMoonpieDbPath;
+export type CommandLeaderboardDetectorInput =
+  CommandGenericDetectorInputEnabledCommands;
+export interface CommandLeaderboardDetectorOutput {
   startingRank?: number;
 }
-
 /**
  * Leaderboard command: Reply with the moonpie count leaderboard list (top 15).
  */
 export const commandLeaderboard: TwitchChatCommandHandler<
-  CommandGenericDataMoonpieDbPath,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-  CommandLeaderboardDetectorDataOut
+  CommandLeaderboardCreateReplyInput,
+  CommandLeaderboardDetectorInput,
+  CommandLeaderboardDetectorOutput
 > = {
   createReply: async (
     client,

@@ -7,10 +7,26 @@ import { commandRp } from "./osu/rp";
 import { commandScore } from "./osu/score";
 import { runTwitchCommandHandler } from "../twitch";
 // Type imports
-import type { CommandHandlerBeatmapDataBase } from "./osu/beatmap";
-import type { CommandHandlerNpDataBase } from "./osu/np";
-import type { CommandHandlerPpRpDataBase } from "./osu/pp";
-import type { CommandHandlerScoreDataBase } from "./osu/score";
+import type {
+  CommandBeatmapCreateReplyInput,
+  CommandBeatmapDetectorInput,
+} from "./osu/beatmap";
+import type {
+  CommandBeatmapRequestsCreateReplyInput,
+  CommandBeatmapRequestsDetectorInput,
+} from "./osu/beatmapRequests";
+import type {
+  CommandNpCreateReplyInput,
+  CommandNpDetectorInput,
+} from "./osu/np";
+import type {
+  CommandPpRpCreateReplyInput,
+  CommandPpRpDetectorInput,
+} from "./osu/pp";
+import type {
+  CommandScoreCreateReplyInput,
+  CommandScoreDetectorInput,
+} from "./osu/score";
 import type { TwitchChatHandler } from "../twitch";
 
 export interface OsuApiV2Credentials {
@@ -28,13 +44,17 @@ const globalBeatmapRequestObject: BeatmapRequestsInfo = {
   beatmapRequestsOn: true,
 };
 
-interface OsuChatHandlerData
-  extends CommandHandlerPpRpDataBase,
-    CommandHandlerNpDataBase,
-    CommandHandlerScoreDataBase,
-    CommandHandlerBeatmapDataBase {
-  enabledCommands: string[];
-}
+export interface OsuChatHandlerData
+  extends CommandNpCreateReplyInput,
+    CommandNpDetectorInput,
+    CommandPpRpCreateReplyInput,
+    CommandPpRpDetectorInput,
+    CommandScoreCreateReplyInput,
+    CommandScoreDetectorInput,
+    CommandBeatmapCreateReplyInput,
+    CommandBeatmapDetectorInput,
+    CommandBeatmapRequestsCreateReplyInput,
+    CommandBeatmapRequestsDetectorInput {}
 
 export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   client,
@@ -48,9 +68,8 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   logger
 ) => {
   // Handle commands
-  const commands = [commandNp, commandPp, commandRp];
   await Promise.all(
-    commands.map((command) =>
+    [commandNp, commandPp, commandRp].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,
@@ -65,45 +84,56 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
       )
     )
   );
-  // Why is this throwing an error?
-  await runTwitchCommandHandler(
-    client,
-    channel,
-    tags,
-    message,
-    { ...data, beatmapId: globalBeatmapRequestObject.lastBeatmapId },
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger,
-    commandScore
+  await Promise.all(
+    [commandScore].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        { ...data, beatmapId: globalBeatmapRequestObject.lastBeatmapId },
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
   );
-  await runTwitchCommandHandler(
-    client,
-    channel,
-    tags,
-    message,
-    { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger,
-    commandBeatmapRequests
+  await Promise.all(
+    [commandBeatmapRequests].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
   );
-  await runTwitchCommandHandler(
-    client,
-    channel,
-    tags,
-    message,
-    {
-      ...data,
-      beatmapRequestsInfo: globalBeatmapRequestObject,
-      beatmapRequestsOn: globalBeatmapRequestObject.beatmapRequestsOn,
-    },
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger,
-    commandBeatmap
+  await Promise.all(
+    [commandBeatmap].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        {
+          ...data,
+          beatmapRequestsInfo: globalBeatmapRequestObject,
+          beatmapRequestsOn: globalBeatmapRequestObject.beatmapRequestsOn,
+        },
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
   );
 };

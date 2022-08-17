@@ -11,20 +11,26 @@ import { macroOsuPpRpRequest } from "../../messageParser/macros/osuPpRpRequest";
 import { messageParserById } from "../../messageParser";
 import { regexOsuChatHandlerCommandRp } from "../../info/regex";
 // Type imports
-import type { CommandDetectorPpRpDataOut, CommandHandlerPpRpData } from "./pp";
 import type {
-  TwitchChatCommandHandler,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-} from "../../twitch";
+  CommandPpRpCreateReplyInput,
+  CommandPpRpDetectorInput,
+  CommandPpRpDetectorOutput,
+} from "./pp";
+import type { BeatmapRequestsInfo } from "../osu";
+import type { TwitchChatCommandHandler } from "../../twitch";
 
+export interface CommandRpCreateReplyInputExtra
+  extends CommandPpRpCreateReplyInput {
+  beatmapRequestsInfo: BeatmapRequestsInfo;
+}
 /**
  * RP (recently played) command:
  * Send the map that was most recently played in osu (via the web api).
  */
 export const commandRp: TwitchChatCommandHandler<
-  CommandHandlerPpRpData,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-  CommandDetectorPpRpDataOut
+  CommandRpCreateReplyInputExtra,
+  CommandPpRpDetectorInput,
+  CommandPpRpDetectorOutput
 > = {
   createReply: async (
     client,

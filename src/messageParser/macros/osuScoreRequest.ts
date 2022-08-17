@@ -5,7 +5,7 @@ export enum MacroOsuScoreRequest {
   BEATMAP_ID = "BEATMAP_ID",
   USER_NAME = "USER_NAME",
 }
-interface MacroOsuScoreRequestData {
+export interface MacroOsuScoreRequestData {
   beatmapId?: number;
   userName: string;
 }

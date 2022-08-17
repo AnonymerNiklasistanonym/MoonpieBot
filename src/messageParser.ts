@@ -557,12 +557,12 @@ const createParseTree = (
   return nodeToReturn;
 };
 
-interface RequestHelp {
+export interface RequestHelp {
   macros?: boolean;
   plugins?: boolean;
   type: "help";
 }
-interface ExportedMacroInformation {
+export interface ExportedMacroInformation {
   id: string;
   keys: string[];
 }
@@ -912,7 +912,7 @@ export const messageParserById = async (
   return await messageParser(stringFromId, strings, plugins, macros, logger);
 };
 
-interface MacroPluginMap {
+export interface MacroPluginMap {
   macroMap: MacroMap;
   pluginMap: PluginMap;
 }
@@ -1139,26 +1139,29 @@ export const generatePluginAndMacroDocumentation = async (
 interface MessageForMessageElement {
   type: string;
 }
-type MessageForMessageElements =
+export type MessageForMessageElements =
   | string
   | MessageForMessageElementMacro
   | MessageForMessageElementPlugin
   | MessageForMessageElementReference;
 
-interface MessageForMessageElementPlugin extends MessageForMessageElement {
+export interface MessageForMessageElementPlugin
+  extends MessageForMessageElement {
   args?: MessageForMessageElements[] | MessageForMessageElements;
   name: string;
   scope?: MessageForMessageElements[] | MessageForMessageElements;
   type: "plugin";
 }
 
-interface MessageForMessageElementMacro extends MessageForMessageElement {
+export interface MessageForMessageElementMacro
+  extends MessageForMessageElement {
   key: string;
   name: string;
   type: "macro";
 }
 
-interface MessageForMessageElementReference extends MessageForMessageElement {
+export interface MessageForMessageElementReference
+  extends MessageForMessageElement {
   name: string;
   type: "reference";
 }

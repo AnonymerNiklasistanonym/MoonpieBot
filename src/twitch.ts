@@ -26,7 +26,7 @@ const LOG_ID = "twitch";
 /**
  * Errorcodes that can be attached to @CreateTwitchClientError.
  */
-enum CreateTwitchClientErrorCode {
+export enum CreateTwitchClientErrorCode {
   TWITCH_CHANNELS_EMPTY = "TWITCH_CHANNELS_EMPTY",
   TWITCH_CHANNELS_UNDEFINED = "TWITCH_CHANNELS_UNDEFINED",
   TWITCH_NAME_UNDEFINED = "TWITCH_NAME_UNDEFINED",
@@ -224,8 +224,10 @@ export interface TwitchChatCommandHandlerReply {
   /** The sent message by a command handler. */
   sentMessage: string[];
 }
-
-export interface TwitchChatCommandHandlerEnabledCommandsDetectorDataIn {
+/**
+ * Default generic interface for enabled commands as detector input.
+ */
+export interface CommandGenericDetectorInputEnabledCommands {
   enabledCommands: string[];
 }
 
@@ -246,7 +248,7 @@ export type TwitchChatCommandHandlerDetect<
   tags: Readonly<ChatUserstate>,
   message: Readonly<string>,
   data: Readonly<INPUT_DATA>
-) => false | TwitchChatCommandDetectorDataForHandler<OUTPUT_DATA>;
+) => false | TwitchChatCommandHandlerDetectorDataOutput<OUTPUT_DATA>;
 
 /**
  * The data that was parsed from a successful detected command by a message.
@@ -254,7 +256,7 @@ export type TwitchChatCommandHandlerDetect<
  * @typeParam DETECTED_DATA Data that the command detector should return when it
  * successfully detects a command (like regular expression group matches).
  */
-export interface TwitchChatCommandDetectorDataForHandler<
+export interface TwitchChatCommandHandlerDetectorDataOutput<
   DETECTED_DATA extends object = EMPTY_OBJECT
 > {
   /**

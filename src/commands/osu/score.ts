@@ -15,44 +15,43 @@ import { messageParserById } from "../../messageParser";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 import { regexOsuChatHandlerCommandScore } from "../../info/regex";
 // Type imports
+import type {
+  CommandGenericDetectorInputEnabledCommands,
+  TwitchChatCommandHandler,
+} from "../../twitch";
 import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
-import type { TwitchChatCommandHandler } from "../../twitch";
 
-export interface CommandHandlerScoreDataBase {
+export interface CommandScoreCreateReplyInput {
   /**
    * The osu API (v2) credentials.
    */
   osuApiV2Credentials?: OsuApiV2Credentials;
 }
-
-export interface CommandHandlerScoreData extends CommandHandlerScoreDataBase {
+export interface CommandScoreCreateReplyInputExtra
+  extends CommandScoreCreateReplyInput {
   /**
    * The osu beatmap ID.
    */
   beatmapId?: number;
 }
-
-export interface CommandDetectorScoreDataIn {
-  enabledCommands: string[];
-}
-
-export interface CommandDetectorScoreDataOut {
+export type CommandScoreDetectorInput =
+  CommandGenericDetectorInputEnabledCommands;
+export interface CommandScoreDetectorOutput {
   /**
    * The osu account name for which the score should be fetched.
    */
   osuUserName: string;
 }
-
 /**
  * Score command:
  * Get the score of the last requested map of either the default user or a
  * custom supplied user.
  */
 export const commandScore: TwitchChatCommandHandler<
-  CommandHandlerScoreData,
-  CommandDetectorScoreDataIn,
-  CommandDetectorScoreDataOut
+  CommandScoreCreateReplyInputExtra,
+  CommandScoreDetectorInput,
+  CommandScoreDetectorOutput
 > = {
   createReply: async (
     client,

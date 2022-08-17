@@ -24,12 +24,12 @@ import { messageParserById } from "../../messageParser";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 
-export interface CommandHandlerNpDataBase {
+export interface CommandNpCreateReplyInput {
   /**
    * The osu API (v2) credentials.
    */
@@ -39,19 +39,19 @@ export interface CommandHandlerNpDataBase {
    */
   osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
 }
-
-interface CommandHandlerNpData extends CommandHandlerNpDataBase {
+export interface CommandNpCreateReplyInputExtra
+  extends CommandNpCreateReplyInput {
   beatmapRequestsInfo: BeatmapRequestsInfo;
 }
-
+export type CommandNpDetectorInput = CommandGenericDetectorInputEnabledCommands;
 /**
  * NP (now playing) command:
  * Send the map that is currently being played in osu (via the window title
  * because the web api is not supporting it).
  */
 export const commandNp: TwitchChatCommandHandler<
-  CommandHandlerNpData,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn
+  CommandNpCreateReplyInputExtra,
+  CommandNpDetectorInput
 > = {
   createReply: async (
     client,

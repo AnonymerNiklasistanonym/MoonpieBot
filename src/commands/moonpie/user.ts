@@ -31,19 +31,21 @@ import { messageParserById } from "../../messageParser";
 import { moonpieDb } from "../../database/moonpieDb";
 // Type imports
 import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
 
-interface CommandDetectorGetData {
+export type CommandGetCreateReplyInput = CommandGenericDataMoonpieDbPath;
+export type CommandGetDetectorInput =
+  CommandGenericDetectorInputEnabledCommands;
+export interface CommandGetDetectorOutput {
   userNameMoonpieDb: string;
 }
-
 export const commandGet: TwitchChatCommandHandler<
-  CommandGenericDataMoonpieDbPath,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-  CommandDetectorGetData
+  CommandGetCreateReplyInput,
+  CommandGetDetectorInput,
+  CommandGetDetectorOutput
 > = {
   createReply: async (
     client,
@@ -133,19 +135,21 @@ export const commandGet: TwitchChatCommandHandler<
   },
 };
 
-interface CommandDetectorSetData {
+export type CommandSetCreateReplyInput = CommandGenericDataMoonpieDbPath;
+export type CommandSetDetectorInput =
+  CommandGenericDetectorInputEnabledCommands;
+export interface CommandSetDetectorOutput {
   operation: "+" | "-" | "=";
   setCount: number;
   userNameMoonpieDb: string;
 }
-
 /**
  * Set command: Set the moonpie count of someone (multiple operations available).
  */
 export const commandSet: TwitchChatCommandHandler<
-  CommandGenericDataMoonpieDbPath,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-  CommandDetectorSetData
+  CommandSetCreateReplyInput,
+  CommandSetDetectorInput,
+  CommandSetDetectorOutput
 > = {
   createReply: async (
     client,
@@ -316,17 +320,19 @@ export const commandSet: TwitchChatCommandHandler<
   },
 };
 
-interface CommandDetectorDeleteDataOut {
+export type CommandDeleteCreateReplyInput = CommandGenericDataMoonpieDbPath;
+export type CommandDeleteDetectorInput =
+  CommandGenericDetectorInputEnabledCommands;
+export interface CommandDeleteDetectorOutput {
   userNameMoonpieDb: string;
 }
-
 /**
  * Delete command: Remove a moonpie database entry from the database.
  */
 export const commandDelete: TwitchChatCommandHandler<
-  CommandGenericDataMoonpieDbPath,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-  CommandDetectorDeleteDataOut
+  CommandDeleteCreateReplyInput,
+  CommandDeleteDetectorInput,
+  CommandDeleteDetectorOutput
 > = {
   createReply: async (
     client,

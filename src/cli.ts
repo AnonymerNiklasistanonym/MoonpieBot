@@ -8,7 +8,7 @@ import { splitTextAtLength } from "./other/splitTextAtLength";
 /**
  * CLI output generation options.
  */
-interface CliOutputOptions {
+export interface CliOutputOptions {
   /** The maximum length of the output. */
   maxLineLength?: number;
 }
@@ -23,7 +23,7 @@ const defaultCliOutputOptions = {
 /**
  * Generic information about the usage of the program.
  */
-interface CliUsageInformation {
+export interface CliUsageInformation {
   /** The signature of the usage option. */
   signature: string;
 }
@@ -44,7 +44,7 @@ export interface CliOptionInformation<NAME = string> {
   signature?: string;
 }
 
-interface CliEnvVariableInformationSupportedValues {
+export interface CliEnvVariableInformationSupportedValues {
   canBeJoinedAsList?: boolean;
   emptyListValue?: string;
   values: string[];

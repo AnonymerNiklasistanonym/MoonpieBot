@@ -6,7 +6,7 @@ export enum MacroMoonpieClaim {
   TIME_SINCE_CLAIM_IN_S = "TIME_SINCE_CLAIM_IN_S",
   TIME_TILL_NEXT_CLAIM_IN_S = "TIME_TILL_NEXT_CLAIM_IN_S",
 }
-interface MacroMoonpieClaimData {
+export interface MacroMoonpieClaimData {
   cooldownHours: number;
   timeSinceLastClaimInS: number;
   timeTillNextClaimInS: number;
@@ -44,7 +44,7 @@ export enum MacroMoonpieLeaderboardEntry {
   NAME = "NAME",
   RANK = "RANK",
 }
-interface MacroMoonpieLeaderboardEntryData {
+export interface MacroMoonpieLeaderboardEntryData {
   count: number;
   name: string;
   rank: number;
@@ -81,7 +81,7 @@ export const macroMoonpieLeaderboardEntry: MessageParserMacroGenerator<MacroMoon
 export enum MacroMoonpieLeaderboard {
   STARTING_RANK = "STARTING_RANK",
 }
-interface MacroMoonpieLeaderboardData {
+export interface MacroMoonpieLeaderboardData {
   startingRank?: number;
 }
 export const macroMoonpieLeaderboard: MessageParserMacroGenerator<MacroMoonpieLeaderboardData> =
@@ -114,7 +114,7 @@ export enum MacroMoonpieUserSet {
   SET_COUNT = "SET_COUNT",
   SET_OPERATION = "SET_OPERATION",
 }
-interface MacroMoonpieUserSetData {
+export interface MacroMoonpieUserSetData {
   setCount: number;
   setOperation: string;
 }
@@ -145,7 +145,7 @@ export const macroMoonpieUserSet: MessageParserMacroGenerator<MacroMoonpieUserSe
 export enum MacroMoonpieUser {
   NAME = "NAME",
 }
-interface MacroMoonpieUserData {
+export interface MacroMoonpieUserData {
   name: string;
 }
 export const macroMoonpieUser: MessageParserMacroGenerator<MacroMoonpieUserData> =

@@ -2,15 +2,31 @@
 import { commandDelete, commandGet, commandSet } from "./moonpie/user";
 import { commandAbout } from "./moonpie/about";
 import { commandClaim } from "./moonpie/claim";
+import { commandCommands } from "./moonpie/commands";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { runTwitchCommandHandler } from "../twitch";
 // Type imports
 import type {
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-  TwitchChatHandler,
-} from "../twitch";
-import type { CommandClaimData } from "./moonpie/claim";
-import { commandCommands } from "./moonpie/commands";
+  CommandClaimCreateReplyInput,
+  CommandClaimDetectorInput,
+} from "./moonpie/claim";
+import type {
+  CommandCommandsCreateReplyInput,
+  CommandCommandsDetectorInput,
+} from "./moonpie/commands";
+import type {
+  CommandDeleteCreateReplyInput,
+  CommandDeleteDetectorInput,
+  CommandGetCreateReplyInput,
+  CommandGetDetectorInput,
+  CommandSetCreateReplyInput,
+  CommandSetDetectorInput,
+} from "./moonpie/user";
+import type {
+  CommandLeaderboardCreateReplyInput,
+  CommandLeaderboardDetectorInput,
+} from "./moonpie/leaderboard";
+import type { TwitchChatHandler } from "../twitch";
 
 export interface CommandGenericDataMoonpieDbPath {
   /**
@@ -19,10 +35,19 @@ export interface CommandGenericDataMoonpieDbPath {
   moonpieDbPath: string;
 }
 
-interface MoonpieChatHandlerData
-  extends CommandClaimData,
-    TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-    CommandGenericDataMoonpieDbPath {}
+export interface MoonpieChatHandlerData
+  extends CommandClaimDetectorInput,
+    CommandCommandsCreateReplyInput,
+    CommandCommandsDetectorInput,
+    CommandDeleteCreateReplyInput,
+    CommandDeleteDetectorInput,
+    CommandGetCreateReplyInput,
+    CommandGetDetectorInput,
+    CommandLeaderboardCreateReplyInput,
+    CommandLeaderboardDetectorInput,
+    CommandSetCreateReplyInput,
+    CommandSetDetectorInput,
+    CommandClaimCreateReplyInput {}
 
 export const moonpieChatHandler: TwitchChatHandler<
   MoonpieChatHandlerData
@@ -38,9 +63,8 @@ export const moonpieChatHandler: TwitchChatHandler<
   logger
 ): Promise<void> => {
   // Handle commands
-  const commands = [commandAbout, commandClaim, commandLeaderboard];
   await Promise.all(
-    commands.map((command) =>
+    [commandAbout, commandClaim, commandLeaderboard].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,
@@ -55,9 +79,8 @@ export const moonpieChatHandler: TwitchChatHandler<
       )
     )
   );
-  const commands2 = [commandSet];
   await Promise.all(
-    commands2.map((command) =>
+    [commandSet].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,
@@ -72,9 +95,8 @@ export const moonpieChatHandler: TwitchChatHandler<
       )
     )
   );
-  const commands3 = [commandGet, commandDelete];
   await Promise.all(
-    commands3.map((command) =>
+    [commandGet, commandDelete].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,
@@ -89,16 +111,20 @@ export const moonpieChatHandler: TwitchChatHandler<
       )
     )
   );
-  await runTwitchCommandHandler(
-    client,
-    channel,
-    tags,
-    message,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger,
-    commandCommands
+  await Promise.all(
+    [commandCommands].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        data,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
   );
 };

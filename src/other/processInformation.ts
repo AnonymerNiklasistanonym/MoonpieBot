@@ -3,7 +3,7 @@ import csv from "csv-parser";
 import { exec } from "child_process";
 import { Readable } from "stream";
 
-interface WindowsTasklistVOutputElement {
+export interface WindowsTasklistVOutputElement {
   "CPU Time": string;
   "Image Name": string;
   "Mem Usage": string;
@@ -19,7 +19,7 @@ interface ProcessInformationBase {
   platform: string;
 }
 
-interface ProcessInformationWindows extends ProcessInformationBase {
+export interface ProcessInformationWindows extends ProcessInformationBase {
   platform: "win32";
   processInformation?: WindowsTasklistVOutputElement;
 }

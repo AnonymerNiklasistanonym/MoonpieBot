@@ -5,7 +5,7 @@ export enum MacroOsuBeatmapRequest {
   COMMENT = "COMMENT",
   ID = "ID",
 }
-interface MacroOsuBeatmapRequestData {
+export interface MacroOsuBeatmapRequestData {
   comment?: string;
   id: number;
 }
@@ -40,7 +40,7 @@ export const macroOsuBeatmapRequest: MessageParserMacroGenerator<MacroOsuBeatmap
 export enum MacroOsuBeatmapRequests {
   CUSTOM_MESSAGE = "CUSTOM_MESSAGE",
 }
-interface MacroOsuBeatmapRequestsData {
+export interface MacroOsuBeatmapRequestsData {
   customMessage?: string;
 }
 export const macroOsuBeatmapRequests: MessageParserMacroGenerator<MacroOsuBeatmapRequestsData> =

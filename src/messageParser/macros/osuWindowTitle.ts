@@ -7,7 +7,7 @@ export enum MacroOsuWindowTitle {
   TITLE = "TITLE",
   VERSION = "VERSION",
 }
-interface MacroOsuWindowTitleData {
+export interface MacroOsuWindowTitleData {
   artist: string;
   mapId?: number;
   title: string;

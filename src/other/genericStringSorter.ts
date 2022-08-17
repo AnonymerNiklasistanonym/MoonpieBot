@@ -1,4 +1,4 @@
-type ComparatorValues = -1 | 0 | 1;
+export type ComparatorValues = -1 | 0 | 1;
 
 export const genericStringSorter = (
   stringA?: string,

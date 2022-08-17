@@ -20,16 +20,20 @@ import { messageParserById } from "../../messageParser";
 import { regexMoonpieChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
 } from "../../twitch";
 
+export type CommandCommandsCreateReplyInput =
+  CommandGenericDetectorInputEnabledCommands;
+export type CommandCommandsDetectorInput =
+  CommandGenericDetectorInputEnabledCommands;
 /**
  * Commands command: Send all available commands of the bot in chat.
  */
 export const commandCommands: TwitchChatCommandHandler<
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn,
-  TwitchChatCommandHandlerEnabledCommandsDetectorDataIn
+  CommandCommandsCreateReplyInput,
+  CommandCommandsDetectorInput
 > = {
   createReply: async (
     client,

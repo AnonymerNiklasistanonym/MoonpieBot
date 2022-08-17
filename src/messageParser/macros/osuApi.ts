@@ -12,7 +12,7 @@ import type { MessageParserMacroGenerator } from "../macros";
 export enum MacroOsuApi {
   DEFAULT_USER_ID = "DEFAULT_USER_ID",
 }
-interface MacroOsuApiData {
+export interface MacroOsuApiData {
   osuApiDefaultId: string;
 }
 export const macroOsuApi: MessageParserMacroGenerator<MacroOsuApiData> = {
@@ -74,7 +74,7 @@ export enum MacroOsuBeatmap {
   URL = "URL",
   VERSION = "VERSION",
 }
-interface MacroOsuBeatmapData {
+export interface MacroOsuBeatmapData {
   beatmap: Beatmap;
 }
 export const macroOsuBeatmap: MessageParserMacroGenerator<MacroOsuBeatmapData> =
@@ -197,7 +197,7 @@ export enum MacroOsuScore {
   USER_NAME = "USER_NAME",
   VERSION = "VERSION",
 }
-interface MacroOsuScoreData {
+export interface MacroOsuScoreData {
   beatmapScore: BeatmapUserScore;
 }
 export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
@@ -322,7 +322,7 @@ export enum MacroOsuMostRecentPlay {
   USER_NAME = "USER_NAME",
   VERSION = "VERSION",
 }
-interface MacroOsuMostRecentPlayData {
+export interface MacroOsuMostRecentPlayData {
   score: Score;
 }
 export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRecentPlayData> =
@@ -460,7 +460,7 @@ export enum MacroOsuUser {
   PLAY_STYLE = "PLAY_STYLE",
   PP = "PP",
 }
-interface MacroOsuUserData {
+export interface MacroOsuUserData {
   user: User;
 }
 const OSU_ACHIEVEMENT_ID_TUTEL = 151;
