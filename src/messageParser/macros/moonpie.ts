@@ -23,6 +23,16 @@ export const macroMoonpieLeaderboardEntry: MessageParserMacroDocumentation = {
   keys: Object.values(MacroMoonpieLeaderboardEntry),
 };
 
+export enum MacroMoonpieLeaderboard {
+  STARTING_RANK = "STARTING_RANK",
+}
+export const macroMoonpieLeaderboard: MessageParserMacroDocumentation = {
+  description:
+    "Available in strings that are replies to the moonpie leaderboard command",
+  id: "MOONPIE_LEADERBOARD",
+  keys: Object.values(MacroMoonpieLeaderboard),
+};
+
 export enum MacroMoonpieUserSet {
   NAME = "NAME",
   SET_COUNT = "SET_COUNT",

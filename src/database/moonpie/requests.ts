@@ -343,6 +343,7 @@ export interface GetMoonpieLeaderboardOut {
  *
  * @param databasePath Path to database.
  * @param limit Limit the number of results.
+ * @param offset Offset from what position to fetch the results.
  * @param logger Logger (used for logging).
  * @throws When not able to get the moonpie count or database fails.
  * @returns The moonpie count of the Twitch ID user.
@@ -350,6 +351,7 @@ export interface GetMoonpieLeaderboardOut {
 export const getMoonpieLeaderboard = async (
   databasePath: string,
   limit: number | undefined,
+  offset: number | undefined,
   logger: Logger
 ): Promise<GetMoonpieLeaderboardOut[]> => {
   const runResult = await database.requests.getAll<GetMoonpieLeaderboardDbOut>(
@@ -363,6 +365,7 @@ export const getMoonpieLeaderboard = async (
       ],
       {
         limit,
+        offset: offset !== undefined ? Math.max(offset - 1, 0) : undefined,
       }
     ),
     [],

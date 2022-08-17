@@ -1,6 +1,7 @@
 // Local imports
 import {
   macroMoonpieClaim,
+  macroMoonpieLeaderboard,
   macroMoonpieLeaderboardEntry,
   macroMoonpieUserDelete,
   macroMoonpieUserNeverClaimed,
@@ -52,6 +53,7 @@ export const defaultMacros: MessageParserMacro[] = [macroMoonpieBot];
  */
 export const defaultMacrosOptional: MessageParserMacroDocumentation[] = [
   macroMoonpieClaim,
+  macroMoonpieLeaderboard,
   macroMoonpieLeaderboardEntry,
   macroMoonpieUserDelete,
   macroMoonpieUserNeverClaimed,

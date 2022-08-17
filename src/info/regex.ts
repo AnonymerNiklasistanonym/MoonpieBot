@@ -70,13 +70,20 @@ export const regexMoonpieChatHandlerCommandCommands =
 /**
  * Regex to recognize the `!moonpie leaderboard` command.
  *
+ * - The first group is the optional rank.
+ *
  * @example
  * ```text
  * !moonpie leaderboard
  * ```
+ * @example
+ * ```text
+ * !moonpie leaderboard 20
+ * ```
  */
 export const regexMoonpieChatHandlerCommandLeaderboard =
-  /^\s*!moonpie\s+leaderboard(?:\s|$)/i;
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!moonpie\s+leaderboard(?:\s+([0-9]+))?(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!moonpie get $USER` command.

@@ -6,12 +6,15 @@ import {
 import {
   MacroMoonpieClaim,
   macroMoonpieClaim,
+  macroMoonpieLeaderboard,
+  MacroMoonpieLeaderboard,
   MacroMoonpieLeaderboardEntry,
   macroMoonpieLeaderboardEntry,
 } from "../../messageParser/macros/moonpie";
 import {
   pluginIfEqual,
   pluginIfNotEqual,
+  pluginIfNotUndefined,
   pluginTimeInSToHumanReadableStringShort,
 } from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../messageParser";
@@ -188,12 +191,38 @@ export const moonpieCommandReplyLeaderboardEntry: StringEntry = {
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_ENTRY`,
 };
 
+export const moonpieCommandReplyLeaderboardErrorNoEntriesFound: StringEntry = {
+  default: createMessageForMessageParser([
+    "No leaderboard entries were found",
+    {
+      args: {
+        key: MacroMoonpieLeaderboard.STARTING_RANK,
+        name: macroMoonpieLeaderboard.id,
+        type: "macro",
+      },
+      name: pluginIfNotUndefined.id,
+      scope: [
+        " (starting from rank ",
+        {
+          key: MacroMoonpieLeaderboard.STARTING_RANK,
+          name: macroMoonpieLeaderboard.id,
+          type: "macro",
+        },
+        ")",
+      ],
+      type: "plugin",
+    },
+  ]),
+  id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_NO_ENTRIES_FOUND`,
+};
+
 export const moonpieCommandReply: StringEntry[] = [
   moonpieCommandReplyAbout,
-  moonpieCommandReplyClaim,
   moonpieCommandReplyAlreadyClaimed,
-  moonpieCommandReplyLeaderboardPrefix,
-  moonpieCommandReplyLeaderboardEntry,
   moonpieCommandReplyAlreadyClaimedRefNormal,
   moonpieCommandReplyAlreadyClaimedRefStar,
+  moonpieCommandReplyClaim,
+  moonpieCommandReplyLeaderboardEntry,
+  moonpieCommandReplyLeaderboardErrorNoEntriesFound,
+  moonpieCommandReplyLeaderboardPrefix,
 ];
