@@ -3,10 +3,6 @@ import osuApiV2 from "osu-api-v2";
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
-  MacroOsuScoreRequest,
-  macroOsuScoreRequest,
-} from "../../messageParser/macros/osuScoreRequest";
-import {
   osuScore,
   osuScoreErrorNoBeatmap,
   osuScoreErrorNotFound,
@@ -14,6 +10,7 @@ import {
 import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { macroOsuScore } from "../../messageParser/macros/osuApi";
+import { macroOsuScoreRequest } from "../../messageParser/macros/osuScoreRequest";
 import { messageParserById } from "../../messageParser";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 import { regexOsuChatHandlerCommandScore } from "../../info/regex";
@@ -85,10 +82,12 @@ export const commandScore: TwitchChatCommandHandler<
     const osuBeatmapRequestMacros = new Map(globalMacros);
     osuBeatmapRequestMacros.set(
       macroOsuScoreRequest.id,
-      new Map([
-        [MacroOsuScoreRequest.BEATMAP_ID, `${data.beatmapId}`],
-        [MacroOsuScoreRequest.USER_NAME, data.osuUserName],
-      ])
+      new Map(
+        macroOsuScoreRequest.generate({
+          beatmapId: data.beatmapId,
+          userName: data.osuUserName,
+        })
+      )
     );
 
     const logCmdBeatmap = createLogFunc(

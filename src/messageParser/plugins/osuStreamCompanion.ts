@@ -1,9 +1,7 @@
 // Type imports
 import {
   macroOsuStreamCompanionCurrentMapFile,
-  macroOsuStreamCompanionCurrentMapFileLogic,
   macroOsuStreamCompanionCurrentMapWebSocket,
-  macroOsuStreamCompanionCurrentMapWebSocketLogic,
 } from "../macros/osuStreamCompanion";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
@@ -38,7 +36,9 @@ export const pluginsOsuStreamCompanionGenerator: MessageParserPluginGenerator<Pl
           [
             macroOsuStreamCompanionCurrentMapWebSocket.id,
             new Map(
-              macroOsuStreamCompanionCurrentMapWebSocketLogic(currentMap)
+              macroOsuStreamCompanionCurrentMapWebSocket.generate({
+                currentMap,
+              })
             ),
           ],
         ]);
@@ -65,7 +65,9 @@ export const pluginsOsuStreamCompanionGenerator: MessageParserPluginGenerator<Pl
         return new Map([
           [
             macroOsuStreamCompanionCurrentMapFile.id,
-            new Map(macroOsuStreamCompanionCurrentMapFileLogic(currentMap)),
+            new Map(
+              macroOsuStreamCompanionCurrentMapFile.generate({ currentMap })
+            ),
           ],
         ]);
       },

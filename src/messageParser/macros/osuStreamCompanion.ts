@@ -5,8 +5,7 @@ import type {
   StreamCompanionFileData,
   StreamCompanionWebSocketData,
 } from "../../osuStreamCompanion";
-import type { MacroDictionaryEntry } from "../../messageParser";
-import type { MessageParserMacroDocumentation } from "../macros";
+import type { MessageParserMacroGenerator } from "../macros";
 
 export enum MacroOsuStreamCompanionCurrentMapWebSocket {
   AR = "AR",
@@ -23,74 +22,73 @@ export enum MacroOsuStreamCompanionCurrentMapWebSocket {
   SET_ID = "SET_ID",
   TITLE_ROMAN = "TITLE_ROMAN",
 }
-
-export const macroOsuStreamCompanionCurrentMapWebSocket: MessageParserMacroDocumentation =
+interface MacroOsuStreamCompanionCurrentMapWebSocketData {
+  currentMap: StreamCompanionWebSocketData;
+}
+export const macroOsuStreamCompanionCurrentMapWebSocket: MessageParserMacroGenerator<MacroOsuStreamCompanionCurrentMapWebSocketData> =
   {
+    generate: (data) =>
+      Object.values(MacroOsuStreamCompanionCurrentMapWebSocket).map<
+        [MacroOsuStreamCompanionCurrentMapWebSocket, string]
+      >((macroId) => {
+        let macroValue;
+        switch (macroId) {
+          case MacroOsuStreamCompanionCurrentMapWebSocket.ARTIST_ROMAN:
+            macroValue = data.currentMap.artistRoman;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.TITLE_ROMAN:
+            macroValue = data.currentMap.titleRoman;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.DIFF_NAME:
+            macroValue = data.currentMap.diffName;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.ID:
+            macroValue = data.currentMap.mapid;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.SET_ID:
+            macroValue = data.currentMap.mapsetid;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.CS:
+            macroValue = data.currentMap.mCS;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.AR:
+            macroValue = data.currentMap.mAR;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.OD:
+            macroValue = data.currentMap.mOD;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.HP:
+            macroValue = data.currentMap.mHP;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.BPM:
+            macroValue = data.currentMap.mBpm;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.DIFFICULTY_RATING:
+            if (data.currentMap.mStars !== undefined) {
+              macroValue = roundNumber(data.currentMap.mStars, 2);
+            }
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.MAX_COMBO:
+            macroValue = data.currentMap.maxCombo;
+            break;
+          case MacroOsuStreamCompanionCurrentMapWebSocket.MODS:
+            macroValue = data.currentMap.mods;
+            break;
+        }
+        if (typeof macroValue === "boolean") {
+          macroValue = macroValue ? "true" : "false";
+        }
+        if (typeof macroValue === "undefined") {
+          macroValue = "undefined";
+        }
+        if (typeof macroValue === "number") {
+          macroValue = `${macroValue}`;
+        }
+        return [macroId, macroValue];
+      }),
     id: "OSU_STREAMCOMPANION_CURRENT_MAP_WEB_SOCKET",
     keys: Object.values(MacroOsuStreamCompanionCurrentMapWebSocket),
   };
-
-export const macroOsuStreamCompanionCurrentMapWebSocketLogic = (
-  currentMap: StreamCompanionWebSocketData
-): MacroDictionaryEntry[] =>
-  Object.values(MacroOsuStreamCompanionCurrentMapWebSocket).map<
-    [MacroOsuStreamCompanionCurrentMapWebSocket, string]
-  >((macroId) => {
-    let macroValue;
-    switch (macroId) {
-      case MacroOsuStreamCompanionCurrentMapWebSocket.ARTIST_ROMAN:
-        macroValue = currentMap.artistRoman;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.TITLE_ROMAN:
-        macroValue = currentMap.titleRoman;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.DIFF_NAME:
-        macroValue = currentMap.diffName;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.ID:
-        macroValue = currentMap.mapid;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.SET_ID:
-        macroValue = currentMap.mapsetid;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.CS:
-        macroValue = currentMap.mCS;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.AR:
-        macroValue = currentMap.mAR;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.OD:
-        macroValue = currentMap.mOD;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.HP:
-        macroValue = currentMap.mHP;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.BPM:
-        macroValue = currentMap.mBpm;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.DIFFICULTY_RATING:
-        if (currentMap.mStars !== undefined) {
-          macroValue = roundNumber(currentMap.mStars, 2);
-        }
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.MAX_COMBO:
-        macroValue = currentMap.maxCombo;
-        break;
-      case MacroOsuStreamCompanionCurrentMapWebSocket.MODS:
-        macroValue = currentMap.mods;
-        break;
-    }
-    if (typeof macroValue === "boolean") {
-      macroValue = macroValue ? "true" : "false";
-    }
-    if (typeof macroValue === "undefined") {
-      macroValue = "undefined";
-    }
-    if (typeof macroValue === "number") {
-      macroValue = `${macroValue}`;
-    }
-    return [macroId, macroValue];
-  });
 
 export enum MacroOsuStreamCompanionCurrentMapFile {
   CURRENT_MODS = "CURRENT_MODS",
@@ -98,36 +96,35 @@ export enum MacroOsuStreamCompanionCurrentMapFile {
   NP_PLAYING_DETAILS = "NP_PLAYING_DETAILS",
   NP_PLAYING_DL = "NP_PLAYING_DL",
 }
-
-export const macroOsuStreamCompanionCurrentMapFile: MessageParserMacroDocumentation =
+interface MacroOsuStreamCompanionCurrentMapFileData {
+  currentMap: StreamCompanionFileData;
+}
+export const macroOsuStreamCompanionCurrentMapFile: MessageParserMacroGenerator<MacroOsuStreamCompanionCurrentMapFileData> =
   {
+    generate: (data) =>
+      Object.values(MacroOsuStreamCompanionCurrentMapFile).map<
+        [MacroOsuStreamCompanionCurrentMapFile, string]
+      >((macroId) => {
+        let macroValue;
+        switch (macroId) {
+          case MacroOsuStreamCompanionCurrentMapFile.NP_ALL:
+            macroValue = data.currentMap.npAll;
+            break;
+          case MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DETAILS:
+            macroValue = data.currentMap.npPlayingDetails;
+            break;
+          case MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DL:
+            macroValue = data.currentMap.npPlayingDl;
+            break;
+          case MacroOsuStreamCompanionCurrentMapFile.CURRENT_MODS:
+            macroValue = data.currentMap.currentMods;
+            break;
+        }
+        if (typeof macroValue === "undefined") {
+          macroValue = "undefined";
+        }
+        return [macroId, macroValue];
+      }),
     id: "OSU_STREAMCOMPANION_CURRENT_MAP_FILE",
     keys: Object.values(MacroOsuStreamCompanionCurrentMapFile),
   };
-
-export const macroOsuStreamCompanionCurrentMapFileLogic = (
-  currentMap: StreamCompanionFileData
-): MacroDictionaryEntry[] =>
-  Object.values(MacroOsuStreamCompanionCurrentMapFile).map<
-    [MacroOsuStreamCompanionCurrentMapFile, string]
-  >((macroId) => {
-    let macroValue;
-    switch (macroId) {
-      case MacroOsuStreamCompanionCurrentMapFile.NP_ALL:
-        macroValue = currentMap.npAll;
-        break;
-      case MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DETAILS:
-        macroValue = currentMap.npPlayingDetails;
-        break;
-      case MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DL:
-        macroValue = currentMap.npPlayingDl;
-        break;
-      case MacroOsuStreamCompanionCurrentMapFile.CURRENT_MODS:
-        macroValue = currentMap.currentMods;
-        break;
-    }
-    if (typeof macroValue === "undefined") {
-      macroValue = "undefined";
-    }
-    return [macroId, macroValue];
-  });

@@ -40,7 +40,6 @@ import {
   loadCustomTimersFromFile,
   registerTimer,
 } from "./customCommandsTimers/customTimer";
-import { MacroOsuApi, macroOsuApi } from "./messageParser/macros/osuApi";
 import { moonpieDbBackup, moonpieDbSetupTables } from "./database/moonpieDb";
 import {
   pluginsCustomCommandDataGenerator,
@@ -50,6 +49,7 @@ import { createLogFunc } from "./logging";
 import { defaultMacros } from "./messageParser/macros";
 import { generateMacroPluginMap } from "./messageParser";
 import { getVersionFromObject } from "./version";
+import { macroOsuApi } from "./messageParser/macros/osuApi";
 import { moonpieChatHandler } from "./commands/moonpie";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
@@ -318,7 +318,7 @@ export const main = async (
   if (osuApiDefaultId) {
     macroPluginMap.macroMap.set(
       macroOsuApi.id,
-      new Map([[MacroOsuApi.DEFAULT_USER_ID, `${osuApiDefaultId}`]])
+      new Map(macroOsuApi.generate({ osuApiDefaultId }))
     );
   }
   if (osuApiClientId && osuApiClientSecret) {

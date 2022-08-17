@@ -244,8 +244,10 @@ export const regexOsuBeatmapDownloadUrlMatcher =
 
 /**
  * Regex to parse the now playing window title on Windows.
- * The first capture group is the artist, the second the title and the third
- * the name of the difficulty.
+ *
+ * - The first capture group is the artist.
+ * - The second group is the title.
+ * - The third group is the name of the difficulty.
  *
  * @example
  * ```text

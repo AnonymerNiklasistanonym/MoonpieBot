@@ -1,6 +1,5 @@
 // Type imports
-import type { MacroDictionaryEntry } from "../../messageParser";
-import type { MessageParserMacroDocumentation } from "../macros";
+import type { MessageParserMacroGenerator } from "../macros";
 
 export enum MacroOsuWindowTitle {
   ARTIST = "ARTIST",
@@ -8,43 +7,41 @@ export enum MacroOsuWindowTitle {
   TITLE = "TITLE",
   VERSION = "VERSION",
 }
-export const macroOsuWindowTitle: MessageParserMacroDocumentation = {
-  id: "OSU_WINDOW_TITLE",
-  keys: Object.values(MacroOsuWindowTitle),
-};
-
-export const macroOsuWindowTitleLogic = (
-  artist: string,
-  title: string,
-  version: string,
-  mapId: number | undefined
-): MacroDictionaryEntry[] =>
-  Object.values(MacroOsuWindowTitle).map<[MacroOsuWindowTitle, string]>(
-    (macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroOsuWindowTitle.ARTIST:
-          macroValue = artist;
-          break;
-        case MacroOsuWindowTitle.MAP_ID_VIA_API:
-          macroValue = mapId;
-          break;
-        case MacroOsuWindowTitle.TITLE:
-          macroValue = title;
-          break;
-        case MacroOsuWindowTitle.VERSION:
-          macroValue = version;
-          break;
-      }
-      if (typeof macroValue === "boolean") {
-        macroValue = macroValue ? "true" : "false";
-      }
-      if (typeof macroValue === "undefined") {
-        macroValue = "undefined";
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${macroValue}`;
-      }
-      return [macroId, macroValue];
-    }
-  );
+interface MacroOsuWindowTitleData {
+  artist: string;
+  mapId?: number;
+  title: string;
+  version: string;
+}
+export const macroOsuWindowTitle: MessageParserMacroGenerator<MacroOsuWindowTitleData> =
+  {
+    generate: (data) =>
+      Object.values(MacroOsuWindowTitle).map<[MacroOsuWindowTitle, string]>(
+        (macroId) => {
+          let macroValue;
+          switch (macroId) {
+            case MacroOsuWindowTitle.ARTIST:
+              macroValue = data.artist;
+              break;
+            case MacroOsuWindowTitle.MAP_ID_VIA_API:
+              macroValue = data.mapId;
+              break;
+            case MacroOsuWindowTitle.TITLE:
+              macroValue = data.title;
+              break;
+            case MacroOsuWindowTitle.VERSION:
+              macroValue = data.version;
+              break;
+          }
+          if (typeof macroValue === "undefined") {
+            macroValue = "undefined";
+          }
+          if (typeof macroValue === "number") {
+            macroValue = `${macroValue}`;
+          }
+          return [macroId, macroValue];
+        }
+      ),
+    id: "OSU_WINDOW_TITLE",
+    keys: Object.values(MacroOsuWindowTitle),
+  };

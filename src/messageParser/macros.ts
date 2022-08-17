@@ -22,8 +22,7 @@ import {
   macroOsuStreamCompanionCurrentMapWebSocket,
 } from "./macros/osuStreamCompanion";
 import { macroMoonpieBot } from "./macros/moonpiebot";
-import { macroOsuPpRequest } from "./macros/osuPpRequest";
-import { macroOsuRpRequest } from "./macros/osuRpRequest";
+import { macroOsuPpRpRequest } from "./macros/osuPpRpRequest";
 import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
 import { macroOsuWindowTitle } from "./macros/osuWindowTitle";
 import { macroSpotifySong } from "./macros/spotify";
@@ -80,7 +79,7 @@ export const defaultMacros: MessageParserMacro[] = checkMacrosForDuplicates(
  * The default values for all macros.
  */
 export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
-  checkMacrosForDuplicates(
+  checkMacrosForDuplicates<MessageParserMacroDocumentation>(
     "default-optional",
     macroMoonpieClaim,
     macroMoonpieLeaderboard,
@@ -92,8 +91,7 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
     macroOsuBeatmapRequest,
     macroOsuBeatmapRequests,
     macroOsuMostRecentPlay,
-    macroOsuPpRequest,
-    macroOsuRpRequest,
+    macroOsuPpRpRequest,
     macroOsuScore,
     macroOsuScoreRequest,
     macroOsuStreamCompanionCurrentMapFile,

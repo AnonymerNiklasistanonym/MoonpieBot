@@ -3,14 +3,11 @@ import osuApiV2, { GameMode, ScoresType } from "osu-api-v2";
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
-  MacroOsuRpRequest,
-  macroOsuRpRequest,
-} from "../../messageParser/macros/osuRpRequest";
-import {
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
 } from "../../strings/osu/commandReply";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
+import { macroOsuPpRpRequest } from "../../messageParser/macros/osuPpRpRequest";
 import { messageParserById } from "../../messageParser";
 import { regexOsuChatHandlerCommandRp } from "../../info/regex";
 // Type imports
@@ -77,17 +74,15 @@ export const commandRp: TwitchChatCommandHandler<
 
     const osuRpRequestMacros = new Map(globalMacros);
     osuRpRequestMacros.set(
-      macroOsuRpRequest.id,
-      new Map([
-        [
-          MacroOsuRpRequest.ID,
-          `${
+      macroOsuPpRpRequest.id,
+      new Map(
+        macroOsuPpRpRequest.generate({
+          id:
             data.customOsuId !== undefined
               ? data.customOsuId
-              : data.defaultOsuId
-          }`,
-        ],
-      ])
+              : data.defaultOsuId,
+        })
+      )
     );
 
     let message = "";

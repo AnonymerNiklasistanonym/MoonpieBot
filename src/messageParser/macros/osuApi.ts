@@ -7,15 +7,25 @@ import { roundNumber } from "../../other/round";
 //import { writeJsonFile } from "../../other/fileOperations";
 // Type imports
 import type { Beatmap, BeatmapUserScore } from "osu-api-v2";
-import type {
-  MessageParserMacroDocumentation,
-  MessageParserMacroGenerator,
-} from "../macros";
+import type { MessageParserMacroGenerator } from "../macros";
 
 export enum MacroOsuApi {
   DEFAULT_USER_ID = "DEFAULT_USER_ID",
 }
-export const macroOsuApi: MessageParserMacroDocumentation = {
+interface MacroOsuApiData {
+  osuApiDefaultId: string;
+}
+export const macroOsuApi: MessageParserMacroGenerator<MacroOsuApiData> = {
+  generate: (data) =>
+    Object.values(MacroOsuApi).map<[MacroOsuApi, string]>((macroId) => {
+      let macroValue;
+      switch (macroId) {
+        case MacroOsuApi.DEFAULT_USER_ID:
+          macroValue = data.osuApiDefaultId;
+          break;
+      }
+      return [macroId, macroValue];
+    }),
   id: "OSU_API",
   keys: Object.values(MacroOsuApi),
 };

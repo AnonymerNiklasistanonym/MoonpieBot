@@ -8,13 +8,9 @@ import {
   MacroOsuUser,
 } from "../../messageParser/macros/osuApi";
 import {
-  MacroOsuPpRequest,
-  macroOsuPpRequest,
-} from "../../messageParser/macros/osuPpRequest";
-import {
-  MacroOsuRpRequest,
-  macroOsuRpRequest,
-} from "../../messageParser/macros/osuRpRequest";
+  MacroOsuPpRpRequest,
+  macroOsuPpRpRequest,
+} from "../../messageParser/macros/osuPpRpRequest";
 import {
   MacroOsuScoreRequest,
   macroOsuScoreRequest,
@@ -376,8 +372,8 @@ export const osuCommandReplyRp: StringEntry = {
     " ",
     {
       args: {
-        key: MacroOsuRpRequest.ID,
-        name: macroOsuRpRequest.id,
+        key: MacroOsuPpRpRequest.ID,
+        name: macroOsuPpRpRequest.id,
         type: "macro",
       },
       name: PluginOsuApi.MOST_RECENT_PLAY,
@@ -662,8 +658,8 @@ export const osuCommandReplyPp: StringEntry = {
     " ",
     {
       args: {
-        key: MacroOsuPpRequest.ID,
-        name: macroOsuPpRequest.id,
+        key: MacroOsuPpRpRequest.ID,
+        name: macroOsuPpRpRequest.id,
         type: "macro",
       },
       name: PluginOsuApi.USER,

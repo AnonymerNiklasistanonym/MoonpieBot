@@ -3,10 +3,6 @@ import osuApiV2 from "osu-api-v2";
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
-  macroOsuWindowTitle,
-  macroOsuWindowTitleLogic,
-} from "../../messageParser/macros/osuWindowTitle";
-import {
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
   osuCommandReplyNpNoMapStreamCompanionWebsocket,
@@ -23,6 +19,7 @@ import {
 import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { getProcessInformationByName } from "../../other/processInformation";
+import { macroOsuWindowTitle } from "../../messageParser/macros/osuWindowTitle";
 import { messageParserById } from "../../messageParser";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
@@ -220,8 +217,13 @@ export const commandNp: TwitchChatCommandHandler<
           customMacros.set(
             macroOsuWindowTitle.id,
             new Map(
-              // eslint-disable-next-line no-magic-numbers
-              macroOsuWindowTitleLogic(match[1], match[2], match[3], mapId)
+              macroOsuWindowTitle.generate({
+                artist: match[1],
+                mapId,
+                title: match[2],
+                // eslint-disable-next-line no-magic-numbers
+                version: match[3],
+              })
             )
           );
           msg = await messageParserById(

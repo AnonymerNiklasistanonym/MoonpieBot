@@ -2,11 +2,8 @@
 import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
-import {
-  MacroOsuPpRequest,
-  macroOsuPpRequest,
-} from "../../messageParser/macros/osuPpRequest";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
+import { macroOsuPpRpRequest } from "../../messageParser/macros/osuPpRpRequest";
 import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 import { regexOsuChatHandlerCommandPp } from "../../info/regex";
@@ -98,17 +95,15 @@ export const commandPp: TwitchChatCommandHandler<
 
     const osuPpRequestMacros = new Map(globalMacros);
     osuPpRequestMacros.set(
-      macroOsuPpRequest.id,
-      new Map([
-        [
-          MacroOsuPpRequest.ID,
-          `${
+      macroOsuPpRpRequest.id,
+      new Map(
+        macroOsuPpRpRequest.generate({
+          id:
             data.customOsuId !== undefined
               ? data.customOsuId
-              : data.defaultOsuId
-          }`,
-        ],
-      ])
+              : data.defaultOsuId,
+        })
+      )
     );
 
     const message = await messageParserById(
