@@ -20,16 +20,35 @@ export enum MacroMoonpieBot {
   URL = "URL",
   VERSION = "VERSION",
 }
-
 export const macroMoonpieBot: MessageParserMacro = {
   id: "MOONPIEBOT",
-  values: new Map([
-    [MacroMoonpieBot.NAME, name],
-    [MacroMoonpieBot.VERSION, getVersionFromObject(version)],
-    [MacroMoonpieBot.AUTHOR, author],
-    [MacroMoonpieBot.DESCRIPTION, description],
-    [MacroMoonpieBot.URL, sourceCodeUrl],
-    [MacroMoonpieBot.LICENSE, license],
-    [MacroMoonpieBot.BUG_TRACKER, bugTrackerUrl],
-  ]),
+  values: new Map(
+    Object.values(MacroMoonpieBot).map<[MacroMoonpieBot, string]>((macroId) => {
+      let macroValue;
+      switch (macroId) {
+        case MacroMoonpieBot.NAME:
+          macroValue = name;
+          break;
+        case MacroMoonpieBot.VERSION:
+          macroValue = getVersionFromObject(version);
+          break;
+        case MacroMoonpieBot.AUTHOR:
+          macroValue = author;
+          break;
+        case MacroMoonpieBot.DESCRIPTION:
+          macroValue = description;
+          break;
+        case MacroMoonpieBot.URL:
+          macroValue = sourceCodeUrl;
+          break;
+        case MacroMoonpieBot.LICENSE:
+          macroValue = license;
+          break;
+        case MacroMoonpieBot.BUG_TRACKER:
+          macroValue = bugTrackerUrl;
+          break;
+      }
+      return [macroId, macroValue];
+    })
+  ),
 };

@@ -5,15 +5,11 @@ import osuApiV2, { GameMode, ScoresType } from "osu-api-v2";
 // Type imports
 import {
   macroOsuBeatmap,
-  macroOsuBeatmapLogic,
   macroOsuMostRecentPlay,
   MacroOsuMostRecentPlay,
-  macroOsuMostRecentPlayLogic,
   MacroOsuScore,
   macroOsuScore,
-  macroOsuScoreLogic,
   macroOsuUser,
-  macroOsuUserLogic,
 } from "../macros/osuApi";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 // Type imports
@@ -56,7 +52,10 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
             beatmapIdNumber
           );
           return new Map([
-            [macroOsuBeatmap.id, new Map(macroOsuBeatmapLogic(beatmap))],
+            [
+              macroOsuBeatmap.id,
+              new Map(macroOsuBeatmap.generate({ beatmap })),
+            ],
           ]);
         },
       id: PluginOsuApi.BEATMAP,
@@ -93,7 +92,10 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
               beatmapIdAndUserIdNumber[1]
             );
             return new Map([
-              [macroOsuScore.id, new Map(macroOsuScoreLogic(beatmapScore))],
+              [
+                macroOsuScore.id,
+                new Map(macroOsuScore.generate({ beatmapScore })),
+              ],
             ]);
           } catch (err) {
             if (
@@ -140,7 +142,9 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
             return new Map([
               [
                 macroOsuMostRecentPlay.id,
-                new Map(macroOsuMostRecentPlayLogic(lastPlays[0])),
+                new Map(
+                  macroOsuMostRecentPlay.generate({ score: lastPlays[0] })
+                ),
               ],
             ]);
           }
@@ -175,7 +179,9 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
             userIdNumber,
             GameMode.osu
           );
-          return new Map([[macroOsuUser.id, new Map(macroOsuUserLogic(user))]]);
+          return new Map([
+            [macroOsuUser.id, new Map(macroOsuUser.generate({ user }))],
+          ]);
         },
       id: PluginOsuApi.USER,
       signature: {
