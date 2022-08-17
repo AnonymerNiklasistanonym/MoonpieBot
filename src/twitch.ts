@@ -163,8 +163,7 @@ export const createTwitchClient = (
  * A global type for all Twitch chat (message) handler functions.
  * This makes it really easy to manage changes across the whole bot.
  *
- * @tparam DATA The additional data the command needs for execution.
- * @tparam RETURN_VALUE The return value of the Twitch handler (currently void).
+ * @typeParam DATA The additional data the chat handler needs for execution.
  */
 export type TwitchChatHandler<DATA extends object = EMPTY_OBJECT> = (
   /** The Twitch client. */
@@ -193,7 +192,7 @@ export type TwitchChatHandler<DATA extends object = EMPTY_OBJECT> = (
 /**
  * A global type for a method that creates a reply for a command.
  *
- * @tparam DATA The additional data necessary for its execution.
+ * @typeParam DATAThe additional data the command needs for execution.
  * @returns One or more sent replies.
  */
 export type TwitchChatCommandHandlerCreateReply<DATA = EMPTY_OBJECT> = (
@@ -234,7 +233,10 @@ export interface TwitchChatCommandHandlerEnabledCommandsDetectorDataIn {
  * A global type for a method that detects a command and return data about what
  * was detected or return false if nothing was detected.
  *
- * @tparam DATA The additional data the command detector needs for execution.
+ * @typeParam INPUT_DATA The additional data the command detector needs for
+ * execution.
+ * @typeParam OUTPUT_DATA Data that the command detector should return when it
+ * successfully detects a command (like regular expression group matches).
  * @returns Either false or an object with information from the detection.
  */
 export type TwitchChatCommandHandlerDetect<
@@ -248,36 +250,45 @@ export type TwitchChatCommandHandlerDetect<
 
 /**
  * The data that was parsed from a successful detected command by a message.
+ *
+ * @typeParam DETECTED_DATA Data that the command detector should return when it
+ * successfully detects a command (like regular expression group matches).
  */
 export interface TwitchChatCommandDetectorDataForHandler<
-  DATA extends object = EMPTY_OBJECT
+  DETECTED_DATA extends object = EMPTY_OBJECT
 > {
   /**
    * The information found by the detector that should be forwarded to the
    * command handler.
    */
-  data: DATA;
+  data: DETECTED_DATA;
 }
 
 /**
  * The structure of a Twitch message command manager object.
+ *
+ * @typeParam CREATE_REPLY_INPUT_DATA The data that is necessary to create a reply.
+ * @typeParam DETECTOR_INPUT_DATA The data that is necessary to detect if a reply
+ * should be created.
+ * @typeParam DETECTOR_OUTPUT_DATA The data that is created by the reply detector
+ * for further use when creating the reply.
  */
 export interface TwitchChatCommandHandler<
-  DATA_HANDLE extends object = EMPTY_OBJECT,
-  DETECTED_INPUT_DATA extends object = EMPTY_OBJECT,
-  DETECTED_OUTPUT_DATA extends object = EMPTY_OBJECT
+  CREATE_REPLY_INPUT_DATA extends object = EMPTY_OBJECT,
+  DETECTOR_INPUT_DATA extends object = EMPTY_OBJECT,
+  DETECTOR_OUTPUT_DATA extends object = EMPTY_OBJECT
 > {
   /**
    * The method that handles the detected command with additional and forwarded
    * data from the detector.
    */
   createReply: TwitchChatCommandHandlerCreateReply<
-    DATA_HANDLE & DETECTED_OUTPUT_DATA
+    CREATE_REPLY_INPUT_DATA & DETECTOR_OUTPUT_DATA
   >;
   /** The method that detects if something should be handled. */
   detect: TwitchChatCommandHandlerDetect<
-    DETECTED_INPUT_DATA,
-    DETECTED_OUTPUT_DATA
+    DETECTOR_INPUT_DATA,
+    DETECTOR_OUTPUT_DATA
   >;
   /** Information about the command handler. */
   info: TwitchChatCommandHandlerInfo;
@@ -376,11 +387,16 @@ const logTwitchMessageCommandReply = (
  * @param globalMacros Global macros.
  * @param logger Global logger.
  * @param twitchCommandHandler The Twitch command handler.
+ * @typeParam CREATE_REPLY_INPUT_DATA The data that is necessary to create a reply.
+ * @typeParam DETECTOR_INPUT_DATA The data that is necessary to detect if a reply
+ * should be created.
+ * @typeParam DETECTOR_OUTPUT_DATA The data that is created by the reply detector
+ * for further use when creating the reply.
  * @returns True if the command was detected and a reply was sent.
  */
 export const runTwitchCommandHandler = async <
-  DATA extends DATA_HANDLE & DETECTOR_INPUT_DATA,
-  DATA_HANDLE extends object = EMPTY_OBJECT,
+  DATA extends CREATE_REPLY_INPUT_DATA & DETECTOR_INPUT_DATA,
+  CREATE_REPLY_INPUT_DATA extends object = EMPTY_OBJECT,
   DETECTOR_INPUT_DATA extends object = EMPTY_OBJECT,
   DETECTOR_OUTPUT_DATA extends object = EMPTY_OBJECT
 >(
@@ -394,7 +410,7 @@ export const runTwitchCommandHandler = async <
   globalMacros: Readonly<MacroMap>,
   logger: Readonly<Logger>,
   twitchCommandHandler: TwitchChatCommandHandler<
-    DATA_HANDLE,
+    CREATE_REPLY_INPUT_DATA,
     DETECTOR_INPUT_DATA,
     DETECTOR_OUTPUT_DATA
   >

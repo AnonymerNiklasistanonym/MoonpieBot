@@ -66,12 +66,11 @@
     "jsdoc/check-param-names": "error",
     "jsdoc/check-tag-names": ["error",
     {
-      "definedTags": ["tparam"]
+      "definedTags": ["typeParam"]
     }],
     "jsdoc/no-types": "error",
     "jsdoc/no-defaults": "error",
     "jsdoc/check-indentation": "error",
-    "jsdoc/check-line-alignment": "error" //,
-    //"sort-imports": ["warn"]
+    "jsdoc/check-line-alignment": "error"
   }
 }
