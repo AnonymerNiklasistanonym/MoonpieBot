@@ -1,6 +1,6 @@
 pkgbase = moonpiebot-git
 	pkgdesc = A custom Twitch chat bot
-	pkgver = 1.0.18
+	pkgver = 1.0.19
 	pkgrel = 1
 	url = https://github.com/AnonymerNiklasistanonym/MoonpieBot
 	arch = x86_64
