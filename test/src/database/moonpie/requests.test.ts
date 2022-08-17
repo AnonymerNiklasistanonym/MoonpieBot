@@ -280,6 +280,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         const leaderboard1 = await moonpieDb.getMoonpieLeaderboard(
           databasePath,
           10,
+          0,
           logger
         );
         chai.expect(leaderboard1).to.be.an("array");
@@ -297,6 +298,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         const leaderboard2 = await moonpieDb.getMoonpieLeaderboard(
           databasePath,
           10,
+          0,
           logger
         );
         chai.expect(leaderboard2).to.be.an("array");
@@ -317,6 +319,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         const leaderboard3 = await moonpieDb.getMoonpieLeaderboard(
           databasePath,
           10,
+          0,
           logger
         );
         chai.expect(leaderboard3).to.be.an("array");
@@ -356,22 +359,21 @@ export default (databaseDirPath: string): Mocha.Suite => {
           logger
         );
 
+        const offset = 1;
         const leaderboard4 = await moonpieDb.getMoonpieLeaderboard(
           databasePath,
           10,
+          offset + 1,
           logger
         );
         chai.expect(leaderboard4).to.be.an("array");
-        chai.expect(leaderboard4.length).to.be.equal(3);
-        chai.expect(leaderboard4[0].count).to.be.equal(10);
-        chai.expect(leaderboard4[0].name).to.be.equal("eight");
-        chai.expect(leaderboard4[0].rank).to.be.equal(1);
-        chai.expect(leaderboard4[1].count).to.be.equal(1);
-        chai.expect(leaderboard4[1].name).to.be.equal("six_new_name");
-        chai.expect(leaderboard4[1].rank).to.be.equal(2);
-        chai.expect(leaderboard4[2].count).to.be.equal(0);
-        chai.expect(leaderboard4[2].name).to.be.equal("four");
-        chai.expect(leaderboard4[2].rank).to.be.equal(3);
+        chai.expect(leaderboard4.length).to.be.equal(3 - offset);
+        chai.expect(leaderboard4[1 - offset].count).to.be.equal(1);
+        chai.expect(leaderboard4[1 - offset].name).to.be.equal("six_new_name");
+        chai.expect(leaderboard4[1 - offset].rank).to.be.equal(2);
+        chai.expect(leaderboard4[2 - offset].count).to.be.equal(0);
+        chai.expect(leaderboard4[2 - offset].name).to.be.equal("four");
+        chai.expect(leaderboard4[2 - offset].rank).to.be.equal(3);
       }
     ).timeout(githubCiMaxTimeout);
     itAllowFail(
