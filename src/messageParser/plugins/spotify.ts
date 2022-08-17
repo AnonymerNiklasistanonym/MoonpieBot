@@ -1,4 +1,4 @@
-import { macroSpotifySong, macroSpotifySongLogic } from "../macros/spotify";
+import { macroSpotifySong } from "../macros/spotify";
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 // Type imports
 import type { MacroMap } from "../../messageParser";
@@ -19,7 +19,10 @@ export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyD
           logger
         );
         return new Map([
-          [macroSpotifySong.id, new Map(macroSpotifySongLogic(spotifyData))],
+          [
+            macroSpotifySong.id,
+            new Map(macroSpotifySong.generate({ spotifyData })),
+          ],
         ]);
       },
     id: "SPOTIFY_SONG",

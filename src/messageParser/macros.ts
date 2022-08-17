@@ -31,15 +31,17 @@ import { macroSpotifySong } from "./macros/spotify";
 import type { MacroDictionary, MacroDictionaryEntry } from "../messageParser";
 import type { EMPTY_OBJECT } from "../info/other";
 
-export interface MessageParserMacro {
+interface MessageParserMacroInfo {
   description?: string;
   id: string;
+}
+
+export interface MessageParserMacro extends MessageParserMacroInfo {
   values: MacroDictionary;
 }
 
-export interface MessageParserMacroDocumentation {
-  description?: string;
-  id: string;
+export interface MessageParserMacroDocumentation
+  extends MessageParserMacroInfo {
   keys: string[];
 }
 export interface MessageParserMacroGenerator<
@@ -49,32 +51,54 @@ export interface MessageParserMacroGenerator<
   generate: (data: GENERATE_DATA) => MacroDictionaryEntry[];
 }
 
-/**
- * The default values for all macros.
- */
-export const defaultMacros: MessageParserMacro[] = [macroMoonpieBot];
+export const checkMacrosForDuplicates = <
+  MACRO_TYPE extends MessageParserMacroInfo
+>(
+  name: string,
+  ...macros: MACRO_TYPE[]
+): MACRO_TYPE[] => {
+  // Check for duplicated IDs
+  macros.forEach((value, index, array) => {
+    if (array.findIndex((a) => a.id === value.id) !== index) {
+      throw Error(
+        `The macro list ${name} contained the ID "${value.id}" twice`
+      );
+    }
+  });
+  return macros;
+};
 
 /**
  * The default values for all macros.
  */
-export const defaultMacrosOptional: MessageParserMacroDocumentation[] = [
-  macroMoonpieClaim,
-  macroMoonpieLeaderboard,
-  macroMoonpieLeaderboardEntry,
-  macroMoonpieUser,
-  macroMoonpieUserSet,
-  macroOsuApi,
-  macroOsuBeatmap,
-  macroOsuBeatmapRequest,
-  macroOsuBeatmapRequests,
-  macroOsuMostRecentPlay,
-  macroOsuPpRequest,
-  macroOsuRpRequest,
-  macroOsuScore,
-  macroOsuScoreRequest,
-  macroOsuStreamCompanionCurrentMapFile,
-  macroOsuStreamCompanionCurrentMapWebSocket,
-  macroOsuUser,
-  macroOsuWindowTitle,
-  macroSpotifySong,
-];
+export const defaultMacros: MessageParserMacro[] = checkMacrosForDuplicates(
+  "default",
+  macroMoonpieBot
+);
+
+/**
+ * The default values for all macros.
+ */
+export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
+  checkMacrosForDuplicates(
+    "default-optional",
+    macroMoonpieClaim,
+    macroMoonpieLeaderboard,
+    macroMoonpieLeaderboardEntry,
+    macroMoonpieUser,
+    macroMoonpieUserSet,
+    macroOsuApi,
+    macroOsuBeatmap,
+    macroOsuBeatmapRequest,
+    macroOsuBeatmapRequests,
+    macroOsuMostRecentPlay,
+    macroOsuPpRequest,
+    macroOsuRpRequest,
+    macroOsuScore,
+    macroOsuScoreRequest,
+    macroOsuStreamCompanionCurrentMapFile,
+    macroOsuStreamCompanionCurrentMapWebSocket,
+    macroOsuUser,
+    macroOsuWindowTitle,
+    macroSpotifySong
+  );

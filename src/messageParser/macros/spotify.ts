@@ -1,6 +1,5 @@
 // Type imports
-import type { MacroDictionaryEntry } from "../../messageParser";
-import type { MessageParserMacroDocumentation } from "../macros";
+import type { MessageParserMacroGenerator } from "../macros";
 import type { SpotifyGetCurrentAndRecentSongs } from "../../spotify";
 
 export enum SpotifySongMacro {
@@ -17,92 +16,92 @@ export enum SpotifySongMacro {
   PREVIOUS_TITLE = "PREVIOUS_TITLE",
   PREVIOUS_URL = "PREVIOUS_URL",
 }
+interface MacroSpotifySongData {
+  spotifyData: SpotifyGetCurrentAndRecentSongs;
+}
+export const macroSpotifySong: MessageParserMacroGenerator<MacroSpotifySongData> =
+  {
+    generate: (data) => {
+      const currData = data.spotifyData.currentlyPlaying.body.item;
+      const hasCurrent = currData != null;
 
-export const macroSpotifySong: MessageParserMacroDocumentation = {
-  id: "SPOTIFY_SONG",
-  keys: Object.values(SpotifySongMacro),
-};
+      const recentData = data.spotifyData.recentlyPlayedTracks.body.items;
+      const hasPrevious = recentData.length > 0;
+      const prevData = recentData[0];
 
-export const macroSpotifySongLogic = (
-  spotifyData: SpotifyGetCurrentAndRecentSongs
-): MacroDictionaryEntry[] => {
-  const currData = spotifyData.currentlyPlaying.body.item;
-  const hasCurrent = currData != null;
-
-  const recentData = spotifyData.recentlyPlayedTracks.body.items;
-  const hasPrevious = recentData.length > 0;
-  const prevData = recentData[0];
-
-  return Object.values(SpotifySongMacro).map<[SpotifySongMacro, string]>(
-    (macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case SpotifySongMacro.CURRENT_ALBUM:
-          if (
-            hasCurrent &&
-            currData.type === "track" &&
-            currData.album.album_type !== "single"
-          ) {
-            macroValue = currData.album.name;
+      return Object.values(SpotifySongMacro).map<[SpotifySongMacro, string]>(
+        (macroId) => {
+          let macroValue;
+          switch (macroId) {
+            case SpotifySongMacro.CURRENT_ALBUM:
+              if (
+                hasCurrent &&
+                currData.type === "track" &&
+                currData.album.album_type !== "single"
+              ) {
+                macroValue = currData.album.name;
+              }
+              break;
+            case SpotifySongMacro.CURRENT_ARTISTS:
+              if (hasCurrent && currData.type === "track") {
+                macroValue = currData.artists.map((a) => a.name).join(", ");
+              }
+              break;
+            case SpotifySongMacro.CURRENT_IS_SINGLE:
+              macroValue =
+                hasCurrent &&
+                currData.type === "track" &&
+                currData.album.album_type === "single";
+              break;
+            case SpotifySongMacro.CURRENT_TITLE:
+              if (hasCurrent && currData.type === "track") {
+                macroValue = currData.name;
+              }
+              break;
+            case SpotifySongMacro.CURRENT_URL:
+              if (hasCurrent) {
+                macroValue = currData.external_urls.spotify;
+              }
+              break;
+            case SpotifySongMacro.HAS_CURRENT:
+              macroValue = hasCurrent;
+              break;
+            case SpotifySongMacro.HAS_PREVIOUS:
+              macroValue = hasPrevious;
+              break;
+            case SpotifySongMacro.PREVIOUS_ALBUM:
+              if (hasPrevious) {
+                macroValue = prevData.track.album.name;
+              }
+              break;
+            case SpotifySongMacro.PREVIOUS_ARTISTS:
+              macroValue = hasPrevious
+                ? prevData.track.artists.map((a) => a.name).join(", ")
+                : undefined;
+              break;
+            case SpotifySongMacro.PREVIOUS_IS_SINGLE:
+              macroValue =
+                hasPrevious && prevData.track.album.album_type === "single";
+              break;
+            case SpotifySongMacro.PREVIOUS_TITLE:
+              macroValue = hasPrevious ? prevData.track.name : undefined;
+              break;
+            case SpotifySongMacro.PREVIOUS_URL:
+              macroValue = hasPrevious
+                ? prevData.track.external_urls.spotify
+                : undefined;
+              break;
           }
-          break;
-        case SpotifySongMacro.CURRENT_ARTISTS:
-          if (hasCurrent && currData.type === "track") {
-            macroValue = currData.artists.map((a) => a.name).join(", ");
+          if (typeof macroValue === "boolean") {
+            macroValue = macroValue ? "true" : "false";
           }
-          break;
-        case SpotifySongMacro.CURRENT_IS_SINGLE:
-          macroValue =
-            hasCurrent &&
-            currData.type === "track" &&
-            currData.album.album_type === "single";
-          break;
-        case SpotifySongMacro.CURRENT_TITLE:
-          if (hasCurrent && currData.type === "track") {
-            macroValue = currData.name;
+          if (typeof macroValue === "undefined") {
+            macroValue = "undefined";
           }
-          break;
-        case SpotifySongMacro.CURRENT_URL:
-          if (hasCurrent) {
-            macroValue = currData.external_urls.spotify;
-          }
-          break;
-        case SpotifySongMacro.HAS_CURRENT:
-          macroValue = hasCurrent;
-          break;
-        case SpotifySongMacro.HAS_PREVIOUS:
-          macroValue = hasPrevious;
-          break;
-        case SpotifySongMacro.PREVIOUS_ALBUM:
-          if (hasPrevious) {
-            macroValue = prevData.track.album.name;
-          }
-          break;
-        case SpotifySongMacro.PREVIOUS_ARTISTS:
-          macroValue = hasPrevious
-            ? prevData.track.artists.map((a) => a.name).join(", ")
-            : undefined;
-          break;
-        case SpotifySongMacro.PREVIOUS_IS_SINGLE:
-          macroValue =
-            hasPrevious && prevData.track.album.album_type === "single";
-          break;
-        case SpotifySongMacro.PREVIOUS_TITLE:
-          macroValue = hasPrevious ? prevData.track.name : undefined;
-          break;
-        case SpotifySongMacro.PREVIOUS_URL:
-          macroValue = hasPrevious
-            ? prevData.track.external_urls.spotify
-            : undefined;
-          break;
-      }
-      if (typeof macroValue === "boolean") {
-        macroValue = macroValue ? "true" : "false";
-      }
-      if (typeof macroValue === "undefined") {
-        macroValue = "undefined";
-      }
-      return [macroId, macroValue];
-    }
-  );
-};
+          return [macroId, macroValue];
+        }
+      );
+    },
+    id: "SPOTIFY_SONG",
+    keys: Object.values(SpotifySongMacro),
+  };

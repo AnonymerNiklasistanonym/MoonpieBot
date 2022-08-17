@@ -1,11 +1,8 @@
 // Package imports
 import osuApiV2 from "osu-api-v2";
 // Local imports
-
 import {
-  MacroOsuBeatmapRequest,
   macroOsuBeatmapRequest,
-  MacroOsuBeatmapRequests,
   macroOsuBeatmapRequests,
 } from "../../messageParser/macros/osuBeatmapRequest";
 import { NOT_FOUND_STATUS_CODE, notUndefined } from "../../info/other";
@@ -129,14 +126,11 @@ export const commandBeatmap: TwitchChatCommandHandler<
       const macros = new Map(globalMacros);
       macros.set(
         macroOsuBeatmapRequests.id,
-        new Map([
-          [
-            MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
-            data.beatmapRequestsInfo.beatmapRequestsOffMessage
-              ? data.beatmapRequestsInfo.beatmapRequestsOffMessage
-              : "",
-          ],
-        ])
+        new Map(
+          macroOsuBeatmapRequests.generate({
+            customMessage: data.beatmapRequestsInfo.beatmapRequestsOffMessage,
+          })
+        )
       );
       const message = await messageParserById(
         osuBeatmapRequestCurrentlyOff.id,
@@ -155,17 +149,12 @@ export const commandBeatmap: TwitchChatCommandHandler<
       const osuBeatmapRequestMacros = new Map(globalMacros);
       osuBeatmapRequestMacros.set(
         macroOsuBeatmapRequest.id,
-        new Map([
-          [MacroOsuBeatmapRequest.ID, `${beatmapRequest.beatmapId}`],
-          [
-            MacroOsuBeatmapRequest.COMMENT,
-            `${
-              beatmapRequest.comment && beatmapRequest.comment.trim().length > 0
-                ? beatmapRequest.comment.trim()
-                : ""
-            }`,
-          ],
-        ])
+        new Map(
+          macroOsuBeatmapRequest.generate({
+            comment: beatmapRequest.comment?.trim(),
+            id: beatmapRequest.beatmapId,
+          })
+        )
       );
 
       // Get beatmap and if found the current top score and convert them into a
