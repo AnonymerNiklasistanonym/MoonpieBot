@@ -19,93 +19,117 @@ import {
   regexOsuWindowTitleNowPlaying,
 } from "../../src/info/regex";
 
+interface RegexTestElement<TEST_TYPE = string[]> {
+  expected: null | TEST_TYPE;
+  input: string;
+}
+
+const checkRegexTestElements = <TEST_TYPE = string[]>(
+  testSet: RegexTestElement<TEST_TYPE>[],
+  regex: RegExp,
+  getExpectedRegexGroups: (a: TEST_TYPE) => string[]
+) => {
+  for (const a of testSet) {
+    const match = a.input.match(regex);
+    if (a.expected == null) {
+      expect(match, `No match was expected for "${a.input}"`).to.be.null;
+    } else {
+      expect(match, `A match was expected for "${a.input}"`).to.be.not.null;
+      if (match != null) {
+        const expectedRegexGroups = getExpectedRegexGroups(a.expected);
+        expect(match.length).to.be.greaterThan(
+          expectedRegexGroups.length,
+          `At least ${expectedRegexGroups.length} regex groups were expected`
+        );
+        for (const [index, value] of expectedRegexGroups.entries()) {
+          // eslint-disable-next-line security/detect-object-injection
+          expect(match[index + 1]).to.be.equal(
+            value,
+            `The regex group match value "${value}" was expected at index ${index}`
+          );
+        }
+      }
+    }
+  }
+};
+
 describe("regex", () => {
   context("!moonpie commands", () => {
     it("!moonpie", () => {
-      const message0 = "!monpie";
-      const matches0 = message0.match(regexMoonpieChatHandlerCommandClaim);
-      expect(matches0).to.be.null;
-
-      const message1 = "!moonpie";
-      const matches1 = message1.match(regexMoonpieChatHandlerCommandClaim);
-      expect(matches1).to.not.be.null;
-
-      const message2 = "!moonpie message after that";
-      const matches2 = message2.match(regexMoonpieChatHandlerCommandClaim);
-      expect(matches2).to.not.be.null;
-
-      const message3 =
-        "Use command !moonpie to participate in the collection leaderboard of the fantastic moonpies ^^ !moonpie commands for rest of the commands!";
-      const matches3 = message3.match(regexMoonpieChatHandlerCommandClaim);
-      expect(matches3).to.be.null;
-
-      const message4 = "abc !moonpie";
-      const matches4 = message4.match(regexMoonpieChatHandlerCommandClaim);
-      expect(matches4).to.be.null;
+      const testSetMoonpieClaim: RegexTestElement[] = [
+        { expected: null, input: "!monpie" },
+        { expected: null, input: "!moonpieabc" },
+        { expected: null, input: "a!moonpie" },
+        { expected: null, input: "moonpie" },
+        { expected: null, input: "a moonpie" },
+        { expected: null, input: "amoonpie" },
+        { expected: [], input: "!moonpie" },
+        { expected: [], input: "   !moonpie   " },
+        { expected: [], input: "!moonpie message" },
+        { expected: [], input: "!moonpie message after that" },
+      ];
+      checkRegexTestElements(
+        testSetMoonpieClaim,
+        regexMoonpieChatHandlerCommandClaim,
+        (a) => a
+      );
     });
     it("!moonpie about", () => {
-      const message0 = "!monpie";
-      const matches0 = message0.match(regexMoonpieChatHandlerCommandAbout);
-      expect(matches0).to.be.null;
-
-      const message1 = "!moonpie about";
-      const matches1 = message1.match(regexMoonpieChatHandlerCommandAbout);
-      expect(matches1).to.not.be.null;
-
-      const message2 = "!moonpie about message after that";
-      const matches2 = message2.match(regexMoonpieChatHandlerCommandAbout);
-      expect(matches2).to.not.be.null;
-
-      const message3 = "!moonpie aboutmessage after that";
-      const matches3 = message3.match(regexMoonpieChatHandlerCommandAbout);
-      expect(matches3).to.be.null;
-
-      const message4 = "abc !moonpie about";
-      const matches4 = message4.match(regexMoonpieChatHandlerCommandAbout);
-      expect(matches4).to.be.null;
+      const testSetMoonpieAbout: RegexTestElement[] = [
+        { expected: null, input: "!monpie" },
+        { expected: null, input: "!moonpieabout" },
+        { expected: null, input: "a!moonpie about" },
+        { expected: null, input: "moonpie about" },
+        { expected: null, input: "a moonpie about" },
+        { expected: null, input: "amoonpie about" },
+        { expected: null, input: "!moonpie aboutmessage" },
+        { expected: [], input: "!moonpie about" },
+        { expected: [], input: "   !moonpie about  " },
+        { expected: [], input: "   !moonpie    about  " },
+        { expected: [], input: "!moonpie about message" },
+        { expected: [], input: "!moonpie about message after that" },
+      ];
+      checkRegexTestElements(
+        testSetMoonpieAbout,
+        regexMoonpieChatHandlerCommandAbout,
+        (a) => a
+      );
     });
     it("!moonpie leaderboard", () => {
-      const message0 = "!monpie";
-      const matches0 = message0.match(
-        regexMoonpieChatHandlerCommandLeaderboard
+      interface MoonpieLeaderboardOutput {
+        rank?: string;
+      }
+      const testSetMoonpieLeaderboard: RegexTestElement<MoonpieLeaderboardOutput>[] =
+        [
+          { expected: null, input: "!monpie" },
+          { expected: null, input: "!moonpieleaderboard" },
+          { expected: null, input: "a!moonpie leaderboard" },
+          { expected: null, input: "moonpie leaderboard" },
+          { expected: null, input: "a moonpie leaderboard" },
+          { expected: null, input: "amoonpie leaderboard" },
+          { expected: null, input: "!moonpie leaderboardmessage" },
+          { expected: {}, input: "!moonpie leaderboard" },
+          { expected: {}, input: "   !moonpie leaderboard  " },
+          { expected: {}, input: "   !moonpie    leaderboard  " },
+          { expected: {}, input: "!moonpie leaderboard message" },
+          { expected: {}, input: "!moonpie leaderboard message after that" },
+          { expected: { rank: "12" }, input: "!moonpie leaderboard 12" },
+          { expected: { rank: "11" }, input: "   !moonpie leaderboard  11  " },
+          {
+            expected: { rank: "69" },
+            input: "!moonpie leaderboard 69 message",
+          },
+          {
+            expected: { rank: "42" },
+            input: "!moonpie leaderboard 42 message after that",
+          },
+          { expected: {}, input: "!moonpie leaderboard 42message" },
+        ];
+      checkRegexTestElements(
+        testSetMoonpieLeaderboard,
+        regexMoonpieChatHandlerCommandLeaderboard,
+        (a) => (a.rank !== undefined ? [a.rank] : [])
       );
-      expect(matches0).to.be.null;
-
-      const message1 = "!moonpie";
-      const matches1 = message1.match(
-        regexMoonpieChatHandlerCommandLeaderboard
-      );
-      expect(matches1).to.be.null;
-
-      const message2 = "!moonpie message";
-      const matches2 = message2.match(
-        regexMoonpieChatHandlerCommandLeaderboard
-      );
-      expect(matches2).to.be.null;
-
-      const message3 = "!moonpie leaderboard";
-      const matches3 = message3.match(
-        regexMoonpieChatHandlerCommandLeaderboard
-      );
-      expect(matches3).to.not.be.null;
-
-      const message4 = "abc !moonpie leaderboard";
-      const matches4 = message4.match(
-        regexMoonpieChatHandlerCommandLeaderboard
-      );
-      expect(matches4).to.be.null;
-
-      const message5 = "!moonpie leaderboard message after that";
-      const matches5 = message5.match(
-        regexMoonpieChatHandlerCommandLeaderboard
-      );
-      expect(matches5).to.not.be.null;
-
-      const message6 = "!moonpie leaderboardmessage";
-      const matches6 = message6.match(
-        regexMoonpieChatHandlerCommandLeaderboard
-      );
-      expect(matches6).to.be.null;
     });
 
     it("!moonpie get $USER", () => {
@@ -376,6 +400,54 @@ describe("regex", () => {
         expect(matches4[2]).to.be.equal("Title [TV Size]");
         expect(matches4[3]).to.be.equal("Difficulty");
       }
+
+      interface OsuWindowTitleOutput {
+        artist: string;
+        title: string;
+        version: string;
+      }
+
+      const testSetOsuWindowTitle: RegexTestElement<OsuWindowTitleOutput>[] = [
+        {
+          expected: {
+            artist: "Sarah Connor",
+            title: "Cold As Ice (PH Electro Remix) (Nightcore Mix)",
+            version: "Freezing",
+          },
+          input:
+            "osu!  - Sarah Connor - Cold As Ice (PH Electro Remix) (Nightcore Mix) [Freezing]",
+        },
+        {
+          expected: {
+            artist: "sasakure.UK",
+            title: "SeventH-HeaveN feat. Hatsune Miku",
+            version: "Easy",
+          },
+          input:
+            "osu!  - sasakure.UK - SeventH-HeaveN feat. Hatsune Miku [Easy]",
+        },
+        {
+          expected: {
+            artist: "-45",
+            title: "Midorigo Queen Bee",
+            version: "Normal",
+          },
+          input: "osu!  - -45 - Midorigo Queen Bee [Normal]",
+        },
+        {
+          expected: {
+            artist: "DJ S3RL",
+            title: "T-T-Techno (feat. Jesskah)",
+            version: "Normal",
+          },
+          input: "osu!  - DJ S3RL - T-T-Techno (feat. Jesskah) [Normal]",
+        },
+      ];
+      checkRegexTestElements(
+        testSetOsuWindowTitle,
+        regexOsuWindowTitleNowPlaying,
+        (a) => [a.artist, a.title, a.version]
+      );
     });
   });
 
