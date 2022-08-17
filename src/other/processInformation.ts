@@ -4,15 +4,15 @@ import { exec } from "child_process";
 import { Readable } from "stream";
 
 interface WindowsTasklistVOutputElement {
-  cpuTime: string;
-  imageName: string;
-  memUsage: string;
-  pid: string;
-  sessionName: string;
-  sessionNumber: string;
-  status: string;
-  userName: string;
-  windowTitle: string;
+  "CPU Time": string;
+  "Image Name": string;
+  "Mem Usage": string;
+  PID: string;
+  "Session Name": string;
+  "Session#": string;
+  Status: string;
+  "User Name": string;
+  "Window Title": string;
 }
 
 interface ProcessInformationBase {
@@ -36,7 +36,7 @@ export const getProcessInformationByName = async (
   let cmd = "";
   switch (process.platform) {
     case "win32":
-      cmd = `tasklist /fi "imagename eq ${processName}*"`;
+      cmd = `tasklist /fi "imagename eq ${processName}*" /fo csv /v`;
       break;
     case "darwin":
       cmd = `ps -ax | grep ${processName}`;
@@ -64,27 +64,16 @@ export const getProcessInformationByName = async (
           const s = new Readable();
           s.push(processInformationStdout);
           s.push(null);
-          s.pipe(
-            csv([
-              "imageName",
-              "pid",
-              "sessionName",
-              "sessionNumber",
-              "memUsage",
-              "status",
-              "userName",
-              "cpuTime",
-              "windowTitle",
-            ])
-          )
+          s.pipe(csv())
             .on("data", (data: WindowsTasklistVOutputElement) =>
               resultsWin32.push(data)
             )
             .on("end", () => {
               const processInformation = resultsWin32.find(
                 (a) =>
-                  a.imageName.toLowerCase().indexOf(processName.toLowerCase()) >
-                  -1
+                  a["Image Name"]
+                    .toLowerCase()
+                    .indexOf(processName.toLowerCase()) > -1
               );
               resolve({
                 platform: "win32",

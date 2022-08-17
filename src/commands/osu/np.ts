@@ -153,12 +153,11 @@ export const commandNp: TwitchChatCommandHandler<
       if (
         osuProcessInformation.platform === "win32" &&
         osuProcessInformation.processInformation !== undefined &&
-        osuProcessInformation.processInformation.windowTitle !== "osu!"
+        osuProcessInformation.processInformation["Window Title"] !== "osu!"
       ) {
-        const match =
-          osuProcessInformation.processInformation.windowTitle.match(
-            regexOsuWindowTitleNowPlaying
-          );
+        const match = osuProcessInformation.processInformation[
+          "Window Title"
+        ].match(regexOsuWindowTitleNowPlaying);
         if (match != null) {
           let mapId;
           try {
