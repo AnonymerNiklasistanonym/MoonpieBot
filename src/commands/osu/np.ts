@@ -9,10 +9,11 @@ import {
 import {
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
-  osuCommandReplyNpNoMapStreamCompanion,
+  osuCommandReplyNpNoMapStreamCompanionWebsocket,
   osuCommandReplyNpStreamCompanionFile,
-  osuCommandReplyNpStreamCompanionNotRunning,
+  osuCommandReplyNpStreamCompanionFileNotRunning,
   osuCommandReplyNpStreamCompanionWebSocket,
+  osuCommandReplyNpStreamCompanionWebSocketNotRunning,
 } from "../../strings/osu/commandReply";
 import {
   regexOsuBeatmapDownloadUrlMatcher,
@@ -124,13 +125,23 @@ export const commandNp: TwitchChatCommandHandler<
         }
       } else if (
         currMapData !== undefined &&
-        ((currMapData.type === "websocket" &&
-          currMapData.mapid !== undefined &&
-          currMapData.mapid === 0) ||
-          (currMapData.type === "file" && currMapData.npAll === ""))
+        currMapData.type === "websocket" &&
+        currMapData.mapid !== undefined &&
+        currMapData.mapid === 0
       ) {
         msg = await messageParserById(
-          osuCommandReplyNpNoMapStreamCompanion.id,
+          osuCommandReplyNpNoMapStreamCompanionWebsocket.id,
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger
+        );
+      } else if (
+        currMapData !== undefined &&
+        currMapData.type === "websocket"
+      ) {
+        msg = await messageParserById(
+          osuCommandReplyNpStreamCompanionWebSocketNotRunning.id,
           globalStrings,
           globalPlugins,
           globalMacros,
@@ -138,7 +149,7 @@ export const commandNp: TwitchChatCommandHandler<
         );
       } else {
         msg = await messageParserById(
-          osuCommandReplyNpStreamCompanionNotRunning.id,
+          osuCommandReplyNpStreamCompanionFileNotRunning.id,
           globalStrings,
           globalPlugins,
           globalMacros,

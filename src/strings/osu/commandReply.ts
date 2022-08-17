@@ -276,15 +276,28 @@ export const osuCommandReplyNpStreamCompanionFile: StringEntry = {
             type: "macro",
           },
           name: pluginIfNotEmpty.id,
-          scope: [
-            " (currently playing with ",
-            {
-              key: MacroOsuStreamCompanionCurrentMapFile.CURRENT_MODS,
-              name: macroOsuStreamCompanionCurrentMapFile.id,
-              type: "macro",
-            },
-            ")",
-          ],
+          scope: {
+            args: [
+              {
+                key: MacroOsuStreamCompanionCurrentMapFile.CURRENT_MODS,
+                name: macroOsuStreamCompanionCurrentMapFile.id,
+                type: "macro",
+              },
+              "!==",
+              "None",
+            ],
+            name: pluginIfNotEqual.id,
+            scope: [
+              " (active mods: ",
+              {
+                key: MacroOsuStreamCompanionCurrentMapFile.CURRENT_MODS,
+                name: macroOsuStreamCompanionCurrentMapFile.id,
+                type: "macro",
+              },
+              ")",
+            ],
+            type: "plugin",
+          },
           type: "plugin",
         },
         {
@@ -308,6 +321,7 @@ export const osuCommandReplyNpStreamCompanionFile: StringEntry = {
       ],
       type: "plugin",
     },
+    " (StreamCompanion)",
   ]),
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_FILE`,
 };
@@ -321,23 +335,39 @@ export const osuCommandReplyNpNoMap: StringEntry = {
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP`,
 };
 
-export const osuCommandReplyNpNoMapStreamCompanion: StringEntry = {
+export const osuCommandReplyNpNoMapStreamCompanionWebsocket: StringEntry = {
   default: createMessageForMessageParser([
-    "@",
-    { name: PluginTwitchChat.USER, type: "plugin" },
-    " No map is currently being played (This is either a custom map or you need to wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
+    {
+      name: osuCommandReplyNpNoMap.id,
+      type: "reference",
+    },
+    " (This is either a custom map or you need to wait until a map change happens since StreamCompanion was found running but it hasn't yet detected an osu! map!)",
   ]),
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_NO_MAP_STREAMCOMPANION`,
 };
 
-export const osuCommandReplyNpStreamCompanionNotRunning: StringEntry = {
+export const osuCommandReplyNpStreamCompanionFileNotRunning: StringEntry = {
   default: createMessageForMessageParser([
-    "@",
-    { name: PluginTwitchChat.USER, type: "plugin" },
-    " No map is currently being played (StreamCompanion was configured but not found running!)",
+    {
+      name: osuCommandReplyNpNoMap.id,
+      type: "reference",
+    },
+    " (It's also possible that StreamCompanion is not running)",
   ]),
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_NOT_RUNNING`,
 };
+
+export const osuCommandReplyNpStreamCompanionWebSocketNotRunning: StringEntry =
+  {
+    default: createMessageForMessageParser([
+      {
+        name: osuCommandReplyNpNoMap.id,
+        type: "reference",
+      },
+      " (StreamCompanion [websocket] was configured but not found running!)",
+    ]),
+    id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_WEB_SOCKET_NOT_RUNNING`,
+  };
 
 export const osuCommandReplyRp: StringEntry = {
   default: createMessageForMessageParser([
@@ -832,10 +862,11 @@ export const osuScore: StringEntry = {
 export const osuCommandReply: StringEntry[] = [
   osuCommandReplyNp,
   osuCommandReplyNpNoMap,
-  osuCommandReplyNpNoMapStreamCompanion,
+  osuCommandReplyNpNoMapStreamCompanionWebsocket,
   osuCommandReplyNpStreamCompanionFile,
-  osuCommandReplyNpStreamCompanionNotRunning,
+  osuCommandReplyNpStreamCompanionFileNotRunning,
   osuCommandReplyNpStreamCompanionWebSocket,
+  osuCommandReplyNpStreamCompanionWebSocketNotRunning,
   osuCommandReplyPp,
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
