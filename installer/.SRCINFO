@@ -1,6 +1,6 @@
 pkgbase = moonpiebot
 	pkgdesc = A custom Twitch chat bot
-	pkgver = 1.0.20
+	pkgver = 1.0.21
 	pkgrel = 1
 	url = https://github.com/AnonymerNiklasistanonym/MoonpieBot
 	arch = x86_64
@@ -11,7 +11,7 @@ pkgbase = moonpiebot
 	conflicts = moonpiebot
 	conflicts = moonpiebot-bin
 	conflicts = moonpiebot-git
-	source = moonpiebot.git::git+https://github.com/AnonymerNiklasistanonym/MoonpieBot#tag=v1.0.20
+	source = moonpiebot.git::git+https://github.com/AnonymerNiklasistanonym/MoonpieBot#tag=v1.0.21
 	sha1sums = SKIP
 
 pkgname = moonpiebot
