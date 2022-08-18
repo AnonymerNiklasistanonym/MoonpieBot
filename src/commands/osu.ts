@@ -15,6 +15,11 @@ import type {
   CommandBeatmapRequestsCreateReplyInput,
   CommandBeatmapRequestsDetectorInput,
 } from "./osu/beatmapRequests";
+import {
+  commandCommands,
+  CommandCommandsCreateReplyInput,
+  CommandCommandsDetectorInput,
+} from "./osu/commands";
 import type {
   CommandNpCreateReplyInput,
   CommandNpDetectorInput,
@@ -45,7 +50,9 @@ const globalBeatmapRequestObject: BeatmapRequestsInfo = {
 };
 
 export interface OsuChatHandlerData
-  extends CommandNpCreateReplyInput,
+  extends CommandCommandsCreateReplyInput,
+    CommandCommandsDetectorInput,
+    CommandNpCreateReplyInput,
     CommandNpDetectorInput,
     CommandPpRpCreateReplyInput,
     CommandPpRpDetectorInput,
@@ -128,6 +135,22 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
           beatmapRequestsInfo: globalBeatmapRequestObject,
           beatmapRequestsOn: globalBeatmapRequestObject.beatmapRequestsOn,
         },
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
+    [commandCommands].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        data,
         globalStrings,
         globalPlugins,
         globalMacros,

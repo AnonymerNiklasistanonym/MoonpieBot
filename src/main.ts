@@ -475,7 +475,7 @@ export const main = async (
               }
             : {
                 enabledCommands: osuEnableCommands.filter(
-                  (a) => a === OsuCommands.NP
+                  (a) => a === OsuCommands.NP || a === OsuCommands.COMMANDS
                 ),
                 osuStreamCompanionCurrentMapData,
               },

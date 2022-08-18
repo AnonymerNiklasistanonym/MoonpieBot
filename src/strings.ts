@@ -10,6 +10,7 @@ import { moonpieCommands } from "./strings/moonpie/commands";
 import { moonpieUser } from "./strings/moonpie/user";
 import { osuBeatmapRequests } from "./strings/osu/beatmapRequest";
 import { osuCommandReply } from "./strings/osu/commandReply";
+import { osuCommands } from "./strings/osu/commands";
 import { spotifyCommandReply } from "./strings/spotify/commandReply";
 // Type imports
 import type { Logger } from "winston";
@@ -72,6 +73,7 @@ export const defaultStringMap: StringMap = new Map([
     ...moonpieUser,
     ...osuBeatmapRequests,
     ...osuCommandReply,
+    ...osuCommands,
     ...spotifyCommandReply
   ),
 ]);

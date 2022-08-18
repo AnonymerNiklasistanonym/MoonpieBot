@@ -7,6 +7,7 @@ import {
   moonpieCommandsAbout,
   moonpieCommandsAdd,
   moonpieCommandsClaim,
+  moonpieCommandsCommands,
   moonpieCommandsDelete,
   moonpieCommandsGet,
   moonpieCommandsLeaderboard,
@@ -47,30 +48,40 @@ export const commandCommands: TwitchChatCommandHandler<
   ) => {
     const commandsStringIds = [];
 
-    if (data.enabledCommands.includes(MoonpieCommands.CLAIM)) {
-      commandsStringIds.push(moonpieCommandsClaim.id);
-    }
-    if (data.enabledCommands.includes(MoonpieCommands.LEADERBOARD)) {
-      commandsStringIds.push(moonpieCommandsLeaderboard.id);
-    }
-    if (data.enabledCommands.includes(MoonpieCommands.GET)) {
-      commandsStringIds.push(moonpieCommandsGet.id);
-    }
-    if (data.enabledCommands.includes(MoonpieCommands.SET)) {
-      commandsStringIds.push(moonpieCommandsSet.id);
-    }
-    if (data.enabledCommands.includes(MoonpieCommands.ADD)) {
-      commandsStringIds.push(moonpieCommandsAdd.id);
-    }
-    if (data.enabledCommands.includes(MoonpieCommands.REMOVE)) {
-      commandsStringIds.push(moonpieCommandsRemove.id);
-    }
-    if (data.enabledCommands.includes(MoonpieCommands.DELETE)) {
-      commandsStringIds.push(moonpieCommandsDelete.id);
-    }
-    if (data.enabledCommands.includes(MoonpieCommands.ABOUT)) {
-      commandsStringIds.push(moonpieCommandsAbout.id);
-    }
+    Object.values(MoonpieCommands).forEach((command) => {
+      if (!data.enabledCommands.includes(command)) {
+        return;
+      }
+      switch (command) {
+        case MoonpieCommands.CLAIM:
+          commandsStringIds.push(moonpieCommandsClaim.id);
+          break;
+        case MoonpieCommands.COMMANDS:
+          commandsStringIds.push(moonpieCommandsCommands.id);
+          break;
+        case MoonpieCommands.LEADERBOARD:
+          commandsStringIds.push(moonpieCommandsLeaderboard.id);
+          break;
+        case MoonpieCommands.GET:
+          commandsStringIds.push(moonpieCommandsGet.id);
+          break;
+        case MoonpieCommands.SET:
+          commandsStringIds.push(moonpieCommandsSet.id);
+          break;
+        case MoonpieCommands.ADD:
+          commandsStringIds.push(moonpieCommandsAdd.id);
+          break;
+        case MoonpieCommands.REMOVE:
+          commandsStringIds.push(moonpieCommandsRemove.id);
+          break;
+        case MoonpieCommands.DELETE:
+          commandsStringIds.push(moonpieCommandsDelete.id);
+          break;
+        case MoonpieCommands.ABOUT:
+          commandsStringIds.push(moonpieCommandsAbout.id);
+          break;
+      }
+    });
 
     if (commandsStringIds.length === 0) {
       commandsStringIds.push(moonpieCommandsNone.id);

@@ -7,6 +7,10 @@ import type { StringEntry } from "../../strings";
 
 const MOONPIE_COMMANDS_STRING_ID = `${MOONPIE_STRING_ID}_COMMANDS`;
 
+export const moonpieCommandsCommands: StringEntry = {
+  default: createMessageForMessageParser(["!moonpie commands"], true),
+  id: `${MOONPIE_COMMANDS_STRING_ID}_COMMANDS`,
+};
 export const moonpieCommandsClaim: StringEntry = {
   default: createMessageForMessageParser(
     ["!moonpie [claim one moonpie per day]"],
@@ -16,14 +20,14 @@ export const moonpieCommandsClaim: StringEntry = {
 };
 export const moonpieCommandsLeaderboard: StringEntry = {
   default: createMessageForMessageParser(
-    ["!moonpie leaderboard ($STARTING_RANK) [get the top moonpie holder]"],
+    ["!moonpie leaderboard ($STARTING_RANK)"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_LEADERBOARD`,
 };
 export const moonpieCommandsGet: StringEntry = {
   default: createMessageForMessageParser(
-    ["!moonpie get $USER [get the moonpie count of a user]"],
+    ["!moonpie get $USER [get moonpies of a user]"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_GET`,
@@ -57,10 +61,7 @@ export const moonpieCommandsDelete: StringEntry = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_DELETE`,
 };
 export const moonpieCommandsAbout: StringEntry = {
-  default: createMessageForMessageParser(
-    ["!moonpie about [get version]"],
-    true
-  ),
+  default: createMessageForMessageParser(["!moonpie about"], true),
   id: `${MOONPIE_COMMANDS_STRING_ID}_ABOUT`,
 };
 export const moonpieCommandsNone: StringEntry = {
@@ -81,6 +82,7 @@ export const moonpieCommandsPrefix: StringEntry = {
 
 export const moonpieCommands: StringEntry[] = [
   moonpieCommandsClaim,
+  moonpieCommandsCommands,
   moonpieCommandsLeaderboard,
   moonpieCommandsGet,
   moonpieCommandsSet,

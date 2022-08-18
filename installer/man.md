@@ -72,9 +72,9 @@ Supported list values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", 
 **MOONPIE_CONFIG_MOONPIE_CLAIM_COOLDOWN_HOURS**="*18*"
 : The number of hours for which a user is unable to claim a Moonpie after claiming one (less than 24 in case of daily streams).
 
-**MOONPIE_CONFIG_OSU_ENABLE_COMMANDS**="*np,pp,requests,rp,score*"
+**MOONPIE_CONFIG_OSU_ENABLE_COMMANDS**="*commands,np,pp,requests,rp,score*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!
-Supported list values: "*np*", "*pp*", "*requests*", "*rp*", "*score*" (empty list value: "*none*")
+Supported list values: "*commands*", "*np*", "*pp*", "*requests*", "*rp*", "*score*" (empty list value: "*none*")
 
 **MOONPIE_CONFIG_OSU_API_CLIENT_ID**
 : The osu! client ID (and client secret) to use the osu! api v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).
