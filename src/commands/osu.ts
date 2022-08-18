@@ -133,7 +133,6 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         {
           ...data,
           beatmapRequestsInfo: globalBeatmapRequestObject,
-          beatmapRequestsOn: globalBeatmapRequestObject.beatmapRequestsOn,
         },
         globalStrings,
         globalPlugins,

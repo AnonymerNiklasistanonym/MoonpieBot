@@ -75,7 +75,7 @@ export type CommandBeatmapDetectorInput =
   CommandGenericDetectorInputEnabledCommands;
 export interface CommandBeatmapDetectorInputExtra
   extends CommandBeatmapDetectorInput {
-  beatmapRequestsOn: boolean;
+  enableOsuBeatmapRequests?: boolean;
 }
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
@@ -253,7 +253,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
     return commandReplies;
   },
   detect: (_tags, message, data) => {
-    if (!data.beatmapRequestsOn) {
+    if (!data.enableOsuBeatmapRequests) {
       return false;
     }
     if (!message.match(regexOsuBeatmapUrlMatcher)) {
