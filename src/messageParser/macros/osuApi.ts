@@ -87,10 +87,10 @@ export const macroOsuBeatmap: MessageParserMacroGenerator<MacroOsuBeatmapData> =
           let macroValue;
           switch (macroId) {
             case MacroOsuBeatmap.ACC:
-              macroValue = roundNumber(data.beatmap.accuracy, 2);
+              macroValue = roundNumber(data.beatmap.accuracy, 1);
               break;
             case MacroOsuBeatmap.AR:
-              macroValue = roundNumber(data.beatmap.ar, 2);
+              macroValue = roundNumber(data.beatmap.ar, 1);
               break;
             case MacroOsuBeatmap.ARTIST:
               macroValue = data.beatmap.beatmapset?.artist;
@@ -105,13 +105,13 @@ export const macroOsuBeatmap: MessageParserMacroGenerator<MacroOsuBeatmapData> =
               macroValue = data.beatmap.beatmapset?.creator;
               break;
             case MacroOsuBeatmap.CS:
-              macroValue = roundNumber(data.beatmap.cs, 2);
+              macroValue = roundNumber(data.beatmap.cs, 1);
               break;
             case MacroOsuBeatmap.DIFFICULTY_RATING:
-              macroValue = roundNumber(data.beatmap.difficulty_rating * 100, 2);
+              macroValue = roundNumber(data.beatmap.difficulty_rating, 1);
               break;
             case MacroOsuBeatmap.DRAIN:
-              macroValue = roundNumber(data.beatmap.drain, 2);
+              macroValue = roundNumber(data.beatmap.drain, 1);
               break;
             case MacroOsuBeatmap.ID:
               macroValue = data.beatmap.id;
@@ -211,7 +211,7 @@ export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
         let macroValue;
         switch (macroId) {
           case MacroOsuScore.ACC:
-            macroValue = roundNumber(score.accuracy * 100, 2);
+            macroValue = roundNumber(score.accuracy * 100, 1);
             break;
           case MacroOsuScore.ARTIST:
             macroValue = score.beatmapset?.artist;
@@ -259,7 +259,7 @@ export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
             macroValue = score.passed;
             break;
           case MacroOsuScore.PP:
-            macroValue = roundNumber(score.pp, 2);
+            macroValue = roundNumber(score.pp, 1);
             break;
           case MacroOsuScore.RANK:
             macroValue = score.rank;
@@ -386,7 +386,7 @@ export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRec
             macroValue = data.score.passed;
             break;
           case MacroOsuMostRecentPlay.PP:
-            macroValue = roundNumber(data.score.pp, 2);
+            macroValue = roundNumber(data.score.pp, 1);
             break;
           case MacroOsuMostRecentPlay.RANK:
             macroValue = data.score.rank;
@@ -484,7 +484,7 @@ export const macroOsuUser: MessageParserMacroGenerator<MacroOsuUserData> = {
       switch (macroId) {
         case MacroOsuUser.ACC:
           if (data.user.statistics) {
-            macroValue = roundNumber(data.user.statistics.hit_accuracy, 2);
+            macroValue = roundNumber(data.user.statistics.hit_accuracy, 1);
           }
           break;
         case MacroOsuUser.COUNTRY:
@@ -543,7 +543,7 @@ export const macroOsuUser: MessageParserMacroGenerator<MacroOsuUserData> = {
           break;
         case MacroOsuUser.PP:
           if (data.user.statistics) {
-            macroValue = roundNumber(data.user.statistics.pp, 2);
+            macroValue = roundNumber(data.user.statistics.pp, 1);
           }
           break;
       }
