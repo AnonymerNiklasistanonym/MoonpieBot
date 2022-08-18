@@ -38,7 +38,8 @@
         "prebuild": "rimraf ./dist/*",
         "start:dev": "cross-env NODE_PATH=./dist NODE_ENV=production node .",
         "start": "node .",
-        "test": "cross-env NODE_PATH=. nyc mocha -- \"test/**/*.test.ts\""
+        "test": "cross-env NODE_PATH=. nyc mocha -- \"test/**/*.test.ts\"",
+        "test:custom": "mocha -- "
     },
     "repository": {
         "type": "git",

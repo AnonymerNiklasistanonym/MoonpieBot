@@ -6,6 +6,7 @@ import { expect } from "chai";
 import {
   regexMoonpieChatHandlerCommandAbout,
   regexMoonpieChatHandlerCommandClaim,
+  regexMoonpieChatHandlerCommandCommands,
   regexMoonpieChatHandlerCommandLeaderboard,
   regexMoonpieChatHandlerCommandUserAdd,
   regexMoonpieChatHandlerCommandUserDelete,
@@ -14,10 +15,13 @@ import {
   regexMoonpieChatHandlerCommandUserSet,
   regexOsuBeatmapUrlMatcher,
   regexOsuBeatmapUrlSplitter,
+  regexOsuChatHandlerCommandCommands,
   regexOsuChatHandlerCommandNp,
   regexOsuChatHandlerCommandPp,
+  regexOsuChatHandlerCommandRequests,
   regexOsuChatHandlerCommandRp,
   regexOsuWindowTitleNowPlaying,
+  regexSpotifyChatHandlerCommandSong,
 } from "../../src/info/regex";
 
 interface RegexTestElement<TEST_TYPE = string[]> {
@@ -84,7 +88,7 @@ describe("regex", () => {
         (a) => a
       );
     });
-    it("!moonpie about/leaderboard", () => {
+    it("!moonpie about/commands/leaderboard", () => {
       const testSetMoonpieAbout: RegexTestElement[] = [
         { expected: null, input: "!monpie" },
         { expected: null, input: "!moonpieabout" },
@@ -110,6 +114,14 @@ describe("regex", () => {
           input: a.input.replace(/about/g, "leaderboard"),
         })),
         regexMoonpieChatHandlerCommandLeaderboard,
+        (a) => a
+      );
+      checkRegexTestElements(
+        testSetMoonpieAbout.map((a) => ({
+          ...a,
+          input: a.input.replace(/about/g, "commands"),
+        })),
+        regexMoonpieChatHandlerCommandCommands,
         (a) => a
       );
     });
@@ -312,7 +324,7 @@ describe("regex", () => {
   });
 
   context("osu! commands", () => {
-    it("!np/!pp/!rp", () => {
+    it("!np/!pp/!rp/!commands/!osuRequests", () => {
       const testSetOsuNp: RegexTestElement[] = [
         { expected: null, input: "!n" },
         { expected: null, input: "!npmessage" },
@@ -344,6 +356,52 @@ describe("regex", () => {
         })),
         regexOsuChatHandlerCommandRp,
         (a) => a
+      );
+      checkRegexTestElements(
+        testSetOsuNp.map((a) => ({
+          ...a,
+          input: a.input.replace(/np/g, "osu commands"),
+        })),
+        regexOsuChatHandlerCommandCommands,
+        (a) => a
+      );
+      checkRegexTestElements(
+        testSetOsuNp.map((a) => ({
+          ...a,
+          input: a.input.replace(/np/g, "osuRequests"),
+        })),
+        regexOsuChatHandlerCommandRequests,
+        (a) => a
+      );
+    });
+
+    it("!osuRequest on/off custom message", () => {
+      interface OsuRequestOutput {
+        customMessage?: string;
+        off?: "off";
+        on?: "on";
+      }
+      const testSetOsuPp: RegexTestElement<OsuRequestOutput>[] = [
+        { expected: null, input: "!osuRrequests a" },
+        { expected: {}, input: "!osuRequests a" },
+        { expected: {}, input: "!osuRequests onnn" },
+        { expected: {}, input: "!osuRequests ofmessage" },
+        { expected: {}, input: "!osuRequests offf message" },
+        { expected: { on: "on" }, input: "!osuRequests on" },
+        { expected: { off: "off" }, input: "!osuRequests off" },
+        {
+          expected: { customMessage: "custom", off: "off" },
+          input: "!osuRequests off custom",
+        },
+        {
+          expected: { customMessage: "custom message", off: "off" },
+          input: "!osuRequests off custom message  ",
+        },
+      ];
+      checkRegexTestElements(
+        testSetOsuPp,
+        regexOsuChatHandlerCommandRequests,
+        (a) => [a.on, a.off, a.customMessage]
       );
     });
 
@@ -476,6 +534,27 @@ describe("regex", () => {
         "https://osu.ppy.sh/beatmaps/2587892 ",
         "https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES",
       ]);
+    });
+
+    context("spotify commands", () => {
+      it("!song", () => {
+        const testSetSpotifySong: RegexTestElement[] = [
+          { expected: null, input: "!son" },
+          { expected: null, input: "!songmessage" },
+          { expected: null, input: "a!song" },
+          { expected: null, input: "a !song" },
+          { expected: null, input: "message before !song" },
+          { expected: [], input: "!song" },
+          { expected: [], input: "  !song  " },
+          { expected: [], input: "  !song message" },
+          { expected: [], input: "  !song message after that" },
+        ];
+        checkRegexTestElements(
+          testSetSpotifySong,
+          regexSpotifyChatHandlerCommandSong,
+          (a) => a
+        );
+      });
     });
   });
 });

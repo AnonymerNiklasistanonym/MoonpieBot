@@ -10,37 +10,24 @@ export const regexMoonpieChatHandlerCommandAbout =
   /^\s*!moonpie\s+about(?:\s|$)/i;
 
 /**
- * Regex to recognize the !osuRequests enable command.
+ * Regex to recognize the !osuRequests (on|off $OPTIONAL_MESSAGE) command.
  *
+ * @example
+ * ```text
+ * !osuRequests
+ * ```
+ * @example
+ * ```text
+ * !osuRequests off $OPTIONAL_TEXT
+ * ```
  * @example
  * ```text
  * !osuRequests on
  * ```
  */
-export const regexMoonpieChatHandlerCommandRequestsOn =
-  /^\s*!osuRequests\s+on(?:\s|$)/i;
-
-/**
- * Regex to recognize the !osuRequests disable command.
- *
- * @example
- * ```text
- * !osuRequests off $OPTIONAL_TEXT
- * ```
- */
-export const regexMoonpieChatHandlerCommandRequestsOff =
-  /^\s*!osuRequests\s+off(?:\s+(.*?)\s*$|\s|$)/i;
-
-/**
- * Regex to recognize the !osuRequests command.
- *
- * @example
- * ```text
- * !osuRequests $OPTIONAL_TEXT
- * ```
- */
-export const regexMoonpieChatHandlerCommandRequests =
-  /^\s*!osuRequests(?:\s|$)/i;
+export const regexOsuChatHandlerCommandRequests =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!osuRequests(?:\s+(on)(?:\s|$)|\s+(off)(?:\s+(.*?)\s*$|\s|$)?(?:\s|$)|\s|$)/i;
 
 /**
  * Regex to recognize the `!moonpie` command.
@@ -152,6 +139,17 @@ export const regexMoonpieChatHandlerCommandUserRemove =
  */
 export const regexMoonpieChatHandlerCommandUserDelete =
   /^\s*!moonpie\s+delete\s+(\S+)(?:\s|$)/i;
+
+/**
+ * Regex to recognize the `!osu commands` command.
+ *
+ * @example
+ * ```text
+ * !osu commands
+ * ```
+ */
+export const regexOsuChatHandlerCommandCommands =
+  /^\s*!osu\s+commands(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!np` command.

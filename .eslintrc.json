@@ -57,7 +57,7 @@
     ],
     "no-lonely-if": "error",
     "no-magic-numbers": ["error", {
-      "ignore": [-1,0,1,2,10,24,60,365,100,1000]
+      "ignore": [-1,0,1,2,3,4,5,10,24,60,365,100,1000]
     }],
     "no-underscore-dangle": "error",
     "jsdoc/require-param-type": "off",

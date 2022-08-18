@@ -15,14 +15,10 @@ import {
   parseTwitchBadgeLevel,
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
-import {
-  regexMoonpieChatHandlerCommandRequests,
-  regexMoonpieChatHandlerCommandRequestsOff,
-  regexMoonpieChatHandlerCommandRequestsOn,
-} from "../../info/regex";
 import { BeatmapRequestsInfo } from "../osu";
 import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
+import { regexOsuChatHandlerCommandRequests } from "../../info/regex";
 // Type imports
 import type { EMPTY_OBJECT } from "../../info/other";
 import type { TwitchChatCommandHandler } from "../../twitch";
@@ -160,27 +156,23 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
     if (!data.enabledCommands.includes(OsuCommands.REQUESTS)) {
       return false;
     }
-    const matchEnable = message.match(regexMoonpieChatHandlerCommandRequestsOn);
-    if (matchEnable) {
+    const match = message.match(regexOsuChatHandlerCommandRequests);
+    if (match && match[1] !== undefined) {
       return {
         data: {
           beatmapRequestsType: BeatmapRequestsType.TURN_ON,
         },
       };
     }
-    const matchDisable = message.match(
-      regexMoonpieChatHandlerCommandRequestsOff
-    );
-    if (matchDisable) {
+    if (match && match[2] !== undefined) {
       return {
         data: {
-          beatmapRequestsOffMessage: matchDisable[1],
+          beatmapRequestsOffMessage: match[3],
           beatmapRequestsType: BeatmapRequestsType.TURN_OFF,
         },
       };
     }
-    const matchStatus = message.match(regexMoonpieChatHandlerCommandRequests);
-    if (matchStatus) {
+    if (match) {
       return {
         data: {
           beatmapRequestsType: BeatmapRequestsType.INFO,

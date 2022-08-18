@@ -273,7 +273,6 @@ export const commandBeatmap: TwitchChatCommandHandler<
         }
         const beatmapId =
           match[1] !== undefined ? parseInt(match[1]) : parseInt(match[2]);
-        // eslint-disable-next-line no-magic-numbers
         const comment: string | undefined = match[3] ? match[3] : undefined;
         return { beatmapId, comment };
       })

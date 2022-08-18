@@ -192,7 +192,6 @@ export const commandNp: TwitchChatCommandHandler<
                 const diffNameCanBeFound = a.beatmaps?.find(
                   (b) =>
                     b.version.trim().toLocaleLowerCase() ===
-                    // eslint-disable-next-line no-magic-numbers
                     match[3].trim().toLocaleLowerCase()
                 );
                 return titleIsTheSame && diffNameCanBeFound;
@@ -201,7 +200,6 @@ export const commandNp: TwitchChatCommandHandler<
                 const exactBeatmapDiff = exactMatch.beatmaps?.find(
                   (a) =>
                     a.version.trim().toLocaleLowerCase() ===
-                    // eslint-disable-next-line no-magic-numbers
                     match[3].trim().toLocaleLowerCase()
                 );
                 if (exactBeatmapDiff) {
@@ -221,7 +219,6 @@ export const commandNp: TwitchChatCommandHandler<
                 artist: match[1],
                 mapId,
                 title: match[2],
-                // eslint-disable-next-line no-magic-numbers
                 version: match[3],
               })
             )
