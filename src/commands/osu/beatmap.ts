@@ -15,12 +15,15 @@ import {
   osuBeatmapRequestNoRedeem,
   osuBeatmapRequestNotFound,
 } from "../../strings/osu/beatmapRequest";
+import {
+  regexOsuBeatmapUrlMatcher,
+  regexOsuBeatmapUrlSplitter,
+} from "../../info/regex";
 import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { macroOsuBeatmap } from "../../messageParser/macros/osuApi";
 import { messageParserById } from "../../messageParser";
-import { regexOsuBeatmapUrlMatcher } from "../../info/regex";
 import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
 import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
@@ -260,10 +263,9 @@ export const commandBeatmap: TwitchChatCommandHandler<
       // Ignore map replies
       return false;
     }
-    const osuBeatmapUrlBegin = "https://osu.ppy.sh/beatmaps";
-    const beatmapRequests: BeatmapRequest[] = message
-      .split(osuBeatmapUrlBegin)
-      .map((a) => `${osuBeatmapUrlBegin}${a}`)
+    const beatmapRequests: BeatmapRequest[] = regexOsuBeatmapUrlSplitter(
+      message
+    )
       .map((a) => {
         const match = a.match(regexOsuBeatmapUrlMatcher);
         if (!match) {

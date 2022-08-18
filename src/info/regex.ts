@@ -237,7 +237,10 @@ export const regexOsuChatHandlerCommandScore = /^\s*!score\s+(\S+)(?:\s|$)/i;
  */
 export const regexOsuBeatmapUrlMatcher =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+\/?#\S+\/(\d+))(?:\s+(.+?)\s*$)?/i;
+  /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+\/?#\S+\/(\d+))(?:\s+(\S.*?)\s*$)?/i;
+
+export const regexOsuBeatmapUrlSplitter = (message: string): string[] =>
+  message.split(/(?=https?:\/\/osu\.ppy\.sh\/beatmaps)/);
 
 export const regexOsuBeatmapDownloadUrlMatcher =
   /https?:\/\/osu\.ppy\.sh\/b\/(\d+)/;
