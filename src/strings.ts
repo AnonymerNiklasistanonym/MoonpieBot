@@ -12,6 +12,7 @@ import { osuBeatmapRequests } from "./strings/osu/beatmapRequest";
 import { osuCommandReply } from "./strings/osu/commandReply";
 import { osuCommands } from "./strings/osu/commands";
 import { spotifyCommandReply } from "./strings/spotify/commandReply";
+import { spotifyCommands } from "./strings/spotify/commands";
 // Type imports
 import type { Logger } from "winston";
 
@@ -74,7 +75,8 @@ export const defaultStringMap: StringMap = new Map([
     ...osuBeatmapRequests,
     ...osuCommandReply,
     ...osuCommands,
-    ...spotifyCommandReply
+    ...spotifyCommandReply,
+    ...spotifyCommands
   ),
 ]);
 
@@ -117,7 +119,7 @@ export const updateStringsMapWithCustomEnvStrings = (
       if (envValue !== undefined && envValue.trim().length > 0) {
         strings.set(key.slice(ENV_STRINGS_VARIABLE_PREFIX.length), envValue);
         foundCustomNonDefaultStringsCounter++;
-        logStrings.info(`Found non-default custom string: ${key}=${envValue}`);
+        logStrings.debug(`Found non-default custom string: ${key}=${envValue}`);
       }
     }
   });

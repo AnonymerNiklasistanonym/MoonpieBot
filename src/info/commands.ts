@@ -12,6 +12,7 @@ export enum OsuCommands {
 export const LOG_ID_CHAT_HANDLER_SPOTIFY = "spotify_chat_handler";
 
 export enum SpotifyCommands {
+  COMMANDS = "commands",
   SONG = "song",
 }
 

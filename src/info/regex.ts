@@ -55,6 +55,17 @@ export const regexMoonpieChatHandlerCommandCommands =
   /^\s*!moonpie\s+commands(?:\s|$)/i;
 
 /**
+ * Regex to recognize the `!spotify commands` command.
+ *
+ * @example
+ * ```text
+ * !spotify commands
+ * ```
+ */
+export const regexSpotifyChatHandlerCommandCommands =
+  /^\s*!spotify\s+commands(?:\s|$)/i;
+
+/**
  * Regex to recognize the `!moonpie leaderboard` command.
  *
  * - The first group is the optional rank.

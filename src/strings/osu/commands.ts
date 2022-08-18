@@ -70,7 +70,7 @@ export const osuCommandsPrefix: StringEntry = {
     [
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
-      " The following osu commands are supported: ",
+      " The following osu! commands are supported: ",
     ],
     true
   ),

@@ -73,7 +73,7 @@ export const moonpieCommandsPrefix: StringEntry = {
     [
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
-      " The following moonpie commands are supported: ",
+      " The following Moonpie commands are supported: ",
     ],
     true
   ),

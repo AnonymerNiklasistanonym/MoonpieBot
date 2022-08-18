@@ -21,6 +21,7 @@ import {
   regexOsuChatHandlerCommandRequests,
   regexOsuChatHandlerCommandRp,
   regexOsuWindowTitleNowPlaying,
+  regexSpotifyChatHandlerCommandCommands,
   regexSpotifyChatHandlerCommandSong,
 } from "../../src/info/regex";
 
@@ -535,26 +536,33 @@ describe("regex", () => {
         "https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES",
       ]);
     });
-
-    context("spotify commands", () => {
-      it("!song", () => {
-        const testSetSpotifySong: RegexTestElement[] = [
-          { expected: null, input: "!son" },
-          { expected: null, input: "!songmessage" },
-          { expected: null, input: "a!song" },
-          { expected: null, input: "a !song" },
-          { expected: null, input: "message before !song" },
-          { expected: [], input: "!song" },
-          { expected: [], input: "  !song  " },
-          { expected: [], input: "  !song message" },
-          { expected: [], input: "  !song message after that" },
-        ];
-        checkRegexTestElements(
-          testSetSpotifySong,
-          regexSpotifyChatHandlerCommandSong,
-          (a) => a
-        );
-      });
+  });
+  context("spotify commands", () => {
+    it("!song/!spotify commands", () => {
+      const testSetSpotifySong: RegexTestElement[] = [
+        { expected: null, input: "!son" },
+        { expected: null, input: "!songmessage" },
+        { expected: null, input: "a!song" },
+        { expected: null, input: "a !song" },
+        { expected: null, input: "message before !song" },
+        { expected: [], input: "!song" },
+        { expected: [], input: "  !song  " },
+        { expected: [], input: "  !song message" },
+        { expected: [], input: "  !song message after that" },
+      ];
+      checkRegexTestElements(
+        testSetSpotifySong,
+        regexSpotifyChatHandlerCommandSong,
+        (a) => a
+      );
+      checkRegexTestElements(
+        testSetSpotifySong.map((a) => ({
+          ...a,
+          input: a.input.replace(/song/g, "spotify commands"),
+        })),
+        regexSpotifyChatHandlerCommandCommands,
+        (a) => a
+      );
     });
   });
 });

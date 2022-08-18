@@ -120,9 +120,9 @@ Example: "*localhost:20727*"
 : osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance to always get the currently being played beatmap and used mods. You can configure the details via the integrated message parser but since it uses the output of StreamCompanion you can just configure it in there. Go to the section 'Output Patterns' and then edit the used rows (like 'np_all'). You can also change the 'Save event' of a row like for the current mods so the mods will be live updated even if no song is played. (If OSU_STREAM_COMPANION_URL is provided this interface will not be used)
 Example: "*C:\Program Files (x86)\StreamCompanion\Files*"
 
-**MOONPIE_CONFIG_SPOTIFY_ENABLE_COMMANDS**="*song*"
+**MOONPIE_CONFIG_SPOTIFY_ENABLE_COMMANDS**="*commands,song*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide Spotify API credentials the commands won't be enabled!
-Supported list values: "*song*" (empty list value: "*none*")
+Supported list values: "*commands*", "*song*" (empty list value: "*none*")
 
 **MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID**
 : Provide client id/secret to enable Twitch api calls in commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application).
