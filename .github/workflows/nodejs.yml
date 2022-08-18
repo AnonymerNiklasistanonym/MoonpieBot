@@ -71,11 +71,7 @@ jobs:
       run: npm run docs
       continue-on-error: true
     - name: Run other scripts that create project related files
-      run: |
-        npm run create:envExamples
-        npm run create:jsonSchemas
-        npm run create:manPage
-        npm run create:windowsInstallerConfig
+      run: npm run create
     - name: Create binary release
       run: npm run package:${{ matrix.os-name }}
     - name: Save binary artifact [binary]
