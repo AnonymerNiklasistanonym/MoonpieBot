@@ -12,5 +12,5 @@ export const version: Version = {
   beta: false,
   major: 1,
   minor: 0,
-  patch: 19,
+  patch: 20,
 };
