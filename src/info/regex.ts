@@ -228,28 +228,39 @@ export const regexOsuChatHandlerCommandRp =
  */
 export const regexOsuChatHandlerCommandScore = /^\s*!score\s+(\S+)(?:\s|$)/i;
 
+export const enum RegexOsuBeatmapIdFromUrl {
+  B = 1,
+  BEATMAPS = 2,
+  BEATMAPSETS = 3,
+  COMMENT = 4,
+}
 /**
  * Regex that matches osu beatmap URLs in any message.
  *
- * - The first group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmaps/$ID`.
- * - The second group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmapsets/MAPSETID#osu/$ID`.
- * - The third group is the optional comment string.
+ * - The first group is the osu beatmap ID number in the format `https://osu.ppy.sh/b/$ID`.
+ * - The second group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmaps/$ID`.
+ * - The third group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmapsets/MAPSETID#osu/$ID`.
+ * - The fourth group is the optional comment string.
  *
  * @example
  * ```text
- * $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES
+ * https://osu.ppy.sh/b/2587891 $COMMENT
  * ```
  * @example
  * ```text
- * $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587891 $OPTIONAL_TEXT_WITH_SPACES
+ * https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $COMMENT
+ * ```
+ * @example
+ * ```text
+ * https://osu.ppy.sh/beatmaps/2587891 $COMMENT
  * ```
  */
-export const regexOsuBeatmapUrlMatcher =
+export const regexOsuBeatmapIdFromUrl =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /https:\/\/osu\.ppy\.sh\/(?:beatmaps\/(\d+)|beatmapsets\/\d+\/?#\S+\/(\d+))(?:\s+(\S.*?)\s*$)?/i;
+  /https:\/\/osu\.ppy\.sh\/(?:b\/(\d+)|beatmaps\/(\d+)|beatmapsets\/\d+\/?#\S+\/(\d+))(?:\s+(\S.*?)\s*$)?/i;
 
 export const regexOsuBeatmapUrlSplitter = (message: string): string[] =>
-  message.split(/(?=https?:\/\/osu\.ppy\.sh\/beatmaps)/);
+  message.split(/(?=https?:\/\/osu\.ppy\.sh\/(?:b|beatmaps|beatmapsets)\/)/);
 
 export const regexOsuBeatmapDownloadUrlMatcher =
   /https?:\/\/osu\.ppy\.sh\/b\/(\d+)/;

@@ -13,7 +13,7 @@ import {
   regexMoonpieChatHandlerCommandUserGet,
   regexMoonpieChatHandlerCommandUserRemove,
   regexMoonpieChatHandlerCommandUserSet,
-  regexOsuBeatmapUrlMatcher,
+  regexOsuBeatmapIdFromUrl,
   regexOsuBeatmapUrlSplitter,
   regexOsuChatHandlerCommandCommands,
   regexOsuChatHandlerCommandNp,
@@ -442,6 +442,7 @@ describe("regex", () => {
 
     it("beatmap detection", () => {
       interface OsuBeatmapUrlIdOutput {
+        bId?: number;
         beatmapsId?: number;
         beatmapsetId?: number;
         comment?: string;
@@ -456,12 +457,20 @@ describe("regex", () => {
           input: "https://osi.ppy.sh/beatmaps/2587891",
         },
         {
+          expected: null,
+          input: "https://osi.ppy.sh/ba/2587891",
+        },
+        {
           expected: { beatmapsetId: 2554945 },
           input: "https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
         },
         {
-          expected: { beatmapsId: 2587891 },
-          input: "  https://osu.ppy.sh/beatmaps/2587891",
+          expected: { bId: 2587891 },
+          input: "  https://osu.ppy.sh/b/2587891",
+        },
+        {
+          expected: { beatmapsetId: 2554945 },
+          input: "https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
         },
         {
           expected: { beatmapsetId: 2554945 },
@@ -484,6 +493,10 @@ describe("regex", () => {
           input: "before https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
         },
         {
+          expected: { bId: 2554945, comment: "after" },
+          input: "  https://osu.ppy.sh/b/2554945  after",
+        },
+        {
           expected: { beatmapsId: 2587891, comment: "after" },
           input: "before https://osu.ppy.sh/beatmaps/2587891 after",
         },
@@ -491,6 +504,10 @@ describe("regex", () => {
           expected: { beatmapsetId: 2554945, comment: "after" },
           input:
             "before https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 after",
+        },
+        {
+          expected: { bId: 2554985, comment: "message after" },
+          input: "  https://osu.ppy.sh/b/2554985   message after  ",
         },
         {
           expected: { beatmapsId: 2587891, comment: "message after" },
@@ -504,8 +521,9 @@ describe("regex", () => {
       ];
       checkRegexTestElements(
         testSetOsuBeatmapUrl,
-        regexOsuBeatmapUrlMatcher,
+        regexOsuBeatmapIdFromUrl,
         (a) => [
+          toStringIfNotUndef(a.bId),
           toStringIfNotUndef(a.beatmapsId),
           toStringIfNotUndef(a.beatmapsetId),
           a.comment,
@@ -527,10 +545,11 @@ describe("regex", () => {
       ).to.be.deep.equal(["abc ", "https://osu.ppy.sh/beatmaps/2587891 abc"]);
       expect(
         regexOsuBeatmapUrlSplitter(
-          "https://osu.ppy.sh/beatmaps/2587891 https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587892 https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES"
+          "https://osu.ppy.sh/beatmaps/2587891 https://osu.ppy.sh/b/2587891 $COMMENT https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587892 https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES"
         )
       ).to.be.deep.equal([
         "https://osu.ppy.sh/beatmaps/2587891 ",
+        "https://osu.ppy.sh/b/2587891 $COMMENT ",
         "https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES ",
         "https://osu.ppy.sh/beatmaps/2587892 ",
         "https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES",
