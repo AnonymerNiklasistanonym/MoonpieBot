@@ -27,7 +27,7 @@ export const regexMoonpieChatHandlerCommandAbout =
  */
 export const regexOsuChatHandlerCommandRequests =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!osuRequests(?:\s+(on)(?:\s|$)|\s+(off)(?:\s+(.*?)\s*$|\s|$)?(?:\s|$)|\s|$)/i;
+  /^\s*!osuRequests(?:\s+(?<requestsOn>on)(?:\s|$)|\s+(?<requestsOff>off)(?:\s+(?<requestsOffMessage>.*?)\s*$|\s|$)?(?:\s|$)|\s|$)/i;
 
 /**
  * Regex to recognize the `!moonpie` command.
@@ -81,7 +81,7 @@ export const regexSpotifyChatHandlerCommandCommands =
  */
 export const regexMoonpieChatHandlerCommandLeaderboard =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!moonpie\s+leaderboard(?:\s+([0-9]+))?(?:\s|$)/i;
+  /^\s*!moonpie\s+leaderboard(?:\s+(?<startingRank>[0-9]+))?(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!moonpie get $USER` command.
@@ -94,7 +94,7 @@ export const regexMoonpieChatHandlerCommandLeaderboard =
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserGet =
-  /^\s*!moonpie\s+get\s+(\S+)(?:\s|$)/i;
+  /^\s*!moonpie\s+get\s+(?<userName>\S+)(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!moonpie set $USER $COUNT` command.
@@ -108,7 +108,7 @@ export const regexMoonpieChatHandlerCommandUserGet =
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserSet =
-  /^\s*!moonpie\s+set\s+(\S+)\s+([0-9]+)(?:\s|$)/i;
+  /^\s*!moonpie\s+set\s+(?<userName>\S+)\s+(?<moonpieCountSet>[0-9]+)(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!moonpie add $USER $COUNT` command.
@@ -122,7 +122,7 @@ export const regexMoonpieChatHandlerCommandUserSet =
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserAdd =
-  /^\s*!moonpie\s+add\s+(\S+)\s+([0-9]+)(?:\s|$)/i;
+  /^\s*!moonpie\s+add\s+(?<userName>\S+)\s+(?<moonpieCountAdd>[0-9]+)(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!moonpie remove $USER $COUNT` command.
@@ -136,7 +136,7 @@ export const regexMoonpieChatHandlerCommandUserAdd =
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserRemove =
-  /^\s*!moonpie\s+remove\s+(.*?)\s+([0-9]+)(?:\s|$)/i;
+  /^\s*!moonpie\s+remove\s+(?<userName>\S+)\s+(?<moonpieCountRemove>[0-9]+)(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!moonpie delete $USER` command.
@@ -149,7 +149,7 @@ export const regexMoonpieChatHandlerCommandUserRemove =
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserDelete =
-  /^\s*!moonpie\s+delete\s+(\S+)(?:\s|$)/i;
+  /^\s*!moonpie\s+delete\s+(?<userName>\S+)(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!osu commands` command.
@@ -192,7 +192,7 @@ export const regexOsuChatHandlerCommandNp = /^\s*!np(?:\s|$)/i;
  * ```
  */
 export const regexOsuChatHandlerCommandPp =
-  /^\s*!pp(?:\s+(?:([0-9]+)|(\S+))(?:\s|$)|\s|$)/i;
+  /^\s*!pp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i;
 
 /**
  * Regex to recognize the `!rp` command.
@@ -214,7 +214,7 @@ export const regexOsuChatHandlerCommandPp =
  * ```
  */
 export const regexOsuChatHandlerCommandRp =
-  /^\s*!rp(?:\s+(?:([0-9]+)|(\S+))(?:\s|$)|\s|$)/i;
+  /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i;
 
 /**
  * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
@@ -226,7 +226,8 @@ export const regexOsuChatHandlerCommandRp =
  * !score osuName $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
-export const regexOsuChatHandlerCommandScore = /^\s*!score\s+(\S+)(?:\s|$)/i;
+export const regexOsuChatHandlerCommandScore =
+  /^\s*!score\s+(?<osuUserName>\S+)(?:\s|$)/i;
 
 export const enum RegexOsuBeatmapIdFromUrl {
   B = 1,
@@ -257,32 +258,32 @@ export const enum RegexOsuBeatmapIdFromUrl {
  */
 export const regexOsuBeatmapIdFromUrl =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /https:\/\/osu\.ppy\.sh\/(?:b\/(\d+)|beatmaps\/(\d+)|beatmapsets\/\d+\/?#\S+\/(\d+))(?:\s+(\S.*?)\s*$)?/i;
+  /https:\/\/osu\.ppy\.sh\/(?:b\/(?<beatmapIdB>\d+)|beatmaps\/(?<beatmapIdBeatmaps>\d+)|beatmapsets\/\d+\/?#\S+\/(?<beatmapIdBeatmapsets>\d+))(?:\s+(?<comment>\S.*?)\s*$)?/i;
 
 export const regexOsuBeatmapUrlSplitter = (message: string): string[] =>
   message.split(/(?=https?:\/\/osu\.ppy\.sh\/(?:b|beatmaps|beatmapsets)\/)/);
 
 export const regexOsuBeatmapDownloadUrlMatcher =
-  /https?:\/\/osu\.ppy\.sh\/b\/(\d+)/;
+  /https?:\/\/osu\.ppy\.sh\/b\/(?<beatmapId>\d+)/;
 
 /**
  * Regex to parse the now playing window title on Windows.
  *
  * - The first capture group is the artist.
  * - The second group is the title.
- * - The third group is the name of the difficulty.
+ * - The third group is the name of the version.
  *
  * @example
  * ```text
- * osu! - Artist - Title [Difficulty]
+ * osu! - Artist - Title [Version]
  * ```
  * @example
  * ```text
- * osu! - Artist - Title [TV Size] [Difficulty]
+ * osu! - Artist - Title [TV Size] [Version]
  * ```
  */
 export const regexOsuWindowTitleNowPlaying =
-  /^\S+\s+-\s+(.+?)\s+-\s+(.+?)\s+\[\s*([^[\]]+?)\s*\]$/;
+  /^\S+\s+-\s+(?<artist>.+?)\s+-\s+(?<title>.+?)\s+\[\s*(?<version>[^[\]]+?)\s*\]$/;
 
 /**
  * Regex to recognize the `!song` command.
