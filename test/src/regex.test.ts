@@ -20,6 +20,7 @@ import {
   regexOsuChatHandlerCommandPp,
   regexOsuChatHandlerCommandRequests,
   regexOsuChatHandlerCommandRp,
+  RegexOsuWindowTitleNowPlaying,
   regexOsuWindowTitleNowPlaying,
   regexSpotifyChatHandlerCommandCommands,
   regexSpotifyChatHandlerCommandSong,
@@ -323,60 +324,56 @@ describe("regex", () => {
 
   context("osu! internal", () => {
     it("osu window title (!np)", () => {
-      interface OsuWindowTitleOutput {
-        artist: string;
-        title: string;
-        version: string;
-      }
-      const testSetOsuWindowTitle: RegexTestElement<OsuWindowTitleOutput>[] = [
-        {
-          expected: null,
-          input: "osu! - Artist Title [Difficulty]",
-        },
-        {
-          expected: null,
-          input: "osu! - Artist - Title",
-        },
-        {
-          expected: null,
-          input: "osu! - Artist [Difficulty]",
-        },
-        {
-          expected: {
-            artist: "Sarah Connor",
-            title: "Cold As Ice (PH Electro Remix) (Nightcore Mix)",
-            version: "Freezing",
+      const testSetOsuWindowTitle: RegexTestElement<RegexOsuWindowTitleNowPlaying>[] =
+        [
+          {
+            expected: null,
+            input: "osu! - Artist Title [Difficulty]",
           },
-          input:
-            "osu!  - Sarah Connor - Cold As Ice (PH Electro Remix) (Nightcore Mix) [Freezing]",
-        },
-        {
-          expected: {
-            artist: "sasakure.UK",
-            title: "SeventH-HeaveN feat. Hatsune Miku",
-            version: "Easy",
+          {
+            expected: null,
+            input: "osu! - Artist - Title",
           },
-          input:
-            "osu!  - sasakure.UK - SeventH-HeaveN feat. Hatsune Miku [Easy]",
-        },
-        {
-          expected: {
-            artist: "-45",
-            title: "Midorigo Queen Bee",
-            version: "Normal",
+          {
+            expected: null,
+            input: "osu! - Artist [Difficulty]",
           },
-          input: "osu!  - -45 - Midorigo Queen Bee [Normal]",
-        },
-        {
-          expected: {
-            artist: "DJ S3RL",
-            title: "T-T-Techno (feat. Jesskah)",
-            version: "Normal",
+          {
+            expected: {
+              artist: "Sarah Connor",
+              title: "Cold As Ice (PH Electro Remix) (Nightcore Mix)",
+              version: "Freezing",
+            },
+            input:
+              "osu!  - Sarah Connor - Cold As Ice (PH Electro Remix) (Nightcore Mix) [Freezing]",
           },
-          input: "osu!  - DJ S3RL - T-T-Techno (feat. Jesskah) [Normal]",
-        },
-      ];
-      checkRegexTestElements(
+          {
+            expected: {
+              artist: "sasakure.UK",
+              title: "SeventH-HeaveN feat. Hatsune Miku",
+              version: "Easy",
+            },
+            input:
+              "osu!  - sasakure.UK - SeventH-HeaveN feat. Hatsune Miku [Easy]",
+          },
+          {
+            expected: {
+              artist: "-45",
+              title: "Midorigo Queen Bee",
+              version: "Normal",
+            },
+            input: "osu!  - -45 - Midorigo Queen Bee [Normal]",
+          },
+          {
+            expected: {
+              artist: "DJ S3RL",
+              title: "T-T-Techno (feat. Jesskah)",
+              version: "Normal",
+            },
+            input: "osu!  - DJ S3RL - T-T-Techno (feat. Jesskah) [Normal]",
+          },
+        ];
+      checkRegexTestElements<RegexOsuWindowTitleNowPlaying>(
         testSetOsuWindowTitle,
         regexOsuWindowTitleNowPlaying,
         (a) => (a === undefined ? [] : [a.artist, a.title, a.version])

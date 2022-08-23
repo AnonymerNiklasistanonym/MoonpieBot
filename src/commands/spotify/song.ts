@@ -61,10 +61,10 @@ export const commandSong: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexSpotifyChatHandlerCommandSong)) {
+    if (!data.enabledCommands.includes(SpotifyCommands.SONG)) {
       return false;
     }
-    if (!data.enabledCommands.includes(SpotifyCommands.SONG)) {
+    if (!message.match(regexSpotifyChatHandlerCommandSong)) {
       return false;
     }
     return { data: {} };

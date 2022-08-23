@@ -251,7 +251,7 @@ export const regexOsuChatHandlerCommandRp =
   /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandScore {
-  osuUserName?: string;
+  osuUserName: string;
 }
 /**
  * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
@@ -303,6 +303,12 @@ export const regexOsuBeatmapUrlSplitter = (message: string): string[] =>
 export const regexOsuBeatmapDownloadUrlMatcher =
   /https?:\/\/osu\.ppy\.sh\/b\/(?<beatmapId>\d+)/;
 
+// TODO Add tests
+export interface RegexOsuWindowTitleNowPlaying {
+  artist: string;
+  title: string;
+  version: string;
+}
 /**
  * Regex to parse the now playing window title on Windows.
  *

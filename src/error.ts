@@ -37,14 +37,6 @@ export const errorMessageUserIdUndefined = (): ErrorWithCode => {
   return error;
 };
 
-export const errorMessageEnabledCommandsUndefined = (): ErrorWithCode => {
-  const error: ErrorWithCode = Error(
-    "Unable to detect message! (enabled commands is undefined)"
-  );
-  error.code = ErrorWithCodeCode.ENABLED_COMMANDS_UNDEFINED;
-  return error;
-};
-
 export const errorMessageOsuApiCredentialsUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to reply to message! (osuApiV2Credentials is undefined)"

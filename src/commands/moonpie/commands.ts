@@ -114,10 +114,10 @@ export const commandCommands: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexMoonpieChatHandlerCommandCommands)) {
+    if (!data.enabledCommands.includes(MoonpieCommands.COMMANDS)) {
       return false;
     }
-    if (!data.enabledCommands.includes(MoonpieCommands.COMMANDS)) {
+    if (!message.match(regexMoonpieChatHandlerCommandCommands)) {
       return false;
     }
     return { data: {} };

@@ -132,10 +132,10 @@ export const commandCommands: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexOsuChatHandlerCommandCommands)) {
+    if (!data.enabledCommands.includes(OsuCommands.COMMANDS)) {
       return false;
     }
-    if (!data.enabledCommands.includes(OsuCommands.COMMANDS)) {
+    if (!message.match(regexOsuChatHandlerCommandCommands)) {
       return false;
     }
     return { data: {} };

@@ -13,6 +13,7 @@ import type {
   TwitchChatCommandHandler,
 } from "../../twitch";
 import type { OsuApiV2Credentials } from "../osu";
+import type { RegexOsuChatHandlerCommandPp } from "../../info/regex";
 
 export interface CommandPpRpCreateReplyInput {
   /**
@@ -115,17 +116,23 @@ export const commandPp: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
+    if (!data.enabledCommands.includes(OsuCommands.PP)) {
+      return false;
+    }
     const match = message.match(regexOsuChatHandlerCommandPp);
     if (!match) {
       return false;
     }
-    if (!data.enabledCommands.includes(OsuCommands.PP)) {
-      return false;
+    const matchGroups: undefined | RegexOsuChatHandlerCommandPp = match.groups;
+    if (!matchGroups) {
+      throw Error("RegexOsuChatHandlerCommandPp groups undefined");
     }
     return {
       data: {
-        customOsuId: match[1] ? parseInt(match[1]) : undefined,
-        customOsuName: match[2],
+        customOsuId: matchGroups.osuUserId
+          ? parseInt(matchGroups.osuUserId)
+          : undefined,
+        customOsuName: matchGroups.osuUserName,
       },
     };
   },

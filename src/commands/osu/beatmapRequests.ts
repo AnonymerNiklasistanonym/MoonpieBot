@@ -16,11 +16,11 @@ import {
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
 import { BeatmapRequestsInfo } from "../osu";
-import { errorMessageEnabledCommandsUndefined } from "../../error";
 import { messageParserById } from "../../messageParser";
 import { regexOsuChatHandlerCommandRequests } from "../../info/regex";
 // Type imports
 import type { EMPTY_OBJECT } from "../../info/other";
+import type { RegexOsuChatHandlerCommandRequests } from "../../info/regex";
 import type { TwitchChatCommandHandler } from "../../twitch";
 
 export type CommandBeatmapRequestsCreateReplyInput = EMPTY_OBJECT;
@@ -150,36 +150,38 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (data.enabledCommands === undefined) {
-      throw errorMessageEnabledCommandsUndefined();
-    }
     if (!data.enabledCommands.includes(OsuCommands.REQUESTS)) {
       return false;
     }
     const match = message.match(regexOsuChatHandlerCommandRequests);
-    if (match && match[1] !== undefined) {
+    if (!match) {
+      return false;
+    }
+    const matchGroups: undefined | RegexOsuChatHandlerCommandRequests =
+      match.groups;
+    if (!matchGroups) {
+      throw Error("RegexOsuChatHandlerCommandRequests groups undefined");
+    }
+    if (matchGroups.requestsOn !== undefined) {
       return {
         data: {
           beatmapRequestsType: BeatmapRequestsType.TURN_ON,
         },
       };
     }
-    if (match && match[2] !== undefined) {
+    if (matchGroups.requestsOff !== undefined) {
       return {
         data: {
-          beatmapRequestsOffMessage: match[3],
+          beatmapRequestsOffMessage: matchGroups.requestsOffMessage,
           beatmapRequestsType: BeatmapRequestsType.TURN_OFF,
         },
       };
     }
-    if (match) {
-      return {
-        data: {
-          beatmapRequestsType: BeatmapRequestsType.INFO,
-        },
-      };
-    }
-    return false;
+    return {
+      data: {
+        beatmapRequestsType: BeatmapRequestsType.INFO,
+      },
+    };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,

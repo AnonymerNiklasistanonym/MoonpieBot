@@ -22,6 +22,7 @@ import type {
   TwitchChatCommandHandler,
 } from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
+import type { RegexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 
 const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 10;
 
@@ -120,16 +121,20 @@ export const commandLeaderboard: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
+    if (!data.enabledCommands.includes(MoonpieCommands.LEADERBOARD)) {
+      return false;
+    }
     const match = message.match(regexMoonpieChatHandlerCommandLeaderboard);
     if (!match) {
       return false;
     }
-    if (!data.enabledCommands.includes(MoonpieCommands.LEADERBOARD)) {
-      return false;
+    const matchGroups: undefined | RegexMoonpieChatHandlerCommandLeaderboard =
+      match.groups;
+    let startingRank;
+    if (matchGroups?.startingRank) {
+      startingRank = parseInt(matchGroups.startingRank);
     }
-    return {
-      data: { startingRank: match[1] ? parseInt(match[1]) : undefined },
-    };
+    return { data: { startingRank } };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,

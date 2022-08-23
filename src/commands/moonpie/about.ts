@@ -41,10 +41,10 @@ export const commandAbout: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexMoonpieChatHandlerCommandAbout)) {
+    if (!data.enabledCommands.includes(MoonpieCommands.ABOUT)) {
       return false;
     }
-    if (!data.enabledCommands.includes(MoonpieCommands.ABOUT)) {
+    if (!message.match(regexMoonpieChatHandlerCommandAbout)) {
       return false;
     }
     return { data: {} };

@@ -274,7 +274,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
         }
         const matchGroups: undefined | RegexOsuBeatmapIdFromUrl = match.groups;
         if (!matchGroups) {
-          throw Error("RegexOsuBeatmapIdFromUrl group was undefined");
+          throw Error("RegexOsuBeatmapIdFromUrl groups undefined");
         }
         let beatmapId;
         if (matchGroups.beatmapIdB !== undefined) {

@@ -27,6 +27,7 @@ import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
+import type { RegexOsuWindowTitleNowPlaying } from "../../info/regex";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 
 export interface CommandNpCreateReplyInput {
@@ -167,6 +168,12 @@ export const commandNp: TwitchChatCommandHandler<
           "Window Title"
         ].match(regexOsuWindowTitleNowPlaying);
         if (match != null) {
+          const matchGroups = match.groups as
+            | undefined
+            | RegexOsuWindowTitleNowPlaying;
+          if (!matchGroups) {
+            throw Error("RegexOsuWindowTitleNowPlaying groups undefined");
+          }
           let mapId;
           try {
             const oauthAccessToken =
@@ -177,7 +184,7 @@ export const commandNp: TwitchChatCommandHandler<
 
             const searchResult = await osuApiV2.beatmapsets.search(
               oauthAccessToken,
-              `title='${match[2]}' artist='${match[1]}'`,
+              `title='${matchGroups.title}' artist='${matchGroups.artist}'`,
               false
             );
             if (
@@ -188,11 +195,11 @@ export const commandNp: TwitchChatCommandHandler<
               const exactMatch = searchResult.beatmapsets.find((a) => {
                 const titleIsTheSame =
                   a.title.trim().toLocaleLowerCase() ===
-                  match[2].trim().toLocaleLowerCase();
+                  matchGroups.title.trim().toLocaleLowerCase();
                 const diffNameCanBeFound = a.beatmaps?.find(
                   (b) =>
                     b.version.trim().toLocaleLowerCase() ===
-                    match[3].trim().toLocaleLowerCase()
+                    matchGroups.version.trim().toLocaleLowerCase()
                 );
                 return titleIsTheSame && diffNameCanBeFound;
               });
@@ -200,7 +207,7 @@ export const commandNp: TwitchChatCommandHandler<
                 const exactBeatmapDiff = exactMatch.beatmaps?.find(
                   (a) =>
                     a.version.trim().toLocaleLowerCase() ===
-                    match[3].trim().toLocaleLowerCase()
+                    matchGroups.version.trim().toLocaleLowerCase()
                 );
                 if (exactBeatmapDiff) {
                   data.beatmapRequestsInfo.lastBeatmapId = exactBeatmapDiff.id;
@@ -216,10 +223,10 @@ export const commandNp: TwitchChatCommandHandler<
             macroOsuWindowTitle.id,
             new Map(
               macroOsuWindowTitle.generate({
-                artist: match[1],
+                artist: matchGroups.artist,
                 mapId,
-                title: match[2],
-                version: match[3],
+                title: matchGroups.title,
+                version: matchGroups.version,
               })
             )
           );
@@ -237,15 +244,14 @@ export const commandNp: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (
-      message.match(regexOsuChatHandlerCommandNp) &&
-      data.enabledCommands.includes(OsuCommands.NP)
-    ) {
-      return {
-        data: {},
-      };
+    if (!data.enabledCommands.includes(OsuCommands.NP)) {
+      return false;
     }
-    return false;
+    const match = message.match(regexOsuChatHandlerCommandNp);
+    if (!match) {
+      return false;
+    }
+    return { data: {} };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,

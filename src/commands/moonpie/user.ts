@@ -34,6 +34,13 @@ import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
+import type {
+  RegexMoonpieChatHandlerCommandUserAdd,
+  RegexMoonpieChatHandlerCommandUserDelete,
+  RegexMoonpieChatHandlerCommandUserGet,
+  RegexMoonpieChatHandlerCommandUserRemove,
+  RegexMoonpieChatHandlerCommandUserSet,
+} from "../../info/regex";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
 
 export type CommandGetCreateReplyInput = CommandGenericDataMoonpieDbPath;
@@ -127,7 +134,13 @@ export const commandGet: TwitchChatCommandHandler<
     if (!match) {
       return false;
     }
-    return { data: { userNameMoonpieDb: match[1] } };
+    const matchGroups = match.groups as
+      | undefined
+      | RegexMoonpieChatHandlerCommandUserGet;
+    if (!matchGroups) {
+      throw Error("RegexMoonpieChatHandlerCommandUserGet groups undefined");
+    }
+    return { data: { userNameMoonpieDb: matchGroups.userName } };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
@@ -284,31 +297,51 @@ export const commandSet: TwitchChatCommandHandler<
   detect: (_tags, message, data) => {
     const matchSet = message.match(regexMoonpieChatHandlerCommandUserSet);
     if (matchSet && data.enabledCommands.includes(MoonpieCommands.SET)) {
+      const matchGroups = matchSet.groups as
+        | undefined
+        | RegexMoonpieChatHandlerCommandUserSet;
+      if (!matchGroups) {
+        throw Error("RegexMoonpieChatHandlerCommandUserSet groups undefined");
+      }
       return {
         data: {
           operation: "=",
-          setCount: parseInt(matchSet[2]),
-          userNameMoonpieDb: matchSet[1],
+          setCount: parseInt(matchGroups.moonpieCountSet),
+          userNameMoonpieDb: matchGroups.userName,
         },
       };
     }
     const matchAdd = message.match(regexMoonpieChatHandlerCommandUserAdd);
     if (matchAdd && data.enabledCommands.includes(MoonpieCommands.ADD)) {
+      const matchGroups = matchAdd.groups as
+        | undefined
+        | RegexMoonpieChatHandlerCommandUserAdd;
+      if (!matchGroups) {
+        throw Error("RegexMoonpieChatHandlerCommandUserAdd groups undefined");
+      }
       return {
         data: {
           operation: "+",
-          setCount: parseInt(matchAdd[2]),
-          userNameMoonpieDb: matchAdd[1],
+          setCount: parseInt(matchGroups.moonpieCountAdd),
+          userNameMoonpieDb: matchGroups.userName,
         },
       };
     }
     const matchRemove = message.match(regexMoonpieChatHandlerCommandUserRemove);
     if (matchRemove && data.enabledCommands.includes(MoonpieCommands.REMOVE)) {
+      const matchGroups = matchRemove.groups as
+        | undefined
+        | RegexMoonpieChatHandlerCommandUserRemove;
+      if (!matchGroups) {
+        throw Error(
+          "RegexMoonpieChatHandlerCommandUserRemove groups undefined"
+        );
+      }
       return {
         data: {
           operation: "-",
-          setCount: parseInt(matchRemove[2]),
-          userNameMoonpieDb: matchRemove[1],
+          setCount: parseInt(matchGroups.moonpieCountRemove),
+          userNameMoonpieDb: matchGroups.userName,
         },
       };
     }
@@ -404,7 +437,13 @@ export const commandDelete: TwitchChatCommandHandler<
     if (!match) {
       return false;
     }
-    return { data: { userNameMoonpieDb: match[1] } };
+    const matchGroups = match.groups as
+      | undefined
+      | RegexMoonpieChatHandlerCommandUserDelete;
+    if (!matchGroups) {
+      throw Error("RegexMoonpieChatHandlerCommandUserDelete groups undefined");
+    }
+    return { data: { userNameMoonpieDb: matchGroups.userName } };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,

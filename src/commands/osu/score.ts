@@ -21,6 +21,7 @@ import type {
 } from "../../twitch";
 import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
+import type { RegexOsuChatHandlerCommandScore } from "../../info/regex";
 
 export interface CommandScoreCreateReplyInput {
   /**
@@ -148,21 +149,23 @@ export const commandScore: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexOsuChatHandlerCommandScore)) {
-      return false;
-    }
     if (!data.enabledCommands.includes(OsuCommands.SCORE)) {
       return false;
     }
-    const match = regexOsuChatHandlerCommandScore.exec(message);
+    if (!message.match(regexOsuChatHandlerCommandScore)) {
+      return false;
+    }
+    const match = message.match(regexOsuChatHandlerCommandScore);
     if (!match) {
       return false;
     }
-    return {
-      data: {
-        osuUserName: match[1],
-      },
-    };
+    const matchGroups = match.groups as
+      | undefined
+      | RegexOsuChatHandlerCommandScore;
+    if (!matchGroups) {
+      throw Error("RegexOsuChatHandlerCommandScore groups undefined");
+    }
+    return { data: { osuUserName: matchGroups.osuUserName } };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,

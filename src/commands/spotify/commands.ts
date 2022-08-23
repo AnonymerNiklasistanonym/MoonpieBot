@@ -86,10 +86,10 @@ export const commandCommands: TwitchChatCommandHandler<
     return { sentMessage };
   },
   detect: (_tags, message, data) => {
-    if (!message.match(regexSpotifyChatHandlerCommandCommands)) {
+    if (!data.enabledCommands.includes(SpotifyCommands.COMMANDS)) {
       return false;
     }
-    if (!data.enabledCommands.includes(SpotifyCommands.COMMANDS)) {
+    if (!message.match(regexSpotifyChatHandlerCommandCommands)) {
       return false;
     }
     return { data: {} };
