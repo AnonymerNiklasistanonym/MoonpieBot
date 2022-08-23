@@ -17,7 +17,7 @@ import {
 } from "../../strings/osu/beatmapRequest";
 import {
   regexOsuBeatmapIdFromUrl,
-  RegexOsuBeatmapIdFromUrl,
+  RegexOsuBeatmapIdFromUrlDEPRECATED,
   regexOsuBeatmapUrlSplitter,
 } from "../../info/regex";
 import { createLogFunc } from "../../logging";
@@ -273,19 +273,19 @@ export const commandBeatmap: TwitchChatCommandHandler<
           return;
         }
         let beatmapId;
-        if (match[RegexOsuBeatmapIdFromUrl.B] !== undefined) {
-          beatmapId = match[RegexOsuBeatmapIdFromUrl.B];
+        if (match[RegexOsuBeatmapIdFromUrlDEPRECATED.B] !== undefined) {
+          beatmapId = match[RegexOsuBeatmapIdFromUrlDEPRECATED.B];
         }
-        if (match[RegexOsuBeatmapIdFromUrl.BEATMAPS] !== undefined) {
-          beatmapId = match[RegexOsuBeatmapIdFromUrl.BEATMAPS];
+        if (match[RegexOsuBeatmapIdFromUrlDEPRECATED.BEATMAPS] !== undefined) {
+          beatmapId = match[RegexOsuBeatmapIdFromUrlDEPRECATED.BEATMAPS];
         }
-        if (match[RegexOsuBeatmapIdFromUrl.BEATMAPSETS] !== undefined) {
-          beatmapId = match[RegexOsuBeatmapIdFromUrl.BEATMAPSETS];
+        if (match[RegexOsuBeatmapIdFromUrlDEPRECATED.BEATMAPSETS] !== undefined) {
+          beatmapId = match[RegexOsuBeatmapIdFromUrlDEPRECATED.BEATMAPSETS];
         }
         if (beatmapId !== undefined) {
           return {
             beatmapId: parseInt(beatmapId),
-            comment: match[RegexOsuBeatmapIdFromUrl.COMMENT],
+            comment: match[RegexOsuBeatmapIdFromUrlDEPRECATED.COMMENT],
           };
         }
         return;

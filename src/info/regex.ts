@@ -9,6 +9,11 @@
 export const regexMoonpieChatHandlerCommandAbout =
   /^\s*!moonpie\s+about(?:\s|$)/i;
 
+export interface RegexOsuChatHandlerCommandRequests {
+  requestsOff?: "off";
+  requestsOffMessage?: string;
+  requestsOn?: "on";
+}
 /**
  * Regex to recognize the !osuRequests (on|off $OPTIONAL_MESSAGE) command.
  *
@@ -65,6 +70,9 @@ export const regexMoonpieChatHandlerCommandCommands =
 export const regexSpotifyChatHandlerCommandCommands =
   /^\s*!spotify\s+commands(?:\s|$)/i;
 
+export interface RegexMoonpieChatHandlerCommandLeaderboard {
+  startingRank?: string;
+}
 /**
  * Regex to recognize the `!moonpie leaderboard` command.
  *
@@ -83,6 +91,9 @@ export const regexMoonpieChatHandlerCommandLeaderboard =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^\s*!moonpie\s+leaderboard(?:\s+(?<startingRank>[0-9]+))?(?:\s|$)/i;
 
+export interface RegexMoonpieChatHandlerCommandUserGet {
+  userName: string;
+}
 /**
  * Regex to recognize the `!moonpie get $USER` command.
  *
@@ -96,6 +107,10 @@ export const regexMoonpieChatHandlerCommandLeaderboard =
 export const regexMoonpieChatHandlerCommandUserGet =
   /^\s*!moonpie\s+get\s+(?<userName>\S+)(?:\s|$)/i;
 
+export interface RegexMoonpieChatHandlerCommandUserSet {
+  moonpieCountSet: string;
+  userName: string;
+}
 /**
  * Regex to recognize the `!moonpie set $USER $COUNT` command.
  *
@@ -110,6 +125,10 @@ export const regexMoonpieChatHandlerCommandUserGet =
 export const regexMoonpieChatHandlerCommandUserSet =
   /^\s*!moonpie\s+set\s+(?<userName>\S+)\s+(?<moonpieCountSet>[0-9]+)(?:\s|$)/i;
 
+export interface RegexMoonpieChatHandlerCommandUserAdd {
+  moonpieCountAdd: string;
+  userName: string;
+}
 /**
  * Regex to recognize the `!moonpie add $USER $COUNT` command.
  *
@@ -124,6 +143,10 @@ export const regexMoonpieChatHandlerCommandUserSet =
 export const regexMoonpieChatHandlerCommandUserAdd =
   /^\s*!moonpie\s+add\s+(?<userName>\S+)\s+(?<moonpieCountAdd>[0-9]+)(?:\s|$)/i;
 
+export interface RegexMoonpieChatHandlerCommandUserRemove {
+  moonpieCountRemove: string;
+  userName: string;
+}
 /**
  * Regex to recognize the `!moonpie remove $USER $COUNT` command.
  *
@@ -138,6 +161,9 @@ export const regexMoonpieChatHandlerCommandUserAdd =
 export const regexMoonpieChatHandlerCommandUserRemove =
   /^\s*!moonpie\s+remove\s+(?<userName>\S+)\s+(?<moonpieCountRemove>[0-9]+)(?:\s|$)/i;
 
+export interface RegexMoonpieChatHandlerCommandUserDelete {
+  userName: string;
+}
 /**
  * Regex to recognize the `!moonpie delete $USER` command.
  *
@@ -172,6 +198,10 @@ export const regexOsuChatHandlerCommandCommands =
  */
 export const regexOsuChatHandlerCommandNp = /^\s*!np(?:\s|$)/i;
 
+export interface RegexOsuChatHandlerCommandPp {
+  osuUserId?: string;
+  osuUserName?: string;
+}
 /**
  * Regex to recognize the `!pp` command.
  *
@@ -194,6 +224,10 @@ export const regexOsuChatHandlerCommandNp = /^\s*!np(?:\s|$)/i;
 export const regexOsuChatHandlerCommandPp =
   /^\s*!pp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i;
 
+export interface RegexOsuChatHandlerCommandRp {
+  osuUserId?: string;
+  osuUserName?: string;
+}
 /**
  * Regex to recognize the `!rp` command.
  *
@@ -216,6 +250,9 @@ export const regexOsuChatHandlerCommandPp =
 export const regexOsuChatHandlerCommandRp =
   /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i;
 
+export interface RegexOsuChatHandlerCommandScore {
+  osuUserName?: string;
+}
 /**
  * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
  *
@@ -229,11 +266,17 @@ export const regexOsuChatHandlerCommandRp =
 export const regexOsuChatHandlerCommandScore =
   /^\s*!score\s+(?<osuUserName>\S+)(?:\s|$)/i;
 
-export const enum RegexOsuBeatmapIdFromUrl {
+export const enum RegexOsuBeatmapIdFromUrlDEPRECATED {
   B = 1,
   BEATMAPS = 2,
   BEATMAPSETS = 3,
   COMMENT = 4,
+}
+export interface RegexOsuBeatmapIdFromUrl {
+  beatmapIdB?: string;
+  beatmapIdBeatmaps?: string;
+  beatmapIdBeatmapsets?: string;
+  comment?: string;
 }
 /**
  * Regex that matches osu beatmap URLs in any message.

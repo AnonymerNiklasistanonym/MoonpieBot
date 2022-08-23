@@ -24,28 +24,48 @@ import {
   regexSpotifyChatHandlerCommandCommands,
   regexSpotifyChatHandlerCommandSong,
 } from "../../src/info/regex";
+// Type imports
+import type {
+  RegexMoonpieChatHandlerCommandLeaderboard,
+  RegexMoonpieChatHandlerCommandUserAdd,
+  RegexMoonpieChatHandlerCommandUserDelete,
+  RegexMoonpieChatHandlerCommandUserGet,
+  RegexMoonpieChatHandlerCommandUserRemove,
+  RegexMoonpieChatHandlerCommandUserSet,
+  RegexOsuBeatmapIdFromUrl,
+  RegexOsuChatHandlerCommandPp,
+  RegexOsuChatHandlerCommandRequests,
+  RegexOsuChatHandlerCommandRp,
+} from "../../src/info/regex";
 
-interface RegexTestElement<TEST_TYPE = string[]> {
-  expected: null | TEST_TYPE;
+interface RegexTestElement<TEST_TYPE extends object = object> {
+  /**
+   * Null if no match is expected, undefined if no capture
+   * groups exist and otherwise the named capture groups.
+   */
+  expected: null | undefined | TEST_TYPE;
   input: string;
 }
-const toStringIfNotUndef = (value: number | undefined) =>
-  value === undefined ? undefined : `${value}`;
-const undefOrValue = (value: string | undefined) =>
+const undefOrValueString = (value: string | undefined) =>
   value === undefined ? "undefined" : `"${value}"`;
-const checkRegexTestElements = <TEST_TYPE = string[]>(
+const undefOrValue = (value?: string | number | object): undefined | string =>
+  value === undefined ? undefined : value.toString();
+const checkRegexTestElements = <TEST_TYPE extends object = object>(
   testSet: RegexTestElement<TEST_TYPE>[],
   regex: RegExp,
-  getExpectedRegexGroups: (a: TEST_TYPE) => (string | undefined)[]
+  getExpectedRegexGroups: (a?: TEST_TYPE) => (string | undefined)[] = (a) =>
+    a === undefined ? [] : Object.entries(a).map(undefOrValue)
 ) => {
   for (const a of testSet) {
     const match = a.input.match(regex);
     const baseErrorMessage = `for "${a.input}" using "${regex.toString()}"`;
-    if (a.expected == null) {
+    if (a.expected === null) {
       expect(match, `No match was expected ${baseErrorMessage}`).to.be.null;
     } else {
       expect(match, `A match was expected ${baseErrorMessage}`).to.be.not.null;
-      if (match != null) {
+      if (match !== null) {
+        // Check if indices work
+        // TODO Delete after migration
         const expectedRegexGroups = getExpectedRegexGroups(a.expected);
         expect(match.length).to.be.greaterThan(
           expectedRegexGroups.length,
@@ -58,11 +78,29 @@ const checkRegexTestElements = <TEST_TYPE = string[]>(
         for (const [index, value] of expectedRegexGroups.entries()) {
           expect(match[index + 1]).to.be.equal(
             value,
-            `Unexpected regex group [${index}] value ${undefOrValue(
+            `Unexpected regex group [${index}] value ${undefOrValueString(
               value
             )} ${baseErrorMessage}`
           );
         }
+        // Check if named capture groups work
+        if (match.groups !== undefined) {
+          // Purge undefined values from the group for testing
+          Object.keys(match.groups).forEach((key) => {
+            if (match.groups === undefined) {
+              return;
+            }
+            // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-unsafe-member-access
+            if (match.groups[key] === undefined) {
+              // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-unsafe-member-access
+              delete match.groups[key];
+            }
+          });
+        }
+        expect(match.groups).to.be.deep.equal(
+          a.expected,
+          `Expected named capture groups to be equal ${baseErrorMessage}`
+        );
       }
     }
   }
@@ -78,15 +116,14 @@ describe("regex", () => {
         { expected: null, input: "moonpie" },
         { expected: null, input: "a moonpie" },
         { expected: null, input: "amoonpie" },
-        { expected: [], input: "!moonpie" },
-        { expected: [], input: "   !moonpie   " },
-        { expected: [], input: "!moonpie message" },
-        { expected: [], input: "!moonpie message after that" },
+        { expected: undefined, input: "!moonpie" },
+        { expected: undefined, input: "   !moonpie   " },
+        { expected: undefined, input: "!moonpie message" },
+        { expected: undefined, input: "!moonpie message after that" },
       ];
       checkRegexTestElements(
         testSetMoonpieClaim,
-        regexMoonpieChatHandlerCommandClaim,
-        (a) => a
+        regexMoonpieChatHandlerCommandClaim
       );
     });
     it("!moonpie about/commands/leaderboard", () => {
@@ -98,65 +135,63 @@ describe("regex", () => {
         { expected: null, input: "a moonpie about" },
         { expected: null, input: "amoonpie about" },
         { expected: null, input: "!moonpie aboutmessage" },
-        { expected: [], input: "!moonpie about" },
-        { expected: [], input: "   !moonpie about  " },
-        { expected: [], input: "   !moonpie    about  " },
-        { expected: [], input: "!moonpie about message" },
-        { expected: [], input: "!moonpie about message after that" },
+        { expected: undefined, input: "!moonpie about" },
+        { expected: undefined, input: "   !moonpie about  " },
+        { expected: undefined, input: "   !moonpie    about  " },
+        { expected: undefined, input: "!moonpie about message" },
+        { expected: undefined, input: "!moonpie about message after that" },
       ];
       checkRegexTestElements(
         testSetMoonpieAbout,
-        regexMoonpieChatHandlerCommandAbout,
-        (a) => a
+        regexMoonpieChatHandlerCommandAbout
       );
-      checkRegexTestElements(
+      checkRegexTestElements<RegexMoonpieChatHandlerCommandLeaderboard>(
         testSetMoonpieAbout.map((a) => ({
           ...a,
+          expected: a.expected === undefined ? {} : a.expected,
           input: a.input.replace(/about/g, "leaderboard"),
         })),
-        regexMoonpieChatHandlerCommandLeaderboard,
-        (a) => a
+        regexMoonpieChatHandlerCommandLeaderboard
       );
       checkRegexTestElements(
         testSetMoonpieAbout.map((a) => ({
           ...a,
           input: a.input.replace(/about/g, "commands"),
         })),
-        regexMoonpieChatHandlerCommandCommands,
-        (a) => a
+        regexMoonpieChatHandlerCommandCommands
       );
     });
     it("!moonpie leaderboard $STARTING_RANK", () => {
-      interface MoonpieLeaderboardOutput {
-        rank?: string;
-      }
-      const testSetMoonpieLeaderboard: RegexTestElement<MoonpieLeaderboardOutput>[] =
+      const testSetMoonpieLeaderboard: RegexTestElement<RegexMoonpieChatHandlerCommandLeaderboard>[] =
         [
           { expected: null, input: "!moonpie leaderboard42" },
-          { expected: { rank: "12" }, input: "!moonpie leaderboard 12" },
-          { expected: { rank: "11" }, input: "   !moonpie leaderboard  11  " },
           {
-            expected: { rank: "69" },
+            expected: { startingRank: "12" },
+            input: "!moonpie leaderboard 12",
+          },
+          {
+            expected: { startingRank: "11" },
+            input: "   !moonpie leaderboard  11  ",
+          },
+          {
+            expected: { startingRank: "69" },
             input: "!moonpie leaderboard 69 message",
           },
           {
-            expected: { rank: "42" },
+            expected: { startingRank: "42" },
             input: "!moonpie leaderboard 42 message after that",
           },
           { expected: {}, input: "!moonpie leaderboard 42message" },
         ];
-      checkRegexTestElements(
+      checkRegexTestElements<RegexMoonpieChatHandlerCommandLeaderboard>(
         testSetMoonpieLeaderboard,
         regexMoonpieChatHandlerCommandLeaderboard,
-        (a) => [a.rank]
+        (a) => (a === undefined ? [] : [a.startingRank])
       );
     });
 
     it("!moonpie delete/get $USER", () => {
-      interface MoonpieGetDeleteUserOutput {
-        user: string;
-      }
-      const testSetMoonpieUserDelete: RegexTestElement<MoonpieGetDeleteUserOutput>[] =
+      const testSetMoonpieUserDelete: RegexTestElement<RegexMoonpieChatHandlerCommandUserDelete>[] =
         [
           { expected: null, input: "!monpie" },
           { expected: null, input: "!moonpie delete" },
@@ -167,35 +202,46 @@ describe("regex", () => {
           { expected: null, input: "moonpie delete user" },
           { expected: null, input: "a moonpie get user" },
           { expected: null, input: "amoonpie delete user" },
-          { expected: { user: "user" }, input: "!moonpie delete user" },
-          { expected: { user: "user" }, input: "   !moonpie delete user  " },
-          { expected: { user: "user" }, input: "   !moonpie    delete user " },
-          { expected: { user: "user" }, input: "!moonpie delete user message" },
-          { expected: { user: "user" }, input: "!moonpie delete user msg ab" },
-          { expected: { user: "userAbc" }, input: "!moonpie delete userAbc" },
-          { expected: { user: "def" }, input: "!moonpie delete def" },
+          { expected: { userName: "user" }, input: "!moonpie delete user" },
+          {
+            expected: { userName: "user" },
+            input: "   !moonpie delete user  ",
+          },
+          {
+            expected: { userName: "user" },
+            input: "   !moonpie    delete user ",
+          },
+          {
+            expected: { userName: "user" },
+            input: "!moonpie delete user message",
+          },
+          {
+            expected: { userName: "user" },
+            input: "!moonpie delete user msg ab",
+          },
+          {
+            expected: { userName: "userAbc" },
+            input: "!moonpie delete userAbc",
+          },
+          { expected: { userName: "def" }, input: "!moonpie delete def" },
         ];
-      checkRegexTestElements(
+      checkRegexTestElements<RegexMoonpieChatHandlerCommandUserDelete>(
         testSetMoonpieUserDelete,
         regexMoonpieChatHandlerCommandUserDelete,
-        (a) => [a.user]
+        (a) => (a === undefined ? [] : [a.userName])
       );
-      checkRegexTestElements(
+      checkRegexTestElements<RegexMoonpieChatHandlerCommandUserGet>(
         testSetMoonpieUserDelete.map((a) => ({
           ...a,
           input: a.input.replace(/delete/g, "get"),
         })),
         regexMoonpieChatHandlerCommandUserGet,
-        (a) => [a.user]
+        (a) => (a === undefined ? [] : [a.userName])
       );
     });
 
     it("!moonpie add/remove/set $USER $COUNT", () => {
-      interface MoonpieUserAddRemoveSetOutput {
-        count: number;
-        user: string;
-      }
-      const testSetMoonpieUserSet: RegexTestElement<MoonpieUserAddRemoveSetOutput>[] =
+      const testSetMoonpieUserSet: RegexTestElement<RegexMoonpieChatHandlerCommandUserSet>[] =
         [
           { expected: null, input: "!monpie" },
           { expected: null, input: "!moonpie set" },
@@ -209,54 +255,68 @@ describe("regex", () => {
           { expected: null, input: "!moonpie set user 100k" },
           { expected: null, input: "!moonpie set user -10" },
           {
-            expected: { count: 100, user: "user" },
+            expected: { moonpieCountSet: "100", userName: "user" },
             input: "!moonpie set user 100",
           },
           {
-            expected: { count: 100, user: "user" },
+            expected: { moonpieCountSet: "100", userName: "user" },
             input: "   !moonpie set user 100   ",
           },
           {
-            expected: { count: 100, user: "user" },
+            expected: { moonpieCountSet: "100", userName: "user" },
             input: "   !moonpie    set    user   100   ",
           },
           {
-            expected: { count: 100, user: "user" },
+            expected: { moonpieCountSet: "100", userName: "user" },
             input: "!moonpie set user 100 message",
           },
           {
-            expected: { count: 100, user: "user" },
+            expected: { moonpieCountSet: "100", userName: "user" },
             input: "!moonpie set user 100 message after that",
           },
           {
-            expected: { count: 100, user: "user" },
+            expected: { moonpieCountSet: "100", userName: "user" },
             input: "!moonpie set user 100 200",
           },
           {
-            expected: { count: 42, user: "user" },
+            expected: { moonpieCountSet: "42", userName: "user" },
             input: "!moonpie set user 42",
           },
         ];
-      checkRegexTestElements(
+      checkRegexTestElements<RegexMoonpieChatHandlerCommandUserSet>(
+        testSetMoonpieUserSet,
+        regexMoonpieChatHandlerCommandUserSet,
+        (a) => (a === undefined ? [] : [a.userName, `${a.moonpieCountSet}`])
+      );
+      checkRegexTestElements<RegexMoonpieChatHandlerCommandUserAdd>(
         testSetMoonpieUserSet.map((a) => ({
           ...a,
+          expected:
+            a.expected == null
+              ? a.expected
+              : {
+                  moonpieCountAdd: a.expected.moonpieCountSet,
+                  userName: a.expected.userName,
+                },
           input: a.input.replace(/set/g, "add"),
         })),
         regexMoonpieChatHandlerCommandUserAdd,
-        (a) => [a.user, `${a.count}`]
+        (a) => (a === undefined ? [] : [a.userName, `${a.moonpieCountAdd}`])
       );
-      checkRegexTestElements(
+      checkRegexTestElements<RegexMoonpieChatHandlerCommandUserRemove>(
         testSetMoonpieUserSet.map((a) => ({
           ...a,
+          expected:
+            a.expected == null
+              ? a.expected
+              : {
+                  moonpieCountRemove: a.expected.moonpieCountSet,
+                  userName: a.expected.userName,
+                },
           input: a.input.replace(/set/g, "remove"),
         })),
         regexMoonpieChatHandlerCommandUserRemove,
-        (a) => [a.user, `${a.count}`]
-      );
-      checkRegexTestElements(
-        testSetMoonpieUserSet,
-        regexMoonpieChatHandlerCommandUserSet,
-        (a) => [a.user, `${a.count}`]
+        (a) => (a === undefined ? [] : [a.userName, `${a.moonpieCountRemove}`])
       );
     });
   });
@@ -319,215 +379,209 @@ describe("regex", () => {
       checkRegexTestElements(
         testSetOsuWindowTitle,
         regexOsuWindowTitleNowPlaying,
-        (a) => [a.artist, a.title, a.version]
+        (a) => (a === undefined ? [] : [a.artist, a.title, a.version])
       );
     });
   });
 
   context("osu! commands", () => {
-    it("!np/!pp/!rp/!commands/!osuRequests", () => {
+    it("!np/!commands/!osuRequests", () => {
       const testSetOsuNp: RegexTestElement[] = [
         { expected: null, input: "!n" },
         { expected: null, input: "!npmessage" },
         { expected: null, input: "a!np" },
         { expected: null, input: "a !np" },
         { expected: null, input: "message before !np" },
-        { expected: [], input: "!np" },
-        { expected: [], input: "  !np  " },
-        { expected: [], input: "  !np message" },
-        { expected: [], input: "  !np message after that" },
+        { expected: undefined, input: "!np" },
+        { expected: undefined, input: "  !np  " },
+        { expected: undefined, input: "  !np message" },
+        { expected: undefined, input: "  !np message after that" },
       ];
-      checkRegexTestElements(
-        testSetOsuNp,
-        regexOsuChatHandlerCommandNp,
-        (a) => a
-      );
-      checkRegexTestElements(
-        testSetOsuNp.map((a) => ({
-          ...a,
-          input: a.input.replace(/np/g, "pp"),
-        })),
-        regexOsuChatHandlerCommandPp,
-        (a) => a
-      );
-      checkRegexTestElements(
-        testSetOsuNp.map((a) => ({
-          ...a,
-          input: a.input.replace(/np/g, "rp"),
-        })),
-        regexOsuChatHandlerCommandRp,
-        (a) => a
-      );
+      checkRegexTestElements(testSetOsuNp, regexOsuChatHandlerCommandNp);
       checkRegexTestElements(
         testSetOsuNp.map((a) => ({
           ...a,
           input: a.input.replace(/np/g, "osu commands"),
         })),
-        regexOsuChatHandlerCommandCommands,
-        (a) => a
+        regexOsuChatHandlerCommandCommands
       );
       checkRegexTestElements(
         testSetOsuNp.map((a) => ({
           ...a,
+          expected: a.expected === undefined ? {} : a.expected,
           input: a.input.replace(/np/g, "osuRequests"),
         })),
-        regexOsuChatHandlerCommandRequests,
-        (a) => a
+        regexOsuChatHandlerCommandRequests
       );
     });
 
     it("!osuRequest on/off custom message", () => {
-      interface OsuRequestOutput {
-        customMessage?: string;
-        off?: "off";
-        on?: "on";
-      }
-      const testSetOsuPp: RegexTestElement<OsuRequestOutput>[] = [
-        { expected: null, input: "!osuRrequests a" },
-        { expected: {}, input: "!osuRequests a" },
-        { expected: {}, input: "!osuRequests onnn" },
-        { expected: {}, input: "!osuRequests ofmessage" },
-        { expected: {}, input: "!osuRequests offf message" },
-        { expected: { on: "on" }, input: "!osuRequests on" },
-        { expected: { off: "off" }, input: "!osuRequests off" },
-        {
-          expected: { customMessage: "custom", off: "off" },
-          input: "!osuRequests off custom",
-        },
-        {
-          expected: { customMessage: "custom message", off: "off" },
-          input: "!osuRequests off custom message  ",
-        },
-      ];
-      checkRegexTestElements(
+      const testSetOsuPp: RegexTestElement<RegexOsuChatHandlerCommandRequests>[] =
+        [
+          { expected: null, input: "!osuRrequests a" },
+          { expected: {}, input: "!osuRequests a" },
+          { expected: {}, input: "!osuRequests onnn" },
+          { expected: {}, input: "!osuRequests ofmessage" },
+          { expected: {}, input: "!osuRequests offf message" },
+          { expected: { requestsOn: "on" }, input: "!osuRequests on" },
+          { expected: { requestsOff: "off" }, input: "!osuRequests off" },
+          {
+            expected: { requestsOff: "off", requestsOffMessage: "custom" },
+            input: "!osuRequests off custom",
+          },
+          {
+            expected: {
+              requestsOff: "off",
+              requestsOffMessage: "custom message",
+            },
+            input: "!osuRequests off custom message  ",
+          },
+        ];
+      checkRegexTestElements<RegexOsuChatHandlerCommandRequests>(
         testSetOsuPp,
         regexOsuChatHandlerCommandRequests,
-        (a) => [a.on, a.off, a.customMessage]
+        (a) =>
+          a === undefined
+            ? []
+            : [a.requestsOn, a.requestsOff, a.requestsOffMessage]
       );
     });
 
     it("!pp/!rp $USER_NAME/$USER_ID", () => {
-      interface OsuPpRpOutput {
-        id?: number;
-        name?: string;
-      }
-      const testSetOsuPp: RegexTestElement<OsuPpRpOutput>[] = [
+      const testSetOsuPp: RegexTestElement<RegexOsuChatHandlerCommandPp>[] = [
         { expected: null, input: "!ppOoi" },
         { expected: null, input: "!pp9096716" },
-        { expected: { name: "Ooi" }, input: "!pp Ooi" },
-        { expected: { name: "Ooi" }, input: "  !pp Ooi  " },
-        { expected: { name: "Ooi" }, input: "  !pp   Ooi  " },
-        { expected: { name: "Ooi" }, input: "!pp Ooi message" },
-        { expected: { name: "Ooi" }, input: "!pp Ooi message after that" },
-        { expected: { id: 9096716 }, input: "!pp 9096716" },
-        { expected: { id: 9096716 }, input: "  !pp 9096716  " },
-        { expected: { id: 9096716 }, input: "  !pp   9096716  " },
-        { expected: { id: 9096716 }, input: "!pp 9096716 message" },
-        { expected: { id: 9096716 }, input: "!pp 9096716 message after that" },
+        { expected: null, input: "!p" },
+        { expected: null, input: "!ppmessage" },
+        { expected: null, input: "a!pp" },
+        { expected: null, input: "a !pp" },
+        { expected: null, input: "message before !pp" },
+        { expected: {}, input: "!pp" },
+        { expected: {}, input: "  !pp  " },
+        { expected: { osuUserName: "Ooi" }, input: "!pp Ooi" },
+        { expected: { osuUserName: "Ooi" }, input: "  !pp Ooi  " },
+        { expected: { osuUserName: "Ooi" }, input: "  !pp   Ooi  " },
+        { expected: { osuUserName: "Ooi" }, input: "!pp Ooi message" },
+        {
+          expected: { osuUserName: "Ooi" },
+          input: "!pp Ooi message after that",
+        },
+        { expected: { osuUserId: "9096716" }, input: "!pp 9096716" },
+        { expected: { osuUserId: "9096716" }, input: "  !pp 9096716  " },
+        { expected: { osuUserId: "9096716" }, input: "  !pp   9096716  " },
+        { expected: { osuUserId: "9096716" }, input: "!pp 9096716 message" },
+        {
+          expected: { osuUserId: "9096716" },
+          input: "!pp 9096716 message after that",
+        },
       ];
-      checkRegexTestElements(
+      checkRegexTestElements<RegexOsuChatHandlerCommandPp>(
         testSetOsuPp,
         regexOsuChatHandlerCommandPp,
-        (a) => [toStringIfNotUndef(a.id), a.name]
+        (a) => (a === undefined ? [] : [a.osuUserId, a.osuUserName])
       );
-      checkRegexTestElements(
+      checkRegexTestElements<RegexOsuChatHandlerCommandRp>(
         testSetOsuPp.map((a) => ({
           ...a,
           input: a.input.replace(/pp/g, "rp"),
         })),
         regexOsuChatHandlerCommandRp,
-        (a) => [toStringIfNotUndef(a.id), a.name]
+        (a) => (a === undefined ? [] : [a.osuUserId, a.osuUserName])
       );
     });
 
     it("beatmap detection", () => {
-      interface OsuBeatmapUrlIdOutput {
-        bId?: number;
-        beatmapsId?: number;
-        beatmapsetId?: number;
-        comment?: string;
-      }
-      const testSetOsuBeatmapUrl: RegexTestElement<OsuBeatmapUrlIdOutput>[] = [
-        {
-          expected: null,
-          input: "https://osu.ppy.sh/beatmps/2587891",
-        },
-        {
-          expected: null,
-          input: "https://osi.ppy.sh/beatmaps/2587891",
-        },
-        {
-          expected: null,
-          input: "https://osi.ppy.sh/ba/2587891",
-        },
-        {
-          expected: { beatmapsetId: 2554945 },
-          input: "https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
-        },
-        {
-          expected: { bId: 2587891 },
-          input: "  https://osu.ppy.sh/b/2587891",
-        },
-        {
-          expected: { beatmapsetId: 2554945 },
-          input: "https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
-        },
-        {
-          expected: { beatmapsetId: 2554945 },
-          input: "  https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
-        },
-        {
-          expected: { beatmapsId: 2587891 },
-          input: "  https://osu.ppy.sh/beatmaps/2587891  ",
-        },
-        {
-          expected: { beatmapsetId: 2554945 },
-          input: "  https://osu.ppy.sh/beatmapsets/1228734#osu/2554945  ",
-        },
-        {
-          expected: { beatmapsId: 2587891 },
-          input: "before https://osu.ppy.sh/beatmaps/2587891",
-        },
-        {
-          expected: { beatmapsetId: 2554945 },
-          input: "before https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
-        },
-        {
-          expected: { bId: 2554945, comment: "after" },
-          input: "  https://osu.ppy.sh/b/2554945  after",
-        },
-        {
-          expected: { beatmapsId: 2587891, comment: "after" },
-          input: "before https://osu.ppy.sh/beatmaps/2587891 after",
-        },
-        {
-          expected: { beatmapsetId: 2554945, comment: "after" },
-          input:
-            "before https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 after",
-        },
-        {
-          expected: { bId: 2554985, comment: "message after" },
-          input: "  https://osu.ppy.sh/b/2554985   message after  ",
-        },
-        {
-          expected: { beatmapsId: 2587891, comment: "message after" },
-          input: "before https://osu.ppy.sh/beatmaps/2587891   message after",
-        },
-        {
-          expected: { beatmapsetId: 2554945, comment: "message after" },
-          input:
-            "before https://osu.ppy.sh/beatmapsets/1228734#osu/2554945   message after",
-        },
-      ];
+      const testSetOsuBeatmapUrl: RegexTestElement<RegexOsuBeatmapIdFromUrl>[] =
+        [
+          {
+            expected: null,
+            input: "https://osu.ppy.sh/beatmps/2587891",
+          },
+          {
+            expected: null,
+            input: "https://osi.ppy.sh/beatmaps/2587891",
+          },
+          {
+            expected: null,
+            input: "https://osi.ppy.sh/ba/2587891",
+          },
+          {
+            expected: { beatmapIdBeatmapsets: "2554945" },
+            input: "https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
+          },
+          {
+            expected: { beatmapIdB: "2587891" },
+            input: "  https://osu.ppy.sh/b/2587891",
+          },
+          {
+            expected: { beatmapIdBeatmapsets: "2554945" },
+            input: "https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
+          },
+          {
+            expected: { beatmapIdBeatmapsets: "2554945" },
+            input: "  https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
+          },
+          {
+            expected: { beatmapIdBeatmaps: "2587891" },
+            input: "  https://osu.ppy.sh/beatmaps/2587891  ",
+          },
+          {
+            expected: { beatmapIdBeatmapsets: "2554945" },
+            input: "  https://osu.ppy.sh/beatmapsets/1228734#osu/2554945  ",
+          },
+          {
+            expected: { beatmapIdBeatmaps: "2587891" },
+            input: "before https://osu.ppy.sh/beatmaps/2587891",
+          },
+          {
+            expected: { beatmapIdBeatmapsets: "2554945" },
+            input: "before https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
+          },
+          {
+            expected: { beatmapIdB: "2554945", comment: "after" },
+            input: "  https://osu.ppy.sh/b/2554945  after",
+          },
+          {
+            expected: { beatmapIdBeatmaps: "2587891", comment: "after" },
+            input: "before https://osu.ppy.sh/beatmaps/2587891 after",
+          },
+          {
+            expected: { beatmapIdBeatmapsets: "2554945", comment: "after" },
+            input:
+              "before https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 after",
+          },
+          {
+            expected: { beatmapIdB: "2554985", comment: "message after" },
+            input: "  https://osu.ppy.sh/b/2554985   message after  ",
+          },
+          {
+            expected: {
+              beatmapIdBeatmaps: "2587891",
+              comment: "message after",
+            },
+            input: "before https://osu.ppy.sh/beatmaps/2587891   message after",
+          },
+          {
+            expected: {
+              beatmapIdBeatmapsets: "2554945",
+              comment: "message after",
+            },
+            input:
+              "before https://osu.ppy.sh/beatmapsets/1228734#osu/2554945   message after",
+          },
+        ];
       checkRegexTestElements(
         testSetOsuBeatmapUrl,
         regexOsuBeatmapIdFromUrl,
-        (a) => [
-          toStringIfNotUndef(a.bId),
-          toStringIfNotUndef(a.beatmapsId),
-          toStringIfNotUndef(a.beatmapsetId),
-          a.comment,
-        ]
+        (a) =>
+          a === undefined
+            ? []
+            : [
+                a.beatmapIdB,
+                a.beatmapIdBeatmaps,
+                a.beatmapIdBeatmapsets,
+                a.comment,
+              ]
       );
 
       expect(
@@ -564,23 +618,21 @@ describe("regex", () => {
         { expected: null, input: "a!song" },
         { expected: null, input: "a !song" },
         { expected: null, input: "message before !song" },
-        { expected: [], input: "!song" },
-        { expected: [], input: "  !song  " },
-        { expected: [], input: "  !song message" },
-        { expected: [], input: "  !song message after that" },
+        { expected: undefined, input: "!song" },
+        { expected: undefined, input: "  !song  " },
+        { expected: undefined, input: "  !song message" },
+        { expected: undefined, input: "  !song message after that" },
       ];
       checkRegexTestElements(
         testSetSpotifySong,
-        regexSpotifyChatHandlerCommandSong,
-        (a) => a
+        regexSpotifyChatHandlerCommandSong
       );
       checkRegexTestElements(
         testSetSpotifySong.map((a) => ({
           ...a,
           input: a.input.replace(/song/g, "spotify commands"),
         })),
-        regexSpotifyChatHandlerCommandCommands,
-        (a) => a
+        regexSpotifyChatHandlerCommandCommands
       );
     });
   });
