@@ -1,3 +1,6 @@
+// Type imports
+import type { EMPTY_OBJECT } from "./other";
+
 /**
  * Regex to recognize the `!moonpie about` command.
  *
@@ -198,10 +201,16 @@ export const regexOsuChatHandlerCommandCommands =
  */
 export const regexOsuChatHandlerCommandNp = /^\s*!np(?:\s|$)/i;
 
-export interface RegexOsuChatHandlerCommandPp {
-  osuUserId?: string;
-  osuUserName?: string;
+export interface RegexOsuChatHandlerCommandPpUserId {
+  osuUserId: string;
 }
+export interface RegexOsuChatHandlerCommandPpUserName {
+  osuUserName: string;
+}
+export type RegexOsuChatHandlerCommandPp =
+  | EMPTY_OBJECT
+  | RegexOsuChatHandlerCommandPpUserId
+  | RegexOsuChatHandlerCommandPpUserName;
 /**
  * Regex to recognize the `!pp` command.
  *
@@ -224,10 +233,16 @@ export interface RegexOsuChatHandlerCommandPp {
 export const regexOsuChatHandlerCommandPp =
   /^\s*!pp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i;
 
-export interface RegexOsuChatHandlerCommandRp {
-  osuUserId?: string;
-  osuUserName?: string;
+export interface RegexOsuChatHandlerCommandRpUserId {
+  osuUserId: string;
 }
+export interface RegexOsuChatHandlerCommandRpUserName {
+  osuUserName: string;
+}
+export type RegexOsuChatHandlerCommandRp =
+  | EMPTY_OBJECT
+  | RegexOsuChatHandlerCommandRpUserId
+  | RegexOsuChatHandlerCommandRpUserName;
 /**
  * Regex to recognize the `!rp` command.
  *

@@ -16,8 +16,12 @@ import type {
   CommandPpRpDetectorInput,
   CommandPpRpDetectorOutput,
 } from "./pp";
+import type {
+  RegexOsuChatHandlerCommandRp,
+  RegexOsuChatHandlerCommandRpUserId,
+  RegexOsuChatHandlerCommandRpUserName,
+} from "../../info/regex";
 import type { BeatmapRequestsInfo } from "../osu";
-import type { RegexOsuChatHandlerCommandRp } from "../../info/regex";
 import type { TwitchChatCommandHandler } from "../../twitch";
 
 export interface CommandRpCreateReplyInputExtra
@@ -128,14 +132,24 @@ export const commandRp: TwitchChatCommandHandler<
     if (!matchGroups) {
       throw Error("RegexOsuChatHandlerCommandRp groups undefined");
     }
-    return {
-      data: {
-        customOsuId: matchGroups.osuUserId
-          ? parseInt(matchGroups.osuUserId)
-          : undefined,
-        customOsuName: matchGroups.osuUserName,
-      },
-    };
+    if ((matchGroups as RegexOsuChatHandlerCommandRpUserId).osuUserId) {
+      return {
+        data: {
+          customOsuId: parseInt(
+            (matchGroups as RegexOsuChatHandlerCommandRpUserId).osuUserId
+          ),
+        },
+      };
+    }
+    if ((matchGroups as RegexOsuChatHandlerCommandRpUserName).osuUserName) {
+      return {
+        data: {
+          customOsuName: (matchGroups as RegexOsuChatHandlerCommandRpUserName)
+            .osuUserName,
+        },
+      };
+    }
+    return { data: {} };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,
