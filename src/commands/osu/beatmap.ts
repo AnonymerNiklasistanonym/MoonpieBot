@@ -116,6 +116,15 @@ export const commandBeatmap: TwitchChatCommandHandler<
       data.enableOsuBeatmapRequestsRedeemId !== undefined &&
       tags["custom-reward-id"] !== data.enableOsuBeatmapRequestsRedeemId
     ) {
+      logger.info(
+        `For the beatmap request the redeem ID "${
+          data.enableOsuBeatmapRequestsRedeemId
+        }" was expected but found was ${
+          tags["custom-reward-id"]
+            ? `"${tags["custom-reward-id"] as string}"`
+            : "no id"
+        }`
+      );
       const message = await messageParserById(
         osuBeatmapRequestNoRedeem.id,
         globalStrings,
