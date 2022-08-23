@@ -32,10 +32,15 @@ import type {
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerReply,
 } from "../../twitch";
+import type {
+  RegexOsuBeatmapIdFromUrl,
+  RegexOsuBeatmapIdFromUrlB,
+  RegexOsuBeatmapIdFromUrlBeatmaps,
+  RegexOsuBeatmapIdFromUrlBeatmapSets,
+} from "../../info/regex";
 import type { Beatmap } from "osu-api-v2";
 import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
-import type { RegexOsuBeatmapIdFromUrl } from "../../info/regex";
 
 export type OsuIrcBotSendMessageFunc = (logId: string) => IrcClient;
 export interface BeatmapRequest {
@@ -272,19 +277,28 @@ export const commandBeatmap: TwitchChatCommandHandler<
         if (!match) {
           return;
         }
-        const matchGroups: undefined | RegexOsuBeatmapIdFromUrl = match.groups;
+        const matchGroups = match.groups as
+          | undefined
+          | RegexOsuBeatmapIdFromUrl;
         if (!matchGroups) {
           throw Error("RegexOsuBeatmapIdFromUrl groups undefined");
         }
         let beatmapId;
-        if (matchGroups.beatmapIdB !== undefined) {
-          beatmapId = matchGroups.beatmapIdB;
+        if ((matchGroups as RegexOsuBeatmapIdFromUrlB).beatmapIdB) {
+          beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlB).beatmapIdB;
         }
-        if (matchGroups.beatmapIdBeatmaps !== undefined) {
-          beatmapId = matchGroups.beatmapIdBeatmaps;
+        if (
+          (matchGroups as RegexOsuBeatmapIdFromUrlBeatmaps).beatmapIdBeatmaps
+        ) {
+          beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlBeatmaps)
+            .beatmapIdBeatmaps;
         }
-        if (matchGroups.beatmapIdBeatmapsets !== undefined) {
-          beatmapId = matchGroups.beatmapIdBeatmapsets;
+        if (
+          (matchGroups as RegexOsuBeatmapIdFromUrlBeatmapSets)
+            .beatmapIdBeatmapsets
+        ) {
+          beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlBeatmapSets)
+            .beatmapIdBeatmapsets;
         }
         if (beatmapId !== undefined) {
           return {

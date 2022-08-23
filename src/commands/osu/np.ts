@@ -12,7 +12,7 @@ import {
   osuCommandReplyNpStreamCompanionWebSocketNotRunning,
 } from "../../strings/osu/commandReply";
 import {
-  regexOsuBeatmapDownloadUrlMatcher,
+  regexOsuBeatmapIdFromUrl,
   regexOsuChatHandlerCommandNp,
   regexOsuWindowTitleNowPlaying,
 } from "../../info/regex";
@@ -27,7 +27,13 @@ import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
-import type { RegexOsuWindowTitleNowPlaying } from "../../info/regex";
+import type {
+  RegexOsuBeatmapIdFromUrl,
+  RegexOsuBeatmapIdFromUrlB,
+  RegexOsuBeatmapIdFromUrlBeatmaps,
+  RegexOsuBeatmapIdFromUrlBeatmapSets,
+  RegexOsuWindowTitleNowPlaying,
+} from "../../info/regex";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 
 export interface CommandNpCreateReplyInput {
@@ -104,12 +110,37 @@ export const commandNp: TwitchChatCommandHandler<
           case "file":
             // eslint-disable-next-line no-case-declarations
             const beatmapIdMatch = currMapData.npPlayingDl.match(
-              regexOsuBeatmapDownloadUrlMatcher
+              regexOsuBeatmapIdFromUrl
             );
-            if (beatmapIdMatch && beatmapIdMatch.length > 1) {
-              data.beatmapRequestsInfo.lastBeatmapId = parseInt(
-                beatmapIdMatch[1]
-              );
+            if (beatmapIdMatch) {
+              const matchGroups = beatmapIdMatch.groups as
+                | undefined
+                | RegexOsuBeatmapIdFromUrl;
+              if (!matchGroups) {
+                throw Error("RegexOsuBeatmapIdFromUrl groups undefined");
+              }
+              let beatmapId;
+              if ((matchGroups as RegexOsuBeatmapIdFromUrlB).beatmapIdB) {
+                beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlB)
+                  .beatmapIdB;
+              }
+              if (
+                (matchGroups as RegexOsuBeatmapIdFromUrlBeatmaps)
+                  .beatmapIdBeatmaps
+              ) {
+                beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlBeatmaps)
+                  .beatmapIdBeatmaps;
+              }
+              if (
+                (matchGroups as RegexOsuBeatmapIdFromUrlBeatmapSets)
+                  .beatmapIdBeatmapsets
+              ) {
+                beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlBeatmapSets)
+                  .beatmapIdBeatmapsets;
+              }
+              if (beatmapId !== undefined) {
+                data.beatmapRequestsInfo.lastBeatmapId = parseInt(beatmapId);
+              }
             }
             // TODO Insert macro in here so no plugin has to be used!
             msg = await messageParserById(

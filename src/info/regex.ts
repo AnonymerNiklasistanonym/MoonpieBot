@@ -266,12 +266,25 @@ export interface RegexOsuChatHandlerCommandScore {
 export const regexOsuChatHandlerCommandScore =
   /^\s*!score\s+(?<osuUserName>\S+)(?:\s|$)/i;
 
-export interface RegexOsuBeatmapIdFromUrl {
-  beatmapIdB?: string;
-  beatmapIdBeatmaps?: string;
-  beatmapIdBeatmapsets?: string;
+export interface RegexOsuBeatmapIdFromUrlBase {
   comment?: string;
 }
+export interface RegexOsuBeatmapIdFromUrlB
+  extends RegexOsuBeatmapIdFromUrlBase {
+  beatmapIdB: string;
+}
+export interface RegexOsuBeatmapIdFromUrlBeatmaps
+  extends RegexOsuBeatmapIdFromUrlBase {
+  beatmapIdBeatmaps: string;
+}
+export interface RegexOsuBeatmapIdFromUrlBeatmapSets
+  extends RegexOsuBeatmapIdFromUrlBase {
+  beatmapIdBeatmapsets: string;
+}
+export type RegexOsuBeatmapIdFromUrl =
+  | RegexOsuBeatmapIdFromUrlB
+  | RegexOsuBeatmapIdFromUrlBeatmaps
+  | RegexOsuBeatmapIdFromUrlBeatmapSets;
 /**
  * Regex that matches osu beatmap URLs in any message.
  *
@@ -300,10 +313,6 @@ export const regexOsuBeatmapIdFromUrl =
 export const regexOsuBeatmapUrlSplitter = (message: string): string[] =>
   message.split(/(?=https?:\/\/osu\.ppy\.sh\/(?:b|beatmaps|beatmapsets)\/)/);
 
-export const regexOsuBeatmapDownloadUrlMatcher =
-  /https?:\/\/osu\.ppy\.sh\/b\/(?<beatmapId>\d+)/;
-
-// TODO Add tests
 export interface RegexOsuWindowTitleNowPlaying {
   artist: string;
   title: string;
