@@ -1,5 +1,3 @@
-/* eslint-disable no-magic-numbers */
-
 // Package imports
 import { expect } from "chai";
 // Local imports
@@ -47,15 +45,9 @@ interface RegexTestElement<TEST_TYPE extends object = object> {
   expected: null | undefined | TEST_TYPE;
   input: string;
 }
-const undefOrValueString = (value: string | undefined) =>
-  value === undefined ? "undefined" : `"${value}"`;
-const undefOrValue = (value?: string | number | object): undefined | string =>
-  value === undefined ? undefined : value.toString();
 const checkRegexTestElements = <TEST_TYPE extends object = object>(
   testSet: RegexTestElement<TEST_TYPE>[],
-  regex: RegExp,
-  getExpectedRegexGroups: (a?: TEST_TYPE) => (string | undefined)[] = (a) =>
-    a === undefined ? [] : Object.entries(a).map(undefOrValue)
+  regex: RegExp
 ) => {
   for (const a of testSet) {
     const match = a.input.match(regex);
@@ -65,28 +57,9 @@ const checkRegexTestElements = <TEST_TYPE extends object = object>(
     } else {
       expect(match, `A match was expected ${baseErrorMessage}`).to.be.not.null;
       if (match !== null) {
-        // Check if indices work
-        // TODO Delete after migration
-        const expectedRegexGroups = getExpectedRegexGroups(a.expected);
-        expect(match.length).to.be.greaterThan(
-          expectedRegexGroups.length,
-          `At least ${
-            expectedRegexGroups.length
-          } regex groups were expected (${JSON.stringify(
-            expectedRegexGroups
-          )}/${JSON.stringify(match.slice(0, 1))}) ${baseErrorMessage}`
-        );
-        for (const [index, value] of expectedRegexGroups.entries()) {
-          expect(match[index + 1]).to.be.equal(
-            value,
-            `Unexpected regex group [${index}] value ${undefOrValueString(
-              value
-            )} ${baseErrorMessage}`
-          );
-        }
         // Check if named capture groups work
         if (match.groups !== undefined) {
-          // Purge undefined values from the group for testing
+          // Purge undefined values from the group for deep equal testing
           Object.keys(match.groups).forEach((key) => {
             if (match.groups === undefined) {
               return;
@@ -186,8 +159,7 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexMoonpieChatHandlerCommandLeaderboard>(
         testSetMoonpieLeaderboard,
-        regexMoonpieChatHandlerCommandLeaderboard,
-        (a) => (a === undefined ? [] : [a.startingRank])
+        regexMoonpieChatHandlerCommandLeaderboard
       );
     });
 
@@ -228,16 +200,14 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserDelete>(
         testSetMoonpieUserDelete,
-        regexMoonpieChatHandlerCommandUserDelete,
-        (a) => (a === undefined ? [] : [a.userName])
+        regexMoonpieChatHandlerCommandUserDelete
       );
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserGet>(
         testSetMoonpieUserDelete.map((a) => ({
           ...a,
           input: a.input.replace(/delete/g, "get"),
         })),
-        regexMoonpieChatHandlerCommandUserGet,
-        (a) => (a === undefined ? [] : [a.userName])
+        regexMoonpieChatHandlerCommandUserGet
       );
     });
 
@@ -286,8 +256,7 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserSet>(
         testSetMoonpieUserSet,
-        regexMoonpieChatHandlerCommandUserSet,
-        (a) => (a === undefined ? [] : [a.userName, `${a.moonpieCountSet}`])
+        regexMoonpieChatHandlerCommandUserSet
       );
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserAdd>(
         testSetMoonpieUserSet.map((a) => ({
@@ -301,8 +270,7 @@ describe("regex", () => {
                 },
           input: a.input.replace(/set/g, "add"),
         })),
-        regexMoonpieChatHandlerCommandUserAdd,
-        (a) => (a === undefined ? [] : [a.userName, `${a.moonpieCountAdd}`])
+        regexMoonpieChatHandlerCommandUserAdd
       );
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserRemove>(
         testSetMoonpieUserSet.map((a) => ({
@@ -316,8 +284,7 @@ describe("regex", () => {
                 },
           input: a.input.replace(/set/g, "remove"),
         })),
-        regexMoonpieChatHandlerCommandUserRemove,
-        (a) => (a === undefined ? [] : [a.userName, `${a.moonpieCountRemove}`])
+        regexMoonpieChatHandlerCommandUserRemove
       );
     });
   });
@@ -375,8 +342,7 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexOsuWindowTitleNowPlaying>(
         testSetOsuWindowTitle,
-        regexOsuWindowTitleNowPlaying,
-        (a) => (a === undefined ? [] : [a.artist, a.title, a.version])
+        regexOsuWindowTitleNowPlaying
       );
     });
   });
@@ -436,11 +402,7 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexOsuChatHandlerCommandRequests>(
         testSetOsuPp,
-        regexOsuChatHandlerCommandRequests,
-        (a) =>
-          a === undefined
-            ? []
-            : [a.requestsOn, a.requestsOff, a.requestsOffMessage]
+        regexOsuChatHandlerCommandRequests
       );
     });
 
@@ -474,16 +436,14 @@ describe("regex", () => {
       ];
       checkRegexTestElements<RegexOsuChatHandlerCommandPp>(
         testSetOsuPp,
-        regexOsuChatHandlerCommandPp,
-        (a) => (a === undefined ? [] : [a.osuUserId, a.osuUserName])
+        regexOsuChatHandlerCommandPp
       );
       checkRegexTestElements<RegexOsuChatHandlerCommandRp>(
         testSetOsuPp.map((a) => ({
           ...a,
           input: a.input.replace(/pp/g, "rp"),
         })),
-        regexOsuChatHandlerCommandRp,
-        (a) => (a === undefined ? [] : [a.osuUserId, a.osuUserName])
+        regexOsuChatHandlerCommandRp
       );
     });
 
@@ -567,19 +527,7 @@ describe("regex", () => {
               "before https://osu.ppy.sh/beatmapsets/1228734#osu/2554945   message after",
           },
         ];
-      checkRegexTestElements(
-        testSetOsuBeatmapUrl,
-        regexOsuBeatmapIdFromUrl,
-        (a) =>
-          a === undefined
-            ? []
-            : [
-                a.beatmapIdB,
-                a.beatmapIdBeatmaps,
-                a.beatmapIdBeatmapsets,
-                a.comment,
-              ]
-      );
+      checkRegexTestElements(testSetOsuBeatmapUrl, regexOsuBeatmapIdFromUrl);
 
       expect(
         regexOsuBeatmapUrlSplitter(
