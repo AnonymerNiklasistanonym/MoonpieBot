@@ -17,7 +17,6 @@ import {
 } from "../../strings/osu/beatmapRequest";
 import {
   regexOsuBeatmapIdFromUrl,
-  RegexOsuBeatmapIdFromUrlDEPRECATED,
   regexOsuBeatmapUrlSplitter,
 } from "../../info/regex";
 import { createLogFunc } from "../../logging";
@@ -36,6 +35,7 @@ import type {
 import type { Beatmap } from "osu-api-v2";
 import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
+import type { RegexOsuBeatmapIdFromUrl } from "../../info/regex";
 
 export type OsuIrcBotSendMessageFunc = (logId: string) => IrcClient;
 export interface BeatmapRequest {
@@ -272,20 +272,24 @@ export const commandBeatmap: TwitchChatCommandHandler<
         if (!match) {
           return;
         }
+        const matchGroups: undefined | RegexOsuBeatmapIdFromUrl = match.groups;
+        if (!matchGroups) {
+          throw Error("RegexOsuBeatmapIdFromUrl group was undefined");
+        }
         let beatmapId;
-        if (match[RegexOsuBeatmapIdFromUrlDEPRECATED.B] !== undefined) {
-          beatmapId = match[RegexOsuBeatmapIdFromUrlDEPRECATED.B];
+        if (matchGroups.beatmapIdB !== undefined) {
+          beatmapId = matchGroups.beatmapIdB;
         }
-        if (match[RegexOsuBeatmapIdFromUrlDEPRECATED.BEATMAPS] !== undefined) {
-          beatmapId = match[RegexOsuBeatmapIdFromUrlDEPRECATED.BEATMAPS];
+        if (matchGroups.beatmapIdBeatmaps !== undefined) {
+          beatmapId = matchGroups.beatmapIdBeatmaps;
         }
-        if (match[RegexOsuBeatmapIdFromUrlDEPRECATED.BEATMAPSETS] !== undefined) {
-          beatmapId = match[RegexOsuBeatmapIdFromUrlDEPRECATED.BEATMAPSETS];
+        if (matchGroups.beatmapIdBeatmapsets !== undefined) {
+          beatmapId = matchGroups.beatmapIdBeatmapsets;
         }
         if (beatmapId !== undefined) {
           return {
             beatmapId: parseInt(beatmapId),
-            comment: match[RegexOsuBeatmapIdFromUrlDEPRECATED.COMMENT],
+            comment: matchGroups.comment,
           };
         }
         return;

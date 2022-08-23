@@ -266,12 +266,6 @@ export interface RegexOsuChatHandlerCommandScore {
 export const regexOsuChatHandlerCommandScore =
   /^\s*!score\s+(?<osuUserName>\S+)(?:\s|$)/i;
 
-export const enum RegexOsuBeatmapIdFromUrlDEPRECATED {
-  B = 1,
-  BEATMAPS = 2,
-  BEATMAPSETS = 3,
-  COMMENT = 4,
-}
 export interface RegexOsuBeatmapIdFromUrl {
   beatmapIdB?: string;
   beatmapIdBeatmaps?: string;
