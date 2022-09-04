@@ -844,7 +844,30 @@ export const osuScoreErrorNotFound: StringEntry = {
       name: macroOsuScoreRequest.id,
       type: "macro",
     },
-    " on the map",
+    " on ",
+    {
+      args: {
+        key: MacroOsuScoreRequest.BEATMAP_ID,
+        name: macroOsuScoreRequest.id,
+        type: "macro",
+      },
+      name: PluginOsuApi.BEATMAP,
+      scope: [
+        {
+          key: MacroOsuBeatmap.TITLE,
+          name: macroOsuBeatmap.id,
+          type: "macro",
+        },
+        " '",
+        {
+          key: MacroOsuBeatmap.VERSION,
+          name: macroOsuBeatmap.id,
+          type: "macro",
+        },
+        "'",
+      ],
+      type: "plugin",
+    },
   ]),
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_SCORE`,
 };
