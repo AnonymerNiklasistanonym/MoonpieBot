@@ -92,7 +92,15 @@ export const osuBeatmapRequestRefTopScore: StringEntry = {
           type: "macro",
         },
         name: pluginIfTrue.id,
-        scope: " (replay available)",
+        scope: [
+          " (replay https://osu.ppy.sh/scores/osu/",
+          {
+            key: MacroOsuScore.ID,
+            name: macroOsuScore.id,
+            type: "macro",
+          },
+          ")",
+        ],
         type: "plugin",
       },
     ],

@@ -176,6 +176,7 @@ export const macroOsuBeatmap: MessageParserMacroGenerator<MacroOsuBeatmapData> =
 export enum MacroOsuScore {
   ACC = "ACC",
   ARTIST = "ARTIST",
+  BEATMAP_ID = "BEATMAP_ID",
   COUNT_100 = "COUNT_100",
   COUNT_300 = "COUNT_300",
   COUNT_50 = "COUNT_50",
@@ -192,7 +193,6 @@ export enum MacroOsuScore {
   PP = "PP",
   RANK = "RANK",
   TIME_IN_S_AGO = "TIME_IN_S_AGO",
-  TITLE = "TITLE",
   USER_ID = "USER_ID",
   USER_NAME = "USER_NAME",
   VERSION = "VERSION",
@@ -215,6 +215,9 @@ export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
             break;
           case MacroOsuScore.ARTIST:
             macroValue = score.beatmapset?.artist;
+            break;
+          case MacroOsuScore.BEATMAP_ID:
+            macroValue = score.beatmap?.id;
             break;
           case MacroOsuScore.COUNT_100:
             macroValue = score.statistics.count_100;
@@ -267,9 +270,6 @@ export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
           case MacroOsuScore.TIME_IN_S_AGO:
             macroValue = roundNumber(scoreDateRangeMs / 1000, 0);
             break;
-          case MacroOsuScore.TITLE:
-            macroValue = score.beatmapset?.title;
-            break;
           case MacroOsuScore.USER_ID:
             macroValue = score.user?.id;
             break;
@@ -300,6 +300,7 @@ export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
 export enum MacroOsuMostRecentPlay {
   ACC = "ACC",
   ARTIST = "ARTIST",
+  BEST_SCORE_ID = "BEST_SCORE_ID",
   COUNT_100 = "COUNT_100",
   COUNT_300 = "COUNT_300",
   COUNT_50 = "COUNT_50",
@@ -341,6 +342,9 @@ export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRec
             break;
           case MacroOsuMostRecentPlay.ARTIST:
             macroValue = data.score.beatmapset?.artist;
+            break;
+          case MacroOsuMostRecentPlay.BEST_SCORE_ID:
+            macroValue = data.score.best_id;
             break;
           case MacroOsuMostRecentPlay.COUNT_100:
             macroValue = data.score.statistics.count_100;

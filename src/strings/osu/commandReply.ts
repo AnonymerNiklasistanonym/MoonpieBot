@@ -4,6 +4,8 @@ import {
   MacroOsuBeatmap,
   macroOsuMostRecentPlay,
   MacroOsuMostRecentPlay,
+  MacroOsuScore,
+  macroOsuScore,
   macroOsuUser,
   MacroOsuUser,
 } from "../../messageParser/macros/osuApi";
@@ -619,7 +621,15 @@ export const osuCommandReplyRp: StringEntry = {
                 type: "macro",
               },
               name: pluginIfTrue.id,
-              scope: " (replay available)",
+              scope: [
+                " (best score replay https://osu.ppy.sh/scores/osu/",
+                {
+                  key: MacroOsuMostRecentPlay.BEST_SCORE_ID,
+                  name: macroOsuMostRecentPlay.id,
+                  type: "macro",
+                },
+                ")",
+              ],
               type: "plugin",
             },
           ],
@@ -851,6 +861,24 @@ export const osuScore: StringEntry = {
     },
     " has a ",
     { name: osuBeatmapRequestRefTopScore.id, type: "reference" },
+    " on ",
+    {
+      args: {
+        key: MacroOsuScore.BEATMAP_ID,
+        name: macroOsuScore.id,
+        type: "macro",
+      },
+      name: PluginOsuApi.BEATMAP,
+      scope: {
+        key: MacroOsuBeatmap.TITLE,
+        name: macroOsuBeatmap.id,
+        type: "macro",
+      },
+      type: "plugin",
+    },
+    " '",
+    { key: MacroOsuScore.VERSION, name: macroOsuScore.id, type: "macro" },
+    "'",
   ]),
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE`,
 };
