@@ -6,6 +6,11 @@
   !include "MUI2.nsh"
 
 ;--------------------------------
+;Include Custom Dialog creator
+
+  !include "nsDialogs.nsh"
+
+;--------------------------------
 ;Include External Config File (that contains name, version, ...)
 
   !include "windows_installer_config.nsi"
@@ -74,6 +79,50 @@
   !define MUI_FINISHPAGE_SHOWREADME_FUNCTION createDesktopShortcut
 
 ;--------------------------------
+;Custom Pages
+
+Var CustomPage_OtherOptions_OpenConfigDir_Checkbox
+Var CustomPage_OtherOptions_OpenConfigDir_CheckboxState
+Var CustomPage_OtherOptions_OpenWebsite_Checkbox
+Var CustomPage_OtherOptions_OpenWebsite_CheckboxState
+
+Function customPageOtherOptions
+    !insertmacro MUI_HEADER_TEXT $(LangStringCustomPageOtherOptionsTitle) $(LangStringCustomPageOtherOptionsSubTitle)
+
+    nsDialogs::Create 1018
+    Pop $0
+    ${If} $0 == error
+        Abort
+    ${EndIf}
+
+    ${NSD_CreateCheckbox} 0 0 100% 10u "&$(LangStringCustomPageOtherOptionsCheckboxOpenConfigDir)"
+    Pop $CustomPage_OtherOptions_OpenConfigDir_Checkbox
+    ${NSD_SetState} $CustomPage_OtherOptions_OpenConfigDir_Checkbox $CustomPage_OtherOptions_OpenConfigDir_CheckboxState
+
+    ${NSD_CreateCheckbox} 0 20u 100% 10u "&$(LangStringCustomPageOtherOptionsCheckboxOpenWebsite)"
+    Pop $CustomPage_OtherOptions_OpenWebsite_Checkbox
+    ${NSD_SetState} $CustomPage_OtherOptions_OpenWebsite_Checkbox $CustomPage_OtherOptions_OpenWebsite_CheckboxState
+
+    nsDialogs::Show
+FunctionEnd
+
+Function customPageOtherOptionsLeave
+
+  ;Open the configuration directory if this was checked by the user
+  ${NSD_GetState} $CustomPage_OtherOptions_OpenConfigDir_Checkbox $CustomPage_OtherOptions_OpenConfigDir_CheckboxState
+  ${If} $CustomPage_OtherOptions_OpenConfigDir_CheckboxState == ${BST_CHECKED}
+    ExecShell "open" "$AppData\${PRODUCT}"
+  ${EndIf}
+
+  ;Open the website if this was checked by the user
+  ${NSD_GetState} $CustomPage_OtherOptions_OpenWebsite_Checkbox $CustomPage_OtherOptions_OpenWebsite_CheckboxState
+  ${If} $CustomPage_OtherOptions_OpenWebsite_CheckboxState == ${BST_CHECKED}
+    ExecShell "open" "${PRODUCT_URL}#readme"
+  ${EndIf}
+
+FunctionEnd
+
+;--------------------------------
 ;Pages
 
   ;For the installer:
@@ -88,6 +137,8 @@
   !insertmacro MUI_PAGE_DIRECTORY
   ;Show progress while installing/copying the files
   !insertmacro MUI_PAGE_INSTFILES
+  ;Show page for other options
+  Page custom customPageOtherOptions customPageOtherOptionsLeave
   ;Show final finish page
   !insertmacro MUI_PAGE_FINISH
 
@@ -266,12 +317,11 @@ SectionEnd
 ;--------------------------------
 ;After Installation Function (is triggered after a successful installation)
 
-Function .onInstSuccess
-
-  ;Open the configuration directory
-  ExecShell "open" "$AppData\${PRODUCT}"
-
-FunctionEnd
+;Function .onInstSuccess
+;
+;  ;Nothing right now
+;
+;FunctionEnd
 
 ;--------------------------------
 ;Custom Function To Create A Desktop Shortcut

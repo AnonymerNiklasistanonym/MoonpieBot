@@ -123,3 +123,23 @@ LangString LangStrErrorEnVarDelete ${LANG_ENGLISH} "There was an error removing 
 LangString LangStrErrorEnVarDelete ${LANG_GERMAN}  "Es gab einen Fehler beim Entfernen des Installationsverzeichnisses aus der Umgebungsvariable PATH des Benutzers"
 LangString LangStrErrorEnVarDelete ${LANG_FINNISH} "Asennushakemiston poistaminen käyttäjän PATH-ympäristömuuttujasta oli virhe"
 LangString LangStrErrorEnVarDelete ${LANG_SPANISH} "Se ha producido un error al eliminar el directorio de instalación de la variable de entorno PATH del usuario"
+
+LangString LangStringCustomPageOtherOptionsTitle ${LANG_ENGLISH} "Other Options"
+LangString LangStringCustomPageOtherOptionsTitle ${LANG_GERMAN}  "Andere Optionen"
+LangString LangStringCustomPageOtherOptionsTitle ${LANG_FINNISH} "Muut vaihtoehdot"
+LangString LangStringCustomPageOtherOptionsTitle ${LANG_SPANISH} "Otras opciones"
+
+LangString LangStringCustomPageOtherOptionsSubTitle ${LANG_ENGLISH} ""
+LangString LangStringCustomPageOtherOptionsSubTitle ${LANG_GERMAN}  ""
+LangString LangStringCustomPageOtherOptionsSubTitle ${LANG_FINNISH} ""
+LangString LangStringCustomPageOtherOptionsSubTitle ${LANG_SPANISH} ""
+
+LangString LangStringCustomPageOtherOptionsCheckboxOpenConfigDir ${LANG_ENGLISH} "Open the configuration directory"
+LangString LangStringCustomPageOtherOptionsCheckboxOpenConfigDir ${LANG_GERMAN}  "Öffne das Konfigurations Verzeichnis"
+LangString LangStringCustomPageOtherOptionsCheckboxOpenConfigDir ${LANG_FINNISH} "Avaa konfiguraatiohakemisto"
+LangString LangStringCustomPageOtherOptionsCheckboxOpenConfigDir ${LANG_SPANISH} "Abrir el directorio de configuración"
+
+LangString LangStringCustomPageOtherOptionsCheckboxOpenWebsite ${LANG_ENGLISH} "Open the website"
+LangString LangStringCustomPageOtherOptionsCheckboxOpenWebsite ${LANG_GERMAN}  "Öffne die Website"
+LangString LangStringCustomPageOtherOptionsCheckboxOpenWebsite ${LANG_FINNISH} "Avaa verkkosivusto"
+LangString LangStringCustomPageOtherOptionsCheckboxOpenWebsite ${LANG_SPANISH} "Abrir el sitio web"
