@@ -86,14 +86,11 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
           data.beatmapRequestsOffMessage;
         macros.set(
           macroOsuBeatmapRequests.id,
-          new Map([
-            [
-              MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
-              data.beatmapRequestsOffMessage
-                ? data.beatmapRequestsOffMessage
-                : "",
-            ],
-          ])
+          new Map(
+            macroOsuBeatmapRequests.generate({
+              customMessage: data.beatmapRequestsInfo.beatmapRequestsOffMessage,
+            })
+          )
         );
         message = await messageParserById(
           osuBeatmapRequestTurnedOff.id,

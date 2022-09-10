@@ -136,6 +136,27 @@ export const commandBeatmap: TwitchChatCommandHandler<
       return { sentMessage };
     }
 
+    if (data.beatmapRequestsInfo.beatmapRequestsOn === false) {
+      const macros = new Map(globalMacros);
+      macros.set(
+        macroOsuBeatmapRequests.id,
+        new Map(
+          macroOsuBeatmapRequests.generate({
+            customMessage: data.beatmapRequestsInfo.beatmapRequestsOffMessage,
+          })
+        )
+      );
+      const message = await messageParserById(
+        osuBeatmapRequestCurrentlyOff.id,
+        globalStrings,
+        globalPlugins,
+        macros,
+        logger
+      );
+      const sentMessage = await client.say(channel, message);
+      return { sentMessage };
+    }
+
     const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
       data.osuApiV2Credentials.clientId,
       data.osuApiV2Credentials.clientSecret
