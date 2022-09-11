@@ -107,6 +107,9 @@ export const commandBeatmapLastRequest: TwitchChatCommandHandler<
         .reverse();
 
     for (const previousBeatmapRequest of previousBeatmapRequests) {
+      data.beatmapRequestsInfo.lastMentionedBeatmapId =
+        previousBeatmapRequest.id;
+
       const osuBeatmapRequestMacros = new Map(globalMacros);
       osuBeatmapRequestMacros.set(
         macroOsuBeatmapRequest.id,

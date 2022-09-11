@@ -116,6 +116,7 @@ export const commandBeatmapPermitRequest: TwitchChatCommandHandler<
       osuBeatmapRequestPlugins.set(plugin.id, plugin.func);
     });
 
+    data.beatmapRequestsInfo.lastMentionedBeatmapId = blockedBeatmapRequest.id;
     data.beatmapRequestsInfo.previousBeatmapRequests.unshift({
       comment: blockedBeatmapRequest.comment?.trim(),
       data: blockedBeatmapRequest.data,
