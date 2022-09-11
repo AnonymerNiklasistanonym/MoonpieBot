@@ -57,17 +57,17 @@
         "@types/chai": "^4.3.3",
         "@types/irc": "^0.5.1",
         "@types/mocha": "^9.1.1",
-        "@types/node": "^18.7.14",
-        "@types/node-cron": "^3.0.3",
+        "@types/node": "^18.7.16",
+        "@types/node-cron": "^3.0.4",
         "@types/sinon-chai": "^3.2.8",
         "@types/spotify-web-api-node": "^5.0.7",
         "@types/sqlite3": "^3.1.8",
         "@types/tmi.js": "^1.8.1",
         "@types/ws": "^8.5.3",
-        "@typescript-eslint/eslint-plugin": "^5.36.1",
-        "@typescript-eslint/parser": "^5.36.1",
+        "@typescript-eslint/eslint-plugin": "^5.36.2",
+        "@typescript-eslint/parser": "^5.36.2",
         "chai": "^4.3.6",
-        "concurrently": "^7.3.0",
+        "concurrently": "^7.4.0",
         "cross-env": "^7.0.3",
         "eslint": "^8.23.0",
         "eslint-config-prettier": "^8.5.0",
@@ -91,7 +91,7 @@
         "typedoc-plugin-coverage": "^2.0.0",
         "typedoc-plugin-mermaid": "^1.9.0",
         "typedoc-umlclass": "^0.7.0",
-        "typescript": "^4.8.2"
+        "typescript": "^4.8.3"
     },
     "dependencies": {
         "@twurple/api": "^5.2.3",
@@ -106,7 +106,7 @@
         "spotify-web-api-node": "^5.0.2",
         "sqlite3": "5.0.11",
         "tmi.js": "^1.8.5",
-        "winston": "^3.8.1",
+        "winston": "^3.8.2",
         "winston-daily-rotate-file": "^4.7.1"
     }
 }
