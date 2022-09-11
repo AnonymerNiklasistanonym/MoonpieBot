@@ -42,6 +42,8 @@ import type { Beatmap } from "osu-api-v2";
 import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 
+const MAX_LENGTH_PREVIOUS_REQUESTS = 15;
+
 export type OsuIrcBotSendMessageFunc = (logId: string) => IrcClient;
 export interface BeatmapRequest {
   beatmapId: number;
@@ -208,7 +210,20 @@ export const commandBeatmap: TwitchChatCommandHandler<
           beatmapRequest.beatmapId
         );
         if (beatmap) {
-          data.beatmapRequestsInfo.lastBeatmapId = beatmap.id;
+          data.beatmapRequestsInfo.lastMentionedBeatmapId = beatmap.id;
+          data.beatmapRequestsInfo.previousBeatmapRequests.unshift({
+            comment: beatmapRequest.comment?.trim(),
+            data: beatmap,
+            id: beatmapRequest.beatmapId,
+            userId: tags["user-id"],
+            userName: tags.username,
+          });
+          // Truncate array at a max length
+          data.beatmapRequestsInfo.previousBeatmapRequests =
+            data.beatmapRequestsInfo.previousBeatmapRequests.slice(
+              0,
+              MAX_LENGTH_PREVIOUS_REQUESTS
+            );
         }
         osuBeatmapRequestMacros.set(
           macroOsuBeatmap.id,

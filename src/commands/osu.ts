@@ -1,5 +1,6 @@
 // Local imports
 import { commandBeatmap } from "./osu/beatmap";
+import { commandBeatmapLastRequest } from "./osu/beatmapLastRequest";
 import { commandBeatmapRequests } from "./osu/beatmapRequests";
 import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
@@ -11,6 +12,10 @@ import type {
   CommandBeatmapCreateReplyInput,
   CommandBeatmapDetectorInput,
 } from "./osu/beatmap";
+import type {
+  CommandBeatmapLastRequestCreateReplyInput,
+  CommandBeatmapLastRequestDetectorInput,
+} from "./osu/beatmapLastRequest";
 import type {
   CommandBeatmapRequestsCreateReplyInput,
   CommandBeatmapRequestsDetectorInput,
@@ -32,6 +37,7 @@ import type {
   CommandScoreCreateReplyInput,
   CommandScoreDetectorInput,
 } from "./osu/score";
+import type { Beatmap } from "osu-api-v2";
 import type { TwitchChatHandler } from "../twitch";
 
 export interface OsuApiV2Credentials {
@@ -39,14 +45,24 @@ export interface OsuApiV2Credentials {
   clientSecret: string;
 }
 
+export interface BeatmapRequestsListElement {
+  comment?: string;
+  data: Beatmap;
+  id: number;
+  userId?: string;
+  userName?: string;
+}
+
 export interface BeatmapRequestsInfo {
   beatmapRequestsOffMessage?: string;
   beatmapRequestsOn: boolean;
-  lastBeatmapId?: number;
+  lastMentionedBeatmapId?: number;
+  previousBeatmapRequests: BeatmapRequestsListElement[];
 }
 
 const globalBeatmapRequestObject: BeatmapRequestsInfo = {
   beatmapRequestsOn: true,
+  previousBeatmapRequests: [],
 };
 
 export interface OsuChatHandlerData
@@ -60,6 +76,8 @@ export interface OsuChatHandlerData
     CommandScoreDetectorInput,
     CommandBeatmapCreateReplyInput,
     CommandBeatmapDetectorInput,
+    CommandBeatmapLastRequestCreateReplyInput,
+    CommandBeatmapLastRequestDetectorInput,
     CommandBeatmapRequestsCreateReplyInput,
     CommandBeatmapRequestsDetectorInput {}
 
@@ -98,7 +116,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         channel,
         tags,
         message,
-        { ...data, beatmapId: globalBeatmapRequestObject.lastBeatmapId },
+        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -124,16 +142,29 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
     )
   );
   await Promise.all(
+    [commandBeatmapLastRequest].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
     [commandBeatmap].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,
         tags,
         message,
-        {
-          ...data,
-          beatmapRequestsInfo: globalBeatmapRequestObject,
-        },
+        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
         globalStrings,
         globalPlugins,
         globalMacros,

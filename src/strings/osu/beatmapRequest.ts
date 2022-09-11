@@ -484,6 +484,13 @@ export const osuBeatmapRequestPermissionError: StringEntry = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_PERMISSION_ERROR`,
 };
 
+export const osuBeatmapRequestNoRequestsError: StringEntry = {
+  default: createMessageForMessageParser([
+    "No previous beatmap request were found!",
+  ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NO_REQUESTS_ERROR`,
+};
+
 export const osuBeatmapRequestTurnedOff: StringEntry = {
   default: createMessageForMessageParser([
     "@",
@@ -570,6 +577,7 @@ export const osuBeatmapRequests: StringEntry[] = [
   osuBeatmapRequestIrcDetailed,
   osuBeatmapRequestNotFound,
   osuBeatmapRequestNoRedeem,
+  osuBeatmapRequestNoRequestsError,
   osuBeatmapRequestPermissionError,
   osuBeatmapRequestRefDetailedStats,
   osuBeatmapRequestRefIrcRequestString,

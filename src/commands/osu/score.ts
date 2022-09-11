@@ -15,11 +15,11 @@ import { messageParserById } from "../../messageParser";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 import { regexOsuChatHandlerCommandScore } from "../../info/regex";
 // Type imports
+import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
-import type { OsuApiV2Credentials } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { RegexOsuChatHandlerCommandScore } from "../../info/regex";
 
@@ -32,9 +32,9 @@ export interface CommandScoreCreateReplyInput {
 export interface CommandScoreCreateReplyInputExtra
   extends CommandScoreCreateReplyInput {
   /**
-   * The osu beatmap ID.
+   * The osu beatmap requests info.
    */
-  beatmapId?: number;
+  beatmapRequestsInfo: BeatmapRequestsInfo;
 }
 export type CommandScoreDetectorInput =
   CommandGenericDetectorInputEnabledCommands;
@@ -68,7 +68,7 @@ export const commandScore: TwitchChatCommandHandler<
       throw errorMessageOsuApiCredentialsUndefined();
     }
 
-    if (data.beatmapId === undefined) {
+    if (data.beatmapRequestsInfo.lastMentionedBeatmapId === undefined) {
       const errorMessage = await messageParserById(
         osuScoreErrorNoBeatmap.id,
         globalStrings,
@@ -84,7 +84,7 @@ export const commandScore: TwitchChatCommandHandler<
       macroOsuScoreRequest.id,
       new Map(
         macroOsuScoreRequest.generate({
-          beatmapId: data.beatmapId,
+          beatmapId: data.beatmapRequestsInfo.lastMentionedBeatmapId,
           userName: data.osuUserName,
         })
       )
@@ -111,7 +111,7 @@ export const commandScore: TwitchChatCommandHandler<
       const userId = user.user.data[0].id;
       const beatmapScore = await osuApiV2.beatmaps.scores.users(
         oauthAccessToken,
-        data.beatmapId,
+        data.beatmapRequestsInfo.lastMentionedBeatmapId,
         userId
       );
       osuBeatmapRequestMacros.set(

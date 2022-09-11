@@ -97,7 +97,7 @@ export const commandNp: TwitchChatCommandHandler<
       ) {
         switch (currMapData.type) {
           case "websocket":
-            data.beatmapRequestsInfo.lastBeatmapId = currMapData.mapid;
+            data.beatmapRequestsInfo.lastMentionedBeatmapId = currMapData.mapid;
             // TODO Insert macro in here so no plugin has to be used!
             msg = await messageParserById(
               osuCommandReplyNpStreamCompanionWebSocket.id,
@@ -139,7 +139,8 @@ export const commandNp: TwitchChatCommandHandler<
                   .beatmapIdBeatmapsets;
               }
               if (beatmapId !== undefined) {
-                data.beatmapRequestsInfo.lastBeatmapId = parseInt(beatmapId);
+                data.beatmapRequestsInfo.lastMentionedBeatmapId =
+                  parseInt(beatmapId);
               }
             }
             // TODO Insert macro in here so no plugin has to be used!
@@ -241,7 +242,8 @@ export const commandNp: TwitchChatCommandHandler<
                     matchGroups.version.trim().toLocaleLowerCase()
                 );
                 if (exactBeatmapDiff) {
-                  data.beatmapRequestsInfo.lastBeatmapId = exactBeatmapDiff.id;
+                  data.beatmapRequestsInfo.lastMentionedBeatmapId =
+                    exactBeatmapDiff.id;
                   mapId = exactBeatmapDiff.id;
                 }
               }

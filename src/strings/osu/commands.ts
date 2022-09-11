@@ -11,6 +11,13 @@ export const osuCommandsCommands: StringEntry = {
   default: createMessageForMessageParser(["!osu commands"], true),
   id: `${OSU_COMMANDS_STRING_ID}_COMMANDS`,
 };
+export const osuCommandsLastRequest: StringEntry = {
+  default: createMessageForMessageParser(
+    ["!osuLastRequest ($COUNT) [resend previous requests]"],
+    true
+  ),
+  id: `${OSU_COMMANDS_STRING_ID}_LAST_REQUEST`,
+};
 export const osuCommandsNp: StringEntry = {
   default: createMessageForMessageParser(["!np [now playing]"], true),
   id: `${OSU_COMMANDS_STRING_ID}_NP`,
@@ -79,6 +86,7 @@ export const osuCommandsPrefix: StringEntry = {
 
 export const osuCommands: StringEntry[] = [
   osuCommandsCommands,
+  osuCommandsLastRequest,
   osuCommandsNp,
   osuCommandsNpStreamCompanionWebsocket,
   osuCommandsNpStreamCompanionFile,

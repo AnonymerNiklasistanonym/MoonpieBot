@@ -2,6 +2,7 @@ export const LOG_ID_CHAT_HANDLER_OSU = "osu_chat_handler";
 
 export enum OsuCommands {
   COMMANDS = "commands",
+  LAST_REQUEST = "lastrequest",
   NP = "np",
   PP = "pp",
   REQUESTS = "requests",

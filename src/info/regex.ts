@@ -37,6 +37,24 @@ export const regexOsuChatHandlerCommandRequests =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^\s*!osuRequests(?:\s+(?<requestsOn>on)(?:\s|$)|\s+(?<requestsOff>off)(?:\s+(?<requestsOffMessage>.*?)\s*$|\s|$)?(?:\s|$)|\s|$)/i;
 
+export interface RegexOsuChatHandlerCommandLastRequest {
+  lastRequestCount?: string;
+}
+/**
+ * Regex to recognize the !osuLastRequests $OPTIONAL_COUNT command.
+ *
+ * @example
+ * ```text
+ * !osuLastRequests
+ * ```
+ * @example
+ * ```text
+ * !osuLastRequests 5
+ * ```
+ */
+export const regexOsuChatHandlerCommandLastRequest =
+  /^\s*!osuLastRequest(?:\s+(?<lastRequestCount>[0-9]+)(?:\s|$)|\s|$)/i;
+
 /**
  * Regex to recognize the `!moonpie` command.
  *

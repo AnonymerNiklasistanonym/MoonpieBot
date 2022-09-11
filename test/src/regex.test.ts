@@ -14,11 +14,11 @@ import {
   regexOsuBeatmapIdFromUrl,
   regexOsuBeatmapUrlSplitter,
   regexOsuChatHandlerCommandCommands,
+  regexOsuChatHandlerCommandLastRequest,
   regexOsuChatHandlerCommandNp,
   regexOsuChatHandlerCommandPp,
   regexOsuChatHandlerCommandRequests,
   regexOsuChatHandlerCommandRp,
-  RegexOsuWindowTitleNowPlaying,
   regexOsuWindowTitleNowPlaying,
   regexSpotifyChatHandlerCommandCommands,
   regexSpotifyChatHandlerCommandSong,
@@ -32,9 +32,11 @@ import type {
   RegexMoonpieChatHandlerCommandUserRemove,
   RegexMoonpieChatHandlerCommandUserSet,
   RegexOsuBeatmapIdFromUrl,
+  RegexOsuChatHandlerCommandLastRequest,
   RegexOsuChatHandlerCommandPp,
   RegexOsuChatHandlerCommandRequests,
   RegexOsuChatHandlerCommandRp,
+  RegexOsuWindowTitleNowPlaying,
 } from "../../src/info/regex";
 
 interface RegexTestElement<TEST_TYPE extends object = object> {
@@ -376,10 +378,18 @@ describe("regex", () => {
         })),
         regexOsuChatHandlerCommandRequests
       );
+      checkRegexTestElements(
+        testSetOsuNp.map((a) => ({
+          ...a,
+          expected: a.expected === undefined ? {} : a.expected,
+          input: a.input.replace(/np/g, "osuLastRequest"),
+        })),
+        regexOsuChatHandlerCommandLastRequest
+      );
     });
 
-    it("!osuRequest on/off custom message", () => {
-      const testSetOsuPp: RegexTestElement<RegexOsuChatHandlerCommandRequests>[] =
+    it("!osuRequests on/off custom message", () => {
+      const testSetOsuRequests: RegexTestElement<RegexOsuChatHandlerCommandRequests>[] =
         [
           { expected: null, input: "!osuRrequests a" },
           { expected: {}, input: "!osuRequests a" },
@@ -401,8 +411,30 @@ describe("regex", () => {
           },
         ];
       checkRegexTestElements<RegexOsuChatHandlerCommandRequests>(
-        testSetOsuPp,
+        testSetOsuRequests,
         regexOsuChatHandlerCommandRequests
+      );
+    });
+
+    it("!osuLastRequest customCount", () => {
+      const testSetOsuLastRequest: RegexTestElement<RegexOsuChatHandlerCommandLastRequest>[] =
+        [
+          { expected: null, input: "!osuLastRrequest a" },
+          { expected: {}, input: "!osuLastRequest a" },
+          { expected: {}, input: "!osuLastRequest onnn" },
+          { expected: {}, input: "!osuLastRequest ofmessage" },
+          { expected: {}, input: "!osuLastRequest offf message" },
+          { expected: { lastRequestCount: "0" }, input: "!osuLastRequest 0" },
+          { expected: { lastRequestCount: "3" }, input: "!osuLastRequest 3" },
+          { expected: { lastRequestCount: "5" }, input: "!osuLastRequest 5" },
+          {
+            expected: { lastRequestCount: "15" },
+            input: "!osuLastRequest 15",
+          },
+        ];
+      checkRegexTestElements<RegexOsuChatHandlerCommandLastRequest>(
+        testSetOsuLastRequest,
+        regexOsuChatHandlerCommandLastRequest
       );
     });
 

@@ -2,6 +2,7 @@
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   osuCommandsCommands,
+  osuCommandsLastRequest,
   osuCommandsNp,
   osuCommandsNpStreamCompanionFile,
   osuCommandsNpStreamCompanionWebsocket,
@@ -68,6 +69,9 @@ export const commandCommands: TwitchChatCommandHandler<
       switch (command) {
         case OsuCommands.COMMANDS:
           commandsStringIds.push(osuCommandsCommands.id);
+          break;
+        case OsuCommands.LAST_REQUEST:
+          commandsStringIds.push(osuCommandsLastRequest.id);
           break;
         case OsuCommands.NP:
           if (
