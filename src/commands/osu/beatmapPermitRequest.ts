@@ -1,6 +1,5 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
-
 import {
   osuBeatmapRequest,
   osuBeatmapRequestDetailed,

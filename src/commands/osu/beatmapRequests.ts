@@ -1,6 +1,7 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
+  macroOsuBeatmapRequestDemands,
   MacroOsuBeatmapRequests,
   macroOsuBeatmapRequests,
 } from "../../messageParser/macros/osuBeatmapRequest";
@@ -27,7 +28,13 @@ export type CommandBeatmapRequestsCreateReplyInput = EMPTY_OBJECT;
 export interface CommandBeatmapRequestsCreateReplyInputExtra
   extends CommandBeatmapRequestsCreateReplyInput {
   beatmapRequestsInfo: BeatmapRequestsInfo;
+  enableOsuBeatmapRequestsArRangeMax?: number;
+  enableOsuBeatmapRequestsArRangeMin?: number;
+  enableOsuBeatmapRequestsCsRangeMax?: number;
+  enableOsuBeatmapRequestsCsRangeMin?: number;
   enableOsuBeatmapRequestsMessage?: string;
+  enableOsuBeatmapRequestsStarRangeMax?: number;
+  enableOsuBeatmapRequestsStarRangeMin?: number;
 }
 export enum BeatmapRequestsType {
   INFO = "INFO",
@@ -118,6 +125,21 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
             new Map(
               macroOsuBeatmapRequests.generate({
                 customMessage: data.enableOsuBeatmapRequestsMessage,
+              })
+            )
+          );
+
+          macros.set(
+            macroOsuBeatmapRequestDemands.id,
+            new Map(
+              macroOsuBeatmapRequestDemands.generate({
+                arRangeMax: data.enableOsuBeatmapRequestsArRangeMax,
+                arRangeMin: data.enableOsuBeatmapRequestsArRangeMin,
+                csRangeMax: data.enableOsuBeatmapRequestsCsRangeMax,
+                csRangeMin: data.enableOsuBeatmapRequestsCsRangeMin,
+                message: data.enableOsuBeatmapRequestsMessage,
+                starRangeMax: data.enableOsuBeatmapRequestsStarRangeMax,
+                starRangeMin: data.enableOsuBeatmapRequestsStarRangeMin,
               })
             )
           );

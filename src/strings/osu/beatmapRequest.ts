@@ -347,9 +347,8 @@ export const osuBeatmapRequestNotFound: StringEntry = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NOT_FOUND`,
 };
 
-export const osuBeatmapRequestNotMeetingDemands: StringEntry = {
+export const osuBeatmapRequestDemandsRef: StringEntry = {
   default: createMessageForMessageParser([
-    "The requested osu! beatmap does not meet the demands of the requests",
     {
       args: {
         key: MacroOsuBeatmapRequestDemands.MESSAGE,
@@ -357,14 +356,11 @@ export const osuBeatmapRequestNotMeetingDemands: StringEntry = {
         type: "macro",
       },
       name: pluginIfNotEmpty.id,
-      scope: [
-        ": ",
-        {
-          key: MacroOsuBeatmapRequestDemands.MESSAGE,
-          name: macroOsuBeatmapRequestDemands.id,
-          type: "macro",
-        },
-      ],
+      scope: {
+        key: MacroOsuBeatmapRequestDemands.MESSAGE,
+        name: macroOsuBeatmapRequestDemands.id,
+        type: "macro",
+      },
       type: "plugin",
     },
     " (",
@@ -473,6 +469,17 @@ export const osuBeatmapRequestNotMeetingDemands: StringEntry = {
       type: "plugin",
     },
     ")",
+  ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_DEMANDS_REF`,
+};
+
+export const osuBeatmapRequestNotMeetingDemands: StringEntry = {
+  default: createMessageForMessageParser([
+    "The requested osu! beatmap does not meet the demands of the requests. ",
+    {
+      name: osuBeatmapRequestDemandsRef.id,
+      type: "reference",
+    },
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NOT_MEETING_DEMANDS`,
 };
@@ -686,7 +693,7 @@ export const osuBeatmapRequestCurrentlyOff: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
-    " Beatmap requests are currently off",
+    " Beatmap requests are currently off.",
     {
       args: {
         key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
@@ -712,23 +719,10 @@ export const osuBeatmapRequestCurrentlyOn: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
-    " Beatmap requests are currently on",
+    " Beatmap requests are currently on. ",
     {
-      args: {
-        key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
-        name: macroOsuBeatmapRequests.id,
-        type: "macro",
-      },
-      name: pluginIfNotEmpty.id,
-      scope: [
-        ": ",
-        {
-          key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
-          name: macroOsuBeatmapRequests.id,
-          type: "macro",
-        },
-      ],
-      type: "plugin",
+      name: osuBeatmapRequestDemandsRef.id,
+      type: "reference",
     },
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
@@ -746,6 +740,7 @@ export const osuBeatmapRequests: StringEntry[] = [
   osuBeatmapRequest,
   osuBeatmapRequestCurrentlyOff,
   osuBeatmapRequestCurrentlyOn,
+  osuBeatmapRequestDemandsRef,
   osuBeatmapRequestDetailed,
   osuBeatmapRequestIrc,
   osuBeatmapRequestIrcDetailed,
