@@ -3,6 +3,7 @@ import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
   macroOsuBeatmapRequest,
+  macroOsuBeatmapRequestDemands,
   macroOsuBeatmapRequests,
 } from "../../messageParser/macros/osuBeatmapRequest";
 import { NOT_FOUND_STATUS_CODE, notUndefined } from "../../info/other";
@@ -14,6 +15,7 @@ import {
   osuBeatmapRequestIrcDetailed,
   osuBeatmapRequestNoRedeem,
   osuBeatmapRequestNotFound,
+  osuBeatmapRequestNotMeetingDemands,
 } from "../../strings/osu/beatmapRequest";
 import {
   regexOsuBeatmapIdFromUrl,
@@ -56,12 +58,19 @@ export interface CommandBeatmapCreateReplyInput {
    */
   defaultOsuId?: number;
   enableOsuBeatmapRequests?: boolean;
+  enableOsuBeatmapRequestsArRangeMax?: number;
+  enableOsuBeatmapRequestsArRangeMin?: number;
+  enableOsuBeatmapRequestsCsRangeMax?: number;
+  enableOsuBeatmapRequestsCsRangeMin?: number;
   enableOsuBeatmapRequestsDetailed?: boolean;
+  enableOsuBeatmapRequestsMessage?: string;
   /**
    * If string not empty/undefined check if the beatmap request was redeemed or
    * just a normal chat message.
    */
   enableOsuBeatmapRequestsRedeemId?: string;
+  enableOsuBeatmapRequestsStarRangeMax?: number;
+  enableOsuBeatmapRequestsStarRangeMin?: number;
   /**
    * The osu API (v2) credentials.
    */
@@ -210,6 +219,53 @@ export const commandBeatmap: TwitchChatCommandHandler<
           beatmapRequest.beatmapId
         );
         if (beatmap) {
+          if (
+            (data.enableOsuBeatmapRequestsArRangeMax !== undefined &&
+              beatmap.ar > data.enableOsuBeatmapRequestsArRangeMax) ||
+            (data.enableOsuBeatmapRequestsArRangeMin !== undefined &&
+              beatmap.ar < data.enableOsuBeatmapRequestsArRangeMin) ||
+            (data.enableOsuBeatmapRequestsCsRangeMax !== undefined &&
+              beatmap.cs > data.enableOsuBeatmapRequestsCsRangeMax) ||
+            (data.enableOsuBeatmapRequestsCsRangeMin !== undefined &&
+              beatmap.cs < data.enableOsuBeatmapRequestsCsRangeMin) ||
+            (data.enableOsuBeatmapRequestsStarRangeMax !== undefined &&
+              beatmap.difficulty_rating >
+                data.enableOsuBeatmapRequestsStarRangeMax) ||
+            (data.enableOsuBeatmapRequestsStarRangeMin !== undefined &&
+              beatmap.difficulty_rating <
+                data.enableOsuBeatmapRequestsStarRangeMin)
+          ) {
+            data.beatmapRequestsInfo.blockedBeatmapRequest = {
+              comment: beatmapRequest.comment?.trim(),
+              data: beatmap,
+              id: beatmapRequest.beatmapId,
+              userId: tags["user-id"],
+              userName: tags.username,
+            };
+            osuBeatmapRequestMacros.set(
+              macroOsuBeatmapRequestDemands.id,
+              new Map(
+                macroOsuBeatmapRequestDemands.generate({
+                  arRangeMax: data.enableOsuBeatmapRequestsArRangeMax,
+                  arRangeMin: data.enableOsuBeatmapRequestsArRangeMin,
+                  csRangeMax: data.enableOsuBeatmapRequestsCsRangeMax,
+                  csRangeMin: data.enableOsuBeatmapRequestsCsRangeMin,
+                  message: data.enableOsuBeatmapRequestsMessage,
+                  starRangeMax: data.enableOsuBeatmapRequestsStarRangeMax,
+                  starRangeMin: data.enableOsuBeatmapRequestsStarRangeMin,
+                })
+              )
+            );
+            const errorMessage = await messageParserById(
+              osuBeatmapRequestNotMeetingDemands.id,
+              globalStrings,
+              globalPlugins,
+              osuBeatmapRequestMacros,
+              logger
+            );
+            throw Error(errorMessage);
+          }
+
           data.beatmapRequestsInfo.lastMentionedBeatmapId = beatmap.id;
           data.beatmapRequestsInfo.previousBeatmapRequests.unshift({
             comment: beatmapRequest.comment?.trim(),

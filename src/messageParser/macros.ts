@@ -15,6 +15,7 @@ import {
 } from "./macros/osuApi";
 import {
   macroOsuBeatmapRequest,
+  macroOsuBeatmapRequestDemands,
   macroOsuBeatmapRequests,
 } from "./macros/osuBeatmapRequest";
 import {
@@ -87,6 +88,7 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
     macroOsuApi,
     macroOsuBeatmap,
     macroOsuBeatmapRequest,
+    macroOsuBeatmapRequestDemands,
     macroOsuBeatmapRequests,
     macroOsuMostRecentPlay,
     macroOsuPpRpRequest,

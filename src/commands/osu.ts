@@ -1,6 +1,7 @@
 // Local imports
 import { commandBeatmap } from "./osu/beatmap";
 import { commandBeatmapLastRequest } from "./osu/beatmapLastRequest";
+import { commandBeatmapPermitRequest } from "./osu/beatmapPermitRequest";
 import { commandBeatmapRequests } from "./osu/beatmapRequests";
 import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
@@ -16,6 +17,10 @@ import type {
   CommandBeatmapLastRequestCreateReplyInput,
   CommandBeatmapLastRequestDetectorInput,
 } from "./osu/beatmapLastRequest";
+import type {
+  CommandBeatmapPermitRequestCreateReplyInput,
+  CommandBeatmapPermitRequestDetectorInput,
+} from "./osu/beatmapPermitRequest";
 import type {
   CommandBeatmapRequestsCreateReplyInput,
   CommandBeatmapRequestsDetectorInput,
@@ -56,6 +61,10 @@ export interface BeatmapRequestsListElement {
 export interface BeatmapRequestsInfo {
   beatmapRequestsOffMessage?: string;
   beatmapRequestsOn: boolean;
+  beatmapRequestsOnMaxStars?: string;
+  beatmapRequestsOnMessage?: string;
+  beatmapRequestsOnMinStars?: string;
+  blockedBeatmapRequest?: BeatmapRequestsListElement;
   lastMentionedBeatmapId?: number;
   previousBeatmapRequests: BeatmapRequestsListElement[];
 }
@@ -78,6 +87,8 @@ export interface OsuChatHandlerData
     CommandBeatmapDetectorInput,
     CommandBeatmapLastRequestCreateReplyInput,
     CommandBeatmapLastRequestDetectorInput,
+    CommandBeatmapPermitRequestCreateReplyInput,
+    CommandBeatmapPermitRequestDetectorInput,
     CommandBeatmapRequestsCreateReplyInput,
     CommandBeatmapRequestsDetectorInput {}
 
@@ -143,6 +154,22 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   );
   await Promise.all(
     [commandBeatmapLastRequest].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
+    [commandBeatmapPermitRequest].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,

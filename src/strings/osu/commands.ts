@@ -18,6 +18,13 @@ export const osuCommandsLastRequest: StringEntry = {
   ),
   id: `${OSU_COMMANDS_STRING_ID}_LAST_REQUEST`,
 };
+export const osuCommandsPermitRequest: StringEntry = {
+  default: createMessageForMessageParser(
+    ["!osuPermitRequest [send blocked requests]"],
+    true
+  ),
+  id: `${OSU_COMMANDS_STRING_ID}_PERMIT_REQUEST`,
+};
 export const osuCommandsNp: StringEntry = {
   default: createMessageForMessageParser(["!np [now playing]"], true),
   id: `${OSU_COMMANDS_STRING_ID}_NP`,
@@ -87,6 +94,7 @@ export const osuCommandsPrefix: StringEntry = {
 export const osuCommands: StringEntry[] = [
   osuCommandsCommands,
   osuCommandsLastRequest,
+  osuCommandsPermitRequest,
   osuCommandsNp,
   osuCommandsNpStreamCompanionWebsocket,
   osuCommandsNpStreamCompanionFile,

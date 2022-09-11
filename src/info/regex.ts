@@ -56,6 +56,17 @@ export const regexOsuChatHandlerCommandLastRequest =
   /^\s*!osuLastRequest(?:\s+(?<lastRequestCount>[0-9]+)(?:\s|$)|\s|$)/i;
 
 /**
+ * Regex to recognize the !osuPermitRequest command.
+ *
+ * @example
+ * ```text
+ * !osuPermitRequest
+ * ```
+ */
+export const regexOsuChatHandlerCommandPermitRequest =
+  /^\s*!osuPermitRequest(?:\s|$)/i;
+
+/**
  * Regex to recognize the `!moonpie` command.
  *
  * @example

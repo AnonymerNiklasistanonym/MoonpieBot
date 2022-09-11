@@ -6,6 +6,7 @@ import {
   osuCommandsNp,
   osuCommandsNpStreamCompanionFile,
   osuCommandsNpStreamCompanionWebsocket,
+  osuCommandsPermitRequest,
   osuCommandsPp,
   osuCommandsPrefix,
   osuCommandsRequests,
@@ -72,6 +73,9 @@ export const commandCommands: TwitchChatCommandHandler<
           break;
         case OsuCommands.LAST_REQUEST:
           commandsStringIds.push(osuCommandsLastRequest.id);
+          break;
+        case OsuCommands.PERMIT_REQUEST:
+          commandsStringIds.push(osuCommandsPermitRequest.id);
           break;
         case OsuCommands.NP:
           if (

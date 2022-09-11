@@ -27,6 +27,7 @@ export type CommandBeatmapRequestsCreateReplyInput = EMPTY_OBJECT;
 export interface CommandBeatmapRequestsCreateReplyInputExtra
   extends CommandBeatmapRequestsCreateReplyInput {
   beatmapRequestsInfo: BeatmapRequestsInfo;
+  enableOsuBeatmapRequestsMessage?: string;
 }
 export enum BeatmapRequestsType {
   INFO = "INFO",
@@ -112,15 +113,22 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
         break;
       case BeatmapRequestsType.INFO:
         if (data.beatmapRequestsInfo.beatmapRequestsOn) {
+          macros.set(
+            macroOsuBeatmapRequests.id,
+            new Map(
+              macroOsuBeatmapRequests.generate({
+                customMessage: data.enableOsuBeatmapRequestsMessage,
+              })
+            )
+          );
           message = await messageParserById(
             osuBeatmapRequestCurrentlyOn.id,
             globalStrings,
             globalPlugins,
-            globalMacros,
+            macros,
             logger
           );
         } else {
-          // TODO Fix message not being displayed
           macros.set(
             macroOsuBeatmapRequests.id,
             new Map([

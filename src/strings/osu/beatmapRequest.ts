@@ -9,6 +9,8 @@ import {
 import {
   MacroOsuBeatmapRequest,
   macroOsuBeatmapRequest,
+  macroOsuBeatmapRequestDemands,
+  MacroOsuBeatmapRequestDemands,
   MacroOsuBeatmapRequests,
   macroOsuBeatmapRequests,
 } from "../../messageParser/macros/osuBeatmapRequest";
@@ -120,46 +122,55 @@ export const osuBeatmapRequest: StringEntry = {
     { key: MacroOsuBeatmap.ARTIST, name: macroOsuBeatmap.id, type: "macro" },
     "'",
     {
-      args: [
-        {
-          key: MacroOsuBeatmapRequest.ID,
-          name: macroOsuBeatmapRequest.id,
-          type: "macro",
-        },
-        " ",
-        {
-          key: MacroOsuApi.DEFAULT_USER_ID,
-          name: macroOsuApi.id,
-          type: "macro",
-        },
-      ],
-      name: PluginOsuApi.SCORE,
-      scope: [
-        " - ",
-        {
-          args: {
-            key: MacroOsuScore.EXISTS,
-            name: macroOsuScore.id,
+      args: {
+        key: MacroOsuBeatmap.HAS_LEADERBOARD,
+        name: macroOsuBeatmap.id,
+        type: "macro",
+      },
+      name: pluginIfTrue.id,
+      scope: {
+        args: [
+          {
+            key: MacroOsuBeatmapRequest.ID,
+            name: macroOsuBeatmapRequest.id,
             type: "macro",
           },
-          name: pluginIfTrue.id,
-          scope: [
-            "Current top score is a ",
-            { name: osuBeatmapRequestRefTopScoreShort.id, type: "reference" },
-          ],
-          type: "plugin",
-        },
-        {
-          args: {
-            key: MacroOsuScore.EXISTS,
-            name: macroOsuScore.id,
+          " ",
+          {
+            key: MacroOsuApi.DEFAULT_USER_ID,
+            name: macroOsuApi.id,
             type: "macro",
           },
-          name: pluginIfFalse.id,
-          scope: "No score found",
-          type: "plugin",
-        },
-      ],
+        ],
+        name: PluginOsuApi.SCORE,
+        scope: [
+          " - ",
+          {
+            args: {
+              key: MacroOsuScore.EXISTS,
+              name: macroOsuScore.id,
+              type: "macro",
+            },
+            name: pluginIfTrue.id,
+            scope: [
+              "Current top score is a ",
+              { name: osuBeatmapRequestRefTopScoreShort.id, type: "reference" },
+            ],
+            type: "plugin",
+          },
+          {
+            args: {
+              key: MacroOsuScore.EXISTS,
+              name: macroOsuScore.id,
+              type: "macro",
+            },
+            name: pluginIfFalse.id,
+            scope: "No score found",
+            type: "plugin",
+          },
+        ],
+        type: "plugin",
+      },
       type: "plugin",
     },
   ]),
@@ -269,45 +280,54 @@ export const osuBeatmapRequestDetailed: StringEntry = {
     },
     "}",
     {
-      args: [
-        {
-          key: MacroOsuBeatmapRequest.ID,
-          name: macroOsuBeatmapRequest.id,
-          type: "macro",
-        },
-        " ",
-        {
-          key: MacroOsuApi.DEFAULT_USER_ID,
-          name: macroOsuApi.id,
-          type: "macro",
-        },
-      ],
-      name: PluginOsuApi.SCORE,
-      scope: [
-        {
-          args: {
-            key: MacroOsuScore.EXISTS,
-            name: macroOsuScore.id,
+      args: {
+        key: MacroOsuBeatmap.HAS_LEADERBOARD,
+        name: macroOsuBeatmap.id,
+        type: "macro",
+      },
+      name: pluginIfTrue.id,
+      scope: {
+        args: [
+          {
+            key: MacroOsuBeatmapRequest.ID,
+            name: macroOsuBeatmapRequest.id,
             type: "macro",
           },
-          name: pluginIfTrue.id,
-          scope: [
-            " - Current top score is a ",
-            { name: osuBeatmapRequestRefTopScore.id, type: "reference" },
-          ],
-          type: "plugin",
-        },
-        {
-          args: {
-            key: MacroOsuScore.EXISTS,
-            name: macroOsuScore.id,
+          " ",
+          {
+            key: MacroOsuApi.DEFAULT_USER_ID,
+            name: macroOsuApi.id,
             type: "macro",
           },
-          name: pluginIfFalse.id,
-          scope: " - No score found",
-          type: "plugin",
-        },
-      ],
+        ],
+        name: PluginOsuApi.SCORE,
+        scope: [
+          {
+            args: {
+              key: MacroOsuScore.EXISTS,
+              name: macroOsuScore.id,
+              type: "macro",
+            },
+            name: pluginIfTrue.id,
+            scope: [
+              " - Current top score is a ",
+              { name: osuBeatmapRequestRefTopScore.id, type: "reference" },
+            ],
+            type: "plugin",
+          },
+          {
+            args: {
+              key: MacroOsuScore.EXISTS,
+              name: macroOsuScore.id,
+              type: "macro",
+            },
+            name: pluginIfFalse.id,
+            scope: " - No score found",
+            type: "plugin",
+          },
+        ],
+        type: "plugin",
+      },
       type: "plugin",
     },
   ]),
@@ -325,6 +345,136 @@ export const osuBeatmapRequestNotFound: StringEntry = {
     "')",
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NOT_FOUND`,
+};
+
+export const osuBeatmapRequestNotMeetingDemands: StringEntry = {
+  default: createMessageForMessageParser([
+    "The requested osu! beatmap does not meet the demands of the requests",
+    {
+      args: {
+        key: MacroOsuBeatmapRequestDemands.MESSAGE,
+        name: macroOsuBeatmapRequestDemands.id,
+        type: "macro",
+      },
+      name: pluginIfNotEmpty.id,
+      scope: [
+        ": ",
+        {
+          key: MacroOsuBeatmapRequestDemands.MESSAGE,
+          name: macroOsuBeatmapRequestDemands.id,
+          type: "macro",
+        },
+      ],
+      type: "plugin",
+    },
+    " (",
+    {
+      args: {
+        key: MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN,
+        name: macroOsuBeatmapRequestDemands.id,
+        type: "macro",
+      },
+      name: pluginIfNotUndefined.id,
+      scope: [
+        " >",
+        {
+          key: MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN,
+          name: macroOsuBeatmapRequestDemands.id,
+          type: "macro",
+        },
+        "*",
+      ],
+      type: "plugin",
+    },
+    {
+      args: {
+        key: MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX,
+        name: macroOsuBeatmapRequestDemands.id,
+        type: "macro",
+      },
+      name: pluginIfNotUndefined.id,
+      scope: [
+        " <",
+        {
+          key: MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX,
+          name: macroOsuBeatmapRequestDemands.id,
+          type: "macro",
+        },
+        "*",
+      ],
+      type: "plugin",
+    },
+    {
+      args: {
+        key: MacroOsuBeatmapRequestDemands.AR_RANGE_MIN,
+        name: macroOsuBeatmapRequestDemands.id,
+        type: "macro",
+      },
+      name: pluginIfNotUndefined.id,
+      scope: [
+        " AR>",
+        {
+          key: MacroOsuBeatmapRequestDemands.AR_RANGE_MIN,
+          name: macroOsuBeatmapRequestDemands.id,
+          type: "macro",
+        },
+      ],
+      type: "plugin",
+    },
+    {
+      args: {
+        key: MacroOsuBeatmapRequestDemands.AR_RANGE_MAX,
+        name: macroOsuBeatmapRequestDemands.id,
+        type: "macro",
+      },
+      name: pluginIfNotUndefined.id,
+      scope: [
+        " AR<",
+        {
+          key: MacroOsuBeatmapRequestDemands.AR_RANGE_MAX,
+          name: macroOsuBeatmapRequestDemands.id,
+          type: "macro",
+        },
+      ],
+      type: "plugin",
+    },
+    {
+      args: {
+        key: MacroOsuBeatmapRequestDemands.CS_RANGE_MIN,
+        name: macroOsuBeatmapRequestDemands.id,
+        type: "macro",
+      },
+      name: pluginIfNotUndefined.id,
+      scope: [
+        " CS>",
+        {
+          key: MacroOsuBeatmapRequestDemands.CS_RANGE_MIN,
+          name: macroOsuBeatmapRequestDemands.id,
+          type: "macro",
+        },
+      ],
+      type: "plugin",
+    },
+    {
+      args: {
+        key: MacroOsuBeatmapRequestDemands.CS_RANGE_MAX,
+        name: macroOsuBeatmapRequestDemands.id,
+        type: "macro",
+      },
+      name: pluginIfNotUndefined.id,
+      scope: [
+        " CS<",
+        {
+          key: MacroOsuBeatmapRequestDemands.CS_RANGE_MAX,
+          name: macroOsuBeatmapRequestDemands.id,
+          type: "macro",
+        },
+      ],
+      type: "plugin",
+    },
+    ")",
+  ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NOT_MEETING_DEMANDS`,
 };
 
 const osuBeatmapRequestRefIrcRequestString: StringEntry = {
@@ -486,9 +636,16 @@ export const osuBeatmapRequestPermissionError: StringEntry = {
 
 export const osuBeatmapRequestNoRequestsError: StringEntry = {
   default: createMessageForMessageParser([
-    "No previous beatmap request were found!",
+    "No previous beatmap request was found!",
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NO_REQUESTS_ERROR`,
+};
+
+export const osuBeatmapRequestNoBlockedRequestsError: StringEntry = {
+  default: createMessageForMessageParser([
+    "No blocked beatmap request was found!",
+  ]),
+  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_NO_BLOCKED_REQUESTS_ERROR`,
 };
 
 export const osuBeatmapRequestTurnedOff: StringEntry = {
@@ -556,6 +713,23 @@ export const osuBeatmapRequestCurrentlyOn: StringEntry = {
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " Beatmap requests are currently on",
+    {
+      args: {
+        key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+        name: macroOsuBeatmapRequests.id,
+        type: "macro",
+      },
+      name: pluginIfNotEmpty.id,
+      scope: [
+        ": ",
+        {
+          key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
+          name: macroOsuBeatmapRequests.id,
+          type: "macro",
+        },
+      ],
+      type: "plugin",
+    },
   ]),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_CURRENTLY_ON`,
 };
@@ -575,7 +749,9 @@ export const osuBeatmapRequests: StringEntry[] = [
   osuBeatmapRequestDetailed,
   osuBeatmapRequestIrc,
   osuBeatmapRequestIrcDetailed,
+  osuBeatmapRequestNoBlockedRequestsError,
   osuBeatmapRequestNotFound,
+  osuBeatmapRequestNotMeetingDemands,
   osuBeatmapRequestNoRedeem,
   osuBeatmapRequestNoRequestsError,
   osuBeatmapRequestPermissionError,

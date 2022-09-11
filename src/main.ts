@@ -179,6 +179,27 @@ export const main = async (
       EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
       configDir
     ) === EnvVariableOnOff.ON;
+  const osuApiBeatmapRequestMessage = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_MESSAGE
+  );
+  const osuApiBeatmapRequestStarRangeMax = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_STAR_RANGE_MAX
+  );
+  const osuApiBeatmapRequestStarRangeMin = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_STAR_RANGE_MIN
+  );
+  const osuApiBeatmapRequestArRangeMax = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_AR_RANGE_MAX
+  );
+  const osuApiBeatmapRequestArRangeMin = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_AR_RANGE_MIN
+  );
+  const osuApiBeatmapRequestCsRangeMax = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_CS_RANGE_MAX
+  );
+  const osuApiBeatmapRequestCsRangeMin = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_CS_RANGE_MIN
+  );
   const osuApiBeatmapRequestsRedeemId = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID
   );
@@ -239,6 +260,31 @@ export const main = async (
   const enableOsuBeatmapRequests = osuApiBeatmapRequests;
   const enableOsuBeatmapRequestsDetailed = osuApiBeatmapRequestsDetailed;
   const enableOsuBeatmapRequestsRedeemId = osuApiBeatmapRequestsRedeemId;
+  const enableOsuBeatmapRequestsMessage = osuApiBeatmapRequestMessage;
+  const enableOsuBeatmapRequestsStarRangeMax =
+    osuApiBeatmapRequestStarRangeMax !== undefined
+      ? parseFloat(osuApiBeatmapRequestStarRangeMax)
+      : undefined;
+  const enableOsuBeatmapRequestsStarRangeMin =
+    osuApiBeatmapRequestStarRangeMin !== undefined
+      ? parseFloat(osuApiBeatmapRequestStarRangeMin)
+      : undefined;
+  const enableOsuBeatmapRequestsArRangeMax =
+    osuApiBeatmapRequestArRangeMax !== undefined
+      ? parseFloat(osuApiBeatmapRequestArRangeMax)
+      : undefined;
+  const enableOsuBeatmapRequestsArRangeMin =
+    osuApiBeatmapRequestArRangeMin !== undefined
+      ? parseFloat(osuApiBeatmapRequestArRangeMin)
+      : undefined;
+  const enableOsuBeatmapRequestsCsRangeMax =
+    osuApiBeatmapRequestCsRangeMax !== undefined
+      ? parseFloat(osuApiBeatmapRequestCsRangeMax)
+      : undefined;
+  const enableOsuBeatmapRequestsCsRangeMin =
+    osuApiBeatmapRequestCsRangeMin !== undefined
+      ? parseFloat(osuApiBeatmapRequestCsRangeMin)
+      : undefined;
   let osuIrcBot: OsuIrcBotSendMessageFunc | undefined;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
     osuIrcBot = (id: string) =>
@@ -462,8 +508,15 @@ export const main = async (
             ? {
                 defaultOsuId: parseInt(osuApiDefaultId),
                 enableOsuBeatmapRequests,
+                enableOsuBeatmapRequestsArRangeMax,
+                enableOsuBeatmapRequestsArRangeMin,
+                enableOsuBeatmapRequestsCsRangeMax,
+                enableOsuBeatmapRequestsCsRangeMin,
                 enableOsuBeatmapRequestsDetailed,
+                enableOsuBeatmapRequestsMessage,
                 enableOsuBeatmapRequestsRedeemId,
+                enableOsuBeatmapRequestsStarRangeMax,
+                enableOsuBeatmapRequestsStarRangeMin,
                 enabledCommands: osuEnableCommands,
                 osuApiV2Credentials: {
                   clientId: parseInt(osuApiClientId),

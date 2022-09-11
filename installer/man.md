@@ -72,9 +72,9 @@ Supported list values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", 
 **MOONPIE_CONFIG_MOONPIE_CLAIM_COOLDOWN_HOURS**="*18*"
 : The number of hours for which a user is unable to claim a Moonpie after claiming one (less than 24 in case of daily streams).
 
-**MOONPIE_CONFIG_OSU_ENABLE_COMMANDS**="*commands,lastrequest,np,pp,requests,rp,score*"
+**MOONPIE_CONFIG_OSU_ENABLE_COMMANDS**="*commands,last_request,np,permit_request,pp,requests,rp,score*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!
-Supported list values: "*commands*", "*lastrequest*", "*np*", "*pp*", "*requests*", "*rp*", "*score*" (empty list value: "*none*")
+Supported list values: "*commands*", "*last_request*", "*np*", "*permit_request*", "*pp*", "*requests*", "*rp*", "*score*" (empty list value: "*none*")
 
 **MOONPIE_CONFIG_OSU_API_CLIENT_ID**
 : The osu! client ID (and client secret) to use the osu! api v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).
@@ -91,6 +91,34 @@ Example: "*1185432*"
 **MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS**="*OFF*"
 : Automatically recognize osu! beatmap links (=requests) in chat.
 Supported values: "*OFF*", "*ON*"
+
+**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_MESSAGE**
+: Message to be displayed when user asks if requests are enabled
+Example: "*I love tech maps and streams*"
+
+**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_STAR_RANGE_MAX**
+: The maximum star range of maps that can be requested
+Example: "*6.5*"
+
+**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_STAR_RANGE_MIN**
+: The minimum star range of maps that can be requested
+Example: "*3.9*"
+
+**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_AR_RANGE_MAX**
+: The maximum AR value of maps that can be requested
+Example: "*10*"
+
+**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_AR_RANGE_MIN**
+: The minimum AR value of maps that can be requested
+Example: "*9*"
+
+**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_CS_RANGE_MAX**
+: The maximum CS value of maps that can be requested
+Example: "*7*"
+
+**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_CS_RANGE_MIN**
+: The minimum CS value of maps that can be requested
+Example: "*4*"
 
 **MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED**="*OFF*"
 : If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) additionally output more detailed information about the map in the chat.

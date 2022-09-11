@@ -59,6 +59,7 @@ export enum MacroOsuBeatmap {
   CS = "CS",
   DIFFICULTY_RATING = "DIFFICULTY_RATING",
   DRAIN = "DRAIN",
+  HAS_LEADERBOARD = "HAS_LEADERBOARD",
   ID = "ID",
   LAST_UPDATED_MONTH = "LAST_UPDATED_MONTH",
   LAST_UPDATED_YEAR = "LAST_UPDATED_YEAR",
@@ -112,6 +113,13 @@ export const macroOsuBeatmap: MessageParserMacroGenerator<MacroOsuBeatmapData> =
               break;
             case MacroOsuBeatmap.DRAIN:
               macroValue = roundNumber(data.beatmap.drain, 1);
+              break;
+            case MacroOsuBeatmap.HAS_LEADERBOARD:
+              macroValue =
+                data.beatmap.ranked === RankedStatus.approved ||
+                data.beatmap.ranked === RankedStatus.loved ||
+                data.beatmap.ranked === RankedStatus.qualified ||
+                data.beatmap.ranked === RankedStatus.ranked;
               break;
             case MacroOsuBeatmap.ID:
               macroValue = data.beatmap.id;
