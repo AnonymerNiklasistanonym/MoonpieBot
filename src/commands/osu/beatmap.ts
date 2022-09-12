@@ -2,6 +2,11 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
+  errorMessageOsuApiCredentialsUndefined,
+  errorMessageUserIdUndefined,
+  errorMessageUserNameUndefined,
+} from "../../error";
+import {
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequestDemands,
   macroOsuBeatmapRequests,
@@ -22,7 +27,6 @@ import {
   regexOsuBeatmapUrlSplitter,
 } from "../../info/regex";
 import { createLogFunc } from "../../logging";
-import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { macroOsuBeatmap } from "../../messageParser/macros/osuApi";
 import { messageParserById } from "../../messageParser";
@@ -115,6 +119,12 @@ export const commandBeatmap: TwitchChatCommandHandler<
   ) => {
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
+    }
+    if (tags["user-id"] === undefined) {
+      throw errorMessageUserIdUndefined();
+    }
+    if (tags.username === undefined) {
+      throw errorMessageUserNameUndefined();
     }
 
     const logCmdBeatmap = createLogFunc(
@@ -238,7 +248,6 @@ export const commandBeatmap: TwitchChatCommandHandler<
             data.beatmapRequestsInfo.blockedBeatmapRequest = {
               comment: beatmapRequest.comment?.trim(),
               data: beatmap,
-              id: beatmapRequest.beatmapId,
               userId: tags["user-id"],
               userName: tags.username,
             };
@@ -270,7 +279,6 @@ export const commandBeatmap: TwitchChatCommandHandler<
           data.beatmapRequestsInfo.previousBeatmapRequests.unshift({
             comment: beatmapRequest.comment?.trim(),
             data: beatmap,
-            id: beatmapRequest.beatmapId,
             userId: tags["user-id"],
             userName: tags.username,
           });

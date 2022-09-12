@@ -97,7 +97,7 @@ export const commandBeatmapPermitRequest: TwitchChatCommandHandler<
       new Map(
         macroOsuBeatmapRequest.generate({
           comment: blockedBeatmapRequest.comment?.trim(),
-          id: blockedBeatmapRequest.id,
+          id: blockedBeatmapRequest.data.id,
         })
       )
     );
@@ -116,14 +116,11 @@ export const commandBeatmapPermitRequest: TwitchChatCommandHandler<
       osuBeatmapRequestPlugins.set(plugin.id, plugin.func);
     });
 
-    data.beatmapRequestsInfo.lastMentionedBeatmapId = blockedBeatmapRequest.id;
-    data.beatmapRequestsInfo.previousBeatmapRequests.unshift({
-      comment: blockedBeatmapRequest.comment?.trim(),
-      data: blockedBeatmapRequest.data,
-      id: blockedBeatmapRequest.id,
-      userId: tags["user-id"],
-      userName: tags.username,
-    });
+    data.beatmapRequestsInfo.lastMentionedBeatmapId =
+      blockedBeatmapRequest.data.id;
+    data.beatmapRequestsInfo.previousBeatmapRequests.unshift(
+      blockedBeatmapRequest
+    );
     data.beatmapRequestsInfo.blockedBeatmapRequest = undefined;
 
     let messageRequest = "";

@@ -108,7 +108,7 @@ export const commandBeatmapLastRequest: TwitchChatCommandHandler<
 
     for (const previousBeatmapRequest of previousBeatmapRequests) {
       data.beatmapRequestsInfo.lastMentionedBeatmapId =
-        previousBeatmapRequest.id;
+        previousBeatmapRequest.data.id;
 
       const osuBeatmapRequestMacros = new Map(globalMacros);
       osuBeatmapRequestMacros.set(
@@ -116,7 +116,7 @@ export const commandBeatmapLastRequest: TwitchChatCommandHandler<
         new Map(
           macroOsuBeatmapRequest.generate({
             comment: previousBeatmapRequest.comment?.trim(),
-            id: previousBeatmapRequest.id,
+            id: previousBeatmapRequest.data.id,
           })
         )
       );

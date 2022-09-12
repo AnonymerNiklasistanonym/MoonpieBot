@@ -50,26 +50,44 @@ export interface OsuApiV2Credentials {
   clientSecret: string;
 }
 
-export interface BeatmapRequestsListElement {
+/**
+ * Information about a beatmap request.
+ */
+export interface BeatmapRequestInfo {
+  /** Optional beatmap request comment. */
   comment?: string;
+  /** Beatmap request fetched raw data. */
   data: Beatmap;
-  id: number;
-  userId?: string;
-  userName?: string;
+  /** Twitch user ID of requestor. */
+  userId: string;
+  /** Twitch user name of requestor. */
+  userName: string;
 }
 
+/**
+ * Dynamic beatmap request information that can be shared across commands.
+ */
 export interface BeatmapRequestsInfo {
+  /** A custom beatmap requests off message. */
   beatmapRequestsOffMessage?: string;
+  /**
+   * Indicator if beatmap requests are currently enabled.
+   * The configuration value can still be false and thus needs to be checked!
+   */
   beatmapRequestsOn: boolean;
-  beatmapRequestsOnMaxStars?: string;
-  beatmapRequestsOnMessage?: string;
-  beatmapRequestsOnMinStars?: string;
-  blockedBeatmapRequest?: BeatmapRequestsListElement;
+  /** The last blocked beatmap request this session. */
+  blockedBeatmapRequest?: BeatmapRequestInfo;
+  /** The last mentioned beatmap ID this session. */
   lastMentionedBeatmapId?: number;
-  previousBeatmapRequests: BeatmapRequestsListElement[];
+  /** A list of previous beatmap requests this session. */
+  previousBeatmapRequests: BeatmapRequestInfo[];
 }
 
-const globalBeatmapRequestObject: BeatmapRequestsInfo = {
+/**
+ * Session object to share dynamic beatmap request information across commands
+ * next to the provided static values from the configuration.
+ */
+const beatmapRequestsInfo: BeatmapRequestsInfo = {
   beatmapRequestsOn: true,
   previousBeatmapRequests: [],
 };
@@ -111,7 +129,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         channel,
         tags,
         message,
-        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
+        { ...data, beatmapRequestsInfo },
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -127,7 +145,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         channel,
         tags,
         message,
-        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
+        { ...data, beatmapRequestsInfo },
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -143,7 +161,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         channel,
         tags,
         message,
-        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
+        { ...data, beatmapRequestsInfo },
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -159,7 +177,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         channel,
         tags,
         message,
-        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
+        { ...data, beatmapRequestsInfo },
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -175,7 +193,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         channel,
         tags,
         message,
-        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
+        { ...data, beatmapRequestsInfo },
         globalStrings,
         globalPlugins,
         globalMacros,
@@ -191,7 +209,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
         channel,
         tags,
         message,
-        { ...data, beatmapRequestsInfo: globalBeatmapRequestObject },
+        { ...data, beatmapRequestsInfo },
         globalStrings,
         globalPlugins,
         globalMacros,
