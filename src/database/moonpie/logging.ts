@@ -1,7 +1,7 @@
 // Package imports
-import { LogLevel } from "sqlite3-promise-query-api/lib/logging";
+import { LogLevel } from "sqlite3-promise-query-api";
 // Type imports
-import type { Logger } from "sqlite3-promise-query-api/lib/logging";
+import type { Logger } from "sqlite3-promise-query-api";
 import type { Logger as WinstonLogger } from "winston";
 
 export const createLogMethod =

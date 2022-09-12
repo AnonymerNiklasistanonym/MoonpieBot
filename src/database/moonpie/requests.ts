@@ -3,7 +3,7 @@ import db, { SqliteTable, SqliteView } from "sqlite3-promise-query-api";
 // Local imports
 import { createLogMethod } from "./logging";
 // Type imports
-import type { ExistsDbOut } from "sqlite3-promise-query-api/lib/queries";
+import type { ExistsDbOut } from "sqlite3-promise-query-api";
 import type { Logger } from "winston";
 
 /** Errors that can happen during moonpie entry creations. */
