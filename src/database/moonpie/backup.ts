@@ -1,7 +1,9 @@
+// Package imports
+import db from "sqlite3-promise-query-api";
 // Local imports
-import * as database from "../core";
 import * as moonpie from "./requests";
 import { createLogFunc } from "../../logging";
+import { createLogMethod } from "./logging";
 // Type imports
 import type { Logger } from "winston";
 
@@ -20,7 +22,7 @@ const LOG_ID = "database_backup";
 /**
  * Create tables if not existing.
  *
- * @param databasePath Path to database.
+ * @param databasePath Path to db.sqlite3.
  * @param logger Logger (for global logs).
  */
 export const exportMoonpieCountTableToJson = async (
@@ -28,13 +30,14 @@ export const exportMoonpieCountTableToJson = async (
   logger: Logger
 ): Promise<DatabaseStructure[]> => {
   const logDbBackup = createLogFunc(logger, LOG_ID);
+  const logMethod = createLogMethod(logger, LOG_ID);
 
-  logDbBackup.debug("Backup moonpie database...");
+  logDbBackup.debug("Backup moonpie db.sqlite3...");
 
   // Check if the database exists
   // The warning makes literally no sense
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  if (!(await database.exists(databasePath, logger))) {
+  if (!(await db.sqlite3.exists(databasePath, logMethod))) {
     logDbBackup.error(Error("Database not found"));
     throw Error(moonpie.GeneralError.NOT_EXISTING);
   }
@@ -42,23 +45,23 @@ export const exportMoonpieCountTableToJson = async (
   // Check if the database can be opened
   // The warning makes literally no sense
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await database.open(databasePath, logger, { readOnly: true });
+  await db.sqlite3.open(databasePath, logMethod, { readOnly: true });
 
   // Get Moonpie table data
-  const moonpieData = await database.requests.getAll<DatabaseStructure>(
+  const moonpieData = await db.requests.getAll<DatabaseStructure>(
     databasePath,
-    database.queries.select(
+    db.queries.select(
       moonpie.table.name,
       [
-        { columnName: moonpie.table.column.twitchId },
-        { columnName: moonpie.table.column.twitchName },
-        { columnName: moonpie.table.column.moonpieCount },
-        { columnName: moonpie.table.column.date },
+        { columnName: moonpie.table.columns.twitchId.name },
+        { columnName: moonpie.table.columns.twitchName.name },
+        { columnName: moonpie.table.columns.moonpieCount.name },
+        { columnName: moonpie.table.columns.date.name },
       ],
       {}
     ),
     undefined,
-    logger
+    logMethod
   );
   return moonpieData;
 };

@@ -1,7 +1,9 @@
+// Package imports
+import db from "sqlite3-promise-query-api";
 // Local imports
-import * as database from "../core";
 import * as moonpie from "./requests";
 import { createLogFunc } from "../../logging";
+import { createLogMethod } from "./logging";
 // Type imports
 import type { Logger } from "winston";
 
@@ -16,97 +18,57 @@ export const createAndSetupTables = async (
   logger: Logger
 ): Promise<void> => {
   const loggerDatabase = createLogFunc(logger, "database", "setup");
+  const logMethod = createLogMethod(logger, "database_sqlite");
   loggerDatabase.debug("Setup database...");
 
   // Create database if not already existing
   // The warning makes literally no sense
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  if (!(await database.exists(databasePath, logger))) {
-    await database.create(databasePath, logger);
+  if (!(await db.sqlite3.exists(databasePath, logMethod))) {
+    await db.sqlite3.create(databasePath, logMethod);
   }
 
   // TODO Update this and think about migrations on later versions
 
   // Setup database tables
   // > Create Moonpie table if not existing
-  await database.requests.post(
+  await db.requests.post(
     databasePath,
-    database.queries.createTable(
+    db.queries.createTable(
       moonpie.table.name,
-      [
-        {
-          name: moonpie.table.column.twitchId,
-          options: { notNull: true, primaryKey: true, unique: true },
-          type: database.queries.CreateTableColumnType.TEXT,
-        },
-        {
-          name: moonpie.table.column.twitchName,
-          options: { notNull: true },
-          type: database.queries.CreateTableColumnType.TEXT,
-        },
-        {
-          name: moonpie.table.column.moonpieCount,
-          options: { notNull: true },
-          type: database.queries.CreateTableColumnType.INTEGER,
-        },
-        {
-          name: moonpie.table.column.date,
-          options: { notNull: true },
-          type: database.queries.CreateTableColumnType.INTEGER,
-        },
-      ],
+      Object.values(moonpie.table.columns),
       true
     ),
     undefined,
-    logger
+    logMethod
   );
   // > Create Moonpie leaderboard table if not existing
-  await database.requests.post(
+  await db.requests.post(
     databasePath,
-    database.queries.createView(
+    db.queries.createView(
       moonpie.viewLeaderboard.name,
-      moonpie.table.name,
-      [
-        {
-          alias: moonpie.viewLeaderboard.column.twitchId,
-          columnName: moonpie.table.column.twitchId,
-          tableName: moonpie.table.name,
-        },
-        {
-          alias: moonpie.viewLeaderboard.column.twitchName,
-          columnName: moonpie.table.column.twitchName,
-          tableName: moonpie.table.name,
-        },
-        {
-          alias: moonpie.viewLeaderboard.column.moonpieCount,
-          columnName: moonpie.table.column.moonpieCount,
-          tableName: moonpie.table.name,
-        },
-        {
-          alias: moonpie.viewLeaderboard.column.rank,
-          columnName: `ROW_NUMBER () OVER (ORDER BY ${moonpie.table.name}.${moonpie.table.column.moonpieCount} DESC, ${moonpie.table.name}.${moonpie.table.column.date} ASC, ${moonpie.table.name}.${moonpie.table.column.twitchName} ASC)`,
-        },
-      ],
+      moonpie.viewLeaderboard.tableName,
+      Object.values(moonpie.viewLeaderboard.columns),
       {
         orderBy: [
           {
             ascending: false,
-            column: moonpie.table.column.moonpieCount,
+            column: moonpie.table.columns.moonpieCount.name,
           },
           {
             ascending: true,
-            column: moonpie.table.column.date,
+            column: moonpie.table.columns.date.name,
           },
           {
             ascending: true,
-            column: moonpie.table.column.twitchName,
+            column: moonpie.table.columns.twitchName.name,
           },
         ],
       },
       true
     ),
     undefined,
-    logger
+    logMethod
   );
   loggerDatabase.debug(`Database tables were created/loaded '${databasePath}'`);
 };

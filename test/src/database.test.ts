@@ -4,7 +4,6 @@ import { describe } from "mocha";
 import os from "os";
 import path from "path";
 // Local imports
-import core from "./database/core.test";
 import moonpie from "./database/moonpie.test";
 
 describe("database", () => {
@@ -12,6 +11,5 @@ describe("database", () => {
   rm(databaseDirPath, { force: true, recursive: true });
   mkdirSync(databaseDirPath, { recursive: true });
 
-  core(databaseDirPath);
   moonpie(databaseDirPath);
 });

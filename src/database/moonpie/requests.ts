@@ -1,4 +1,9 @@
-import * as database from "../core";
+// Package imports
+import db, { SqliteTable, SqliteView } from "sqlite3-promise-query-api";
+// Local imports
+import { createLogMethod } from "./logging";
+// Type imports
+import type { ExistsDbOut } from "sqlite3-promise-query-api/lib/queries";
 import type { Logger } from "winston";
 
 /** Errors that can happen during moonpie entry creations. */
@@ -14,37 +19,65 @@ export enum GeneralError {
 }
 
 /** Information about the SQlite table for moonpies. */
-export const table = {
-  /** SQlite column names for moonpie table. */
-  column: {
+export const table: SqliteTable = {
+  columns: {
     /** The timestamp at the last time of the claim (for time based claims). */
-    date: "timestamp",
+    date: {
+      name: "timestamp",
+      options: { notNull: true },
+      type: db.queries.CreateTableColumnType.INTEGER,
+    },
     /** The current number of moonpies. */
-    moonpieCount: "count",
+    moonpieCount: {
+      name: "count",
+      options: { notNull: true },
+      type: db.queries.CreateTableColumnType.INTEGER,
+    },
     /** The *unique* Twitch ID. */
-    twitchId: "id",
+    twitchId: {
+      name: "id",
+      options: { notNull: true, primaryKey: true, unique: true },
+      type: db.queries.CreateTableColumnType.TEXT,
+    },
     /** The *current* Twitch account name at the last time of the claim (for the leaderboard). */
-    twitchName: "name",
+    twitchName: {
+      name: "name",
+      options: { notNull: true },
+      type: db.queries.CreateTableColumnType.TEXT,
+    },
   },
-  /** SQlite table name for moonpies. */
   name: "moonpie",
 } as const;
 
 /** Information about the SQlite table for moonpies. */
-export const viewLeaderboard = {
-  /** SQlite column names for moonpie table. */
-  column: {
+export const viewLeaderboard: SqliteView<
+  "moonpieCount" | "rank" | "twitchId" | "twitchName"
+> = {
+  columns: {
     /** The current number of moonpies. */
-    moonpieCount: "count",
+    moonpieCount: {
+      columnName: "count",
+    },
     /** The current rank on the leaderboard. */
-    rank: "rank",
+    rank: {
+      alias: "rank",
+      columnName: db.queries.rowNumberOver([
+        { ascending: false, column: table.columns.moonpieCount.name },
+        { ascending: true, column: table.columns.date.name },
+        { ascending: true, column: table.columns.twitchName.name },
+      ]),
+    },
     /** The *unique* Twitch ID. */
-    twitchId: "id",
+    twitchId: {
+      columnName: "id",
+    },
     /** The *current* Twitch account name at the last time of the claim (for the leaderboard). */
-    twitchName: "name",
+    twitchName: {
+      columnName: "name",
+    },
   },
-  /** SQlite table name for moonpies. */
   name: "moonpieleaderboard",
+  tableName: table.name,
 } as const;
 
 // Exists
@@ -63,17 +96,17 @@ export const exists = async (
   twitchId: string,
   logger: Logger
 ): Promise<boolean> => {
+  const logMethod = createLogMethod(logger, "database_exists");
   //logger.debug("database: exists");
   try {
-    const runResultExists =
-      await database.requests.getEach<database.queries.ExistsDbOut>(
-        databasePath,
-        // The warning makes literally no sense
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        database.queries.exists(table.name, table.column.twitchId),
-        [twitchId],
-        logger
-      );
+    const runResultExists = await db.requests.getEach<ExistsDbOut>(
+      databasePath,
+      // The warning makes literally no sense
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      db.queries.exists(table.name, table.columns.twitchId.name),
+      [twitchId],
+      logMethod
+    );
     if (runResultExists) {
       return runResultExists.exists_value === 1;
     }
@@ -96,20 +129,17 @@ export const existsName = async (
   twitchName: string,
   logger: Logger
 ): Promise<boolean> => {
+  const logMethod = createLogMethod(logger, "database_exists_name");
   //logger.debug("database: exists");
   try {
-    const runResultExists =
-      await database.requests.getEach<database.queries.ExistsDbOut>(
-        databasePath,
-        // The warning makes literally no sense
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        database.queries.exists(
-          table.name,
-          `lower(${table.column.twitchName})`
-        ),
-        [twitchName.toLowerCase()],
-        logger
-      );
+    const runResultExists = await db.requests.getEach<ExistsDbOut>(
+      databasePath,
+      // The warning makes literally no sense
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      db.queries.exists(table.name, `lower(${table.columns.twitchName.name})`),
+      [twitchName.toLowerCase()],
+      logMethod
+    );
     if (runResultExists) {
       return runResultExists.exists_value === 1;
     }
@@ -143,22 +173,23 @@ export const create = async (
   input: CreateInput,
   logger: Logger
 ): Promise<number> => {
+  const logMethod = createLogMethod(logger, "database_create");
   // Special validations for DB entry creation
   // > Check if entry already exists
   if (await exists(databasePath, input.id, logger)) {
     throw Error(CreateError.ALREADY_EXISTS);
   }
 
-  const postResult = await database.requests.post(
+  const postResult = await db.requests.post(
     databasePath,
-    database.queries.insert(table.name, [
-      table.column.twitchId,
-      table.column.twitchName,
-      table.column.moonpieCount,
-      table.column.date,
+    db.queries.insert(table.name, [
+      table.columns.twitchId.name,
+      table.columns.twitchName.name,
+      table.columns.moonpieCount.name,
+      table.columns.date.name,
     ]),
     [input.id, input.name, 0, 0],
-    logger
+    logMethod
   );
   return postResult.lastID;
 };
@@ -180,15 +211,16 @@ export const remove = async (
   twitchId: string,
   logger: Logger
 ): Promise<boolean> => {
+  const logMethod = createLogMethod(logger, "database_remove");
   if ((await exists(databasePath, twitchId, logger)) === false) {
     return true;
   }
 
-  const postResult = await database.requests.post(
+  const postResult = await db.requests.post(
     databasePath,
-    database.queries.remove(table.name, table.column.twitchId),
+    db.queries.remove(table.name, table.columns.twitchId.name),
     [twitchId],
-    logger
+    logMethod
   );
   return postResult.changes > 0;
 };
@@ -207,15 +239,16 @@ export const removeName = async (
   twitchName: string,
   logger: Logger
 ): Promise<boolean> => {
+  const logMethod = createLogMethod(logger, "database_remove_name");
   if ((await existsName(databasePath, twitchName, logger)) === false) {
     return true;
   }
 
-  const postResult = await database.requests.post(
+  const postResult = await db.requests.post(
     databasePath,
-    database.queries.remove(table.name, table.column.twitchName),
+    db.queries.remove(table.name, table.columns.twitchName.name),
     [twitchName],
-    logger
+    logMethod
   );
   return postResult.changes > 0;
 };
@@ -251,28 +284,29 @@ export const getMoonpie = async (
   twitchId: string,
   logger: Logger
 ): Promise<GetMoonpieOut> => {
+  const logMethod = createLogMethod(logger, "database_get_moonpie");
   // Special validations for DB entry request
   // > Check if entry already exists
   if ((await exists(databasePath, twitchId, logger)) === false) {
     throw Error(GeneralError.NOT_EXISTING);
   }
 
-  const runResult = await database.requests.getEach<GetMoonpieDbOut>(
+  const runResult = await db.requests.getEach<GetMoonpieDbOut>(
     databasePath,
-    database.queries.select(
+    db.queries.select(
       table.name,
       [
-        table.column.twitchId,
-        table.column.moonpieCount,
-        table.column.twitchName,
-        table.column.date,
+        table.columns.twitchId.name,
+        table.columns.moonpieCount.name,
+        table.columns.twitchName.name,
+        table.columns.date.name,
       ],
       {
-        whereColumn: table.column.twitchId,
+        whereColumn: table.columns.twitchId.name,
       }
     ),
     [twitchId],
-    logger
+    logMethod
   );
   if (runResult) {
     return runResult;
@@ -294,28 +328,29 @@ export const getMoonpieName = async (
   twitchName: string,
   logger: Logger
 ): Promise<GetMoonpieOut> => {
+  const logMethod = createLogMethod(logger, "database_get_moonpie_name");
   // Special validations for DB entry request
   // > Check if entry already exists
   if ((await existsName(databasePath, twitchName, logger)) === false) {
     throw Error(GeneralError.NOT_EXISTING);
   }
 
-  const runResult = await database.requests.getEach<GetMoonpieDbOut>(
+  const runResult = await db.requests.getEach<GetMoonpieDbOut>(
     databasePath,
-    database.queries.select(
+    db.queries.select(
       table.name,
       [
-        table.column.twitchId,
-        table.column.moonpieCount,
-        table.column.twitchName,
-        table.column.date,
+        table.columns.twitchId.name,
+        table.columns.moonpieCount.name,
+        table.columns.twitchName.name,
+        table.columns.date.name,
       ],
       {
-        whereColumn: `lower(${table.column.twitchName})`,
+        whereColumn: `lower(${table.columns.twitchName.name})`,
       }
     ),
     [twitchName.toLowerCase()],
-    logger
+    logMethod
   );
   if (runResult) {
     return runResult;
@@ -354,14 +389,17 @@ export const getMoonpieLeaderboard = async (
   offset: number | undefined,
   logger: Logger
 ): Promise<GetMoonpieLeaderboardOut[]> => {
-  const runResult = await database.requests.getAll<GetMoonpieLeaderboardDbOut>(
+  const logMethod = createLogMethod(logger, "database_get_moonpie_leaderboard");
+  const runResult = await db.requests.getAll<GetMoonpieLeaderboardDbOut>(
     databasePath,
-    database.queries.select(
+    db.queries.select(
       viewLeaderboard.name,
       [
-        viewLeaderboard.column.moonpieCount,
-        viewLeaderboard.column.twitchName,
-        viewLeaderboard.column.rank,
+        viewLeaderboard.columns.moonpieCount.columnName,
+        viewLeaderboard.columns.twitchName.columnName,
+        viewLeaderboard.columns.rank.alias !== undefined
+          ? viewLeaderboard.columns.rank.alias
+          : viewLeaderboard.columns.rank.columnName,
       ],
       {
         limit,
@@ -369,7 +407,7 @@ export const getMoonpieLeaderboard = async (
       }
     ),
     [],
-    logger
+    logMethod
   );
   if (runResult) {
     return runResult;
@@ -391,29 +429,35 @@ export const getMoonpieLeaderboardEntry = async (
   twitchId: string,
   logger: Logger
 ): Promise<GetMoonpieLeaderboardOut> => {
+  const logMethod = createLogMethod(
+    logger,
+    "database_get_moonpie_leaderboard_entry"
+  );
   // Special validations for DB entry request
   // > Check if entry already exists
   if ((await exists(databasePath, twitchId, logger)) === false) {
     throw Error(GeneralError.NOT_EXISTING);
   }
 
-  const runResult = await database.requests.getEach<GetMoonpieLeaderboardDbOut>(
+  const runResult = await db.requests.getEach<GetMoonpieLeaderboardDbOut>(
     databasePath,
-    database.queries.select(
+    db.queries.select(
       viewLeaderboard.name,
       [
-        viewLeaderboard.column.moonpieCount,
-        viewLeaderboard.column.twitchName,
-        viewLeaderboard.column.rank,
+        viewLeaderboard.columns.moonpieCount.columnName,
+        viewLeaderboard.columns.twitchName.columnName,
+        viewLeaderboard.columns.rank.alias !== undefined
+          ? viewLeaderboard.columns.rank.alias
+          : viewLeaderboard.columns.rank.columnName,
       ],
       {
         whereColumn: {
-          columnName: viewLeaderboard.column.twitchId,
+          columnName: viewLeaderboard.columns.twitchId.columnName,
         },
       }
     ),
     [twitchId],
-    logger
+    logMethod
   );
   if (runResult) {
     return runResult;
@@ -444,6 +488,7 @@ export const update = async (
   input: UpdateInput,
   logger: Logger
 ): Promise<boolean> => {
+  const logMethod = createLogMethod(logger, "database_update");
   // Special validations for DB entry request
   // > Check if entry already exists
   if ((await exists(databasePath, input.id, logger)) === false) {
@@ -451,9 +496,9 @@ export const update = async (
   }
 
   const columns = [
-    table.column.twitchName,
-    table.column.moonpieCount,
-    table.column.date,
+    table.columns.twitchName.name,
+    table.columns.moonpieCount.name,
+    table.columns.date.name,
   ];
   const values = [
     input.name,
@@ -461,11 +506,11 @@ export const update = async (
     input.timestamp !== undefined ? input.timestamp : new Date().getTime(),
     input.id,
   ];
-  const postResult = await database.requests.post(
+  const postResult = await db.requests.post(
     databasePath,
-    database.queries.update(table.name, columns, table.column.twitchId),
+    db.queries.update(table.name, columns, table.columns.twitchId.name),
     values,
-    logger
+    logMethod
   );
   return postResult.changes > 0;
 };
