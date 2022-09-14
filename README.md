@@ -50,6 +50,7 @@ All features are optional (which means they can be enabled and disabled) but the
   | Command | Permissions | Description |
   | ------ | -- | -------- |
   | `!moonpie` | everyone | (If not already claimed) Claim a moonpie and return the current count and the leaderboard position |
+  | `!moonpie commands` | everyone | See all available moonpie commands |
   | `!moonpie leaderboard` | everyone | Show the top 15 moonpie holders |
   | `!moonpie get $USER` | everyone | Return the current count and the leaderboard position of `$USER` if found in database |
   | `!moonpie about` | everyone | Show the version and source code link of the bot |
@@ -70,17 +71,19 @@ Given an osu! OAuth client ID/secret and a default (streamer) osu! ID the bot ca
 | `!pp ($OSU_ID/$OSU_NAME)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given osu! player ID |
 | `!np` | everyone | Get a link to the currently being played map (this can be either done by using the osu! window text [default, slow and only works if the map is being played] or if [StreamCompanion](https://github.com/Piotrekol/StreamCompanion) is configured and running it can use this information instead which works always, is very fast and contains detailed information even regarding the current selected mods) |
 | `!score $OSU_NAME` | everyone | Get the score of an osu! user of the last requested beatmap |
+| `!osu commands` | everyone | See all available osu! commands |
 | `!osuRequests` | everyone | Get if map requests are currently enabled and with which demands if there are any |
-| `!osuRequests on/off ($REASON)` | mod | Turn map requests on or off with an optional reason |
-| `!osuLastRequest ($COUNT)` | mod | Resend the last request or multiple ones |
+| `!osuRequests on/off ($MESSAGE)` | mod | Turn map requests on or off with an optional message |
+| `!osuRequests set/unset $OPTION ($VALUE)` | mod | Set map request demands (`arMin`, `arMax`, `csMin`, `csMax`, `starMin`, `starMax`, ...) |
+| `!osuLastRequest ($COUNT)` | mod | Resend the last request or multiple ones in case of a client restart |
 | `!osuPermitRequest` | mod | Permit the last blocked map request |
 
-It also can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat if enabled.
-(This can be temporarily turned off/on with the commands `!osuRequests on`/`!osuRequests off [Optional reason]`)
+It can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat **if enabled**.
+(This can be toggled at runtime via the commands `!osuRequests on/off`)
 Given an osu! IRC login it can even send these beatmap links to the osu! client.
 
-Also demands can be added to map requests regarding the star rating, AR and CS.
-(Maps can still be permitted using the `!osuPermitRequest` command)
+Added demands regarding star rating, AR and CS will block map requests from coming through.
+(The latest blocked map request can still be permitted using the `!osuPermitRequest` command)
 
 It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) or a directory path (`C:\Program Files (x86)\StreamCompanion\Files`) can be found in the configuration even if no other osu! related configurations is set.
 
