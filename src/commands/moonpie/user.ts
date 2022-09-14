@@ -28,7 +28,7 @@ import {
   regexMoonpieChatHandlerCommandUserSet,
 } from "../../info/regex";
 import { messageParserById } from "../../messageParser";
-import { moonpieDb } from "../../database/moonpieDb";
+import moonpieDb from "../../database/moonpieDb";
 // Type imports
 import type {
   CommandGenericDetectorInputEnabledCommands,
@@ -67,20 +67,20 @@ export const commandGet: TwitchChatCommandHandler<
     let message;
 
     if (
-      await moonpieDb.existsName(
+      await moonpieDb.requests.moonpie.existsEntryName(
         data.moonpieDbPath,
         data.userNameMoonpieDb,
         logger
       )
     ) {
-      const moonpieEntry = await moonpieDb.getMoonpieName(
+      const moonpieEntry = await moonpieDb.requests.moonpie.getEntryName(
         data.moonpieDbPath,
         data.userNameMoonpieDb,
         logger
       );
 
       const currentMoonpieLeaderboardEntry =
-        await moonpieDb.getMoonpieLeaderboardEntry(
+        await moonpieDb.requests.moonpieLeaderboard.getEntry(
           data.moonpieDbPath,
           moonpieEntry.id,
           logger
@@ -216,7 +216,7 @@ export const commandSet: TwitchChatCommandHandler<
 
     // Check if a moonpie entry already exists
     if (
-      !(await moonpieDb.existsName(
+      !(await moonpieDb.requests.moonpie.existsEntryName(
         data.moonpieDbPath,
         data.userNameMoonpieDb,
         logger
@@ -236,7 +236,7 @@ export const commandSet: TwitchChatCommandHandler<
       throw Error(errorMessage);
     }
 
-    const moonpieEntry = await moonpieDb.getMoonpieName(
+    const moonpieEntry = await moonpieDb.requests.moonpie.getEntryName(
       data.moonpieDbPath,
       data.userNameMoonpieDb,
       logger
@@ -256,7 +256,7 @@ export const commandSet: TwitchChatCommandHandler<
     if (newCount < 0) {
       newCount = 0;
     }
-    await moonpieDb.update(
+    await moonpieDb.requests.moonpie.updateEntry(
       data.moonpieDbPath,
       {
         count: newCount,
@@ -268,7 +268,7 @@ export const commandSet: TwitchChatCommandHandler<
     );
 
     const currentMoonpieLeaderboardEntry =
-      await moonpieDb.getMoonpieLeaderboardEntry(
+      await moonpieDb.requests.moonpieLeaderboard.getEntry(
         data.moonpieDbPath,
         moonpieEntry.id,
         logger
@@ -397,7 +397,7 @@ export const commandDelete: TwitchChatCommandHandler<
 
     // Check if a moonpie entry already exists
     if (
-      !(await moonpieDb.existsName(
+      !(await moonpieDb.requests.moonpie.existsEntryName(
         data.moonpieDbPath,
         data.userNameMoonpieDb,
         logger
@@ -413,7 +413,7 @@ export const commandDelete: TwitchChatCommandHandler<
       throw Error(errorMessage);
     }
 
-    await moonpieDb.removeName(
+    await moonpieDb.requests.moonpie.removeEntryName(
       data.moonpieDbPath,
       data.userNameMoonpieDb,
       logger

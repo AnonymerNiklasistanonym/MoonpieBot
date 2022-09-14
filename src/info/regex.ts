@@ -14,8 +14,8 @@ export const regexMoonpieChatHandlerCommandAbout =
 
 export interface RegexOsuChatHandlerCommandRequests {
   requestsOff?: "off";
-  requestsOffMessage?: string;
   requestsOn?: "on";
+  requestsOnOffMessage?: string;
 }
 /**
  * Regex to recognize the !osuRequests (on|off $OPTIONAL_MESSAGE) command.
@@ -35,7 +35,53 @@ export interface RegexOsuChatHandlerCommandRequests {
  */
 export const regexOsuChatHandlerCommandRequests =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!osuRequests(?:\s+(?<requestsOn>on)(?:\s|$)|\s+(?<requestsOff>off)(?:\s+(?<requestsOffMessage>.*?)\s*$|\s|$)?(?:\s|$)|\s|$)/i;
+  /^\s*!osuRequests(?:(?:\s+(?<requestsOn>on)|\s+(?<requestsOff>off))(?:\s+(?<requestsOnOffMessage>.*?)\s*$|\s|$)?)?(?:\s|$)/i;
+
+// TODO Implement
+export interface RegexOsuChatHandlerCommandRequestsSet {
+  setOption: string;
+  setOptionValue: string;
+}
+/**
+ * Regex to recognize the !osuRequests set $OPTION $VALUE command.
+ *
+ * @example
+ * ```text
+ * !osuRequests set messageOn new message
+ * ```
+ * @example
+ * ```text
+ * !osuRequests set minAr 7
+ * ```
+ * @example
+ * ```text
+ * !osuRequests set maxStar 10
+ * ```
+ */
+export const regexOsuChatHandlerCommandRequestsSet =
+  /^\s*!osuRequests\s+set\s+(?<setOption>\S+)\s+(?<setOptionValue>.+?)(?:\s*$)/i;
+// TODO Implement
+export interface RegexOsuChatHandlerCommandRequestsUnset {
+  unsetOption: string;
+}
+/**
+ * Regex to recognize the !osuRequests set $OPTION $VALUE command.
+ *
+ * @example
+ * ```text
+ * !osuRequests unset messageOn
+ * ```
+ * @example
+ * ```text
+ * !osuRequests unset minAr
+ * ```
+ * @example
+ * ```text
+ * !osuRequests unset maxStar
+ * ```
+ */
+export const regexOsuChatHandlerCommandRequestsUnset =
+  /^\s*!osuRequests\s+unset\s+(?<unsetOption>\S+)(?:\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandLastRequest {
   lastRequestCount?: string;
@@ -390,3 +436,59 @@ export const regexOsuWindowTitleNowPlaying =
  * ```
  */
 export const regexSpotifyChatHandlerCommandSong = /^\s*!song(?:\s|$)/i;
+
+// TODO Implement
+export interface RegexCustomCommandAddRemove {
+  customCommandId: string;
+  customCommandOption: "add" | "remove";
+}
+/**
+ * Regex to recognize the !customCommand add/remove $ID command.
+ *
+ * @example
+ * ```text
+ * !customCommand add ping
+ * ```
+ * @example
+ * ```text
+ * !customCommand remove ping
+ * ```
+ */
+export const regexCustomCommandAddRemove =
+  /^\s*!customCommand\s+(?<customCommandOption>add|remove)\s+(?<customCommandId>\S+?)(?:\s*$)/i;
+
+// TODO Implement
+export interface RegexCustomCommandSet {
+  customCommandId: string;
+  customCommandOption: string;
+  customCommandOptionValue: string;
+}
+/**
+ * Regex to recognize the !customCommand set $ID $OPTION $VALUE command.
+ *
+ * @example
+ * ```text
+ * !customCommand set ping regex ^\s*!ping(?:\s*$)
+ * ```
+ * @example
+ * ```text
+ * !customCommand set ping message @$(USER) pong
+ * ```
+ * @example
+ * ```text
+ * !customCommand set ping level everyone
+ * ```
+ */
+export const regexCustomCommandSet =
+  /^\s*!customCommand\s+set\s+(?<customCommandId>\S+?)\s+(?<customCommandOption>\S+)\s+(?<customCommandOptionValue>.+?)(?:\s*$)/i;
+
+// TODO Implement
+/**
+ * Regex to recognize the !customCommand list command.
+ *
+ * @example
+ * ```text
+ * !customCommand list
+ * ```
+ */
+export const regexCustomCommandList = /^\s*!customCommand\s+list(?:\s|$)/i;

@@ -399,13 +399,13 @@ describe("regex", () => {
           { expected: { requestsOn: "on" }, input: "!osuRequests on" },
           { expected: { requestsOff: "off" }, input: "!osuRequests off" },
           {
-            expected: { requestsOff: "off", requestsOffMessage: "custom" },
+            expected: { requestsOff: "off", requestsOnOffMessage: "custom" },
             input: "!osuRequests off custom",
           },
           {
             expected: {
               requestsOff: "off",
-              requestsOffMessage: "custom message",
+              requestsOnOffMessage: "custom message",
             },
             input: "!osuRequests off custom message  ",
           },

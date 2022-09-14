@@ -40,7 +40,6 @@ import {
   loadCustomTimersFromFile,
   registerTimer,
 } from "./customCommandsTimers/customTimer";
-import { moonpieDbBackup, moonpieDbSetupTables } from "./database/moonpieDb";
 import {
   pluginsCustomCommandDataGenerator,
   pluginsCustomCommandGenerator,
@@ -51,9 +50,11 @@ import { generateMacroPluginMap } from "./messageParser";
 import { getVersionFromObject } from "./version";
 import { macroOsuApi } from "./messageParser/macros/osuApi";
 import { moonpieChatHandler } from "./commands/moonpie";
+import moonpieDb from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
+import osuRequestsDb from "./database/osuRequestsDb";
 import { pluginsOsuGenerator } from "./messageParser/plugins/osuApi";
 import { pluginsOsuStreamCompanionGenerator } from "./messageParser/plugins/osuStreamCompanion";
 import { pluginSpotifyGenerator } from "./messageParser/plugins/spotify";
@@ -125,7 +126,7 @@ export const main = async (
     EnvVariable.TWITCH_API_ACCESS_TOKEN
   );
   // > Moonpie
-  const pathDatabase = path.resolve(
+  const pathDatabaseMoonpie = path.resolve(
     configDir,
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
   );
@@ -179,26 +180,12 @@ export const main = async (
       EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
       configDir
     ) === EnvVariableOnOff.ON;
-  const osuApiBeatmapRequestMessage = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_MESSAGE
-  );
-  const osuApiBeatmapRequestStarRangeMax = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_STAR_RANGE_MAX
-  );
-  const osuApiBeatmapRequestStarRangeMin = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_STAR_RANGE_MIN
-  );
-  const osuApiBeatmapRequestArRangeMax = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_AR_RANGE_MAX
-  );
-  const osuApiBeatmapRequestArRangeMin = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_AR_RANGE_MIN
-  );
-  const osuApiBeatmapRequestCsRangeMax = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_CS_RANGE_MAX
-  );
-  const osuApiBeatmapRequestCsRangeMin = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_CS_RANGE_MIN
+  const pathDatabaseOsuApi = path.resolve(
+    configDir,
+    getEnvVariableValueOrDefault(
+      EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH,
+      configDir
+    )
   );
   const osuApiBeatmapRequestsRedeemId = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID
@@ -260,31 +247,19 @@ export const main = async (
   const enableOsuBeatmapRequests = osuApiBeatmapRequests;
   const enableOsuBeatmapRequestsDetailed = osuApiBeatmapRequestsDetailed;
   const enableOsuBeatmapRequestsRedeemId = osuApiBeatmapRequestsRedeemId;
-  const enableOsuBeatmapRequestsMessage = osuApiBeatmapRequestMessage;
-  const enableOsuBeatmapRequestsStarRangeMax =
-    osuApiBeatmapRequestStarRangeMax !== undefined
-      ? parseFloat(osuApiBeatmapRequestStarRangeMax)
-      : undefined;
-  const enableOsuBeatmapRequestsStarRangeMin =
-    osuApiBeatmapRequestStarRangeMin !== undefined
-      ? parseFloat(osuApiBeatmapRequestStarRangeMin)
-      : undefined;
-  const enableOsuBeatmapRequestsArRangeMax =
-    osuApiBeatmapRequestArRangeMax !== undefined
-      ? parseFloat(osuApiBeatmapRequestArRangeMax)
-      : undefined;
-  const enableOsuBeatmapRequestsArRangeMin =
-    osuApiBeatmapRequestArRangeMin !== undefined
-      ? parseFloat(osuApiBeatmapRequestArRangeMin)
-      : undefined;
-  const enableOsuBeatmapRequestsCsRangeMax =
-    osuApiBeatmapRequestCsRangeMax !== undefined
-      ? parseFloat(osuApiBeatmapRequestCsRangeMax)
-      : undefined;
-  const enableOsuBeatmapRequestsCsRangeMin =
-    osuApiBeatmapRequestCsRangeMin !== undefined
-      ? parseFloat(osuApiBeatmapRequestCsRangeMin)
-      : undefined;
+  // Remove commands that should not be usable if map requests are off
+  if (!enableOsuBeatmapRequests) {
+    for (const command of [
+      OsuCommands.LAST_REQUEST,
+      OsuCommands.PERMIT_REQUEST,
+      OsuCommands.REQUESTS,
+    ]) {
+      const indexCommand = osuEnableCommands.findIndex((a) => a === command);
+      if (indexCommand > -1) {
+        osuEnableCommands.splice(indexCommand, 1);
+      }
+    }
+  }
   let osuIrcBot: OsuIrcBotSendMessageFunc | undefined;
   if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
     osuIrcBot = (id: string) =>
@@ -337,14 +312,30 @@ export const main = async (
       )
     ) {
       // Setup database tables (or do nothing if they already exist)
-      await moonpieDbSetupTables(pathDatabase, logger);
+      await moonpieDb.setup(pathDatabaseMoonpie, logger);
       const databaseBackupData =
-        await moonpieDbBackup.exportMoonpieCountTableToJson(
-          pathDatabase,
+        await moonpieDb.backup.exportMoonpieCountTableToJson(
+          pathDatabaseMoonpie,
           logger
         );
       const pathDatabaseBackup = path.join(logDir, fileNameDatabaseBackups());
       await writeJsonFile(pathDatabaseBackup, databaseBackupData);
+    }
+  };
+
+  // Setup/Migrate osu!requests database
+  const setupMigrateOsuRequestsDatabase = async () => {
+    // Only touch the moonpie database if it will be used
+    if (
+      enableOsu &&
+      osuEnableCommands.length > 0 &&
+      !(
+        osuEnableCommands.length === 1 &&
+        osuEnableCommands.includes(EnvVariableNone.NONE)
+      )
+    ) {
+      // Setup database tables (or do nothing if they already exist)
+      await osuRequestsDb.setup(pathDatabaseOsuApi, logger);
     }
   };
 
@@ -353,6 +344,7 @@ export const main = async (
     loadCustomCommands(),
     loadCustomTimers(),
     setupMigrateBackupMoonpieDatabase(),
+    setupMigrateOsuRequestsDatabase(),
   ]);
 
   // Setup message parser
@@ -478,7 +470,7 @@ export const main = async (
         {
           enabledCommands: moonpieEnableCommands,
           moonpieClaimCooldownHours: moonpieClaimCooldownHoursNumber,
-          moonpieDbPath: pathDatabase,
+          moonpieDbPath: pathDatabaseMoonpie,
         },
         stringMap,
         pluginMapChannel,
@@ -508,16 +500,10 @@ export const main = async (
             ? {
                 defaultOsuId: parseInt(osuApiDefaultId),
                 enableOsuBeatmapRequests,
-                enableOsuBeatmapRequestsArRangeMax,
-                enableOsuBeatmapRequestsArRangeMin,
-                enableOsuBeatmapRequestsCsRangeMax,
-                enableOsuBeatmapRequestsCsRangeMin,
                 enableOsuBeatmapRequestsDetailed,
-                enableOsuBeatmapRequestsMessage,
                 enableOsuBeatmapRequestsRedeemId,
-                enableOsuBeatmapRequestsStarRangeMax,
-                enableOsuBeatmapRequestsStarRangeMin,
                 enabledCommands: osuEnableCommands,
+                osuApiDbPath: pathDatabaseOsuApi,
                 osuApiV2Credentials: {
                   clientId: parseInt(osuApiClientId),
                   clientSecret: osuApiClientSecret,

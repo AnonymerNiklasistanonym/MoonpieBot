@@ -11,5 +11,5 @@
   "bail": true,
   "no-timeout": true,
   "colors": true,
-  "watch-files": ["src/**/*.ts", "tests/**/*.ts"]
+  "watch-files": ["package.json",".mocharc.json","src/**/*.ts", "tests/**/*.ts"]
 }

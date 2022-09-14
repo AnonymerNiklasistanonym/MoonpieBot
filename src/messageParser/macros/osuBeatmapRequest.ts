@@ -52,7 +52,7 @@ export const macroOsuBeatmapRequests: MessageParserMacroGenerator<MacroOsuBeatma
         let macroValue;
         switch (macroId) {
           case MacroOsuBeatmapRequests.CUSTOM_MESSAGE:
-            if (data.customMessage) {
+            if (data.customMessage !== undefined) {
               macroValue = data.customMessage;
             } else {
               macroValue = "";
@@ -70,18 +70,17 @@ export enum MacroOsuBeatmapRequestDemands {
   AR_RANGE_MIN = "AR_RANGE_MIN",
   CS_RANGE_MAX = "CS_RANGE_MAX",
   CS_RANGE_MIN = "CS_RANGE_MIN",
-  MESSAGE = "MESSAGE",
+  HAS_DEMANDS = "HAS_DEMANDS",
   STAR_RANGE_MAX = "STAR_RANGE_MAX",
   STAR_RANGE_MIN = "STAR_RANGE_MIN",
 }
 export interface MacroOsuBeatmapRequestDemandsData {
-  arRangeMax?: number;
-  arRangeMin?: number;
-  csRangeMax?: number;
-  csRangeMin?: number;
-  message?: string;
-  starRangeMax?: number;
-  starRangeMin?: number;
+  arRangeMax?: number | string;
+  arRangeMin?: number | string;
+  csRangeMax?: number | string;
+  csRangeMin?: number | string;
+  starRangeMax?: number | string;
+  starRangeMin?: number | string;
 }
 export const macroOsuBeatmapRequestDemands: MessageParserMacroGenerator<MacroOsuBeatmapRequestDemandsData> =
   {
@@ -103,12 +102,14 @@ export const macroOsuBeatmapRequestDemands: MessageParserMacroGenerator<MacroOsu
           case MacroOsuBeatmapRequestDemands.CS_RANGE_MIN:
             macroValue = data.csRangeMin;
             break;
-          case MacroOsuBeatmapRequestDemands.MESSAGE:
-            if (data.message) {
-              macroValue = data.message;
-            } else {
-              macroValue = "";
-            }
+          case MacroOsuBeatmapRequestDemands.HAS_DEMANDS:
+            macroValue =
+              data.arRangeMax !== undefined ||
+              data.arRangeMin !== undefined ||
+              data.csRangeMax !== undefined ||
+              data.csRangeMin !== undefined ||
+              data.starRangeMax !== undefined ||
+              data.starRangeMin !== undefined;
             break;
           case MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX:
             macroValue = data.starRangeMax;
@@ -123,8 +124,11 @@ export const macroOsuBeatmapRequestDemands: MessageParserMacroGenerator<MacroOsu
         if (typeof macroValue === "number") {
           macroValue = `${macroValue}`;
         }
+        if (typeof macroValue === "boolean") {
+          macroValue = macroValue ? "true" : "false";
+        }
         return [macroId, macroValue];
       }),
     id: "OSU_BEATMAP_REQUEST_DEMANDS",
-    keys: Object.values(MacroOsuBeatmapRequests),
+    keys: Object.values(MacroOsuBeatmapRequestDemands),
   };

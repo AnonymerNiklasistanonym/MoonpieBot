@@ -28,7 +28,7 @@ import {
   regexMoonpieChatHandlerCommandUserSet,
 } from "../../info/regex";
 import { messageParserById } from "../../messageParser";
-import { moonpieDb } from "../../database/moonpieDb";
+import moonpieDb from "../../database/moonpieDb";
 // Type imports
 import type {
   CommandGenericDetectorInputEnabledCommands,
@@ -81,8 +81,14 @@ export const commandClaim: TwitchChatCommandHandler<
     let alreadyClaimedAMoonpie = false;
     let newTimestamp = new Date().getTime();
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    if (await moonpieDb.exists(data.moonpieDbPath, tags["user-id"], logger)) {
-      const moonpieEntry = await moonpieDb.getMoonpie(
+    if (
+      await moonpieDb.requests.moonpie.existsEntry(
+        data.moonpieDbPath,
+        tags["user-id"],
+        logger
+      )
+    ) {
+      const moonpieEntry = await moonpieDb.requests.moonpie.getEntry(
         data.moonpieDbPath,
         tags["user-id"],
         logger
@@ -104,13 +110,13 @@ export const commandClaim: TwitchChatCommandHandler<
         newTimestamp = moonpieEntry.timestamp;
       }
     } else {
-      await moonpieDb.create(
+      await moonpieDb.requests.moonpie.createEntry(
         data.moonpieDbPath,
         { id: tags["user-id"], name: tags.username },
         logger
       );
     }
-    await moonpieDb.update(
+    await moonpieDb.requests.moonpie.updateEntry(
       data.moonpieDbPath,
       {
         count: newMoonpieCount,
@@ -122,7 +128,7 @@ export const commandClaim: TwitchChatCommandHandler<
     );
 
     const currentMoonpieLeaderboardEntry =
-      await moonpieDb.getMoonpieLeaderboardEntry(
+      await moonpieDb.requests.moonpieLeaderboard.getEntry(
         data.moonpieDbPath,
         tags["user-id"],
         logger

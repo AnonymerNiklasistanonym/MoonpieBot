@@ -45,7 +45,7 @@ export const osuCommandsNpStreamCompanionFile: StringEntry = {
 };
 export const osuCommandsPp: StringEntry = {
   default: createMessageForMessageParser(
-    ["!pp ($USER_ID/$USER_NAME) [osu! information about streamer or user]"],
+    ["!pp ($USER_ID/$USER_NAME) [osu! profile information]"],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_PP`,
@@ -53,7 +53,7 @@ export const osuCommandsPp: StringEntry = {
 export const osuCommandsRequests: StringEntry = {
   default: createMessageForMessageParser(
     [
-      "!osuRequests (on/off ($REASON)) [get if requests are currently open or toggle them]",
+      "!osuRequests (on/off ($REASON)|set/unset $OPTION ($VALUE)) [get/set osu requests demands]",
     ],
     true
   ),
@@ -68,9 +68,7 @@ export const osuCommandsRp: StringEntry = {
 };
 export const osuCommandsScore: StringEntry = {
   default: createMessageForMessageParser(
-    [
-      "!score $USER_ID/$USER_NAME [get score of a user on the most recent mentioned map]",
-    ],
+    ["!score $USER_ID/$USER_NAME [get score on the last mentioned map]"],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_SCORE`,

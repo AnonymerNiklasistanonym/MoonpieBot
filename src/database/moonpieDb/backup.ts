@@ -1,9 +1,9 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Local imports
-import * as moonpie from "./requests";
+import { MoonpieDbError, moonpieTable } from "./info";
 import { createLogFunc } from "../../logging";
-import { createLogMethod } from "./logging";
+import { createLogMethod } from "../logging";
 // Type imports
 import type { Logger } from "winston";
 
@@ -39,7 +39,7 @@ export const exportMoonpieCountTableToJson = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   if (!(await db.sqlite3.exists(databasePath, logMethod))) {
     logDbBackup.error(Error("Database not found"));
-    throw Error(moonpie.GeneralError.NOT_EXISTING);
+    throw Error(MoonpieDbError.NOT_EXISTING);
   }
 
   // Check if the database can be opened
@@ -51,12 +51,12 @@ export const exportMoonpieCountTableToJson = async (
   const moonpieData = await db.requests.getAll<DatabaseStructure>(
     databasePath,
     db.queries.select(
-      moonpie.table.name,
+      moonpieTable.name,
       [
-        { columnName: moonpie.table.columns.twitchId.name },
-        { columnName: moonpie.table.columns.twitchName.name },
-        { columnName: moonpie.table.columns.moonpieCount.name },
-        { columnName: moonpie.table.columns.date.name },
+        { columnName: moonpieTable.columns.twitchId.name },
+        { columnName: moonpieTable.columns.twitchName.name },
+        { columnName: moonpieTable.columns.moonpieCount.name },
+        { columnName: moonpieTable.columns.date.name },
       ],
       {}
     ),

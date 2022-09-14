@@ -3,6 +3,7 @@ import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
   errorMessageOsuApiCredentialsUndefined,
+  errorMessageOsuApiDbPathUndefined,
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
 } from "../../error";
@@ -30,9 +31,15 @@ import { createLogFunc } from "../../logging";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { macroOsuBeatmap } from "../../messageParser/macros/osuApi";
 import { messageParserById } from "../../messageParser";
+import { OsuRequestsConfig } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
+import osuRequestsDb from "../../database/osuRequestsDb";
 import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
-import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
+import type {
+  BeatmapRequestsInfo,
+  CommandGenericDataOsuApiDbPath,
+  OsuApiV2Credentials,
+} from "../osu";
 import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
@@ -45,6 +52,7 @@ import type {
   RegexOsuBeatmapIdFromUrlBeatmapSets,
 } from "../../info/regex";
 import type { Beatmap } from "osu-api-v2";
+import type { GetOsuRequestsConfigOut } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 
@@ -56,25 +64,63 @@ export interface BeatmapRequest {
   comment?: string;
 }
 
-export interface CommandBeatmapCreateReplyInput {
+const checkIfBeatmapMatchesDemands = (
+  beatmap: Beatmap,
+  demands: GetOsuRequestsConfigOut[]
+) => {
+  for (const demand of demands) {
+    switch (demand.option) {
+      case OsuRequestsConfig.AR_MAX:
+        if (beatmap.ar > parseFloat(demand.optionValue)) {
+          return false;
+        }
+        break;
+      case OsuRequestsConfig.AR_MIN:
+        if (beatmap.ar < parseFloat(demand.optionValue)) {
+          return false;
+        }
+        break;
+      case OsuRequestsConfig.CS_MAX:
+        if (beatmap.cs > parseFloat(demand.optionValue)) {
+          return false;
+        }
+        break;
+      case OsuRequestsConfig.CS_MIN:
+        if (beatmap.cs < parseFloat(demand.optionValue)) {
+          return false;
+        }
+        break;
+      case OsuRequestsConfig.STAR_MAX:
+        if (beatmap.difficulty_rating > parseFloat(demand.optionValue)) {
+          return false;
+        }
+        break;
+      case OsuRequestsConfig.STAR_MIN:
+        if (beatmap.difficulty_rating < parseFloat(demand.optionValue)) {
+          return false;
+        }
+        break;
+      default:
+        // Ignore unknown options or messages
+        break;
+    }
+  }
+  return true;
+};
+
+export interface CommandBeatmapCreateReplyInput
+  extends CommandGenericDataOsuApiDbPath {
   /**
    * The default osu user ID.
    */
   defaultOsuId?: number;
   enableOsuBeatmapRequests?: boolean;
-  enableOsuBeatmapRequestsArRangeMax?: number;
-  enableOsuBeatmapRequestsArRangeMin?: number;
-  enableOsuBeatmapRequestsCsRangeMax?: number;
-  enableOsuBeatmapRequestsCsRangeMin?: number;
   enableOsuBeatmapRequestsDetailed?: boolean;
-  enableOsuBeatmapRequestsMessage?: string;
   /**
    * If string not empty/undefined check if the beatmap request was redeemed or
    * just a normal chat message.
    */
   enableOsuBeatmapRequestsRedeemId?: string;
-  enableOsuBeatmapRequestsStarRangeMax?: number;
-  enableOsuBeatmapRequestsStarRangeMin?: number;
   /**
    * The osu API (v2) credentials.
    */
@@ -120,6 +166,9 @@ export const commandBeatmap: TwitchChatCommandHandler<
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
+    if (data.osuApiDbPath === undefined) {
+      throw errorMessageOsuApiDbPathUndefined();
+    }
     if (tags["user-id"] === undefined) {
       throw errorMessageUserIdUndefined();
     }
@@ -157,13 +206,26 @@ export const commandBeatmap: TwitchChatCommandHandler<
       return { sentMessage };
     }
 
-    if (data.beatmapRequestsInfo.beatmapRequestsOn === false) {
+    const osuRequestsConfigEntries =
+      await osuRequestsDb.requests.osuRequestsConfig.getEntries(
+        data.osuApiDbPath,
+        channel,
+        logger
+      );
+
+    if (
+      osuRequestsConfigEntries.find(
+        (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
+      ) !== undefined
+    ) {
       const macros = new Map(globalMacros);
       macros.set(
         macroOsuBeatmapRequests.id,
         new Map(
           macroOsuBeatmapRequests.generate({
-            customMessage: data.beatmapRequestsInfo.beatmapRequestsOffMessage,
+            customMessage: osuRequestsConfigEntries.find(
+              (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
+            )?.optionValue,
           })
         )
       );
@@ -182,27 +244,6 @@ export const commandBeatmap: TwitchChatCommandHandler<
       data.osuApiV2Credentials.clientId,
       data.osuApiV2Credentials.clientSecret
     );
-
-    if (!data.enableOsuBeatmapRequests) {
-      const macros = new Map(globalMacros);
-      macros.set(
-        macroOsuBeatmapRequests.id,
-        new Map(
-          macroOsuBeatmapRequests.generate({
-            customMessage: data.beatmapRequestsInfo.beatmapRequestsOffMessage,
-          })
-        )
-      );
-      const message = await messageParserById(
-        osuBeatmapRequestCurrentlyOff.id,
-        globalStrings,
-        globalPlugins,
-        macros,
-        logger
-      );
-      const sentMessage = await client.say(channel, message);
-      return { sentMessage };
-    }
 
     const commandReplies: TwitchChatCommandHandlerReply[] = [];
 
@@ -230,20 +271,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
         );
         if (beatmap) {
           if (
-            (data.enableOsuBeatmapRequestsArRangeMax !== undefined &&
-              beatmap.ar > data.enableOsuBeatmapRequestsArRangeMax) ||
-            (data.enableOsuBeatmapRequestsArRangeMin !== undefined &&
-              beatmap.ar < data.enableOsuBeatmapRequestsArRangeMin) ||
-            (data.enableOsuBeatmapRequestsCsRangeMax !== undefined &&
-              beatmap.cs > data.enableOsuBeatmapRequestsCsRangeMax) ||
-            (data.enableOsuBeatmapRequestsCsRangeMin !== undefined &&
-              beatmap.cs < data.enableOsuBeatmapRequestsCsRangeMin) ||
-            (data.enableOsuBeatmapRequestsStarRangeMax !== undefined &&
-              beatmap.difficulty_rating >
-                data.enableOsuBeatmapRequestsStarRangeMax) ||
-            (data.enableOsuBeatmapRequestsStarRangeMin !== undefined &&
-              beatmap.difficulty_rating <
-                data.enableOsuBeatmapRequestsStarRangeMin)
+            !checkIfBeatmapMatchesDemands(beatmap, osuRequestsConfigEntries)
           ) {
             data.beatmapRequestsInfo.blockedBeatmapRequest = {
               comment: beatmapRequest.comment?.trim(),
@@ -252,16 +280,37 @@ export const commandBeatmap: TwitchChatCommandHandler<
               userName: tags.username,
             };
             osuBeatmapRequestMacros.set(
+              macroOsuBeatmapRequests.id,
+              new Map(
+                macroOsuBeatmapRequests.generate({
+                  customMessage: osuRequestsConfigEntries.find(
+                    (a) => a.option === OsuRequestsConfig.MESSAGE_ON
+                  )?.optionValue,
+                })
+              )
+            );
+            osuBeatmapRequestMacros.set(
               macroOsuBeatmapRequestDemands.id,
               new Map(
                 macroOsuBeatmapRequestDemands.generate({
-                  arRangeMax: data.enableOsuBeatmapRequestsArRangeMax,
-                  arRangeMin: data.enableOsuBeatmapRequestsArRangeMin,
-                  csRangeMax: data.enableOsuBeatmapRequestsCsRangeMax,
-                  csRangeMin: data.enableOsuBeatmapRequestsCsRangeMin,
-                  message: data.enableOsuBeatmapRequestsMessage,
-                  starRangeMax: data.enableOsuBeatmapRequestsStarRangeMax,
-                  starRangeMin: data.enableOsuBeatmapRequestsStarRangeMin,
+                  arRangeMax: osuRequestsConfigEntries.find(
+                    (a) => a.option === OsuRequestsConfig.AR_MAX
+                  )?.optionValue,
+                  arRangeMin: osuRequestsConfigEntries.find(
+                    (a) => a.option === OsuRequestsConfig.AR_MIN
+                  )?.optionValue,
+                  csRangeMax: osuRequestsConfigEntries.find(
+                    (a) => a.option === OsuRequestsConfig.CS_MAX
+                  )?.optionValue,
+                  csRangeMin: osuRequestsConfigEntries.find(
+                    (a) => a.option === OsuRequestsConfig.CS_MIN
+                  )?.optionValue,
+                  starRangeMax: osuRequestsConfigEntries.find(
+                    (a) => a.option === OsuRequestsConfig.STAR_MAX
+                  )?.optionValue,
+                  starRangeMin: osuRequestsConfigEntries.find(
+                    (a) => a.option === OsuRequestsConfig.STAR_MIN
+                  )?.optionValue,
                 })
               )
             );

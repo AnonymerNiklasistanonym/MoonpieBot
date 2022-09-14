@@ -1,8 +1,12 @@
 // Local imports
+import {
+  commandBeatmapRequests,
+  commandBeatmapRequestsSetUnset,
+} from "./osu/requests";
 import { commandBeatmap } from "./osu/beatmap";
-import { commandBeatmapLastRequest } from "./osu/beatmapLastRequest";
-import { commandBeatmapPermitRequest } from "./osu/beatmapPermitRequest";
-import { commandBeatmapRequests } from "./osu/beatmapRequests";
+import { commandBeatmapLastRequest } from "./osu/lastRequest";
+import { commandBeatmapPermitRequest } from "./osu/permitRequest";
+import { commandCommands } from "./osu/commands";
 import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
@@ -16,17 +20,18 @@ import type {
 import type {
   CommandBeatmapLastRequestCreateReplyInput,
   CommandBeatmapLastRequestDetectorInput,
-} from "./osu/beatmapLastRequest";
+} from "./osu/lastRequest";
 import type {
   CommandBeatmapPermitRequestCreateReplyInput,
   CommandBeatmapPermitRequestDetectorInput,
-} from "./osu/beatmapPermitRequest";
+} from "./osu/permitRequest";
 import type {
   CommandBeatmapRequestsCreateReplyInput,
   CommandBeatmapRequestsDetectorInput,
-} from "./osu/beatmapRequests";
-import {
-  commandCommands,
+  CommandBeatmapRequestsSetUnsetCreateReplyInput,
+  CommandBeatmapRequestsSetUnsetDetectorInput,
+} from "./osu/requests";
+import type {
   CommandCommandsCreateReplyInput,
   CommandCommandsDetectorInput,
 } from "./osu/commands";
@@ -44,6 +49,13 @@ import type {
 } from "./osu/score";
 import type { Beatmap } from "osu-api-v2";
 import type { TwitchChatHandler } from "../twitch";
+
+export interface CommandGenericDataOsuApiDbPath {
+  /**
+   * Database file path of the osu api database.
+   */
+  osuApiDbPath?: string;
+}
 
 export interface OsuApiV2Credentials {
   clientId: number;
@@ -68,13 +80,6 @@ export interface BeatmapRequestInfo {
  * Dynamic beatmap request information that can be shared across commands.
  */
 export interface BeatmapRequestsInfo {
-  /** A custom beatmap requests off message. */
-  beatmapRequestsOffMessage?: string;
-  /**
-   * Indicator if beatmap requests are currently enabled.
-   * The configuration value can still be false and thus needs to be checked!
-   */
-  beatmapRequestsOn: boolean;
   /** The last blocked beatmap request this session. */
   blockedBeatmapRequest?: BeatmapRequestInfo;
   /** The last mentioned beatmap ID this session. */
@@ -88,7 +93,6 @@ export interface BeatmapRequestsInfo {
  * next to the provided static values from the configuration.
  */
 const beatmapRequestsInfo: BeatmapRequestsInfo = {
-  beatmapRequestsOn: true,
   previousBeatmapRequests: [],
 };
 
@@ -108,7 +112,9 @@ export interface OsuChatHandlerData
     CommandBeatmapPermitRequestCreateReplyInput,
     CommandBeatmapPermitRequestDetectorInput,
     CommandBeatmapRequestsCreateReplyInput,
-    CommandBeatmapRequestsDetectorInput {}
+    CommandBeatmapRequestsDetectorInput,
+    CommandBeatmapRequestsSetUnsetDetectorInput,
+    CommandBeatmapRequestsSetUnsetCreateReplyInput {}
 
 export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   client,
@@ -156,6 +162,22 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   );
   await Promise.all(
     [commandBeatmapRequests].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        { ...data, beatmapRequestsInfo },
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
+    [commandBeatmapRequestsSetUnset].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,

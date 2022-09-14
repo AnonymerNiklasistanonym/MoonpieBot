@@ -14,7 +14,7 @@ import {
 } from "../../strings/moonpie/commandReply";
 import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../info/other";
 import { messageParserById } from "../../messageParser";
-import { moonpieDb } from "../../database/moonpieDb";
+import moonpieDb from "../../database/moonpieDb";
 import { regexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 // Type imports
 import type {
@@ -51,12 +51,13 @@ export const commandLeaderboard: TwitchChatCommandHandler<
     globalMacros,
     logger
   ) => {
-    const moonpieEntries = await moonpieDb.getMoonpieLeaderboard(
-      data.moonpieDbPath,
-      NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH,
-      data.startingRank,
-      logger
-    );
+    const moonpieEntries =
+      await moonpieDb.requests.moonpieLeaderboard.getEntries(
+        data.moonpieDbPath,
+        NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH,
+        data.startingRank,
+        logger
+      );
 
     const macros = new Map(globalMacros);
     macros.set(

@@ -5,11 +5,10 @@ import chai from "chai";
 import { describe } from "mocha";
 import path from "path";
 // Local imports
-import { moonpieDb, moonpieDbBackup } from "../../../../src/database/moonpieDb";
-import { createAndSetupTables } from "../../../../src/database/moonpie/management";
-import { GeneralError } from "../../../../src/database/moonpie/requests";
 import { getTestLogger } from "../../logger";
 import { itAllowFail } from "../../allowFail";
+import moonpieDb from "../../../../src/database/moonpieDb";
+import { MoonpieDbError } from "../../../../src/database/moonpieDb/info";
 
 const githubCiMaxTimeout = 8000;
 
@@ -22,16 +21,16 @@ export default (databaseDirPath: string): Mocha.Suite => {
         databaseDirPath,
         "moonpieDb_backupTables.db"
       );
-      await createAndSetupTables(databasePath, logger);
+      await moonpieDb.setup(databasePath, logger);
 
-      const backup1 = await moonpieDbBackup.exportMoonpieCountTableToJson(
+      const backup1 = await moonpieDb.backup.exportMoonpieCountTableToJson(
         databasePath,
         logger
       );
       chai.expect(backup1).to.be.an("array");
       chai.expect(backup1.length).to.be.equal(0);
 
-      await moonpieDb.create(
+      await moonpieDb.requests.moonpie.createEntry(
         databasePath,
         {
           id: "1",
@@ -40,7 +39,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         logger
       );
 
-      await moonpieDb.create(
+      await moonpieDb.requests.moonpie.createEntry(
         databasePath,
         {
           id: "3",
@@ -49,7 +48,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         logger
       );
 
-      await moonpieDb.update(
+      await moonpieDb.requests.moonpie.updateEntry(
         databasePath,
         {
           count: 20,
@@ -60,7 +59,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
         logger
       );
 
-      const backup2 = await moonpieDbBackup.exportMoonpieCountTableToJson(
+      const backup2 = await moonpieDb.backup.exportMoonpieCountTableToJson(
         databasePath,
         logger
       );
@@ -82,13 +81,15 @@ export default (databaseDirPath: string): Mocha.Suite => {
       }
 
       try {
-        await moonpieDbBackup.exportMoonpieCountTableToJson(
+        await moonpieDb.backup.exportMoonpieCountTableToJson(
           databasePath + "abc",
           logger
         );
         chai.expect(false);
       } catch (err) {
-        chai.expect((err as Error).message).to.equal(GeneralError.NOT_EXISTING);
+        chai
+          .expect((err as Error).message)
+          .to.equal(MoonpieDbError.NOT_EXISTING);
       }
     }).timeout(githubCiMaxTimeout);
   });

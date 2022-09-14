@@ -8,6 +8,7 @@ export interface ErrorWithCode extends Error {
 export enum ErrorWithCodeCode {
   ENABLED_COMMANDS_UNDEFINED = "ENABLED_COMMANDS_UNDEFINED",
   MESSAGE_ID_UNDEFINED = "MESSAGE_ID_UNDEFINED",
+  OSU_API_DB_PATH_UNDEFINED = "OSU_API_DB_PATH_UNDEFINED",
   OSU_API_V2_CREDENTIALS_UNDEFINED = "OSU_API_V2_CREDENTIALS_UNDEFINED",
   USER_ID_UNDEFINED = "USER_ID_UNDEFINED",
   USER_NAME_UNDEFINED = "USER_NAME_UNDEFINED",
@@ -42,5 +43,13 @@ export const errorMessageOsuApiCredentialsUndefined = (): ErrorWithCode => {
     "Unable to reply to message! (osuApiV2Credentials is undefined)"
   );
   error.code = ErrorWithCodeCode.OSU_API_V2_CREDENTIALS_UNDEFINED;
+  return error;
+};
+
+export const errorMessageOsuApiDbPathUndefined = (): ErrorWithCode => {
+  const error: ErrorWithCode = Error(
+    "Unable to reply to message! (osuApiDbPath is undefined)"
+  );
+  error.code = ErrorWithCodeCode.OSU_API_DB_PATH_UNDEFINED;
   return error;
 };

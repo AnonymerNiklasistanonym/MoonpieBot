@@ -1,5 +1,10 @@
-import * as moonpieDb from "./moonpie/requests";
-import * as moonpieDbBackup from "./moonpie/backup";
-import { createAndSetupTables as moonpieDbSetupTables } from "./moonpie/management";
+// Local imports
+import * as backup from "./moonpieDb/backup";
+import * as requests from "./moonpieDb/requests";
+import { setup } from "./moonpieDb/management";
 
-export { moonpieDb, moonpieDbSetupTables, moonpieDbBackup };
+export default {
+  backup,
+  requests,
+  setup,
+};

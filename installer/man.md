@@ -92,33 +92,8 @@ Example: "*1185432*"
 : Automatically recognize osu! beatmap links (=requests) in chat.
 Supported values: "*OFF*", "*ON*"
 
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_MESSAGE**
-: Message to be displayed when user asks if requests are enabled
-Example: "*I love tech maps and streams*"
-
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_STAR_RANGE_MAX**
-: The maximum star range of maps that can be requested
-Example: "*6.5*"
-
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_STAR_RANGE_MIN**
-: The minimum star range of maps that can be requested
-Example: "*3.9*"
-
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_AR_RANGE_MAX**
-: The maximum AR value of maps that can be requested
-Example: "*10*"
-
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_AR_RANGE_MIN**
-: The minimum AR value of maps that can be requested
-Example: "*9*"
-
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_CS_RANGE_MAX**
-: The maximum CS value of maps that can be requested
-Example: "*7*"
-
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_CS_RANGE_MIN**
-: The minimum CS value of maps that can be requested
-Example: "*4*"
+**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH**="*osu_map_requests.db*"
+: The database file path that contains the persistent osu! map requests data.
 
 **MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED**="*OFF*"
 : If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) additionally output more detailed information about the map in the chat.
