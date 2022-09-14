@@ -387,7 +387,7 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
 
     let option: undefined | OsuRequestsConfig;
     for (const value of Object.values(OsuRequestsConfig)) {
-      if (value === data.beatmapRequestsSetOption) {
+      if (value.toLowerCase() === data.beatmapRequestsSetOption.toLowerCase()) {
         option = value;
       }
     }
