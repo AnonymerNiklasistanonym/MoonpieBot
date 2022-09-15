@@ -177,7 +177,11 @@ export const commandScore: TwitchChatCommandHandler<
     if (!matchGroups) {
       throw Error("RegexOsuChatHandlerCommandScore groups undefined");
     }
-    return { data: { osuUserName: matchGroups.osuUserName } };
+    let osuUserName = matchGroups.osuUserName;
+    if (osuUserName.startsWith("'") && osuUserName.endsWith("'")) {
+      osuUserName = osuUserName.substring(1, osuUserName.length - 1);
+    }
+    return { data: { osuUserName } };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_OSU,

@@ -354,7 +354,7 @@ export interface RegexOsuChatHandlerCommandScore {
  * ```
  */
 export const regexOsuChatHandlerCommandScore =
-  /^\s*!score\s+(?<osuUserName>\S+)(?:\s|$)/i;
+  /^\s*!score\s+(?<osuUserName>(?:'[^'"]+'|\S+))(?:\s|$)/i;
 
 export interface RegexOsuBeatmapIdFromUrlBase {
   comment?: string;
