@@ -80,15 +80,18 @@ const entryPoint = async () => {
     let configDir = process.cwd();
     if (cliArgs.includes(CliOption.CONFIG_DIRECTORY)) {
       // Get the last index so this argument can be overridden
-      const indexConfigDirArg = cliArgs.lastIndexOf(CliOption.CONFIG_DIRECTORY);
-      if (indexConfigDirArg + 1 < cliArgs.length) {
-        configDir = cliArgs[indexConfigDirArg + 1];
+      const indexConfigDirArg =
+        cliArgs.lastIndexOf(CliOption.CONFIG_DIRECTORY) + 1;
+      // Make sure the a config directory can follow in the next argument
+      if (indexConfigDirArg < cliArgs.length) {
+        // eslint-disable-next-line security/detect-object-injection
+        configDir = cliArgs[indexConfigDirArg];
         // Create config directory if it doesn't exist
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.mkdir(configDir, { recursive: true });
       } else {
         throw Error(
-          `Found ${CliOption.CONFIG_DIRECTORY} but no config directory`
+          `Found '${CliOption.CONFIG_DIRECTORY}' but no config directory`
         );
       }
     }
@@ -121,20 +124,22 @@ const entryPoint = async () => {
           configDir
         )
       );
-      await createEnvVariableDocumentation(
-        path.join(configDir, fileNameEnvExample),
-        configDir
-      );
-      await createStringsVariableDocumentation(
-        path.join(configDir, fileNameEnvStringsExample),
-        defaultStringMap,
-        defaultPlugins,
-        defaultMacros,
-        defaultPluginsOptional,
-        defaultMacrosOptional,
-        logger
-      );
-      await createCustomCommandTimerExampleFiles(configDir);
+      await Promise.all([
+        createEnvVariableDocumentation(
+          path.join(configDir, fileNameEnvExample),
+          configDir
+        ),
+        createStringsVariableDocumentation(
+          path.join(configDir, fileNameEnvStringsExample),
+          defaultStringMap,
+          defaultPlugins,
+          defaultMacros,
+          defaultPluginsOptional,
+          defaultMacrosOptional,
+          logger
+        ),
+        createCustomCommandTimerExampleFiles(configDir),
+      ]);
       process.exit(0);
     }
 
