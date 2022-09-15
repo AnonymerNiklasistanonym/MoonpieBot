@@ -80,15 +80,6 @@ export const commandScore: TwitchChatCommandHandler<
     }
 
     const osuBeatmapRequestMacros = new Map(globalMacros);
-    osuBeatmapRequestMacros.set(
-      macroOsuScoreRequest.id,
-      new Map(
-        macroOsuScoreRequest.generate({
-          beatmapId: data.beatmapRequestsInfo.lastMentionedBeatmapId,
-          userName: data.osuUserName,
-        })
-      )
-    );
 
     const logCmdBeatmap = createLogFunc(
       logger,
@@ -119,7 +110,28 @@ export const commandScore: TwitchChatCommandHandler<
         new Map(macroOsuScore.generate({ beatmapScore }))
       );
       // Check for user score
+      osuBeatmapRequestMacros.set(
+        macroOsuScoreRequest.id,
+        new Map(
+          macroOsuScoreRequest.generate({
+            beatmapId: data.beatmapRequestsInfo.lastMentionedBeatmapId,
+            userName:
+              beatmapScore.score.user?.username !== undefined
+                ? beatmapScore.score.user?.username
+                : data.osuUserName,
+          })
+        )
+      );
     } catch (err) {
+      osuBeatmapRequestMacros.set(
+        macroOsuScoreRequest.id,
+        new Map(
+          macroOsuScoreRequest.generate({
+            beatmapId: data.beatmapRequestsInfo.lastMentionedBeatmapId,
+            userName: data.osuUserName,
+          })
+        )
+      );
       if (
         (err as OsuApiV2WebRequestError).statusCode === NOT_FOUND_STATUS_CODE
       ) {
