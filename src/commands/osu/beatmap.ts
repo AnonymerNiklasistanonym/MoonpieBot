@@ -229,6 +229,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
           })
         )
       );
+      // TODO Allow beatmap to be sent via the !osupermitrequest command
       const message = await messageParserById(
         osuBeatmapRequestCurrentlyOff.id,
         globalStrings,

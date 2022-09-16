@@ -193,6 +193,7 @@ export enum MacroOsuScore {
   DATE_YEAR = "DATE_YEAR",
   EXISTS = "EXISTS",
   FC = "FC",
+  //GLOBAL_RANK = "GLOBAL_RANK",
   HAS_REPLAY = "HAS_REPLAY",
   ID = "ID",
   MAX_COMBO = "MAX_COMBO",
@@ -254,6 +255,8 @@ export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
           case MacroOsuScore.FC:
             macroValue = score.perfect;
             break;
+          //case MacroOsuScore.GLOBAL_RANK:
+          //  break;
           case MacroOsuScore.HAS_REPLAY:
             macroValue = score.replay;
             break;
