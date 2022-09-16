@@ -1,16 +1,12 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Local imports
-import {
-  moonpieLeaderboardView,
-  moonpieTable,
-  versionCurrent,
-  versionTable,
-} from "./info";
+import { moonpieLeaderboardView, moonpieTable, versionCurrent } from "./info";
 import { createLogFunc } from "../../logging";
 import { createLogMethod } from "../logging";
 import { getVersionFromObject } from "../../version";
 import moonpieDb from "../moonpieDb";
+import { versionTable } from "../generic/version/info";
 // Type imports
 import type { Logger } from "winston";
 /**

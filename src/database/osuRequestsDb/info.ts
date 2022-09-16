@@ -29,30 +29,6 @@ export const osuRequestsConfigTable: SqliteTable<
   name: "osu_requests_config",
 };
 
-/**
- * The SQLite table for storing the database version for migrations.
- */
-export const versionTable: SqliteTable<"major" | "minor" | "patch"> = {
-  columns: {
-    major: {
-      name: "major",
-      options: { notNull: true, primaryKey: true },
-      type: db.queries.CreateTableColumnType.INTEGER,
-    },
-    minor: {
-      name: "minor",
-      options: { notNull: true, primaryKey: true },
-      type: db.queries.CreateTableColumnType.INTEGER,
-    },
-    patch: {
-      name: "patch",
-      options: { notNull: true, primaryKey: true },
-      type: db.queries.CreateTableColumnType.INTEGER,
-    },
-  },
-  name: "version",
-};
-
 export const versionCurrent = {
   major: 0,
   minor: 0,

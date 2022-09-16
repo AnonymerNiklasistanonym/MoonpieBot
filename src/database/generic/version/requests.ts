@@ -1,7 +1,7 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Local imports
-import { OsuRequestsDbError, versionTable } from "../info";
+import { DbVersionRequestError, versionTable } from "./info";
 import { createLogMethod } from "../../logging";
 // Type imports
 import type { Logger } from "winston";
@@ -20,10 +20,7 @@ export const createEntry = async (
   input: CreateInput,
   logger: Logger
 ): Promise<number> => {
-  const logMethod = createLogMethod(
-    logger,
-    "database_osu_requests_version_create"
-  );
+  const logMethod = createLogMethod(logger, "database_version_create");
   const postResult = await db.requests.post(
     databasePath,
     db.queries.insert(versionTable.name, [
@@ -51,10 +48,7 @@ export const removeEntry = async (
   input: RemoveInput,
   logger: Logger
 ): Promise<boolean> => {
-  const logMethod = createLogMethod(
-    logger,
-    "database_osu_requests_version_remove"
-  );
+  const logMethod = createLogMethod(logger, "database_version_remove");
   const postResult = await db.requests.post(
     databasePath,
     db.queries.remove(versionTable.name, {
@@ -90,10 +84,7 @@ export const getEntries = async (
   databasePath: string,
   logger: Logger
 ): Promise<GetVersionDbOut[]> => {
-  const logMethod = createLogMethod(
-    logger,
-    "database_osu_requests_version_get"
-  );
+  const logMethod = createLogMethod(logger, "database_version_get");
 
   const runResult = await db.requests.getAll<GetVersionDbOut>(
     databasePath,
@@ -108,5 +99,5 @@ export const getEntries = async (
   if (runResult) {
     return runResult;
   }
-  throw Error(OsuRequestsDbError.NOT_FOUND);
+  throw Error(DbVersionRequestError.NOT_FOUND);
 };
