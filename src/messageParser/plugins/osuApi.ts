@@ -132,8 +132,8 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
           const lastPlays = await osuApiV2.users.scores(
             oauthAccessToken,
             userIdNumber,
-            ScoresType.Recent,
-            GameMode.osu,
+            ScoresType.RECENT,
+            GameMode.OSU_STANDARD,
             1,
             0,
             true
@@ -174,10 +174,10 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
             data.osuApiV2Credentials.clientId,
             data.osuApiV2Credentials.clientSecret
           );
-          const user = await osuApiV2.users.id(
+          const user = await osuApiV2.users.get(
             oauthAccessToken,
             userIdNumber,
-            GameMode.osu
+            GameMode.OSU_STANDARD
           );
           return new Map([
             [macroOsuUser.id, new Map(macroOsuUser.generate({ user }))],

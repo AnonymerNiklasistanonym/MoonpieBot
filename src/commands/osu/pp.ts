@@ -81,18 +81,18 @@ export const commandPp: TwitchChatCommandHandler<
         data.customOsuName
       );
       if (
-        userSearchResult?.user?.data !== undefined &&
-        Array.isArray(userSearchResult.user.data) &&
-        userSearchResult.user.data.length > 0
+        userSearchResult.data !== undefined &&
+        Array.isArray(userSearchResult.data) &&
+        userSearchResult.data.length > 0
       ) {
-        data.customOsuId = userSearchResult.user.data[0].id;
+        data.customOsuId = userSearchResult.data[0].id;
       }
     }
 
-    await osuApiV2.users.id(
+    await osuApiV2.users.get(
       oauthAccessToken,
       data.customOsuId !== undefined ? data.customOsuId : data.defaultOsuId,
-      GameMode.osu
+      GameMode.OSU_STANDARD
     );
 
     const osuPpRequestMacros = new Map(globalMacros);

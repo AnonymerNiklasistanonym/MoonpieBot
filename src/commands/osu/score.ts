@@ -99,7 +99,7 @@ export const commandScore: TwitchChatCommandHandler<
         oauthAccessToken,
         data.osuUserName
       );
-      const userId = user.user.data[0].id;
+      const userId = user.data[0].id;
       const beatmapScore = await osuApiV2.beatmaps.scores.users(
         oauthAccessToken,
         data.beatmapRequestsInfo.lastMentionedBeatmapId,

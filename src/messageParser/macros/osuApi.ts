@@ -1,5 +1,5 @@
 // Package imports
-import { RankedStatus, Score, User } from "osu-api-v2";
+import { RankStatusInt, Score, User } from "osu-api-v2";
 //import path from "path";
 // Local imports
 import { monthNames } from "../../other/monthNames";
@@ -30,21 +30,21 @@ export const macroOsuApi: MessageParserMacroGenerator<MacroOsuApiData> = {
   keys: Object.values(MacroOsuApi),
 };
 
-const mapRankedStatusToStr = (rankedStatus: RankedStatus) => {
-  switch (rankedStatus) {
-    case RankedStatus.approved:
+const mapRankStatusIntToStr = (rankStatusInt: RankStatusInt) => {
+  switch (rankStatusInt) {
+    case RankStatusInt.APPROVED:
       return "Approved";
-    case RankedStatus.graveyard:
+    case RankStatusInt.GRAVEYARD:
       return "Graveyard";
-    case RankedStatus.loved:
+    case RankStatusInt.LOVED:
       return "Loved";
-    case RankedStatus.pending:
+    case RankStatusInt.PENDING:
       return "Pending";
-    case RankedStatus.qualified:
+    case RankStatusInt.QUALIFIED:
       return "Qualified";
-    case RankedStatus.ranked:
+    case RankStatusInt.RANKED:
       return "Ranked";
-    case RankedStatus.wip:
+    case RankStatusInt.WIP:
       return "WIP";
   }
 };
@@ -116,10 +116,10 @@ export const macroOsuBeatmap: MessageParserMacroGenerator<MacroOsuBeatmapData> =
               break;
             case MacroOsuBeatmap.HAS_LEADERBOARD:
               macroValue =
-                data.beatmap.ranked === RankedStatus.approved ||
-                data.beatmap.ranked === RankedStatus.loved ||
-                data.beatmap.ranked === RankedStatus.qualified ||
-                data.beatmap.ranked === RankedStatus.ranked;
+                data.beatmap.ranked === RankStatusInt.APPROVED ||
+                data.beatmap.ranked === RankStatusInt.LOVED ||
+                data.beatmap.ranked === RankStatusInt.QUALIFIED ||
+                data.beatmap.ranked === RankStatusInt.RANKED;
               break;
             case MacroOsuBeatmap.ID:
               macroValue = data.beatmap.id;
@@ -143,7 +143,7 @@ export const macroOsuBeatmap: MessageParserMacroGenerator<MacroOsuBeatmapData> =
               macroValue = data.beatmap.playcount;
               break;
             case MacroOsuBeatmap.RANKED_STATUS:
-              macroValue = mapRankedStatusToStr(data.beatmap.ranked);
+              macroValue = mapRankStatusIntToStr(data.beatmap.ranked);
               break;
             case MacroOsuBeatmap.SET_ID:
               macroValue = data.beatmap.beatmapset?.id;
@@ -273,7 +273,9 @@ export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
             macroValue = score.passed;
             break;
           case MacroOsuScore.PP:
-            macroValue = roundNumber(score.pp, 1);
+            if (score.pp !== null && score.pp !== undefined) {
+              macroValue = roundNumber(score.pp, 1);
+            }
             break;
           case MacroOsuScore.RANK:
             macroValue = score.rank;
@@ -355,7 +357,9 @@ export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRec
             macroValue = data.score.beatmapset?.artist;
             break;
           case MacroOsuMostRecentPlay.BEST_SCORE_ID:
-            macroValue = data.score.best_id;
+            if (data.score.best_id !== null) {
+              macroValue = data.score.best_id;
+            }
             break;
           case MacroOsuMostRecentPlay.COUNT_100:
             macroValue = data.score.statistics.count_100;
@@ -401,7 +405,9 @@ export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRec
             macroValue = data.score.passed;
             break;
           case MacroOsuMostRecentPlay.PP:
-            macroValue = roundNumber(data.score.pp, 1);
+            if (data.score.pp !== null && data.score.pp !== undefined) {
+              macroValue = roundNumber(data.score.pp, 1);
+            }
             break;
           case MacroOsuMostRecentPlay.RANK:
             macroValue = data.score.rank;
@@ -425,7 +431,7 @@ export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRec
         if (typeof macroValue === "boolean") {
           macroValue = macroValue ? "true" : "false";
         }
-        if (typeof macroValue === "undefined") {
+        if (macroValue === undefined) {
           macroValue = "undefined";
         }
         if (typeof macroValue === "number") {

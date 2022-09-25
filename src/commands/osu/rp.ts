@@ -65,19 +65,18 @@ export const commandRp: TwitchChatCommandHandler<
         data.customOsuName
       );
       if (
-        userSearchResult?.user?.data !== undefined &&
-        Array.isArray(userSearchResult.user.data) &&
-        userSearchResult.user.data.length > 0
+        Array.isArray(userSearchResult.data) &&
+        userSearchResult.data.length > 0
       ) {
-        data.customOsuId = userSearchResult.user.data[0].id;
+        data.customOsuId = userSearchResult.data[0].id;
       }
     }
 
     const lastPlay = await osuApiV2.users.scores(
       oauthAccessToken,
       data.customOsuId !== undefined ? data.customOsuId : data.defaultOsuId,
-      ScoresType.Recent,
-      GameMode.osu,
+      ScoresType.RECENT,
+      GameMode.OSU_STANDARD,
       1,
       0,
       true
