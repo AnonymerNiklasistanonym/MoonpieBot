@@ -199,3 +199,6 @@ installer/*.1
 
 # Macro cache files
 macro_cache_*
+
+# GitHub Actions downloads
+*.zip

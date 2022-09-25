@@ -107,8 +107,8 @@ jobs:
         if-no-files-found: error
 
 
-  # Update the online (HTML) documentation
-  update-documentation:
+  # Creates a GitHub release if a new tag was pushed
+  create-github-release:
 
     strategy:
       matrix:
@@ -116,46 +116,32 @@ jobs:
         os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
-    env:
-      GITHUB_URL_REPO: https://github.com/AnonymerNiklasistanonym/MoonpieBot/blob/main
 
-    # Only update documentation if the build didn't fail and happened on the main branch
-    # That way changes on other branches won't override the current stable version
+    # Only create a GitHub release if a new tag was pushed that starts with v
+    # and if the build step was successful
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - name: Download all workflow run artifacts
+      uses: actions/download-artifact@v3
+    - run: ls
+    - run: ls "moonpiebot-installer-windows-node-18.x"
+    - name: Rename downloaded artifacts for release
+      shell: pwsh
+      working-directory: "scripts"
+      run: ./rename_download_artifacts_github_actions.ps1
+    - name: Create automatic GitHub release
+      uses: marvinpinto/action-automatic-releases@v1.2.1
       with:
-        node-version: ${{ matrix.node-version }}
-    - name: Install dependencies (apt - Linux)
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo apt install graphviz
-    - name: Install dependencies (choco - Windows)
-      if: matrix.os == 'windows-latest'
-      run: choco install graphviz nsis
-    - name: Install dependencies (npm)
-      run: npm ci
-    - name: Create documentation
-      run: npm run docs
-    - name: Modify documentation
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        # Add application icon
-        mkdir -p docs/res/icons
-        cp res/icons/moonpiebot.png docs/res/icons/
-        # Rename paths to example files
-        sed -i "s#href=\"./.env#href=\"$GITHUB_URL_REPO/.env#g" docs/index.html
-        sed -i "s#href=\"./installer#href=\"$GITHUB_URL_REPO/installer#g" docs/index.html
-        sed -i "s#href=\"./custom#href=\"$GITHUB_URL_REPO/custom#g" docs/index.html
-        sed -i "s#href=\"src/#href=\"$GITHUB_URL_REPO/src/#g" docs/index.html
-        # Add favicon (doesn't work for more than the first page)
-        cp res/icons/moonpiebot.ico docs/favicon.ico
-        sed -i "s#</title>#</title><link rel=\"icon\" type=\"image/x-icon\" href=\"./favicon.ico\">#g" docs/index.html
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4.2.5
-      with:
-        branch: gh-pages # The branch the action should deploy to.
-        folder: docs # The folder the action should deploy.
+         repo_token: "${{ secrets.GITHUB_TOKEN }}"
+         automatic_release_tag: "${{ github.ref_name }}"
+         prerelease: false
+         title: "${{ github.ref_name }}"
+         files: |
+           bin/github_action_binaries/*
+           res/icons/moonpiebot.ico
+           res/icons/moonpiebot.png
+           res/icons/moonpiebot.svg
+           installer/PKGBUILD*
