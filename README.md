@@ -274,7 +274,7 @@ The default location of the configuration/database/etc. files is `$HOME/.local/s
 
 ---
 
-**IMOPRTANT:**
+**IMPORTANT:**
 
 Migrating to a new version CAN break the database, custom commands, etc.
 This means you should always backup (or don't overwrite) your old configuration file (`.env`), database file (`moonpie.db`) and custom commands/timers (`customCommands/Timers.json`).
@@ -527,10 +527,40 @@ cross-env NODE_PATH=. nyc mocha -- "test/src/database.test.ts"
 
 ### How to handle versions
 
-For releases set the version in [`src/version.ts`](src/version.ts) to `beta: false` and then run `npm version patch`/`minor`/`major`.
-When working on the code after that change set the version in [`src/version.ts`](src/version.ts) to `beta: true` and the version to what is expected to be the next version.
+1. Prepare version for release
 
-To push the git tag created by `npm` run `git push origin <tag_name>`.
+   For releases set the next version in [`src/version.ts`](src/version.ts) (don't forget to set `beta: false`).
+   Then you need to run the following command to update most files with that version:
+
+   ```sh
+   npm run create
+   ```
+
+   Currently the `PKGBUILD` files are not included in this step so their versions need to be renamed manually (do a simple string replace `OLD.VER.SION/NEW.VER.SION` without the `v`).
+
+   After all versions are updated commit these changes with the message: *Prepare version for release*
+
+2. Create git version tag
+
+   Now you can run `npm version patch`/`minor`/`major` because it will automatically create a commit and tag for you (in case you want a specific version modify the version in [`package.json`](package.json) before running `npm version` for ease of use).
+
+   To push the git tag created by `npm version` run `git push origin <tag_name>` or use `git push --tags`.
+
+3. Bump version for next dev cycle
+
+   To mark the next dev cycle as a not final release change the version in [`src/version.ts`](src/version.ts) to the version you aim to release next (don't forget to set `beta: true`).
+
+   Then you need to run the following command to update most files with that version:
+
+   ```sh
+   npm run create
+   ```
+
+   After all versions are updated commit these changes with the message: *Bump version for next dev cycle*
+
+---
+
+GitHub Actions will automatically create a GitHub release for you so you only need to edit the title and description after it successfully ran.
 
 ### Documentation
 
