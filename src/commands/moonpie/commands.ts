@@ -7,7 +7,6 @@ import {
   moonpieCommandsAbout,
   moonpieCommandsAdd,
   moonpieCommandsClaim,
-  moonpieCommandsCommands,
   moonpieCommandsDelete,
   moonpieCommandsGet,
   moonpieCommandsLeaderboard,
@@ -42,7 +41,6 @@ export const commandCommands: TwitchChatCommandHandler<
           commandsStringIds.push([moonpieCommandsClaim.id, enabled]);
           break;
         case MoonpieCommands.COMMANDS:
-          commandsStringIds.push([moonpieCommandsCommands.id, enabled]);
           break;
         case MoonpieCommands.LEADERBOARD:
           commandsStringIds.push([moonpieCommandsLeaderboard.id, enabled]);

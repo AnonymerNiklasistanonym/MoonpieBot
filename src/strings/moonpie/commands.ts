@@ -14,10 +14,6 @@ import type { StringEntry } from "../../strings";
 
 const MOONPIE_COMMANDS_STRING_ID = `${MOONPIE_STRING_ID}_COMMANDS`;
 
-export const moonpieCommandsCommands: StringEntry = {
-  default: createMessageForMessageParser(["!moonpie commands"], true),
-  id: `${MOONPIE_COMMANDS_STRING_ID}_COMMANDS`,
-};
 export const moonpieCommandsClaim: StringEntry = {
   default: createMessageForMessageParser(
     ["!moonpie [claim one moonpie per day]"],
@@ -97,7 +93,6 @@ export const moonpieCommandsString: StringEntry = {
         args: {
           args: [
             moonpieCommandsClaim,
-            moonpieCommandsCommands,
             moonpieCommandsLeaderboard,
             moonpieCommandsGet,
             moonpieCommandsSet,
@@ -144,7 +139,6 @@ export const moonpieCommandsString: StringEntry = {
 
 export const moonpieCommands: StringEntry[] = [
   moonpieCommandsClaim,
-  moonpieCommandsCommands,
   moonpieCommandsLeaderboard,
   moonpieCommandsGet,
   moonpieCommandsSet,

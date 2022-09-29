@@ -4,7 +4,6 @@ import {
   SpotifyCommands,
 } from "../../info/commands";
 import {
-  spotifyCommandsCommands,
   spotifyCommandsSong,
   spotifyCommandsString,
 } from "../../strings/spotify/commands";
@@ -33,7 +32,6 @@ export const commandCommands: TwitchChatCommandHandler<
       const enabled = data.enabledCommands.includes(command);
       switch (command) {
         case SpotifyCommands.COMMANDS:
-          commandsStringIds.push([spotifyCommandsCommands.id, enabled]);
           break;
         case SpotifyCommands.SONG:
           commandsStringIds.push([spotifyCommandsSong.id, enabled]);

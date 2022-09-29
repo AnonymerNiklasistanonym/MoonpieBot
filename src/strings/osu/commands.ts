@@ -14,10 +14,6 @@ import type { StringEntry } from "../../strings";
 
 const OSU_COMMANDS_STRING_ID = `${OSU_STRING_ID}_COMMANDS`;
 
-export const osuCommandsCommands: StringEntry = {
-  default: createMessageForMessageParser(["!osu commands"], true),
-  id: `${OSU_COMMANDS_STRING_ID}_COMMANDS`,
-};
 export const osuCommandsLastRequest: StringEntry = {
   default: createMessageForMessageParser(
     ["!osuLastRequest ($COUNT) [resend previous requests]"],
@@ -105,7 +101,6 @@ export const osuCommandsString: StringEntry = {
       args: {
         args: {
           args: [
-            osuCommandsCommands,
             osuCommandsLastRequest,
             osuCommandsPermitRequest,
             osuCommandsNp,
@@ -153,7 +148,6 @@ export const osuCommandsString: StringEntry = {
 };
 
 export const osuCommands: StringEntry[] = [
-  osuCommandsCommands,
   osuCommandsLastRequest,
   osuCommandsPermitRequest,
   osuCommandsNp,

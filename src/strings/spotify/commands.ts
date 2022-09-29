@@ -9,14 +9,11 @@ import { createMessageForMessageParser } from "../../messageParser";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
 // Type imports
+import type { MessageForMessageElementPlugin } from "../../messageParser";
 import type { StringEntry } from "../../strings";
 
 const SPOTIFY_COMMANDS_STRING_ID = `${SPOTIFY_STRING_ID}_COMMANDS`;
 
-export const spotifyCommandsCommands: StringEntry = {
-  default: createMessageForMessageParser(["!spotify commands"], true),
-  id: `${SPOTIFY_COMMANDS_STRING_ID}_COMMANDS`,
-};
 export const spotifyCommandsSong: StringEntry = {
   default: createMessageForMessageParser(
     ["!song [now playing and previously played song]"],
@@ -48,21 +45,26 @@ export const spotifyCommandsString: StringEntry = {
     {
       args: {
         args: {
-          args: [spotifyCommandsCommands, spotifyCommandsSong]
-            .map((a) => ({
-              args: {
-                key: a.id,
-                name: "COMMAND_ENABLED",
-                type: "macro",
-              },
-              name: pluginIfTrue.id,
-              scope: {
-                name: a.id,
-                type: "reference",
-              },
-              type: "plugin",
-            }))
-            .join(";"),
+          args: [spotifyCommandsSong]
+            .map(
+              (a): MessageForMessageElementPlugin => ({
+                args: {
+                  key: a.id,
+                  name: "COMMAND_ENABLED",
+                  type: "macro",
+                },
+                name: pluginIfTrue.id,
+                scope: {
+                  name: a.id,
+                  type: "reference",
+                },
+                type: "plugin",
+              })
+            )
+            .reduce<(MessageForMessageElementPlugin | string)[]>(
+              (prev, curr) => prev.concat([curr, ";"]),
+              []
+            ),
           name: pluginListFilterUndefined.id,
           scope: {
             name: spotifyCommandsNone.id,
@@ -81,7 +83,6 @@ export const spotifyCommandsString: StringEntry = {
 };
 
 export const spotifyCommands: StringEntry[] = [
-  spotifyCommandsCommands,
   spotifyCommandsSong,
   spotifyCommandsNone,
   spotifyCommandsPrefix,

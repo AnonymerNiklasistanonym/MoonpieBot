@@ -1,7 +1,6 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
-  osuCommandsCommands,
   osuCommandsLastRequest,
   osuCommandsNp,
   osuCommandsNpStreamCompanionFile,
@@ -55,7 +54,6 @@ export const commandCommands: TwitchChatCommandHandler<
       const enabled = data.enabledCommands.includes(command);
       switch (command) {
         case OsuCommands.COMMANDS:
-          commandsStringIds.push([osuCommandsCommands.id, enabled]);
           break;
         case OsuCommands.LAST_REQUEST:
           commandsStringIds.push([osuCommandsLastRequest.id, enabled]);
