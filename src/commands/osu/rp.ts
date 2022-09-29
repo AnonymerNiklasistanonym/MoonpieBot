@@ -1,14 +1,16 @@
 // Package imports
 import osuApiV2, { GameMode, ScoresType } from "osu-api-v2";
 // Local imports
+import {
+  errorMessageDefaultOsuIdUndefined,
+  errorMessageOsuApiCredentialsUndefined,
+} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
 } from "../../strings/osu/commandReply";
-import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { macroOsuPpRpRequest } from "../../messageParser/macros/osuPpRpRequest";
-import { messageParserById } from "../../messageParser";
 import { regexOsuChatHandlerCommandRp } from "../../info/regex";
 // Type imports
 import type {
@@ -37,21 +39,12 @@ export const commandRp: TwitchChatCommandHandler<
   CommandPpRpDetectorInput,
   CommandPpRpDetectorOutput
 > = {
-  createReply: async (
-    client,
-    channel,
-    _tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
+  createReply: async (_channel, _tags, data) => {
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
     if (data.defaultOsuId === undefined) {
-      throw Error("Default OSU ID was undefined");
+      throw errorMessageDefaultOsuIdUndefined();
     }
 
     const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
@@ -82,7 +75,7 @@ export const commandRp: TwitchChatCommandHandler<
       true
     );
 
-    const osuRpRequestMacros = new Map(globalMacros);
+    const osuRpRequestMacros = new Map();
     osuRpRequestMacros.set(
       macroOsuPpRpRequest.id,
       new Map(
@@ -95,30 +88,20 @@ export const commandRp: TwitchChatCommandHandler<
       )
     );
 
-    let message = "";
     if (lastPlay.length > 0) {
       if (lastPlay[0].beatmap?.id) {
         data.beatmapRequestsInfo.lastMentionedBeatmapId =
           lastPlay[0].beatmap?.id;
       }
-      message = await messageParserById(
-        osuCommandReplyRp.id,
-        globalStrings,
-        globalPlugins,
-        osuRpRequestMacros,
-        logger
-      );
-    } else {
-      message = await messageParserById(
-        osuCommandReplyRpNotFound.id,
-        globalStrings,
-        globalPlugins,
-        osuRpRequestMacros,
-        logger
-      );
+      return {
+        additionalMacros: osuRpRequestMacros,
+        messageId: osuCommandReplyRp.id,
+      };
     }
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+    return {
+      additionalMacros: osuRpRequestMacros,
+      messageId: osuCommandReplyRpNotFound.id,
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(OsuCommands.RP)) {

@@ -4,7 +4,6 @@ import {
   SpotifyCommands,
 } from "../../info/commands";
 import { macroSpotifySong } from "../../messageParser/macros/spotify";
-import { messageParserById } from "../../messageParser";
 import { regexSpotifyChatHandlerCommandSong } from "../../info/regex";
 import { spotifyCommandReplySong } from "../../strings/spotify/commandReply";
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
@@ -29,36 +28,22 @@ export const commandSong: TwitchChatCommandHandler<
   CommandSongCreateReplyInput,
   CommandSongDetectorInput
 > = {
-  createReply: async (
-    client,
-    channel,
-    _tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
+  createReply: async (_channel, _tags, data, logger) => {
     const spotifyData = await spotifyGetCurrentAndRecentSongs(
       data.spotifyWebApi,
       logger
     );
 
-    const macrosWithSpotifySong = new Map(globalMacros);
+    const macrosWithSpotifySong = new Map();
     macrosWithSpotifySong.set(
       macroSpotifySong.id,
       new Map(macroSpotifySong.generate({ spotifyData }))
     );
 
-    const message = await messageParserById(
-      spotifyCommandReplySong.id,
-      globalStrings,
-      globalPlugins,
-      macrosWithSpotifySong,
-      logger
-    );
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+    return {
+      additionalMacros: macrosWithSpotifySong,
+      messageId: spotifyCommandReplySong.id,
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(SpotifyCommands.SONG)) {

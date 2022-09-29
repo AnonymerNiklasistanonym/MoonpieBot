@@ -573,19 +573,32 @@ export interface PluginSignature {
   type: "signature";
 }
 
-// A plugin can have a scope in which special plugins can be defined
-// They output a tuple list of macro value and macro output or just a string
+/**
+ * A plugin can have a scope in which special plugins can be defined.
+ * They output a tuple list of macro value and macro output or just a string.
+ *
+ * The plugin either returns:
+ * - a "string" which contains the result.
+ * - a "boolean" which if true means insert the plugin value string as scope or render scope if not empty or false meaning the same as empty string.
+ * - a "map" which contains plugin macros.
+ * - a help information object.
+ * - a signature information object.
+ */
 export type PluginFunc = (
   logger: Logger,
+  /**
+   * The plugin value string if exists.
+   */
   value?: string,
   /**
    * Return the plugin signature if available.
    */
   signature?: boolean
 ) =>
-  | Promise<MacroMap | string | RequestHelp | PluginSignature>
+  | Promise<MacroMap | string | boolean | RequestHelp | PluginSignature>
   | MacroMap
   | string
+  | boolean
   | RequestHelp
   | PluginSignature;
 export type PluginMap = Map<string, PluginFunc>;
@@ -797,6 +810,20 @@ const parseTreeNode = async (
         return parseTreeNode(pluginContentNode, plugins, macros, logger);
       } else if (typeof pluginOutput === "string") {
         return pluginOutput;
+      } else if (typeof pluginOutput === "boolean") {
+        if (pluginOutput === false) {
+          return "";
+        }
+        const pluginContentNode = treeNode.pluginContent;
+        if (pluginContentNode === undefined) {
+          if (pluginValueString !== undefined) {
+            return pluginValueString;
+          }
+          throw Error(
+            `Parse tree node '${treeNode.type}' had no plugin content and no plugin value (${treeNode.originalString})`
+          );
+        }
+        return parseTreeNode(pluginContentNode, plugins, macros, logger);
       } else if (pluginOutput.type === "help") {
         let helpOutput = "";
         if (pluginOutput.macros && macros) {
@@ -842,9 +869,8 @@ const parseTreeNode = async (
         return helpOutput;
       } else if (pluginOutput.type === "signature") {
         throw Error("Signature output is not supported in the message parser!");
-      } else {
-        throw Error("This should be unreachable!");
       }
+      throw Error("This should be unreachable!");
     case "children":
       if (treeNode.children === undefined) {
         throw Error(

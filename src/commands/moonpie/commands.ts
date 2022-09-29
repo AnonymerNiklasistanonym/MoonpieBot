@@ -11,13 +11,10 @@ import {
   moonpieCommandsDelete,
   moonpieCommandsGet,
   moonpieCommandsLeaderboard,
-  moonpieCommandsNone,
-  moonpieCommandsPrefix,
   moonpieCommandsRemove,
   moonpieCommandsSet,
+  moonpieCommandsString,
 } from "../../strings/moonpie/commands";
-import { genericStringSorter } from "../../other/genericStringSorter";
-import { messageParserById } from "../../messageParser";
 import { regexMoonpieChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
@@ -36,82 +33,51 @@ export const commandCommands: TwitchChatCommandHandler<
   CommandCommandsCreateReplyInput,
   CommandCommandsDetectorInput
 > = {
-  createReply: async (
-    client,
-    channel,
-    _tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
-    const commandsStringIds = [];
-
+  createReply: (_channel, _tags, data) => {
+    const commandsStringIds: [string, boolean][] = [];
     Object.values(MoonpieCommands).forEach((command) => {
-      if (!data.enabledCommands.includes(command)) {
-        return;
-      }
+      const enabled = data.enabledCommands.includes(command);
       switch (command) {
         case MoonpieCommands.CLAIM:
-          commandsStringIds.push(moonpieCommandsClaim.id);
+          commandsStringIds.push([moonpieCommandsClaim.id, enabled]);
           break;
         case MoonpieCommands.COMMANDS:
-          commandsStringIds.push(moonpieCommandsCommands.id);
+          commandsStringIds.push([moonpieCommandsCommands.id, enabled]);
           break;
         case MoonpieCommands.LEADERBOARD:
-          commandsStringIds.push(moonpieCommandsLeaderboard.id);
+          commandsStringIds.push([moonpieCommandsLeaderboard.id, enabled]);
           break;
         case MoonpieCommands.GET:
-          commandsStringIds.push(moonpieCommandsGet.id);
+          commandsStringIds.push([moonpieCommandsGet.id, enabled]);
           break;
         case MoonpieCommands.SET:
-          commandsStringIds.push(moonpieCommandsSet.id);
+          commandsStringIds.push([moonpieCommandsSet.id, enabled]);
           break;
         case MoonpieCommands.ADD:
-          commandsStringIds.push(moonpieCommandsAdd.id);
+          commandsStringIds.push([moonpieCommandsAdd.id, enabled]);
           break;
         case MoonpieCommands.REMOVE:
-          commandsStringIds.push(moonpieCommandsRemove.id);
+          commandsStringIds.push([moonpieCommandsRemove.id, enabled]);
           break;
         case MoonpieCommands.DELETE:
-          commandsStringIds.push(moonpieCommandsDelete.id);
+          commandsStringIds.push([moonpieCommandsDelete.id, enabled]);
           break;
         case MoonpieCommands.ABOUT:
-          commandsStringIds.push(moonpieCommandsAbout.id);
+          commandsStringIds.push([moonpieCommandsAbout.id, enabled]);
           break;
       }
     });
-
-    if (commandsStringIds.length === 0) {
-      commandsStringIds.push(moonpieCommandsNone.id);
-    }
-
-    const commands = [];
-    for (const commandsStringId of commandsStringIds) {
-      commands.push(
-        await messageParserById(
-          commandsStringId,
-          globalStrings,
-          globalPlugins,
-          globalMacros,
-          logger
-        )
-      );
-    }
-
-    const messagePrefix = await messageParserById(
-      moonpieCommandsPrefix.id,
-      globalStrings,
-      globalPlugins,
-      globalMacros,
-      logger
-    );
-    const message = `${messagePrefix} ${commands
-      .sort(genericStringSorter)
-      .join(", ")}`;
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+    return {
+      additionalMacros: new Map([
+        [
+          "COMMAND_ENABLED",
+          new Map(
+            commandsStringIds.map((a) => [a[0], a[1] ? "true" : "false"])
+          ),
+        ],
+      ]),
+      messageId: moonpieCommandsString.id,
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(MoonpieCommands.COMMANDS)) {

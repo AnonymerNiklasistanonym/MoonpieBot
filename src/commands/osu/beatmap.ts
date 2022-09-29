@@ -4,8 +4,6 @@ import osuApiV2 from "osu-api-v2";
 import {
   errorMessageOsuApiCredentialsUndefined,
   errorMessageOsuApiDbPathUndefined,
-  errorMessageUserIdUndefined,
-  errorMessageUserNameUndefined,
 } from "../../error";
 import {
   macroOsuBeatmapRequest,
@@ -28,11 +26,12 @@ import {
   regexOsuBeatmapUrlSplitter,
 } from "../../info/regex";
 import { createLogFunc } from "../../logging";
+import { generatePlugin } from "../../messageParser/plugins";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { macroOsuBeatmap } from "../../messageParser/macros/osuApi";
-import { messageParserById } from "../../messageParser";
 import { OsuRequestsConfig } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import osuRequestsDb from "../../database/osuRequestsDb";
+import { pluginsTwitchChatGenerator } from "../../messageParser/plugins/twitchChat";
 import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
 import type {
@@ -45,6 +44,7 @@ import type {
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerReply,
 } from "../../twitch";
+import type { MacroMap, PluginMap } from "../../messageParser";
 import type {
   RegexOsuBeatmapIdFromUrl,
   RegexOsuBeatmapIdFromUrlB,
@@ -55,6 +55,7 @@ import type { Beatmap } from "osu-api-v2";
 import type { GetOsuRequestsConfigOut } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
+import type { PluginTwitchChatData } from "../../messageParser/plugins/twitchChat";
 
 const MAX_LENGTH_PREVIOUS_REQUESTS = 15;
 
@@ -108,6 +109,72 @@ const checkIfBeatmapMatchesDemands = (
   return true;
 };
 
+export const sendBeatmapRequest = (
+  detailedMapRequests: boolean | undefined,
+  messageParserMacros: MacroMap = new Map(),
+  messageParserTwitchPluginData: PluginTwitchChatData | undefined,
+  beatmapRequestId: number,
+  beatmapRequestComment?: string,
+  beatmap?: Beatmap,
+  osuIrcRequestTarget?: string,
+  osuIrcBot?: OsuIrcBotSendMessageFunc
+): TwitchChatCommandHandlerReply[] => {
+  const commandRepliesBeatmap: TwitchChatCommandHandlerReply[] = [];
+  let twitchPluginOverride: PluginMap | undefined;
+  if (messageParserTwitchPluginData) {
+    // Overwrite the user name and id for the correct requestor name
+    twitchPluginOverride = new Map();
+    pluginsTwitchChatGenerator.forEach((a) => {
+      const plugin = generatePlugin<PluginTwitchChatData>(
+        a,
+        messageParserTwitchPluginData
+      );
+      twitchPluginOverride?.set(plugin.id, plugin.func);
+    });
+  }
+  messageParserMacros.set(
+    macroOsuBeatmapRequest.id,
+    new Map(
+      macroOsuBeatmapRequest.generate({
+        comment: beatmapRequestComment?.trim(),
+        id: beatmapRequestId,
+      })
+    )
+  );
+  if (beatmap !== undefined) {
+    messageParserMacros.set(
+      macroOsuBeatmap.id,
+      new Map(macroOsuBeatmap.generate({ beatmap }))
+    );
+  }
+  commandRepliesBeatmap.push({
+    additionalMacros: messageParserMacros,
+    messageId: detailedMapRequests
+      ? osuBeatmapRequestDetailed.id
+      : osuBeatmapRequest.id,
+  });
+  if (osuIrcRequestTarget && osuIrcBot !== undefined) {
+    commandRepliesBeatmap.push({
+      additionalMacros: messageParserMacros,
+      additionalPlugins: twitchPluginOverride,
+      customSendFunc: async (message, loggerSendFunc) => {
+        await tryToSendOsuIrcMessage(
+          osuIrcBot,
+          "commandBeatmap",
+          osuIrcRequestTarget,
+          message,
+          loggerSendFunc
+        );
+        return [osuIrcRequestTarget, message];
+      },
+      messageId: detailedMapRequests
+        ? osuBeatmapRequestIrcDetailed.id
+        : osuBeatmapRequestIrc.id,
+    });
+  }
+  return commandRepliesBeatmap;
+};
+
 export interface CommandBeatmapCreateReplyInput
   extends CommandGenericDataOsuApiDbPath {
   /**
@@ -124,7 +191,7 @@ export interface CommandBeatmapCreateReplyInput
   /**
    * The osu API (v2) credentials.
    */
-  osuApiV2Credentials?: OsuApiV2Credentials;
+  osuApiV2Credentials?: Readonly<OsuApiV2Credentials>;
   osuIrcBot?: OsuIrcBotSendMessageFunc;
   osuIrcRequestTarget?: string;
 }
@@ -153,27 +220,12 @@ export const commandBeatmap: TwitchChatCommandHandler<
   CommandBeatmapDetectorInputExtra,
   CommandBeatmapDetectorOutput
 > = {
-  createReply: async (
-    client,
-    channel,
-    tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
+  createReply: async (channel, tags, data, logger) => {
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
     if (data.osuApiDbPath === undefined) {
       throw errorMessageOsuApiDbPathUndefined();
-    }
-    if (tags["user-id"] === undefined) {
-      throw errorMessageUserIdUndefined();
-    }
-    if (tags.username === undefined) {
-      throw errorMessageUserNameUndefined();
     }
 
     const logCmdBeatmap = createLogFunc(
@@ -195,15 +247,9 @@ export const commandBeatmap: TwitchChatCommandHandler<
             : "no id"
         }`
       );
-      const message = await messageParserById(
-        osuBeatmapRequestNoRedeem.id,
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger
-      );
-      const sentMessage = await client.say(channel, message);
-      return { sentMessage };
+      return {
+        messageId: osuBeatmapRequestNoRedeem.id,
+      };
     }
 
     const osuRequestsConfigEntries =
@@ -218,27 +264,22 @@ export const commandBeatmap: TwitchChatCommandHandler<
         (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
       ) !== undefined
     ) {
-      const macros = new Map(globalMacros);
-      macros.set(
-        macroOsuBeatmapRequests.id,
-        new Map(
-          macroOsuBeatmapRequests.generate({
-            customMessage: osuRequestsConfigEntries.find(
-              (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
-            )?.optionValue,
-          })
-        )
-      );
       // TODO Allow beatmap to be sent via the !osupermitrequest command
-      const message = await messageParserById(
-        osuBeatmapRequestCurrentlyOff.id,
-        globalStrings,
-        globalPlugins,
-        macros,
-        logger
-      );
-      const sentMessage = await client.say(channel, message);
-      return { sentMessage };
+      return {
+        additionalMacros: new Map([
+          [
+            macroOsuBeatmapRequests.id,
+            new Map(
+              macroOsuBeatmapRequests.generate({
+                customMessage: osuRequestsConfigEntries.find(
+                  (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
+                )?.optionValue,
+              })
+            ),
+          ],
+        ]),
+        messageId: osuBeatmapRequestCurrentlyOff.id,
+      };
     }
 
     const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
@@ -249,7 +290,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
     const commandReplies: TwitchChatCommandHandlerReply[] = [];
 
     for (const beatmapRequest of data.beatmapRequests) {
-      const osuBeatmapRequestMacros = new Map(globalMacros);
+      const osuBeatmapRequestMacros: MacroMap = new Map();
       osuBeatmapRequestMacros.set(
         macroOsuBeatmapRequest.id,
         new Map(
@@ -262,8 +303,6 @@ export const commandBeatmap: TwitchChatCommandHandler<
 
       // Get beatmap and if found the current top score and convert them into a
       // message for Twitch and IRC channel
-      let messageRequest = "";
-      let messageRequestIrc = "";
       let beatmap: Beatmap | undefined;
       try {
         beatmap = await osuApiV2.beatmaps.get(
@@ -315,14 +354,11 @@ export const commandBeatmap: TwitchChatCommandHandler<
                 })
               )
             );
-            const errorMessage = await messageParserById(
-              osuBeatmapRequestNotMeetingDemands.id,
-              globalStrings,
-              globalPlugins,
-              osuBeatmapRequestMacros,
-              logger
-            );
-            throw Error(errorMessage);
+            return {
+              additionalMacros: osuBeatmapRequestMacros,
+              isError: true,
+              messageId: osuBeatmapRequestNotMeetingDemands.id,
+            };
           }
 
           data.beatmapRequestsInfo.lastMentionedBeatmapId = beatmap.id;
@@ -339,81 +375,34 @@ export const commandBeatmap: TwitchChatCommandHandler<
               MAX_LENGTH_PREVIOUS_REQUESTS
             );
         }
-        osuBeatmapRequestMacros.set(
-          macroOsuBeatmap.id,
-          new Map(macroOsuBeatmap.generate({ beatmap }))
-        );
         // Check for user score
       } catch (err) {
         if (
           (err as OsuApiV2WebRequestError).statusCode === NOT_FOUND_STATUS_CODE
         ) {
           logCmdBeatmap.warn((err as OsuApiV2WebRequestError).message);
-          const errorMessage = await messageParserById(
-            osuBeatmapRequestNotFound.id,
-            globalStrings,
-            globalPlugins,
-            osuBeatmapRequestMacros,
-            logger
-          );
-          throw Error(errorMessage);
+          return {
+            additionalMacros: osuBeatmapRequestMacros,
+            isError: true,
+            messageId: osuBeatmapRequestNotFound.id,
+          };
         } else {
           throw err;
         }
       }
 
-      if (data.enableOsuBeatmapRequestsDetailed) {
-        messageRequest = await messageParserById(
-          osuBeatmapRequestDetailed.id,
-          globalStrings,
-          globalPlugins,
+      commandReplies.push(
+        ...sendBeatmapRequest(
+          data.enableOsuBeatmapRequestsDetailed,
           osuBeatmapRequestMacros,
-          logger
-        );
-        messageRequestIrc = await messageParserById(
-          osuBeatmapRequestIrcDetailed.id,
-          globalStrings,
-          globalPlugins,
-          osuBeatmapRequestMacros,
-          logger
-        );
-      } else {
-        messageRequest = await messageParserById(
-          osuBeatmapRequest.id,
-          globalStrings,
-          globalPlugins,
-          osuBeatmapRequestMacros,
-          logger
-        );
-        messageRequestIrc = await messageParserById(
-          osuBeatmapRequestIrc.id,
-          globalStrings,
-          globalPlugins,
-          osuBeatmapRequestMacros,
-          logger
-        );
-      }
-
-      // Send response to Twitch channel and if found to IRC channel
-      const sentMessage = await client.say(channel, messageRequest);
-
-      if (beatmap === undefined) {
-        logCmdBeatmap.debug(
-          "osu! beatmap information was not found, stop attempt sending beatmap over IRC channel"
-        );
-      } else if (data.osuIrcRequestTarget && data.osuIrcBot !== undefined) {
-        logCmdBeatmap.info(
-          "Try to send beatmap request via osu! IRC connection"
-        );
-        await tryToSendOsuIrcMessage(
-          data.osuIrcBot,
-          "commandBeatmap",
+          undefined,
+          beatmapRequest.beatmapId,
+          beatmapRequest.comment,
+          beatmap,
           data.osuIrcRequestTarget,
-          messageRequestIrc,
-          logger
-        );
-      }
-      commandReplies.push({ sentMessage });
+          data.osuIrcBot
+        )
+      );
     }
     return commandReplies;
   },

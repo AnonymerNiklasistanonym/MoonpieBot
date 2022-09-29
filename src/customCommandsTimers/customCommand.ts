@@ -292,17 +292,8 @@ export const getCustomCommand = (
   CommandHandleCustomCommandDetectorDataOut
 > => {
   return {
-    createReply: async (
-      client,
-      channel,
-      _tags,
-      data,
-      globalStrings,
-      globalPlugins,
-      globalMacros,
-      logger
-    ) => {
-      const pluginsCommand: PluginMap = new Map(globalPlugins);
+    createReply: (_channel, _tags, data) => {
+      const pluginsCommand: PluginMap = new Map();
       pluginsCommand.set(
         pluginRegexGroupId,
         (_, regexGroupIndex, signature) => {
@@ -319,16 +310,21 @@ export const getCustomCommand = (
         }
       );
 
-      const parsedMessage = await messageParser(
-        customCommand.message,
-        globalStrings,
-        pluginsCommand,
-        globalMacros,
-        logger
-      );
-      const sentMessage = await client.say(channel, parsedMessage);
-
-      return { sentMessage };
+      return {
+        messageId: (
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          loggerMessage
+        ) =>
+          messageParser(
+            customCommand.message,
+            globalStrings,
+            new Map([...globalPlugins, ...pluginsCommand]),
+            globalMacros,
+            loggerMessage
+          ),
+      };
     },
     detect: (tags, message) => {
       // Check if the user is allowed to run the command (level)

@@ -11,7 +11,6 @@ import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { macroOsuScore } from "../../messageParser/macros/osuApi";
 import { macroOsuScoreRequest } from "../../messageParser/macros/osuScoreRequest";
-import { messageParserById } from "../../messageParser";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 import { regexOsuChatHandlerCommandScore } from "../../info/regex";
 // Type imports
@@ -27,7 +26,7 @@ export interface CommandScoreCreateReplyInput {
   /**
    * The osu API (v2) credentials.
    */
-  osuApiV2Credentials?: OsuApiV2Credentials;
+  osuApiV2Credentials?: Readonly<OsuApiV2Credentials>;
 }
 export interface CommandScoreCreateReplyInputExtra
   extends CommandScoreCreateReplyInput {
@@ -54,32 +53,19 @@ export const commandScore: TwitchChatCommandHandler<
   CommandScoreDetectorInput,
   CommandScoreDetectorOutput
 > = {
-  createReply: async (
-    client,
-    channel,
-    _tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
+  createReply: async (_channel, _tags, data, logger) => {
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
 
     if (data.beatmapRequestsInfo.lastMentionedBeatmapId === undefined) {
-      const errorMessage = await messageParserById(
-        osuScoreErrorNoBeatmap.id,
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger
-      );
-      throw Error(errorMessage);
+      return {
+        isError: true,
+        messageId: osuScoreErrorNoBeatmap.id,
+      };
     }
 
-    const osuBeatmapRequestMacros = new Map(globalMacros);
+    const osuBeatmapRequestMacros = new Map();
 
     const logCmdBeatmap = createLogFunc(
       logger,
@@ -136,29 +122,20 @@ export const commandScore: TwitchChatCommandHandler<
         (err as OsuApiV2WebRequestError).statusCode === NOT_FOUND_STATUS_CODE
       ) {
         logCmdBeatmap.warn((err as OsuApiV2WebRequestError).message);
-        const errorMessage = await messageParserById(
-          osuScoreErrorNotFound.id,
-          globalStrings,
-          globalPlugins,
-          osuBeatmapRequestMacros,
-          logger
-        );
-        throw Error(errorMessage);
+        return {
+          additionalMacros: osuBeatmapRequestMacros,
+          isError: true,
+          messageId: osuScoreErrorNotFound.id,
+        };
       } else {
         throw err;
       }
     }
 
-    const message = await messageParserById(
-      osuScore.id,
-      globalStrings,
-      globalPlugins,
-      osuBeatmapRequestMacros,
-      logger
-    );
-
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+    return {
+      additionalMacros: osuBeatmapRequestMacros,
+      messageId: osuScore.id,
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(OsuCommands.SCORE)) {

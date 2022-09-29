@@ -22,6 +22,7 @@ import type {
   TwitchChatCommandHandler,
 } from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
+import type { MacroMap } from "../../messageParser";
 import type { RegexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 
 const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 10;
@@ -41,16 +42,7 @@ export const commandLeaderboard: TwitchChatCommandHandler<
   CommandLeaderboardDetectorInput,
   CommandLeaderboardDetectorOutput
 > = {
-  createReply: async (
-    client,
-    channel,
-    _tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
+  createReply: async (_channel, _tags, data, logger) => {
     const moonpieEntries =
       await moonpieDb.requests.moonpieLeaderboard.getEntries(
         data.moonpieDbPath,
@@ -59,7 +51,7 @@ export const commandLeaderboard: TwitchChatCommandHandler<
         logger
       );
 
-    const macros = new Map(globalMacros);
+    const macros: MacroMap = new Map();
     macros.set(
       macroMoonpieLeaderboard.id,
       new Map(
@@ -68,58 +60,65 @@ export const commandLeaderboard: TwitchChatCommandHandler<
     );
 
     if (moonpieEntries.length === 0) {
-      const errorMessage = await messageParserById(
-        moonpieCommandReplyLeaderboardErrorNoEntriesFound.id,
+      return {
+        additionalMacros: macros,
+        isError: true,
+        messageId: moonpieCommandReplyLeaderboardErrorNoEntriesFound.id,
+      };
+    }
+
+    // TODO Think about a better implementation
+    return {
+      messageId: async (
         globalStrings,
         globalPlugins,
-        macros,
-        logger
-      );
-      throw Error(errorMessage);
-    }
-
-    let messageLeaderboard = await messageParserById(
-      moonpieCommandReplyLeaderboardPrefix.id,
-      globalStrings,
-      globalPlugins,
-      macros,
-      logger
-    );
-    const messageLeaderboardEntries = [];
-    for (const moonpieEntry of moonpieEntries) {
-      const macrosLeaderboardEntry = new Map(macros);
-      macrosLeaderboardEntry.set(
-        macroMoonpieLeaderboardEntry.id,
-        new Map(
-          macroMoonpieLeaderboardEntry.generate({
-            count: moonpieEntry.count,
-            name: moonpieEntry.name,
-            rank: moonpieEntry.rank,
-          })
-        )
-      );
-      messageLeaderboardEntries.push(
-        await messageParserById(
-          moonpieCommandReplyLeaderboardEntry.id,
+        globalMacros,
+        logger2
+      ) => {
+        const mergedMacros = new Map([...globalMacros, ...macros]);
+        let messageLeaderboard = await messageParserById(
+          moonpieCommandReplyLeaderboardPrefix.id,
           globalStrings,
           globalPlugins,
-          macrosLeaderboardEntry,
-          logger
-        )
-      );
-    }
-    messageLeaderboard += messageLeaderboardEntries.join(", ");
+          mergedMacros,
+          logger2
+        );
+        const messageLeaderboardEntries = [];
+        for (const moonpieEntry of moonpieEntries) {
+          const macrosLeaderboardEntry = new Map(mergedMacros);
+          macrosLeaderboardEntry.set(
+            macroMoonpieLeaderboardEntry.id,
+            new Map(
+              macroMoonpieLeaderboardEntry.generate({
+                count: moonpieEntry.count,
+                name: moonpieEntry.name,
+                rank: moonpieEntry.rank,
+              })
+            )
+          );
+          messageLeaderboardEntries.push(
+            await messageParserById(
+              moonpieCommandReplyLeaderboardEntry.id,
+              globalStrings,
+              globalPlugins,
+              macrosLeaderboardEntry,
+              logger
+            )
+          );
+        }
+        messageLeaderboard += messageLeaderboardEntries.join(", ");
 
-    // Slice the message if too long
-    const message =
-      messageLeaderboard.length > MAX_LENGTH_OF_A_TWITCH_MESSAGE
-        ? messageLeaderboard.slice(
-            0,
-            MAX_LENGTH_OF_A_TWITCH_MESSAGE - "...".length
-          ) + "..."
-        : messageLeaderboard;
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+        // Slice the message if too long
+        const message =
+          messageLeaderboard.length > MAX_LENGTH_OF_A_TWITCH_MESSAGE
+            ? messageLeaderboard.slice(
+                0,
+                MAX_LENGTH_OF_A_TWITCH_MESSAGE - "...".length
+              ) + "..."
+            : messageLeaderboard;
+        return message;
+      },
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(MoonpieCommands.LEADERBOARD)) {

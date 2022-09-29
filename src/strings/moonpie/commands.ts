@@ -1,8 +1,15 @@
 // Local imports
+import {
+  pluginIfTrue,
+  pluginListFilterUndefined,
+  pluginListJoinCommaSpace,
+  pluginListSort,
+} from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 // Type imports
+import type { MessageForMessageElementPlugin } from "../../messageParser";
 import type { StringEntry } from "../../strings";
 
 const MOONPIE_COMMANDS_STRING_ID = `${MOONPIE_STRING_ID}_COMMANDS`;
@@ -79,6 +86,61 @@ export const moonpieCommandsPrefix: StringEntry = {
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_PREFIX`,
 };
+export const moonpieCommandsString: StringEntry = {
+  default: createMessageForMessageParser([
+    {
+      name: moonpieCommandsPrefix.id,
+      type: "reference",
+    },
+    {
+      args: {
+        args: {
+          args: [
+            moonpieCommandsClaim,
+            moonpieCommandsCommands,
+            moonpieCommandsLeaderboard,
+            moonpieCommandsGet,
+            moonpieCommandsSet,
+            moonpieCommandsAdd,
+            moonpieCommandsRemove,
+            moonpieCommandsDelete,
+            moonpieCommandsAbout,
+          ]
+            .map(
+              (a): MessageForMessageElementPlugin => ({
+                args: {
+                  key: a.id,
+                  name: "COMMAND_ENABLED",
+                  type: "macro",
+                },
+                name: pluginIfTrue.id,
+                scope: {
+                  name: a.id,
+                  type: "reference",
+                },
+                type: "plugin",
+              })
+            )
+            .reduce<(MessageForMessageElementPlugin | string)[]>(
+              (prev, curr) => prev.concat([curr, ";"]),
+              []
+            ),
+          name: pluginListFilterUndefined.id,
+          scope: {
+            name: moonpieCommandsNone.id,
+            type: "reference",
+          },
+          type: "plugin",
+        },
+        name: pluginListSort.id,
+        type: "plugin",
+      },
+      name: pluginListJoinCommaSpace.id,
+      type: "plugin",
+    },
+  ]),
+  id: `${MOONPIE_COMMANDS_STRING_ID}_STRING`,
+};
 
 export const moonpieCommands: StringEntry[] = [
   moonpieCommandsClaim,
@@ -92,4 +154,5 @@ export const moonpieCommands: StringEntry[] = [
   moonpieCommandsAbout,
   moonpieCommandsNone,
   moonpieCommandsPrefix,
+  moonpieCommandsString,
 ];

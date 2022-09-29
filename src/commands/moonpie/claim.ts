@@ -1,10 +1,5 @@
 // Local imports
 import {
-  errorMessageIdUndefined,
-  errorMessageUserIdUndefined,
-  errorMessageUserNameUndefined,
-} from "../../error";
-import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
 } from "../../info/commands";
@@ -27,7 +22,6 @@ import {
   regexMoonpieChatHandlerCommandUserRemove,
   regexMoonpieChatHandlerCommandUserSet,
 } from "../../info/regex";
-import { messageParserById } from "../../messageParser";
 import moonpieDb from "../../database/moonpieDb";
 // Type imports
 import type {
@@ -35,6 +29,7 @@ import type {
   TwitchChatCommandHandler,
 } from "../../twitch";
 import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
+import type { MacroMap } from "../../messageParser";
 
 export interface CommandClaimCreateReplyInput
   extends CommandGenericDataMoonpieDbPath {
@@ -53,26 +48,7 @@ export const commandClaim: TwitchChatCommandHandler<
   CommandClaimCreateReplyInput,
   CommandClaimDetectorInput
 > = {
-  createReply: async (
-    client,
-    channel,
-    tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
-    if (tags.id === undefined) {
-      throw errorMessageIdUndefined();
-    }
-    if (tags.username === undefined) {
-      throw errorMessageUserNameUndefined();
-    }
-    if (tags["user-id"] === undefined) {
-      throw errorMessageUserIdUndefined();
-    }
-
+  createReply: async (_channel, tags, data, logger) => {
     // Check if a moonpie entry already exists
     let newMoonpieCount = 1;
     let msSinceLastClaim = 0;
@@ -134,7 +110,7 @@ export const commandClaim: TwitchChatCommandHandler<
         logger
       );
 
-    const macros = new Map(globalMacros);
+    const macros: MacroMap = new Map();
     macros.set(
       macroMoonpieClaim.id,
       new Map(
@@ -156,26 +132,17 @@ export const commandClaim: TwitchChatCommandHandler<
       )
     );
 
-    let message = await messageParserById(
-      moonpieCommandReplyClaim.id,
-      globalStrings,
-      globalPlugins,
-      macros,
-      logger
-    );
-
     if (alreadyClaimedAMoonpie) {
-      message = await messageParserById(
-        moonpieCommandReplyAlreadyClaimed.id,
-        globalStrings,
-        globalPlugins,
-        macros,
-        logger
-      );
+      return {
+        additionalMacros: macros,
+        messageId: moonpieCommandReplyAlreadyClaimed.id,
+      };
     }
 
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+    return {
+      additionalMacros: macros,
+      messageId: moonpieCommandReplyClaim.id,
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(MoonpieCommands.CLAIM)) {

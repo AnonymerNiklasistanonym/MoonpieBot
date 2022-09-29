@@ -1,3 +1,5 @@
+// Local imports
+import { genericStringSorter } from "../../other/genericStringSorter";
 // Type imports
 import type { MessageParserPlugin } from "../plugins";
 
@@ -10,12 +12,13 @@ export const pluginIfEmpty: MessageParserPlugin = {
   examples: [
     { argument: "not empty", scope: "Will not be shown" },
     { argument: "", scope: "Will be shown" },
+    { argument: "not empty" },
   ],
   func: (_, content, signature) => {
     if (signature === true) {
       return { argument: "value", scope: "showIfEmpty", type: "signature" };
     }
-    return pluginIfEmptyLogic(content) ? new Map() : "";
+    return pluginIfEmptyLogic(content);
   },
   id: "IF_EMPTY",
 };
@@ -25,12 +28,14 @@ export const pluginIfNotEmpty: MessageParserPlugin = {
   examples: [
     { argument: "not empty", scope: "Will be shown" },
     { argument: "", scope: "Will not be shown" },
+    { argument: "not empty" },
+    { argument: "" },
   ],
   func: (_, content, signature) => {
     if (signature === true) {
       return { argument: "value", scope: "showIfNotEmpty", type: "signature" };
     }
-    return !pluginIfEmptyLogic(content) ? new Map() : "";
+    return !pluginIfEmptyLogic(content);
   },
   id: "IF_NOT_EMPTY",
 };
@@ -47,6 +52,8 @@ export const pluginIfTrue: MessageParserPlugin = {
   examples: [
     { argument: "true", scope: "Will be shown" },
     { argument: "false", scope: "Will not be shown" },
+    { argument: "true" },
+    { argument: "false" },
   ],
   func: (_, content, signature) => {
     if (signature === true) {
@@ -56,9 +63,7 @@ export const pluginIfTrue: MessageParserPlugin = {
         type: "signature",
       };
     }
-    return pluginIfNotUndefinedAndMatchesStringLogic("true", content)
-      ? new Map()
-      : "";
+    return pluginIfNotUndefinedAndMatchesStringLogic("true", content);
   },
   id: "IF_TRUE",
 };
@@ -69,6 +74,8 @@ export const pluginIfFalse: MessageParserPlugin = {
   examples: [
     { argument: "true", scope: "Will not be shown" },
     { argument: "false", scope: "Will be shown" },
+    { argument: "true" },
+    { argument: "false" },
   ],
   func: (_, content, signature) => {
     if (signature === true) {
@@ -78,9 +85,7 @@ export const pluginIfFalse: MessageParserPlugin = {
         type: "signature",
       };
     }
-    return pluginIfNotUndefinedAndMatchesStringLogic("false", content)
-      ? new Map()
-      : "";
+    return pluginIfNotUndefinedAndMatchesStringLogic("false", content);
   },
   id: "IF_FALSE",
 };
@@ -90,7 +95,9 @@ export const pluginIfUndefined: MessageParserPlugin = {
     "Plugin that only displays text inside of its scope if the supplied value is 'undefined'",
   examples: [
     { argument: "undefined", scope: "Will be shown" },
-    { argument: "abc", scope: "Will not be shown" },
+    { argument: "not undefined", scope: "Will not be shown" },
+    { argument: "undefined" },
+    { argument: "not undefined" },
   ],
   func: (_, content, signature) => {
     if (signature === true) {
@@ -100,9 +107,7 @@ export const pluginIfUndefined: MessageParserPlugin = {
         type: "signature",
       };
     }
-    return pluginIfNotUndefinedAndMatchesStringLogic("undefined", content)
-      ? new Map()
-      : "";
+    return pluginIfNotUndefinedAndMatchesStringLogic("undefined", content);
   },
   id: "IF_UNDEFINED",
 };
@@ -111,7 +116,9 @@ export const pluginIfNotUndefined: MessageParserPlugin = {
   description: `Opposite of ${pluginIfUndefined.id}`,
   examples: [
     { argument: "undefined", scope: "Will not be shown" },
-    { argument: "abc", scope: "Will be shown" },
+    { argument: "not undefined", scope: "Will be shown" },
+    { argument: "undefined" },
+    { argument: "not undefined" },
   ],
   func: (_, content, signature) => {
     if (signature === true) {
@@ -121,9 +128,7 @@ export const pluginIfNotUndefined: MessageParserPlugin = {
         type: "signature",
       };
     }
-    return !pluginIfNotUndefinedAndMatchesStringLogic("undefined", content)
-      ? new Map()
-      : "";
+    return !pluginIfNotUndefinedAndMatchesStringLogic("undefined", content);
   },
   id: "IF_NOT_UNDEFINED",
 };
@@ -653,4 +658,88 @@ export const pluginHelp: MessageParserPlugin = {
     return { macros: true, plugins: true, type: "help" };
   },
   id: "HELP",
+};
+
+export const pluginListFilterUndefined: MessageParserPlugin = {
+  description:
+    "Filter undefined values from a list (values separated by ;) and if empty use scope",
+  examples: [
+    { argument: "1;2;3;4" },
+    { argument: "1", scope: "list not empty so scope is ignored" },
+    { argument: ";1;undefined;2;undefined;3;" },
+    { argument: "undefined" },
+    { argument: "undefined", scope: "scope is used if list empty" },
+    { argument: ";undefined;undefined;", scope: "scope is used if list empty" },
+  ],
+  func: (_logger, listString, signature) => {
+    if (signature === true) {
+      return {
+        argument: "list",
+        type: "signature",
+      };
+    }
+    if (listString === undefined) {
+      throw Error("List string was undefined");
+    }
+    const finalList = listString
+      .split(";")
+      .filter((a) => a !== "" && a !== "undefined");
+    if (finalList.length === 0) {
+      return true;
+    }
+    return finalList.join(";");
+  },
+  id: "LIST_FILTER_UNDEFINED",
+};
+
+export const pluginListJoinCommaSpace: MessageParserPlugin = {
+  description: "Join values from a list (values separated by ;) using ', '",
+  examples: [
+    { argument: "1;2;3;4" },
+    { argument: "1" },
+    { argument: ";1;undefined;2;undefined;3;" },
+    { argument: "undefined" },
+  ],
+  func: (_logger, listString, signature) => {
+    if (signature === true) {
+      return {
+        argument: "list",
+        type: "signature",
+      };
+    }
+    if (listString === undefined) {
+      throw Error("List string was undefined");
+    }
+    return listString
+      .split(";")
+      .filter((a) => a !== "")
+      .join(", ");
+  },
+  id: "LIST_JOIN_COMMA_SPACE",
+};
+
+export const pluginListSort: MessageParserPlugin = {
+  description: "Sort values from a list (values separated by ;)",
+  examples: [
+    { argument: "8;6;-1;20;81;Herbert;Anja;Gerd is blue;" },
+    { argument: "1" },
+    { argument: ";1;undefined;2;undefined;3;" },
+  ],
+  func: (_logger, listString, signature) => {
+    if (signature === true) {
+      return {
+        argument: "list",
+        type: "signature",
+      };
+    }
+    if (listString === undefined) {
+      throw Error("List string was undefined");
+    }
+    return listString
+      .split(";")
+      .filter((a) => a !== "")
+      .sort(genericStringSorter)
+      .join(";");
+  },
+  id: "LIST_SORT",
 };

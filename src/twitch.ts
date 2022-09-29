@@ -9,11 +9,12 @@ import { client as tmiClient } from "tmi.js";
 import { createLogFunc, LoggerInformation } from "./logging";
 import {
   errorMessageIdUndefined,
+  errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
 } from "./error";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
-import type { MacroMap, PluginMap } from "./messageParser";
+import { MacroMap, messageParserById, PluginMap } from "./messageParser";
 import type { EMPTY_OBJECT } from "./info/other";
 import type { Logger } from "winston";
 import type { StringMap } from "./strings";
@@ -189,6 +190,12 @@ export type TwitchChatHandler<DATA extends object = EMPTY_OBJECT> = (
   logger: Readonly<Logger>
 ) => Promise<void>;
 
+export interface ChatUserstateIdUserNameId extends ChatUserstate {
+  id: string;
+  "user-id": string;
+  username: string;
+}
+
 /**
  * A global type for a method that creates a reply for a command.
  *
@@ -196,33 +203,46 @@ export type TwitchChatHandler<DATA extends object = EMPTY_OBJECT> = (
  * @returns One or more sent replies.
  */
 export type TwitchChatCommandHandlerCreateReply<DATA = EMPTY_OBJECT> = (
-  /** The Twitch client. */
-  client: Readonly<Client>,
   /** The Twitch channel where the current message was written. */
   channel: Readonly<string>,
   /**
    * The Twitch (user) chat state (the user name/id/badges of the user that
    * wrote the current message).
    */
-  tags: Readonly<ChatUserstate>,
+  tags: Readonly<ChatUserstateIdUserNameId>,
   /** The additional data necessary for execution. */
   data: DATA,
-  /** The global strings object to get strings for parsing. */
-  globalStrings: Readonly<StringMap>,
-  /** The global plugin object to generate text from strings. */
-  globalPlugins: Readonly<PluginMap>,
-  /** The global macro object to generate text from strings. */
-  globalMacros: Readonly<MacroMap>,
   /** The global logger. */
   logger: Readonly<Logger>
-) => Promise<TwitchChatCommandHandlerReply | TwitchChatCommandHandlerReply[]>;
+) =>
+  | Promise<TwitchChatCommandHandlerReply | TwitchChatCommandHandlerReply[]>
+  | TwitchChatCommandHandlerReply
+  | TwitchChatCommandHandlerReply[];
 
 /**
  * Object that represents a successful reply done by a command handler.
  */
 export interface TwitchChatCommandHandlerReply {
-  /** The sent message by a command handler. */
-  sentMessage: string[];
+  /** Additional macro map to generate text from strings. */
+  additionalMacros?: Readonly<MacroMap>;
+  /** Additional plugin map to generate text from strings. */
+  additionalPlugins?: Readonly<PluginMap>;
+  /** A custom send function. */
+  customSendFunc?: (
+    message: string,
+    logger: Readonly<Logger>
+  ) => Promise<string[]> | string[];
+  /** This message should throw an error. */
+  isError?: boolean;
+  /** The message ID or as fallback a custom string generator. */
+  messageId:
+    | string
+    | ((
+        globalStrings: Readonly<StringMap>,
+        globalPlugins: Readonly<PluginMap>,
+        globalMacros: Readonly<MacroMap>,
+        logger: Readonly<Logger>
+      ) => Promise<string>);
 }
 /**
  * Default generic interface for enabled commands as detector input.
@@ -294,6 +314,8 @@ export interface TwitchChatCommandHandler<
   >;
   /** Information about the command handler. */
   info: TwitchChatCommandHandlerInfo;
+  zTypeHelperDetectorInput?: DETECTOR_INPUT_DATA;
+  zTypeHelperDetectorOutput?: DETECTOR_OUTPUT_DATA;
 }
 
 /**
@@ -356,20 +378,20 @@ const logTwitchMessageCommandDetected = (
  *
  * @param logger The global logger.
  * @param detectedCommand The detected command.
- * @param commandReply The command reply.
+ * @param commandReplySentMessage The command reply.
  * @param replyToMessageId The ID of the message that is replied to.
  */
 const logTwitchMessageCommandReply = (
   logger: Logger,
   detectedCommand: TwitchChatCommandHandlerInfo,
-  commandReply: TwitchChatCommandHandlerReply,
+  commandReplySentMessage: string[],
   replyToMessageId: string
 ): void => {
   logger.log({
     level: "debug",
     message: `Successfully replied to message ${replyToMessageId} using the command "${
       detectedCommand.chatHandlerId
-    }:${detectedCommand.id}": '${JSON.stringify(commandReply.sentMessage)}'`,
+    }:${detectedCommand.id}": '${JSON.stringify(commandReplySentMessage)}'`,
     section: "twitch_message:reply",
   } as LoggerInformation);
 };
@@ -429,6 +451,9 @@ export const runTwitchCommandHandler = async <
     if (tags.username === undefined) {
       throw errorMessageUserNameUndefined();
     }
+    if (tags["user-id"] === undefined) {
+      throw errorMessageUserIdUndefined();
+    }
     logTwitchMessageCommandDetected(
       logger,
       tags.id,
@@ -436,29 +461,41 @@ export const runTwitchCommandHandler = async <
       twitchCommandHandler.info
     );
     const twitchCommandReply = await twitchCommandHandler.createReply(
-      client,
       channel,
-      tags,
+      tags as ChatUserstateIdUserNameId,
       { ...data, ...twitchCommandDetected.data },
-      globalStrings,
-      globalPlugins,
-      globalMacros,
       logger
     );
-    if (Array.isArray(twitchCommandReply)) {
-      for (const a of twitchCommandReply) {
-        logTwitchMessageCommandReply(
-          logger,
-          twitchCommandHandler.info,
-          a,
-          tags.id
-        );
+    const twitchCommandReplies = Array.isArray(twitchCommandReply)
+      ? twitchCommandReply
+      : [twitchCommandReply];
+    for (const a of twitchCommandReplies) {
+      const replyMacros = a.additionalMacros
+        ? new Map([...globalMacros, ...a.additionalMacros])
+        : globalMacros;
+      const replyPlugins = a.additionalPlugins
+        ? new Map([...globalPlugins, ...a.additionalPlugins])
+        : globalPlugins;
+      const messageToSend =
+        typeof a.messageId === "string"
+          ? await messageParserById(
+              a.messageId,
+              globalStrings,
+              replyPlugins,
+              replyMacros,
+              logger
+            )
+          : await a.messageId(globalStrings, replyPlugins, replyMacros, logger);
+      if (a.isError) {
+        throw Error(messageToSend);
       }
-    } else {
+      const sentMessage = a.customSendFunc
+        ? await a.customSendFunc(messageToSend, logger)
+        : await client.say(channel, messageToSend);
       logTwitchMessageCommandReply(
         logger,
         twitchCommandHandler.info,
-        twitchCommandReply,
+        sentMessage,
         tags.id
       );
     }

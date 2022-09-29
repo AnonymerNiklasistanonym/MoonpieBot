@@ -158,7 +158,7 @@ export const tryToSendOsuIrcMessage = async (
   id: string,
   osuIrcRequestTarget: string,
   message: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<void> => {
   const logOsuIrc = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU_IRC, id);
 

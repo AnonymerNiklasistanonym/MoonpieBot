@@ -1,10 +1,6 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
-  osuBeatmapRequest,
-  osuBeatmapRequestDetailed,
-  osuBeatmapRequestIrc,
-  osuBeatmapRequestIrcDetailed,
   osuBeatmapRequestNoRequestsError,
   osuBeatmapRequestPermissionError,
 } from "../../strings/osu/beatmapRequest";
@@ -13,14 +9,8 @@ import {
   TwitchBadgeLevels,
 } from "../../other/twitchBadgeParser";
 import { BeatmapRequestsInfo } from "../osu";
-import { createLogFunc } from "../../logging";
-import { generatePlugin } from "../../messageParser/plugins";
-import { macroOsuBeatmap } from "../../messageParser/macros/osuApi";
-import { macroOsuBeatmapRequest } from "../../messageParser/macros/osuBeatmapRequest";
-import { messageParserById } from "../../messageParser";
-import { pluginsTwitchChatGenerator } from "../../messageParser/plugins/twitchChat";
 import { regexOsuChatHandlerCommandLastRequest } from "../../info/regex";
-import { tryToSendOsuIrcMessage } from "../../osuIrc";
+import { sendBeatmapRequest } from "./beatmap";
 // Type imports
 import type {
   TwitchChatCommandHandler,
@@ -28,7 +18,6 @@ import type {
 } from "../../twitch";
 import type { EMPTY_OBJECT } from "../../info/other";
 import type { OsuIrcBotSendMessageFunc } from "./beatmap";
-import type { PluginTwitchChatData } from "../../messageParser/plugins/twitchChat";
 import type { RegexOsuChatHandlerCommandLastRequest } from "../../info/regex";
 
 export type CommandBeatmapLastRequestCreateReplyInput = EMPTY_OBJECT;
@@ -54,35 +43,16 @@ export const commandBeatmapLastRequest: TwitchChatCommandHandler<
   CommandBeatmapLastRequestDetectorInput,
   CommandBeatmapLastRequestDetectorOutput
 > = {
-  createReply: async (
-    client,
-    channel,
-    tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
-    const logCmdBeatmap = createLogFunc(
-      logger,
-      LOG_ID_CHAT_HANDLER_OSU,
-      "beatmapLastRequest"
-    );
-
+  createReply: (channel, tags, data) => {
     const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
     if (
       twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER &&
       twitchBadgeLevel !== TwitchBadgeLevels.MODERATOR
     ) {
-      const errorMessage = await messageParserById(
-        osuBeatmapRequestPermissionError.id,
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger
-      );
-      throw Error(errorMessage);
+      return {
+        isError: true,
+        messageId: osuBeatmapRequestPermissionError.id,
+      };
     }
 
     if (data.beatmapRequestCount < 1) {
@@ -90,14 +60,10 @@ export const commandBeatmapLastRequest: TwitchChatCommandHandler<
     }
 
     if (data.beatmapRequestsInfo.previousBeatmapRequests.length < 1) {
-      const errorMessage = await messageParserById(
-        osuBeatmapRequestNoRequestsError.id,
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger
-      );
-      throw Error(errorMessage);
+      return {
+        isError: true,
+        messageId: osuBeatmapRequestNoRequestsError.id,
+      };
     }
 
     const commandReplies: TwitchChatCommandHandlerReply[] = [];
@@ -110,83 +76,22 @@ export const commandBeatmapLastRequest: TwitchChatCommandHandler<
       data.beatmapRequestsInfo.lastMentionedBeatmapId =
         previousBeatmapRequest.data.id;
 
-      const osuBeatmapRequestMacros = new Map(globalMacros);
-      osuBeatmapRequestMacros.set(
-        macroOsuBeatmapRequest.id,
-        new Map(
-          macroOsuBeatmapRequest.generate({
-            comment: previousBeatmapRequest.comment?.trim(),
-            id: previousBeatmapRequest.data.id,
-          })
-        )
-      );
-      osuBeatmapRequestMacros.set(
-        macroOsuBeatmap.id,
-        new Map(
-          macroOsuBeatmap.generate({ beatmap: previousBeatmapRequest.data })
-        )
-      );
-
-      const osuBeatmapRequestPlugins = new Map(globalPlugins);
-      pluginsTwitchChatGenerator.forEach((a) => {
-        const plugin = generatePlugin<PluginTwitchChatData>(a, {
-          channelName: channel.slice(1),
-          userId: previousBeatmapRequest.userId,
-          userName: previousBeatmapRequest.userName,
-        });
-        osuBeatmapRequestPlugins.set(plugin.id, plugin.func);
-      });
-
-      let messageRequest = "";
-      let messageRequestIrc = "";
-
-      if (data.enableOsuBeatmapRequestsDetailed) {
-        messageRequest = await messageParserById(
-          osuBeatmapRequestDetailed.id,
-          globalStrings,
-          osuBeatmapRequestPlugins,
-          osuBeatmapRequestMacros,
-          logger
-        );
-        messageRequestIrc = await messageParserById(
-          osuBeatmapRequestIrcDetailed.id,
-          globalStrings,
-          osuBeatmapRequestPlugins,
-          osuBeatmapRequestMacros,
-          logger
-        );
-      } else {
-        messageRequest = await messageParserById(
-          osuBeatmapRequest.id,
-          globalStrings,
-          osuBeatmapRequestPlugins,
-          osuBeatmapRequestMacros,
-          logger
-        );
-        messageRequestIrc = await messageParserById(
-          osuBeatmapRequestIrc.id,
-          globalStrings,
-          osuBeatmapRequestPlugins,
-          osuBeatmapRequestMacros,
-          logger
-        );
-      }
-      // Send response to Twitch channel and if found to IRC channel
-      const sentMessage = await client.say(channel, messageRequest);
-
-      if (data.osuIrcRequestTarget && data.osuIrcBot !== undefined) {
-        logCmdBeatmap.info(
-          "Try to send beatmap request via osu! IRC connection"
-        );
-        await tryToSendOsuIrcMessage(
-          data.osuIrcBot,
-          "commandBeatmap",
+      commandReplies.push(
+        ...sendBeatmapRequest(
+          data.enableOsuBeatmapRequestsDetailed,
+          undefined,
+          {
+            channelName: channel.slice(1),
+            userId: previousBeatmapRequest.userId,
+            userName: previousBeatmapRequest.userName,
+          },
+          previousBeatmapRequest.data.id,
+          previousBeatmapRequest.comment,
+          previousBeatmapRequest.data,
           data.osuIrcRequestTarget,
-          messageRequestIrc,
-          logger
-        );
-      }
-      commandReplies.push({ sentMessage });
+          data.osuIrcBot
+        )
+      );
     }
     return commandReplies;
   },

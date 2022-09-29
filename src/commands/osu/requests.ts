@@ -24,7 +24,6 @@ import {
   regexOsuChatHandlerCommandRequestsUnset,
 } from "../../info/regex";
 import { errorMessageOsuApiDbPathUndefined } from "../../error";
-import { messageParserById } from "../../messageParser";
 import { OsuRequestsConfig } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import osuRequestsDb from "../../database/osuRequestsDb";
 // Type imports
@@ -62,16 +61,7 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
   CommandBeatmapRequestsDetectorInput,
   CommandBeatmapRequestsDetectorOutput
 > = {
-  createReply: async (
-    client,
-    channel,
-    tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
+  createReply: async (channel, tags, data, logger) => {
     if (data.osuApiDbPath === undefined) {
       throw errorMessageOsuApiDbPathUndefined();
     }
@@ -82,18 +72,13 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
       twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER &&
       twitchBadgeLevel !== TwitchBadgeLevels.MODERATOR
     ) {
-      const errorMessage = await messageParserById(
-        osuBeatmapRequestPermissionError.id,
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger
-      );
-      throw Error(errorMessage);
+      return {
+        isError: true,
+        messageId: osuBeatmapRequestPermissionError.id,
+      };
     }
 
-    let message: string;
-    const macros = new Map(globalMacros);
+    const macros = new Map();
 
     switch (data.beatmapRequestsType) {
       case BeatmapRequestsType.TURN_OFF:
@@ -117,14 +102,10 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
             })
           )
         );
-        message = await messageParserById(
-          osuBeatmapRequestTurnedOff.id,
-          globalStrings,
-          globalPlugins,
-          macros,
-          logger
-        );
-        break;
+        return {
+          additionalMacros: macros,
+          messageId: osuBeatmapRequestTurnedOff.id,
+        };
       case BeatmapRequestsType.TURN_ON:
         await osuRequestsDb.requests.osuRequestsConfig.removeEntry(
           data.osuApiDbPath,
@@ -154,14 +135,10 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
             })
           )
         );
-        message = await messageParserById(
-          osuBeatmapRequestTurnedOn.id,
-          globalStrings,
-          globalPlugins,
-          macros,
-          logger
-        );
-        break;
+        return {
+          additionalMacros: macros,
+          messageId: osuBeatmapRequestTurnedOn.id,
+        };
       case BeatmapRequestsType.INFO:
         // eslint-disable-next-line no-case-declarations
         const osuRequestsConfigEntries =
@@ -170,13 +147,6 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
             channel,
             logger
           );
-        // eslint-disable-next-line no-console
-        console.log(
-          osuRequestsConfigEntries,
-          osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
-          ) === undefined
-        );
         if (
           osuRequestsConfigEntries.find(
             (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
@@ -218,13 +188,10 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
               })
             )
           );
-          message = await messageParserById(
-            osuBeatmapRequestCurrentlyOn.id,
-            globalStrings,
-            globalPlugins,
-            macros,
-            logger
-          );
+          return {
+            additionalMacros: macros,
+            messageId: osuBeatmapRequestCurrentlyOn.id,
+          };
         } else {
           macros.set(
             macroOsuBeatmapRequests.id,
@@ -236,19 +203,12 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
               })
             )
           );
-          message = await messageParserById(
-            osuBeatmapRequestCurrentlyOff.id,
-            globalStrings,
-            globalPlugins,
-            macros,
-            logger
-          );
+          return {
+            additionalMacros: macros,
+            messageId: osuBeatmapRequestCurrentlyOff.id,
+          };
         }
-        break;
     }
-
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(OsuCommands.REQUESTS)) {
@@ -355,16 +315,7 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
   CommandBeatmapRequestsSetUnsetDetectorInput,
   CommandBeatmapRequestsSetUnsetDetectorOutput
 > = {
-  createReply: async (
-    client,
-    channel,
-    tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
+  createReply: async (channel, tags, data, logger) => {
     if (data.osuApiDbPath === undefined) {
       throw errorMessageOsuApiDbPathUndefined();
     }
@@ -373,17 +324,13 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
       twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER &&
       twitchBadgeLevel !== TwitchBadgeLevels.MODERATOR
     ) {
-      const errorMessage = await messageParserById(
-        osuBeatmapRequestPermissionError.id,
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger
-      );
-      throw Error(errorMessage);
+      return {
+        isError: true,
+        messageId: osuBeatmapRequestPermissionError.id,
+      };
     }
 
-    const macros = new Map(globalMacros);
+    const macros = new Map();
 
     let option: undefined | OsuRequestsConfig;
     for (const value of Object.values(OsuRequestsConfig)) {
@@ -469,16 +416,11 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
         })
       )
     );
-    const message = await messageParserById(
-      osuBeatmapRequestDemandsUpdated.id,
-      globalStrings,
-      globalPlugins,
-      macros,
-      logger
-    );
 
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+    return {
+      additionalMacros: macros,
+      messageId: osuBeatmapRequestDemandsUpdated.id,
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(OsuCommands.REQUESTS)) {

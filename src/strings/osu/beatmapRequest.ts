@@ -356,11 +356,6 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
         type: "macro",
       },
       name: pluginIfNotEmpty.id,
-      scope: {
-        key: MacroOsuBeatmapRequests.CUSTOM_MESSAGE,
-        name: macroOsuBeatmapRequests.id,
-        type: "macro",
-      },
       type: "plugin",
     },
     {

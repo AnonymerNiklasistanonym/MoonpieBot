@@ -17,9 +17,10 @@ export interface Version {
  * Get a version string.
  *
  * @param version The version that should be used.
- * @returns "1.2.3b" or "1.2.3" if not in beta.
+ * @param prefix The prefix of the version.
+ * @returns "v1.2.3b" or "v1.2.3" if not in beta.
  */
-export const getVersionFromObject = (version: Version): string =>
-  `v${version.major}.${version.minor}.${version.patch}${
+export const getVersionFromObject = (version: Version, prefix = "v"): string =>
+  `${prefix}${version.major}.${version.minor}.${version.patch}${
     version.beta ? "b" : ""
   }`;

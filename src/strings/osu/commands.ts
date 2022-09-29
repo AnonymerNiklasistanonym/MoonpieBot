@@ -1,8 +1,15 @@
 // Local imports
+import {
+  pluginIfTrue,
+  pluginListFilterUndefined,
+  pluginListJoinCommaSpace,
+  pluginListSort,
+} from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../messageParser";
 import { OSU_STRING_ID } from "../osu";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 // Type imports
+import type { MessageForMessageElementPlugin } from "../../messageParser";
 import type { StringEntry } from "../../strings";
 
 const OSU_COMMANDS_STRING_ID = `${OSU_STRING_ID}_COMMANDS`;
@@ -88,6 +95,62 @@ export const osuCommandsPrefix: StringEntry = {
   ),
   id: `${OSU_COMMANDS_STRING_ID}_PREFIX`,
 };
+export const osuCommandsString: StringEntry = {
+  default: createMessageForMessageParser([
+    {
+      name: osuCommandsPrefix.id,
+      type: "reference",
+    },
+    {
+      args: {
+        args: {
+          args: [
+            osuCommandsCommands,
+            osuCommandsLastRequest,
+            osuCommandsPermitRequest,
+            osuCommandsNp,
+            osuCommandsNpStreamCompanionWebsocket,
+            osuCommandsNpStreamCompanionFile,
+            osuCommandsPp,
+            osuCommandsRequests,
+            osuCommandsRp,
+            osuCommandsScore,
+          ]
+            .map(
+              (a): MessageForMessageElementPlugin => ({
+                args: {
+                  key: a.id,
+                  name: "COMMAND_ENABLED",
+                  type: "macro",
+                },
+                name: pluginIfTrue.id,
+                scope: {
+                  name: a.id,
+                  type: "reference",
+                },
+                type: "plugin",
+              })
+            )
+            .reduce<(MessageForMessageElementPlugin | string)[]>(
+              (prev, curr) => prev.concat([curr, ";"]),
+              []
+            ),
+          name: pluginListFilterUndefined.id,
+          scope: {
+            name: osuCommandsNone.id,
+            type: "reference",
+          },
+          type: "plugin",
+        },
+        name: pluginListSort.id,
+        type: "plugin",
+      },
+      name: pluginListJoinCommaSpace.id,
+      type: "plugin",
+    },
+  ]),
+  id: `${OSU_COMMANDS_STRING_ID}_STRING`,
+};
 
 export const osuCommands: StringEntry[] = [
   osuCommandsCommands,
@@ -102,4 +165,5 @@ export const osuCommands: StringEntry[] = [
   osuCommandsScore,
   osuCommandsNone,
   osuCommandsPrefix,
+  osuCommandsString,
 ];

@@ -1,10 +1,12 @@
 // Package imports
 import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
+import {
+  errorMessageDefaultOsuIdUndefined,
+  errorMessageOsuApiCredentialsUndefined,
+} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
-import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { macroOsuPpRpRequest } from "../../messageParser/macros/osuPpRpRequest";
-import { messageParserById } from "../../messageParser";
 import { osuCommandReplyPp } from "../../strings/osu/commandReply";
 import { regexOsuChatHandlerCommandPp } from "../../info/regex";
 // Type imports
@@ -27,7 +29,7 @@ export interface CommandPpRpCreateReplyInput {
   /**
    * The osu API (v2) credentials.
    */
-  osuApiV2Credentials?: OsuApiV2Credentials;
+  osuApiV2Credentials?: Readonly<OsuApiV2Credentials>;
 }
 export type CommandPpRpDetectorInput =
   CommandGenericDetectorInputEnabledCommands;
@@ -53,21 +55,12 @@ export const commandPp: TwitchChatCommandHandler<
   CommandPpRpDetectorInput,
   CommandPpRpDetectorOutput
 > = {
-  createReply: async (
-    client,
-    channel,
-    _tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
+  createReply: async (_channel, _tags, data) => {
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
     if (data.defaultOsuId === undefined) {
-      throw Error("Default OSU ID was undefined");
+      throw errorMessageDefaultOsuIdUndefined();
     }
 
     const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
@@ -95,7 +88,7 @@ export const commandPp: TwitchChatCommandHandler<
       GameMode.OSU_STANDARD
     );
 
-    const osuPpRequestMacros = new Map(globalMacros);
+    const osuPpRequestMacros = new Map();
     osuPpRequestMacros.set(
       macroOsuPpRpRequest.id,
       new Map(
@@ -108,16 +101,10 @@ export const commandPp: TwitchChatCommandHandler<
       )
     );
 
-    const message = await messageParserById(
-      osuCommandReplyPp.id,
-      globalStrings,
-      globalPlugins,
-      osuPpRequestMacros,
-      logger
-    );
-
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+    return {
+      additionalMacros: osuPpRequestMacros,
+      messageId: osuCommandReplyPp.id,
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(OsuCommands.PP)) {

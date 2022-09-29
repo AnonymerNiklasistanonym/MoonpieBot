@@ -8,14 +8,11 @@ import {
   osuCommandsNpStreamCompanionWebsocket,
   osuCommandsPermitRequest,
   osuCommandsPp,
-  osuCommandsPrefix,
   osuCommandsRequests,
   osuCommandsRp,
   osuCommandsScore,
+  osuCommandsString,
 } from "../../strings/osu/commands";
-import { genericStringSorter } from "../../other/genericStringSorter";
-import { messageParserById } from "../../messageParser";
-import { osuCommandsNone } from "../../strings/osu/commands";
 import { regexOsuChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
@@ -44,17 +41,8 @@ export const commandCommands: TwitchChatCommandHandler<
   CommandCommandsCreateReplyInput,
   CommandCommandsDetectorInput
 > = {
-  createReply: async (
-    client,
-    channel,
-    _tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
-    const commandsStringIds = [];
+  createReply: async (_channel, _tags, data) => {
+    const commandsStringIds: [string, boolean][] = [];
     let streamCompanionInfo:
       | StreamCompanionFileData
       | StreamCompanionWebSocketData
@@ -64,18 +52,16 @@ export const commandCommands: TwitchChatCommandHandler<
     }
 
     Object.values(OsuCommands).forEach((command) => {
-      if (!data.enabledCommands.includes(command)) {
-        return;
-      }
+      const enabled = data.enabledCommands.includes(command);
       switch (command) {
         case OsuCommands.COMMANDS:
-          commandsStringIds.push(osuCommandsCommands.id);
+          commandsStringIds.push([osuCommandsCommands.id, enabled]);
           break;
         case OsuCommands.LAST_REQUEST:
-          commandsStringIds.push(osuCommandsLastRequest.id);
+          commandsStringIds.push([osuCommandsLastRequest.id, enabled]);
           break;
         case OsuCommands.PERMIT_REQUEST:
-          commandsStringIds.push(osuCommandsPermitRequest.id);
+          commandsStringIds.push([osuCommandsPermitRequest.id, enabled]);
           break;
         case OsuCommands.NP:
           if (
@@ -83,61 +69,48 @@ export const commandCommands: TwitchChatCommandHandler<
             streamCompanionInfo !== undefined &&
             streamCompanionInfo.type === "file"
           ) {
-            commandsStringIds.push(osuCommandsNpStreamCompanionFile.id);
+            commandsStringIds.push([
+              osuCommandsNpStreamCompanionFile.id,
+              enabled,
+            ]);
           } else if (
             data.osuStreamCompanionCurrentMapData !== undefined &&
             streamCompanionInfo !== undefined &&
             streamCompanionInfo.type === "websocket"
           ) {
-            commandsStringIds.push(osuCommandsNpStreamCompanionWebsocket.id);
+            commandsStringIds.push([
+              osuCommandsNpStreamCompanionWebsocket.id,
+              enabled,
+            ]);
           } else {
-            commandsStringIds.push(osuCommandsNp.id);
+            commandsStringIds.push([osuCommandsNp.id, enabled]);
           }
           break;
         case OsuCommands.PP:
-          commandsStringIds.push(osuCommandsPp.id);
+          commandsStringIds.push([osuCommandsPp.id, enabled]);
           break;
         case OsuCommands.REQUESTS:
-          commandsStringIds.push(osuCommandsRequests.id);
+          commandsStringIds.push([osuCommandsRequests.id, enabled]);
           break;
         case OsuCommands.RP:
-          commandsStringIds.push(osuCommandsRp.id);
+          commandsStringIds.push([osuCommandsRp.id, enabled]);
           break;
         case OsuCommands.SCORE:
-          commandsStringIds.push(osuCommandsScore.id);
+          commandsStringIds.push([osuCommandsScore.id, enabled]);
           break;
       }
     });
-
-    if (commandsStringIds.length === 0) {
-      commandsStringIds.push(osuCommandsNone.id);
-    }
-
-    const commands = [];
-    for (const commandsStringId of commandsStringIds) {
-      commands.push(
-        await messageParserById(
-          commandsStringId,
-          globalStrings,
-          globalPlugins,
-          globalMacros,
-          logger
-        )
-      );
-    }
-
-    const messagePrefix = await messageParserById(
-      osuCommandsPrefix.id,
-      globalStrings,
-      globalPlugins,
-      globalMacros,
-      logger
-    );
-    const message = `${messagePrefix} ${commands
-      .sort(genericStringSorter)
-      .join(", ")}`;
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+    return {
+      additionalMacros: new Map([
+        [
+          "COMMAND_ENABLED",
+          new Map(
+            commandsStringIds.map((a) => [a[0], a[1] ? "true" : "false"])
+          ),
+        ],
+      ]),
+      messageId: osuCommandsString.id,
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(OsuCommands.COMMANDS)) {

@@ -5,12 +5,9 @@ import {
 } from "../../info/commands";
 import {
   spotifyCommandsCommands,
-  spotifyCommandsNone,
-  spotifyCommandsPrefix,
   spotifyCommandsSong,
+  spotifyCommandsString,
 } from "../../strings/spotify/commands";
-import { genericStringSorter } from "../../other/genericStringSorter";
-import { messageParserById } from "../../messageParser";
 import { regexSpotifyChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
@@ -29,61 +26,31 @@ export const commandCommands: TwitchChatCommandHandler<
   CommandCommandsCreateReplyInput,
   CommandCommandsDetectorInput
 > = {
-  createReply: async (
-    client,
-    channel,
-    _tags,
-    data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
-    const commandsStringIds = [];
+  createReply: (_channel, _tags, data) => {
+    const commandsStringIds: [string, boolean][] = [];
 
     Object.values(SpotifyCommands).forEach((command) => {
-      if (!data.enabledCommands.includes(command)) {
-        return;
-      }
+      const enabled = data.enabledCommands.includes(command);
       switch (command) {
         case SpotifyCommands.COMMANDS:
-          commandsStringIds.push(spotifyCommandsCommands.id);
+          commandsStringIds.push([spotifyCommandsCommands.id, enabled]);
           break;
         case SpotifyCommands.SONG:
-          commandsStringIds.push(spotifyCommandsSong.id);
+          commandsStringIds.push([spotifyCommandsSong.id, enabled]);
           break;
       }
     });
-
-    if (commandsStringIds.length === 0) {
-      commandsStringIds.push(spotifyCommandsNone.id);
-    }
-
-    const commands = [];
-    for (const commandsStringId of commandsStringIds) {
-      commands.push(
-        await messageParserById(
-          commandsStringId,
-          globalStrings,
-          globalPlugins,
-          globalMacros,
-          logger
-        )
-      );
-    }
-
-    const messagePrefix = await messageParserById(
-      spotifyCommandsPrefix.id,
-      globalStrings,
-      globalPlugins,
-      globalMacros,
-      logger
-    );
-    const message = `${messagePrefix} ${commands
-      .sort(genericStringSorter)
-      .join(", ")}`;
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
+    return {
+      additionalMacros: new Map([
+        [
+          "COMMAND_ENABLED",
+          new Map(
+            commandsStringIds.map((a) => [a[0], a[1] ? "true" : "false"])
+          ),
+        ],
+      ]),
+      messageId: spotifyCommandsString.id,
+    };
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(SpotifyCommands.COMMANDS)) {

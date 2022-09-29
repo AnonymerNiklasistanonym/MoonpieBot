@@ -3,7 +3,6 @@ import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
 } from "../../info/commands";
-import { messageParserById } from "../../messageParser";
 import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
 import { regexMoonpieChatHandlerCommandAbout } from "../../info/regex";
 // Type imports
@@ -20,26 +19,7 @@ export const commandAbout: TwitchChatCommandHandler<
   EMPTY_OBJECT,
   CommandGenericDetectorInputEnabledCommands
 > = {
-  createReply: async (
-    client,
-    channel,
-    _tags,
-    _data,
-    globalStrings,
-    globalPlugins,
-    globalMacros,
-    logger
-  ) => {
-    const message = await messageParserById(
-      moonpieCommandReplyAbout.id,
-      globalStrings,
-      globalPlugins,
-      globalMacros,
-      logger
-    );
-    const sentMessage = await client.say(channel, message);
-    return { sentMessage };
-  },
+  createReply: () => ({ messageId: moonpieCommandReplyAbout.id }),
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(MoonpieCommands.ABOUT)) {
       return false;
