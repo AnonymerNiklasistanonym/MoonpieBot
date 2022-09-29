@@ -15,25 +15,22 @@ _installdirman="/usr/share/man/man1"
 _defaultconfigdir="$HOME/.local/share/$_applicationname"
 
 pkgname="$_applicationname-bin"
-pkgver="1.0.27b"
+pkgver="1.0.26"
 pkgrel="1"
 pkgdesc="A custom Twitch chat bot"
-arch=('x86_64')
+arch=("x86_64")
 url="https://github.com/AnonymerNiklasistanonym/MoonpieBot"
-license=('MIT')
-# Node.js runtime is required
+license=("MIT")
 depends=()
-# Node.js runtime is required to build the program
-# Pandoc is required to create the man page
 makedepends=()
 provides=("$pkgname")
 conflicts=("$_applicationname" "$_applicationname-bin" "$_applicationname-git")
 source=("$_applicationname.bin::$url/releases/download/v$pkgver/$_applicationname-v$pkgver-linux64-node-18"
         "$_applicationname.1::$url/releases/download/v$pkgver/$_applicationname-v$pkgver-man.1"
         "$_applicationname.svg::$url/releases/download/v$pkgver/$_applicationname.svg")
-sha1sums=('SKIP'
-          'SKIP'
-          'SKIP')
+sha1sums=("SKIP"
+          "SKIP"
+          "SKIP")
 # Don't strip the symbols from the downloaded binary file since this breaks it
 options=(!strip)
 

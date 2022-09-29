@@ -20,18 +20,18 @@ pkgname="$_applicationname-git"
 pkgver="1.0.27b"
 pkgrel="1"
 pkgdesc="A custom Twitch chat bot"
-arch=('x86_64')
+arch=("x86_64")
 url="https://github.com/AnonymerNiklasistanonym/MoonpieBot"
-license=('MIT')
+license=("MIT")
 # Node.js runtime is required
-depends=('nodejs')
-# Node.js runtime is required to build the program
+depends=("nodejs")
+# Node.js and npm is required to build the program
 # Pandoc is required to create the man page
-makedepends=('nodejs' 'pandoc')
+makedepends=("nodejs" "npm" "pandoc")
 provides=("$pkgname")
 conflicts=("$_applicationname" "$_applicationname-bin" "$_applicationname-git")
-source=("$_gitname::git+$url#tag=v$pkgver")
-sha1sums=('SKIP')
+source=("$_gitname::git+$url#branch=main")
+sha1sums=("SKIP")
 
 # Update version based on the current commit
 pkgver() {
@@ -83,7 +83,7 @@ package() {
   # Create and install a global script to start the application
   echo -e "\
 #!/usr/bin/env bash\n\
-node \"$_installdir\"\n" > "$_applicationname"
+node \"$_installdir\" --config-dir \"$_defaultconfigdir\" \$@\n" > "$_applicationname"
   install -Dd "$pkgdir$_installdirbin"
   install -Dm 755 "$_applicationname" "$pkgdir$_installdirbin"
 

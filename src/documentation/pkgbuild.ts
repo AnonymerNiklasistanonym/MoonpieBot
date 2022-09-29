@@ -71,9 +71,12 @@ export const mergeUndefSingleArrayToArray = <TYPE extends object | string>(
 
 export const createPkgbuildArray = (
   value?: string | string[],
-  split = " "
+  split = " ",
+  literalValues = false
 ): string => {
-  return `(${mergeUndefSingleArrayToArray(value).join(split)})`;
+  return `(${mergeUndefSingleArrayToArray(value)
+    .map((a) => createPkgValue(a, literalValues))
+    .join(split)})`;
 };
 
 export const createPkgbuildComment = (value?: string | string[]): string => {
@@ -91,6 +94,16 @@ export const createPkgbuildCmdsSection = (
   }
   outputString += value.cmds.map((a) => `  ${a}\n`).join("");
   return outputString;
+};
+
+export const createPkgValue = (
+  value: string | number,
+  literalValue = false
+): string => {
+  if (literalValue) {
+    return `${value}`;
+  }
+  return `"${value}"`;
 };
 
 export const createPkgbuild = (info: PkgbuildInfo): string => {
@@ -117,12 +130,14 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
     }
     outputString += "\n";
   }
-  outputString += `pkgname="${info.pkgname}"\n`;
-  outputString += `pkgver="${info.pkgver}"\n`;
-  outputString += `pkgrel="${info.pkgrel !== undefined ? info.pkgrel : 1}"\n`;
-  outputString += `pkgdesc="${info.pkgdesc}"\n`;
+  outputString += `pkgname=${createPkgValue(info.pkgname)}\n`;
+  outputString += `pkgver=${createPkgValue(info.pkgver)}\n`;
+  outputString += `pkgrel=${createPkgValue(
+    info.pkgrel !== undefined ? info.pkgrel : 1
+  )}\n`;
+  outputString += `pkgdesc=${createPkgValue(info.pkgdesc)}\n`;
   outputString += `arch=${createPkgbuildArray(info.arch)}\n`;
-  outputString += `url="${info.url}"\n`;
+  outputString += `url=${createPkgValue(info.url)}\n`;
   outputString += `license=${createPkgbuildArray(info.license)}\n`;
   outputString += createPkgbuildComment(info.dependsNote);
   outputString += `depends=${createPkgbuildArray(info.depends)}\n`;
@@ -136,7 +151,7 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
   for (const source of mergeSingleArrayToArray(info.source)) {
     sources.push(source.name);
     sourcesSha1sums.push(
-      source.sha1sum !== undefined ? source.sha1sum : "'SKIP'"
+      source.sha1sum !== undefined ? source.sha1sum : "SKIP"
     );
   }
   outputString += `source=${createPkgbuildArray(sources, "\n        ")}\n`;
@@ -146,7 +161,11 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
   )}\n`;
   if (info.options) {
     outputString += createPkgbuildComment(info.optionsNote);
-    outputString += `options=${createPkgbuildArray(info.options)}\n`;
+    outputString += `options=${createPkgbuildArray(
+      info.options,
+      undefined,
+      true
+    )}\n`;
   }
   if (info.pkgverCmds) {
     outputString += "\n";

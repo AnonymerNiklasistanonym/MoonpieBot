@@ -121,12 +121,12 @@ export const packageCmdsGenerator = (
     cmds: [
       `echo -e "${[
         "#!/usr/bin/env bash",
-        packageType === "source"
+        (packageType === "source"
           ? `node "${referencePCV(defaultPCVInstallDir)}"`
           : `"${referencePCV(defaultPCVInstallDir)}/${referencePCV(
               defaultPCVApplicationName
-            )}.bin"` +
-            ` --config-dir "${referencePCV(defaultPCVConfigDir)}" \\$@`,
+            )}.bin"`) +
+          ` --config-dir "${referencePCV(defaultPCVConfigDir)}" \\$@`,
       ]
         .map((a) => `\\\n${a}\\n`)
         .join("")
@@ -189,7 +189,7 @@ export const packageCmdsGenerator = (
 };
 
 export const pkgbuildInfo: PkgbuildInfo = {
-  arch: ["x86_64"].map((a) => `'${a}'`),
+  arch: "x86_64",
   buildCmds: [
     {
       cmds: [
@@ -237,7 +237,7 @@ export const pkgbuildInfo: PkgbuildInfo = {
     referencePCV(defaultPCVApplicationName),
     `${referencePCV(defaultPCVApplicationName)}-bin`,
     `${referencePCV(defaultPCVApplicationName)}-git`,
-  ].map((a) => `"${a}"`),
+  ],
   customVariables: [
     defaultPCVApplicationName,
     defaultPCVGitName,
@@ -247,16 +247,16 @@ export const pkgbuildInfo: PkgbuildInfo = {
     defaultPCVInstallDirMan,
     defaultPCVConfigDir,
   ],
-  depends: ["nodejs"].map((a) => `'${a}'`),
+  depends: "nodejs",
   dependsNote: "Node.js runtime is required",
-  license: ["MIT"].map((a) => `'${a}'`),
+  license: "MIT",
   maintainer: {
     email: "niklas.mikeler@gmail.com",
     name: "AnonymerNiklasistanonym",
   },
-  makedepends: ["nodejs", "pandoc"].map((a) => `'${a}'`),
+  makedepends: ["nodejs", "npm", "pandoc"],
   makedependsNote: [
-    "Node.js runtime is required to build the program",
+    "Node.js and npm is required to build the program",
     "Pandoc is required to create the man page",
   ],
   packageCmds: packageCmdsGenerator("source"),
@@ -264,14 +264,14 @@ export const pkgbuildInfo: PkgbuildInfo = {
   pkgdesc: description,
   pkgname: referencePCV(defaultPCVApplicationName),
   pkgver: getVersionFromObject(version, ""),
-  provides: [referencePV("pkgname")].map((a) => `"${a}"`),
+  provides: referencePV("pkgname"),
   source: [
     {
       name: `${referencePCV(defaultPCVGitName)}::git+${referencePV(
         "url"
       )}#tag=v${referencePV("pkgver")}`,
     },
-  ].map((a) => ({ ...a, name: `"${a.name}"` })),
+  ],
   url: sourceCodeUrl,
 };
 
@@ -287,7 +287,9 @@ export const pkgbuildBinInfo: PkgbuildInfo = {
     pkgbuildInfo.customVariables
   ).filter((a) => a.name !== defaultPCVGitName.name),
   depends: undefined,
+  dependsNote: undefined,
   makedepends: undefined,
+  makedependsNote: undefined,
   options: "!strip",
   optionsNote:
     "Don't strip the symbols from the downloaded binary file since this breaks it",
@@ -315,7 +317,7 @@ export const pkgbuildBinInfo: PkgbuildInfo = {
         defaultPCVApplicationName
       )}.svg`,
     },
-  ].map((a) => ({ ...a, name: `"${a.name}"` })),
+  ],
 };
 
 export const pkgbuildGitInfo: PkgbuildInfo = {
@@ -336,6 +338,13 @@ export const pkgbuildGitInfo: PkgbuildInfo = {
     },
   ],
   pkgverCmdsNote: "Update version based on the current commit",
+  source: [
+    {
+      name: `${referencePCV(defaultPCVGitName)}::git+${referencePV(
+        "url"
+      )}#branch=main`,
+    },
+  ],
 };
 
 console.log(`Create PKGBUILD file '${pkgbuildFile}'`);

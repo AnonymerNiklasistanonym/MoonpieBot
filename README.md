@@ -536,8 +536,6 @@ cross-env NODE_PATH=. nyc mocha -- "test/src/database.test.ts"
    npm run create
    ```
 
-   Currently the `PKGBUILD` files are not included in this step so their versions need to be renamed manually (do a simple string replace `OLD.VER.SION/NEW.VER.SION` without the `v`).
-
    After all versions are updated commit these changes with the message: *Prepare version for release*
 
 2. Create git version tag
