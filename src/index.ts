@@ -190,7 +190,7 @@ const entryPoint = async () => {
       logIndex.debug(`Config directory: '${configDir}'`);
       logIndex.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
       await main(logger, configDir, logDir);
-      logIndex.debug(`${name} was closed`);
+      logIndex.debug("Main method finished without errors");
     } catch (err) {
       logIndex.error(err as Error);
       logIndex.debug(`${name} was closed after unexpected error`);
