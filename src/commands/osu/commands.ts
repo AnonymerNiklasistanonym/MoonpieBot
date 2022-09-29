@@ -12,6 +12,7 @@ import {
   osuCommandsScore,
   osuCommandsString,
 } from "../../strings/osu/commands";
+import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { regexOsuChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
@@ -41,7 +42,6 @@ export const commandCommands: TwitchChatCommandHandler<
   CommandCommandsDetectorInput
 > = {
   createReply: async (_channel, _tags, data) => {
-    const commandsStringIds: [string, boolean][] = [];
     let streamCompanionInfo:
       | StreamCompanionFileData
       | StreamCompanionWebSocketData
@@ -50,60 +50,53 @@ export const commandCommands: TwitchChatCommandHandler<
       streamCompanionInfo = await data.osuStreamCompanionCurrentMapData();
     }
 
-    Object.values(OsuCommands).forEach((command) => {
-      const enabled = data.enabledCommands.includes(command);
-      switch (command) {
-        case OsuCommands.COMMANDS:
-          break;
-        case OsuCommands.LAST_REQUEST:
-          commandsStringIds.push([osuCommandsLastRequest.id, enabled]);
-          break;
-        case OsuCommands.PERMIT_REQUEST:
-          commandsStringIds.push([osuCommandsPermitRequest.id, enabled]);
-          break;
-        case OsuCommands.NP:
-          if (
-            data.osuStreamCompanionCurrentMapData !== undefined &&
-            streamCompanionInfo !== undefined &&
-            streamCompanionInfo.type === "file"
-          ) {
-            commandsStringIds.push([
-              osuCommandsNpStreamCompanionFile.id,
-              enabled,
-            ]);
-          } else if (
-            data.osuStreamCompanionCurrentMapData !== undefined &&
-            streamCompanionInfo !== undefined &&
-            streamCompanionInfo.type === "websocket"
-          ) {
-            commandsStringIds.push([
-              osuCommandsNpStreamCompanionWebsocket.id,
-              enabled,
-            ]);
-          } else {
-            commandsStringIds.push([osuCommandsNp.id, enabled]);
-          }
-          break;
-        case OsuCommands.PP:
-          commandsStringIds.push([osuCommandsPp.id, enabled]);
-          break;
-        case OsuCommands.REQUESTS:
-          commandsStringIds.push([osuCommandsRequests.id, enabled]);
-          break;
-        case OsuCommands.RP:
-          commandsStringIds.push([osuCommandsRp.id, enabled]);
-          break;
-        case OsuCommands.SCORE:
-          commandsStringIds.push([osuCommandsScore.id, enabled]);
-          break;
-      }
-    });
     return {
       additionalMacros: new Map([
         [
-          "COMMAND_ENABLED",
+          macroCommandEnabled.id,
           new Map(
-            commandsStringIds.map((a) => [a[0], a[1] ? "true" : "false"])
+            macroCommandEnabled.generate({
+              convertEnumValueToInfo: (enumValue) => {
+                const enabled = data.enabledCommands.includes(enumValue);
+                switch (enumValue as OsuCommands) {
+                  case OsuCommands.COMMANDS:
+                    break;
+                  case OsuCommands.LAST_REQUEST:
+                    return [osuCommandsLastRequest.id, enabled];
+                  case OsuCommands.PERMIT_REQUEST:
+                    return [osuCommandsPermitRequest.id, enabled];
+                  case OsuCommands.NP:
+                    if (
+                      data.osuStreamCompanionCurrentMapData !== undefined &&
+                      streamCompanionInfo !== undefined &&
+                      streamCompanionInfo.type === "file"
+                    ) {
+                      return [osuCommandsNpStreamCompanionFile.id, enabled];
+                    } else if (
+                      data.osuStreamCompanionCurrentMapData !== undefined &&
+                      streamCompanionInfo !== undefined &&
+                      streamCompanionInfo.type === "websocket"
+                    ) {
+                      return [
+                        osuCommandsNpStreamCompanionWebsocket.id,
+                        enabled,
+                      ];
+                    } else {
+                      return [osuCommandsNp.id, enabled];
+                    }
+                  case OsuCommands.PP:
+                    return [osuCommandsPp.id, enabled];
+                  case OsuCommands.REQUESTS:
+                    return [osuCommandsRequests.id, enabled];
+                  case OsuCommands.RP:
+                    return [osuCommandsRp.id, enabled];
+                  case OsuCommands.SCORE:
+                    return [osuCommandsScore.id, enabled];
+                }
+                return ["undefined", false];
+              },
+              enumValues: Object.values(OsuCommands),
+            })
           ),
         ],
       ]),

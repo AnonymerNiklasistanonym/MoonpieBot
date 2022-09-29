@@ -6,6 +6,7 @@ import {
   pluginListSort,
 } from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../messageParser";
+import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
 // Type imports
@@ -50,7 +51,7 @@ export const spotifyCommandsString: StringEntry = {
               (a): MessageForMessageElementPlugin => ({
                 args: {
                   key: a.id,
-                  name: "COMMAND_ENABLED",
+                  name: macroCommandEnabled.id,
                   type: "macro",
                 },
                 name: pluginIfTrue.id,

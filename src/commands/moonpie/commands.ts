@@ -14,6 +14,7 @@ import {
   moonpieCommandsSet,
   moonpieCommandsString,
 } from "../../strings/moonpie/commands";
+import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { regexMoonpieChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
@@ -33,44 +34,38 @@ export const commandCommands: TwitchChatCommandHandler<
   CommandCommandsDetectorInput
 > = {
   createReply: (_channel, _tags, data) => {
-    const commandsStringIds: [string, boolean][] = [];
-    Object.values(MoonpieCommands).forEach((command) => {
-      const enabled = data.enabledCommands.includes(command);
-      switch (command) {
-        case MoonpieCommands.CLAIM:
-          commandsStringIds.push([moonpieCommandsClaim.id, enabled]);
-          break;
-        case MoonpieCommands.COMMANDS:
-          break;
-        case MoonpieCommands.LEADERBOARD:
-          commandsStringIds.push([moonpieCommandsLeaderboard.id, enabled]);
-          break;
-        case MoonpieCommands.GET:
-          commandsStringIds.push([moonpieCommandsGet.id, enabled]);
-          break;
-        case MoonpieCommands.SET:
-          commandsStringIds.push([moonpieCommandsSet.id, enabled]);
-          break;
-        case MoonpieCommands.ADD:
-          commandsStringIds.push([moonpieCommandsAdd.id, enabled]);
-          break;
-        case MoonpieCommands.REMOVE:
-          commandsStringIds.push([moonpieCommandsRemove.id, enabled]);
-          break;
-        case MoonpieCommands.DELETE:
-          commandsStringIds.push([moonpieCommandsDelete.id, enabled]);
-          break;
-        case MoonpieCommands.ABOUT:
-          commandsStringIds.push([moonpieCommandsAbout.id, enabled]);
-          break;
-      }
-    });
     return {
       additionalMacros: new Map([
         [
-          "COMMAND_ENABLED",
+          macroCommandEnabled.id,
           new Map(
-            commandsStringIds.map((a) => [a[0], a[1] ? "true" : "false"])
+            macroCommandEnabled.generate({
+              convertEnumValueToInfo: (enumValue) => {
+                const enabled = data.enabledCommands.includes(enumValue);
+                switch (enumValue as MoonpieCommands) {
+                  case MoonpieCommands.CLAIM:
+                    return [moonpieCommandsClaim.id, enabled];
+                  case MoonpieCommands.COMMANDS:
+                    break;
+                  case MoonpieCommands.LEADERBOARD:
+                    return [moonpieCommandsLeaderboard.id, enabled];
+                  case MoonpieCommands.GET:
+                    return [moonpieCommandsGet.id, enabled];
+                  case MoonpieCommands.SET:
+                    return [moonpieCommandsSet.id, enabled];
+                  case MoonpieCommands.ADD:
+                    return [moonpieCommandsAdd.id, enabled];
+                  case MoonpieCommands.REMOVE:
+                    return [moonpieCommandsRemove.id, enabled];
+                  case MoonpieCommands.DELETE:
+                    return [moonpieCommandsDelete.id, enabled];
+                  case MoonpieCommands.ABOUT:
+                    return [moonpieCommandsAbout.id, enabled];
+                }
+                return ["undefined", false];
+              },
+              enumValues: Object.values(MoonpieCommands),
+            })
           ),
         ],
       ]),

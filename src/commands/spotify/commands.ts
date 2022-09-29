@@ -7,6 +7,7 @@ import {
   spotifyCommandsSong,
   spotifyCommandsString,
 } from "../../strings/spotify/commands";
+import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { regexSpotifyChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
@@ -26,24 +27,24 @@ export const commandCommands: TwitchChatCommandHandler<
   CommandCommandsDetectorInput
 > = {
   createReply: (_channel, _tags, data) => {
-    const commandsStringIds: [string, boolean][] = [];
-
-    Object.values(SpotifyCommands).forEach((command) => {
-      const enabled = data.enabledCommands.includes(command);
-      switch (command) {
-        case SpotifyCommands.COMMANDS:
-          break;
-        case SpotifyCommands.SONG:
-          commandsStringIds.push([spotifyCommandsSong.id, enabled]);
-          break;
-      }
-    });
     return {
       additionalMacros: new Map([
         [
-          "COMMAND_ENABLED",
+          macroCommandEnabled.id,
           new Map(
-            commandsStringIds.map((a) => [a[0], a[1] ? "true" : "false"])
+            macroCommandEnabled.generate({
+              convertEnumValueToInfo: (enumValue) => {
+                const enabled = data.enabledCommands.includes(enumValue);
+                switch (enumValue as SpotifyCommands) {
+                  case SpotifyCommands.COMMANDS:
+                    break;
+                  case SpotifyCommands.SONG:
+                    return [spotifyCommandsSong.id, enabled];
+                }
+                return ["undefined", false];
+              },
+              enumValues: Object.values(SpotifyCommands),
+            })
           ),
         ],
       ]),
