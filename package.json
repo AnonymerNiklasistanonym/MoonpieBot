@@ -26,6 +26,7 @@
         "create:envExamples": "ts-node scripts/createEnvExampleFiles.ts",
         "create:jsonSchemas": "ts-node scripts/createJsonSchemaFiles.ts",
         "create:manPage": "ts-node scripts/createManPageFile.ts",
+        "create:pkgbuilds": "ts-node scripts/createPkgbuildFiles.ts",
         "create:windowsInstallerConfig": "ts-node scripts/createWindowsInstallerConfigFile.ts",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",
         "docs": "typedoc --tsconfig tsconfig.json",

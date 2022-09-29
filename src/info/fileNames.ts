@@ -35,3 +35,7 @@ export const fileNameDatabaseBackups = (date: Date = new Date()): string => {
   const dateYear = date.getFullYear();
   return `db_backup_moonpie_${dateYear}-${DateMonth}-${dateDay}.json`;
 };
+
+export const fileNamePkgbuild = path.join("installer", "PKGBUILD");
+export const fileNamePkgbuildBin = path.join("installer", "PKGBUILD_BIN");
+export const fileNamePkgbuildGit = path.join("installer", "PKGBUILD_GIT");
