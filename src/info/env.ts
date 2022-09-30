@@ -67,6 +67,7 @@ export enum EnvVariable {
   SPOTIFY_API_CLIENT_ID = "SPOTIFY_API_CLIENT_ID",
   SPOTIFY_API_CLIENT_SECRET = "SPOTIFY_API_CLIENT_SECRET",
   SPOTIFY_API_REFRESH_TOKEN = "SPOTIFY_API_REFRESH_TOKEN",
+  SPOTIFY_DATABASE_PATH = "SPOTIFY_DATABASE_PATH",
   SPOTIFY_ENABLE_COMMANDS = "SPOTIFY_ENABLE_COMMANDS",
   TWITCH_API_ACCESS_TOKEN = "TWITCH_API_ACCESS_TOKEN",
   TWITCH_API_CLIENT_ID = "TWITCH_API_CLIENT_ID",
@@ -319,10 +320,20 @@ export const envVariableInformation: EnvVariableData[] = [
     },
   },
   {
+    block: EnvVariableBlock.SPOTIFY,
+    default: (configDir) =>
+      path.relative(configDir, path.join(configDir, "spotify.db")),
+    defaultValue: (configDir) =>
+      path.resolve(path.join(configDir, "spotify.db")),
+    description:
+      "The database file path that contains the persistent spotify data.",
+    name: EnvVariable.SPOTIFY_DATABASE_PATH,
+  },
+  {
     block: EnvVariableBlock.SPOTIFY_API,
     censor: true,
     description:
-      "Provide client id/secret to enable Twitch api calls in commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application).",
+      "Provide client id/secret to enable Twitch api calls or Spotify commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application). At the first start a browser window will open where you need to authenticate once.",
     example: "abcdefghijklmnop",
     name: EnvVariable.SPOTIFY_API_CLIENT_ID,
   },
@@ -336,7 +347,7 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     block: EnvVariableBlock.SPOTIFY_API,
     censor: true,
-    description: `You can get this token by authenticating once successfully using the ${ENV_VARIABLE_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_ID} and ${ENV_VARIABLE_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_SECRET}. After the successful authentication via a website that will open you can copy the refresh token from there.`,
+    description: `Providing this token is not necessary but optional. You can get this token by authenticating once successfully using the ${ENV_VARIABLE_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_ID} and ${ENV_VARIABLE_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_SECRET}. This will be done automatically by this program if both values are provided (the browser window will open after starting). After a successful authentication via this website the refresh token can be copied from there but since it will be automatically stored in a database this variable does not need to be provided. If a value is found it is automatically written into the database and does not need to be provided after that.`,
     example: "abcdefghijklmnop",
     name: EnvVariable.SPOTIFY_API_REFRESH_TOKEN,
   },

@@ -127,8 +127,11 @@ Example: "*C:\Program Files (x86)\StreamCompanion\Files*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide Spotify API credentials the commands won't be enabled!
 Supported list values: "*commands*", "*song*" (empty list value: "*none*")
 
+**MOONPIE_CONFIG_SPOTIFY_DATABASE_PATH**="*spotify.db*"
+: The database file path that contains the persistent spotify data.
+
 **MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID**
-: Provide client id/secret to enable Twitch api calls in commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application).
+: Provide client id/secret to enable Twitch api calls or Spotify commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application). At the first start a browser window will open where you need to authenticate once.
 Example: "*abcdefghijklmnop*"
 
 **MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET**
@@ -136,7 +139,7 @@ Example: "*abcdefghijklmnop*"
 Example: "*abcdefghijklmnop*"
 
 **MOONPIE_CONFIG_SPOTIFY_API_REFRESH_TOKEN**
-: You can get this token by authenticating once successfully using the MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID and MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET. After the successful authentication via a website that will open you can copy the refresh token from there.
+: Providing this token is not necessary but optional. You can get this token by authenticating once successfully using the MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID and MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET. This will be done automatically by this program if both values are provided (the browser window will open after starting). After a successful authentication via this website the refresh token can be copied from there but since it will be automatically stored in a database this variable does not need to be provided. If a value is found it is automatically written into the database and does not need to be provided after that.
 Example: "*abcdefghijklmnop*"
 
 **MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN**

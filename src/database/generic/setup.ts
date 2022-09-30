@@ -44,57 +44,63 @@ export const genericSetupDatabase = async (
   const loggerDatabase = createLogFunc(logger, "database", "setup");
   const logMethod = createLogMethod(logger, "database_setup");
   loggerDatabase.debug(`Setup database '${databasePath}'...`);
+  let databaseWasCreated = false;
 
   // Create database if not already existing
   // The warning makes literally no sense
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   if (!(await db.sqlite3.exists(databasePath, logMethod))) {
     await db.sqlite3.create(databasePath, logMethod);
+    databaseWasCreated = true;
   }
 
-  // Setup database tables
-  for (const table of [versionTable, ...tables]) {
-    // > Create table if not existing
-    await db.requests.post(
-      databasePath,
-      db.queries.createTable(table.name, Object.values(table.columns), true),
-      undefined,
-      logMethod
-    );
-  }
+  // Setup database if it was created
+  if (databaseWasCreated) {
+    // Setup database tables
+    for (const table of [versionTable, ...tables]) {
+      // > Create table if not existing
+      await db.requests.post(
+        databasePath,
+        db.queries.createTable(table.name, Object.values(table.columns), true),
+        undefined,
+        logMethod
+      );
+    }
 
-  // Setup database views
-  for (const view of views) {
-    // > Create view if not existing
-    await db.requests.post(
-      databasePath,
-      db.queries.createView(
-        view.name,
-        view.tableName,
-        Object.values(view.columns),
-        view.options,
-        true
-      ),
-      undefined,
-      logMethod
-    );
-  }
+    // Setup database views
+    for (const view of views) {
+      // > Create view if not existing
+      await db.requests.post(
+        databasePath,
+        db.queries.createView(
+          view.name,
+          view.tableName,
+          Object.values(view.columns),
+          view.options,
+          true
+        ),
+        undefined,
+        logMethod
+      );
+    }
 
-  // Insert setup data
-  if (options?.setupInitialData !== undefined) {
-    await options?.setupInitialData();
+    // Insert initial data
+    await versionRequests.createEntry(databasePath, currentVersion, logger);
+    if (options?.setupInitialData !== undefined) {
+      await options.setupInitialData();
+    }
   }
 
   // Check for migrations
   const versions = await versionRequests.getEntries(databasePath, logger);
   if (versions.length === 0) {
     loggerDatabase.info(
-      `Database '${databasePath}' had no version: '${getVersionFromObject(
-        versions[0]
-      )}' (current: '${getVersionFromObject(currentVersion)}')`
+      `Database '${databasePath}' had no version (current: '${getVersionFromObject(
+        currentVersion
+      )}')`
     );
     if (options?.migrateVersion !== undefined) {
-      await options?.migrateVersion(undefined, currentVersion);
+      await options.migrateVersion(undefined, currentVersion);
     }
     // Add current version if no version is found
     await versionRequests.createEntry(databasePath, currentVersion, logger);
@@ -122,6 +128,7 @@ export const genericSetupDatabase = async (
     await versionRequests.removeEntry(databasePath, versions[0], logger);
     await versionRequests.createEntry(databasePath, currentVersion, logger);
   }
+
   loggerDatabase.debug(
     `Database '${databasePath}'@${getVersionFromObject(
       currentVersion,

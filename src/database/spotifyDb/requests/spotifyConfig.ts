@@ -15,7 +15,6 @@ export enum SpotifyConfig {
 // -----------------------------------------------------------------------------
 
 export interface ExistsInput {
-  channel: string;
   option: SpotifyConfig;
 }
 
@@ -33,7 +32,7 @@ export const existsEntry = async (
   input: ExistsInput,
   logger: Logger
 ): Promise<boolean> => {
-  const logMethod = createLogMethod(logger, "database_osu_requests_exists");
+  const logMethod = createLogMethod(logger, "database_spotify_exists");
   try {
     const runResultExists = await db.requests.getEach<ExistsDbOut>(
       databasePath,
@@ -42,7 +41,7 @@ export const existsEntry = async (
       db.queries.exists(spotifyConfigTable.name, {
         columnName: spotifyConfigTable.columns.option.name,
       }),
-      [input.channel, input.option],
+      [input.option],
       logMethod
     );
     if (runResultExists) {
@@ -58,7 +57,6 @@ export const existsEntry = async (
 // -----------------------------------------------------------------------------
 
 export interface CreateInput {
-  channel: string;
   option: SpotifyConfig;
   optionValue: string;
 }
@@ -77,14 +75,14 @@ export const createEntry = async (
   input: CreateInput,
   logger: Logger
 ): Promise<number> => {
-  const logMethod = createLogMethod(logger, "database_osu_requests_create");
+  const logMethod = createLogMethod(logger, "database_spotify_create");
   const postResult = await db.requests.post(
     databasePath,
     db.queries.insert(spotifyConfigTable.name, [
       spotifyConfigTable.columns.option.name,
       spotifyConfigTable.columns.optionValue.name,
     ]),
-    [input.channel, input.option, input.optionValue],
+    [input.option, input.optionValue],
     logMethod
   );
   return postResult.lastID;
@@ -98,7 +96,6 @@ export const createOrUpdateEntry = async (
   const exists = await existsEntry(
     databasePath,
     {
-      channel: input.channel,
       option: input.option,
     },
     logger
@@ -114,7 +111,6 @@ export const createOrUpdateEntry = async (
 // -----------------------------------------------------------------------------
 
 export interface RemoveInput {
-  channel: string;
   option: SpotifyConfig;
 }
 
@@ -138,7 +134,7 @@ export const removeEntry = async (
     db.queries.remove(spotifyConfigTable.name, {
       columnName: spotifyConfigTable.columns.option.name,
     }),
-    [input.channel, input.option],
+    [input.option],
     logMethod
   );
   return postResult.changes > 0;
@@ -154,12 +150,11 @@ export interface GetOsuRequestsConfigDbOut {
 
 export const getEntries = async (
   databasePath: string,
-  twitchChannel: string,
   logger: Logger
 ): Promise<GetOsuRequestsConfigDbOut[]> => {
   const logMethod = createLogMethod(
     logger,
-    "database_osu_requests_get_entries"
+    "database_spotify_get_entries"
   );
 
   const runResult = await db.requests.getAll<GetOsuRequestsConfigDbOut>(
@@ -174,7 +169,7 @@ export const getEntries = async (
         columnName: spotifyConfigTable.columns.optionValue.name,
       },
     ]),
-    [twitchChannel],
+    undefined,
     logMethod
   );
   if (runResult) {
@@ -187,7 +182,6 @@ export const getEntries = async (
 // -----------------------------------------------------------------------------
 
 export interface UpdateInput {
-  channel: string;
   option: SpotifyConfig;
   optionValue: string;
 }
@@ -201,11 +195,8 @@ export const updateEntry = async (
   // Special validations for DB entry request
   // > Check if entry already exists
   if (
-    (await existsEntry(
-      databasePath,
-      { channel: input.channel, option: input.option },
-      logger
-    )) === false
+    (await existsEntry(databasePath, { option: input.option }, logger)) ===
+    false
   ) {
     throw Error(SpotifyDbError.NOT_EXISTING);
   }
@@ -214,13 +205,13 @@ export const updateEntry = async (
     spotifyConfigTable.columns.option.name,
     spotifyConfigTable.columns.optionValue.name,
   ];
-  const values = [input.channel, input.option, input.optionValue];
+  const values = [input.option, input.optionValue];
   const postResult = await db.requests.post(
     databasePath,
     db.queries.update(spotifyConfigTable.name, columns, {
       columnName: spotifyConfigTable.columns.option.name,
     }),
-    [...values, input.channel, input.option],
+    [...values, input.option],
     logMethod
   );
   return postResult.changes;

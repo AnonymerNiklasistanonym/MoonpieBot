@@ -5,8 +5,10 @@ import open from "open";
 import SpotifyWebApi from "spotify-web-api-node";
 // Local imports
 import { createLogFunc } from "./logging";
+import { SpotifyConfig } from "./database/spotifyDb/requests/spotifyConfig";
 // Type imports
 import type { Logger } from "winston";
+import spotifyDb from "./database/spotifyDb";
 
 /**
  * The logging ID of this module.
@@ -24,17 +26,27 @@ const FORBIDDEN_STATUS_CODE = 403;
  *
  * @param spotifyClientId The Spotify client ID.
  * @param spotifyClientSecret The Spotify client secret.
- * @param spotifyRefreshToken The refresh token from a previous authentication.
+ * @param spotifyDatabasePath The path to the Spotify database to save the
+ * refresh token if not available already.
  * @param logger Used for logging.
  * @returns Currently playing and recently played songs data.
  */
 export const setupSpotifyAuthentication = async (
   spotifyClientId: string,
   spotifyClientSecret: string,
-  spotifyRefreshToken: string | undefined,
+  spotifyDatabasePath: string,
   logger: Logger
 ): Promise<SpotifyWebApi> => {
   const logSpotify = createLogFunc(logger, LOG_ID, "authentication");
+
+  const spotifyConfigDbEntries =
+    await spotifyDb.requests.spotifyConfig.getEntries(
+      spotifyDatabasePath,
+      logger
+    );
+  const spotifyRefreshToken = spotifyConfigDbEntries.find(
+    (a) => a.option === SpotifyConfig.REFRESH_TOKEN
+  )?.optionValue;
 
   const spotifyApi = new SpotifyWebApi({
     clientId: spotifyClientId,
@@ -81,6 +93,14 @@ export const setupSpotifyAuthentication = async (
               spotifyApi.setRefreshToken(
                 codeGrantAuthorization.body["refresh_token"]
               );
+              return spotifyDb.requests.spotifyConfig.createOrUpdateEntry(
+                spotifyDatabasePath,
+                {
+                  option: SpotifyConfig.REFRESH_TOKEN,
+                  optionValue: codeGrantAuthorization.body["refresh_token"],
+                },
+                logger
+              );
             })
             .then(() => {
               // Tell user that the page can now be closed and clear the private tokens from the URL
@@ -93,7 +113,7 @@ export const setupSpotifyAuthentication = async (
                 }
                 .spoiler:hover{
                   color: white;
-                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>For a permanent authentication you can copy the following refresh token:</p><br><p>Refresh Token: <span class="spoiler">${
+                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>If you want to use the refresh token otherwise you can copy it:</p><br><p>Refresh Token: <span class="spoiler">${
                   refreshToken ? refreshToken : "ERROR"
                 }</span></p></body><script>window.history.replaceState({}, document.title, "/");</script></html>`
               );

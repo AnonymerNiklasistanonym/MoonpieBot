@@ -2,24 +2,24 @@
 import { promises as fs } from "fs";
 // Local imports
 import {
+  ENV_LIST_SPLIT_CHARACTER,
+  ENV_VARIABLE_PREFIX,
+  EnvVariable,
+  EnvVariableBlock,
+  envVariableInformation,
+  envVariableStructure,
+} from "./info/env";
+import {
   FileDocumentationPartType,
   generateFileDocumentation,
 } from "./other/splitTextAtLength";
 import { escapeStringIfWhiteSpace } from "./other/whiteSpaceChecker";
 // Type imports
-import {
-  ENV_LIST_SPLIT_CHARACTER,
-  ENV_VARIABLE_PREFIX,
-  EnvVariable,
-  EnvVariableBlock,
-  EnvVariableData,
-  envVariableInformation,
-  envVariableStructure,
-} from "./info/env";
 import type {
   FileDocumentationParts,
   FileDocumentationPartValue,
 } from "./other/splitTextAtLength";
+import type { EnvVariableData } from "./info/env";
 
 /**
  * Environment variable handling.

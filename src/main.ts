@@ -62,6 +62,8 @@ import { pluginsTwitchApiGenerator } from "./messageParser/plugins/twitchApi";
 import { pluginsTwitchChatGenerator } from "./messageParser/plugins/twitchChat";
 import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
+import { SpotifyConfig } from "./database/spotifyDb/requests/spotifyConfig";
+import spotifyDb from "./database/spotifyDb";
 import { version } from "./info/version";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
@@ -146,6 +148,15 @@ export const main = async (
     EnvVariable.MOONPIE_ENABLE_COMMANDS,
     configDir
   ).split(",");
+  // > Spotify
+  const pathDatabaseSpotify = path.resolve(
+    configDir,
+    getEnvVariableValueOrDefault(EnvVariable.SPOTIFY_DATABASE_PATH, configDir)
+  );
+  const spotifyEnableCommands = getEnvVariableValueOrDefault(
+    EnvVariable.SPOTIFY_ENABLE_COMMANDS,
+    configDir
+  ).split(",");
   // > Spotify API
   const spotifyApiClientId = getEnvVariableValueOrUndefined(
     EnvVariable.SPOTIFY_API_CLIENT_ID
@@ -156,10 +167,6 @@ export const main = async (
   const spotifyApiRefreshToken = getEnvVariableValueOrUndefined(
     EnvVariable.SPOTIFY_API_REFRESH_TOKEN
   );
-  const spotifyEnableCommands = getEnvVariableValueOrDefault(
-    EnvVariable.SPOTIFY_ENABLE_COMMANDS,
-    configDir
-  ).split(",");
   // > osu! API
   const osuApiClientId = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_API_CLIENT_ID
@@ -230,16 +237,6 @@ export const main = async (
     twitchApiClient = new ApiClient({
       authProvider: authProviderScopes,
     });
-  }
-  // > Spotify API
-  let spotifyWebApi: undefined | SpotifyWebApi;
-  if (spotifyApiClientId && spotifyApiClientSecret) {
-    spotifyWebApi = await setupSpotifyAuthentication(
-      spotifyApiClientId,
-      spotifyApiClientSecret,
-      spotifyApiRefreshToken,
-      logger
-    );
   }
   // > osu! API
   const enableOsu = osuApiClientId && osuApiClientSecret && osuApiDefaultId;
@@ -339,13 +336,47 @@ export const main = async (
     }
   };
 
+  // Setup/Migrate spotify database
+  const setupMigrateSpotifyDatabase = async () => {
+    // Only touch the moonpie database if it will be used
+    if (
+      spotifyApiClientId !== undefined &&
+      spotifyApiClientSecret !== undefined
+    ) {
+      // Setup database tables (or do nothing if they already exist)
+      await spotifyDb.setup(pathDatabaseSpotify, logger);
+      if (spotifyApiRefreshToken !== undefined) {
+        await spotifyDb.requests.spotifyConfig.createOrUpdateEntry(
+          pathDatabaseSpotify,
+          {
+            option: SpotifyConfig.REFRESH_TOKEN,
+            optionValue: spotifyApiRefreshToken,
+          },
+          logger
+        );
+      }
+    }
+  };
+
   // Run all file related async methods in parallel
   await Promise.all([
     loadCustomCommands(),
     loadCustomTimers(),
     setupMigrateBackupMoonpieDatabase(),
     setupMigrateOsuRequestsDatabase(),
+    setupMigrateSpotifyDatabase(),
   ]);
+
+  // Setup Spotify API
+  let spotifyWebApi: undefined | SpotifyWebApi;
+  if (spotifyApiClientId && spotifyApiClientSecret) {
+    spotifyWebApi = await setupSpotifyAuthentication(
+      spotifyApiClientId,
+      spotifyApiClientSecret,
+      pathDatabaseSpotify,
+      logger
+    );
+  }
 
   // Setup message parser
   const stringMap = updateStringsMapWithCustomEnvStrings(
