@@ -283,31 +283,22 @@ export const createEnvVariableDocumentation = async (
   const data: FileDocumentationParts[] = [];
 
   for (const structurePart of envVariableStructure) {
-    if (!(structurePart as EnvVariableStructureVariablesBlock)?.block) {
-      // Just a text block
-      const structurePartText = structurePart as EnvVariableStructureTextBlock;
-      data.push({
-        content: structurePartText.content,
-        type: FileDocumentationPartType.TEXT,
-      });
-    } else {
+    if ("block" in structurePart) {
       // Variable documentation block
-      const structurePartVariables =
-        structurePart as EnvVariableStructureVariablesBlock;
       data.push({
         count: 1,
         type: FileDocumentationPartType.NEWLINE,
       });
       data.push({
-        description: structurePartVariables.description,
-        title: structurePartVariables.name,
+        description: structurePart.description,
+        title: structurePart.name,
         type: FileDocumentationPartType.HEADING,
       });
 
       // Now add for each variable of the block the documentation
       for (const envVariable in EnvVariable) {
         const envVariableInfo = getEnvVariableValueInformation(envVariable);
-        if (envVariableInfo?.block === structurePartVariables.block) {
+        if (envVariableInfo.block === structurePart.block) {
           const envVariableEntry: FileDocumentationPartValue = {
             description: envVariableInfo.description,
             prefix: ">",
@@ -381,6 +372,12 @@ export const createEnvVariableDocumentation = async (
           data.push(envVariableEntry);
         }
       }
+    } else {
+      // Just a text block
+      data.push({
+        content: structurePart.content,
+        type: FileDocumentationPartType.TEXT,
+      });
     }
   }
 

@@ -18,12 +18,8 @@ import type {
   CommandPpRpDetectorInput,
   CommandPpRpDetectorOutput,
 } from "./pp";
-import type {
-  RegexOsuChatHandlerCommandRp,
-  RegexOsuChatHandlerCommandRpUserId,
-  RegexOsuChatHandlerCommandRpUserName,
-} from "../../info/regex";
 import type { BeatmapRequestsInfo } from "../osu";
+import type { RegexOsuChatHandlerCommandRp } from "../../info/regex";
 import type { TwitchChatCommandHandler } from "../../twitch";
 
 export interface CommandRpCreateReplyInputExtra
@@ -111,24 +107,21 @@ export const commandRp: TwitchChatCommandHandler<
     if (!match) {
       return false;
     }
-    const matchGroups: undefined | RegexOsuChatHandlerCommandRp = match.groups;
-    if (!matchGroups) {
+    const matchGroups = match.groups as
+      | undefined
+      | RegexOsuChatHandlerCommandRp;
+    if (matchGroups === undefined) {
       throw Error("RegexOsuChatHandlerCommandRp groups undefined");
-    }
-    if ((matchGroups as RegexOsuChatHandlerCommandRpUserId).osuUserId) {
+    } else if ("osuUserId" in matchGroups) {
       return {
         data: {
-          customOsuId: parseInt(
-            (matchGroups as RegexOsuChatHandlerCommandRpUserId).osuUserId
-          ),
+          customOsuId: parseInt(matchGroups.osuUserId),
         },
       };
-    }
-    if ((matchGroups as RegexOsuChatHandlerCommandRpUserName).osuUserName) {
+    } else if ("osuUserName" in matchGroups) {
       return {
         data: {
-          customOsuName: (matchGroups as RegexOsuChatHandlerCommandRpUserName)
-            .osuUserName,
+          customOsuName: matchGroups.osuUserName,
         },
       };
     }

@@ -28,9 +28,6 @@ import type {
 } from "../../twitch";
 import type {
   RegexOsuBeatmapIdFromUrl,
-  RegexOsuBeatmapIdFromUrlB,
-  RegexOsuBeatmapIdFromUrlBeatmaps,
-  RegexOsuBeatmapIdFromUrlBeatmapSets,
   RegexOsuWindowTitleNowPlaying,
 } from "../../info/regex";
 import type { MacroMap } from "../../messageParser";
@@ -96,23 +93,12 @@ export const commandNp: TwitchChatCommandHandler<
                 throw Error("RegexOsuBeatmapIdFromUrl groups undefined");
               }
               let beatmapId;
-              if ((matchGroups as RegexOsuBeatmapIdFromUrlB).beatmapIdB) {
-                beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlB)
-                  .beatmapIdB;
-              }
-              if (
-                (matchGroups as RegexOsuBeatmapIdFromUrlBeatmaps)
-                  .beatmapIdBeatmaps
-              ) {
-                beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlBeatmaps)
-                  .beatmapIdBeatmaps;
-              }
-              if (
-                (matchGroups as RegexOsuBeatmapIdFromUrlBeatmapSets)
-                  .beatmapIdBeatmapsets
-              ) {
-                beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlBeatmapSets)
-                  .beatmapIdBeatmapsets;
+              if ("beatmapIdB" in matchGroups) {
+                beatmapId = matchGroups.beatmapIdB;
+              } else if ("beatmapIdBeatmaps" in matchGroups) {
+                beatmapId = matchGroups.beatmapIdBeatmaps;
+              } else if ("beatmapIdBeatmapsets" in matchGroups) {
+                beatmapId = matchGroups.beatmapIdBeatmapsets;
               }
               if (beatmapId !== undefined) {
                 data.beatmapRequestsInfo.lastMentionedBeatmapId =

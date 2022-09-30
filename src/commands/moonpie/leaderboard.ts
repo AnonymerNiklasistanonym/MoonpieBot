@@ -130,11 +130,10 @@ export const commandLeaderboard: TwitchChatCommandHandler<
     }
     const matchGroups: undefined | RegexMoonpieChatHandlerCommandLeaderboard =
       match.groups;
-    let startingRank;
     if (matchGroups?.startingRank) {
-      startingRank = parseInt(matchGroups.startingRank);
+      return { data: { startingRank: parseInt(matchGroups.startingRank) } };
     }
-    return { data: { startingRank } };
+    return { data: {} };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,

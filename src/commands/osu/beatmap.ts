@@ -45,17 +45,12 @@ import type {
   TwitchChatCommandHandlerReply,
 } from "../../twitch";
 import type { MacroMap, PluginMap } from "../../messageParser";
-import type {
-  RegexOsuBeatmapIdFromUrl,
-  RegexOsuBeatmapIdFromUrlB,
-  RegexOsuBeatmapIdFromUrlBeatmaps,
-  RegexOsuBeatmapIdFromUrlBeatmapSets,
-} from "../../info/regex";
 import type { Beatmap } from "osu-api-v2";
 import type { GetOsuRequestsConfigOut } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { PluginTwitchChatData } from "../../messageParser/plugins/twitchChat";
+import type { RegexOsuBeatmapIdFromUrl } from "../../info/regex";
 
 const MAX_LENGTH_PREVIOUS_REQUESTS = 15;
 
@@ -432,21 +427,12 @@ export const commandBeatmap: TwitchChatCommandHandler<
           throw Error("RegexOsuBeatmapIdFromUrl groups undefined");
         }
         let beatmapId;
-        if ((matchGroups as RegexOsuBeatmapIdFromUrlB).beatmapIdB) {
-          beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlB).beatmapIdB;
-        }
-        if (
-          (matchGroups as RegexOsuBeatmapIdFromUrlBeatmaps).beatmapIdBeatmaps
-        ) {
-          beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlBeatmaps)
-            .beatmapIdBeatmaps;
-        }
-        if (
-          (matchGroups as RegexOsuBeatmapIdFromUrlBeatmapSets)
-            .beatmapIdBeatmapsets
-        ) {
-          beatmapId = (matchGroups as RegexOsuBeatmapIdFromUrlBeatmapSets)
-            .beatmapIdBeatmapsets;
+        if ("beatmapIdB" in matchGroups) {
+          beatmapId = matchGroups.beatmapIdB;
+        } else if ("beatmapIdBeatmaps" in matchGroups) {
+          beatmapId = matchGroups.beatmapIdBeatmaps;
+        } else if ("beatmapIdBeatmapsets" in matchGroups) {
+          beatmapId = matchGroups.beatmapIdBeatmapsets;
         }
         if (beatmapId !== undefined) {
           return {
@@ -454,7 +440,6 @@ export const commandBeatmap: TwitchChatCommandHandler<
             comment: matchGroups.comment,
           };
         }
-        return;
       })
       .filter(notUndefined);
     if (beatmapRequests.length === 0) {
