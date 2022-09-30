@@ -1,17 +1,13 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
-import {
-  parseTwitchBadgeLevel,
-  TwitchBadgeLevel,
-} from "../../other/twitchBadgeParser";
 import { BeatmapRequestsInfo } from "../osu";
-import { generalUserPermissionError } from "../../strings/general";
-import { macroPermissionError } from "../../messageParser/macros/general";
 import { osuBeatmapRequestNoRequestsError } from "../../strings/osu/beatmapRequest";
 import { regexOsuChatHandlerCommandLastRequest } from "../../info/regex";
 import { sendBeatmapRequest } from "./beatmap";
+import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
 // Type imports
-import type {
+import {
+  checkTwitchBadgeLevel,
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerReply,
 } from "../../twitch";
@@ -43,22 +39,12 @@ export const commandBeatmapLastRequest: TwitchChatCommandHandler<
   CommandBeatmapLastRequestDetectorOutput
 > = {
   createReply: (channel, tags, data) => {
-    const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
-    if (twitchBadgeLevel < TwitchBadgeLevel.MODERATOR) {
-      return {
-        additionalMacros: new Map([
-          [
-            macroPermissionError.id,
-            new Map(
-              macroPermissionError.generate({
-                expected: TwitchBadgeLevel.MODERATOR,
-                found: twitchBadgeLevel,
-              })
-            ),
-          ],
-        ]),
-        messageId: generalUserPermissionError.id,
-      };
+    const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
+      tags,
+      TwitchBadgeLevel.MODERATOR
+    );
+    if (twitchBadgeLevelCheck !== undefined) {
+      return twitchBadgeLevelCheck;
     }
 
     if (data.beatmapRequestCount < 1) {

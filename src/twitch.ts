@@ -12,12 +12,16 @@ import {
   errorMessageUserIdUndefined,
   errorMessageUserNameUndefined,
 } from "./error";
+import { generalUserPermissionError } from "./strings/general";
+import { macroPermissionError } from "./messageParser/macros/general";
+import { parseTwitchBadgeLevel } from "./other/twitchBadgeParser";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import { MacroMap, messageParserById, PluginMap } from "./messageParser";
 import type { EMPTY_OBJECT } from "./info/other";
 import type { Logger } from "winston";
 import type { StringMap } from "./strings";
+import type { TwitchBadgeLevel } from "./other/twitchBadgeParser";
 
 /**
  * The logging ID of this module.
@@ -502,4 +506,27 @@ export const runTwitchCommandHandler = async <
     return true;
   }
   return false;
+};
+
+export const checkTwitchBadgeLevel = (
+  tags: Readonly<ChatUserstate>,
+  expectedBadgeLevel: TwitchBadgeLevel
+): TwitchChatCommandHandlerReply | undefined => {
+  const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
+  if (twitchBadgeLevel < expectedBadgeLevel) {
+    return {
+      additionalMacros: new Map([
+        [
+          macroPermissionError.id,
+          new Map(
+            macroPermissionError.generate({
+              expected: expectedBadgeLevel,
+              found: twitchBadgeLevel,
+            })
+          ),
+        ],
+      ]),
+      messageId: generalUserPermissionError.id,
+    };
+  }
 };

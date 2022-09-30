@@ -12,21 +12,17 @@ import {
   osuBeatmapRequestTurnedOn,
 } from "../../strings/osu/beatmapRequest";
 import {
-  parseTwitchBadgeLevel,
-  TwitchBadgeLevel,
-} from "../../other/twitchBadgeParser";
-import {
   regexOsuChatHandlerCommandRequests,
   RegexOsuChatHandlerCommandRequestsSet,
   regexOsuChatHandlerCommandRequestsSet,
   RegexOsuChatHandlerCommandRequestsUnset,
   regexOsuChatHandlerCommandRequestsUnset,
 } from "../../info/regex";
+import { checkTwitchBadgeLevel } from "../../twitch";
 import { errorMessageOsuApiDbPathUndefined } from "../../error";
-import { generalUserPermissionError } from "../../strings/general";
-import { macroPermissionError } from "../../messageParser/macros/general";
 import { OsuRequestsConfig } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import osuRequestsDb from "../../database/osuRequestsDb";
+import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
 // Type imports
 import type {
   BeatmapRequestsInfo,
@@ -70,22 +66,12 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
       data.beatmapRequestsType === BeatmapRequestsType.TURN_OFF ||
       data.beatmapRequestsType === BeatmapRequestsType.TURN_ON
     ) {
-      const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
-      if (twitchBadgeLevel < TwitchBadgeLevel.MODERATOR) {
-        return {
-          additionalMacros: new Map([
-            [
-              macroPermissionError.id,
-              new Map(
-                macroPermissionError.generate({
-                  expected: TwitchBadgeLevel.MODERATOR,
-                  found: twitchBadgeLevel,
-                })
-              ),
-            ],
-          ]),
-          messageId: generalUserPermissionError.id,
-        };
+      const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
+        tags,
+        TwitchBadgeLevel.MODERATOR
+      );
+      if (twitchBadgeLevelCheck !== undefined) {
+        return twitchBadgeLevelCheck;
       }
     }
 
@@ -330,22 +316,12 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
     if (data.osuApiDbPath === undefined) {
       throw errorMessageOsuApiDbPathUndefined();
     }
-    const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
-    if (twitchBadgeLevel < TwitchBadgeLevel.MODERATOR) {
-      return {
-        additionalMacros: new Map([
-          [
-            macroPermissionError.id,
-            new Map(
-              macroPermissionError.generate({
-                expected: TwitchBadgeLevel.MODERATOR,
-                found: twitchBadgeLevel,
-              })
-            ),
-          ],
-        ]),
-        messageId: generalUserPermissionError.id,
-      };
+    const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
+      tags,
+      TwitchBadgeLevel.MODERATOR
+    );
+    if (twitchBadgeLevelCheck !== undefined) {
+      return twitchBadgeLevelCheck;
     }
 
     const macros = new Map();
