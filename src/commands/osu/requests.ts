@@ -8,13 +8,12 @@ import {
   osuBeatmapRequestCurrentlyOff,
   osuBeatmapRequestCurrentlyOn,
   osuBeatmapRequestDemandsUpdated,
-  osuBeatmapRequestPermissionError,
   osuBeatmapRequestTurnedOff,
   osuBeatmapRequestTurnedOn,
 } from "../../strings/osu/beatmapRequest";
 import {
   parseTwitchBadgeLevel,
-  TwitchBadgeLevels,
+  TwitchBadgeLevel,
 } from "../../other/twitchBadgeParser";
 import {
   regexOsuChatHandlerCommandRequests,
@@ -24,6 +23,8 @@ import {
   regexOsuChatHandlerCommandRequestsUnset,
 } from "../../info/regex";
 import { errorMessageOsuApiDbPathUndefined } from "../../error";
+import { generalUserPermissionError } from "../../strings/general";
+import { macroPermissionError } from "../../messageParser/macros/general";
 import { OsuRequestsConfig } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import osuRequestsDb from "../../database/osuRequestsDb";
 // Type imports
@@ -65,17 +66,27 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
     if (data.osuApiDbPath === undefined) {
       throw errorMessageOsuApiDbPathUndefined();
     }
-    const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
     if (
-      (data.beatmapRequestsType === BeatmapRequestsType.TURN_OFF ||
-        data.beatmapRequestsType === BeatmapRequestsType.TURN_ON) &&
-      twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER &&
-      twitchBadgeLevel !== TwitchBadgeLevels.MODERATOR
+      data.beatmapRequestsType === BeatmapRequestsType.TURN_OFF ||
+      data.beatmapRequestsType === BeatmapRequestsType.TURN_ON
     ) {
-      return {
-        isError: true,
-        messageId: osuBeatmapRequestPermissionError.id,
-      };
+      const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
+      if (twitchBadgeLevel < TwitchBadgeLevel.MODERATOR) {
+        return {
+          additionalMacros: new Map([
+            [
+              macroPermissionError.id,
+              new Map(
+                macroPermissionError.generate({
+                  expected: TwitchBadgeLevel.MODERATOR,
+                  found: twitchBadgeLevel,
+                })
+              ),
+            ],
+          ]),
+          messageId: generalUserPermissionError.id,
+        };
+      }
     }
 
     const macros = new Map();
@@ -320,13 +331,20 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
       throw errorMessageOsuApiDbPathUndefined();
     }
     const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
-    if (
-      twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER &&
-      twitchBadgeLevel !== TwitchBadgeLevels.MODERATOR
-    ) {
+    if (twitchBadgeLevel < TwitchBadgeLevel.MODERATOR) {
       return {
-        isError: true,
-        messageId: osuBeatmapRequestPermissionError.id,
+        additionalMacros: new Map([
+          [
+            macroPermissionError.id,
+            new Map(
+              macroPermissionError.generate({
+                expected: TwitchBadgeLevel.MODERATOR,
+                found: twitchBadgeLevel,
+              })
+            ),
+          ],
+        ]),
+        messageId: generalUserPermissionError.id,
       };
     }
 

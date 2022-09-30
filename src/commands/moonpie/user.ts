@@ -12,13 +12,12 @@ import {
   moonpieUserDelete,
   moonpieUserGet,
   moonpieUserNeverClaimedError,
-  moonpieUserPermissionError,
   moonpieUserSet,
   moonpieUserSetNaNError,
 } from "../../strings/moonpie/user";
 import {
   parseTwitchBadgeLevel,
-  TwitchBadgeLevels,
+  TwitchBadgeLevel,
 } from "../../other/twitchBadgeParser";
 import {
   regexMoonpieChatHandlerCommandUserAdd,
@@ -27,6 +26,8 @@ import {
   regexMoonpieChatHandlerCommandUserRemove,
   regexMoonpieChatHandlerCommandUserSet,
 } from "../../info/regex";
+import { generalUserPermissionError } from "../../strings/general";
+import { macroPermissionError } from "../../messageParser/macros/general";
 import moonpieDb from "../../database/moonpieDb";
 // Type imports
 import type {
@@ -150,12 +151,23 @@ export const commandSet: TwitchChatCommandHandler<
 > = {
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
-    if (twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER) {
+    if (twitchBadgeLevel < TwitchBadgeLevel.BROADCASTER) {
       return {
-        isError: true,
-        messageId: moonpieUserPermissionError.id,
+        additionalMacros: new Map([
+          [
+            macroPermissionError.id,
+            new Map(
+              macroPermissionError.generate({
+                expected: TwitchBadgeLevel.BROADCASTER,
+                found: twitchBadgeLevel,
+              })
+            ),
+          ],
+        ]),
+        messageId: generalUserPermissionError.id,
       };
     }
+
     const macros = new Map();
     macros.set(
       macroMoonpieUser.id,
@@ -329,10 +341,20 @@ export const commandDelete: TwitchChatCommandHandler<
 > = {
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
-    if (twitchBadgeLevel !== TwitchBadgeLevels.BROADCASTER) {
+    if (twitchBadgeLevel < TwitchBadgeLevel.BROADCASTER) {
       return {
-        isError: true,
-        messageId: moonpieUserPermissionError.id,
+        additionalMacros: new Map([
+          [
+            macroPermissionError.id,
+            new Map(
+              macroPermissionError.generate({
+                expected: TwitchBadgeLevel.BROADCASTER,
+                found: twitchBadgeLevel,
+              })
+            ),
+          ],
+        ]),
+        messageId: generalUserPermissionError.id,
       };
     }
 

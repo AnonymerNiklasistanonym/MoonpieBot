@@ -640,13 +640,6 @@ export const osuBeatmapRequestIrcDetailed: StringEntry = {
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_DETAILED`,
 };
 
-export const osuBeatmapRequestPermissionError: StringEntry = {
-  default: createMessageForMessageParser([
-    "You are not a broadcaster and thus are not allowed to use this command!",
-  ]),
-  id: `${OSU_BEATMAP_REQUEST_STRING_ID}_PERMISSION_ERROR`,
-};
-
 export const osuBeatmapRequestNoRequestsError: StringEntry = {
   default: createMessageForMessageParser([
     "No previous beatmap request was found!",
@@ -768,7 +761,6 @@ export const osuBeatmapRequests: StringEntry[] = [
   osuBeatmapRequestNotMeetingDemands,
   osuBeatmapRequestNoRedeem,
   osuBeatmapRequestNoRequestsError,
-  osuBeatmapRequestPermissionError,
   osuBeatmapRequestRefDetailedStats,
   osuBeatmapRequestRefIrcRequestString,
   osuBeatmapRequestRefTopScore,

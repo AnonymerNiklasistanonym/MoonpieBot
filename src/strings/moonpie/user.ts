@@ -68,12 +68,6 @@ export const moonpieUserNeverClaimedError: StringEntry = {
   ]),
   id: `${MOONPIE_USER_STRING_ID}_NEVER_CLAIMED_ERROR`,
 };
-export const moonpieUserPermissionError: StringEntry = {
-  default: createMessageForMessageParser([
-    "You are not a broadcaster and thus are not allowed to use this command!",
-  ]),
-  id: `${MOONPIE_USER_STRING_ID}_PERMISSION_ERROR`,
-};
 export const moonpieUserSetNaNError: StringEntry = {
   default: createMessageForMessageParser([
     "The given moonpie count (",
@@ -162,7 +156,6 @@ export const moonpieUserDelete: StringEntry = {
 export const moonpieUser: StringEntry[] = [
   moonpieUserGet,
   moonpieUserNeverClaimedError,
-  moonpieUserPermissionError,
   moonpieUserSetNaNError,
   moonpieUserSet,
   moonpieUserDelete,

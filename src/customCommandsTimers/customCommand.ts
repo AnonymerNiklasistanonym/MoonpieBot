@@ -3,7 +3,7 @@ import { createLogFunc, typeGuardLog } from "../logging";
 import { fileExists, readJsonFile } from "../other/fileOperations";
 import {
   parseTwitchBadgeLevel,
-  TwitchBadgeLevels,
+  TwitchBadgeLevel,
 } from "../other/twitchBadgeParser";
 import { messageParser } from "../messageParser";
 // Type imports
@@ -330,14 +330,14 @@ export const getCustomCommand = (
       // Check if the user is allowed to run the command (level)
       if (customCommand.userLevel !== undefined) {
         switch (parseTwitchBadgeLevel(tags)) {
-          case TwitchBadgeLevels.BROADCASTER:
+          case TwitchBadgeLevel.BROADCASTER:
             break;
-          case TwitchBadgeLevels.MODERATOR:
+          case TwitchBadgeLevel.MODERATOR:
             if (customCommand.userLevel === "broadcaster") {
               return false;
             }
             break;
-          case TwitchBadgeLevels.VIP:
+          case TwitchBadgeLevel.VIP:
             if (
               customCommand.userLevel === "broadcaster" ||
               customCommand.userLevel === "mod"
@@ -345,7 +345,7 @@ export const getCustomCommand = (
               return false;
             }
             break;
-          case TwitchBadgeLevels.NONE:
+          case TwitchBadgeLevel.NONE:
             if (
               customCommand.userLevel === "broadcaster" ||
               customCommand.userLevel === "mod" ||
