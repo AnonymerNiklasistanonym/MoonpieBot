@@ -1,5 +1,5 @@
 // Local imports
-import { osuRequestsConfigTable, versionCurrent } from "./info";
+import { spotifyConfigTable, versionCurrent } from "./info";
 import { genericSetupDatabase } from "../generic/setup";
 import { getVersionFromObject } from "../../version";
 // Type imports
@@ -17,7 +17,7 @@ export const setup = async (
 ): Promise<void> =>
   genericSetupDatabase(
     databasePath,
-    [osuRequestsConfigTable],
+    [spotifyConfigTable],
     [],
     versionCurrent,
     {

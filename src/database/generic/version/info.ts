@@ -31,3 +31,9 @@ export const versionTable: SqliteTable<"major" | "minor" | "patch"> = {
 export enum DbVersionRequestError {
   NOT_FOUND = "VERSION_NOT_FOUND",
 }
+
+export interface DbVersionInfo {
+  major: number;
+  minor: number;
+  patch: number;
+}

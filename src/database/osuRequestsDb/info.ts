@@ -4,7 +4,7 @@ import db from "sqlite3-promise-query-api";
 import type { SqliteTable } from "sqlite3-promise-query-api";
 
 /**
- * The SQLite table for osu requests configurations.
+ * The SQLite table for osu requests configuration information.
  */
 export const osuRequestsConfigTable: SqliteTable<
   "option" | "optionValue" | "twitchChannel"
@@ -35,9 +35,9 @@ export const versionCurrent = {
   patch: 1,
 };
 
-/** Errors that can happen during moonpie requests. */
+/** Errors that can happen during requests. */
 export enum OsuRequestsDbError {
-  NOT_EXISTING = "OSU_REQUESTS_NOT_EXISTING",
-  NOT_FOUND = "OSU_REQUESTS_NOT_FOUND",
-  NO_ACCESS = "OSU_REQUESTS_NO_ACCESS",
+  NOT_EXISTING = "OSU_REQUESTS_CONFIG_NOT_EXISTING",
+  NOT_FOUND = "OSU_REQUESTS_CONFIG_NOT_FOUND",
+  NO_ACCESS = "OSU_REQUESTS_CONFIG_NO_ACCESS",
 }
