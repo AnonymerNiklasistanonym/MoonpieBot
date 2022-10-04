@@ -3,10 +3,17 @@ import { createLogFunc } from "./logging";
 import { createParseTree } from "./messageParser/createParseTree";
 import { parseTreeNode } from "./messageParser/parseTreeNode";
 // Type imports
-import type { MacroMap, MessageParserMacro } from "./messageParser/macros";
-import type { MessageParserPlugin, PluginMap } from "./messageParser/plugins";
 import type { Logger } from "winston";
+import type { MacroMap } from "./messageParser/macros";
+import type { PluginMap } from "./messageParser/plugins";
 import type { StringMap } from "./strings";
+// Local exports
+export { defaultMacros, generateMacroMap } from "./messageParser/macros";
+export {
+  defaultPlugins,
+  generatePlugin,
+  generatePluginMap,
+} from "./messageParser/plugins";
 // Type exports
 export type {
   MessageParserMacroDocumentation,
@@ -71,26 +78,4 @@ export const messageParserById = async (
     throw Error(`Message string could not be found via its ID '${stringId}'`);
   }
   return await messageParser(stringFromId, strings, plugins, macros, logger);
-};
-
-// TODO Think about if this is actually necessary
-
-export interface MacroPluginMap {
-  macroMap: MacroMap;
-  pluginMap: PluginMap;
-}
-
-export const generateMacroPluginMap = (
-  plugins: MessageParserPlugin[],
-  macros: MessageParserMacro[]
-): MacroPluginMap => {
-  const pluginsMap: PluginMap = new Map();
-  for (const plugin of plugins) {
-    pluginsMap.set(plugin.id, plugin.func);
-  }
-  const macrosMap: MacroMap = new Map();
-  for (const macro of macros) {
-    macrosMap.set(macro.id, macro.values);
-  }
-  return { macroMap: macrosMap, pluginMap: pluginsMap };
 };

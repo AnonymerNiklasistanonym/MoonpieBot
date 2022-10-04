@@ -162,3 +162,13 @@ export const defaultPluginsOptional: MessageParserPluginInfo[] = [
   ...pluginsCustomCommandDataGenerator.map(generatePluginInfo),
   ...pluginsTwitchApiGenerator.map(generatePluginInfo),
 ];
+
+export const generatePluginMap = (
+  plugins: MessageParserPlugin[]
+): PluginMap => {
+  const pluginsMap: PluginMap = new Map();
+  for (const plugin of plugins) {
+    pluginsMap.set(plugin.id, plugin.func);
+  }
+  return pluginsMap;
+};

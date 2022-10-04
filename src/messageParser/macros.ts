@@ -122,3 +122,11 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
     macroPermissionError,
     macroSpotifySong
   );
+
+export const generateMacroMap = (macros: MessageParserMacro[]): MacroMap => {
+  const macrosMap: MacroMap = new Map();
+  for (const macro of macros) {
+    macrosMap.set(macro.id, macro.values);
+  }
+  return macrosMap;
+};

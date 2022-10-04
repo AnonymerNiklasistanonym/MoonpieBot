@@ -17,7 +17,13 @@ import {
   runTwitchCommandHandler,
   TwitchClientListener,
 } from "./twitch";
-import { defaultPlugins, generatePlugin } from "./messageParser/plugins";
+import {
+  defaultMacros,
+  defaultPlugins,
+  generateMacroMap,
+  generatePlugin,
+  generatePluginMap,
+} from "./messageParser";
 import {
   defaultStringMap,
   updateStringsMapWithCustomEnvStrings,
@@ -45,8 +51,6 @@ import {
   pluginsCustomCommandGenerator,
 } from "./messageParser/plugins/customCommand";
 import { createLogFunc } from "./logging";
-import { defaultMacros } from "./messageParser/macros";
-import { generateMacroPluginMap } from "./messageParser";
 import { getVersionFromObject } from "./version";
 import { macroOsuApi } from "./messageParser/macros/osuApi";
 import { moonpieChatHandler } from "./commands/moonpie";
@@ -383,9 +387,10 @@ export const main = async (
     defaultStringMap,
     logger
   );
-  const macroPluginMap = generateMacroPluginMap(defaultPlugins, defaultMacros);
+  const macroMap = generateMacroMap(defaultMacros);
+  const pluginMap = generatePluginMap(defaultPlugins);
   if (osuApiDefaultId) {
-    macroPluginMap.macroMap.set(
+    macroMap.set(
       macroOsuApi.id,
       new Map(macroOsuApi.generate({ osuApiDefaultId }))
     );
@@ -398,7 +403,7 @@ export const main = async (
           clientSecret: osuApiClientSecret,
         },
       });
-      macroPluginMap.pluginMap.set(pluginReady.id, pluginReady.func);
+      pluginMap.set(pluginReady.id, pluginReady.func);
     });
   }
   const temp = osuStreamCompanionCurrentMapData;
@@ -407,17 +412,14 @@ export const main = async (
       const pluginReady = generatePlugin(plugin, {
         streamCompanionDataFunc: temp,
       });
-      macroPluginMap.pluginMap.set(pluginReady.id, pluginReady.func);
+      pluginMap.set(pluginReady.id, pluginReady.func);
     });
   }
   if (spotifyWebApi !== undefined) {
     const pluginSpotifyReady = generatePlugin(pluginSpotifyGenerator, {
       spotifyWebApi,
     });
-    macroPluginMap.pluginMap.set(
-      pluginSpotifyReady.id,
-      pluginSpotifyReady.func
-    );
+    pluginMap.set(pluginSpotifyReady.id, pluginSpotifyReady.func);
   }
 
   // Connect functionality to Twitch connection triggers
@@ -470,8 +472,8 @@ export const main = async (
         return;
       }
 
-      const pluginMapChannel = new Map(macroPluginMap.pluginMap);
-      const macroMapChannel = new Map(macroPluginMap.macroMap);
+      const pluginMapChannel = new Map(pluginMap);
+      const macroMapChannel = new Map(macroMap);
       const tempTwitchApiClient = twitchApiClient;
       if (tempTwitchApiClient !== undefined) {
         pluginsTwitchApiGenerator.forEach((a) => {
@@ -688,8 +690,8 @@ export const main = async (
         customTimer.message,
         customTimer.cronString,
         stringMap,
-        macroPluginMap.pluginMap,
-        macroPluginMap.macroMap,
+        pluginMap,
+        macroMap,
         logger
       );
     }

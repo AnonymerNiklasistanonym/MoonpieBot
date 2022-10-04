@@ -1,5 +1,9 @@
 // Local imports
-import { generateMacroPluginMap, messageParser } from "../messageParser";
+import {
+  generateMacroMap,
+  generatePluginMap,
+  messageParser,
+} from "../messageParser";
 import { FileDocumentationPartType } from "../other/splitTextAtLength";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
@@ -96,9 +100,8 @@ export const generatePluginAndMacroDocumentation = async (
   optionalMacros: undefined | MessageParserMacroDocumentation[],
   logger: Logger
 ): Promise<FileDocumentationParts[]> => {
-  const maps = generateMacroPluginMap(plugins, macros);
-  const pluginsMap = maps.pluginMap;
-  const macrosMap = maps.macroMap;
+  const pluginsMap = generatePluginMap(plugins);
+  const macrosMap = generateMacroMap(macros);
   const output: FileDocumentationParts[] = [];
   output.push({
     title: "Supported Plugins",
