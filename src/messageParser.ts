@@ -1171,7 +1171,9 @@ export const generatePluginAndMacroDocumentation = async (
             }),
           ],
         ]);
-        for (const [key] of macroValues) {
+        for (const key of macroValues
+          .map((a) => a[0])
+          .sort(genericStringSorter)) {
           const macroString = `%${optionalMacro.id}:${key}%`;
           const extendedMacroMap = new Map([
             ...macrosMap,
@@ -1191,7 +1193,7 @@ export const generatePluginAndMacroDocumentation = async (
           macroListKeys,
         ]);
       } else {
-        for (const key of optionalMacro.keys) {
+        for (const key of optionalMacro.keys.sort(genericStringSorter)) {
           const macroString = `%${optionalMacro.id}:${key}%`;
           macroListKeys.push(`"${macroString}"`);
         }
