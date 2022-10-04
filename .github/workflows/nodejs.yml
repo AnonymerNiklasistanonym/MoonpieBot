@@ -35,12 +35,11 @@ jobs:
         include:
           - os: ubuntu-latest
             os-name: linux
-            binary-name: ${{ env.APPLICATION_NAME }}
-            man-page-name: ${{ env.APPLICATION_NAME }}-man.1
+            binary-postfix-man: -man.1
           - os: windows-latest
             os-name: windows
-            binary-name: ${{ env.APPLICATION_NAME }}.exe
-            binary-name-installer: ${{ env.APPLICATION_NAME }}_setup.exe
+            binary-postfix: .exe
+            binary-postfix-installer: _setup.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -84,7 +83,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{ env.APPLICATION_NAME }}-${{ matrix.os-name }}-node-${{ matrix.node-version }}
-        path: bin/${{ matrix.binary-name }}
+        path: bin/${{ env.APPLICATION_NAME }}${{ matrix.binary-postfix }}
         retention-days: 7
         if-no-files-found: error
     - name: Create binary installer (Windows)
@@ -96,19 +95,19 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{ env.APPLICATION_NAME }}-installer-${{ matrix.os-name }}-node-${{ matrix.node-version }}
-        path: bin/${{ matrix.binary-name-installer }}
+        path: bin/${{ env.APPLICATION_NAME }}${{ matrix.binary-postfix-installer }}
         retention-days: 7
         if-no-files-found: error
     - name: Create man page (Linux)
       if: matrix.os == 'ubuntu-latest'
-      run: pandoc "man.md" -s -t man -o "${{ matrix.man-page-name }}"
+      run: pandoc "man.md" -s -t man -o "${{ env.APPLICATION_NAME }}${{ matrix.binary-postfix-man }}"
       working-directory: installer
     - name: Save man page (Linux)
       if: matrix.os == 'ubuntu-latest' && (contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v'))
       uses: actions/upload-artifact@v3
       with:
         name: ${{ env.APPLICATION_NAME }}-man-page
-        path: installer/${{ matrix.man-page-name }}
+        path: installer/${{ env.APPLICATION_NAME }}${{ matrix.binary-postfix-man }}
         retention-days: 7
         if-no-files-found: error
 
