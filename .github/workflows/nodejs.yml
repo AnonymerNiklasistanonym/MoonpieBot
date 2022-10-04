@@ -74,7 +74,7 @@ jobs:
       run: npm run create
     - name: Create binary release
       run: npm run package:${{ matrix.os-name }}
-    - name: Save binary artifact [binary]
+    - name: Save binary release
       if: contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v')
       uses: actions/upload-artifact@v3
       with:
@@ -82,11 +82,11 @@ jobs:
         path: bin/${{ matrix.binary-name }}
         retention-days: 7
         if-no-files-found: error
-    - name: Create installer (Windows)
+    - name: Create binary installer (Windows)
       if: matrix.os == 'windows-latest'
       run: makensis .\windows_installer.nsi
       working-directory: .\installer\windows_installer
-    - name: Save binary artifact [binary+installer] (Windows)
+    - name: Save binary installer (Windows)
       if: matrix.os == 'windows-latest' && (contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v'))
       uses: actions/upload-artifact@v3
       with:
