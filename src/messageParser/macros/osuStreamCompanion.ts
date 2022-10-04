@@ -27,10 +27,29 @@ export interface MacroOsuStreamCompanionCurrentMapWebSocketData {
 }
 export const macroOsuStreamCompanionCurrentMapWebSocket: MessageParserMacroGenerator<MacroOsuStreamCompanionCurrentMapWebSocketData> =
   {
+    exampleData: {
+      currentMap: {
+        artistRoman: "UNDEAD CORPORATION",
+        diffName: "Easy",
+        mAR: 4.5,
+        mBpm: "193-215 (200)",
+        mCS: 2.5,
+        mHP: 3,
+        mOD: 3,
+        mStars: 2.068,
+        mapid: 2151824,
+        mapsetid: 1019827,
+        maxCombo: 773,
+        mods: "None",
+        titleRoman: "Sad Dream",
+        type: "websocket",
+      },
+    },
     generate: (data) =>
       Object.values(MacroOsuStreamCompanionCurrentMapWebSocket).map<
         [MacroOsuStreamCompanionCurrentMapWebSocket, string]
       >((macroId) => {
+        //console.log(data);
         let macroValue;
         switch (macroId) {
           case MacroOsuStreamCompanionCurrentMapWebSocket.ARTIST_ROMAN:
@@ -101,10 +120,20 @@ export interface MacroOsuStreamCompanionCurrentMapFileData {
 }
 export const macroOsuStreamCompanionCurrentMapFile: MessageParserMacroGenerator<MacroOsuStreamCompanionCurrentMapFileData> =
   {
+    exampleData: {
+      currentMap: {
+        currentMods: "None",
+        npAll: "UNDEAD CORPORATION - Sad Dream [Easy] CS:2,5 AR:4,5 OD:3 HP:3",
+        npPlayingDetails: "",
+        npPlayingDl: "http://osu.ppy.sh/b/2151824",
+        type: "file",
+      },
+    },
     generate: (data) =>
       Object.values(MacroOsuStreamCompanionCurrentMapFile).map<
         [MacroOsuStreamCompanionCurrentMapFile, string]
       >((macroId) => {
+        //console.log(data);
         let macroValue;
         switch (macroId) {
           case MacroOsuStreamCompanionCurrentMapFile.NP_ALL:
