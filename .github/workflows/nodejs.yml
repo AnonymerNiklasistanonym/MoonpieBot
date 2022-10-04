@@ -15,6 +15,11 @@ on:
   pull_request:
     branches: [ main, dev ]
 
+env:
+  # The name of the application
+  APPLICATION_NAME: moonpiebot
+
+
 jobs:
 
 
@@ -30,12 +35,12 @@ jobs:
         include:
           - os: ubuntu-latest
             os-name: linux
-            binary-name: moonpiebot
-            man-page-name: moonpiebot-man.1
+            binary-name: ${{ env.APPLICATION_NAME }}
+            man-page-name: ${{ env.APPLICATION_NAME }}-man.1
           - os: windows-latest
             os-name: windows
-            binary-name: moonpiebot.exe
-            binary-name-installer: moonpiebot_setup.exe
+            binary-name: ${{ env.APPLICATION_NAME }}.exe
+            binary-name-installer: ${{ env.APPLICATION_NAME }}_setup.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -78,7 +83,7 @@ jobs:
       if: contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v')
       uses: actions/upload-artifact@v3
       with:
-        name: moonpiebot-${{ matrix.os-name }}-node-${{ matrix.node-version }}
+        name: ${{ env.APPLICATION_NAME }}-${{ matrix.os-name }}-node-${{ matrix.node-version }}
         path: bin/${{ matrix.binary-name }}
         retention-days: 7
         if-no-files-found: error
@@ -90,7 +95,7 @@ jobs:
       if: matrix.os == 'windows-latest' && (contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v'))
       uses: actions/upload-artifact@v3
       with:
-        name: moonpiebot-installer-${{ matrix.os-name }}-node-${{ matrix.node-version }}
+        name: ${{ env.APPLICATION_NAME }}-installer-${{ matrix.os-name }}-node-${{ matrix.node-version }}
         path: bin/${{ matrix.binary-name-installer }}
         retention-days: 7
         if-no-files-found: error
@@ -102,7 +107,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest' && (contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v'))
       uses: actions/upload-artifact@v3
       with:
-        name: moonpiebot-man-page
+        name: ${{ env.APPLICATION_NAME }}-man-page
         path: installer/${{ matrix.man-page-name }}
         retention-days: 7
         if-no-files-found: error
@@ -127,8 +132,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v3
-    - run: ls
-    - run: ls "moonpiebot-installer-windows-node-18.x"
     - name: Rename downloaded artifacts for release
       shell: pwsh
       working-directory: "scripts"
@@ -142,7 +145,7 @@ jobs:
          title: "${{ github.ref_name }}"
          files: |
            bin/github_action_binaries/*
-           res/icons/moonpiebot.ico
-           res/icons/moonpiebot.png
-           res/icons/moonpiebot.svg
+           res/icons/${{ env.APPLICATION_NAME }}.ico
+           res/icons/${{ env.APPLICATION_NAME }}.png
+           res/icons/${{ env.APPLICATION_NAME }}.svg
            installer/PKGBUILD*
