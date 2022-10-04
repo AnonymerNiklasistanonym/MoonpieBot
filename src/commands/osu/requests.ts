@@ -58,7 +58,7 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
   CommandBeatmapRequestsDetectorInput,
   CommandBeatmapRequestsDetectorOutput
 > = {
-  createReply: async (channel, tags, data, logger) => {
+  createReply: async (_channel, tags, data, logger) => {
     if (data.osuApiDbPath === undefined) {
       throw errorMessageOsuApiDbPathUndefined();
     }
@@ -82,7 +82,6 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           data.osuApiDbPath,
           {
-            channel,
             option: OsuRequestsConfig.MESSAGE_OFF,
             optionValue:
               data.beatmapRequestsOnOffMessage !== undefined
@@ -107,7 +106,6 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
         await osuRequestsDb.requests.osuRequestsConfig.removeEntry(
           data.osuApiDbPath,
           {
-            channel,
             option: OsuRequestsConfig.MESSAGE_OFF,
           },
           logger
@@ -115,7 +113,6 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           data.osuApiDbPath,
           {
-            channel,
             option: OsuRequestsConfig.MESSAGE_ON,
             optionValue:
               data.beatmapRequestsOnOffMessage !== undefined
@@ -141,7 +138,6 @@ export const commandBeatmapRequests: TwitchChatCommandHandler<
         const osuRequestsConfigEntries =
           await osuRequestsDb.requests.osuRequestsConfig.getEntries(
             data.osuApiDbPath,
-            channel,
             logger
           );
         if (
@@ -312,7 +308,7 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
   CommandBeatmapRequestsSetUnsetDetectorInput,
   CommandBeatmapRequestsSetUnsetDetectorOutput
 > = {
-  createReply: async (channel, tags, data, logger) => {
+  createReply: async (_channel, tags, data, logger) => {
     if (data.osuApiDbPath === undefined) {
       throw errorMessageOsuApiDbPathUndefined();
     }
@@ -346,7 +342,6 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           data.osuApiDbPath,
           {
-            channel,
             option,
             optionValue: validateSetValue(
               option,
@@ -360,7 +355,6 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
         await osuRequestsDb.requests.osuRequestsConfig.removeEntry(
           data.osuApiDbPath,
           {
-            channel,
             option,
           },
           logger
@@ -370,7 +364,6 @@ export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
     const osuRequestsConfigEntries =
       await osuRequestsDb.requests.osuRequestsConfig.getEntries(
         data.osuApiDbPath,
-        channel,
         logger
       );
 

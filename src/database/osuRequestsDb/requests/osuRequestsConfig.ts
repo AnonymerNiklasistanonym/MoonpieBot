@@ -22,7 +22,6 @@ export enum OsuRequestsConfig {
 // -----------------------------------------------------------------------------
 
 export interface ExistsInput {
-  channel: string;
   option: OsuRequestsConfig;
 }
 
@@ -47,12 +46,9 @@ export const existsEntry = async (
       // The warning makes literally no sense
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       db.queries.exists(osuRequestsConfigTable.name, {
-        and: {
-          columnName: osuRequestsConfigTable.columns.option.name,
-        },
-        columnName: osuRequestsConfigTable.columns.twitchChannel.name,
+        columnName: osuRequestsConfigTable.columns.option.name,
       }),
-      [input.channel, input.option],
+      [input.option],
       logMethod
     );
     if (runResultExists) {
@@ -68,7 +64,6 @@ export const existsEntry = async (
 // -----------------------------------------------------------------------------
 
 export interface CreateInput {
-  channel: string;
   option: OsuRequestsConfig;
   optionValue: string;
 }
@@ -91,11 +86,10 @@ export const createEntry = async (
   const postResult = await db.requests.post(
     databasePath,
     db.queries.insert(osuRequestsConfigTable.name, [
-      osuRequestsConfigTable.columns.twitchChannel.name,
       osuRequestsConfigTable.columns.option.name,
       osuRequestsConfigTable.columns.optionValue.name,
     ]),
-    [input.channel, input.option, input.optionValue],
+    [input.option, input.optionValue],
     logMethod
   );
   return postResult.lastID;
@@ -109,7 +103,6 @@ export const createOrUpdateEntry = async (
   const exists = await existsEntry(
     databasePath,
     {
-      channel: input.channel,
       option: input.option,
     },
     logger
@@ -125,7 +118,6 @@ export const createOrUpdateEntry = async (
 // -----------------------------------------------------------------------------
 
 export interface RemoveInput {
-  channel: string;
   option: OsuRequestsConfig;
 }
 
@@ -147,12 +139,9 @@ export const removeEntry = async (
   const postResult = await db.requests.post(
     databasePath,
     db.queries.remove(osuRequestsConfigTable.name, {
-      and: {
-        columnName: osuRequestsConfigTable.columns.option.name,
-      },
-      columnName: osuRequestsConfigTable.columns.twitchChannel.name,
+      columnName: osuRequestsConfigTable.columns.option.name,
     }),
-    [input.channel, input.option],
+    [input.option],
     logMethod
   );
   return postResult.changes > 0;
@@ -171,7 +160,6 @@ export interface GetOsuRequestsConfigOut extends GetOsuRequestsConfigDbOut {}
 
 export const getEntries = async (
   databasePath: string,
-  twitchChannel: string,
   logger: Logger
 ): Promise<GetOsuRequestsConfigOut[]> => {
   const logMethod = createLogMethod(
@@ -181,25 +169,17 @@ export const getEntries = async (
 
   const runResult = await db.requests.getAll<GetOsuRequestsConfigDbOut>(
     databasePath,
-    db.queries.select(
-      osuRequestsConfigTable.name,
-      [
-        {
-          alias: "option",
-          columnName: osuRequestsConfigTable.columns.option.name,
-        },
-        {
-          alias: "optionValue",
-          columnName: osuRequestsConfigTable.columns.optionValue.name,
-        },
-      ],
+    db.queries.select(osuRequestsConfigTable.name, [
       {
-        whereColumns: {
-          columnName: osuRequestsConfigTable.columns.twitchChannel.name,
-        },
-      }
-    ),
-    [twitchChannel],
+        alias: "option",
+        columnName: osuRequestsConfigTable.columns.option.name,
+      },
+      {
+        alias: "optionValue",
+        columnName: osuRequestsConfigTable.columns.optionValue.name,
+      },
+    ]),
+    undefined,
     logMethod
   );
   if (runResult) {
@@ -212,7 +192,6 @@ export const getEntries = async (
 // -----------------------------------------------------------------------------
 
 export interface UpdateInput {
-  channel: string;
   option: OsuRequestsConfig;
   optionValue: string;
 }
@@ -225,31 +204,21 @@ export const updateEntry = async (
   const logMethod = createLogMethod(logger, "database_update");
   // Special validations for DB entry request
   // > Check if entry already exists
-  if (
-    (await existsEntry(
-      databasePath,
-      { channel: input.channel, option: input.option },
-      logger
-    )) === false
-  ) {
+  if ((await existsEntry(databasePath, input, logger)) === false) {
     throw Error(OsuRequestsDbError.NOT_EXISTING);
   }
 
   const columns = [
-    osuRequestsConfigTable.columns.twitchChannel.name,
     osuRequestsConfigTable.columns.option.name,
     osuRequestsConfigTable.columns.optionValue.name,
   ];
-  const values = [input.channel, input.option, input.optionValue];
+  const values = [input.option, input.optionValue];
   const postResult = await db.requests.post(
     databasePath,
     db.queries.update(osuRequestsConfigTable.name, columns, {
-      and: {
-        columnName: osuRequestsConfigTable.columns.option.name,
-      },
-      columnName: osuRequestsConfigTable.columns.twitchChannel.name,
+      columnName: osuRequestsConfigTable.columns.option.name,
     }),
-    [...values, input.channel, input.option],
+    [...values, input.option],
     logMethod
   );
   return postResult.changes;

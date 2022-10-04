@@ -215,7 +215,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
   CommandBeatmapDetectorInputExtra,
   CommandBeatmapDetectorOutput
 > = {
-  createReply: async (channel, tags, data, logger) => {
+  createReply: async (_channel, tags, data, logger) => {
     if (data.osuApiV2Credentials === undefined) {
       throw errorMessageOsuApiCredentialsUndefined();
     }
@@ -250,7 +250,6 @@ export const commandBeatmap: TwitchChatCommandHandler<
     const osuRequestsConfigEntries =
       await osuRequestsDb.requests.osuRequestsConfig.getEntries(
         data.osuApiDbPath,
-        channel,
         logger
       );
 

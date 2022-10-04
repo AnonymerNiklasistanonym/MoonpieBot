@@ -10,7 +10,7 @@ import type { SqliteTable, SqliteView } from "sqlite3-promise-query-api";
  * of the Twitch account.
  */
 export const moonpieTable: SqliteTable<
-  "date" | "moonpieCount" | "twitchId" | "twitchName" /*| "twitchChannel"*/
+  "date" | "moonpieCount" | "twitchId" | "twitchName"
 > = {
   columns: {
     /** The timestamp at the last time of the claim (for time based claims). */
@@ -25,12 +25,6 @@ export const moonpieTable: SqliteTable<
       options: { notNull: true },
       type: db.queries.CreateTableColumnType.INTEGER,
     },
-    ///** The twitch channel for which this count is active. */
-    //twitchChannel: {
-    //  name: "channel",
-    //  options: { notNull: true, primaryKey: true },
-    //  type: db.queries.CreateTableColumnType.TEXT,
-    //},
     /** The *unique* Twitch ID. */
     twitchId: {
       name: "id",
@@ -106,7 +100,7 @@ export const versionCurrent = {
   patch: 1,
 };
 
-/** Errors that can happen during moonpie requests. */
+/** Errors that can happen during requests. */
 export enum MoonpieDbError {
   ALREADY_EXISTS = "MOONPIE_ALREADY_EXISTS",
   NOT_EXISTING = "MOONPIE_NOT_EXISTING",
