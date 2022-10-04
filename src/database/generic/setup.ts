@@ -13,12 +13,12 @@ import type { Logger } from "winston";
 // TODO Make the setup step a generic method
 
 export interface SetupDatabaseOptions {
-  /** TODO. Is undefined if no version was found. */
+  /** Handle database version migrations. */
   migrateVersion?: (
     oldVersion: DbVersionInfo | undefined,
     currentVersion: DbVersionInfo
   ) => void | Promise<void>;
-  /** TODO. */
+  /** Setup initial data when the database is created. */
   setupInitialData?: () => void | Promise<void>;
 }
 

@@ -35,6 +35,9 @@ export const setup = async (
           },current=${getVersionFromObject(currentVersion, "")})!`
         );
       },
+      setupInitialData: () => {
+        // TODO Write examples to the database (at least for commands)
+      },
     },
     logger
   );

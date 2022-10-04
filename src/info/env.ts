@@ -42,6 +42,7 @@ export enum EnvVariableNone {
  * Environment variables.
  */
 export enum EnvVariable {
+  CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH = "CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH",
   LOGGING_CONSOLE_LOG_LEVEL = "LOGGING_CONSOLE_LOG_LEVEL",
   LOGGING_DIRECTORY_PATH = "LOGGING_DIRECTORY_PATH",
   LOGGING_FILE_LOG_LEVEL = "LOGGING_FILE_LOG_LEVEL",
@@ -84,6 +85,7 @@ export const ENV_LIST_SPLIT_CHARACTER = ",";
  * The order is important.
  */
 export enum EnvVariableBlock {
+  CUSTOM_COMMANDS_BROADCASTS = "CUSTOM_COMMANDS_BROADCASTS",
   LOGGING = "LOGGING",
   MOONPIE = "MOONPIE",
   OSU = "OSU",
@@ -116,6 +118,19 @@ export interface EnvVariableData
  * ENV variable information.
  */
 export const envVariableInformation: EnvVariableData[] = [
+  {
+    block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
+    default: (configDir) =>
+      path.relative(
+        configDir,
+        path.join(configDir, "customCommandsBroadcasts.db")
+      ),
+    defaultValue: (configDir) =>
+      path.resolve(path.join(configDir, "customCommandsBroadcasts.db")),
+    description:
+      "The database file path that contains the persistent custom commands and broadcasts data.",
+    name: EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH,
+  },
   {
     block: EnvVariableBlock.LOGGING,
     default: "info",
@@ -442,9 +457,14 @@ export const envVariableStructure: EnvVariableStructureElement[] = [
     name: "SPOTIFY API",
   },
   {
+    block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
+    description: "Optional configurations for custom commands and broadcasts.",
+    name: "CUSTOM COMMANDS & BROADCASTS",
+  },
+  {
     block: EnvVariableBlock.TWITCH_API,
     description:
       "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
-    name: "Twitch API",
+    name: "TWITCH API",
   },
 ];

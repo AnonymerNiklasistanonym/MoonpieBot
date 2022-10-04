@@ -51,6 +51,7 @@ import {
   pluginsCustomCommandGenerator,
 } from "./messageParser/plugins/customCommand";
 import { createLogFunc } from "./logging";
+import customCommandsBroadcastsDb from "./database/customCommandsBroadcastsDb";
 import { getVersionFromObject } from "./version";
 import { macroOsuApi } from "./messageParser/macros/osuApi";
 import { moonpieChatHandler } from "./commands/moonpie";
@@ -221,6 +222,14 @@ export const main = async (
   const osuStreamCompanionDirPath = getEnvVariableValueOrUndefined(
     EnvVariable.OSU_STREAM_COMPANION_DIR_PATH
   );
+  // > Custom commands and broadcasts
+  const pathDatabaseCustomCommandsBroadcasts = path.resolve(
+    configDir,
+    getEnvVariableValueOrDefault(
+      EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH,
+      configDir
+    )
+  );
 
   // Initialize global objects
   // Twitch connection
@@ -304,7 +313,7 @@ export const main = async (
 
   // Setup/Migrate/Backup moonpie database
   const setupMigrateBackupMoonpieDatabase = async () => {
-    // Only touch the moonpie database if it will be used
+    // Only touch the database if it will be used
     if (
       moonpieEnableCommands.length > 0 &&
       !(
@@ -326,7 +335,7 @@ export const main = async (
 
   // Setup/Migrate osu!requests database
   const setupMigrateOsuRequestsDatabase = async () => {
-    // Only touch the moonpie database if it will be used
+    // Only touch the database if it will be used
     if (
       enableOsu &&
       osuEnableCommands.length > 0 &&
@@ -338,6 +347,15 @@ export const main = async (
       // Setup database tables (or do nothing if they already exist)
       await osuRequestsDb.setup(pathDatabaseOsuApi, logger);
     }
+  };
+
+  // Setup/Migrate custom commands/broadcasts database
+  const setupMigrateCustomCommandsBroadcastsDatabase = async () => {
+    // Setup database tables (or do nothing if they already exist)
+    await customCommandsBroadcastsDb.setup(
+      pathDatabaseCustomCommandsBroadcasts,
+      logger
+    );
   };
 
   // Setup/Migrate spotify database
@@ -367,6 +385,7 @@ export const main = async (
     loadCustomCommands(),
     loadCustomTimers(),
     setupMigrateBackupMoonpieDatabase(),
+    setupMigrateCustomCommandsBroadcastsDatabase(),
     setupMigrateOsuRequestsDatabase(),
     setupMigrateSpotifyDatabase(),
   ]);
