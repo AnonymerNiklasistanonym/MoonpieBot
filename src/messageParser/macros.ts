@@ -22,6 +22,7 @@ import {
   macroOsuStreamCompanionCurrentMapFile,
   macroOsuStreamCompanionCurrentMapWebSocket,
 } from "./macros/osuStreamCompanion";
+import { macroCommandEnabled } from "./macros/commands";
 import { macroMoonpieBot } from "./macros/moonpiebot";
 import { macroOsuPpRpRequest } from "./macros/osuPpRpRequest";
 import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
@@ -30,6 +31,7 @@ import { macroSpotifySong } from "./macros/spotify";
 // Type imports
 import type { MacroDictionary, MacroDictionaryEntry } from "../messageParser";
 import type { EMPTY_OBJECT } from "../info/other";
+import { macroPermissionError } from "./macros/general";
 
 export interface MessageParserMacroInfo {
   description?: string;
@@ -47,6 +49,8 @@ export interface MessageParserMacroDocumentation
 export interface MessageParserMacroGenerator<
   GENERATE_DATA extends object = EMPTY_OBJECT
 > extends MessageParserMacroDocumentation {
+  /** Example data. */
+  exampleData?: GENERATE_DATA;
   /** Method to generate the macro entries. */
   generate: (data: GENERATE_DATA) => MacroDictionaryEntry[];
 }
@@ -81,6 +85,7 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
   checkMacrosForDuplicates<MessageParserMacroDocumentation>(
     "default-optional",
     macroMoonpieClaim,
+    macroCommandEnabled,
     macroMoonpieLeaderboard,
     macroMoonpieLeaderboardEntry,
     macroMoonpieUser,
@@ -98,5 +103,6 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
     macroOsuStreamCompanionCurrentMapWebSocket,
     macroOsuUser,
     macroOsuWindowTitle,
+    macroPermissionError,
     macroSpotifySong
   );

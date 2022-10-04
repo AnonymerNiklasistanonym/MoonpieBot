@@ -8,7 +8,7 @@ import {
   TwitchBadgeLevel,
 } from "../other/twitchBadgeParser";
 import { generalUserPermissionError } from "../strings/general";
-import { macroPermissionError } from "src/messageParser/macros/general";
+import { macroPermissionError } from "../messageParser/macros/general";
 // Type imports
 import type { ChatUserstate } from "tmi.js";
 import type { TwitchChatCommandHandlerReply } from "./twitchChatCommandHandler";

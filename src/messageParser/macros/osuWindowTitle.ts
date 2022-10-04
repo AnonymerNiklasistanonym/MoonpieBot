@@ -15,6 +15,12 @@ export interface MacroOsuWindowTitleData {
 }
 export const macroOsuWindowTitle: MessageParserMacroGenerator<MacroOsuWindowTitleData> =
   {
+    exampleData: {
+      artist: "RIOT",
+      mapId: 2355511,
+      title: "Disorder (Rebirth)",
+      version: "bryant kumat",
+    },
     generate: (data) =>
       Object.values(MacroOsuWindowTitle).map<[MacroOsuWindowTitle, string]>(
         (macroId) => {
