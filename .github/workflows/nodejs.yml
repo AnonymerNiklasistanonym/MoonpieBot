@@ -75,35 +75,36 @@ jobs:
     - name: Create binary release
       run: npm run package:${{ matrix.os-name }}
     - name: Save binary artifact [binary]
+      if: contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v')
       uses: actions/upload-artifact@v3
       with:
         name: moonpiebot-${{ matrix.os-name }}-node-${{ matrix.node-version }}
         path: bin/${{ matrix.binary-name }}
-        retention-days: 14
+        retention-days: 7
         if-no-files-found: error
     - name: Create installer (Windows)
       if: matrix.os == 'windows-latest'
       run: makensis .\windows_installer.nsi
       working-directory: .\installer\windows_installer
     - name: Save binary artifact [binary+installer] (Windows)
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-latest' && (contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v'))
       uses: actions/upload-artifact@v3
       with:
         name: moonpiebot-installer-${{ matrix.os-name }}-node-${{ matrix.node-version }}
         path: bin/${{ matrix.binary-name-installer }}
-        retention-days: 14
+        retention-days: 7
         if-no-files-found: error
     - name: Create man page (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: pandoc "man.md" -s -t man -o "${{ matrix.man-page-name }}"
       working-directory: installer
     - name: Save man page (Linux)
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest' && (contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v'))
       uses: actions/upload-artifact@v3
       with:
         name: moonpiebot-man-page
         path: installer/${{ matrix.man-page-name }}
-        retention-days: 14
+        retention-days: 7
         if-no-files-found: error
 
 
