@@ -5,12 +5,12 @@ import {
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../messageParser";
+import { createMessageForMessageParser } from "../../documentation/messageParser";
 import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { OSU_STRING_ID } from "../osu";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../messageParser";
+import type { MessageForMessageElementPlugin } from "../../documentation/messageParser";
 import type { StringEntry } from "../../strings";
 
 const OSU_COMMANDS_STRING_ID = `${OSU_STRING_ID}_COMMANDS`;

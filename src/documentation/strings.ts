@@ -4,7 +4,7 @@ import { promises as fs } from "fs";
 import { defaultStringMap } from "../strings";
 import { ENV_STRINGS_VARIABLE_PREFIX } from "../info/env";
 import { generateFileDocumentation } from "../other/splitTextAtLength";
-import { generatePluginAndMacroDocumentation } from "../messageParser";
+import { generatePluginAndMacroDocumentation } from "../documentation/messageParser";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
 import {

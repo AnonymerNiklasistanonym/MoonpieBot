@@ -1,6 +1,6 @@
 // Local imports
 // TODO Move that function to a separate file
-import { createMessageForMessageParser } from "../messageParser";
+import { createMessageForMessageParser } from "../documentation/messageParser";
 import { pluginRandomNumber } from "../messageParser/plugins/general";
 // Type imports
 import type { CustomTimer } from "../customCommandsTimers/customTimer";

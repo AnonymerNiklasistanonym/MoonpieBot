@@ -152,10 +152,7 @@ export const getEntries = async (
   databasePath: string,
   logger: Logger
 ): Promise<GetOsuRequestsConfigDbOut[]> => {
-  const logMethod = createLogMethod(
-    logger,
-    "database_spotify_get_entries"
-  );
+  const logMethod = createLogMethod(logger, "database_spotify_get_entries");
 
   const runResult = await db.requests.getAll<GetOsuRequestsConfigDbOut>(
     databasePath,

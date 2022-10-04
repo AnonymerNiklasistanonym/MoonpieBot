@@ -19,7 +19,7 @@ import {
   pluginRandomNumber,
   pluginTimeInSToHumanReadableStringShort,
 } from "../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../messageParser";
+import { createMessageForMessageParser } from "../documentation/messageParser";
 import { PluginTwitchApi } from "../messageParser/plugins/twitchApi";
 import { PluginTwitchChat } from "../messageParser/plugins/twitchChat";
 // Type imports

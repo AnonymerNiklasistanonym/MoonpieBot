@@ -23,7 +23,7 @@ import {
   pluginIfTrue,
   pluginTimeInSToStopwatchString,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../messageParser";
+import { createMessageForMessageParser } from "../../documentation/messageParser";
 import { OSU_IRC_NEWLINE } from "../../osuIrc";
 import { OSU_STRING_ID } from "../osu";
 import { PluginOsuApi } from "../../messageParser/plugins/osuApi";

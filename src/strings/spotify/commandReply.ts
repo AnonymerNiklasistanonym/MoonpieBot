@@ -3,7 +3,7 @@ import {
   pluginIfFalse,
   pluginIfTrue,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../messageParser";
+import { createMessageForMessageParser } from "../../documentation/messageParser";
 import { macroSpotifySong } from "../../messageParser/macros/spotify";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";

@@ -7,7 +7,7 @@ import {
   MacroMoonpieUserSet,
   macroMoonpieUserSet,
 } from "../../messageParser/macros/moonpie";
-import { createMessageForMessageParser } from "../../messageParser";
+import { createMessageForMessageParser } from "../../documentation/messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { pluginIfNotEqual } from "../../messageParser/plugins/general";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";

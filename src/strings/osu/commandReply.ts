@@ -37,7 +37,7 @@ import {
   pluginIfTrue,
   pluginTimeInSToStopwatchString,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../messageParser";
+import { createMessageForMessageParser } from "../../documentation/messageParser";
 import { OSU_STRING_ID } from "../osu";
 import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
 import { PluginOsuApi } from "../../messageParser/plugins/osuApi";

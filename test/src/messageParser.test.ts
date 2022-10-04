@@ -15,8 +15,7 @@ import {
 import { getTestLogger } from "./logger";
 import { messageParser } from "../../src/messageParser";
 // Type imports
-import type { MacroMap, PluginMap } from "../../src/messageParser";
-import type { PluginFunc } from "../../src/messageParser";
+import type { MacroMap, PluginFunc, PluginMap } from "../../src/messageParser";
 import type { StringMap } from "../../src/strings";
 
 describe("messageParser", () => {

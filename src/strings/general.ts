@@ -3,7 +3,7 @@ import {
   MacroPermissionError,
   macroPermissionError,
 } from "../messageParser/macros/general";
-import { createMessageForMessageParser } from "../messageParser";
+import { createMessageForMessageParser } from "../documentation/messageParser";
 import { PluginTwitchChat } from "../messageParser/plugins/twitchChat";
 // Type imports
 import type { StringEntry } from "../strings";

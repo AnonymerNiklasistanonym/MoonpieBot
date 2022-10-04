@@ -29,9 +29,25 @@ import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
 import { macroOsuWindowTitle } from "./macros/osuWindowTitle";
 import { macroSpotifySong } from "./macros/spotify";
 // Type imports
-import type { MacroDictionary, MacroDictionaryEntry } from "../messageParser";
 import type { EMPTY_OBJECT } from "../info/other";
 import { macroPermissionError } from "./macros/general";
+
+// A macro is a simple text replace dictionary
+export type MacroDictionaryEntry<KEY = string> = [KEY, string];
+export type MacroDictionary = Map<string, string>;
+export type MacroMap = Map<string, MacroDictionary>;
+
+// TODO Move to a better position
+export interface RequestHelp {
+  macros?: boolean;
+  plugins?: boolean;
+  type: "help";
+}
+// TODO Move to a better position
+export interface ExportedMacroInformation {
+  id: string;
+  keys: string[];
+}
 
 export interface MessageParserMacroInfo {
   description?: string;
