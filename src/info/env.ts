@@ -1,9 +1,9 @@
 // Package imports
 import path from "path";
 // Local imports
+import { CustomCommandsBroadcastsCommands, MoonpieCommands } from "./commands";
 import { fileNameEnv, fileNameEnvExample } from "./fileNames";
 import { LoggerLevel } from "../logging";
-import { MoonpieCommands } from "./commands";
 import { OsuCommands } from "./commands";
 import { SpotifyCommands } from "./commands";
 // Type imports
@@ -43,6 +43,7 @@ export enum EnvVariableNone {
  */
 export enum EnvVariable {
   CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH = "CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH",
+  CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS = "CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS",
   LOGGING_CONSOLE_LOG_LEVEL = "LOGGING_CONSOLE_LOG_LEVEL",
   LOGGING_DIRECTORY_PATH = "LOGGING_DIRECTORY_PATH",
   LOGGING_FILE_LOG_LEVEL = "LOGGING_FILE_LOG_LEVEL",
@@ -130,6 +131,17 @@ export const envVariableInformation: EnvVariableData[] = [
     description:
       "The database file path that contains the persistent custom commands and broadcasts data.",
     name: EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH,
+  },
+  {
+    block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
+    default: Object.values(CustomCommandsBroadcastsCommands).sort().join(","),
+    description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
+    name: EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
+    supportedValues: {
+      canBeJoinedAsList: true,
+      emptyListValue: EnvVariableNone.NONE,
+      values: Object.values(CustomCommandsBroadcastsCommands),
+    },
   },
   {
     block: EnvVariableBlock.LOGGING,

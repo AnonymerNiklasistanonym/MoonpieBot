@@ -6,6 +6,7 @@ import {
   pluginListSort,
 } from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
@@ -68,10 +69,6 @@ export const moonpieCommandsAbout: StringEntry = {
   default: createMessageForMessageParser(["!moonpie about"], true),
   id: `${MOONPIE_COMMANDS_STRING_ID}_ABOUT`,
 };
-export const moonpieCommandsNone: StringEntry = {
-  default: createMessageForMessageParser(["None"], true),
-  id: `${MOONPIE_COMMANDS_STRING_ID}_NONE`,
-};
 export const moonpieCommandsPrefix: StringEntry = {
   default: createMessageForMessageParser(
     [
@@ -123,7 +120,7 @@ export const moonpieCommandsString: StringEntry = {
             ),
           name: pluginListFilterUndefined.id,
           scope: {
-            name: moonpieCommandsNone.id,
+            name: generalCommandsNone.id,
             type: "reference",
           },
           type: "plugin",
@@ -147,7 +144,6 @@ export const moonpieCommands: StringEntry[] = [
   moonpieCommandsRemove,
   moonpieCommandsDelete,
   moonpieCommandsAbout,
-  moonpieCommandsNone,
   moonpieCommandsPrefix,
   moonpieCommandsString,
 ];

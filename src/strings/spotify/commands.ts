@@ -6,6 +6,7 @@ import {
   pluginListSort,
 } from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
@@ -21,10 +22,6 @@ export const spotifyCommandsSong: StringEntry = {
     true
   ),
   id: `${SPOTIFY_COMMANDS_STRING_ID}_SONG`,
-};
-export const spotifyCommandsNone: StringEntry = {
-  default: createMessageForMessageParser(["None"], true),
-  id: `${SPOTIFY_COMMANDS_STRING_ID}_NONE`,
 };
 export const spotifyCommandsPrefix: StringEntry = {
   default: createMessageForMessageParser(
@@ -68,7 +65,7 @@ export const spotifyCommandsString: StringEntry = {
             ),
           name: pluginListFilterUndefined.id,
           scope: {
-            name: spotifyCommandsNone.id,
+            name: generalCommandsNone.id,
             type: "reference",
           },
           type: "plugin",
@@ -85,7 +82,6 @@ export const spotifyCommandsString: StringEntry = {
 
 export const spotifyCommands: StringEntry[] = [
   spotifyCommandsSong,
-  spotifyCommandsNone,
   spotifyCommandsPrefix,
   spotifyCommandsString,
 ];

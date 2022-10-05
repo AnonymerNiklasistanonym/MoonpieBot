@@ -28,7 +28,15 @@ export const generalUserPermissionError: StringEntry = {
     },
     ")",
   ]),
-  id: `${GENERAL_STRING_ID}_PERMISSION_ERROR`,
+  id: `${GENERAL_STRING_ID}_USER_PERMISSION_ERROR`,
 };
 
-export const general: StringEntry[] = [generalUserPermissionError];
+export const generalCommandsNone: StringEntry = {
+  default: createMessageForMessageParser(["None"], true),
+  id: `${GENERAL_STRING_ID}_COMMANDS_NONE`,
+};
+
+export const general: StringEntry[] = [
+  generalCommandsNone,
+  generalUserPermissionError,
+];

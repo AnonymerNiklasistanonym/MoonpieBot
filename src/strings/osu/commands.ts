@@ -6,6 +6,7 @@ import {
   pluginListSort,
 } from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { OSU_STRING_ID } from "../osu";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
@@ -77,10 +78,6 @@ export const osuCommandsScore: StringEntry = {
   ),
   id: `${OSU_COMMANDS_STRING_ID}_SCORE`,
 };
-export const osuCommandsNone: StringEntry = {
-  default: createMessageForMessageParser(["None"], true),
-  id: `${OSU_COMMANDS_STRING_ID}_NONE`,
-};
 export const osuCommandsPrefix: StringEntry = {
   default: createMessageForMessageParser(
     [
@@ -133,7 +130,7 @@ export const osuCommandsString: StringEntry = {
             ),
           name: pluginListFilterUndefined.id,
           scope: {
-            name: osuCommandsNone.id,
+            name: generalCommandsNone.id,
             type: "reference",
           },
           type: "plugin",
@@ -158,7 +155,6 @@ export const osuCommands: StringEntry[] = [
   osuCommandsRequests,
   osuCommandsRp,
   osuCommandsScore,
-  osuCommandsNone,
   osuCommandsPrefix,
   osuCommandsString,
 ];

@@ -40,6 +40,7 @@ import {
 import { createBroadcastScheduledTask } from "./customCommandsBroadcasts/customBroadcast";
 import { createLogFunc } from "./logging";
 import { customCommandChatHandler } from "./customCommandsBroadcasts/customCommand";
+import { customCommandsBroadcastsChatHandler } from "./commands/customCommandsBroadcasts";
 import customCommandsBroadcastsDb from "./database/customCommandsBroadcastsDb";
 import { fileNameDatabaseBackups } from "./info/fileNames";
 import { getVersionFromObject } from "./version";
@@ -217,6 +218,10 @@ export const main = async (
       configDir
     )
   );
+  const customCommandsBroadcastsEnableCommands = getEnvVariableValueOrDefault(
+    EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
+    configDir
+  ).split(",");
 
   // Initialize global objects
   // Twitch connection
@@ -589,6 +594,35 @@ export const main = async (
           )
           .catch(loggerMain.error);
       }
+    }
+
+    try {
+      await customCommandsBroadcastsChatHandler(
+        twitchClient,
+        channel,
+        tags,
+        message,
+        {
+          customCommandsBroadcastsDbPath: pathDatabaseCustomCommandsBroadcasts,
+          enabledCommands: customCommandsBroadcastsEnableCommands,
+        },
+        stringMap,
+        pluginMapChannel,
+        macroMapChannel,
+        logger
+      );
+    } catch (err) {
+      loggerMain.error(err as Error);
+      // When the chat handler throws an error write the error message in chat
+      const errorInfo = err as ErrorWithCode;
+      twitchClient
+        .say(
+          channel,
+          `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
+            errorInfo.message
+          }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
+        )
+        .catch(loggerMain.error);
     }
 
     // Check custom commands

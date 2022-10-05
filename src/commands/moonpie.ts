@@ -13,6 +13,7 @@ import type {
   CommandSetDetectorInput,
 } from "./moonpie/user";
 import type { CommandClaimCreateReplyInput } from "./moonpie/claim";
+import type { CommandGenericDetectorInputEnabledCommands } from "../twitch";
 import type { TwitchChatHandler } from "../twitch";
 
 export interface CommandMoonpieGenericDataMoonpieDbPath {
@@ -24,6 +25,7 @@ export interface CommandMoonpieGenericDataMoonpieDbPath {
 
 export interface MoonpieChatHandlerData
   extends CommandMoonpieGenericDataMoonpieDbPath,
+    CommandGenericDetectorInputEnabledCommands,
     CommandDeleteCreateReplyInput,
     CommandDeleteDetectorInput,
     CommandSetCreateReplyInput,

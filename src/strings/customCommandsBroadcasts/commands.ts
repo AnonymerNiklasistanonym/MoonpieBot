@@ -7,6 +7,7 @@ import {
 } from "../../messageParser/plugins/general";
 import { createMessageForMessageParser } from "../../documentation/messageParser";
 import { CUSTOM_COMMANDS_BROADCASTS_STRING_ID } from "../customCommandsBroadcasts";
+import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 // Type imports
@@ -18,7 +19,7 @@ const CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID = `${CUSTOM_COMMANDS_BROADCA
 export const customCommandsBroadcastsCommandsAddCustomCommand: StringEntry = {
   default: createMessageForMessageParser(
     [
-      "!addcc '$ID' '$REGEX' 'MESSAGE' (-ul=$USER_LEVEL) (-cd=$COOLDOWN_IN_S) [add custom command]",
+      "!addcc $ID $REGEX MESSAGE (-ul=$USER_LEVEL) (-cd=$COOLDOWN_IN_S) [add custom command]",
     ],
     true
   ),
@@ -26,14 +27,14 @@ export const customCommandsBroadcastsCommandsAddCustomCommand: StringEntry = {
 };
 export const customCommandsBroadcastsCommandsAddCustomBroadcast: StringEntry = {
   default: createMessageForMessageParser(
-    ["!addcb '$ID' '$CRON_STRING' 'MESSAGE' [add custom broadcast]"],
+    ["!addcb $ID $CRON_STRING MESSAGE [add custom broadcast]"],
     true
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_ADD_CUSTOM_BROADCAST`,
 };
 export const customCommandsBroadcastsCommandsEditCustomCommand: StringEntry = {
   default: createMessageForMessageParser(
-    ["!editcc '$ID' $OPTION '$OPTION_VALUE' [edit custom command]"],
+    ["!editcc $ID $OPTION $OPTION_VALUE [edit command]"],
     true
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_EDIT_CUSTOM_COMMAND`,
@@ -41,22 +42,19 @@ export const customCommandsBroadcastsCommandsEditCustomCommand: StringEntry = {
 export const customCommandsBroadcastsCommandsEditCustomBroadcast: StringEntry =
   {
     default: createMessageForMessageParser(
-      ["!editcb '$ID' $OPTION '$OPTION_VALUE' [edit custom broadcast]"],
+      ["!editcb $ID $OPTION $OPTION_VALUE [edit broadcast]"],
       true
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_EDIT_CUSTOM_BROADCAST`,
   };
 export const customCommandsBroadcastsCommandsListCustomCommands: StringEntry = {
-  default: createMessageForMessageParser(
-    ["!listccs [list custom commands]"],
-    true
-  ),
+  default: createMessageForMessageParser(["!listccs [list commands]"], true),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_LIST_CUSTOM_COMMANDS`,
 };
 export const customCommandsBroadcastsCommandsListCustomBroadcasts: StringEntry =
   {
     default: createMessageForMessageParser(
-      ["!listcbs [list custom broadcasts]"],
+      ["!listcbs [list broadcasts]"],
       true
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_LIST_CUSTOM_BROADCAST`,
@@ -64,7 +62,7 @@ export const customCommandsBroadcastsCommandsListCustomBroadcasts: StringEntry =
 export const customCommandsBroadcastsCommandsDeleteCustomCommand: StringEntry =
   {
     default: createMessageForMessageParser(
-      ["!deletecc '$ID' [delete custom command]"],
+      ["!delcc $ID [delete custom command]"],
       true
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_DELETE_CUSTOM_COMMAND`,
@@ -72,15 +70,11 @@ export const customCommandsBroadcastsCommandsDeleteCustomCommand: StringEntry =
 export const customCommandsBroadcastsCommandsDeleteCustomBroadcast: StringEntry =
   {
     default: createMessageForMessageParser(
-      ["!deletecb '$ID' [delete custom broadcast]"],
+      ["!delcb $ID [delete custom broadcast]"],
       true
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_DELETE_CUSTOM_BROADCAST`,
   };
-export const customCommandsBroadcastsCommandsNone: StringEntry = {
-  default: createMessageForMessageParser(["None"], true),
-  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_NONE`,
-};
 export const customCommandsBroadcastsCommandsPrefix: StringEntry = {
   default: createMessageForMessageParser(
     [
@@ -132,7 +126,7 @@ export const customCommandsBroadcastsCommandsString: StringEntry = {
             ),
           name: pluginListFilterUndefined.id,
           scope: {
-            name: customCommandsBroadcastsCommandsNone.id,
+            name: generalCommandsNone.id,
             type: "reference",
           },
           type: "plugin",
@@ -156,7 +150,6 @@ export const customCommandsBroadcastsCommands: StringEntry[] = [
   customCommandsBroadcastsCommandsEditCustomCommand,
   customCommandsBroadcastsCommandsListCustomBroadcasts,
   customCommandsBroadcastsCommandsListCustomCommands,
-  customCommandsBroadcastsCommandsNone,
   customCommandsBroadcastsCommandsPrefix,
   customCommandsBroadcastsCommandsString,
 ];
