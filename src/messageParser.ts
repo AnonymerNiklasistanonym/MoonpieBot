@@ -14,6 +14,7 @@ export {
   generatePlugin,
   generatePluginMap,
 } from "./messageParser/plugins";
+export { generateMacroMapFromMacroGenerator } from "./messageParser/macrosHelper";
 // Type exports
 export type {
   MessageParserMacroDocumentation,

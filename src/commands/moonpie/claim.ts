@@ -28,25 +28,24 @@ import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
-import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
+import type { CommandMoonpieGenericDataMoonpieDbPath } from "../moonpie";
 import type { MacroMap } from "../../messageParser";
 
 export interface CommandClaimCreateReplyInput
-  extends CommandGenericDataMoonpieDbPath {
+  extends CommandMoonpieGenericDataMoonpieDbPath {
   /**
    * The number of hours between moonpie claims.
    */
   moonpieClaimCooldownHours: number;
 }
-export type CommandClaimDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
+
 /**
  * Claim command: Claim a moonpie if no moonpie was claimed in the last 24
  * hours.
  */
 export const commandClaim: TwitchChatCommandHandler<
   CommandClaimCreateReplyInput,
-  CommandClaimDetectorInput
+  CommandGenericDetectorInputEnabledCommands
 > = {
   createReply: async (_channel, tags, data, logger) => {
     // Check if a moonpie entry already exists

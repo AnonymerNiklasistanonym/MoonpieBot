@@ -13,9 +13,7 @@ import {
 } from "../../strings/osu/beatmapRequest";
 import {
   regexOsuChatHandlerCommandRequests,
-  RegexOsuChatHandlerCommandRequestsSet,
   regexOsuChatHandlerCommandRequestsSet,
-  RegexOsuChatHandlerCommandRequestsUnset,
   regexOsuChatHandlerCommandRequestsUnset,
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../../twitch";
@@ -26,17 +24,17 @@ import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
 // Type imports
 import type {
   BeatmapRequestsInfo,
-  CommandGenericDataOsuApiDbPath,
+  CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandOsuGenericDataOsuApiDbPath,
 } from "../osu";
-import type { RegexOsuChatHandlerCommandRequests } from "../../info/regex";
+import type {
+  RegexOsuChatHandlerCommandRequests,
+  RegexOsuChatHandlerCommandRequestsSet,
+  RegexOsuChatHandlerCommandRequestsUnset,
+} from "../../info/regex";
+import type { CommandGenericDetectorInputEnabledCommands } from "../../twitch";
 import type { TwitchChatCommandHandler } from "../../twitch";
 
-export type CommandBeatmapRequestsCreateReplyInput =
-  CommandGenericDataOsuApiDbPath;
-export interface CommandBeatmapRequestsCreateReplyInputExtra
-  extends CommandBeatmapRequestsCreateReplyInput {
-  beatmapRequestsInfo: BeatmapRequestsInfo;
-}
 export enum BeatmapRequestsType {
   INFO = "INFO",
   TURN_OFF = "TURN_OFF",
@@ -46,16 +44,14 @@ export interface CommandBeatmapRequestsDetectorOutput {
   beatmapRequestsOnOffMessage?: string;
   beatmapRequestsType: BeatmapRequestsType;
 }
-export interface CommandBeatmapRequestsDetectorInput {
-  enabledCommands: string[];
-}
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
  * the current top score of the default osu User in the chat.
  */
 export const commandBeatmapRequests: TwitchChatCommandHandler<
-  CommandBeatmapRequestsCreateReplyInputExtra,
-  CommandBeatmapRequestsDetectorInput,
+  CommandOsuGenericDataOsuApiDbPath &
+    CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandGenericDetectorInputEnabledCommands,
   CommandBeatmapRequestsDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
@@ -285,7 +281,7 @@ const validateSetValue = (
 };
 
 export type CommandBeatmapRequestsSetUnsetCreateReplyInput =
-  CommandGenericDataOsuApiDbPath;
+  CommandOsuGenericDataOsuApiDbPath;
 export interface CommandBeatmapRequestsSetUnsetCreateReplyInputExtra
   extends CommandBeatmapRequestsSetUnsetCreateReplyInput {
   beatmapRequestsInfo: BeatmapRequestsInfo;

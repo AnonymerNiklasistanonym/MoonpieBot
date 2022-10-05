@@ -1,41 +1,37 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
-import { BeatmapRequestsInfo } from "../osu";
+import { checkTwitchBadgeLevel } from "../../twitch";
 import { osuBeatmapRequestNoRequestsError } from "../../strings/osu/beatmapRequest";
 import { regexOsuChatHandlerCommandLastRequest } from "../../info/regex";
 import { sendBeatmapRequest } from "./beatmap";
 import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
 // Type imports
-import {
-  checkTwitchBadgeLevel,
+import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerReply,
 } from "../../twitch";
-import type { EMPTY_OBJECT } from "../../info/other";
-import type { OsuIrcBotSendMessageFunc } from "./beatmap";
+import type {
+  CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandOsuGenericDataOsuIrcData,
+} from "../osu";
 import type { RegexOsuChatHandlerCommandLastRequest } from "../../info/regex";
 
-export type CommandBeatmapLastRequestCreateReplyInput = EMPTY_OBJECT;
-export interface CommandBeatmapLastRequestCreateReplyInputExtra
-  extends CommandBeatmapLastRequestCreateReplyInput {
-  beatmapRequestsInfo: BeatmapRequestsInfo;
+export interface CommandBeatmapLastRequestCreateReplyInput
+  extends CommandOsuGenericDataOsuIrcData {
   enableOsuBeatmapRequestsDetailed?: boolean;
-  osuIrcBot?: OsuIrcBotSendMessageFunc;
-  osuIrcRequestTarget?: string;
 }
 export interface CommandBeatmapLastRequestDetectorOutput {
   beatmapRequestCount: number;
-}
-export interface CommandBeatmapLastRequestDetectorInput {
-  enabledCommands: string[];
 }
 /**
  * Post information about the last beatmap request in chat and resend them
  * if enabled via IRC to the client.
  */
 export const commandBeatmapLastRequest: TwitchChatCommandHandler<
-  CommandBeatmapLastRequestCreateReplyInputExtra,
-  CommandBeatmapLastRequestDetectorInput,
+  CommandBeatmapLastRequestCreateReplyInput &
+    CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandGenericDetectorInputEnabledCommands,
   CommandBeatmapLastRequestDetectorOutput
 > = {
   createReply: (channel, tags, data) => {

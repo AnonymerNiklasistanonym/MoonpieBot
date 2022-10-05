@@ -437,6 +437,21 @@ export const regexOsuWindowTitleNowPlaying =
  */
 export const regexSpotifyChatHandlerCommandSong = /^\s*!song(?:\s|$)/i;
 
+/**
+ * Regex to recognize the !cc/!cb commands command.
+ *
+ * @example
+ * ```text
+ * !cc commands
+ * ```
+ * @example
+ * ```text
+ * !cb commands
+ * ```
+ */
+export const regexCustomCommandsBroadcastsCommands =
+  /^\s*!(?:ccs?|cbs?)\s+commands(?:\s*$)/i;
+
 // TODO Implement
 export interface RegexCustomCommandAddRemove {
   customCommandId: string;

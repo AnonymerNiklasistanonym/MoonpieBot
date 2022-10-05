@@ -22,15 +22,16 @@ import {
   macroOsuStreamCompanionCurrentMapFile,
   macroOsuStreamCompanionCurrentMapWebSocket,
 } from "./macros/osuStreamCompanion";
+import { checkMacrosForDuplicates } from "./macrosHelper";
 import { macroCommandEnabled } from "./macros/commands";
 import { macroMoonpieBot } from "./macros/moonpiebot";
 import { macroOsuPpRpRequest } from "./macros/osuPpRpRequest";
 import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
 import { macroOsuWindowTitle } from "./macros/osuWindowTitle";
+import { macroPermissionError } from "./macros/general";
 import { macroSpotifySong } from "./macros/spotify";
 // Type imports
 import type { EMPTY_OBJECT } from "../info/other";
-import { macroPermissionError } from "./macros/general";
 
 // A macro is a simple text replace dictionary
 export type MacroDictionaryEntry<KEY = string> = [KEY, string];
@@ -70,21 +71,6 @@ export interface MessageParserMacroGenerator<
   /** Method to generate the macro entries. */
   generate: (data: GENERATE_DATA) => MacroDictionaryEntry[];
 }
-
-const checkMacrosForDuplicates = <MACRO_TYPE extends MessageParserMacroInfo>(
-  name: string,
-  ...macros: MACRO_TYPE[]
-): MACRO_TYPE[] => {
-  // Check for duplicated IDs
-  macros.forEach((value, index, array) => {
-    if (array.findIndex((a) => a.id === value.id) !== index) {
-      throw Error(
-        `The macro list ${name} contained the ID "${value.id}" twice`
-      );
-    }
-  });
-  return macros;
-};
 
 /**
  * The default values for all macros.

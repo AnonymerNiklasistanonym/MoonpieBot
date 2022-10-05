@@ -6,11 +6,10 @@ import osuApiV2, { GameMode, ScoresType } from "osu-api-v2";
 import {
   macroOsuBeatmap,
   macroOsuMostRecentPlay,
-  MacroOsuMostRecentPlay,
-  MacroOsuScore,
   macroOsuScore,
   macroOsuUser,
 } from "../macros/osuApi";
+import { generateMacroMapFromMacroGenerator } from "../macrosHelper";
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 // Type imports
 import type { MacroMap } from "../../messageParser";
@@ -51,12 +50,9 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
             oauthAccessToken,
             beatmapIdNumber
           );
-          return new Map([
-            [
-              macroOsuBeatmap.id,
-              new Map(macroOsuBeatmap.generate({ beatmap })),
-            ],
-          ]);
+          return generateMacroMapFromMacroGenerator(macroOsuBeatmap, {
+            beatmap,
+          });
         },
       id: PluginOsuApi.BEATMAP,
       signature: {
@@ -91,20 +87,15 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
               beatmapIdAndUserIdNumber[0],
               beatmapIdAndUserIdNumber[1]
             );
-            return new Map([
-              [
-                macroOsuScore.id,
-                new Map(macroOsuScore.generate({ beatmapScore })),
-              ],
-            ]);
+            return generateMacroMapFromMacroGenerator(macroOsuScore, {
+              beatmapScore,
+            });
           } catch (err) {
             if (
               (err as OsuApiV2WebRequestError).statusCode ===
               NOT_FOUND_STATUS_CODE
             ) {
-              return new Map([
-                [macroOsuScore.id, new Map([[MacroOsuScore.EXISTS, "false"]])],
-              ]);
+              return generateMacroMapFromMacroGenerator(macroOsuScore, {});
             } else {
               throw err;
             }
@@ -139,21 +130,11 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
             true
           );
           if (lastPlays.length > 0) {
-            return new Map([
-              [
-                macroOsuMostRecentPlay.id,
-                new Map(
-                  macroOsuMostRecentPlay.generate({ score: lastPlays[0] })
-                ),
-              ],
-            ]);
+            return generateMacroMapFromMacroGenerator(macroOsuMostRecentPlay, {
+              score: lastPlays[0],
+            });
           }
-          return new Map([
-            [
-              macroOsuMostRecentPlay.id,
-              new Map([[MacroOsuMostRecentPlay.FOUND, "false"]]),
-            ],
-          ]);
+          return generateMacroMapFromMacroGenerator(macroOsuMostRecentPlay, {});
         },
       id: PluginOsuApi.MOST_RECENT_PLAY,
       signature: {
@@ -179,9 +160,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
             userIdNumber,
             GameMode.OSU_STANDARD
           );
-          return new Map([
-            [macroOsuUser.id, new Map(macroOsuUser.generate({ user }))],
-          ]);
+          return generateMacroMapFromMacroGenerator(macroOsuUser, { user });
         },
       id: PluginOsuApi.USER,
       signature: {

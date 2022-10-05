@@ -31,3 +31,18 @@ export enum MoonpieCommands {
   REMOVE = "remove",
   SET = "set",
 }
+
+export const LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS =
+  "custom_commands_broadcasts_chat_handler";
+
+export enum CustomCommandsBroadcastsCommands {
+  ADD_CUSTOM_BROADCAST = "add_custom_broadcast",
+  ADD_CUSTOM_COMMAND = "add_custom_command",
+  COMMANDS = "commands",
+  DELETE_CUSTOM_BROADCAST = "delete_custom_broadcast",
+  DELETE_CUSTOM_COMMAND = "delete_custom_command",
+  EDIT_CUSTOM_BROADCAST = "edit_custom_broadcast",
+  EDIT_CUSTOM_COMMAND = "edit_custom_command",
+  LIST_CUSTOM_BROADCASTS = "list_custom_broadcasts",
+  LIST_CUSTOM_COMMANDS = "list_custom_commands",
+}

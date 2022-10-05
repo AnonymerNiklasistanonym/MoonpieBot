@@ -78,10 +78,14 @@ export interface TwitchChatCommandHandlerReply {
         logger: Readonly<Logger>
       ) => Promise<string>);
 }
+
 /**
  * Default generic interface for enabled commands as detector input.
  */
 export interface CommandGenericDetectorInputEnabledCommands {
+  /**
+   * The enabled commands for the current Twitch chat handler.
+   */
   enabledCommands: string[];
 }
 

@@ -21,16 +21,12 @@ import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
-import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
+import type { CommandMoonpieGenericDataMoonpieDbPath } from "../moonpie";
 import type { MacroMap } from "../../messageParser";
 import type { RegexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 
 const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 10;
 
-export type CommandLeaderboardCreateReplyInput =
-  CommandGenericDataMoonpieDbPath;
-export type CommandLeaderboardDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
 export interface CommandLeaderboardDetectorOutput {
   startingRank?: number;
 }
@@ -38,8 +34,8 @@ export interface CommandLeaderboardDetectorOutput {
  * Leaderboard command: Reply with the moonpie count leaderboard list (top 15).
  */
 export const commandLeaderboard: TwitchChatCommandHandler<
-  CommandLeaderboardCreateReplyInput,
-  CommandLeaderboardDetectorInput,
+  CommandMoonpieGenericDataMoonpieDbPath,
+  CommandGenericDetectorInputEnabledCommands,
   CommandLeaderboardDetectorOutput
 > = {
   createReply: async (_channel, _tags, data, logger) => {

@@ -12,6 +12,7 @@ import {
   osuCommandsScore,
   osuCommandsString,
 } from "../../strings/osu/commands";
+import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { regexOsuChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
@@ -32,14 +33,12 @@ export interface CommandCommandsCreateReplyInput
    */
   osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
 }
-export type CommandCommandsDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
 /**
  * Commands command: Send all available commands of the bot in chat.
  */
 export const commandCommands: TwitchChatCommandHandler<
   CommandCommandsCreateReplyInput,
-  CommandCommandsDetectorInput
+  CommandGenericDetectorInputEnabledCommands
 > = {
   createReply: async (_channel, _tags, data) => {
     let streamCompanionInfo:
@@ -51,55 +50,48 @@ export const commandCommands: TwitchChatCommandHandler<
     }
 
     return {
-      additionalMacros: new Map([
-        [
-          macroCommandEnabled.id,
-          new Map(
-            macroCommandEnabled.generate({
-              convertEnumValueToInfo: (enumValue) => {
-                const enabled = data.enabledCommands.includes(enumValue);
-                switch (enumValue as OsuCommands) {
-                  case OsuCommands.COMMANDS:
-                    break;
-                  case OsuCommands.LAST_REQUEST:
-                    return [osuCommandsLastRequest.id, enabled];
-                  case OsuCommands.PERMIT_REQUEST:
-                    return [osuCommandsPermitRequest.id, enabled];
-                  case OsuCommands.NP:
-                    if (
-                      data.osuStreamCompanionCurrentMapData !== undefined &&
-                      streamCompanionInfo !== undefined &&
-                      streamCompanionInfo.type === "file"
-                    ) {
-                      return [osuCommandsNpStreamCompanionFile.id, enabled];
-                    } else if (
-                      data.osuStreamCompanionCurrentMapData !== undefined &&
-                      streamCompanionInfo !== undefined &&
-                      streamCompanionInfo.type === "websocket"
-                    ) {
-                      return [
-                        osuCommandsNpStreamCompanionWebsocket.id,
-                        enabled,
-                      ];
-                    } else {
-                      return [osuCommandsNp.id, enabled];
-                    }
-                  case OsuCommands.PP:
-                    return [osuCommandsPp.id, enabled];
-                  case OsuCommands.REQUESTS:
-                    return [osuCommandsRequests.id, enabled];
-                  case OsuCommands.RP:
-                    return [osuCommandsRp.id, enabled];
-                  case OsuCommands.SCORE:
-                    return [osuCommandsScore.id, enabled];
+      additionalMacros: generateMacroMapFromMacroGenerator(
+        macroCommandEnabled,
+        {
+          convertEnumValueToInfo: (enumValue) => {
+            const enabled = data.enabledCommands.includes(enumValue);
+            switch (enumValue as OsuCommands) {
+              case OsuCommands.COMMANDS:
+                break;
+              case OsuCommands.LAST_REQUEST:
+                return [osuCommandsLastRequest.id, enabled];
+              case OsuCommands.PERMIT_REQUEST:
+                return [osuCommandsPermitRequest.id, enabled];
+              case OsuCommands.NP:
+                if (
+                  data.osuStreamCompanionCurrentMapData !== undefined &&
+                  streamCompanionInfo !== undefined &&
+                  streamCompanionInfo.type === "file"
+                ) {
+                  return [osuCommandsNpStreamCompanionFile.id, enabled];
+                } else if (
+                  data.osuStreamCompanionCurrentMapData !== undefined &&
+                  streamCompanionInfo !== undefined &&
+                  streamCompanionInfo.type === "websocket"
+                ) {
+                  return [osuCommandsNpStreamCompanionWebsocket.id, enabled];
+                } else {
+                  return [osuCommandsNp.id, enabled];
                 }
-                return ["undefined", false];
-              },
-              enumValues: Object.values(OsuCommands),
-            })
-          ),
-        ],
-      ]),
+              case OsuCommands.PP:
+                return [osuCommandsPp.id, enabled];
+              case OsuCommands.REQUESTS:
+                return [osuCommandsRequests.id, enabled];
+              case OsuCommands.RP:
+                return [osuCommandsRp.id, enabled];
+              case OsuCommands.SCORE:
+                return [osuCommandsScore.id, enabled];
+            }
+            return ["undefined", false];
+          },
+          enumValues: Object.values(OsuCommands),
+        }
+      ),
       messageId: osuCommandsString.id,
     };
   },

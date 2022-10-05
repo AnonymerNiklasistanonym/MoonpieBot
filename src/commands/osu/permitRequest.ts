@@ -1,37 +1,33 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
-import { BeatmapRequestsInfo } from "../osu";
+import { checkTwitchBadgeLevel } from "../../twitch";
 import { osuBeatmapRequestNoBlockedRequestsError } from "../../strings/osu/beatmapRequest";
 import { regexOsuChatHandlerCommandPermitRequest } from "../../info/regex";
 import { sendBeatmapRequest } from "./beatmap";
 import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
 // Type imports
-import {
-  checkTwitchBadgeLevel,
+import type {
+  CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
   TwitchChatCommandHandlerReply,
 } from "../../twitch";
-import type { EMPTY_OBJECT } from "../../info/other";
-import type { OsuIrcBotSendMessageFunc } from "./beatmap";
+import type {
+  CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandOsuGenericDataOsuIrcData,
+} from "../osu";
 
-export type CommandBeatmapPermitRequestCreateReplyInput = EMPTY_OBJECT;
-export interface CommandBeatmapPermitRequestCreateReplyInputExtra
-  extends CommandBeatmapPermitRequestCreateReplyInput {
-  beatmapRequestsInfo: BeatmapRequestsInfo;
+export interface CommandBeatmapPermitRequestCreateReplyInput
+  extends CommandOsuGenericDataOsuIrcData {
   enableOsuBeatmapRequestsDetailed?: boolean;
-  osuIrcBot?: OsuIrcBotSendMessageFunc;
-  osuIrcRequestTarget?: string;
-}
-export interface CommandBeatmapPermitRequestDetectorInput {
-  enabledCommands: string[];
 }
 /**
  * Post information about the last blocked request in chat and send them
  * if enabled via IRC to the client.
  */
 export const commandBeatmapPermitRequest: TwitchChatCommandHandler<
-  CommandBeatmapPermitRequestCreateReplyInputExtra,
-  CommandBeatmapPermitRequestDetectorInput
+  CommandBeatmapPermitRequestCreateReplyInput &
+    CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandGenericDetectorInputEnabledCommands
 > = {
   createReply: (channel, tags, data) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(

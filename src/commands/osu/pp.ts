@@ -19,20 +19,15 @@ import type {
   RegexOsuChatHandlerCommandPpUserId,
   RegexOsuChatHandlerCommandPpUserName,
 } from "../../info/regex";
-import type { OsuApiV2Credentials } from "../osu";
+import type { CommandOsuGenericDataOsuApiV2Credentials } from "../osu";
 
-export interface CommandPpRpCreateReplyInput {
+export interface CommandPpRpCreateReplyInput
+  extends CommandOsuGenericDataOsuApiV2Credentials {
   /**
    * Default osu Account ID (used for checking for existing scores).
    */
   defaultOsuId?: number;
-  /**
-   * The osu API (v2) credentials.
-   */
-  osuApiV2Credentials?: Readonly<OsuApiV2Credentials>;
 }
-export type CommandPpRpDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
 export interface CommandPpRpDetectorOutput {
   /**
    * Custom osu account ID (use this over the default osu
@@ -52,7 +47,7 @@ export interface CommandPpRpDetectorOutput {
  */
 export const commandPp: TwitchChatCommandHandler<
   CommandPpRpCreateReplyInput,
-  CommandPpRpDetectorInput,
+  CommandGenericDetectorInputEnabledCommands,
   CommandPpRpDetectorOutput
 > = {
   createReply: async (_channel, _tags, data) => {

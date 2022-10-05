@@ -207,11 +207,35 @@ export enum MacroOsuScore {
   VERSION = "VERSION",
 }
 export interface MacroOsuScoreData {
-  beatmapScore: BeatmapUserScore;
+  beatmapScore?: BeatmapUserScore;
 }
 export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
   generate: (data) => {
-    const score = data.beatmapScore.score;
+    const beatmapScore = data.beatmapScore;
+    if (beatmapScore === undefined) {
+      return Object.values(MacroOsuScore).map<[MacroOsuScore, string]>(
+        (macroId) => {
+          let macroValue;
+          switch (macroId) {
+            case MacroOsuScore.EXISTS:
+              macroValue = false;
+              break;
+            default:
+              macroValue = undefined;
+              break;
+          }
+          if (typeof macroValue === "boolean") {
+            macroValue = macroValue ? "true" : "false";
+          }
+          if (typeof macroValue === "undefined") {
+            macroValue = "undefined";
+          }
+          return [macroId, macroValue];
+        }
+      );
+    }
+
+    const score = beatmapScore.score;
     const scoreDate = new Date(score.created_at);
     const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
 
@@ -249,8 +273,8 @@ export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
             break;
           case MacroOsuScore.EXISTS:
             macroValue =
-              data.beatmapScore.position !== undefined &&
-              data.beatmapScore.position !== -1;
+              beatmapScore.position !== undefined &&
+              beatmapScore.position !== -1;
             break;
           case MacroOsuScore.FC:
             macroValue = score.perfect;
@@ -337,12 +361,35 @@ export enum MacroOsuMostRecentPlay {
   VERSION = "VERSION",
 }
 export interface MacroOsuMostRecentPlayData {
-  score: Score;
+  score?: Score;
 }
 export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRecentPlayData> =
   {
     generate: (data) => {
-      const scoreDate = new Date(data.score.created_at);
+      const score = data.score;
+      if (score === undefined) {
+        return Object.values(MacroOsuMostRecentPlay).map<
+          [MacroOsuMostRecentPlay, string]
+        >((macroId) => {
+          let macroValue;
+          switch (macroId) {
+            case MacroOsuMostRecentPlay.FOUND:
+              macroValue = false;
+              break;
+            default:
+              macroValue = undefined;
+              break;
+          }
+          if (typeof macroValue === "boolean") {
+            macroValue = macroValue ? "true" : "false";
+          }
+          if (macroValue === undefined) {
+            macroValue = "undefined";
+          }
+          return [macroId, macroValue];
+        });
+      }
+      const scoreDate = new Date(score.created_at);
       const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
 
       const macroEntries = Object.values(MacroOsuMostRecentPlay).map<
@@ -351,27 +398,27 @@ export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRec
         let macroValue;
         switch (macroId) {
           case MacroOsuMostRecentPlay.ACC:
-            macroValue = roundNumber(data.score.accuracy * 100, 2);
+            macroValue = roundNumber(score.accuracy * 100, 2);
             break;
           case MacroOsuMostRecentPlay.ARTIST:
-            macroValue = data.score.beatmapset?.artist;
+            macroValue = score.beatmapset?.artist;
             break;
           case MacroOsuMostRecentPlay.BEST_SCORE_ID:
-            if (data.score.best_id !== null) {
-              macroValue = data.score.best_id;
+            if (score.best_id !== null) {
+              macroValue = score.best_id;
             }
             break;
           case MacroOsuMostRecentPlay.COUNT_100:
-            macroValue = data.score.statistics.count_100;
+            macroValue = score.statistics.count_100;
             break;
           case MacroOsuMostRecentPlay.COUNT_300:
-            macroValue = data.score.statistics.count_300;
+            macroValue = score.statistics.count_300;
             break;
           case MacroOsuMostRecentPlay.COUNT_50:
-            macroValue = data.score.statistics.count_50;
+            macroValue = score.statistics.count_50;
             break;
           case MacroOsuMostRecentPlay.COUNT_MISS:
-            macroValue = data.score.statistics.count_miss;
+            macroValue = score.statistics.count_miss;
             break;
           case MacroOsuMostRecentPlay.DATE_MONTH:
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -384,48 +431,48 @@ export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRec
             macroValue = true;
             break;
           case MacroOsuMostRecentPlay.FC:
-            macroValue = data.score.perfect;
+            macroValue = score.perfect;
             break;
           case MacroOsuMostRecentPlay.HAS_REPLAY:
-            macroValue = data.score.replay;
+            macroValue = score.replay;
             break;
           case MacroOsuMostRecentPlay.ID:
-            macroValue = data.score.id;
+            macroValue = score.id;
             break;
           case MacroOsuMostRecentPlay.MAP_ID:
-            macroValue = data.score.beatmap?.id;
+            macroValue = score.beatmap?.id;
             break;
           case MacroOsuMostRecentPlay.MAX_COMBO:
-            macroValue = data.score.max_combo;
+            macroValue = score.max_combo;
             break;
           case MacroOsuMostRecentPlay.MODS:
-            macroValue = data.score.mods.join(",");
+            macroValue = score.mods.join(",");
             break;
           case MacroOsuMostRecentPlay.PASSED:
-            macroValue = data.score.passed;
+            macroValue = score.passed;
             break;
           case MacroOsuMostRecentPlay.PP:
-            if (data.score.pp !== null && data.score.pp !== undefined) {
-              macroValue = roundNumber(data.score.pp, 1);
+            if (score.pp !== null && score.pp !== undefined) {
+              macroValue = roundNumber(score.pp, 1);
             }
             break;
           case MacroOsuMostRecentPlay.RANK:
-            macroValue = data.score.rank;
+            macroValue = score.rank;
             break;
           case MacroOsuMostRecentPlay.TIME_IN_S_AGO:
             macroValue = roundNumber(scoreDateRangeMs / 1000, 0);
             break;
           case MacroOsuMostRecentPlay.TITLE:
-            macroValue = data.score.beatmapset?.title;
+            macroValue = score.beatmapset?.title;
             break;
           case MacroOsuMostRecentPlay.USER_ID:
-            macroValue = data.score.user?.id;
+            macroValue = score.user?.id;
             break;
           case MacroOsuMostRecentPlay.USER_NAME:
-            macroValue = data.score.user?.username;
+            macroValue = score.user?.username;
             break;
           case MacroOsuMostRecentPlay.VERSION:
-            macroValue = data.score.beatmap?.version;
+            macroValue = score.beatmap?.version;
             break;
         }
         if (typeof macroValue === "boolean") {

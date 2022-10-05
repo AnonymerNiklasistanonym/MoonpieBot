@@ -14,47 +14,51 @@ import { commandScore } from "./osu/score";
 import { runTwitchCommandHandler } from "../twitch";
 // Type imports
 import type {
-  CommandBeatmapCreateReplyInput,
-  CommandBeatmapDetectorInput,
-} from "./osu/beatmap";
-import type {
-  CommandBeatmapLastRequestCreateReplyInput,
-  CommandBeatmapLastRequestDetectorInput,
-} from "./osu/lastRequest";
-import type {
-  CommandBeatmapPermitRequestCreateReplyInput,
-  CommandBeatmapPermitRequestDetectorInput,
-} from "./osu/permitRequest";
-import type {
-  CommandBeatmapRequestsCreateReplyInput,
-  CommandBeatmapRequestsDetectorInput,
   CommandBeatmapRequestsSetUnsetCreateReplyInput,
   CommandBeatmapRequestsSetUnsetDetectorInput,
 } from "./osu/requests";
-import type {
-  CommandCommandsCreateReplyInput,
-  CommandCommandsDetectorInput,
-} from "./osu/commands";
-import type {
-  CommandNpCreateReplyInput,
-  CommandNpDetectorInput,
-} from "./osu/np";
-import type {
-  CommandPpRpCreateReplyInput,
-  CommandPpRpDetectorInput,
-} from "./osu/pp";
-import type {
-  CommandScoreCreateReplyInput,
-  CommandScoreDetectorInput,
-} from "./osu/score";
 import type { Beatmap } from "osu-api-v2";
+import type { CommandBeatmapCreateReplyInput } from "./osu/beatmap";
+import type { CommandBeatmapLastRequestCreateReplyInput } from "./osu/lastRequest";
+import type { CommandCommandsCreateReplyInput } from "./osu/commands";
+import type { CommandGenericDetectorInputEnabledCommands } from "../twitch";
+import type { CommandNpCreateReplyInput } from "./osu/np";
+import type { CommandPpRpCreateReplyInput } from "./osu/pp";
+import type { CommandScoreCreateReplyInput } from "./osu/score";
+import type { OsuIrcBotSendMessageFunc } from "./osu/beatmap";
 import type { TwitchChatHandler } from "../twitch";
 
-export interface CommandGenericDataOsuApiDbPath {
+export interface CommandOsuGenericDataOsuApiDbPath {
   /**
    * Database file path of the osu api database.
    */
   osuApiDbPath?: string;
+}
+
+export interface CommandOsuGenericDataOsuApiV2Credentials {
+  /**
+   * The osu API (v2) credentials.
+   */
+  osuApiV2Credentials?: Readonly<OsuApiV2Credentials>;
+}
+
+export interface CommandOsuGenericDataOsuIrcData {
+  /**
+   * The osu IRC bot with which messages can be sent.
+   */
+  osuIrcBot?: OsuIrcBotSendMessageFunc;
+  /**
+   * The osu IRC request target.
+   */
+  osuIrcRequestTarget?: string;
+}
+
+export interface CommandOsuGenericDataExtraBeatmapRequestsInfo {
+  /**
+   * Dynamic beatmap request information that can be shared across commands.
+   * Is only available to the osu chat handler.
+   */
+  beatmapRequestsInfo: BeatmapRequestsInfo;
 }
 
 export interface OsuApiV2Credentials {
@@ -97,22 +101,16 @@ const beatmapRequestsInfo: BeatmapRequestsInfo = {
 };
 
 export interface OsuChatHandlerData
-  extends CommandCommandsCreateReplyInput,
-    CommandCommandsDetectorInput,
+  extends CommandOsuGenericDataOsuApiDbPath,
+    CommandOsuGenericDataOsuApiV2Credentials,
+    CommandOsuGenericDataOsuIrcData,
+    CommandGenericDetectorInputEnabledCommands,
+    CommandCommandsCreateReplyInput,
     CommandNpCreateReplyInput,
-    CommandNpDetectorInput,
     CommandPpRpCreateReplyInput,
-    CommandPpRpDetectorInput,
     CommandScoreCreateReplyInput,
-    CommandScoreDetectorInput,
     CommandBeatmapCreateReplyInput,
-    CommandBeatmapDetectorInput,
     CommandBeatmapLastRequestCreateReplyInput,
-    CommandBeatmapLastRequestDetectorInput,
-    CommandBeatmapPermitRequestCreateReplyInput,
-    CommandBeatmapPermitRequestDetectorInput,
-    CommandBeatmapRequestsCreateReplyInput,
-    CommandBeatmapRequestsDetectorInput,
     CommandBeatmapRequestsSetUnsetDetectorInput,
     CommandBeatmapRequestsSetUnsetCreateReplyInput {}
 

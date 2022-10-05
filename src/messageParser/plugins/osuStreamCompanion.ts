@@ -1,3 +1,5 @@
+// Local imports
+import { generateMacroMapFromMacroGenerator } from "../macrosHelper";
 // Type imports
 import {
   macroOsuStreamCompanionCurrentMapFile,
@@ -32,16 +34,10 @@ export const pluginsOsuStreamCompanionGenerator: MessageParserPluginGenerator<Pl
             `No web socket connection was found (type='${currentMap.type}')`
           );
         }
-        return new Map([
-          [
-            macroOsuStreamCompanionCurrentMapWebSocket.id,
-            new Map(
-              macroOsuStreamCompanionCurrentMapWebSocket.generate({
-                currentMap,
-              })
-            ),
-          ],
-        ]);
+        return generateMacroMapFromMacroGenerator(
+          macroOsuStreamCompanionCurrentMapWebSocket,
+          { currentMap }
+        );
       },
       id: PluginOsuStreamCompanion.CURRENT_MAP_WEBSOCKET,
       signature: {
@@ -62,14 +58,10 @@ export const pluginsOsuStreamCompanionGenerator: MessageParserPluginGenerator<Pl
             `No file connection was found (type='${currentMap.type}')`
           );
         }
-        return new Map([
-          [
-            macroOsuStreamCompanionCurrentMapFile.id,
-            new Map(
-              macroOsuStreamCompanionCurrentMapFile.generate({ currentMap })
-            ),
-          ],
-        ]);
+        return generateMacroMapFromMacroGenerator(
+          macroOsuStreamCompanionCurrentMapFile,
+          { currentMap }
+        );
       },
       id: PluginOsuStreamCompanion.CURRENT_MAP_FILE,
       signature: {

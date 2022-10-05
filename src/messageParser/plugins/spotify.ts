@@ -1,7 +1,9 @@
+// Local imports
+import { generateMacroMapFromMacroGenerator } from "../macrosHelper";
 import { macroSpotifySong } from "../macros/spotify";
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 // Type imports
-import type { MacroMap } from "../../messageParser";
+import type { MacroMap } from "../macros";
 import type { MessageParserPluginGenerator } from "../plugins";
 import type SpotifyWebApi from "spotify-web-api-node";
 
@@ -18,12 +20,9 @@ export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyD
           data.spotifyWebApi,
           logger
         );
-        return new Map([
-          [
-            macroSpotifySong.id,
-            new Map(macroSpotifySong.generate({ spotifyData })),
-          ],
-        ]);
+        return generateMacroMapFromMacroGenerator(macroSpotifySong, {
+          spotifyData,
+        });
       },
     id: "SPOTIFY_SONG",
     signature: {

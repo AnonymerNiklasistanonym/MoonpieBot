@@ -5,7 +5,7 @@ import {
   customDataTable,
   versionCurrent,
 } from "./info";
-import { customBroadcastsInformation } from "../../info/customBroadcasts";
+//import { customBroadcastsInformation } from "../../info/customBroadcasts";
 import customCommandsBroadcastsDb from "../customCommandsBroadcastsDb";
 import { customCommandsInformation } from "../../info/customCommands";
 import { genericSetupDatabase } from "../generic/setup";
@@ -54,18 +54,18 @@ export const setup = async (
             logger
           );
         }
-        for (const exampleEntry of customBroadcastsInformation) {
-          await customCommandsBroadcastsDb.requests.customBroadcast.createEntry(
-            databasePath,
-            {
-              cronString: exampleEntry.cronString,
-              description: exampleEntry.description,
-              id: exampleEntry.id,
-              message: exampleEntry.message,
-            },
-            logger
-          );
-        }
+        //for (const exampleEntry of customBroadcastsInformation) {
+        //  await customCommandsBroadcastsDb.requests.customBroadcast.createEntry(
+        //    databasePath,
+        //    {
+        //      cronString: exampleEntry.cronString,
+        //      description: exampleEntry.description,
+        //      id: exampleEntry.id,
+        //      message: exampleEntry.message,
+        //    },
+        //    logger
+        //  );
+        //}
       },
     },
     logger

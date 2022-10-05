@@ -22,11 +22,12 @@ import {
   regexMoonpieChatHandlerCommandUserRemove,
   regexMoonpieChatHandlerCommandUserSet,
 } from "../../info/regex";
+import { checkTwitchBadgeLevel } from "../../twitch";
+import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import moonpieDb from "../../database/moonpieDb";
 import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
 // Type imports
-import {
-  checkTwitchBadgeLevel,
+import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
@@ -37,17 +38,14 @@ import type {
   RegexMoonpieChatHandlerCommandUserRemove,
   RegexMoonpieChatHandlerCommandUserSet,
 } from "../../info/regex";
-import type { CommandGenericDataMoonpieDbPath } from "../moonpie";
+import type { CommandMoonpieGenericDataMoonpieDbPath } from "../moonpie";
 
-export type CommandGetCreateReplyInput = CommandGenericDataMoonpieDbPath;
-export type CommandGetDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
 export interface CommandGetDetectorOutput {
   userNameMoonpieDb: string;
 }
 export const commandGet: TwitchChatCommandHandler<
-  CommandGetCreateReplyInput,
-  CommandGetDetectorInput,
+  CommandMoonpieGenericDataMoonpieDbPath,
+  CommandGenericDetectorInputEnabledCommands,
   CommandGetDetectorOutput
 > = {
   createReply: async (_channel, _tags, data, logger) => {
@@ -73,35 +71,22 @@ export const commandGet: TwitchChatCommandHandler<
 
       return {
         additionalMacros: new Map([
-          [
-            macroMoonpieUser.id,
-            new Map(
-              macroMoonpieUser.generate({ name: data.userNameMoonpieDb })
-            ),
-          ],
-          [
-            macroMoonpieLeaderboardEntry.id,
-            new Map(
-              macroMoonpieLeaderboardEntry.generate({
-                count: currentMoonpieLeaderboardEntry.count,
-                name: data.userNameMoonpieDb,
-                rank: currentMoonpieLeaderboardEntry.rank,
-              })
-            ),
-          ],
+          ...generateMacroMapFromMacroGenerator(macroMoonpieUser, {
+            name: data.userNameMoonpieDb,
+          }),
+          ...generateMacroMapFromMacroGenerator(macroMoonpieLeaderboardEntry, {
+            count: currentMoonpieLeaderboardEntry.count,
+            name: data.userNameMoonpieDb,
+            rank: currentMoonpieLeaderboardEntry.rank,
+          }),
         ]),
         messageId: moonpieUserGet.id,
       };
     } else {
       return {
-        additionalMacros: new Map([
-          [
-            macroMoonpieUser.id,
-            new Map(
-              macroMoonpieUser.generate({ name: data.userNameMoonpieDb })
-            ),
-          ],
-        ]),
+        additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
+          name: data.userNameMoonpieDb,
+        }),
         isError: true,
         messageId: moonpieUserNeverClaimedError.id,
       };
@@ -129,7 +114,7 @@ export const commandGet: TwitchChatCommandHandler<
   },
 };
 
-export type CommandSetCreateReplyInput = CommandGenericDataMoonpieDbPath;
+export type CommandSetCreateReplyInput = CommandMoonpieGenericDataMoonpieDbPath;
 export type CommandSetDetectorInput =
   CommandGenericDetectorInputEnabledCommands;
 export interface CommandSetDetectorOutput {
@@ -311,7 +296,7 @@ export const commandSet: TwitchChatCommandHandler<
   },
 };
 
-export type CommandDeleteCreateReplyInput = CommandGenericDataMoonpieDbPath;
+export type CommandDeleteCreateReplyInput = CommandMoonpieGenericDataMoonpieDbPath;
 export type CommandDeleteDetectorInput =
   CommandGenericDetectorInputEnabledCommands;
 export interface CommandDeleteDetectorOutput {

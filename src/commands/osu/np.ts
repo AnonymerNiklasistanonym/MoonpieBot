@@ -21,11 +21,14 @@ import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { getProcessInformationByName } from "../../other/processInformation";
 import { macroOsuWindowTitle } from "../../messageParser/macros/osuWindowTitle";
 // Type imports
-import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
+import type {
+  CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandOsuGenericDataOsuApiV2Credentials,
+} from "../osu";
 import type {
   RegexOsuBeatmapIdFromUrl,
   RegexOsuWindowTitleNowPlaying,
@@ -33,29 +36,21 @@ import type {
 import type { MacroMap } from "../../messageParser";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 
-export interface CommandNpCreateReplyInput {
-  /**
-   * The osu API (v2) credentials.
-   */
-  osuApiV2Credentials?: Readonly<OsuApiV2Credentials>;
+export interface CommandNpCreateReplyInput
+  extends CommandOsuGenericDataOsuApiV2Credentials {
   /**
    * If available get the current map data using StreamCompanion.
    */
   osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
 }
-export interface CommandNpCreateReplyInputExtra
-  extends CommandNpCreateReplyInput {
-  beatmapRequestsInfo: BeatmapRequestsInfo;
-}
-export type CommandNpDetectorInput = CommandGenericDetectorInputEnabledCommands;
 /**
  * NP (now playing) command:
  * Send the map that is currently being played in osu (via the window title
  * because the web api is not supporting it).
  */
 export const commandNp: TwitchChatCommandHandler<
-  CommandNpCreateReplyInputExtra,
-  CommandNpDetectorInput
+  CommandNpCreateReplyInput & CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandGenericDetectorInputEnabledCommands
 > = {
   createReply: async (_channel, _tags, data, logger) => {
     const logCmdNp = createLogFunc(

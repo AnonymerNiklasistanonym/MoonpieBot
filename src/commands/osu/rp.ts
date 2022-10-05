@@ -14,13 +14,15 @@ import { macroOsuPpRpRequest } from "../../messageParser/macros/osuPpRpRequest";
 import { regexOsuChatHandlerCommandRp } from "../../info/regex";
 // Type imports
 import type {
+  CommandGenericDetectorInputEnabledCommands,
+  TwitchChatCommandHandler,
+} from "../../twitch";
+import type {
   CommandPpRpCreateReplyInput,
-  CommandPpRpDetectorInput,
   CommandPpRpDetectorOutput,
 } from "./pp";
 import type { BeatmapRequestsInfo } from "../osu";
 import type { RegexOsuChatHandlerCommandRp } from "../../info/regex";
-import type { TwitchChatCommandHandler } from "../../twitch";
 
 export interface CommandRpCreateReplyInputExtra
   extends CommandPpRpCreateReplyInput {
@@ -32,7 +34,7 @@ export interface CommandRpCreateReplyInputExtra
  */
 export const commandRp: TwitchChatCommandHandler<
   CommandRpCreateReplyInputExtra,
-  CommandPpRpDetectorInput,
+  CommandGenericDetectorInputEnabledCommands,
   CommandPpRpDetectorOutput
 > = {
   createReply: async (_channel, _tags, data) => {

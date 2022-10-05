@@ -14,11 +14,14 @@ import { macroOsuScoreRequest } from "../../messageParser/macros/osuScoreRequest
 import { NOT_FOUND_STATUS_CODE } from "../../info/other";
 import { regexOsuChatHandlerCommandScore } from "../../info/regex";
 // Type imports
-import type { BeatmapRequestsInfo, OsuApiV2Credentials } from "../osu";
 import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
+import type {
+  CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  OsuApiV2Credentials,
+} from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { RegexOsuChatHandlerCommandScore } from "../../info/regex";
 
@@ -28,15 +31,6 @@ export interface CommandScoreCreateReplyInput {
    */
   osuApiV2Credentials?: Readonly<OsuApiV2Credentials>;
 }
-export interface CommandScoreCreateReplyInputExtra
-  extends CommandScoreCreateReplyInput {
-  /**
-   * The osu beatmap requests info.
-   */
-  beatmapRequestsInfo: BeatmapRequestsInfo;
-}
-export type CommandScoreDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
 export interface CommandScoreDetectorOutput {
   /**
    * The osu account name for which the score should be fetched.
@@ -49,8 +43,8 @@ export interface CommandScoreDetectorOutput {
  * custom supplied user.
  */
 export const commandScore: TwitchChatCommandHandler<
-  CommandScoreCreateReplyInputExtra,
-  CommandScoreDetectorInput,
+  CommandScoreCreateReplyInput & CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandGenericDetectorInputEnabledCommands,
   CommandScoreDetectorOutput
 > = {
   createReply: async (_channel, _tags, data, logger) => {
