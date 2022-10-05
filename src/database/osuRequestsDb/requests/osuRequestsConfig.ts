@@ -135,7 +135,7 @@ export const removeEntry = async (
   input: RemoveInput,
   logger: Logger
 ): Promise<boolean> => {
-  const logMethod = createLogMethod(logger, "database_remove");
+  const logMethod = createLogMethod(logger, "database_osu_requests_remove");
   const postResult = await db.requests.post(
     databasePath,
     db.queries.remove(osuRequestsConfigTable.name, {
@@ -150,13 +150,15 @@ export const removeEntry = async (
 // Get entries
 // -----------------------------------------------------------------------------
 
-export interface GetOsuRequestsConfigDbOut {
+interface GetOsuRequestsConfigDbOut {
   option: OsuRequestsConfig;
   optionValue: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GetOsuRequestsConfigOut extends GetOsuRequestsConfigDbOut {}
+export interface GetOsuRequestsConfigOut {
+  option: OsuRequestsConfig;
+  optionValue: string;
+}
 
 export const getEntries = async (
   databasePath: string,
@@ -208,11 +210,8 @@ export const updateEntry = async (
     throw Error(OsuRequestsDbError.NOT_EXISTING);
   }
 
-  const columns = [
-    osuRequestsConfigTable.columns.option.name,
-    osuRequestsConfigTable.columns.optionValue.name,
-  ];
-  const values = [input.option, input.optionValue];
+  const columns = [osuRequestsConfigTable.columns.optionValue.name];
+  const values = [input.optionValue];
   const postResult = await db.requests.post(
     databasePath,
     db.queries.update(osuRequestsConfigTable.name, columns, {

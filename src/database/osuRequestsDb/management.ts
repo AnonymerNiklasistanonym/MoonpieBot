@@ -86,7 +86,9 @@ export const setup = async (
             // Now rename the data but don't drop it in case of errors
             await db.requests.post(
               databasePath,
-              `ALTER TABLE ${osuRequestsConfigTableV001.name} RENAME TO ${osuRequestsConfigTableV001.name}_old_v001;`,
+              db.queries.alterTable(osuRequestsConfigTableV001.name, {
+                newTableName: `${osuRequestsConfigTableV001.name}_old_v001`,
+              }),
               undefined,
               logMethod
             );

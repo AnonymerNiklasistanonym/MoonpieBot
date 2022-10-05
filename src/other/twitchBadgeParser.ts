@@ -5,7 +5,7 @@ import type { ChatUserstate } from "tmi.js";
  * Twitch badge levels.
  * The numbers are taken from the API.
  */
-export const enum TwitchBadgeLevel {
+export enum TwitchBadgeLevel {
   BROADCASTER = 3,
   MODERATOR = 2,
   VIP = 1,
@@ -46,5 +46,24 @@ export const convertTwitchBadgeLevelToString = (
       return "none";
     case TwitchBadgeLevel.VIP:
       return "vip";
+  }
+};
+
+export const convertTwitchBadgeStringToLevel = (
+  badgeLevelString: string
+): TwitchBadgeLevel => {
+  switch (badgeLevelString) {
+    case "broadcaster":
+      return TwitchBadgeLevel.BROADCASTER;
+    case "mod":
+      return TwitchBadgeLevel.MODERATOR;
+    case "none":
+      return TwitchBadgeLevel.NONE;
+    case "vip":
+      return TwitchBadgeLevel.VIP;
+    default:
+      throw Error(
+        `Unexpected Twitch badge level string: '${badgeLevelString}'`
+      );
   }
 };

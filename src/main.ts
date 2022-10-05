@@ -30,28 +30,18 @@ import {
 } from "./strings";
 import { EnvVariable, EnvVariableNone, EnvVariableOnOff } from "./info/env";
 import {
-  fileNameCustomCommands,
-  fileNameCustomTimers,
-  fileNameDatabaseBackups,
-} from "./info/fileNames";
-import {
-  getCustomCommand,
-  loadCustomCommandsFromFile,
-} from "./customCommandsTimers/customCommand";
-import {
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrUndefined,
 } from "./env";
 import {
-  loadCustomTimersFromFile,
-  registerTimer,
-} from "./customCommandsTimers/customTimer";
-import {
   pluginsCustomCommandDataGenerator,
   pluginsCustomCommandGenerator,
-} from "./messageParser/plugins/customCommand";
+} from "./messageParser/plugins/customDataLogic";
+import { createBroadcastScheduledTask } from "./customCommandsBroadcasts/customBroadcast";
 import { createLogFunc } from "./logging";
+import { customCommandChatHandler } from "./customCommandsBroadcasts/customCommand";
 import customCommandsBroadcastsDb from "./database/customCommandsBroadcastsDb";
+import { fileNameDatabaseBackups } from "./info/fileNames";
 import { getVersionFromObject } from "./version";
 import { macroOsuApi } from "./messageParser/macros/osuApi";
 import { moonpieChatHandler } from "./commands/moonpie";
@@ -72,13 +62,13 @@ import spotifyDb from "./database/spotifyDb";
 import { version } from "./info/version";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
-import type { CustomCommandsJson } from "./customCommandsTimers/customCommand";
-import type { CustomTimer } from "./customCommandsTimers/customTimer";
+import type { ChatUserstate } from "tmi.js";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
 import type { OsuIrcBotSendMessageFunc } from "./commands/osu/beatmap";
 import type { PluginTwitchApiData } from "./messageParser/plugins/twitchApi";
 import type { PluginTwitchChatData } from "./messageParser/plugins/twitchChat";
+import type { ScheduledTask } from "node-cron";
 import type SpotifyWebApi from "spotify-web-api-node";
 import type { StreamCompanionConnection } from "./osuStreamCompanion";
 
@@ -108,9 +98,6 @@ export const main = async (
   configDir: string,
   logDir: string
 ): Promise<void> => {
-  const pathCustomTimers = path.join(configDir, fileNameCustomTimers);
-  const pathCustomCommands = path.join(configDir, fileNameCustomCommands);
-
   const loggerMain = createLogFunc(logger, LOG_ID);
 
   // Read in paths/values from environment variables
@@ -233,10 +220,13 @@ export const main = async (
 
   // Initialize global objects
   // Twitch connection
+  const twitchClientChannels = twitchChannels
+    ?.split(" ")
+    .filter((a) => a.trim().length !== 0);
   const twitchClient = createTwitchClient(
     twitchName,
     twitchOAuthToken,
-    twitchChannels?.split(" ").filter((a) => a.trim().length !== 0),
+    twitchClientChannels,
     twitchDebug,
     logger
   );
@@ -288,28 +278,6 @@ export const main = async (
       logger
     );
   }
-
-  // Load custom commands/timers from files
-  const customCommands: CustomCommandsJson = {
-    commands: [],
-    data: [],
-  };
-  const customTimers: CustomTimer[] = [];
-  const loadCustomCommands = async () => {
-    const data = await loadCustomCommandsFromFile(pathCustomCommands, logger);
-    customCommands.commands.push(...data.customCommands);
-    if (data.customCommandsGlobalData) {
-      if (customCommands.data === undefined) {
-        customCommands.data = [];
-      }
-      customCommands.data.push(...data.customCommandsGlobalData);
-    }
-  };
-  const loadCustomTimers = async () => {
-    customTimers.push(
-      ...(await loadCustomTimersFromFile(pathCustomTimers, logger))
-    );
-  };
 
   // Setup/Migrate/Backup moonpie database
   const setupMigrateBackupMoonpieDatabase = async () => {
@@ -382,8 +350,6 @@ export const main = async (
 
   // Run all file related async methods in parallel
   await Promise.all([
-    loadCustomCommands(),
-    loadCustomTimers(),
     setupMigrateBackupMoonpieDatabase(),
     setupMigrateCustomCommandsBroadcastsDatabase(),
     setupMigrateOsuRequestsDatabase(),
@@ -441,6 +407,255 @@ export const main = async (
     pluginMap.set(pluginSpotifyReady.id, pluginSpotifyReady.func);
   }
 
+  // Setup custom commands
+  const customCommands =
+    await customCommandsBroadcastsDb.requests.customCommand.getEntries(
+      pathDatabaseCustomCommandsBroadcasts,
+      logger
+    );
+
+  // Setup custom broadcasts
+  const customBroadcasts =
+    await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
+      pathDatabaseCustomCommandsBroadcasts,
+      logger
+    );
+  const customBroadcastsScheduledTasks = new Map<string, ScheduledTask>();
+  for (const customBroadcast of customBroadcasts) {
+    const customBroadcastScheduledTask = createBroadcastScheduledTask(
+      twitchClient,
+      twitchClientChannels ? twitchClientChannels : [],
+      customBroadcast,
+      stringMap,
+      pluginMap,
+      macroMap,
+      logger
+    );
+    customBroadcastsScheduledTasks.set(
+      customBroadcast.id,
+      customBroadcastScheduledTask
+    );
+  }
+
+  /**
+   * Run this method every time a new message is detected.
+   * This is a method on it's own in order to maybe support more than twitch in
+   * the future and to decouple it from the Twitch event logic.
+   *
+   * @param channel The Twitch channel (#channel_name).
+   * @param tags The Twitch message tags.
+   * @param message The message.
+   * @param self True if the message was written by this client.
+   */
+  const onNewMessage = async (
+    channel: string,
+    tags: ChatUserstate,
+    message: string,
+    self: boolean
+  ): Promise<void> => {
+    // Ignore messages written by the Twitch client
+    if (self) {
+      return;
+    }
+
+    const pluginMapChannel = new Map(pluginMap);
+    const macroMapChannel = new Map(macroMap);
+    const tempTwitchApiClient = twitchApiClient;
+    if (tempTwitchApiClient !== undefined) {
+      pluginsTwitchApiGenerator.forEach((a) => {
+        const plugin = generatePlugin<PluginTwitchApiData>(a, {
+          channelName: channel.slice(1),
+          twitchApiClient: tempTwitchApiClient,
+          twitchUserId: tags["user-id"],
+        });
+        pluginMapChannel.set(plugin.id, plugin.func);
+      });
+    }
+    pluginsTwitchChatGenerator.forEach((a) => {
+      const plugin = generatePlugin<PluginTwitchChatData>(a, {
+        channelName: channel.slice(1),
+        userId: tags["user-id"],
+        userName: tags.username,
+      });
+      pluginMapChannel.set(plugin.id, plugin.func);
+    });
+
+    // Handle all bot commands
+    try {
+      await moonpieChatHandler(
+        twitchClient,
+        channel,
+        tags,
+        message,
+        {
+          enabledCommands: moonpieEnableCommands,
+          moonpieClaimCooldownHours: moonpieClaimCooldownHoursNumber,
+          moonpieDbPath: pathDatabaseMoonpie,
+        },
+        stringMap,
+        pluginMapChannel,
+        macroMapChannel,
+        logger
+      );
+    } catch (err) {
+      loggerMain.error(err as Error);
+      // When the chat handler throws an error write the error message in chat
+      const errorInfo = err as ErrorWithCode;
+      twitchClient
+        .say(
+          channel,
+          `${tags.username ? "@" + tags.username + " " : ""}Moonpie Error: ${
+            errorInfo.message
+          }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
+        )
+        .catch(loggerMain.error);
+    }
+
+    if (enableOsu || osuStreamCompanionCurrentMapData !== undefined) {
+      try {
+        await osuChatHandler(
+          twitchClient,
+          channel,
+          tags,
+          message,
+          enableOsu
+            ? {
+                defaultOsuId: parseInt(osuApiDefaultId),
+                enableOsuBeatmapRequests,
+                enableOsuBeatmapRequestsDetailed,
+                enableOsuBeatmapRequestsRedeemId,
+                enabledCommands: osuEnableCommands,
+                osuApiDbPath: pathDatabaseOsuApi,
+                osuApiV2Credentials: {
+                  clientId: parseInt(osuApiClientId),
+                  clientSecret: osuApiClientSecret,
+                },
+                osuIrcBot,
+                osuIrcRequestTarget,
+                osuStreamCompanionCurrentMapData,
+              }
+            : {
+                enabledCommands: osuEnableCommands.filter(
+                  (a) => a === OsuCommands.NP || a === OsuCommands.COMMANDS
+                ),
+                osuStreamCompanionCurrentMapData,
+              },
+          stringMap,
+          pluginMapChannel,
+          macroMapChannel,
+          logger
+        );
+      } catch (err) {
+        loggerMain.error(err as Error);
+        // When the chat handler throws an error write the error message in chat
+        const errorInfo = err as ErrorWithCode;
+        twitchClient
+          .say(
+            channel,
+            `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
+              errorInfo.message
+            }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
+          )
+          .catch(loggerMain.error);
+      }
+    }
+
+    if (spotifyWebApi !== undefined) {
+      try {
+        await spotifyChatHandler(
+          twitchClient,
+          channel,
+          tags,
+          message,
+          {
+            enabledCommands: spotifyEnableCommands,
+            spotifyWebApi,
+          },
+          stringMap,
+          pluginMapChannel,
+          macroMapChannel,
+          logger
+        );
+      } catch (err) {
+        loggerMain.error(err as Error);
+        // When the chat handler throws an error write the error message in chat
+        const errorInfo = err as ErrorWithCode;
+        twitchClient
+          .say(
+            channel,
+            `${tags.username ? "@" + tags.username + " " : ""}Spotify Error: ${
+              errorInfo.message
+            }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
+          )
+          .catch(loggerMain.error);
+      }
+    }
+
+    // Check custom commands
+    try {
+      const pluginsCustomCommands = new Map(pluginMapChannel);
+      // Add plugins to manipulate custom command global data
+      pluginsCustomCommandDataGenerator.forEach((a) => {
+        const plugin = generatePlugin(a, {
+          databasePath: pathDatabaseCustomCommandsBroadcasts,
+        });
+        pluginsCustomCommands.set(plugin.id, plugin.func);
+      });
+      for (const customCommand of customCommands) {
+        const pluginsCustomCommand = new Map(pluginsCustomCommands);
+        // Add plugins to manipulate custom command
+        pluginsCustomCommandGenerator.forEach((a) => {
+          const plugin = generatePlugin(a, { customCommand });
+          pluginsCustomCommand.set(plugin.id, plugin.func);
+        });
+
+        const executed = await runTwitchCommandHandler(
+          twitchClient,
+          channel,
+          tags,
+          message,
+          {},
+          stringMap,
+          pluginsCustomCommand,
+          macroMapChannel,
+          logger,
+          customCommandChatHandler(
+            customCommand,
+            pathDatabaseCustomCommandsBroadcasts
+          )
+        );
+        if (!executed) {
+          continue;
+        }
+        customCommand.count += 1;
+        customCommand.timestampLastExecution = Date.now();
+        await customCommandsBroadcastsDb.requests.customCommand.updateEntry(
+          pathDatabaseCustomCommandsBroadcasts,
+          {
+            countIncrease: 1,
+            id: customCommand.id,
+            timestampLastExecution: customCommand.timestampLastExecution,
+          },
+          logger
+        );
+      }
+    } catch (err) {
+      loggerMain.error(err as Error);
+      // When the chat handler throws an error write the error message in chat
+      const errorInfo = err as ErrorWithCode;
+      twitchClient
+        .say(
+          channel,
+          `${
+            tags.username ? "@" + tags.username + " " : ""
+          }Custom Command Error: ${errorInfo.message}${
+            errorInfo.code ? " (" + errorInfo.code + ")" : ""
+          }`
+        )
+        .catch(loggerMain.error);
+    }
+  };
+
   // Connect functionality to Twitch connection triggers
   twitchClient.on(
     TwitchClientListener.NEW_REDEEM,
@@ -486,208 +701,9 @@ export const main = async (
   twitchClient.on(
     TwitchClientListener.NEW_MESSAGE,
     (channel, tags, message, self) => {
-      // Ignore messages written by the Twitch client
-      if (self) {
-        return;
-      }
-
-      const pluginMapChannel = new Map(pluginMap);
-      const macroMapChannel = new Map(macroMap);
-      const tempTwitchApiClient = twitchApiClient;
-      if (tempTwitchApiClient !== undefined) {
-        pluginsTwitchApiGenerator.forEach((a) => {
-          const plugin = generatePlugin<PluginTwitchApiData>(a, {
-            channelName: channel.slice(1),
-            twitchApiClient: tempTwitchApiClient,
-            twitchUserId: tags["user-id"],
-          });
-          pluginMapChannel.set(plugin.id, plugin.func);
-        });
-      }
-      pluginsTwitchChatGenerator.forEach((a) => {
-        const plugin = generatePlugin<PluginTwitchChatData>(a, {
-          channelName: channel.slice(1),
-          userId: tags["user-id"],
-          userName: tags.username,
-        });
-        pluginMapChannel.set(plugin.id, plugin.func);
-      });
-
-      // Handle all bot commands
-      moonpieChatHandler(
-        twitchClient,
-        channel,
-        tags,
-        message,
-        {
-          enabledCommands: moonpieEnableCommands,
-          moonpieClaimCooldownHours: moonpieClaimCooldownHoursNumber,
-          moonpieDbPath: pathDatabaseMoonpie,
-        },
-        stringMap,
-        pluginMapChannel,
-        macroMapChannel,
-        logger
-      ).catch((err) => {
+      onNewMessage(channel, tags, message, self).catch((err) => {
         loggerMain.error(err as Error);
-        // When the chat handler throws an error write the error message in chat
-        const errorInfo = err as ErrorWithCode;
-        twitchClient
-          .say(
-            channel,
-            `${tags.username ? "@" + tags.username + " " : ""}Moonpie Error: ${
-              errorInfo.message
-            }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
-          )
-          .catch(loggerMain.error);
       });
-
-      if (enableOsu || osuStreamCompanionCurrentMapData !== undefined) {
-        osuChatHandler(
-          twitchClient,
-          channel,
-          tags,
-          message,
-          enableOsu
-            ? {
-                defaultOsuId: parseInt(osuApiDefaultId),
-                enableOsuBeatmapRequests,
-                enableOsuBeatmapRequestsDetailed,
-                enableOsuBeatmapRequestsRedeemId,
-                enabledCommands: osuEnableCommands,
-                osuApiDbPath: pathDatabaseOsuApi,
-                osuApiV2Credentials: {
-                  clientId: parseInt(osuApiClientId),
-                  clientSecret: osuApiClientSecret,
-                },
-                osuIrcBot,
-                osuIrcRequestTarget,
-                osuStreamCompanionCurrentMapData,
-              }
-            : {
-                enabledCommands: osuEnableCommands.filter(
-                  (a) => a === OsuCommands.NP || a === OsuCommands.COMMANDS
-                ),
-                osuStreamCompanionCurrentMapData,
-              },
-          stringMap,
-          pluginMapChannel,
-          macroMapChannel,
-          logger
-        ).catch((err) => {
-          loggerMain.error(err as Error);
-          // When the chat handler throws an error write the error message in chat
-          const errorInfo = err as ErrorWithCode;
-          twitchClient
-            .say(
-              channel,
-              `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
-                errorInfo.message
-              }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
-            )
-            .catch(loggerMain.error);
-        });
-      }
-
-      if (spotifyWebApi !== undefined) {
-        spotifyChatHandler(
-          twitchClient,
-          channel,
-          tags,
-          message,
-          {
-            enabledCommands: spotifyEnableCommands,
-            spotifyWebApi,
-          },
-          stringMap,
-          pluginMapChannel,
-          macroMapChannel,
-          logger
-        ).catch((err) => {
-          loggerMain.error(err as Error);
-          // When the chat handler throws an error write the error message in chat
-          const errorInfo = err as ErrorWithCode;
-          twitchClient
-            .say(
-              channel,
-              `${
-                tags.username ? "@" + tags.username + " " : ""
-              }Spotify Error: ${errorInfo.message}${
-                errorInfo.code ? " (" + errorInfo.code + ")" : ""
-              }`
-            )
-            .catch(loggerMain.error);
-        });
-      }
-
-      // Check custom commands
-      try {
-        const pluginsCustomCommands = new Map(pluginMapChannel);
-        // Add plugins to manipulate custom command global data
-        pluginsCustomCommandDataGenerator.forEach((a) => {
-          const plugin = generatePlugin(a, { customCommands });
-          pluginsCustomCommands.set(plugin.id, plugin.func);
-        });
-        for (const customCommand of customCommands.commands.filter((a) =>
-          a.channels.includes(channel.slice(1))
-        )) {
-          const pluginsCustomCommand = new Map(pluginsCustomCommands);
-          // Add plugins to manipulate custom command
-          pluginsCustomCommandGenerator.forEach((a) => {
-            const plugin = generatePlugin(a, { customCommand });
-            pluginsCustomCommand.set(plugin.id, plugin.func);
-          });
-
-          runTwitchCommandHandler(
-            twitchClient,
-            channel,
-            tags,
-            message,
-            {},
-            stringMap,
-            pluginsCustomCommand,
-            macroMapChannel,
-            logger,
-            getCustomCommand(customCommand)
-          )
-            .then((executed) => {
-              if (!executed) {
-                return;
-              }
-              if (customCommand.count === undefined) {
-                customCommand.count = 1;
-              } else {
-                customCommand.count += 1;
-              }
-              // Save custom command counts to files
-              writeJsonFile<CustomCommandsJson>(pathCustomCommands, {
-                $schema: "./customCommands.schema.json",
-                ...customCommands,
-              })
-                .then(() => {
-                  loggerMain.info("Custom commands were saved");
-                })
-                .catch(loggerMain.error);
-            })
-            .catch((err) => {
-              loggerMain.error(err as Error);
-              // When the chat handler throws an error write the error message in chat
-              const errorInfo = err as ErrorWithCode;
-              twitchClient
-                .say(
-                  channel,
-                  `${
-                    tags.username ? "@" + tags.username + " " : ""
-                  }Custom Command Error: ${errorInfo.message}${
-                    errorInfo.code ? " (" + errorInfo.code + ")" : ""
-                  }`
-                )
-                .catch(loggerMain.error);
-            });
-        }
-      } catch (err) {
-        loggerMain.error(err as Error);
-      }
     }
   );
 
@@ -700,25 +716,7 @@ export const main = async (
   // Connect Twitch client to Twitch
   await twitchClient.connect();
 
-  // Register custom timers
-  try {
-    for (const customTimer of customTimers) {
-      registerTimer(
-        twitchClient,
-        customTimer.channels,
-        customTimer.message,
-        customTimer.cronString,
-        stringMap,
-        pluginMap,
-        macroMap,
-        logger
-      );
-    }
-  } catch (err) {
-    loggerMain.error(err as Error);
-  }
-
-  // Check if IRC bot is working
+  // Send osu! IRC message when bot is started
   if (enableOsu && osuIrcBot && osuIrcRequestTarget) {
     try {
       await tryToSendOsuIrcMessage(

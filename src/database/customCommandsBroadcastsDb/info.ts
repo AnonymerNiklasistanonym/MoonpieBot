@@ -7,9 +7,28 @@ import type { SqliteTable } from "sqlite3-promise-query-api";
  * The SQLite table for custom commands.
  */
 export const customCommandsTable: SqliteTable<
-  "description" | "id" | "message" | "regex" | "userLevel"
+  | "cooldownInS"
+  | "count"
+  | "description"
+  | "id"
+  | "message"
+  | "regex"
+  | "timestampLastExecution"
+  | "userLevel"
 > = {
   columns: {
+    /** The time between the command can be used. */
+    cooldownInS: {
+      name: "cooldown_in_s",
+      options: { default: 0, notNull: true },
+      type: db.queries.CreateTableColumnType.INTEGER,
+    },
+    /** The amount of times the command was used. */
+    count: {
+      name: "count",
+      options: { default: 0, notNull: true },
+      type: db.queries.CreateTableColumnType.INTEGER,
+    },
     /** An optional description. */
     description: {
       name: "description",
@@ -33,20 +52,27 @@ export const customCommandsTable: SqliteTable<
       options: { notNull: true },
       type: db.queries.CreateTableColumnType.TEXT,
     },
+    /** The timestamp of the last command execution. */
+    timestampLastExecution: {
+      name: "timestamp_last_execution",
+      type: db.queries.CreateTableColumnType.INTEGER,
+    },
     /** The user level for what messages can use this command. */
     userLevel: {
-      name: "userlevel",
+      name: "user_level",
       options: { notNull: true },
       type: db.queries.CreateTableColumnType.TEXT,
     },
   },
-  name: "customcommands",
+  name: "custom_commands",
 };
 
 /**
  * The SQLite table for custom data for custom commands and broadcasts.
  */
-export const customDataTable: SqliteTable<"id" | "description" | "value"> = {
+export const customDataTable: SqliteTable<
+  "id" | "description" | "value" | "valueType"
+> = {
   columns: {
     /** An optional description. */
     description: {
@@ -65,8 +91,14 @@ export const customDataTable: SqliteTable<"id" | "description" | "value"> = {
       options: { notNull: true },
       type: db.queries.CreateTableColumnType.TEXT,
     },
+    /** The value type of the custom data (number, string, string_list). */
+    valueType: {
+      name: "value_type",
+      options: { notNull: true },
+      type: db.queries.CreateTableColumnType.TEXT,
+    },
   },
-  name: "customdata",
+  name: "custom_data",
 };
 
 /**
@@ -78,7 +110,7 @@ export const customBroadcastsTable: SqliteTable<
   columns: {
     /** The cron string that is used to determine when the broadcast should be sent. */
     cronString: {
-      name: "cronstring",
+      name: "cron_string",
       options: { notNull: true },
       type: db.queries.CreateTableColumnType.TEXT,
     },
@@ -100,7 +132,7 @@ export const customBroadcastsTable: SqliteTable<
       type: db.queries.CreateTableColumnType.TEXT,
     },
   },
-  name: "custombroadcasts",
+  name: "custom_broadcasts",
 };
 
 export const versionCurrent = {

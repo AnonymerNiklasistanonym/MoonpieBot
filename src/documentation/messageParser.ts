@@ -387,10 +387,25 @@ export const createMessageForMessageParser = (
       }
       switch (a.type) {
         case "macro":
+          if (a.name === undefined || a.key === undefined) {
+            throw Error(
+              `Macro name/key was undefined (${JSON.stringify({ a, message })})`
+            );
+          }
           return `%${a.name}:${a.key}%`;
         case "reference":
+          if (a.name === undefined) {
+            throw Error(
+              `Reference name was undefined (${JSON.stringify({ a, message })})`
+            );
+          }
           return `$[${a.name}]`;
         case "plugin":
+          if (a.name === undefined) {
+            throw Error(
+              `Plugin name was undefined (${JSON.stringify({ a, message })})`
+            );
+          }
           // eslint-disable-next-line no-case-declarations
           let pluginText = `$(${a.name}`;
           if (a.args) {

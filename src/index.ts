@@ -33,7 +33,6 @@ import {
   fileNameEnvStringsExample,
 } from "./info/fileNames";
 import { cliHelpGenerator } from "./cli";
-import { createCustomCommandTimerExampleFiles } from "./customCommandsTimers/createExampleFiles";
 import { createStringsVariableDocumentation } from "./documentation/strings";
 import { defaultStringMap } from "./strings";
 import { genericStringSorter } from "./other/genericStringSorter";
@@ -138,7 +137,6 @@ const entryPoint = async () => {
           defaultMacrosOptional,
           logger
         ),
-        createCustomCommandTimerExampleFiles(configDir),
       ]);
       process.exit(0);
     }

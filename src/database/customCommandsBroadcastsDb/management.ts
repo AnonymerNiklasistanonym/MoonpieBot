@@ -5,6 +5,9 @@ import {
   customDataTable,
   versionCurrent,
 } from "./info";
+import { customBroadcastsInformation } from "../../info/customBroadcasts";
+import customCommandsBroadcastsDb from "../customCommandsBroadcastsDb";
+import { customCommandsInformation } from "../../info/customCommands";
 import { genericSetupDatabase } from "../generic/setup";
 import { getVersionFromObject } from "../../version";
 // Type imports
@@ -35,8 +38,34 @@ export const setup = async (
           },current=${getVersionFromObject(currentVersion, "")})!`
         );
       },
-      setupInitialData: () => {
-        // TODO Write examples to the database (at least for commands)
+      setupInitialData: async () => {
+        for (const exampleEntry of customCommandsInformation) {
+          await customCommandsBroadcastsDb.requests.customCommand.createEntry(
+            databasePath,
+            {
+              cooldownInS: exampleEntry.cooldownInS,
+              count: exampleEntry.count,
+              description: exampleEntry.description,
+              id: exampleEntry.id,
+              message: exampleEntry.message,
+              regex: exampleEntry.regex,
+              userLevel: exampleEntry.userLevel,
+            },
+            logger
+          );
+        }
+        for (const exampleEntry of customBroadcastsInformation) {
+          await customCommandsBroadcastsDb.requests.customBroadcast.createEntry(
+            databasePath,
+            {
+              cronString: exampleEntry.cronString,
+              description: exampleEntry.description,
+              id: exampleEntry.id,
+              message: exampleEntry.message,
+            },
+            logger
+          );
+        }
       },
     },
     logger
