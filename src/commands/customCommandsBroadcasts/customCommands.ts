@@ -6,16 +6,23 @@ import {
 import {
   customCommandsBroadcastsCommandReplyAddCC,
   customCommandsBroadcastsCommandReplyAddCCAlreadyExists,
+  customCommandsBroadcastsCommandReplyCCInvalidRegex,
+  customCommandsBroadcastsCommandReplyCCNotFound,
+  customCommandsBroadcastsCommandReplyDelCC,
 } from "../../strings/customCommandsBroadcasts/commandReply";
 import {
   CustomCommandsBroadcastsCommands,
   LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
 } from "../../info/commands";
+import {
+  regexCustomCommandAdd,
+  regexCustomCommandDelete,
+} from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../../twitch";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { macroCustomCommandInfo } from "../../messageParser/macros/customCommands";
-import { regexCustomCommandAdd } from "../../info/regex";
+import { parseRegexStringArgument } from "../helper";
 // Type imports
 import type {
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath,
@@ -25,9 +32,12 @@ import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
-import type { RegexCustomCommandAdd } from "../../info/regex";
+import type {
+  RegexCustomCommandAdd,
+  RegexCustomCommandDelete,
+} from "../../info/regex";
 
-export interface CommandDeleteDetectorOutput {
+export interface CommandAddDetectorOutput {
   customCommandCooldownInS?: number;
   customCommandId: string;
   customCommandMessage: string;
@@ -35,13 +45,13 @@ export interface CommandDeleteDetectorOutput {
   customCommandUserLevel?: TwitchBadgeLevel;
 }
 /**
- * Add command: Add a custom command.
+ * Add a custom command.
  */
 export const commandAddCC: TwitchChatCommandHandler<
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
     CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
   CommandGenericDetectorInputEnabledCommands,
-  CommandDeleteDetectorOutput
+  CommandAddDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
@@ -52,25 +62,39 @@ export const commandAddCC: TwitchChatCommandHandler<
       return twitchBadgeLevelCheck;
     }
 
+    const customCommandInfo = {
+      cooldownInS: data.customCommandCooldownInS,
+      id: data.customCommandId,
+      message: data.customCommandMessage,
+      regex: data.customCommandRegex,
+      userLevel: data.customCommandUserLevel,
+    };
+
+    try {
+      // eslint-disable-next-line security/detect-non-literal-regexp
+      new RegExp(data.customCommandRegex, "i");
+    } catch (err) {
+      // TODO Add error information
+      return {
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroCustomCommandInfo,
+          customCommandInfo
+        ),
+        messageId: customCommandsBroadcastsCommandReplyCCInvalidRegex.id,
+      };
+    }
+
     const exists =
       await customCommandsBroadcastsDb.requests.customCommand.existsEntry(
         data.customCommandsBroadcastsDbPath,
-        {
-          id: data.customCommandId,
-        },
+        { id: data.customCommandId },
         logger
       );
 
     if (!exists) {
       await customCommandsBroadcastsDb.requests.customCommand.createEntry(
         data.customCommandsBroadcastsDbPath,
-        {
-          cooldownInS: data.customCommandCooldownInS,
-          id: data.customCommandId,
-          message: data.customCommandMessage,
-          regex: data.customCommandRegex,
-          userLevel: data.customCommandUserLevel,
-        },
+        customCommandInfo,
         logger
       );
       data.customCommandsBroadcastsRefreshHelper.refreshCustomCommands = true;
@@ -79,13 +103,7 @@ export const commandAddCC: TwitchChatCommandHandler<
     return {
       additionalMacros: generateMacroMapFromMacroGenerator(
         macroCustomCommandInfo,
-        {
-          cooldownInS: data.customCommandCooldownInS,
-          id: data.customCommandId,
-          message: data.customCommandMessage,
-          regex: data.customCommandRegex,
-          userLevel: data.customCommandUserLevel,
-        }
+        customCommandInfo
       ),
       messageId: exists
         ? customCommandsBroadcastsCommandReplyAddCCAlreadyExists.id
@@ -95,7 +113,7 @@ export const commandAddCC: TwitchChatCommandHandler<
   detect: (_tags, message, data) => {
     if (
       !data.enabledCommands.includes(
-        CustomCommandsBroadcastsCommands.ADD_CUSTOM_BROADCAST
+        CustomCommandsBroadcastsCommands.ADD_CUSTOM_COMMAND
       )
     ) {
       return false;
@@ -110,11 +128,17 @@ export const commandAddCC: TwitchChatCommandHandler<
     }
     return {
       data: {
-        ...matchGroups,
         customCommandCooldownInS:
           matchGroups.customCommandCooldownInS !== undefined
             ? parseInt(matchGroups.customCommandCooldownInS)
             : undefined,
+        customCommandId: parseRegexStringArgument(matchGroups.customCommandId),
+        customCommandMessage: parseRegexStringArgument(
+          matchGroups.customCommandMessage
+        ),
+        customCommandRegex: parseRegexStringArgument(
+          matchGroups.customCommandRegex
+        ),
         customCommandUserLevel:
           matchGroups.customCommandUserLevel !== undefined
             ? convertTwitchBadgeStringToLevel(
@@ -127,5 +151,84 @@ export const commandAddCC: TwitchChatCommandHandler<
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
     id: CustomCommandsBroadcastsCommands.ADD_CUSTOM_COMMAND,
+  },
+};
+
+export interface CommandDeleteDetectorOutput {
+  customCommandId: string;
+}
+/**
+ * Delete a custom command.
+ */
+export const commandDelCC: TwitchChatCommandHandler<
+  CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
+    CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
+  CommandGenericDetectorInputEnabledCommands,
+  CommandDeleteDetectorOutput
+> = {
+  createReply: async (_channel, tags, data, logger) => {
+    const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
+      tags,
+      TwitchBadgeLevel.MODERATOR
+    );
+    if (twitchBadgeLevelCheck !== undefined) {
+      return twitchBadgeLevelCheck;
+    }
+
+    const customCommandInfo = {
+      id: data.customCommandId,
+    };
+
+    const exists =
+      await customCommandsBroadcastsDb.requests.customCommand.existsEntry(
+        data.customCommandsBroadcastsDbPath,
+        { id: data.customCommandId },
+        logger
+      );
+
+    if (exists) {
+      await customCommandsBroadcastsDb.requests.customCommand.removeEntry(
+        data.customCommandsBroadcastsDbPath,
+        customCommandInfo,
+        logger
+      );
+      data.customCommandsBroadcastsRefreshHelper.refreshCustomCommands = true;
+    }
+
+    return {
+      additionalMacros: generateMacroMapFromMacroGenerator(
+        macroCustomCommandInfo,
+        customCommandInfo
+      ),
+      messageId: exists
+        ? customCommandsBroadcastsCommandReplyDelCC.id
+        : customCommandsBroadcastsCommandReplyCCNotFound.id,
+    };
+  },
+  detect: (_tags, message, data) => {
+    if (
+      !data.enabledCommands.includes(
+        CustomCommandsBroadcastsCommands.DELETE_CUSTOM_COMMAND
+      )
+    ) {
+      return false;
+    }
+    const match = message.match(regexCustomCommandDelete);
+    if (!match) {
+      return false;
+    }
+    const matchGroups = match.groups as undefined | RegexCustomCommandDelete;
+    if (!matchGroups) {
+      throw Error("RegexCustomCommandDelete groups undefined");
+    }
+    return {
+      data: {
+        customCommandId: parseRegexStringArgument(matchGroups.customCommandId),
+      },
+    };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
+    id: CustomCommandsBroadcastsCommands.DELETE_CUSTOM_COMMAND,
   },
 };

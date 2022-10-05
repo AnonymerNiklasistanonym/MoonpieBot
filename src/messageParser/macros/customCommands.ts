@@ -7,8 +7,8 @@ import type { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
 export interface MacroCustomCommandInfoData {
   cooldownInS?: number;
   id: string;
-  message: string;
-  regex: string;
+  message?: string;
+  regex?: string;
   userLevel?: TwitchBadgeLevel;
 }
 export enum MacroCustomCommandInfo {
