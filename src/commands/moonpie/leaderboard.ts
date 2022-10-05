@@ -1,5 +1,9 @@
 // Local imports
 import {
+  generateMacroMapFromMacroGenerator,
+  messageParserById,
+} from "../../messageParser";
+import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
 } from "../../info/commands";
@@ -13,7 +17,6 @@ import {
   moonpieCommandReplyLeaderboardPrefix,
 } from "../../strings/moonpie/commandReply";
 import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../info/other";
-import { messageParserById } from "../../messageParser";
 import moonpieDb from "../../database/moonpieDb";
 import { regexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 // Type imports
@@ -22,7 +25,6 @@ import type {
   TwitchChatCommandHandler,
 } from "../../twitch";
 import type { CommandMoonpieGenericDataMoonpieDbPath } from "../moonpie";
-import type { MacroMap } from "../../messageParser";
 import type { RegexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 
 const NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH = 10;
@@ -47,17 +49,12 @@ export const commandLeaderboard: TwitchChatCommandHandler<
         logger
       );
 
-    const macros: MacroMap = new Map();
-    macros.set(
-      macroMoonpieLeaderboard.id,
-      new Map(
-        macroMoonpieLeaderboard.generate({ startingRank: data.startingRank })
-      )
-    );
-
     if (moonpieEntries.length === 0) {
       return {
-        additionalMacros: macros,
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroMoonpieLeaderboard,
+          { startingRank: data.startingRank }
+        ),
         isError: true,
         messageId: moonpieCommandReplyLeaderboardErrorNoEntriesFound.id,
       };
@@ -71,7 +68,12 @@ export const commandLeaderboard: TwitchChatCommandHandler<
         globalMacros,
         logger2
       ) => {
-        const mergedMacros = new Map([...globalMacros, ...macros]);
+        const mergedMacros = new Map([
+          ...globalMacros,
+          ...generateMacroMapFromMacroGenerator(macroMoonpieLeaderboard, {
+            startingRank: data.startingRank,
+          }),
+        ]);
         let messageLeaderboard = await messageParserById(
           moonpieCommandReplyLeaderboardPrefix.id,
           globalStrings,
@@ -81,23 +83,22 @@ export const commandLeaderboard: TwitchChatCommandHandler<
         );
         const messageLeaderboardEntries = [];
         for (const moonpieEntry of moonpieEntries) {
-          const macrosLeaderboardEntry = new Map(mergedMacros);
-          macrosLeaderboardEntry.set(
-            macroMoonpieLeaderboardEntry.id,
-            new Map(
-              macroMoonpieLeaderboardEntry.generate({
-                count: moonpieEntry.count,
-                name: moonpieEntry.name,
-                rank: moonpieEntry.rank,
-              })
-            )
-          );
           messageLeaderboardEntries.push(
             await messageParserById(
               moonpieCommandReplyLeaderboardEntry.id,
               globalStrings,
               globalPlugins,
-              macrosLeaderboardEntry,
+              new Map([
+                ...mergedMacros,
+                ...generateMacroMapFromMacroGenerator(
+                  macroMoonpieLeaderboardEntry,
+                  {
+                    count: moonpieEntry.count,
+                    name: moonpieEntry.name,
+                    rank: moonpieEntry.rank,
+                  }
+                ),
+              ]),
               logger
             )
           );

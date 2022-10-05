@@ -1,5 +1,6 @@
 // Local imports
 // TODO Add commands
+import { commandAddCC } from "./customCommandsBroadcasts/customCommands";
 import { commandCommands } from "./customCommandsBroadcasts/commands";
 import { runTwitchCommandHandler } from "../twitch";
 // Type imports
@@ -13,9 +14,23 @@ export interface CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadca
    */
   customCommandsBroadcastsDbPath: string;
 }
+export interface CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper {
+  /**
+   * Helper object to refresh custom commands/broadcasts if they are updated.
+   */
+  customCommandsBroadcastsRefreshHelper: CustomCommandsBroadcastsRefreshHelper;
+}
+
+export interface CustomCommandsBroadcastsRefreshHelper {
+  /** If set to true custom broadcasts will be refreshed. */
+  refreshCustomBroadcasts: boolean;
+  /** If set to true custom commands will be refreshed. */
+  refreshCustomCommands: boolean;
+}
 
 export interface CustomCommandsBroadcastsChatHandlerData
   extends CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath,
+    CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
     CommandGenericDetectorInputEnabledCommands {}
 
 export const customCommandsBroadcastsChatHandler: TwitchChatHandler<
@@ -34,6 +49,22 @@ export const customCommandsBroadcastsChatHandler: TwitchChatHandler<
   // Handle commands
   await Promise.all(
     [commandCommands].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        data,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
+    [commandAddCC].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,

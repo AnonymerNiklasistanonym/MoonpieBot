@@ -453,24 +453,24 @@ export const regexCustomCommandsBroadcastsCommands =
   /^\s*!(?:ccs?|cbs?)\s+commands(?:\s*$)/i;
 
 // TODO Implement
-export interface RegexCustomCommandAddRemove {
+export interface RegexCustomCommandAdd {
+  customCommandCooldownInS?: string;
   customCommandId: string;
-  customCommandOption: "add" | "remove";
+  customCommandMessage: string;
+  customCommandRegex: string;
+  customCommandUserLevel?: "mod" | "vip" | "none" | "broadcaster";
 }
 /**
  * Regex to recognize the !customCommand add/remove $ID command.
  *
  * @example
  * ```text
- * !customCommand add ping
- * ```
- * @example
- * ```text
- * !customCommand remove ping
+ * !addcc ID REGES MESSAGE -ul=mod -cd=12
  * ```
  */
-export const regexCustomCommandAddRemove =
-  /^\s*!customCommand\s+(?<customCommandOption>add|remove)\s+(?<customCommandId>\S+?)(?:\s*$)/i;
+export const regexCustomCommandAdd =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!addcc\s+(?<customCommandId>\S+|'\S+')\s+(?<customCommandRegex>\S+|'\S+')\s+(?<customCommandMessage>\S+|'\S+')(?:\s+-ul=(?<customCommandUserLevel>mod|vip|none|broadcaster))?(?:\s+-cd=(?<customCommandCooldownInS>[0-9]+))?(?:\s|$)/i;
 
 // TODO Implement
 export interface RegexCustomCommandSet {

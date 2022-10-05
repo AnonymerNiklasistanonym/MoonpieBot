@@ -70,11 +70,11 @@ export const createBroadcastScheduledTask = (
 
 export const stopBroadcastScheduledTask = (
   cronTask: ScheduledTask,
-  customBroadcast: CustomBroadcast,
+  customBroadcastId: string,
   logger: Logger
 ): void => {
   const logCustomTimer = createLogFunc(logger, LOG_ID, "stop_broadcast");
 
   cronTask.stop();
-  logCustomTimer.debug(`Broadcast '${customBroadcast.id}' was stopped`);
+  logCustomTimer.debug(`Broadcast '${customBroadcastId}' was stopped`);
 };

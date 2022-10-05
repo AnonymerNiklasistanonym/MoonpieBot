@@ -24,6 +24,7 @@ import {
 } from "./macros/osuStreamCompanion";
 import { checkMacrosForDuplicates } from "./macrosHelper";
 import { macroCommandEnabled } from "./macros/commands";
+import { macroCustomCommandInfo } from "./macros/customCommands";
 import { macroMoonpieBot } from "./macros/moonpiebot";
 import { macroOsuPpRpRequest } from "./macros/osuPpRpRequest";
 import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
@@ -86,6 +87,7 @@ export const defaultMacros: MessageParserMacro[] = checkMacrosForDuplicates(
 export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
   checkMacrosForDuplicates<MessageParserMacroDocumentation>(
     "default-optional",
+    macroCustomCommandInfo,
     macroMoonpieClaim,
     macroCommandEnabled,
     macroMoonpieLeaderboard,

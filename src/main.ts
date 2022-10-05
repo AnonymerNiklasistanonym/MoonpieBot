@@ -7,6 +7,10 @@ import { ApiClient } from "@twurple/api";
 import path from "path";
 import { StaticAuthProvider } from "@twurple/auth";
 // Local imports
+import {
+  createBroadcastScheduledTask,
+  stopBroadcastScheduledTask,
+} from "./customCommandsBroadcasts/customBroadcast";
 import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuIrc";
 import {
   createStreamCompanionFileConnection,
@@ -37,7 +41,6 @@ import {
   pluginsCustomCommandDataGenerator,
   pluginsCustomCommandGenerator,
 } from "./messageParser/plugins/customDataLogic";
-import { createBroadcastScheduledTask } from "./customCommandsBroadcasts/customBroadcast";
 import { createLogFunc } from "./logging";
 import { customCommandChatHandler } from "./customCommandsBroadcasts/customCommand";
 import { customCommandsBroadcastsChatHandler } from "./commands/customCommandsBroadcasts";
@@ -64,6 +67,8 @@ import { version } from "./info/version";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
 import type { ChatUserstate } from "tmi.js";
+import type { CustomBroadcast } from "./customCommandsBroadcasts/customBroadcast";
+import type { CustomCommand } from "./customCommandsBroadcasts/customCommand";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
 import type { OsuIrcBotSendMessageFunc } from "./commands/osu/beatmap";
@@ -413,34 +418,13 @@ export const main = async (
   }
 
   // Setup custom commands
-  const customCommands =
-    await customCommandsBroadcastsDb.requests.customCommand.getEntries(
-      pathDatabaseCustomCommandsBroadcasts,
-      logger
-    );
-
-  // Setup custom broadcasts
-  const customBroadcasts =
-    await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
-      pathDatabaseCustomCommandsBroadcasts,
-      logger
-    );
-  const customBroadcastsScheduledTasks = new Map<string, ScheduledTask>();
-  for (const customBroadcast of customBroadcasts) {
-    const customBroadcastScheduledTask = createBroadcastScheduledTask(
-      twitchClient,
-      twitchClientChannels ? twitchClientChannels : [],
-      customBroadcast,
-      stringMap,
-      pluginMap,
-      macroMap,
-      logger
-    );
-    customBroadcastsScheduledTasks.set(
-      customBroadcast.id,
-      customBroadcastScheduledTask
-    );
-  }
+  const customCommandsBroadcastsRefreshHelper = {
+    enabledCustomBroadcasts: new Map<string, ScheduledTask>(),
+    refreshCustomBroadcasts: true,
+    refreshCustomCommands: true,
+  };
+  let customCommands: CustomCommand[] = [];
+  let customBroadcasts: CustomBroadcast[] = [];
 
   /**
    * Run this method every time a new message is detected.
@@ -484,6 +468,50 @@ export const main = async (
       });
       pluginMapChannel.set(plugin.id, plugin.func);
     });
+
+    // Refresh custom commands/broadcasts if necessary
+    if (customCommandsBroadcastsRefreshHelper.refreshCustomCommands) {
+      logger.debug("Refresh custom commands...");
+      customCommandsBroadcastsRefreshHelper.refreshCustomCommands = false;
+      customCommands =
+        await customCommandsBroadcastsDb.requests.customCommand.getEntries(
+          pathDatabaseCustomCommandsBroadcasts,
+          logger
+        );
+    }
+    if (customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts) {
+      logger.debug("Refresh custom broadcasts...");
+      customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts = false;
+      customBroadcasts =
+        await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
+          pathDatabaseCustomCommandsBroadcasts,
+          logger
+        );
+      // Stop all old running custom broadcasts
+      for (const [
+        customBroadcastId,
+        scheduledTask,
+      ] of customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts) {
+        stopBroadcastScheduledTask(scheduledTask, customBroadcastId, logger);
+      }
+      customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts.clear();
+      // Start new custom broadcasts
+      for (const customBroadcast of customBroadcasts) {
+        const customBroadcastScheduledTask = createBroadcastScheduledTask(
+          twitchClient,
+          twitchClientChannels ? twitchClientChannels : [],
+          customBroadcast,
+          stringMap,
+          pluginMap,
+          macroMap,
+          logger
+        );
+        customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts.set(
+          customBroadcast.id,
+          customBroadcastScheduledTask
+        );
+      }
+    }
 
     // Handle all bot commands
     try {
@@ -604,6 +632,7 @@ export const main = async (
         message,
         {
           customCommandsBroadcastsDbPath: pathDatabaseCustomCommandsBroadcasts,
+          customCommandsBroadcastsRefreshHelper,
           enabledCommands: customCommandsBroadcastsEnableCommands,
         },
         stringMap,

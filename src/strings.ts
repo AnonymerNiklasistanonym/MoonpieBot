@@ -4,6 +4,7 @@
 
 // Local imports
 import { createLogFunc } from "./logging";
+import { customCommandsBroadcastsCommandReply } from "./strings/customCommandsBroadcasts/commandReply";
 import { customCommandsBroadcastsCommands } from "./strings/customCommandsBroadcasts/commands";
 import { ENV_STRINGS_VARIABLE_PREFIX } from "./info/env";
 import { general } from "./strings/general";
@@ -72,6 +73,7 @@ const generateStringList = (
 export const defaultStringMap: StringMap = new Map([
   ...generateStringList(
     ...customCommandsBroadcastsCommands,
+    ...customCommandsBroadcastsCommandReply,
     ...general,
     ...moonpieCommandReply,
     ...moonpieCommands,
