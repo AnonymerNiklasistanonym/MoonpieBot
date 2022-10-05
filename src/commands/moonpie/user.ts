@@ -136,27 +136,17 @@ export const commandSet: TwitchChatCommandHandler<
       return twitchBadgeLevelCheck;
     }
 
-    const macros = new Map();
-    macros.set(
-      macroMoonpieUser.id,
-      new Map(
-        macroMoonpieUser.generate({
-          name: data.userNameMoonpieDb,
-        })
-      )
-    );
-    macros.set(
-      macroMoonpieUserSet.id,
-      new Map(
-        macroMoonpieUserSet.generate({
-          setCount: data.setCount,
-          setOperation: data.operation,
-        })
-      )
-    );
     if (!Number.isInteger(data.setCount)) {
       return {
-        additionalMacros: macros,
+        additionalMacros: new Map([
+          ...generateMacroMapFromMacroGenerator(macroMoonpieUser, {
+            name: data.userNameMoonpieDb,
+          }),
+          ...generateMacroMapFromMacroGenerator(macroMoonpieUserSet, {
+            setCount: data.setCount,
+            setOperation: data.operation,
+          }),
+        ]),
         isError: true,
         messageId: moonpieUserSetNaNError.id,
       };
@@ -170,12 +160,10 @@ export const commandSet: TwitchChatCommandHandler<
         logger
       ))
     ) {
-      macros.set(
-        macroMoonpieUser.id,
-        new Map(macroMoonpieUser.generate({ name: data.userNameMoonpieDb }))
-      );
       return {
-        additionalMacros: macros,
+        additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
+          name: data.userNameMoonpieDb,
+        }),
         isError: true,
         messageId: moonpieUserNeverClaimedError.id,
       };
@@ -219,18 +207,21 @@ export const commandSet: TwitchChatCommandHandler<
         logger
       );
 
-    macros.set(
-      macroMoonpieLeaderboardEntry.id,
-      new Map(
-        macroMoonpieLeaderboardEntry.generate({
+    return {
+      additionalMacros: new Map([
+        ...generateMacroMapFromMacroGenerator(macroMoonpieUser, {
+          name: data.userNameMoonpieDb,
+        }),
+        ...generateMacroMapFromMacroGenerator(macroMoonpieUserSet, {
+          setCount: data.setCount,
+          setOperation: data.operation,
+        }),
+        ...generateMacroMapFromMacroGenerator(macroMoonpieLeaderboardEntry, {
           count: newCount,
           name: data.userNameMoonpieDb,
           rank: currentMoonpieLeaderboardEntry.rank,
-        })
-      )
-    );
-    return {
-      additionalMacros: macros,
+        }),
+      ]),
       messageId: moonpieUserSet.id,
     };
   },
@@ -313,12 +304,6 @@ export const commandDelete: TwitchChatCommandHandler<
       return twitchBadgeLevelCheck;
     }
 
-    const macros = new Map();
-    macros.set(
-      macroMoonpieUser.id,
-      new Map(macroMoonpieUser.generate({ name: data.userNameMoonpieDb }))
-    );
-
     // Check if a moonpie entry already exists
     if (
       !(await moonpieDb.requests.moonpie.existsEntryName(
@@ -328,7 +313,9 @@ export const commandDelete: TwitchChatCommandHandler<
       ))
     ) {
       return {
-        additionalMacros: macros,
+        additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
+          name: data.userNameMoonpieDb,
+        }),
         isError: true,
         messageId: moonpieUserNeverClaimedError.id,
       };
@@ -341,7 +328,9 @@ export const commandDelete: TwitchChatCommandHandler<
     );
 
     return {
-      additionalMacros: macros,
+      additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
+        name: data.userNameMoonpieDb,
+      }),
       messageId: moonpieUserDelete.id,
     };
   },

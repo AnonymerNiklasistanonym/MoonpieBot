@@ -22,6 +22,7 @@ import {
   regexMoonpieChatHandlerCommandUserRemove,
   regexMoonpieChatHandlerCommandUserSet,
 } from "../../info/regex";
+import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import moonpieDb from "../../database/moonpieDb";
 // Type imports
 import type {
@@ -29,7 +30,6 @@ import type {
   TwitchChatCommandHandler,
 } from "../../twitch";
 import type { CommandMoonpieGenericDataMoonpieDbPath } from "../moonpie";
-import type { MacroMap } from "../../messageParser";
 
 export interface CommandClaimCreateReplyInput
   extends CommandMoonpieGenericDataMoonpieDbPath {
@@ -109,38 +109,22 @@ export const commandClaim: TwitchChatCommandHandler<
         logger
       );
 
-    const macros: MacroMap = new Map();
-    macros.set(
-      macroMoonpieClaim.id,
-      new Map(
-        macroMoonpieClaim.generate({
+    return {
+      additionalMacros: new Map([
+        ...generateMacroMapFromMacroGenerator(macroMoonpieClaim, {
           cooldownHours: data.moonpieClaimCooldownHours,
           timeSinceLastClaimInS: msSinceLastClaim / 1000,
           timeTillNextClaimInS: msTillNextClaim / 1000,
-        })
-      )
-    );
-    macros.set(
-      macroMoonpieLeaderboardEntry.id,
-      new Map(
-        macroMoonpieLeaderboardEntry.generate({
+        }),
+        ...generateMacroMapFromMacroGenerator(macroMoonpieLeaderboardEntry, {
           count: newMoonpieCount,
           name: tags.username,
           rank: currentMoonpieLeaderboardEntry.rank,
-        })
-      )
-    );
-
-    if (alreadyClaimedAMoonpie) {
-      return {
-        additionalMacros: macros,
-        messageId: moonpieCommandReplyAlreadyClaimed.id,
-      };
-    }
-
-    return {
-      additionalMacros: macros,
-      messageId: moonpieCommandReplyClaim.id,
+        }),
+      ]),
+      messageId: alreadyClaimedAMoonpie
+        ? moonpieCommandReplyAlreadyClaimed.id
+        : moonpieCommandReplyClaim.id,
     };
   },
   detect: (_tags, message, data) => {
