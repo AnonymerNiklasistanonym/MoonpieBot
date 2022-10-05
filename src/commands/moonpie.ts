@@ -6,12 +6,6 @@ import { commandCommands } from "./moonpie/commands";
 import { commandLeaderboard } from "./moonpie/leaderboard";
 import { runTwitchCommandHandler } from "../twitch";
 // Type imports
-import type {
-  CommandDeleteCreateReplyInput,
-  CommandDeleteDetectorInput,
-  CommandSetCreateReplyInput,
-  CommandSetDetectorInput,
-} from "./moonpie/user";
 import type { CommandClaimCreateReplyInput } from "./moonpie/claim";
 import type { CommandGenericDetectorInputEnabledCommands } from "../twitch";
 import type { TwitchChatHandler } from "../twitch";
@@ -26,10 +20,6 @@ export interface CommandMoonpieGenericDataMoonpieDbPath {
 export interface MoonpieChatHandlerData
   extends CommandMoonpieGenericDataMoonpieDbPath,
     CommandGenericDetectorInputEnabledCommands,
-    CommandDeleteCreateReplyInput,
-    CommandDeleteDetectorInput,
-    CommandSetCreateReplyInput,
-    CommandSetDetectorInput,
     CommandClaimCreateReplyInput {}
 
 export const moonpieChatHandler: TwitchChatHandler<

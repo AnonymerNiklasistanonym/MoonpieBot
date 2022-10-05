@@ -114,9 +114,6 @@ export const commandGet: TwitchChatCommandHandler<
   },
 };
 
-export type CommandSetCreateReplyInput = CommandMoonpieGenericDataMoonpieDbPath;
-export type CommandSetDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
 export interface CommandSetDetectorOutput {
   operation: "+" | "-" | "=";
   setCount: number;
@@ -126,8 +123,8 @@ export interface CommandSetDetectorOutput {
  * Set command: Set the moonpie count of someone (multiple operations available).
  */
 export const commandSet: TwitchChatCommandHandler<
-  CommandSetCreateReplyInput,
-  CommandSetDetectorInput,
+  CommandMoonpieGenericDataMoonpieDbPath,
+  CommandGenericDetectorInputEnabledCommands,
   CommandSetDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
@@ -296,9 +293,6 @@ export const commandSet: TwitchChatCommandHandler<
   },
 };
 
-export type CommandDeleteCreateReplyInput = CommandMoonpieGenericDataMoonpieDbPath;
-export type CommandDeleteDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
 export interface CommandDeleteDetectorOutput {
   userNameMoonpieDb: string;
 }
@@ -306,8 +300,8 @@ export interface CommandDeleteDetectorOutput {
  * Delete command: Remove a moonpie database entry from the database.
  */
 export const commandDelete: TwitchChatCommandHandler<
-  CommandDeleteCreateReplyInput,
-  CommandDeleteDetectorInput,
+  CommandMoonpieGenericDataMoonpieDbPath,
+  CommandGenericDetectorInputEnabledCommands,
   CommandDeleteDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
@@ -369,6 +363,6 @@ export const commandDelete: TwitchChatCommandHandler<
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
-    id: MoonpieCommands.ABOUT,
+    id: MoonpieCommands.DELETE,
   },
 };
