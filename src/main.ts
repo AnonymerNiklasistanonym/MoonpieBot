@@ -695,17 +695,16 @@ export const main = async (
           if (!executed) {
             continue;
           }
-          customCommand.count += 1;
-          customCommand.timestampLastExecution = Date.now();
           await customCommandsBroadcastsDb.requests.customCommand.updateEntry(
             pathDatabaseCustomCommandsBroadcasts,
             {
               countIncrease: 1,
               id: customCommand.id,
-              timestampLastExecution: customCommand.timestampLastExecution,
+              timestampLastExecution: Date.now(),
             },
             logger
           );
+          customCommandsBroadcastsRefreshHelper.refreshCustomCommands = true;
         } catch (err) {
           await chatHandlerErrorMessage(
             channel,
