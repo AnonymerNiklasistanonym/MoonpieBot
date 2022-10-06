@@ -328,6 +328,16 @@ export const spotifyGetCurrentAndRecentSongs = async (
 
     logSpotify.debug("Spotify data was successfully acquired");
 
+    // Remove the currently playing song from the recently played tracks
+    if (
+      recentlyPlayedTracks.body?.items?.length > 0 &&
+      currentlyPlaying.body?.item?.id !== undefined
+    ) {
+      recentlyPlayedTracks.body.items = recentlyPlayedTracks.body.items.filter(
+        (a) => a.track.id !== currentlyPlaying.body.item?.id
+      );
+    }
+
     return {
       currentlyPlaying,
       recentlyPlayedTracks,
