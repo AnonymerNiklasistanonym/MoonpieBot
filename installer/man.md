@@ -12,7 +12,7 @@ moonpiebot - A custom Twitch chat bot.
 
 # DESCRIPTION
 
-Running this program will start a Twitch connected bot using information provided by either environment variables, a '*.env*' file in the same directory or given a **----config-dir** argument a '*.env*' file in the specified directory. Additionally log files and the database are written to this directory if not specified otherwise. In this directory can optionally a JSON file for custom commands ('*customCommands.json*') and custom timers ('*customTimers.json*') be specified.
+Running this program will start a Twitch connected bot using information provided by either environment variables, a '*.env*' file in the same directory or given a **----config-dir** argument a '*.env*' file in the specified directory. Additionally log files and the databases are written to this directory if not specified otherwise by 'LOGGING_DIRECTORY_PATH', 'MOONPIE_DATABASE_PATH', 'SPOTIFY_DATABASE_PATH', 'CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH'. Custom strings can also be written to '*.env*.strings' to keep the '*.env*' clean.
 
 If this program is installed via a package it will use *$HOME/.local/share/moonpiebot* as the default **----config-dir**.
 

@@ -3,9 +3,8 @@ import { promises as fs } from "fs";
 // Local imports
 import {
   ENV_LIST_SPLIT_CHARACTER,
-  ENV_VARIABLE_PREFIX,
+  ENV_PREFIX,
   EnvVariable,
-  EnvVariableBlock,
   envVariableInformation,
   envVariableStructure,
 } from "./info/env";
@@ -19,7 +18,20 @@ import type {
   FileDocumentationParts,
   FileDocumentationPartValue,
 } from "./other/splitTextAtLength";
-import type { EnvVariableData } from "./info/env";
+import { CliEnvVariableInformation } from "./cli";
+
+export interface EnvVariableStructureTextBlock {
+  content: string;
+  name: string;
+}
+export interface EnvVariableStructureVariablesBlock<BLOCK = string>
+  extends EnvVariableStructureTextBlock {
+  block: BLOCK;
+}
+
+export type EnvVariableStructureElement<BLOCK = string> =
+  | EnvVariableStructureTextBlock
+  | EnvVariableStructureVariablesBlock<BLOCK>;
 
 /**
  * Environment variable handling.
@@ -214,7 +226,7 @@ export const getEnvVariableValueOrUndefined = (
 
 const getEnvVariableValueInformation = (
   envVariable: EnvVariable | string
-): EnvVariableData => {
+): CliEnvVariableInformation<EnvVariable> => {
   const info = envVariableInformation.find((a) => a.name === envVariable);
   if (info) {
     return info;
@@ -263,18 +275,8 @@ export const getEnvVariableValueOrDefault = (
 export const getEnvVariableName = (
   envVariable: EnvVariable | string
 ): string => {
-  return `${ENV_VARIABLE_PREFIX}${envVariable}`;
+  return `${ENV_PREFIX}${envVariable}`;
 };
-
-export interface EnvVariableStructureTextBlock {
-  content: string;
-  name: string;
-}
-export interface EnvVariableStructureVariablesBlock {
-  block: EnvVariableBlock;
-  description: string;
-  name: string;
-}
 
 export const createEnvVariableDocumentation = async (
   path: string,
@@ -290,7 +292,7 @@ export const createEnvVariableDocumentation = async (
         type: FileDocumentationPartType.NEWLINE,
       });
       data.push({
-        description: structurePart.description,
+        description: structurePart.content,
         title: structurePart.name,
         type: FileDocumentationPartType.HEADING,
       });
@@ -336,7 +338,7 @@ export const createEnvVariableDocumentation = async (
           }
           if (envVariableInfo.default) {
             const defaultStrOrFunc = envVariableInfo.default;
-            envVariableEntry.value = `${ENV_VARIABLE_PREFIX}${envVariable}=${
+            envVariableEntry.value = `${ENV_PREFIX}${envVariable}=${
               typeof defaultStrOrFunc === "function"
                 ? escapeStringIfWhiteSpace(defaultStrOrFunc(configDir))
                 : escapeStringIfWhiteSpace(defaultStrOrFunc)
@@ -346,7 +348,7 @@ export const createEnvVariableDocumentation = async (
             envVariableEntry.infos.push(
               "(The following line is only an example!)"
             );
-            envVariableEntry.value = `${ENV_VARIABLE_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
+            envVariableEntry.value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
               envVariableInfo.example
             )}`;
             envVariableEntry.isComment = !envVariableInfo.required;

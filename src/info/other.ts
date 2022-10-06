@@ -1,3 +1,7 @@
+/*
+ * Information that currently has not yet found a home.
+ */
+
 /**
  * Web status code for not found.
  */

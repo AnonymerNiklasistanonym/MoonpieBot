@@ -15,6 +15,7 @@ import {
   pluginRandomNumber,
   pluginTimeInSToHumanReadableStringShort,
 } from "../messageParser/plugins/general";
+import { convertRegexToString } from "../other/regexToString";
 import { createMessageForMessageParser } from "../documentation/messageParser";
 import { pluginRegexGroupId } from "../messageParser/plugins/regexGroup";
 import { PluginTwitchApi } from "../messageParser/plugins/twitchApi";
@@ -26,19 +27,6 @@ import type { CustomCommand } from "../customCommandsBroadcasts/customCommand";
 const defaultExampleCommandValues = {
   count: 0,
   userLevel: TwitchBadgeLevel.NONE,
-};
-
-/**
- * This method converts a regex to a string.
- * It will remove all modifiers/flags.
- *
- * @param regex The regex that should be converted to a string.
- * @returns Regex as a string.
- */
-const convertRegexToString = (regex: RegExp) => {
-  const regexString = regex.toString();
-  const indexLastSlash = regexString.lastIndexOf("/");
-  return regexString.slice(1, indexLastSlash);
 };
 
 export const customCommandsInformation: CustomCommand[] = [

@@ -1,14 +1,14 @@
+/**
+ * CLI (Command Line Interface) information.
+ */
+
 // Package imports
 import path from "path";
 // Type imports
 import type { CliOptionInformation } from "../cli";
 
 /**
- * Command line interface variable handling.
- */
-
-/**
- * CLI options.
+ * Supported CLI options.
  */
 export enum CliOption {
   CONFIG_DIRECTORY = "--config-dir",
@@ -18,15 +18,10 @@ export enum CliOption {
   VERSION = "--version",
 }
 
-export interface CliOptionData extends CliOptionInformation<CliOption> {
-  /** The default value for example to display relative paths in 'default' but use absolute path as 'defaultValue'. */
-  defaultValue?: string | ((configDir: string) => string);
-}
-
 /**
- * Command line interface variable information.
+ * CLI options information.
  */
-export const cliOptionInformation: CliOptionData[] = [
+export const cliOptionsInformation: CliOptionInformation<CliOption>[] = [
   {
     default: (configDir) =>
       process.cwd() === path.resolve(configDir) ? "." + path.sep : configDir,

@@ -9,25 +9,12 @@ import {
   PkgbuildCmdsSection,
   referencePCV,
   referencePV,
-} from "../src/documentation/pkgbuild";
+} from "./pkgbuild";
 import { description, name, sourceCodeUrl } from "../src/info/general";
-import {
-  fileNamePkgbuild,
-  fileNamePkgbuildBin,
-  fileNamePkgbuildGit,
-} from "../src/info/fileNames";
 import { getVersionFromObject } from "../src/version";
 import { version } from "../src/info/version";
 // Type imports
-import type {
-  PkgbuildCustomVariable,
-  PkgbuildInfo,
-} from "../src/documentation/pkgbuild";
-
-const configDir = path.join(__dirname, "..");
-const pkgbuildFile = path.join(configDir, fileNamePkgbuild);
-const pkgbuildBinFile = path.join(configDir, fileNamePkgbuildBin);
-const pkgbuildGitFile = path.join(configDir, fileNamePkgbuildGit);
+import type { PkgbuildCustomVariable, PkgbuildInfo } from "./pkgbuild";
 
 export const defaultPCVApplicationName: PkgbuildCustomVariable = {
   name: "applicationname",
@@ -347,9 +334,30 @@ export const pkgbuildGitInfo: PkgbuildInfo = {
   ],
 };
 
-console.log(`Create PKGBUILD file '${pkgbuildFile}'`);
-createPkgbuildFile(pkgbuildFile, pkgbuildInfo).catch(console.error);
-console.log(`Create PKGBUILD file '${pkgbuildBinFile}'`);
-createPkgbuildFile(pkgbuildBinFile, pkgbuildBinInfo).catch(console.error);
-console.log(`Create PKGBUILD file '${pkgbuildGitFile}'`);
-createPkgbuildFile(pkgbuildGitFile, pkgbuildGitInfo).catch(console.error);
+const INSTALLER_DIR = path.join(__dirname, "..", "installer");
+const fileNamePkgbuild = "PKGBUILD";
+
+/** The output file path of the PKGBUILD to create. */
+const filePathOutputPkgbuild = path.join(INSTALLER_DIR, fileNamePkgbuild);
+/** The output file path of the PKGBUILD for the binary files to create. */
+const filePathOutputPkgbuildBin = path.join(
+  INSTALLER_DIR,
+  `${fileNamePkgbuild}_BIN`
+);
+/** The output file path of the PKGBUILD for the latest git commit to create. */
+const filePathOutputPkgbuildGit = path.join(
+  INSTALLER_DIR,
+  `${fileNamePkgbuild}_GIT`
+);
+
+// -----------------------------------------------------------------------------
+
+console.log(`Create PKGBUILD file '${filePathOutputPkgbuild}'...`);
+console.log(`Create PKGBUILD file '${filePathOutputPkgbuildBin}'...`);
+console.log(`Create PKGBUILD file '${filePathOutputPkgbuildGit}'...`);
+
+Promise.all([
+  createPkgbuildFile(filePathOutputPkgbuild, pkgbuildInfo),
+  createPkgbuildFile(filePathOutputPkgbuildBin, pkgbuildBinInfo),
+  createPkgbuildFile(filePathOutputPkgbuildGit, pkgbuildGitInfo),
+]).catch(console.error);

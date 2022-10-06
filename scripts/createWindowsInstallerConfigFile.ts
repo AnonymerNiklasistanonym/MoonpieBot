@@ -3,10 +3,23 @@
 // Package imports
 import path from "path";
 // Local imports
-import { createWindowsInstallerConfigFile } from "../src/documentation/windowsInstaller";
-import { fileNameWindowsInstallerConfig } from "../src/info/fileNames";
+import { createWindowsInstallerConfigFile } from "./windowsInstaller";
 
-const configFile = path.join(__dirname, "..", fileNameWindowsInstallerConfig);
+const INSTALLER_DIR = path.join(__dirname, "..", "installer");
 
-console.log(`Create Windows installer config file '${configFile}'...`);
-createWindowsInstallerConfigFile(configFile).catch(console.error);
+/** The output file path of the windows installer config to create. */
+export const filePathOutputWindowsInstallerConfig = path.join(
+  INSTALLER_DIR,
+  "windows_installer",
+  "windows_installer_config.nsi"
+);
+
+// -----------------------------------------------------------------------------
+
+console.log(
+  `Create Windows installer config file '${filePathOutputWindowsInstallerConfig}'...`
+);
+
+Promise.all([
+  createWindowsInstallerConfigFile(filePathOutputWindowsInstallerConfig),
+]).catch(console.error);

@@ -34,6 +34,8 @@ export interface CliUsageInformation {
 export interface CliOptionInformation<NAME = string> {
   /** The default value. */
   default?: string | ((configDir: string) => string);
+  /** The default value for example to display relative paths in 'default' but use absolute path as 'defaultValue'. */
+  defaultValue?: string | ((configDir: string) => string);
   /** The description of the option. */
   description: string;
   /** Usage example. */
@@ -53,15 +55,25 @@ export interface CliEnvVariableInformationSupportedValues {
 /**
  * Generic information about a CLI environment variable.
  */
-export interface CliEnvVariableInformation<NAME = string> {
+export interface CliEnvVariableInformation<NAME = string, BLOCK = string> {
+  /** The ENV variable block. */
+  block: BLOCK;
+  /** Censor variable per default to prevent leaks. */
+  censor?: boolean;
   /** The default value. */
   default?: string | ((configDir: string) => string);
+  /** The default value for example to display relative paths in 'default' but use absolute path as 'defaultValue'. */
+  defaultValue?: string | ((configDir: string) => string);
   /** The description of the environment variable. */
   description: string;
   /** Usage example. */
   example?: string;
+  /** Legacy names of ENV variable. */
+  legacyNames?: string[];
   /** The name of the environment variable. */
   name: NAME;
+  /** Is required to run the program. */
+  required?: boolean;
   /** The supported values. */
   supportedValues?: CliEnvVariableInformationSupportedValues;
 }

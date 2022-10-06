@@ -14,11 +14,11 @@ import {
   sourceCodeUrl,
   usages,
   websiteUrl,
-} from "../info/general";
-import { ENV_VARIABLE_PREFIX, envVariableInformation } from "../info/env";
-import { cliOptionInformation } from "../info/cli";
-import { getVersionFromObject } from "../version";
-import { version } from "../info/version";
+} from "../src/info/general";
+import { ENV_PREFIX, envVariableInformation } from "../src/info/env";
+import { cliOptionsInformation } from "../src/info/cli";
+import { getVersionFromObject } from "../src/version";
+import { version } from "../src/info/version";
 
 export const createManPageFile = async (outputPath: string): Promise<void> => {
   let outputString = "";
@@ -64,7 +64,7 @@ export const createManPageFile = async (outputPath: string): Promise<void> => {
   outputString += "\n";
   // OPTIONS
   outputString += "# OPTIONS\n\n";
-  for (const cliOption of cliOptionInformation) {
+  for (const cliOption of cliOptionsInformation) {
     outputString += `${cliOption.name}`;
     if (cliOption.signature) {
       outputString += ` ${cliOption.signature
@@ -77,7 +77,7 @@ export const createManPageFile = async (outputPath: string): Promise<void> => {
   // ENVIRONMENT VARIABLES
   outputString += "# ENVIRONMENT VARIABLES\n\n";
   for (const envVariable of envVariableInformation) {
-    outputString += `**${ENV_VARIABLE_PREFIX}${envVariable.name}**`;
+    outputString += `**${ENV_PREFIX}${envVariable.name}**`;
     if (envVariable.default) {
       outputString += `="*${
         typeof envVariable.default === "string"
@@ -124,7 +124,7 @@ export const createManPageFile = async (outputPath: string): Promise<void> => {
   outputString += `GitHub repository and issue tracker: ${sourceCodeUrl}\n`;
 
   // Update highlighting some values and CLI options
-  for (const cliOption of cliOptionInformation) {
+  for (const cliOption of cliOptionsInformation) {
     outputString = outputString.replace(
       // eslint-disable-next-line security/detect-non-literal-regexp
       new RegExp(`${cliOption.name}`, "g"),

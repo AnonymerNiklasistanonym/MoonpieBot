@@ -6,7 +6,7 @@
 import { createLogFunc } from "./logging";
 import { customCommandsBroadcastsCommandReply } from "./strings/customCommandsBroadcasts/commandReply";
 import { customCommandsBroadcastsCommands } from "./strings/customCommandsBroadcasts/commands";
-import { ENV_STRINGS_VARIABLE_PREFIX } from "./info/env";
+import { ENV_PREFIX_CUSTOM_STRINGS } from "./info/env";
 import { general } from "./strings/general";
 import { moonpieCommandReply } from "./strings/moonpie/commandReply";
 import { moonpieCommands } from "./strings/moonpie/commands";
@@ -103,7 +103,7 @@ export const updateStringsMapWithCustomEnvStrings = (
   let foundCustomNonDefaultStringsCounter = 0;
   // First check for the default string entries
   for (const [key] of defaultStringMap.entries()) {
-    const envValue = process.env[`${ENV_STRINGS_VARIABLE_PREFIX}${key}`];
+    const envValue = process.env[`${ENV_PREFIX_CUSTOM_STRINGS}${key}`];
     if (envValue !== undefined && envValue.trim().length > 0) {
       strings.set(key, envValue);
       foundCustomStringsCounter++;
@@ -113,13 +113,13 @@ export const updateStringsMapWithCustomEnvStrings = (
   // Now check for custom strings
   Object.keys(process.env).forEach((key) => {
     if (
-      key.startsWith(ENV_STRINGS_VARIABLE_PREFIX) &&
-      strings.get(key.slice(ENV_STRINGS_VARIABLE_PREFIX.length)) === undefined
+      key.startsWith(ENV_PREFIX_CUSTOM_STRINGS) &&
+      strings.get(key.slice(ENV_PREFIX_CUSTOM_STRINGS.length)) === undefined
     ) {
       // eslint-disable-next-line security/detect-object-injection
       const envValue = process.env[key];
       if (envValue !== undefined && envValue.trim().length > 0) {
-        strings.set(key.slice(ENV_STRINGS_VARIABLE_PREFIX.length), envValue);
+        strings.set(key.slice(ENV_PREFIX_CUSTOM_STRINGS.length), envValue);
         foundCustomNonDefaultStringsCounter++;
         logStrings.debug(`Found non-default custom string: ${key}=${envValue}`);
       }

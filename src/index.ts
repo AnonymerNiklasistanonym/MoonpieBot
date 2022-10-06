@@ -9,7 +9,7 @@ import { promises as fs } from "fs";
 import path from "path";
 // Local imports
 import { binaryName, name, usages } from "./info/general";
-import { CliOption, cliOptionInformation } from "./info/cli";
+import { CliOption, cliOptionsInformation } from "./info/cli";
 import { createConsoleLogger, createLogFunc, createLogger } from "./logging";
 import {
   createEnvVariableDocumentation,
@@ -21,17 +21,13 @@ import {
   defaultPlugins,
   defaultPluginsOptional,
 } from "./messageParser/plugins";
-import {
-  ENV_VARIABLE_PREFIX,
-  EnvVariable,
-  envVariableInformation,
-} from "./info/env";
+import { ENV_PREFIX, EnvVariable, envVariableInformation } from "./info/env";
 import {
   fileNameEnv,
   fileNameEnvExample,
   fileNameEnvStrings,
   fileNameEnvStringsExample,
-} from "./info/fileNames";
+} from "./info/files";
 import { cliHelpGenerator } from "./cli";
 import { createStringsVariableDocumentation } from "./documentation/strings";
 import { defaultStringMap } from "./strings";
@@ -102,11 +98,11 @@ const entryPoint = async () => {
         cliHelpGenerator(
           binaryName,
           usages,
-          cliOptionInformation.sort((a, b) =>
+          cliOptionsInformation.sort((a, b) =>
             genericStringSorter(a.name, b.name)
           ),
           envVariableInformation
-            .map((a) => ({ ...a, name: `${ENV_VARIABLE_PREFIX}${a.name}` }))
+            .map((a) => ({ ...a, name: `${ENV_PREFIX}${a.name}` }))
             .sort((a, b) => genericStringSorter(a.name, b.name)),
           configDir
         )

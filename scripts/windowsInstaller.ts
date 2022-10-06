@@ -1,9 +1,9 @@
 // Package imports
 import { promises as fs } from "fs";
 // Local imports
-import { name, sourceCodeUrl } from "../info/general";
-import { getVersionFromObject } from "../version";
-import { version } from "../info/version";
+import { name, sourceCodeUrl } from "../src/info/general";
+import { getVersionFromObject } from "../src/version";
+import { version } from "../src/info/version";
 
 export const createWindowsInstallerConfigFile = async (
   outputPath: string

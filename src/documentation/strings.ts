@@ -2,7 +2,7 @@
 import { promises as fs } from "fs";
 // Local imports
 import { defaultStringMap } from "../strings";
-import { ENV_STRINGS_VARIABLE_PREFIX } from "../info/env";
+import { ENV_PREFIX_CUSTOM_STRINGS } from "../info/env";
 import { generateFileDocumentation } from "../other/splitTextAtLength";
 import { generatePluginAndMacroDocumentation } from "../documentation/messageParser";
 import { genericStringSorter } from "../other/genericStringSorter";
@@ -65,14 +65,14 @@ export const createStringsVariableDocumentation = async (
   data.push({
     content:
       "To use a customized value instead of the default one uncomment the line. " +
-      `(The lines that start with ${ENV_STRINGS_VARIABLE_PREFIX})`,
+      `(The lines that start with ${ENV_PREFIX_CUSTOM_STRINGS})`,
     type: FileDocumentationPartType.TEXT,
   });
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   data.push({
     content:
       "You can also reference other strings via $[REFERENCE]. " +
-      `This will then be replaced by the string saved in ${ENV_STRINGS_VARIABLE_PREFIX}REFERENCE.`,
+      `This will then be replaced by the string saved in ${ENV_PREFIX_CUSTOM_STRINGS}REFERENCE.`,
     type: FileDocumentationPartType.TEXT,
   });
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
@@ -85,7 +85,7 @@ export const createStringsVariableDocumentation = async (
         isComment: true,
         prefix: ">",
         type: FileDocumentationPartType.VALUE,
-        value: `${ENV_STRINGS_VARIABLE_PREFIX}${key}="${defaultValue}"`,
+        value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}="${defaultValue}"`,
       });
     } else {
       dataDefaultStrings.push({
@@ -93,7 +93,7 @@ export const createStringsVariableDocumentation = async (
         isComment: true,
         prefix: ">",
         type: FileDocumentationPartType.VALUE,
-        value: `${ENV_STRINGS_VARIABLE_PREFIX}${key}=${defaultValue}`,
+        value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}=${defaultValue}`,
       });
     }
   }

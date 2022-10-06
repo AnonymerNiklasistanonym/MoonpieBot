@@ -1,30 +1,36 @@
+/**
+ * ENV (Environment variable) information.
+ */
+
 // Package imports
 import path from "path";
 // Local imports
 import { CustomCommandsBroadcastsCommands, MoonpieCommands } from "./commands";
-import { fileNameEnv, fileNameEnvExample } from "./fileNames";
+import { fileNameEnv, fileNameEnvExample } from "./files";
 import { LoggerLevel } from "../logging";
 import { OsuCommands } from "./commands";
 import { SpotifyCommands } from "./commands";
 // Type imports
 import type { CliEnvVariableInformation } from "../cli";
+import { EnvVariableStructureElement } from "src/env";
 
 /**
- * Environment variable handling.
+ * ENV prefix.
  */
+export const ENV_PREFIX = "MOONPIE_CONFIG_";
 
 /**
- * Environment variable prefix.
+ * ENV prefix for custom strings.
  */
-export const ENV_VARIABLE_PREFIX = "MOONPIE_CONFIG_";
+export const ENV_PREFIX_CUSTOM_STRINGS = "MOONPIE_CUSTOM_STRING_";
 
 /**
- * Environment variable prefix for custom strings.
+ * Character to split list options of ENV values.
  */
-export const ENV_STRINGS_VARIABLE_PREFIX = "MOONPIE_CUSTOM_STRING_";
+export const ENV_LIST_SPLIT_CHARACTER = ",";
 
 /**
- * Environment variable values for ON/OFF.
+ * ENV values for ON/OFF variables.
  */
 export enum EnvVariableOnOff {
   OFF = "OFF",
@@ -32,14 +38,15 @@ export enum EnvVariableOnOff {
 }
 
 /**
- * Environment variable values for other list elements.
+ * ENV values for other list options.
  */
-export enum EnvVariableNone {
+export enum EnvVariableOtherListOptions {
+  /** Ignore all options and disable them if there are default ones.  */
   NONE = "none",
 }
 
 /**
- * Environment variables.
+ * Supported ENV (Environment Variables).
  */
 export enum EnvVariable {
   CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH = "CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH",
@@ -47,11 +54,8 @@ export enum EnvVariable {
   LOGGING_CONSOLE_LOG_LEVEL = "LOGGING_CONSOLE_LOG_LEVEL",
   LOGGING_DIRECTORY_PATH = "LOGGING_DIRECTORY_PATH",
   LOGGING_FILE_LOG_LEVEL = "LOGGING_FILE_LOG_LEVEL",
-  /** The amount of hours between which no moonpie can be claimed. */
   MOONPIE_CLAIM_COOLDOWN_HOURS = "MOONPIE_CLAIM_COOLDOWN_HOURS",
-  /** The path to the moonpie database. */
   MOONPIE_DATABASE_PATH = "MOONPIE_DATABASE_PATH",
-  /** Disable/Enable !moonpie commands. */
   MOONPIE_ENABLE_COMMANDS = "MOONPIE_ENABLE_COMMANDS",
   OSU_API_CLIENT_ID = "OSU_API_CLIENT_ID",
   OSU_API_CLIENT_SECRET = "OSU_API_CLIENT_SECRET",
@@ -79,11 +83,8 @@ export enum EnvVariable {
   TWITCH_OAUTH_TOKEN = "TWITCH_OAUTH_TOKEN",
 }
 
-export const ENV_LIST_SPLIT_CHARACTER = ",";
-
 /**
- * Environment variables are grouped in blocks.
- * The order is important.
+ * ENV blocks to group {@link EnvVariable} values.
  */
 export enum EnvVariableBlock {
   CUSTOM_COMMANDS_BROADCASTS = "CUSTOM_COMMANDS_BROADCASTS",
@@ -99,26 +100,15 @@ export enum EnvVariableBlock {
   TWITCH_API = "TWITCH_API",
 }
 
-const ENABLE_COMMANDS_DEFAULT_DESCRIPTION = `You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to '${EnvVariableNone.NONE}' if no commands should be enabled).`;
-
-export interface EnvVariableData
-  extends CliEnvVariableInformation<EnvVariable> {
-  /** The ENV variable block. */
-  block: EnvVariableBlock;
-  /** Censor variable per default to prevent leaks. */
-  censor?: boolean;
-  /** The default value for example to display relative paths in 'default' but use absolute path as 'defaultValue'. */
-  defaultValue?: string | ((configDir: string) => string);
-  /** Legacy names of ENV variable. */
-  legacyNames?: string[];
-  /** Is required to run the program. */
-  required?: boolean;
-}
+const ENABLE_COMMANDS_DEFAULT_DESCRIPTION = `You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to '${EnvVariableOtherListOptions.NONE}' if no commands should be enabled).`;
 
 /**
  * ENV variable information.
  */
-export const envVariableInformation: EnvVariableData[] = [
+export const envVariableInformation: CliEnvVariableInformation<
+  EnvVariable,
+  EnvVariableBlock
+>[] = [
   {
     block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
     default: (configDir) =>
@@ -139,7 +129,7 @@ export const envVariableInformation: EnvVariableData[] = [
     name: EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
     supportedValues: {
       canBeJoinedAsList: true,
-      emptyListValue: EnvVariableNone.NONE,
+      emptyListValue: EnvVariableOtherListOptions.NONE,
       values: Object.values(CustomCommandsBroadcastsCommands),
     },
   },
@@ -210,7 +200,7 @@ export const envVariableInformation: EnvVariableData[] = [
     name: EnvVariable.MOONPIE_ENABLE_COMMANDS,
     supportedValues: {
       canBeJoinedAsList: true,
-      emptyListValue: EnvVariableNone.NONE,
+      emptyListValue: EnvVariableOtherListOptions.NONE,
       values: Object.values(MoonpieCommands),
     },
   },
@@ -240,7 +230,7 @@ export const envVariableInformation: EnvVariableData[] = [
     name: EnvVariable.OSU_ENABLE_COMMANDS,
     supportedValues: {
       canBeJoinedAsList: true,
-      emptyListValue: EnvVariableNone.NONE,
+      emptyListValue: EnvVariableOtherListOptions.NONE,
       values: Object.values(OsuCommands),
     },
   },
@@ -256,7 +246,7 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     block: EnvVariableBlock.OSU_API,
     censor: true,
-    description: `Check the description of ${ENV_VARIABLE_PREFIX}${EnvVariable.OSU_API_CLIENT_ID}.`,
+    description: `Check the description of ${ENV_PREFIX}${EnvVariable.OSU_API_CLIENT_ID}.`,
     example: "dadasfsafsafdsadffasfsafasfa",
     legacyNames: ["OSU_CLIENT_SECRET"],
     name: EnvVariable.OSU_API_CLIENT_SECRET,
@@ -291,14 +281,14 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     block: EnvVariableBlock.OSU_API,
     default: EnvVariableOnOff.OFF,
-    description: `If recognizing is enabled (${ENV_VARIABLE_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) additionally output more detailed information about the map in the chat.`,
+    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) additionally output more detailed information about the map in the chat.`,
     legacyNames: ["OSU_RECOGNIZE_MAP_REQUESTS_DETAILED"],
     name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
     supportedValues: { values: Object.values(EnvVariableOnOff) },
   },
   {
     block: EnvVariableBlock.OSU_API,
-    description: `If recognizing is enabled (${ENV_VARIABLE_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) make it that only messages that used a channel point redeem will be recognized as requests.`,
+    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) make it that only messages that used a channel point redeem will be recognized as requests.`,
     example: "651f5474-07c2-4406-9e59-37d66fd34069",
     name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID,
   },
@@ -312,7 +302,7 @@ export const envVariableInformation: EnvVariableData[] = [
   },
   {
     block: EnvVariableBlock.OSU_IRC,
-    description: `Check the description of ${ENV_VARIABLE_PREFIX}${EnvVariable.OSU_IRC_PASSWORD}.`,
+    description: `Check the description of ${ENV_PREFIX}${EnvVariable.OSU_IRC_PASSWORD}.`,
     example: "senderUserName",
     name: EnvVariable.OSU_IRC_USERNAME,
   },
@@ -342,7 +332,7 @@ export const envVariableInformation: EnvVariableData[] = [
     name: EnvVariable.SPOTIFY_ENABLE_COMMANDS,
     supportedValues: {
       canBeJoinedAsList: true,
-      emptyListValue: EnvVariableNone.NONE,
+      emptyListValue: EnvVariableOtherListOptions.NONE,
       values: Object.values(SpotifyCommands),
     },
   },
@@ -367,14 +357,14 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     block: EnvVariableBlock.SPOTIFY_API,
     censor: true,
-    description: `Check the description of ${ENV_VARIABLE_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_ID}.`,
+    description: `Check the description of ${ENV_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_ID}.`,
     example: "abcdefghijklmnop",
     name: EnvVariable.SPOTIFY_API_CLIENT_SECRET,
   },
   {
     block: EnvVariableBlock.SPOTIFY_API,
     censor: true,
-    description: `Providing this token is not necessary but optional. You can get this token by authenticating once successfully using the ${ENV_VARIABLE_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_ID} and ${ENV_VARIABLE_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_SECRET}. This will be done automatically by this program if both values are provided (the browser window will open after starting). After a successful authentication via this website the refresh token can be copied from there but since it will be automatically stored in a database this variable does not need to be provided. If a value is found it is automatically written into the database and does not need to be provided after that.`,
+    description: `Providing this token is not necessary but optional. You can get this token by authenticating once successfully using the ${ENV_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_ID} and ${ENV_PREFIX}${EnvVariable.SPOTIFY_API_CLIENT_SECRET}. This will be done automatically by this program if both values are provided (the browser window will open after starting). After a successful authentication via this website the refresh token can be copied from there but since it will be automatically stored in a database this variable does not need to be provided. If a value is found it is automatically written into the database and does not need to be provided after that.`,
     example: "abcdefghijklmnop",
     name: EnvVariable.SPOTIFY_API_REFRESH_TOKEN,
   },
@@ -389,94 +379,81 @@ export const envVariableInformation: EnvVariableData[] = [
   {
     block: EnvVariableBlock.TWITCH_API,
     censor: true,
-    description: `Check the description of ${ENV_VARIABLE_PREFIX}${EnvVariable.TWITCH_API_ACCESS_TOKEN}.`,
+    description: `Check the description of ${ENV_PREFIX}${EnvVariable.TWITCH_API_ACCESS_TOKEN}.`,
     example: "abcdefghijklmnop",
     name: EnvVariable.TWITCH_API_CLIENT_ID,
   },
 ];
 
-export interface EnvVariableStructureTextBlock {
-  content: string;
-  name: string;
-}
-export interface EnvVariableStructureVariablesBlock {
-  block: EnvVariableBlock;
-  description: string;
-  name: string;
-}
-
-export type EnvVariableStructureElement =
-  | EnvVariableStructureTextBlock
-  | EnvVariableStructureVariablesBlock;
-
-export const envVariableStructure: EnvVariableStructureElement[] = [
-  {
-    content:
-      "This is an example config file for the MoonpieBot that contains all environment variables that the bot uses.",
-    name: "File description",
-  },
-  {
-    content: `You can either set the variables yourself or copy this file, rename it from \`${fileNameEnvExample}\` to \`${fileNameEnv}\` and edit it with your own values since this is just an example to show how it should look.`,
-    name: "File purpose",
-  },
-  {
-    content: `If a line that starts with '${ENV_VARIABLE_PREFIX}' has the symbol '#' in front of it that means it will be ignored as a comment. This means you can add custom comments and easily enable/disable any '${ENV_VARIABLE_PREFIX}' option by adding or removing that symbol.`,
-    name: "How to edit file",
-  },
-  {
-    block: EnvVariableBlock.LOGGING,
-    description: "Customize how much and where should be logged.",
-    name: "LOGGING",
-  },
-  {
-    block: EnvVariableBlock.TWITCH,
-    description:
-      "Required variables that need to be set for ANY configuration to connect to Twitch chat.",
-    name: "TWITCH",
-  },
-  {
-    block: EnvVariableBlock.MOONPIE,
-    description:
-      "Customize the moonpie functionality that is enabled per default.",
-    name: "MOONPIE",
-  },
-  {
-    block: EnvVariableBlock.OSU,
-    description: "Optional osu! commands that can be enabled.",
-    name: "OSU",
-  },
-  {
-    block: EnvVariableBlock.OSU_API,
-    description:
-      "Optional osu! API connection that can be enabled to use more osu! commands or detect beatmap requests.",
-    name: "OSU API",
-  },
-  {
-    block: EnvVariableBlock.OSU_STREAM_COMPANION,
-    description:
-      "Optional osu! StreamCompanion (https://github.com/Piotrekol/StreamCompanion) connection that can be enabled for a much better !np command via either a websocket or file interface.",
-    name: "OSU STREAM COMPANION",
-  },
-  {
-    block: EnvVariableBlock.SPOTIFY,
-    description: "Optional Spotify commands that can be enabled.",
-    name: "SPOTIFY",
-  },
-  {
-    block: EnvVariableBlock.SPOTIFY_API,
-    description:
-      "Optional Spotify API connection that can be enabled to use Spotify commands.",
-    name: "SPOTIFY API",
-  },
-  {
-    block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
-    description: "Optional configurations for custom commands and broadcasts.",
-    name: "CUSTOM COMMANDS & BROADCASTS",
-  },
-  {
-    block: EnvVariableBlock.TWITCH_API,
-    description:
-      "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
-    name: "TWITCH API",
-  },
-];
+export const envVariableStructure: EnvVariableStructureElement<EnvVariableBlock>[] =
+  [
+    {
+      content:
+        "This is an example config file for the MoonpieBot that contains all environment variables that the bot uses.",
+      name: "File description",
+    },
+    {
+      content: `You can either set the variables yourself or copy this file, rename it from \`${fileNameEnvExample}\` to \`${fileNameEnv}\` and edit it with your own values since this is just an example to show how it should look.`,
+      name: "File purpose",
+    },
+    {
+      content: `If a line that starts with '${ENV_PREFIX}' has the symbol '#' in front of it that means it will be ignored as a comment. This means you can add custom comments and easily enable/disable any '${ENV_PREFIX}' option by adding or removing that symbol.`,
+      name: "How to edit file",
+    },
+    {
+      block: EnvVariableBlock.LOGGING,
+      content: "Customize how much and where should be logged.",
+      name: "LOGGING",
+    },
+    {
+      block: EnvVariableBlock.TWITCH,
+      content:
+        "Required variables that need to be set for ANY configuration to connect to Twitch chat.",
+      name: "TWITCH",
+    },
+    {
+      block: EnvVariableBlock.MOONPIE,
+      content:
+        "Customize the moonpie functionality that is enabled per default.",
+      name: "MOONPIE",
+    },
+    {
+      block: EnvVariableBlock.OSU,
+      content: "Optional osu! commands that can be enabled.",
+      name: "OSU",
+    },
+    {
+      block: EnvVariableBlock.OSU_API,
+      content:
+        "Optional osu! API connection that can be enabled to use more osu! commands or detect beatmap requests.",
+      name: "OSU API",
+    },
+    {
+      block: EnvVariableBlock.OSU_STREAM_COMPANION,
+      content:
+        "Optional osu! StreamCompanion (https://github.com/Piotrekol/StreamCompanion) connection that can be enabled for a much better !np command via either a websocket or file interface.",
+      name: "OSU STREAM COMPANION",
+    },
+    {
+      block: EnvVariableBlock.SPOTIFY,
+      content: "Optional Spotify commands that can be enabled.",
+      name: "SPOTIFY",
+    },
+    {
+      block: EnvVariableBlock.SPOTIFY_API,
+      content:
+        "Optional Spotify API connection that can be enabled to use Spotify commands.",
+      name: "SPOTIFY API",
+    },
+    {
+      block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
+      content: "Optional configurations for custom commands and broadcasts.",
+      name: "CUSTOM COMMANDS & BROADCASTS",
+    },
+    {
+      block: EnvVariableBlock.TWITCH_API,
+      content:
+        "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
+      name: "TWITCH API",
+    },
+  ];

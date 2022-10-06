@@ -32,7 +32,11 @@ import {
   defaultStringMap,
   updateStringsMapWithCustomEnvStrings,
 } from "./strings";
-import { EnvVariable, EnvVariableNone, EnvVariableOnOff } from "./info/env";
+import {
+  EnvVariable,
+  EnvVariableOnOff,
+  EnvVariableOtherListOptions,
+} from "./info/env";
 import {
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrUndefined,
@@ -45,7 +49,7 @@ import { createLogFunc } from "./logging";
 import { customCommandChatHandler } from "./customCommandsBroadcasts/customCommand";
 import { customCommandsBroadcastsChatHandler } from "./commands/customCommandsBroadcasts";
 import customCommandsBroadcastsDb from "./database/customCommandsBroadcastsDb";
-import { fileNameDatabaseBackups } from "./info/fileNames";
+import { generateOutputFileNameMoonpieDbBackup } from "./info/files";
 import { getVersionFromObject } from "./version";
 import { macroOsuApi } from "./messageParser/macros/osuApi";
 import { moonpieChatHandler } from "./commands/moonpie";
@@ -296,7 +300,7 @@ export const main = async (
       moonpieEnableCommands.length > 0 &&
       !(
         moonpieEnableCommands.length === 1 &&
-        moonpieEnableCommands.includes(EnvVariableNone.NONE)
+        moonpieEnableCommands.includes(EnvVariableOtherListOptions.NONE)
       )
     ) {
       // Setup database tables (or do nothing if they already exist)
@@ -306,7 +310,10 @@ export const main = async (
           pathDatabaseMoonpie,
           logger
         );
-      const pathDatabaseBackup = path.join(logDir, fileNameDatabaseBackups());
+      const pathDatabaseBackup = path.join(
+        logDir,
+        generateOutputFileNameMoonpieDbBackup()
+      );
       await writeJsonFile(pathDatabaseBackup, databaseBackupData);
     }
   };
@@ -319,7 +326,7 @@ export const main = async (
       osuEnableCommands.length > 0 &&
       !(
         osuEnableCommands.length === 1 &&
-        osuEnableCommands.includes(EnvVariableNone.NONE)
+        osuEnableCommands.includes(EnvVariableOtherListOptions.NONE)
       )
     ) {
       // Setup database tables (or do nothing if they already exist)

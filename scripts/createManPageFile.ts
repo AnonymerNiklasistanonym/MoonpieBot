@@ -3,10 +3,15 @@
 // Package imports
 import path from "path";
 // Local imports
-import { createManPageFile } from "../src/documentation/man";
-import { fileNameManPage } from "../src/info/fileNames";
+import { createManPageFile } from "./man";
 
-const manPage = path.join(__dirname, "..", fileNameManPage);
+const INSTALLER_DIR = path.join(__dirname, "..", "installer");
 
-console.log(`Create MAN page file "${manPage}"...`);
-createManPageFile(manPage).catch(console.error);
+/** The output file path of the man page to create. */
+const filePathOutputManPage = path.join(INSTALLER_DIR, "man.md");
+
+// -----------------------------------------------------------------------------
+
+console.log(`Create MAN page file '${filePathOutputManPage}'...`);
+
+Promise.all([createManPageFile(filePathOutputManPage)]).catch(console.error);
