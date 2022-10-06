@@ -469,6 +469,27 @@ export const main = async (
       }
     }
   };
+  await refreshCustomCommandsBroadcasts();
+
+  // Use this method to notify the user about unexpected chat handler errors
+  const chatHandlerErrorMessage = async (
+    channel: string,
+    tags: ChatUserstate,
+    err: ErrorWithCode,
+    chatHandlerId: string
+  ) => {
+    loggerMain.error(err);
+    try {
+      await twitchClient.say(
+        channel,
+        `${tags.username ? `@${tags.username} ` : ""}${chatHandlerId} Error: ${
+          err.message
+        }${err.code ? ` (${err.code})` : ""}`
+      );
+    } catch (errFunc) {
+      loggerMain.error(errFunc as Error);
+    }
+  };
 
   /**
    * Run this method every time a new message is detected.
@@ -531,17 +552,12 @@ export const main = async (
         logger
       );
     } catch (err) {
-      loggerMain.error(err as Error);
-      // When the chat handler throws an error write the error message in chat
-      const errorInfo = err as ErrorWithCode;
-      twitchClient
-        .say(
-          channel,
-          `${tags.username ? "@" + tags.username + " " : ""}Moonpie Error: ${
-            errorInfo.message
-          }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
-        )
-        .catch(loggerMain.error);
+      await chatHandlerErrorMessage(
+        channel,
+        tags,
+        err as ErrorWithCode,
+        "Moonpie"
+      );
     }
 
     if (enableOsu || osuStreamCompanionCurrentMapData !== undefined) {
@@ -579,17 +595,12 @@ export const main = async (
           logger
         );
       } catch (err) {
-        loggerMain.error(err as Error);
-        // When the chat handler throws an error write the error message in chat
-        const errorInfo = err as ErrorWithCode;
-        twitchClient
-          .say(
-            channel,
-            `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
-              errorInfo.message
-            }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
-          )
-          .catch(loggerMain.error);
+        await chatHandlerErrorMessage(
+          channel,
+          tags,
+          err as ErrorWithCode,
+          "osu!"
+        );
       }
     }
 
@@ -610,21 +621,15 @@ export const main = async (
           logger
         );
       } catch (err) {
-        loggerMain.error(err as Error);
-        // When the chat handler throws an error write the error message in chat
-        const errorInfo = err as ErrorWithCode;
-        twitchClient
-          .say(
-            channel,
-            `${tags.username ? "@" + tags.username + " " : ""}Spotify Error: ${
-              errorInfo.message
-            }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
-          )
-          .catch(loggerMain.error);
+        await chatHandlerErrorMessage(
+          channel,
+          tags,
+          err as ErrorWithCode,
+          "Spotify"
+        );
       }
     }
 
-    await refreshCustomCommandsBroadcasts();
     try {
       await customCommandsBroadcastsChatHandler(
         twitchClient,
@@ -642,17 +647,12 @@ export const main = async (
         logger
       );
     } catch (err) {
-      loggerMain.error(err as Error);
-      // When the chat handler throws an error write the error message in chat
-      const errorInfo = err as ErrorWithCode;
-      twitchClient
-        .say(
-          channel,
-          `${tags.username ? "@" + tags.username + " " : ""}Osu Error: ${
-            errorInfo.message
-          }${errorInfo.code ? " (" + errorInfo.code + ")" : ""}`
-        )
-        .catch(loggerMain.error);
+      await chatHandlerErrorMessage(
+        channel,
+        tags,
+        err as ErrorWithCode,
+        "Custom Commands/Broadcasts"
+      );
     }
 
     // Refresh custom commands/broadcasts if necessary (maybe a new one was added)
@@ -676,50 +676,52 @@ export const main = async (
           pluginsCustomCommand.set(plugin.id, plugin.func);
         });
 
-        const executed = await runTwitchCommandHandler(
-          twitchClient,
-          channel,
-          tags,
-          message,
-          {},
-          stringMap,
-          pluginsCustomCommand,
-          macroMapChannel,
-          logger,
-          customCommandChatHandler(
-            customCommand,
-            pathDatabaseCustomCommandsBroadcasts
-          )
-        );
-        if (!executed) {
-          continue;
+        try {
+          const executed = await runTwitchCommandHandler(
+            twitchClient,
+            channel,
+            tags,
+            message,
+            {},
+            stringMap,
+            pluginsCustomCommand,
+            macroMapChannel,
+            logger,
+            customCommandChatHandler(
+              customCommand,
+              pathDatabaseCustomCommandsBroadcasts
+            )
+          );
+          if (!executed) {
+            continue;
+          }
+          customCommand.count += 1;
+          customCommand.timestampLastExecution = Date.now();
+          await customCommandsBroadcastsDb.requests.customCommand.updateEntry(
+            pathDatabaseCustomCommandsBroadcasts,
+            {
+              countIncrease: 1,
+              id: customCommand.id,
+              timestampLastExecution: customCommand.timestampLastExecution,
+            },
+            logger
+          );
+        } catch (err) {
+          await chatHandlerErrorMessage(
+            channel,
+            tags,
+            err as ErrorWithCode,
+            `Custom Command ${customCommand.id}`
+          );
         }
-        customCommand.count += 1;
-        customCommand.timestampLastExecution = Date.now();
-        await customCommandsBroadcastsDb.requests.customCommand.updateEntry(
-          pathDatabaseCustomCommandsBroadcasts,
-          {
-            countIncrease: 1,
-            id: customCommand.id,
-            timestampLastExecution: customCommand.timestampLastExecution,
-          },
-          logger
-        );
       }
     } catch (err) {
-      loggerMain.error(err as Error);
-      // When the chat handler throws an error write the error message in chat
-      const errorInfo = err as ErrorWithCode;
-      twitchClient
-        .say(
-          channel,
-          `${
-            tags.username ? "@" + tags.username + " " : ""
-          }Custom Command Error: ${errorInfo.message}${
-            errorInfo.code ? " (" + errorInfo.code + ")" : ""
-          }`
-        )
-        .catch(loggerMain.error);
+      await chatHandlerErrorMessage(
+        channel,
+        tags,
+        err as ErrorWithCode,
+        "Custom Command"
+      );
     }
   };
 
