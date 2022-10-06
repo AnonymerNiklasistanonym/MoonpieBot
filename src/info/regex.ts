@@ -464,12 +464,12 @@ export interface RegexCustomCommandAdd {
  *
  * @example
  * ```text
- * !addcc ID REGES MESSAGE -ul=mod -cd=12
+ * !addcc ID REGEX MESSAGE -ul=mod -cd=12
  * ```
  */
 export const regexCustomCommandAdd =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!addcc\s+(?<customCommandId>'\S+'|(?!')\S+(?!'))\s+(?<customCommandRegex>'.+?'|(?!').+?(?!'))\s+(?<customCommandMessage>'.+?'|(?!').+?(?!'))(?:\s+-ul=(?<customCommandUserLevel>mod|vip|none|broadcaster))?(?:\s+-cd=(?<customCommandCooldownInS>[0-9]+))?(?:\s|$)/i;
+  /^\s*!addcc\s+(?<customCommandId>'.+?'|(?!')\S+(?!'))\s+(?<customCommandRegex>'.+?'|(?!')\S+(?!'))\s+(?<customCommandMessage>'.+?'|(?!')\S+(?!'))(?:\s+-ul=(?<customCommandUserLevel>mod|vip|none|broadcaster))?(?:\s+-cd=(?<customCommandCooldownInS>[0-9]+))?(?:\s|$)/i;
 export interface RegexCustomCommandDelete {
   customCommandId: string;
 }
@@ -483,7 +483,39 @@ export interface RegexCustomCommandDelete {
  */
 export const regexCustomCommandDelete =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!delcc\s+(?<customCommandId>'\S+'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!delcc\s+(?<customCommandId>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+
+export interface RegexCustomBroadcastAdd {
+  customBroadcastCronString: string;
+  customBroadcastId: string;
+  customBroadcastMessage: string;
+}
+/**
+ * Regex to recognize the !addcc command.
+ *
+ * @example
+ * ```text
+ * !addcb ID CRON_STRING MESSAGE
+ * ```
+ */
+export const regexCustomBroadcastAdd =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!addcb\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!'))\s+(?<customBroadcastCronString>'.+?'|(?!')\S+(?!'))\s+(?<customBroadcastMessage>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+export interface RegexCustomBroadcastDelete {
+  customBroadcastId: string;
+}
+/**
+ * Regex to recognize the !delcb command.
+ *
+ * @example
+ * ```text
+ * !delcb ID
+ * ```
+ */
+export const regexCustomBroadcastDelete =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!delcb\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+
 // TODO Implement
 export interface RegexCustomCommandSet {
   customCommandId: string;

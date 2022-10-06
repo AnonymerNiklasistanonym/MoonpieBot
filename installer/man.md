@@ -1,6 +1,6 @@
 % MoonpieBot(1) moonpiebot 1.0.27b
 % AnonymerNiklasistanonym
-% September 2022
+% October 2022
 
 # NAME
 
@@ -34,6 +34,13 @@ If this program is installed via a package it will use *$HOME/.local/share/moonp
 : Get the version of the program
 
 # ENVIRONMENT VARIABLES
+
+**MOONPIE_CONFIG_CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH**="*customCommandsBroadcasts.db*"
+: The database file path that contains the persistent custom commands and broadcasts data.
+
+**MOONPIE_CONFIG_CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS**="*add_custom_broadcast,add_custom_command,commands,delete_custom_broadcast,delete_custom_command,edit_custom_broadcast,edit_custom_command,list_custom_broadcasts,list_custom_commands*"
+: You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
+Supported list values: "*add_custom_broadcast*", "*add_custom_command*", "*commands*", "*delete_custom_broadcast*", "*delete_custom_command*", "*edit_custom_broadcast*", "*edit_custom_command*", "*list_custom_broadcasts*", "*list_custom_commands*" (empty list value: "*none*")
 
 **MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL**="*info*"
 : The log level of the log messages that are printed to the console.

@@ -425,6 +425,50 @@ export const main = async (
   };
   let customCommands: CustomCommand[] = [];
   let customBroadcasts: CustomBroadcast[] = [];
+  const refreshCustomCommandsBroadcasts = async () => {
+    if (customCommandsBroadcastsRefreshHelper.refreshCustomCommands) {
+      logger.debug("Refresh custom commands...");
+      customCommandsBroadcastsRefreshHelper.refreshCustomCommands = false;
+      customCommands =
+        await customCommandsBroadcastsDb.requests.customCommand.getEntries(
+          pathDatabaseCustomCommandsBroadcasts,
+          logger
+        );
+    }
+    if (customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts) {
+      logger.debug("Refresh custom broadcasts...");
+      customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts = false;
+      customBroadcasts =
+        await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
+          pathDatabaseCustomCommandsBroadcasts,
+          logger
+        );
+      // Stop all old running custom broadcasts
+      for (const [
+        customBroadcastId,
+        scheduledTask,
+      ] of customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts) {
+        stopBroadcastScheduledTask(scheduledTask, customBroadcastId, logger);
+      }
+      customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts.clear();
+      // Start new custom broadcasts
+      for (const customBroadcast of customBroadcasts) {
+        const customBroadcastScheduledTask = createBroadcastScheduledTask(
+          twitchClient,
+          twitchClientChannels ? twitchClientChannels : [],
+          customBroadcast,
+          stringMap,
+          pluginMap,
+          macroMap,
+          logger
+        );
+        customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts.set(
+          customBroadcast.id,
+          customBroadcastScheduledTask
+        );
+      }
+    }
+  };
 
   /**
    * Run this method every time a new message is detected.
@@ -468,50 +512,6 @@ export const main = async (
       });
       pluginMapChannel.set(plugin.id, plugin.func);
     });
-
-    // Refresh custom commands/broadcasts if necessary
-    if (customCommandsBroadcastsRefreshHelper.refreshCustomCommands) {
-      logger.debug("Refresh custom commands...");
-      customCommandsBroadcastsRefreshHelper.refreshCustomCommands = false;
-      customCommands =
-        await customCommandsBroadcastsDb.requests.customCommand.getEntries(
-          pathDatabaseCustomCommandsBroadcasts,
-          logger
-        );
-    }
-    if (customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts) {
-      logger.debug("Refresh custom broadcasts...");
-      customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts = false;
-      customBroadcasts =
-        await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
-          pathDatabaseCustomCommandsBroadcasts,
-          logger
-        );
-      // Stop all old running custom broadcasts
-      for (const [
-        customBroadcastId,
-        scheduledTask,
-      ] of customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts) {
-        stopBroadcastScheduledTask(scheduledTask, customBroadcastId, logger);
-      }
-      customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts.clear();
-      // Start new custom broadcasts
-      for (const customBroadcast of customBroadcasts) {
-        const customBroadcastScheduledTask = createBroadcastScheduledTask(
-          twitchClient,
-          twitchClientChannels ? twitchClientChannels : [],
-          customBroadcast,
-          stringMap,
-          pluginMap,
-          macroMap,
-          logger
-        );
-        customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts.set(
-          customBroadcast.id,
-          customBroadcastScheduledTask
-        );
-      }
-    }
 
     // Handle all bot commands
     try {
@@ -624,6 +624,7 @@ export const main = async (
       }
     }
 
+    await refreshCustomCommandsBroadcasts();
     try {
       await customCommandsBroadcastsChatHandler(
         twitchClient,
@@ -653,6 +654,9 @@ export const main = async (
         )
         .catch(loggerMain.error);
     }
+
+    // Refresh custom commands/broadcasts if necessary (maybe a new one was added)
+    await refreshCustomCommandsBroadcasts();
 
     // Check custom commands
     try {

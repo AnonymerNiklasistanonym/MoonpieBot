@@ -6,7 +6,7 @@ import {
 import {
   customCommandsBroadcastsCommandReplyAddCC,
   customCommandsBroadcastsCommandReplyAddCCAlreadyExists,
-  customCommandsBroadcastsCommandReplyCCInvalidRegex,
+  customCommandsBroadcastsCommandReplyInvalidRegex,
   customCommandsBroadcastsCommandReplyCCNotFound,
   customCommandsBroadcastsCommandReplyDelCC,
 } from "../../strings/customCommandsBroadcasts/commandReply";
@@ -70,6 +70,8 @@ export const commandAddCC: TwitchChatCommandHandler<
       userLevel: data.customCommandUserLevel,
     };
 
+    // TODO Validate message
+
     try {
       // eslint-disable-next-line security/detect-non-literal-regexp
       new RegExp(data.customCommandRegex, "i");
@@ -80,7 +82,7 @@ export const commandAddCC: TwitchChatCommandHandler<
           macroCustomCommandInfo,
           customCommandInfo
         ),
-        messageId: customCommandsBroadcastsCommandReplyCCInvalidRegex.id,
+        messageId: customCommandsBroadcastsCommandReplyInvalidRegex.id,
       };
     }
 

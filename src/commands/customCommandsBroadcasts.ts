@@ -1,6 +1,10 @@
 // Local imports
 // TODO Add commands
 import {
+  commandAddCB,
+  commandDelCB,
+} from "./customCommandsBroadcasts/customBroadcasts";
+import {
   commandAddCC,
   commandDelCC,
 } from "./customCommandsBroadcasts/customCommands";
@@ -84,6 +88,38 @@ export const customCommandsBroadcastsChatHandler: TwitchChatHandler<
   );
   await Promise.all(
     [commandDelCC].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        data,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
+    [commandAddCB].map((command) =>
+      runTwitchCommandHandler(
+        client,
+        channel,
+        tags,
+        message,
+        data,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
+    [commandDelCB].map((command) =>
       runTwitchCommandHandler(
         client,
         channel,

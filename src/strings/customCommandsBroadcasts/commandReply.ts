@@ -1,5 +1,9 @@
 // Local imports
 import {
+  macroCustomBroadcastInfo,
+  MacroCustomBroadcastInfo,
+} from "../../messageParser/macros/customBroadcast";
+import {
   MacroCustomCommandInfo,
   macroCustomCommandInfo,
 } from "../../messageParser/macros/customCommands";
@@ -15,9 +19,15 @@ export const customCommandsBroadcastsCommandReplyAddCC: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
-    " You added a command (",
+    " You added a command (ID=",
     {
       key: MacroCustomCommandInfo.ID,
+      name: macroCustomCommandInfo.id,
+      type: "macro",
+    },
+    ",REGEX=",
+    {
+      key: MacroCustomCommandInfo.REGEX,
       name: macroCustomCommandInfo.id,
       type: "macro",
     },
@@ -40,11 +50,11 @@ export const customCommandsBroadcastsCommandReplyAddCCAlreadyExists: StringEntry
     ]),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_ADD_CC_ALREADY_EXISTS`,
   };
-export const customCommandsBroadcastsCommandReplyCCInvalidRegex: StringEntry = {
+export const customCommandsBroadcastsCommandReplyInvalidRegex: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
-    " The regex string '",
+    " The regex '",
     {
       key: MacroCustomCommandInfo.REGEX,
       name: macroCustomCommandInfo.id,
@@ -52,7 +62,7 @@ export const customCommandsBroadcastsCommandReplyCCInvalidRegex: StringEntry = {
     },
     "' is not valid!",
   ]),
-  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CC_INVALID_REGEX`,
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_INVALID_REGEX`,
 };
 export const customCommandsBroadcastsCommandReplyDelCC: StringEntry = {
   default: createMessageForMessageParser([
@@ -72,7 +82,7 @@ export const customCommandsBroadcastsCommandReplyCCNotFound: StringEntry = {
   default: createMessageForMessageParser([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
-    " No custom command with the ID '",
+    " No command with the ID '",
     {
       key: MacroCustomCommandInfo.ID,
       name: macroCustomCommandInfo.id,
@@ -82,11 +92,94 @@ export const customCommandsBroadcastsCommandReplyCCNotFound: StringEntry = {
   ]),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CC_NOT_FOUND`,
 };
+export const customCommandsBroadcastsCommandReplyAddCB: StringEntry = {
+  default: createMessageForMessageParser([
+    "@",
+    { name: PluginTwitchChat.USER, type: "plugin" },
+    " You added a broadcast (ID=",
+    {
+      key: MacroCustomBroadcastInfo.ID,
+      name: macroCustomBroadcastInfo.id,
+      type: "macro",
+    },
+    ",CRON_STRING=",
+    {
+      key: MacroCustomBroadcastInfo.CRON_STRING,
+      name: macroCustomBroadcastInfo.id,
+      type: "macro",
+    },
+    ")",
+  ]),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_ADD_CB`,
+};
+export const customCommandsBroadcastsCommandReplyAddCBAlreadyExists: StringEntry =
+  {
+    default: createMessageForMessageParser([
+      "@",
+      { name: PluginTwitchChat.USER, type: "plugin" },
+      " A broadcast with the ID '",
+      {
+        key: MacroCustomBroadcastInfo.ID,
+        name: macroCustomBroadcastInfo.id,
+        type: "macro",
+      },
+      "' already exists!",
+    ]),
+    id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_ADD_CB_ALREADY_EXISTS`,
+  };
+export const customCommandsBroadcastsCommandReplyDelCB: StringEntry = {
+  default: createMessageForMessageParser([
+    "@",
+    { name: PluginTwitchChat.USER, type: "plugin" },
+    " You deleted a broadcast (",
+    {
+      key: MacroCustomBroadcastInfo.ID,
+      name: macroCustomBroadcastInfo.id,
+      type: "macro",
+    },
+    ")",
+  ]),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_DEL_CB`,
+};
+export const customCommandsBroadcastsCommandReplyCBNotFound: StringEntry = {
+  default: createMessageForMessageParser([
+    "@",
+    { name: PluginTwitchChat.USER, type: "plugin" },
+    " No broadcast with the ID '",
+    {
+      key: MacroCustomBroadcastInfo.ID,
+      name: macroCustomBroadcastInfo.id,
+      type: "macro",
+    },
+    "' was found!",
+  ]),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CB_NOT_FOUND`,
+};
+export const customCommandsBroadcastsCommandReplyInvalidCronString: StringEntry =
+  {
+    default: createMessageForMessageParser([
+      "@",
+      { name: PluginTwitchChat.USER, type: "plugin" },
+      " The cron string '",
+      {
+        key: MacroCustomBroadcastInfo.CRON_STRING,
+        name: macroCustomBroadcastInfo.id,
+        type: "macro",
+      },
+      "' is not valid!",
+    ]),
+    id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_INVALID_CRON_STRING`,
+  };
 
 export const customCommandsBroadcastsCommandReply: StringEntry[] = [
+  customCommandsBroadcastsCommandReplyAddCB,
+  customCommandsBroadcastsCommandReplyAddCBAlreadyExists,
+  customCommandsBroadcastsCommandReplyInvalidCronString,
+  customCommandsBroadcastsCommandReplyCBNotFound,
+  customCommandsBroadcastsCommandReplyDelCB,
   customCommandsBroadcastsCommandReplyAddCC,
   customCommandsBroadcastsCommandReplyAddCCAlreadyExists,
-  customCommandsBroadcastsCommandReplyCCInvalidRegex,
+  customCommandsBroadcastsCommandReplyInvalidRegex,
   customCommandsBroadcastsCommandReplyCCNotFound,
   customCommandsBroadcastsCommandReplyDelCC,
 ];
