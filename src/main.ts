@@ -766,12 +766,29 @@ export const main = async (
       }
     }
   );
+  let averageCommandHandleTime = 0;
+  let averageCommandHandleCount = 0;
   twitchClient.on(
     TwitchClientListener.NEW_MESSAGE,
     (channel, tags, message, self) => {
-      onNewMessage(channel, tags, message, self).catch((err) => {
-        loggerMain.error(err as Error);
-      });
+      const startTime = performance.now();
+      onNewMessage(channel, tags, message, self)
+        .catch((err) => {
+          loggerMain.error(err as Error);
+        })
+        .finally(() => {
+          const endTime = performance.now();
+          averageCommandHandleCount++;
+          averageCommandHandleTime -=
+            averageCommandHandleTime / averageCommandHandleCount;
+          averageCommandHandleTime +=
+            (endTime - startTime) / averageCommandHandleCount;
+          loggerMain.debug(
+            `Command was handled in ${
+              endTime - startTime
+            }ms (average time: ${averageCommandHandleTime}ms N=${averageCommandHandleCount})`
+          );
+        });
     }
   );
 
