@@ -6,7 +6,6 @@
  * The Version structure.
  */
 export interface Version {
-  /** Set true for beta builds/versions. */
   beta?: boolean;
   major: number;
   minor: number;
@@ -26,11 +25,11 @@ export const getVersionFromObject = (version: Version, prefix = "v"): string =>
   }`;
 
 /**
- * Compare versions.
+ * Get if 2 versions are the same.
  *
  * @param versionA Version A.
  * @param versionB Version B.
- * @returns True if A and B are the same.
+ * @returns True if version A and B are the same.
  */
 export const isSameVersion = (versionA: Version, versionB: Version): boolean =>
   versionA.major === versionB.major &&

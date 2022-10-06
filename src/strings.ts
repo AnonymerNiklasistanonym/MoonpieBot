@@ -51,9 +51,7 @@ export interface StringEntry {
  * @param stringEntries The string entries (with more information).
  * @returns The resulting array can be inserted into a map for easy setup.
  */
-const generateStringList = (
-  ...stringEntries: StringEntry[]
-): [string, string][] => {
+const generateStringMap = (...stringEntries: StringEntry[]): StringMap => {
   const mappedStringEntries = stringEntries.map<[string, string]>((a) => [
     a.id,
     a.default,
@@ -64,27 +62,25 @@ const generateStringList = (
       throw Error(`The string list contained the ID "${value[0]}" twice`);
     }
   });
-  return mappedStringEntries;
+  return new Map(mappedStringEntries);
 };
 
 /**
  * The default values for all strings.
  */
-export const defaultStringMap: StringMap = new Map([
-  ...generateStringList(
-    ...customCommandsBroadcastsCommands,
-    ...customCommandsBroadcastsCommandReply,
-    ...general,
-    ...moonpieCommandReply,
-    ...moonpieCommands,
-    ...moonpieUser,
-    ...osuBeatmapRequests,
-    ...osuCommandReply,
-    ...osuCommands,
-    ...spotifyCommandReply,
-    ...spotifyCommands
-  ),
-]);
+export const defaultStringMap: StringMap = generateStringMap(
+  ...customCommandsBroadcastsCommands,
+  ...customCommandsBroadcastsCommandReply,
+  ...general,
+  ...moonpieCommandReply,
+  ...moonpieCommands,
+  ...moonpieUser,
+  ...osuBeatmapRequests,
+  ...osuCommandReply,
+  ...osuCommands,
+  ...spotifyCommandReply,
+  ...spotifyCommands
+);
 
 /**
  * Update the strings map with environment variable strings.
@@ -94,7 +90,7 @@ export const defaultStringMap: StringMap = new Map([
  * @returns The updated strings map.
  */
 export const updateStringsMapWithCustomEnvStrings = (
-  strings: StringMap = new Map(defaultStringMap),
+  strings: StringMap = defaultStringMap,
   logger: Logger
 ): StringMap => {
   const logStrings = createLogFunc(
