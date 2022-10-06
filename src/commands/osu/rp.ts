@@ -114,13 +114,19 @@ export const commandRp: TwitchChatCommandHandler<
       | RegexOsuChatHandlerCommandRp;
     if (matchGroups === undefined) {
       throw Error("RegexOsuChatHandlerCommandRp groups undefined");
-    } else if ("osuUserId" in matchGroups) {
+    } else if (
+      "osuUserId" in matchGroups &&
+      matchGroups.osuUserId !== undefined
+    ) {
       return {
         data: {
           customOsuId: parseInt(matchGroups.osuUserId),
         },
       };
-    } else if ("osuUserName" in matchGroups) {
+    } else if (
+      "osuUserName" in matchGroups &&
+      matchGroups.osuUserName !== undefined
+    ) {
       return {
         data: {
           customOsuName: matchGroups.osuUserName,

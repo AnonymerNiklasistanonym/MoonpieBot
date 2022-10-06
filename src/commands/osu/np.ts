@@ -88,11 +88,22 @@ export const commandNp: TwitchChatCommandHandler<
                 throw Error("RegexOsuBeatmapIdFromUrl groups undefined");
               }
               let beatmapId;
-              if ("beatmapIdB" in matchGroups) {
+              if (
+                "beatmapIdB" in matchGroups &&
+                matchGroups.beatmapIdB !== undefined
+              ) {
                 beatmapId = matchGroups.beatmapIdB;
-              } else if ("beatmapIdBeatmaps" in matchGroups) {
+              }
+              if (
+                "beatmapIdBeatmaps" in matchGroups &&
+                matchGroups.beatmapIdBeatmaps !== undefined
+              ) {
                 beatmapId = matchGroups.beatmapIdBeatmaps;
-              } else if ("beatmapIdBeatmapsets" in matchGroups) {
+              }
+              if (
+                "beatmapIdBeatmapsets" in matchGroups &&
+                matchGroups.beatmapIdBeatmapsets !== undefined
+              ) {
                 beatmapId = matchGroups.beatmapIdBeatmapsets;
               }
               if (beatmapId !== undefined) {

@@ -14,12 +14,8 @@ import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
-import type {
-  RegexOsuChatHandlerCommandPp,
-  RegexOsuChatHandlerCommandPpUserId,
-  RegexOsuChatHandlerCommandPpUserName,
-} from "../../info/regex";
 import type { CommandOsuGenericDataOsuApiV2Credentials } from "../osu";
+import type { RegexOsuChatHandlerCommandPp } from "../../info/regex";
 
 export interface CommandPpRpCreateReplyInput
   extends CommandOsuGenericDataOsuApiV2Credentials {
@@ -109,25 +105,20 @@ export const commandPp: TwitchChatCommandHandler<
     if (!match) {
       return false;
     }
-    const matchGroups: undefined | RegexOsuChatHandlerCommandPp = match.groups;
+    const matchGroups = match.groups as
+      | undefined
+      | RegexOsuChatHandlerCommandPp;
     if (!matchGroups) {
       throw Error("RegexOsuChatHandlerCommandPp groups undefined");
     }
-    if ((matchGroups as RegexOsuChatHandlerCommandPpUserId).osuUserId) {
+    if ("osuUserId" in matchGroups && matchGroups.osuUserId !== undefined) {
       return {
-        data: {
-          customOsuId: parseInt(
-            (matchGroups as RegexOsuChatHandlerCommandPpUserId).osuUserId
-          ),
-        },
+        data: { customOsuId: parseInt(matchGroups.osuUserId) },
       };
     }
-    if ((matchGroups as RegexOsuChatHandlerCommandPpUserName).osuUserName) {
+    if ("osuUserName" in matchGroups && matchGroups.osuUserName !== undefined) {
       return {
-        data: {
-          customOsuName: (matchGroups as RegexOsuChatHandlerCommandPpUserName)
-            .osuUserName,
-        },
+        data: { customOsuName: matchGroups.osuUserName },
       };
     }
     return { data: {} };
