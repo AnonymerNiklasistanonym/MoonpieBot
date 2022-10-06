@@ -36,6 +36,7 @@
         "package:linux": "pkg --target node18-linux-x64 .",
         "package:windows": "pkg --target node18-win-x64 .",
         "prebuild": "rimraf ./dist/*",
+        "start:inspect": "cross-env MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL=debug MOONPIE_CONFIG_TWITCH_DEBUG=ON node --inspect . -- --disable-censoring",
         "start:dev": "cross-env NODE_PATH=./dist NODE_ENV=production node .",
         "start": "node .",
         "test": "cross-env NODE_PATH=. nyc mocha -- \"test/**/*.test.ts\"",

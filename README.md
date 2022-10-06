@@ -583,6 +583,24 @@ For documentation purposes several plugins can be used:
 
 ## Profiling
 
+- Node.js profiling: https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27
+
+  - Start application with custom inspect option:
+
+    ```sh
+    npm run build
+    npm run start:inspect
+    ```
+
+  - Now open a chromium based browser and enter as URL `chrome://inspect`
+  - Click the button *Open dedicated DevTools for Node*
+  - Now you can set breakpoints and memory/CPU profile the running application:
+    - Breakpoints: Go to the *Sources* tab, select *Filesystem* and then add the repository directory (or just the `dist` directory) - now you can set breakpoints by clicking on the line of code you want to break on
+    - Memory: (Go to the *Memory* tab)
+      - You can create and compare heap snapshots (click the round button) when you set the profiling type to *Heap snapshot*
+      - You can get a heap change visualization with the same kind of snapshot information by setting the profiling type to *Allocation instrumentation on timeline*
+    - CPU: In the tab *Profiler* you can record the application as long as you want, if you stop the profiler you will get a table of what parts of the code were used the most
+
 - Simple profiling: https://nodejs.org/en/docs/guides/simple-profiling/
 
   ```sh
