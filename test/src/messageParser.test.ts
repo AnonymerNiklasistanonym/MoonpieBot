@@ -14,6 +14,7 @@ import {
 } from "../../src/messageParser/plugins/general";
 import { getTestLogger } from "./logger";
 import { messageParser } from "../../src/messageParser";
+import pluginsTestSuite from "./messageParser/plugins.test";
 // Type imports
 import type { MacroMap, PluginFunc, PluginMap } from "../../src/messageParser";
 import type { StringMap } from "../../src/strings";
@@ -387,4 +388,6 @@ describe("messageParser", () => {
       expect(output12).to.be.equal("");
     });
   });
+
+  pluginsTestSuite();
 });

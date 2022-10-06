@@ -5,19 +5,19 @@ import {
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { createMessageParserMessage } from "../../messageParser/createMessageParserMessage";
 import { CUSTOM_COMMANDS_BROADCASTS_STRING_ID } from "../customCommandsBroadcasts";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../documentation/messageParser";
+import type { MessageForMessageElementPlugin } from "../../messageParser/createMessageParserMessage";
 import type { StringEntry } from "../../strings";
 
 const CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID = `${CUSTOM_COMMANDS_BROADCASTS_STRING_ID}_COMMANDS`;
 
 export const customCommandsBroadcastsCommandsAddCustomCommand: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     [
       "!addcc $ID $REGEX MESSAGE (-ul=$USER_LEVEL) (-cd=$COOLDOWN_IN_S) [add custom command]",
     ],
@@ -26,14 +26,14 @@ export const customCommandsBroadcastsCommandsAddCustomCommand: StringEntry = {
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_ADD_CUSTOM_COMMAND`,
 };
 export const customCommandsBroadcastsCommandsAddCustomBroadcast: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!addcb $ID $CRON_STRING MESSAGE [add custom broadcast]"],
     true
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_ADD_CUSTOM_BROADCAST`,
 };
 export const customCommandsBroadcastsCommandsEditCustomCommand: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!editcc $ID $OPTION $OPTION_VALUE [edit command]"],
     true
   ),
@@ -41,27 +41,24 @@ export const customCommandsBroadcastsCommandsEditCustomCommand: StringEntry = {
 };
 export const customCommandsBroadcastsCommandsEditCustomBroadcast: StringEntry =
   {
-    default: createMessageForMessageParser(
+    default: createMessageParserMessage(
       ["!editcb $ID $OPTION $OPTION_VALUE [edit broadcast]"],
       true
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_EDIT_CUSTOM_BROADCAST`,
   };
 export const customCommandsBroadcastsCommandsListCustomCommands: StringEntry = {
-  default: createMessageForMessageParser(["!listccs [list commands]"], true),
+  default: createMessageParserMessage(["!listccs [list commands]"], true),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_LIST_CUSTOM_COMMANDS`,
 };
 export const customCommandsBroadcastsCommandsListCustomBroadcasts: StringEntry =
   {
-    default: createMessageForMessageParser(
-      ["!listcbs [list broadcasts]"],
-      true
-    ),
+    default: createMessageParserMessage(["!listcbs [list broadcasts]"], true),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_LIST_CUSTOM_BROADCAST`,
   };
 export const customCommandsBroadcastsCommandsDeleteCustomCommand: StringEntry =
   {
-    default: createMessageForMessageParser(
+    default: createMessageParserMessage(
       ["!delcc $ID [delete custom command]"],
       true
     ),
@@ -69,14 +66,14 @@ export const customCommandsBroadcastsCommandsDeleteCustomCommand: StringEntry =
   };
 export const customCommandsBroadcastsCommandsDeleteCustomBroadcast: StringEntry =
   {
-    default: createMessageForMessageParser(
+    default: createMessageParserMessage(
       ["!delcb $ID [delete custom broadcast]"],
       true
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_DELETE_CUSTOM_BROADCAST`,
   };
 export const customCommandsBroadcastsCommandsPrefix: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     [
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -87,7 +84,7 @@ export const customCommandsBroadcastsCommandsPrefix: StringEntry = {
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_PREFIX`,
 };
 export const customCommandsBroadcastsCommandsString: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     {
       name: customCommandsBroadcastsCommandsPrefix.id,
       type: "reference",

@@ -17,7 +17,7 @@ import {
   pluginIfNotUndefined,
   pluginTimeInSToHumanReadableStringShort,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { createMessageParserMessage } from "../../messageParser/createMessageParserMessage";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 // Type imports
@@ -26,7 +26,7 @@ import type { StringEntry } from "../../strings";
 const MOONPIE_COMMAND_REPLY_STRING_ID = `${MOONPIE_STRING_ID}_COMMAND_REPLY`;
 
 export const moonpieCommandReplyAbout: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",
@@ -41,7 +41,7 @@ export const moonpieCommandReplyAbout: StringEntry = {
 };
 
 export const moonpieCommandReplyClaim: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You just claimed a moonpie! You have now ",
@@ -76,7 +76,7 @@ export const moonpieCommandReplyClaim: StringEntry = {
 };
 
 const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     [
       "You already claimed a moonpie for today (",
       {
@@ -112,7 +112,7 @@ const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
 };
 
 const moonpieCommandReplyAlreadyClaimedRefStar: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     [
       "You are the cutest! You have 6969 moonpies and are rank 1 in my heart! <3",
     ],
@@ -124,7 +124,7 @@ const moonpieCommandReplyAlreadyClaimedRefStar: StringEntry = {
 const starTwitchId = 93818178;
 
 export const moonpieCommandReplyAlreadyClaimed: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",
@@ -157,7 +157,7 @@ export const moonpieCommandReplyAlreadyClaimed: StringEntry = {
 };
 
 export const moonpieCommandReplyLeaderboardPrefix: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["@", { name: PluginTwitchChat.USER, type: "plugin" }, " "],
     true
   ),
@@ -165,7 +165,7 @@ export const moonpieCommandReplyLeaderboardPrefix: StringEntry = {
 };
 
 export const moonpieCommandReplyLeaderboardEntry: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     [
       {
         key: MacroMoonpieLeaderboardEntry.RANK,
@@ -192,7 +192,7 @@ export const moonpieCommandReplyLeaderboardEntry: StringEntry = {
 };
 
 export const moonpieCommandReplyLeaderboardErrorNoEntriesFound: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "No leaderboard entries were found",
     {
       args: {

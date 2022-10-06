@@ -36,6 +36,7 @@ import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 // Type imports
 import type { ExportedMacroInformation, MacroMap, RequestHelp } from "./macros";
 import type { Logger } from "winston";
+import type { ParseTreeNodeErrorCode } from "./errors";
 
 export interface PluginSignature {
   argument?: string | string[];
@@ -75,10 +76,21 @@ export type PluginFunc = (
 export type PluginMap = Map<string, PluginFunc>;
 
 export interface MessageParserPluginExample {
+  /** Text content after plugin. */
   after?: string;
+  /** The plugin argument content. */
   argument?: string;
+  /** Text content before plugin. */
   before?: string;
+  /** The expected plugin error message. */
+  expectedError?: string;
+  /** The expected error code of the parser. */
+  expectedErrorCode?: ParseTreeNodeErrorCode;
+  /** The expected string. */
+  expectedOutput?: string;
+  /** Hide the output (because it is time dependent/random etc.). */
   hideOutput?: boolean;
+  /** The plugin scope content. */
   scope?: string;
 }
 

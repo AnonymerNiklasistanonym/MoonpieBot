@@ -7,7 +7,7 @@ import {
   MacroCustomCommandInfo,
   macroCustomCommandInfo,
 } from "../../messageParser/macros/customCommands";
-import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { createMessageParserMessage } from "../../messageParser/createMessageParserMessage";
 import { CUSTOM_COMMANDS_BROADCASTS_STRING_ID } from "../customCommandsBroadcasts";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 // Type imports
@@ -16,7 +16,7 @@ import type { StringEntry } from "../../strings";
 const CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID = `${CUSTOM_COMMANDS_BROADCASTS_STRING_ID}_COMMAND_REPLY`;
 
 export const customCommandsBroadcastsCommandReplyAddCC: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You added a command (ID=",
@@ -37,7 +37,7 @@ export const customCommandsBroadcastsCommandReplyAddCC: StringEntry = {
 };
 export const customCommandsBroadcastsCommandReplyAddCCAlreadyExists: StringEntry =
   {
-    default: createMessageForMessageParser([
+    default: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " A command with the ID '",
@@ -51,7 +51,7 @@ export const customCommandsBroadcastsCommandReplyAddCCAlreadyExists: StringEntry
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_ADD_CC_ALREADY_EXISTS`,
   };
 export const customCommandsBroadcastsCommandReplyInvalidRegex: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " The regex '",
@@ -65,7 +65,7 @@ export const customCommandsBroadcastsCommandReplyInvalidRegex: StringEntry = {
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_INVALID_REGEX`,
 };
 export const customCommandsBroadcastsCommandReplyDelCC: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You deleted a command (",
@@ -79,7 +79,7 @@ export const customCommandsBroadcastsCommandReplyDelCC: StringEntry = {
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_DEL_CC`,
 };
 export const customCommandsBroadcastsCommandReplyCCNotFound: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " No command with the ID '",
@@ -93,7 +93,7 @@ export const customCommandsBroadcastsCommandReplyCCNotFound: StringEntry = {
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CC_NOT_FOUND`,
 };
 export const customCommandsBroadcastsCommandReplyAddCB: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You added a broadcast (ID=",
@@ -114,7 +114,7 @@ export const customCommandsBroadcastsCommandReplyAddCB: StringEntry = {
 };
 export const customCommandsBroadcastsCommandReplyAddCBAlreadyExists: StringEntry =
   {
-    default: createMessageForMessageParser([
+    default: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " A broadcast with the ID '",
@@ -128,7 +128,7 @@ export const customCommandsBroadcastsCommandReplyAddCBAlreadyExists: StringEntry
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_ADD_CB_ALREADY_EXISTS`,
   };
 export const customCommandsBroadcastsCommandReplyDelCB: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You deleted a broadcast (",
@@ -142,7 +142,7 @@ export const customCommandsBroadcastsCommandReplyDelCB: StringEntry = {
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_DEL_CB`,
 };
 export const customCommandsBroadcastsCommandReplyCBNotFound: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " No broadcast with the ID '",
@@ -157,7 +157,7 @@ export const customCommandsBroadcastsCommandReplyCBNotFound: StringEntry = {
 };
 export const customCommandsBroadcastsCommandReplyInvalidCronString: StringEntry =
   {
-    default: createMessageForMessageParser([
+    default: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " The cron string '",

@@ -3,7 +3,7 @@ import {
   pluginIfFalse,
   pluginIfTrue,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { createMessageParserMessage } from "../../messageParser/createMessageParserMessage";
 import { macroSpotifySong } from "../../messageParser/macros/spotify";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
@@ -14,12 +14,12 @@ import type { StringEntry } from "../../strings";
 const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
 
 const spotifyCommandReplyRefSongNone: StringEntry = {
-  default: createMessageForMessageParser(["Currently playing no song"], true),
+  default: createMessageParserMessage(["Currently playing no song"], true),
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_NO_SONG`,
 };
 
 const spotifyCommandReplyRefSongCurrent: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     [
       "Currently playing '",
       {
@@ -59,7 +59,7 @@ const spotifyCommandReplyRefSongCurrent: StringEntry = {
 };
 
 const spotifyCommandReplyRefSongPrevious: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     [
       ", previously played '",
       {
@@ -99,7 +99,7 @@ const spotifyCommandReplyRefSongPrevious: StringEntry = {
 };
 
 export const spotifyCommandReplySong: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",

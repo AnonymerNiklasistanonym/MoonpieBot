@@ -37,7 +37,7 @@ import {
   pluginIfTrue,
   pluginTimeInSToStopwatchString,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { createMessageParserMessage } from "../../messageParser/createMessageParserMessage";
 import { OSU_STRING_ID } from "../osu";
 import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
 import { PluginOsuApi } from "../../messageParser/plugins/osuApi";
@@ -49,7 +49,7 @@ import type { StringEntry } from "../../strings";
 const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
 
 export const osuCommandReplyNp: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " Currently playing '",
@@ -94,7 +94,7 @@ export const osuCommandReplyNp: StringEntry = {
 };
 
 export const osuCommandReplyNpStreamCompanionWebSocket: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " Currently playing ",
@@ -255,7 +255,7 @@ export const osuCommandReplyNpStreamCompanionWebSocket: StringEntry = {
 };
 
 export const osuCommandReplyNpStreamCompanionFile: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " Currently playing ",
@@ -325,7 +325,7 @@ export const osuCommandReplyNpStreamCompanionFile: StringEntry = {
 };
 
 export const osuCommandReplyNpNoMap: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " No map is currently being played",
@@ -334,7 +334,7 @@ export const osuCommandReplyNpNoMap: StringEntry = {
 };
 
 export const osuCommandReplyNpNoMapStreamCompanionWebsocket: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     {
       name: osuCommandReplyNpNoMap.id,
       type: "reference",
@@ -345,7 +345,7 @@ export const osuCommandReplyNpNoMapStreamCompanionWebsocket: StringEntry = {
 };
 
 export const osuCommandReplyNpStreamCompanionFileNotRunning: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     {
       name: osuCommandReplyNpNoMap.id,
       type: "reference",
@@ -357,7 +357,7 @@ export const osuCommandReplyNpStreamCompanionFileNotRunning: StringEntry = {
 
 export const osuCommandReplyNpStreamCompanionWebSocketNotRunning: StringEntry =
   {
-    default: createMessageForMessageParser([
+    default: createMessageParserMessage([
       {
         name: osuCommandReplyNpNoMap.id,
         type: "reference",
@@ -368,7 +368,7 @@ export const osuCommandReplyNpStreamCompanionWebSocketNotRunning: StringEntry =
   };
 
 export const osuCommandReplyRp: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",
@@ -653,7 +653,7 @@ export const osuCommandReplyRp: StringEntry = {
 };
 
 export const osuCommandReplyRpNotFound: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " No recent play was found",
@@ -662,7 +662,7 @@ export const osuCommandReplyRpNotFound: StringEntry = {
 };
 
 export const osuCommandReplyPp: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",
@@ -832,12 +832,12 @@ export const osuCommandReplyPp: StringEntry = {
 };
 
 export const osuScoreErrorNoBeatmap: StringEntry = {
-  default: createMessageForMessageParser(["No beatmap was found"]),
+  default: createMessageParserMessage(["No beatmap was found"]),
   id: `${OSU_COMMAND_REPLY_STRING_ID}_SCORE_NO_BEATMAP`,
 };
 
 export const osuScoreErrorNotFound: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "No score was found of the user ",
     {
       key: MacroOsuScoreRequest.USER_NAME,
@@ -873,7 +873,7 @@ export const osuScoreErrorNotFound: StringEntry = {
 };
 
 export const osuScore: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",

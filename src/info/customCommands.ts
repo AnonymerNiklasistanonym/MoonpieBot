@@ -16,7 +16,7 @@ import {
   pluginTimeInSToHumanReadableStringShort,
 } from "../messageParser/plugins/general";
 import { convertRegexToString } from "../other/regexToString";
-import { createMessageForMessageParser } from "../documentation/messageParser";
+import { createMessageParserMessage } from "../messageParser/createMessageParserMessage";
 import { pluginRegexGroupId } from "../messageParser/plugins/regexGroup";
 import { PluginTwitchApi } from "../messageParser/plugins/twitchApi";
 import { PluginTwitchChat } from "../messageParser/plugins/twitchChat";
@@ -33,7 +33,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Reply > ${PluginTwitchChat.USER}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " pong",
@@ -43,7 +43,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Random numbers > ${pluginRandomNumber.id}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       { args: "0<->100", name: pluginRandomNumber.id, type: "plugin" },
       "%",
     ]),
@@ -52,7 +52,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Count command calls > ${pluginRegexGroupId}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "the test command was called ",
       { name: pluginRegexGroupId, type: "plugin" },
       " time",
@@ -69,7 +69,7 @@ export const customCommandsInformation: CustomCommand[] = [
     ...defaultExampleCommandValues,
     cooldownInS: 30,
     id: "Add a cooldown to a command",
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "This command can only be executed every 30s",
     ]),
     regex: convertRegexToString(/^\s*!cooldown(?:\s|$)/),
@@ -78,7 +78,7 @@ export const customCommandsInformation: CustomCommand[] = [
     ...defaultExampleCommandValues,
     count: 20,
     id: `Reference parts of a message > ${pluginRegexGroupId},${pluginIfNotUndefined.id}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "Detected the command !regex with ",
       {
         args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
@@ -102,7 +102,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Use Twitch API for more specific shout outs > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "/announce Go check out ",
       { args: "1", name: pluginRegexGroupId, type: "plugin" },
       " at https://www.twitch.tv/",
@@ -121,7 +121,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Use Twitch API to get the follow age > ${pluginRegexGroupId},${PluginTwitchApi.GET_FOLLOW_AGE},${pluginTimeInSToHumanReadableStringShort.id}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       {
@@ -166,7 +166,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Use Twitch API to get/set the title > ${pluginRegexGroupId},${PluginTwitchApi.GET_TITLE},${PluginTwitchApi.SET_TITLE} [user:edit:broadcast scope necessary to set the title]`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       {
@@ -200,7 +200,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Use Twitch API to get/set the game > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME},${PluginTwitchApi.SET_GAME} [user:edit:broadcast scope necessary to set the game]`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " ",
@@ -235,7 +235,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Death counter that works across commands [1/4] > ${pluginCustomCommandDataAddId}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " death was added, streamer died ",
@@ -261,7 +261,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Death counter that works across commands [2/4] > ${pluginCustomCommandDataGetId}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " streamer died ",
@@ -290,7 +290,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Death counter that works across commands [3/4] > ${pluginCustomCommandDataSetId}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " ",
@@ -346,7 +346,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `Death counter that works across commands [4/4] > ${pluginCustomCommandDataRemoveId}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " death was removed, streamer died ",
@@ -376,7 +376,7 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     id: `List all available macros and plugins for debugging > ${pluginHelp.id}`,
-    message: createMessageForMessageParser([
+    message: createMessageParserMessage([
       { name: pluginHelp.id, type: "plugin" },
     ]),
     regex: convertRegexToString(/^\s*!help(?:\s|$)/),

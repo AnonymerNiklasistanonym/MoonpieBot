@@ -5,72 +5,72 @@ import {
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { createMessageParserMessage } from "../../messageParser/createMessageParserMessage";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../documentation/messageParser";
+import type { MessageForMessageElementPlugin } from "../../messageParser/createMessageParserMessage";
 import type { StringEntry } from "../../strings";
 
 const MOONPIE_COMMANDS_STRING_ID = `${MOONPIE_STRING_ID}_COMMANDS`;
 
 export const moonpieCommandsClaim: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!moonpie [claim one moonpie per day]"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_CLAIM`,
 };
 export const moonpieCommandsLeaderboard: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!moonpie leaderboard ($STARTING_RANK)"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_LEADERBOARD`,
 };
 export const moonpieCommandsGet: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!moonpie get $USER [get moonpies of a user]"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_GET`,
 };
 export const moonpieCommandsSet: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!moonpie set $USER $COUNT [set moonpies of a user]"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_SET`,
 };
 export const moonpieCommandsAdd: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!moonpie add $USER $COUNT [add moonpies to a user]"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_ADD`,
 };
 export const moonpieCommandsRemove: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!moonpie remove $USER $COUNT [remove moonpies of a user]"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_REMOVE`,
 };
 export const moonpieCommandsDelete: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!moonpie delete $USER [remove a user from the database]"],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_DELETE`,
 };
 export const moonpieCommandsAbout: StringEntry = {
-  default: createMessageForMessageParser(["!moonpie about"], true),
+  default: createMessageParserMessage(["!moonpie about"], true),
   id: `${MOONPIE_COMMANDS_STRING_ID}_ABOUT`,
 };
 export const moonpieCommandsPrefix: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     [
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -81,7 +81,7 @@ export const moonpieCommandsPrefix: StringEntry = {
   id: `${MOONPIE_COMMANDS_STRING_ID}_PREFIX`,
 };
 export const moonpieCommandsString: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     {
       name: moonpieCommandsPrefix.id,
       type: "reference",

@@ -1,5 +1,6 @@
 // Local imports
 import { genericStringSorter } from "../../other/genericStringSorter";
+import { ParseTreeNodeErrorCode } from "../errors";
 // Type imports
 import type { MessageParserPlugin } from "../plugins";
 
@@ -10,9 +11,10 @@ export const pluginIfEmpty: MessageParserPlugin = {
   description:
     "Plugin that only displays text inside of its scope if the supplied value is empty",
   examples: [
-    { argument: "not empty", scope: "Will not be shown" },
-    { argument: "", scope: "Will be shown" },
-    { argument: "not empty" },
+    { argument: "not empty", expectedOutput: "", scope: "Will not be shown" },
+    { argument: "", expectedOutput: "Will be shown", scope: "Will be shown" },
+    { argument: "not empty", expectedOutput: "" },
+    { expectedErrorCode: ParseTreeNodeErrorCode.NO_PLUGIN_CONTENT_AND_VALUE },
   ],
   func: (_, content, signature) => {
     if (signature === true) {
@@ -26,10 +28,14 @@ export const pluginIfEmpty: MessageParserPlugin = {
 export const pluginIfNotEmpty: MessageParserPlugin = {
   description: `Opposite of ${pluginIfEmpty.id}`,
   examples: [
-    { argument: "not empty", scope: "Will be shown" },
-    { argument: "", scope: "Will not be shown" },
-    { argument: "not empty" },
-    { argument: "" },
+    {
+      argument: "not empty",
+      expectedOutput: "Will be shown",
+      scope: "Will be shown",
+    },
+    { argument: "", expectedOutput: "", scope: "Will not be shown" },
+    { argument: "not empty", expectedOutput: "not empty" },
+    { argument: "", expectedOutput: "" },
   ],
   func: (_, content, signature) => {
     if (signature === true) {
@@ -50,10 +56,14 @@ export const pluginIfTrue: MessageParserPlugin = {
   description:
     "Plugin that only displays text inside of its scope if the supplied value is 'true'",
   examples: [
-    { argument: "true", scope: "Will be shown" },
-    { argument: "false", scope: "Will not be shown" },
-    { argument: "true" },
-    { argument: "false" },
+    {
+      argument: "true",
+      expectedOutput: "Will be shown",
+      scope: "Will be shown",
+    },
+    { argument: "false", expectedOutput: "", scope: "Will not be shown" },
+    { argument: "true", expectedOutput: "true" },
+    { argument: "false", expectedOutput: "" },
   ],
   func: (_, content, signature) => {
     if (signature === true) {
@@ -335,7 +345,7 @@ export const pluginIfNotSmaller: MessageParserPlugin = {
 
 export const pluginLowercase: MessageParserPlugin = {
   description: "Converts the plugin argument to lowercase letters",
-  examples: [{ argument: "Hello World!" }],
+  examples: [{ argument: "Hello World!", expectedOutput: "hello world!" }],
   func: (_, content, signature) => {
     if (signature === true) {
       return {
@@ -350,7 +360,7 @@ export const pluginLowercase: MessageParserPlugin = {
 
 export const pluginUppercase: MessageParserPlugin = {
   description: "Converts the plugin argument to uppercase letters",
-  examples: [{ argument: "Hello World!" }],
+  examples: [{ argument: "Hello World!", expectedOutput: "HELLO WORLD!" }],
   func: (_, content, signature) => {
     if (signature === true) {
       return {
@@ -380,6 +390,14 @@ export const pluginRandomNumber: MessageParserPlugin = {
       argument: "-100<->0",
       before: "Random number between -100 and 0: ",
       hideOutput: true,
+    },
+    {
+      argument: "0",
+      expectedOutput: "0",
+    },
+    {
+      argument: "-100<->-100",
+      expectedOutput: "-100",
     },
   ],
   func: (_logger, interval, signature) => {
@@ -450,8 +468,16 @@ const secondsToObject = (seconds: number) => {
 export const pluginTimeInSToStopwatchString: MessageParserPlugin = {
   description: "Converts a seconds number to a stopwatch like string",
   examples: [
-    { argument: "3600", before: "3600s will be converted to " },
-    { argument: "62", before: "62s will be converted to " },
+    {
+      argument: "3600",
+      before: "3600s will be converted to ",
+      expectedOutput: "3600s will be converted to 01:00:00 h",
+    },
+    {
+      argument: "62",
+      before: "62s will be converted to ",
+      expectedOutput: "62s will be converted to 01:02 min",
+    },
   ],
   func: (_logger, timeInS, signature) => {
     if (signature === true) {
@@ -488,9 +514,22 @@ export const pluginTimeInSToStopwatchString: MessageParserPlugin = {
 export const pluginTimeInSToHumanReadableString: MessageParserPlugin = {
   description: "Converts a seconds number to a human readable string",
   examples: [
-    { argument: "3600234", before: "3600234s will be converted to " },
-    { argument: "3600", before: "3600s will be converted to " },
-    { argument: "62", before: "62s will be converted to " },
+    {
+      argument: "3600234",
+      before: "3600234s will be converted to ",
+      expectedOutput:
+        "3600234s will be converted to 41 days, 16 hours, 3 minutes and 54 seconds",
+    },
+    {
+      argument: "3600",
+      before: "3600s will be converted to ",
+      expectedOutput: "3600s will be converted to 1 hour",
+    },
+    {
+      argument: "62",
+      before: "62s will be converted to ",
+      expectedOutput: "62s will be converted to 1 minute and 2 seconds",
+    },
   ],
   func: (_logger, timeInS, signature) => {
     if (signature === true) {
@@ -552,9 +591,21 @@ const H_COUNT_UNTIL_MIN_HIDDEN = 1;
 export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
   description: `Short version of ${pluginTimeInSToHumanReadableString.id} that discards smaller time units if bigger ones are given`,
   examples: [
-    { argument: "3600234", before: "3600234s will be converted to " },
-    { argument: "3600", before: "3600s will be converted to " },
-    { argument: "62", before: "62s will be converted to " },
+    {
+      argument: "3600234",
+      before: "3600234s will be converted to ",
+      expectedOutput: "3600234s will be converted to 41 days",
+    },
+    {
+      argument: "3600",
+      before: "3600s will be converted to ",
+      expectedOutput: "3600s will be converted to 1 hour",
+    },
+    {
+      argument: "62",
+      before: "62s will be converted to ",
+      expectedOutput: "62s will be converted to 1 minute and 2 seconds",
+    },
   ],
   func: (_logger, timeInS, signature) => {
     if (signature === true) {
@@ -624,10 +675,11 @@ export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
 export const pluginConvertToShortNumber: MessageParserPlugin = {
   description: "Shorten a long number into a short number string",
   examples: [
-    { argument: "26934111" },
-    { argument: "0" },
-    { argument: "10" },
-    { argument: "1101" },
+    { argument: "26934111", expectedOutput: "27M" },
+    { argument: "0", expectedOutput: "0" },
+    { argument: "10", expectedOutput: "10" },
+    { argument: "1101", expectedOutput: "1.1K" },
+    { expectedError: "Number string was undefined" },
   ],
   func: (_logger, numberString, signature) => {
     if (signature === true) {
@@ -647,7 +699,7 @@ export const pluginConvertToShortNumber: MessageParserPlugin = {
 
 export const pluginHelp: MessageParserPlugin = {
   description: "Print all available plugins and macros",
-  examples: [{}],
+  examples: [{ hideOutput: true }],
   func: (_, __, signature) => {
     if (signature === true) {
       return {
@@ -664,12 +716,27 @@ export const pluginListFilterUndefined: MessageParserPlugin = {
   description:
     "Filter undefined values from a list (values separated by ;) and if empty use scope",
   examples: [
-    { argument: "1;2;3;4" },
-    { argument: "1", scope: "list not empty so scope is ignored" },
-    { argument: ";1;undefined;2;undefined;3;" },
-    { argument: "undefined" },
-    { argument: "undefined", scope: "scope is used if list empty" },
-    { argument: ";undefined;undefined;", scope: "scope is used if list empty" },
+    { argument: "1;2;3;4", expectedOutput: "1;2;3;4" },
+    {
+      argument: "1",
+      expectedOutput: "1",
+      scope: "list not empty so scope is ignored",
+    },
+    { argument: ";1;undefined;2;undefined;3;", expectedOutput: "1;2;3" },
+    {
+      argument: "undefined",
+      expectedOutput: "scope is used if list empty",
+      scope: "scope is used if list empty",
+    },
+    { argument: "undefined", expectedOutput: "", scope: "" },
+    {
+      argument: ";undefined;undefined;",
+      expectedOutput: "scope is used if list empty",
+      scope: "scope is used if list empty",
+    },
+    {
+      expectedError: "List string was undefined",
+    },
   ],
   func: (_logger, listString, signature) => {
     if (signature === true) {
@@ -695,10 +762,13 @@ export const pluginListFilterUndefined: MessageParserPlugin = {
 export const pluginListJoinCommaSpace: MessageParserPlugin = {
   description: "Join values from a list (values separated by ;) using ', '",
   examples: [
-    { argument: "1;2;3;4" },
-    { argument: "1" },
-    { argument: ";1;undefined;2;undefined;3;" },
-    { argument: "undefined" },
+    { argument: "1;2;3;4", expectedOutput: "1, 2, 3, 4" },
+    { argument: "1", expectedOutput: "1" },
+    {
+      argument: ";1;undefined;2;undefined;3;",
+      expectedOutput: "1, undefined, 2, undefined, 3",
+    },
+    { argument: "undefined", expectedOutput: "undefined" },
   ],
   func: (_logger, listString, signature) => {
     if (signature === true) {
@@ -721,9 +791,15 @@ export const pluginListJoinCommaSpace: MessageParserPlugin = {
 export const pluginListSort: MessageParserPlugin = {
   description: "Sort values from a list (values separated by ;)",
   examples: [
-    { argument: "8;6;-1;20;81;Herbert;Anja;Gerd is blue;" },
-    { argument: "1" },
-    { argument: ";1;undefined;2;undefined;3;" },
+    {
+      argument: "8;6;-1;20;81;Herbert;Anja;Gerd is blue;",
+      expectedOutput: "-1;20;6;8;81;Anja;Gerd is blue;Herbert",
+    },
+    { argument: "1", expectedOutput: "1" },
+    {
+      argument: ";1;undefined;2;undefined;3;",
+      expectedOutput: "1;2;3;undefined;undefined",
+    },
   ],
   func: (_logger, listString, signature) => {
     if (signature === true) {

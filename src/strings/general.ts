@@ -3,7 +3,7 @@ import {
   MacroPermissionError,
   macroPermissionError,
 } from "../messageParser/macros/general";
-import { createMessageForMessageParser } from "../documentation/messageParser";
+import { createMessageParserMessage } from "../messageParser/createMessageParserMessage";
 import { PluginTwitchChat } from "../messageParser/plugins/twitchChat";
 // Type imports
 import type { StringEntry } from "../strings";
@@ -11,7 +11,7 @@ import type { StringEntry } from "../strings";
 export const GENERAL_STRING_ID = "GENERAL";
 
 export const generalUserPermissionError: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You do not have the permission to use this command! (expected ",
@@ -32,7 +32,7 @@ export const generalUserPermissionError: StringEntry = {
 };
 
 export const generalCommandsNone: StringEntry = {
-  default: createMessageForMessageParser(["None"], true),
+  default: createMessageParserMessage(["None"], true),
   id: `${GENERAL_STRING_ID}_COMMANDS_NONE`,
 };
 

@@ -7,7 +7,7 @@ import {
   MacroMoonpieUserSet,
   macroMoonpieUserSet,
 } from "../../messageParser/macros/moonpie";
-import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { createMessageParserMessage } from "../../messageParser/createMessageParserMessage";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { pluginIfNotEqual } from "../../messageParser/plugins/general";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
@@ -17,7 +17,7 @@ import { StringEntry } from "../../strings";
 const MOONPIE_USER_STRING_ID = `${MOONPIE_STRING_ID}_USER`;
 
 export const moonpieUserGet: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " The user ",
@@ -57,7 +57,7 @@ export const moonpieUserGet: StringEntry = {
   id: `${MOONPIE_USER_STRING_ID}_GET`,
 };
 export const moonpieUserNeverClaimedError: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "The user ",
     {
       key: MacroMoonpieUser.NAME,
@@ -69,7 +69,7 @@ export const moonpieUserNeverClaimedError: StringEntry = {
   id: `${MOONPIE_USER_STRING_ID}_NEVER_CLAIMED_ERROR`,
 };
 export const moonpieUserSetNaNError: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "The given moonpie count (",
     {
       key: MacroMoonpieUserSet.SET_OPERATION,
@@ -88,7 +88,7 @@ export const moonpieUserSetNaNError: StringEntry = {
 };
 
 export const moonpieUserSet: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You have set the number of moonpies for the user ",
@@ -140,7 +140,7 @@ export const moonpieUserSet: StringEntry = {
 };
 
 export const moonpieUserDelete: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You deleted the entry of the user ",

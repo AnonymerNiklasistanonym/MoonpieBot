@@ -4,6 +4,7 @@ import {
   generatePluginMap,
   messageParser,
 } from "../messageParser";
+import { createMessageParserMessage } from "../messageParser/createMessageParserMessage";
 import { FileDocumentationPartType } from "../other/splitTextAtLength";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
@@ -125,35 +126,48 @@ export const generatePluginAndMacroDocumentation = async (
       pluginEntry.lists = [];
       const pluginListExamples = [];
       for (const example of plugin.examples) {
-        let exampleString = "";
-        if (example.before) {
-          exampleString += example.before;
-        }
-        exampleString += `$(${plugin.id}`;
-        if (example.argument) {
-          exampleString += `=${example.argument}`;
-        }
-        if (example.scope) {
-          exampleString += `|${example.scope}`;
-        }
-        exampleString += ")";
-        if (example.after) {
-          exampleString += example.after;
-        }
+        const exampleString = createMessageParserMessage([
+          example.before !== undefined ? example.before : "",
+          {
+            args: example.argument,
+            name: plugin.id,
+            scope: example.scope,
+            type: "plugin",
+          },
+          example.after !== undefined ? example.after : "",
+        ]);
         // Don't render random number output because there is no seed
         if (example.hideOutput) {
           pluginListExamples.push(`"${exampleString}"`);
         } else {
-          const exampleStringOutput = await messageParser(
-            exampleString,
-            strings,
-            pluginsMap,
-            macrosMap,
-            logger
-          );
-          pluginListExamples.push(
-            `"${exampleString}" => "${exampleStringOutput}"`
-          );
+          try {
+            const exampleStringOutput = await messageParser(
+              exampleString,
+              strings,
+              pluginsMap,
+              macrosMap,
+              logger
+            );
+            pluginListExamples.push(
+              `"${exampleString}" => "${exampleStringOutput}"`
+            );
+          } catch (err) {
+            if (example.expectedError !== undefined) {
+              pluginListExamples.push(
+                `"${exampleString}" => Plugin Error: "${
+                  (err as Error).message
+                }"`
+              );
+            } else if (example.expectedErrorCode !== undefined) {
+              pluginListExamples.push(
+                `"${exampleString}" => Parser Error: "${
+                  (err as Error).message
+                }"`
+              );
+            } else {
+              throw err;
+            }
+          }
         }
       }
       pluginEntry.lists.push(["Examples", pluginListExamples]);
@@ -342,88 +356,3 @@ export const generatePluginAndMacroDocumentation = async (
 
   return output;
 };
-
-interface MessageForMessageElement {
-  type: string;
-}
-export type MessageForMessageElements =
-  | string
-  | MessageForMessageElementMacro
-  | MessageForMessageElementPlugin
-  | MessageForMessageElementReference;
-
-export interface MessageForMessageElementPlugin
-  extends MessageForMessageElement {
-  args?: MessageForMessageElements[] | MessageForMessageElements;
-  name: string;
-  scope?: MessageForMessageElements[] | MessageForMessageElements;
-  type: "plugin";
-}
-
-export interface MessageForMessageElementMacro
-  extends MessageForMessageElement {
-  key: string;
-  name: string;
-  type: "macro";
-}
-
-export interface MessageForMessageElementReference
-  extends MessageForMessageElement {
-  name: string;
-  type: "reference";
-}
-
-export const createMessageForMessageParser = (
-  message: MessageForMessageElements[],
-  insidePlugin = false
-): string =>
-  message
-    .map((a) => {
-      if (typeof a === "string") {
-        if (insidePlugin) {
-          return a.replace(/\(/g, "\\(").replace(/\)/g, "\\)");
-        }
-        return a;
-      }
-      switch (a.type) {
-        case "macro":
-          if (a.name === undefined || a.key === undefined) {
-            throw Error(
-              `Macro name/key was undefined (${JSON.stringify({ a, message })})`
-            );
-          }
-          return `%${a.name}:${a.key}%`;
-        case "reference":
-          if (a.name === undefined) {
-            throw Error(
-              `Reference name was undefined (${JSON.stringify({ a, message })})`
-            );
-          }
-          return `$[${a.name}]`;
-        case "plugin":
-          if (a.name === undefined) {
-            throw Error(
-              `Plugin name was undefined (${JSON.stringify({ a, message })})`
-            );
-          }
-          // eslint-disable-next-line no-case-declarations
-          let pluginText = `$(${a.name}`;
-          if (a.args) {
-            pluginText += `=${createMessageForMessageParser(
-              Array.isArray(a.args) ? a.args : [a.args],
-              true
-            )}`;
-          }
-          if (a.scope) {
-            pluginText += `|${createMessageForMessageParser(
-              Array.isArray(a.scope) ? a.scope : [a.scope],
-              true
-            )}`;
-          }
-          pluginText += ")";
-          return pluginText;
-        default:
-          return "ERROR";
-      }
-    })
-    .join("");

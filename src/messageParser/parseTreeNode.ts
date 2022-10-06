@@ -3,6 +3,7 @@
  */
 
 // Local imports
+import { ParseTreeNodeError, ParseTreeNodeErrorCode } from "./errors";
 import { createLogFunc } from "../logging";
 import { createPluginSignatureString } from "../documentation/messageParser";
 import { genericStringSorter } from "../other/genericStringSorter";
@@ -48,6 +49,16 @@ const replaceMacros = (text: string, macros: MacroMap) => {
   );
 };
 
+/**
+ * Parse a tree node to a string (recursively).
+ *
+ * @param treeNode The tree node to be parsed.
+ * @param plugins The supported plugins.
+ * @param macros The supported macros.
+ * @param logger The global logger.
+ * @throws Throws {@link ParseTreeNodeError} for all expected errors.
+ * @returns The parsed string.
+ */
 export const parseTreeNode = async (
   treeNode: ParseTreeNode,
   plugins: PluginMap,
@@ -59,17 +70,21 @@ export const parseTreeNode = async (
   switch (treeNode.type) {
     case "text":
       if (treeNode.content === undefined) {
-        throw Error(
-          `Parse tree node '${treeNode.type}' had no content (${treeNode.originalString})`
+        throw new ParseTreeNodeError(
+          `Parse tree node '${treeNode.type}' had no content (${treeNode.originalString})`,
+          ParseTreeNodeErrorCode.NO_CONTENT
         );
       }
       try {
         return replaceMacros(treeNode.content, macros);
       } catch (err) {
-        throw Error(
+        throw new ParseTreeNodeError(
           `Parse tree node '${treeNode.type}' encountered a macro error ('${
             treeNode.originalString
-          }',${(err as Error).message})`
+          }',${(err as Error).message})`,
+          ParseTreeNodeErrorCode.MACRO_ERROR,
+          undefined,
+          (err as Error).message
         );
       }
     case "plugin":
@@ -77,14 +92,15 @@ export const parseTreeNode = async (
       // eslint-disable-next-line no-case-declarations
       const pluginName = treeNode.pluginName;
       if (pluginName === undefined) {
-        throw Error(
-          `Parse tree node '${treeNode.type}' had no plugin name (${treeNode.originalString})`
+        throw new ParseTreeNodeError(
+          `Parse tree node '${treeNode.type}' had no plugin name (${treeNode.originalString})`,
+          ParseTreeNodeErrorCode.NO_PLUGIN_NAME
         );
       }
       // eslint-disable-next-line no-case-declarations
       const plugin = plugins.get(pluginName);
       if (plugin === undefined) {
-        throw Error(
+        throw new ParseTreeNodeError(
           `Parse tree node '${
             treeNode.type
           }' plugin name '${pluginName}' was not found ('${
@@ -92,7 +108,8 @@ export const parseTreeNode = async (
           }',[${Array.from(plugins.entries())
             .map((a) => a[0])
             .sort(genericStringSorter)
-            .join(",")}])`
+            .join(",")}])`,
+          ParseTreeNodeErrorCode.PLUGIN_NOT_FOUND
         );
       }
       // eslint-disable-next-line no-case-declarations
@@ -104,7 +121,7 @@ export const parseTreeNode = async (
           ? await parseTreeNode(pluginValue, plugins, macros, logger)
           : undefined;
       } catch (err) {
-        logMessageParser.error(err as Error);
+        // For debugging log all parse tree node levels
         logMessageParser.error(
           Error(
             `Parse tree node '${
@@ -122,17 +139,15 @@ export const parseTreeNode = async (
         // TODO Think about a cache implementation
         pluginOutput = await plugin(logger, pluginValueString);
       } catch (err) {
-        logMessageParser.error(err as Error);
-        logMessageParser.error(
-          Error(
-            `Parse tree node '${
-              treeNode.type
-            }' could not produce plugin output (${treeNode.originalString},${
-              (err as Error).message
-            })`
-          )
+        throw new ParseTreeNodeError(
+          `Parse tree node '${
+            treeNode.type
+          }' could not produce plugin output (${treeNode.originalString},${
+            (err as Error).message
+          })`,
+          ParseTreeNodeErrorCode.PLUGIN_ERROR,
+          (err as Error).message
         );
-        throw err;
       }
       if (pluginOutput instanceof Map) {
         for (const [macroId, macroValues] of pluginOutput) {
@@ -145,8 +160,9 @@ export const parseTreeNode = async (
         }
         const pluginContentNode = treeNode.pluginContent;
         if (pluginContentNode === undefined) {
-          throw Error(
-            `Parse tree node '${treeNode.type}' had no plugin content (${treeNode.originalString})`
+          throw new ParseTreeNodeError(
+            `Parse tree node '${treeNode.type}' had no plugin content (${treeNode.originalString})`,
+            ParseTreeNodeErrorCode.NO_PLUGIN_CONTENT
           );
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -162,8 +178,9 @@ export const parseTreeNode = async (
           if (pluginValueString !== undefined) {
             return pluginValueString;
           }
-          throw Error(
-            `Parse tree node '${treeNode.type}' had no plugin content and no plugin value (${treeNode.originalString})`
+          throw new ParseTreeNodeError(
+            `Parse tree node '${treeNode.type}' had no plugin content and no plugin value (${treeNode.originalString})`,
+            ParseTreeNodeErrorCode.NO_PLUGIN_CONTENT_AND_VALUE
           );
         }
         return parseTreeNode(pluginContentNode, plugins, macros, logger);
@@ -216,8 +233,9 @@ export const parseTreeNode = async (
       throw Error("This should be unreachable!");
     case "children":
       if (treeNode.children === undefined) {
-        throw Error(
-          `Parse tree node '${treeNode.type}' had no children (${treeNode.originalString})`
+        throw new ParseTreeNodeError(
+          `Parse tree node '${treeNode.type}' had no children (${treeNode.originalString})`,
+          ParseTreeNodeErrorCode.NO_CHILDREN
         );
       }
       // eslint-disable-next-line no-case-declarations

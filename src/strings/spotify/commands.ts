@@ -5,26 +5,26 @@ import {
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../messageParser/plugins/general";
-import { createMessageForMessageParser } from "../../documentation/messageParser";
+import { createMessageParserMessage } from "../../messageParser/createMessageParserMessage";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../messageParser/macros/commands";
 import { PluginTwitchChat } from "../../messageParser/plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../documentation/messageParser";
+import type { MessageForMessageElementPlugin } from "../../messageParser/createMessageParserMessage";
 import type { StringEntry } from "../../strings";
 
 const SPOTIFY_COMMANDS_STRING_ID = `${SPOTIFY_STRING_ID}_COMMANDS`;
 
 export const spotifyCommandsSong: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     ["!song [now playing and previously played song]"],
     true
   ),
   id: `${SPOTIFY_COMMANDS_STRING_ID}_SONG`,
 };
 export const spotifyCommandsPrefix: StringEntry = {
-  default: createMessageForMessageParser(
+  default: createMessageParserMessage(
     [
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -35,7 +35,7 @@ export const spotifyCommandsPrefix: StringEntry = {
   id: `${SPOTIFY_COMMANDS_STRING_ID}_PREFIX`,
 };
 export const spotifyCommandsString: StringEntry = {
-  default: createMessageForMessageParser([
+  default: createMessageParserMessage([
     {
       name: spotifyCommandsPrefix.id,
       type: "reference",
