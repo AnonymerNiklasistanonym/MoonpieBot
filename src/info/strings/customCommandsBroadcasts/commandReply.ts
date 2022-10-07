@@ -171,6 +171,100 @@ export const customCommandsBroadcastsCommandReplyInvalidCronString: StringEntry 
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_INVALID_CRON_STRING`,
   };
 
+export const customCommandsBroadcastsCommandReplyListCCsPrefix: StringEntry = {
+  default: createMessageParserMessage(
+    ["@", { name: PluginTwitchChat.USER, type: "plugin" }, " "],
+    true
+  ),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CCS_LIST_PREFIX`,
+};
+
+export const customCommandsBroadcastsCommandReplyListCCsEntry: StringEntry = {
+  default: createMessageParserMessage(
+    [
+      "'",
+      {
+        key: MacroCustomCommandInfo.ID,
+        name: macroCustomCommandInfo.id,
+        type: "macro",
+      },
+      "' (",
+      {
+        key: MacroCustomCommandInfo.REGEX,
+        name: macroCustomCommandInfo.id,
+        type: "macro",
+      },
+      ")",
+    ],
+    true
+  ),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CCS_LIST_ENTRY`,
+};
+
+export const customCommandsBroadcastsCommandReplyListCC: StringEntry = {
+  default: createMessageParserMessage(
+    [
+      {
+        name: customCommandsBroadcastsCommandReplyListCCsPrefix.id,
+        type: "reference",
+      },
+      {
+        name: customCommandsBroadcastsCommandReplyListCCsEntry.id,
+        type: "reference",
+      },
+    ],
+    true
+  ),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CC_LIST`,
+};
+
+export const customCommandsBroadcastsCommandReplyListCBsPrefix: StringEntry = {
+  default: createMessageParserMessage(
+    ["@", { name: PluginTwitchChat.USER, type: "plugin" }, " "],
+    true
+  ),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CBS_LIST_PREFIX`,
+};
+
+export const customCommandsBroadcastsCommandReplyListCBsEntry: StringEntry = {
+  default: createMessageParserMessage(
+    [
+      "'",
+      {
+        key: MacroCustomBroadcastInfo.ID,
+        name: macroCustomBroadcastInfo.id,
+        type: "macro",
+      },
+      "' (",
+      {
+        key: MacroCustomBroadcastInfo.CRON_STRING,
+        name: macroCustomBroadcastInfo.id,
+        type: "macro",
+      },
+      ")",
+    ],
+    true
+  ),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CBS_LIST_ENTRY`,
+};
+
+export const customCommandsBroadcastsCommandReplyListCB: StringEntry = {
+  default: createMessageParserMessage(
+    [
+      {
+        name: customCommandsBroadcastsCommandReplyListCBsPrefix.id,
+        type: "reference",
+      },
+      {
+        name: customCommandsBroadcastsCommandReplyListCBsEntry.id,
+        type: "reference",
+      },
+    ],
+    true
+  ),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CB_LIST`,
+};
+
 export const customCommandsBroadcastsCommandReply: StringEntry[] = [
   customCommandsBroadcastsCommandReplyAddCB,
   customCommandsBroadcastsCommandReplyAddCBAlreadyExists,
@@ -180,6 +274,12 @@ export const customCommandsBroadcastsCommandReply: StringEntry[] = [
   customCommandsBroadcastsCommandReplyAddCC,
   customCommandsBroadcastsCommandReplyAddCCAlreadyExists,
   customCommandsBroadcastsCommandReplyInvalidRegex,
+  customCommandsBroadcastsCommandReplyListCCsPrefix,
+  customCommandsBroadcastsCommandReplyListCCsEntry,
+  customCommandsBroadcastsCommandReplyListCC,
+  customCommandsBroadcastsCommandReplyListCBsPrefix,
+  customCommandsBroadcastsCommandReplyListCBsEntry,
+  customCommandsBroadcastsCommandReplyListCB,
   customCommandsBroadcastsCommandReplyCCNotFound,
   customCommandsBroadcastsCommandReplyDelCC,
 ];

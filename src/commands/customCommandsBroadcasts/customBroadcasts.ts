@@ -7,21 +7,28 @@ import {
   customCommandsBroadcastsCommandReplyCBNotFound,
   customCommandsBroadcastsCommandReplyDelCB,
   customCommandsBroadcastsCommandReplyInvalidCronString,
+  customCommandsBroadcastsCommandReplyListCB,
+  customCommandsBroadcastsCommandReplyListCBsEntry,
+  customCommandsBroadcastsCommandReplyListCBsPrefix,
 } from "../../info/strings/customCommandsBroadcasts/commandReply";
 import {
   CustomCommandsBroadcastsCommands,
   LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
 } from "../../info/commands";
 import {
+  generateMacroMapFromMacroGenerator,
+  messageParserById,
+} from "../../messageParser";
+import { MAX_LENGTH_OF_A_TWITCH_MESSAGE, TwitchBadgeLevel } from "../../twitch";
+import {
   regexCustomBroadcastAdd,
   regexCustomBroadcastDelete,
+  regexCustomBroadcastList,
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
-import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { macroCustomBroadcastInfo } from "../../info/macros/customBroadcast";
 import { parseRegexStringArgument } from "../helper";
-import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -34,6 +41,10 @@ import type {
 import type {
   RegexCustomBroadcastAdd,
   RegexCustomBroadcastDelete,
+} from "../../info/regex";
+import type {
+  RegexCustomBroadcastList,
+  RegexCustomBroadcastListOffset,
 } from "../../info/regex";
 
 export interface CommandAddDetectorOutput {
@@ -216,5 +227,161 @@ export const commandDelCB: ChatMessageHandlerReplyCreator<
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
     id: CustomCommandsBroadcastsCommands.DELETE_CUSTOM_BROADCAST,
+  },
+};
+
+export interface CommandListDetectorOutput {
+  customBroadcastId?: string;
+  customBroadcastOffset?: number;
+}
+/**
+ * List custom commands.
+ */
+export const commandListCBs: ChatMessageHandlerReplyCreator<
+  CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
+    CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+  CommandListDetectorOutput
+> = {
+  createReply: async (_channel, tags, data, logger) => {
+    const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
+      tags,
+      TwitchBadgeLevel.MODERATOR
+    );
+    if (twitchBadgeLevelCheck !== undefined) {
+      return twitchBadgeLevelCheck;
+    }
+
+    if (data.customBroadcastId !== undefined) {
+      const exists =
+        await customCommandsBroadcastsDb.requests.customBroadcast.existsEntry(
+          data.customCommandsBroadcastsDbPath,
+          { id: data.customBroadcastId },
+          logger
+        );
+
+      if (exists) {
+        const customBroadcastInfo =
+          await customCommandsBroadcastsDb.requests.customBroadcast.getEntry(
+            data.customCommandsBroadcastsDbPath,
+            { id: data.customBroadcastId },
+            logger
+          );
+        return {
+          additionalMacros: generateMacroMapFromMacroGenerator(
+            macroCustomBroadcastInfo,
+            customBroadcastInfo
+          ),
+          messageId: customCommandsBroadcastsCommandReplyListCB.id,
+        };
+      }
+      return {
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroCustomBroadcastInfo,
+          { id: data.customBroadcastId }
+        ),
+        messageId: customCommandsBroadcastsCommandReplyCBNotFound.id,
+      };
+    }
+
+    const customBroadcastInfos =
+      await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
+        data.customCommandsBroadcastsDbPath,
+        data.customBroadcastOffset
+          ? Math.max(data.customBroadcastOffset - 1, 0)
+          : 0,
+        logger
+      );
+
+    // TODO Think about a better implementation
+    return {
+      messageId: async (
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger2
+      ) => {
+        let messageList = await messageParserById(
+          customCommandsBroadcastsCommandReplyListCBsPrefix.id,
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger2
+        );
+        const messageListEntries = [];
+        for (const customBroadcastInfo of customBroadcastInfos) {
+          messageListEntries.push(
+            await messageParserById(
+              customCommandsBroadcastsCommandReplyListCBsEntry.id,
+              globalStrings,
+              globalPlugins,
+              generateMacroMapFromMacroGenerator(
+                macroCustomBroadcastInfo,
+                customBroadcastInfo
+              ),
+              logger
+            )
+          );
+        }
+        messageList += messageListEntries.join(", ");
+
+        // Slice the message if too long
+        const message =
+          messageList.length > MAX_LENGTH_OF_A_TWITCH_MESSAGE
+            ? messageList.slice(
+                0,
+                MAX_LENGTH_OF_A_TWITCH_MESSAGE - "...".length
+              ) + "..."
+            : messageList;
+        return message;
+      },
+    };
+  },
+  detect: (_tags, message, data) => {
+    if (
+      !data.enabledCommands.includes(
+        CustomCommandsBroadcastsCommands.LIST_CUSTOM_BROADCASTS
+      )
+    ) {
+      return false;
+    }
+    const match = message.match(regexCustomBroadcastList);
+    if (!match) {
+      return false;
+    }
+    const matchGroups = match.groups as
+      | undefined
+      | RegexCustomBroadcastList
+      | RegexCustomBroadcastListOffset;
+    if (!matchGroups) {
+      throw Error("RegexCustomBroadcastList groups undefined");
+    }
+    if (
+      "customBroadcastOffset" in matchGroups &&
+      matchGroups.customBroadcastOffset !== undefined
+    ) {
+      return {
+        data: {
+          customBroadcastOffset: parseInt(matchGroups.customBroadcastOffset),
+        },
+      };
+    }
+    if (
+      "customBroadcastId" in matchGroups &&
+      matchGroups.customBroadcastId !== undefined
+    ) {
+      return {
+        data: {
+          customBroadcastId: parseRegexStringArgument(
+            matchGroups.customBroadcastId
+          ),
+        },
+      };
+    }
+    return { data: {} };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
+    id: CustomCommandsBroadcastsCommands.LIST_CUSTOM_BROADCASTS,
   },
 };

@@ -45,7 +45,12 @@ export type {
   PluginSignature,
 } from "./messageParser/plugins";
 export type { StringEntry, StringMap } from "./messageParser/strings";
-export type { MessageForMessageElementPlugin } from "./messageParser/createMessageParserMessage";
+export type {
+  MessageForMessageElements,
+  MessageForMessageElementMacro,
+  MessageForMessageElementReference,
+  MessageForMessageElementPlugin,
+} from "./messageParser/createMessageParserMessage";
 
 /**
  * The logging ID of this module.

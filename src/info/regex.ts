@@ -484,6 +484,27 @@ export interface RegexCustomCommandDelete {
 export const regexCustomCommandDelete =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^\s*!delcc\s+(?<customCommandId>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+export interface RegexCustomCommandList {
+  customCommandId?: string;
+}
+export interface RegexCustomCommandListOffset {
+  customCommandOffset?: string;
+}
+/**
+ * Regex to recognize the !listccs command.
+ *
+ * @example
+ * ```text
+ * !listccs ID
+ * ```
+ * @example
+ * ```text
+ * !listccs 2
+ * ```
+ */
+export const regexCustomCommandList =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!listccs?(?:\s+(?<customCommandOffset>[0-9]+?)|\s+(?<customCommandId>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
 
 export interface RegexCustomBroadcastAdd {
   customBroadcastCronString: string;
@@ -516,6 +537,28 @@ export const regexCustomBroadcastDelete =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^\s*!delcb\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
 
+export interface RegexCustomBroadcastList {
+  customBroadcastId?: string;
+}
+export interface RegexCustomBroadcastListOffset {
+  customBroadcastOffset?: string;
+}
+/**
+ * Regex to recognize the !listcbs command.
+ *
+ * @example
+ * ```text
+ * !listcbs ID
+ * ```
+ * @example
+ * ```text
+ * !listcbs 2
+ * ```
+ */
+export const regexCustomBroadcastList =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!listcbs?(?:\s+(?<customBroadcastOffset>[0-9]+?)|\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
+
 // TODO Implement
 export interface RegexCustomCommandSet {
   customCommandId: string;
@@ -540,14 +583,3 @@ export interface RegexCustomCommandSet {
  */
 export const regexCustomCommandSet =
   /^\s*!customCommand\s+set\s+(?<customCommandId>\S+?)\s+(?<customCommandOption>\S+)\s+(?<customCommandOptionValue>.+?)(?:\s*$)/i;
-
-// TODO Implement
-/**
- * Regex to recognize the !customCommand list command.
- *
- * @example
- * ```text
- * !customCommand list
- * ```
- */
-export const regexCustomCommandList = /^\s*!customCommand\s+list(?:\s|$)/i;

@@ -434,6 +434,7 @@ export const main = async (
       customCommands =
         await customCommandsBroadcastsDb.requests.customCommand.getEntries(
           pathDatabaseCustomCommandsBroadcasts,
+          undefined,
           logger
         );
     }
@@ -443,6 +444,7 @@ export const main = async (
       customBroadcasts =
         await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
           pathDatabaseCustomCommandsBroadcasts,
+          undefined,
           logger
         );
       // Stop all old running custom broadcasts

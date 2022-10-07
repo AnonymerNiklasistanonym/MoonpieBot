@@ -134,6 +134,7 @@ interface GetCustomCommandDbOut {
 
 export const getEntries = async (
   databasePath: string,
+  offset: number | undefined,
   logger: Logger
 ): Promise<CustomCommand[]> => {
   const logMethod = createLogMethod(
@@ -143,40 +144,49 @@ export const getEntries = async (
 
   const runResult = await db.requests.getAll<GetCustomCommandDbOut>(
     databasePath,
-    db.queries.select(customCommandsTable.name, [
-      {
-        alias: "cooldownInS",
-        columnName: customCommandsTable.columns.cooldownInS.name,
-      },
-      {
-        alias: "count",
-        columnName: customCommandsTable.columns.count.name,
-      },
-      {
-        alias: "description",
-        columnName: customCommandsTable.columns.description.name,
-      },
-      {
-        alias: "id",
-        columnName: customCommandsTable.columns.id.name,
-      },
-      {
-        alias: "message",
-        columnName: customCommandsTable.columns.message.name,
-      },
-      {
-        alias: "regex",
-        columnName: customCommandsTable.columns.regex.name,
-      },
-      {
-        alias: "timestampLastExecution",
-        columnName: customCommandsTable.columns.timestampLastExecution.name,
-      },
-      {
-        alias: "userLevel",
-        columnName: customCommandsTable.columns.userLevel.name,
-      },
-    ]),
+    db.queries.select(
+      customCommandsTable.name,
+      [
+        {
+          alias: "cooldownInS",
+          columnName: customCommandsTable.columns.cooldownInS.name,
+        },
+        {
+          alias: "count",
+          columnName: customCommandsTable.columns.count.name,
+        },
+        {
+          alias: "description",
+          columnName: customCommandsTable.columns.description.name,
+        },
+        {
+          alias: "id",
+          columnName: customCommandsTable.columns.id.name,
+        },
+        {
+          alias: "message",
+          columnName: customCommandsTable.columns.message.name,
+        },
+        {
+          alias: "regex",
+          columnName: customCommandsTable.columns.regex.name,
+        },
+        {
+          alias: "timestampLastExecution",
+          columnName: customCommandsTable.columns.timestampLastExecution.name,
+        },
+        {
+          alias: "userLevel",
+          columnName: customCommandsTable.columns.userLevel.name,
+        },
+      ],
+      offset !== undefined
+        ? {
+            limit: 5,
+            limitOffset: offset,
+          }
+        : undefined
+    ),
     undefined,
     logMethod
   );

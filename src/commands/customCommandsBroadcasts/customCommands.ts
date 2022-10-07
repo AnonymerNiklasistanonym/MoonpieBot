@@ -1,6 +1,7 @@
 // Local imports
 import {
   convertTwitchBadgeStringToLevel,
+  MAX_LENGTH_OF_A_TWITCH_MESSAGE,
   TwitchBadgeLevel,
 } from "../../twitch";
 import {
@@ -9,18 +10,27 @@ import {
   customCommandsBroadcastsCommandReplyCCNotFound,
   customCommandsBroadcastsCommandReplyDelCC,
   customCommandsBroadcastsCommandReplyInvalidRegex,
+  customCommandsBroadcastsCommandReplyListCC,
+  customCommandsBroadcastsCommandReplyListCCsEntry,
+  customCommandsBroadcastsCommandReplyListCCsPrefix,
 } from "../../info/strings/customCommandsBroadcasts/commandReply";
 import {
   CustomCommandsBroadcastsCommands,
   LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
 } from "../../info/commands";
 import {
+  generateMacroMapFromMacroGenerator,
+  messageParserById,
+} from "../../messageParser";
+import {
   regexCustomCommandAdd,
   regexCustomCommandDelete,
+  RegexCustomCommandList,
+  regexCustomCommandList,
+  RegexCustomCommandListOffset,
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
-import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { macroCustomCommandInfo } from "../../info/macros/customCommands";
 import { parseRegexStringArgument } from "../helper";
 // Type imports
@@ -232,5 +242,161 @@ export const commandDelCC: ChatMessageHandlerReplyCreator<
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
     id: CustomCommandsBroadcastsCommands.DELETE_CUSTOM_COMMAND,
+  },
+};
+
+export interface CommandListDetectorOutput {
+  customCommandId?: string;
+  customCommandOffset?: number;
+}
+/**
+ * List custom commands.
+ */
+export const commandListCCs: ChatMessageHandlerReplyCreator<
+  CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
+    CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+  CommandListDetectorOutput
+> = {
+  createReply: async (_channel, tags, data, logger) => {
+    const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
+      tags,
+      TwitchBadgeLevel.MODERATOR
+    );
+    if (twitchBadgeLevelCheck !== undefined) {
+      return twitchBadgeLevelCheck;
+    }
+
+    if (data.customCommandId !== undefined) {
+      const exists =
+        await customCommandsBroadcastsDb.requests.customCommand.existsEntry(
+          data.customCommandsBroadcastsDbPath,
+          { id: data.customCommandId },
+          logger
+        );
+
+      if (exists) {
+        const customCommandInfo =
+          await customCommandsBroadcastsDb.requests.customCommand.getEntry(
+            data.customCommandsBroadcastsDbPath,
+            { id: data.customCommandId },
+            logger
+          );
+        return {
+          additionalMacros: generateMacroMapFromMacroGenerator(
+            macroCustomCommandInfo,
+            customCommandInfo
+          ),
+          messageId: customCommandsBroadcastsCommandReplyListCC.id,
+        };
+      }
+      return {
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroCustomCommandInfo,
+          { id: data.customCommandId }
+        ),
+        messageId: customCommandsBroadcastsCommandReplyCCNotFound.id,
+      };
+    }
+
+    const customCommandInfos =
+      await customCommandsBroadcastsDb.requests.customCommand.getEntries(
+        data.customCommandsBroadcastsDbPath,
+        data.customCommandOffset
+          ? Math.max(data.customCommandOffset - 1, 0)
+          : 0,
+        logger
+      );
+
+    // TODO Think about a better implementation
+    return {
+      messageId: async (
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger2
+      ) => {
+        let messageList = await messageParserById(
+          customCommandsBroadcastsCommandReplyListCCsPrefix.id,
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger2
+        );
+        const messageListEntries = [];
+        for (const customCommandInfo of customCommandInfos) {
+          messageListEntries.push(
+            await messageParserById(
+              customCommandsBroadcastsCommandReplyListCCsEntry.id,
+              globalStrings,
+              globalPlugins,
+              generateMacroMapFromMacroGenerator(
+                macroCustomCommandInfo,
+                customCommandInfo
+              ),
+              logger
+            )
+          );
+        }
+        messageList += messageListEntries.join(", ");
+
+        // Slice the message if too long
+        const message =
+          messageList.length > MAX_LENGTH_OF_A_TWITCH_MESSAGE
+            ? messageList.slice(
+                0,
+                MAX_LENGTH_OF_A_TWITCH_MESSAGE - "...".length
+              ) + "..."
+            : messageList;
+        return message;
+      },
+    };
+  },
+  detect: (_tags, message, data) => {
+    if (
+      !data.enabledCommands.includes(
+        CustomCommandsBroadcastsCommands.LIST_CUSTOM_COMMANDS
+      )
+    ) {
+      return false;
+    }
+    const match = message.match(regexCustomCommandList);
+    if (!match) {
+      return false;
+    }
+    const matchGroups = match.groups as
+      | undefined
+      | RegexCustomCommandList
+      | RegexCustomCommandListOffset;
+    if (!matchGroups) {
+      throw Error("RegexCustomCommandList groups undefined");
+    }
+    if (
+      "customCommandOffset" in matchGroups &&
+      matchGroups.customCommandOffset !== undefined
+    ) {
+      return {
+        data: {
+          customCommandOffset: parseInt(matchGroups.customCommandOffset),
+        },
+      };
+    }
+    if (
+      "customCommandId" in matchGroups &&
+      matchGroups.customCommandId !== undefined
+    ) {
+      return {
+        data: {
+          customCommandId: parseRegexStringArgument(
+            matchGroups.customCommandId
+          ),
+        },
+      };
+    }
+    return { data: {} };
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
+    id: CustomCommandsBroadcastsCommands.LIST_CUSTOM_COMMANDS,
   },
 };

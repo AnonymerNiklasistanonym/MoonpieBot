@@ -3,10 +3,12 @@
 import {
   commandAddCB,
   commandDelCB,
+  commandListCBs,
 } from "./customCommandsBroadcasts/customBroadcasts";
 import {
   commandAddCC,
   commandDelCC,
+  commandListCCs,
 } from "./customCommandsBroadcasts/customCommands";
 import { commandCommands } from "./customCommandsBroadcasts/commands";
 import { runChatMessageHandlerReplyCreator } from "../chatMessageHandler";
@@ -105,6 +107,22 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
     )
   );
   await Promise.all(
+    [commandListCCs].map((command) =>
+      runChatMessageHandlerReplyCreator(
+        client,
+        channel,
+        tags,
+        message,
+        data,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
     [commandAddCB].map((command) =>
       runChatMessageHandlerReplyCreator(
         client,
@@ -122,6 +140,22 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
   );
   await Promise.all(
     [commandDelCB].map((command) =>
+      runChatMessageHandlerReplyCreator(
+        client,
+        channel,
+        tags,
+        message,
+        data,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
+    [commandListCBs].map((command) =>
       runChatMessageHandlerReplyCreator(
         client,
         channel,

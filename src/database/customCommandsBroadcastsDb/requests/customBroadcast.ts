@@ -109,6 +109,7 @@ interface GetCustomCommandDbOut {
 
 export const getEntries = async (
   databasePath: string,
+  offset: number | undefined,
   logger: Logger
 ): Promise<CustomBroadcast[]> => {
   const logMethod = createLogMethod(
@@ -118,24 +119,33 @@ export const getEntries = async (
 
   const runResult = await db.requests.getAll<GetCustomCommandDbOut>(
     databasePath,
-    db.queries.select(customBroadcastsTable.name, [
-      {
-        alias: "cronString",
-        columnName: customBroadcastsTable.columns.cronString.name,
-      },
-      {
-        alias: "description",
-        columnName: customBroadcastsTable.columns.description.name,
-      },
-      {
-        alias: "id",
-        columnName: customBroadcastsTable.columns.id.name,
-      },
-      {
-        alias: "message",
-        columnName: customBroadcastsTable.columns.message.name,
-      },
-    ]),
+    db.queries.select(
+      customBroadcastsTable.name,
+      [
+        {
+          alias: "cronString",
+          columnName: customBroadcastsTable.columns.cronString.name,
+        },
+        {
+          alias: "description",
+          columnName: customBroadcastsTable.columns.description.name,
+        },
+        {
+          alias: "id",
+          columnName: customBroadcastsTable.columns.id.name,
+        },
+        {
+          alias: "message",
+          columnName: customBroadcastsTable.columns.message.name,
+        },
+      ],
+      offset !== undefined
+        ? {
+            limit: 5,
+            limitOffset: offset,
+          }
+        : undefined
+    ),
     undefined,
     logMethod
   );
