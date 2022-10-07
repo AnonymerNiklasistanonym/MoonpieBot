@@ -7,14 +7,14 @@ import {
   macroMoonpieLeaderboardEntry,
   macroMoonpieUser,
   macroMoonpieUserSet,
-} from "../../messageParser/macros/moonpie";
+} from "../../info/macros/moonpie";
 import {
   moonpieUserDelete,
   moonpieUserGet,
   moonpieUserNeverClaimedError,
   moonpieUserSet,
   moonpieUserSetNaNError,
-} from "../../strings/moonpie/user";
+} from "../../info/strings/moonpie/user";
 import {
   regexMoonpieChatHandlerCommandUserAdd,
   regexMoonpieChatHandlerCommandUserDelete,

@@ -13,9 +13,9 @@ import {
   moonpieCommandsRemove,
   moonpieCommandsSet,
   moonpieCommandsString,
-} from "../../strings/moonpie/commands";
+} from "../../info/strings/moonpie/commands";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
-import { macroCommandEnabled } from "../../messageParser/macros/commands";
+import { macroCommandEnabled } from "../../info/macros/commands";
 import { regexMoonpieChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {

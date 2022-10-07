@@ -3,11 +3,9 @@
 // Package imports
 import { expect } from "chai";
 // Local imports
-import {
-  defaultStringMap,
-  updateStringsMapWithCustomEnvStrings,
-} from "../../src/strings";
+import { defaultStringMap } from "../../src/info/strings";
 import { getTestLogger } from "./logger";
+import { updateStringsMapWithCustomEnvStrings } from "../../src/strings";
 
 describe("strings", () => {
   context("general", () => {

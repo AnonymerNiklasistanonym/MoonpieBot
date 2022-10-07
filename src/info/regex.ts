@@ -1,5 +1,5 @@
 // Type imports
-import type { EMPTY_OBJECT } from "./other";
+import type { EMPTY_OBJECT } from "../other/types";
 
 /**
  * Regex to recognize the `!moonpie about` command.

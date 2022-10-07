@@ -1,7 +1,7 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import { checkTwitchBadgeLevel } from "../../twitch";
-import { osuBeatmapRequestNoRequestsError } from "../../strings/osu/beatmapRequest";
+import { osuBeatmapRequestNoRequestsError } from "../../info/strings/osu/beatmapRequest";
 import { regexOsuChatHandlerCommandLastRequest } from "../../info/regex";
 import { sendBeatmapRequest } from "./beatmap";
 import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";

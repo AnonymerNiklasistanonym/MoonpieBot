@@ -1,7 +1,7 @@
 // Package imports
 import { promises as fs } from "fs";
 // Local imports
-import { defaultStringMap } from "../strings";
+import { defaultStringMap } from "../info/strings";
 import { ENV_PREFIX_CUSTOM_STRINGS } from "../info/env";
 import { generateFileDocumentation } from "../other/splitTextAtLength";
 import { generatePluginAndMacroDocumentation } from "../documentation/messageParser";

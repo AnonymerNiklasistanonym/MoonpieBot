@@ -11,9 +11,9 @@ import {
   osuCommandsRp,
   osuCommandsScore,
   osuCommandsString,
-} from "../../strings/osu/commands";
+} from "../../info/strings/osu/commands";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
-import { macroCommandEnabled } from "../../messageParser/macros/commands";
+import { macroCommandEnabled } from "../../info/macros/commands";
 import { regexOsuChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {

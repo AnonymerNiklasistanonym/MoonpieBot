@@ -4,18 +4,7 @@
 
 // Local imports
 import { createLogFunc } from "./logging";
-import { customCommandsBroadcastsCommandReply } from "./strings/customCommandsBroadcasts/commandReply";
-import { customCommandsBroadcastsCommands } from "./strings/customCommandsBroadcasts/commands";
 import { ENV_PREFIX_CUSTOM_STRINGS } from "./info/env";
-import { general } from "./strings/general";
-import { moonpieCommandReply } from "./strings/moonpie/commandReply";
-import { moonpieCommands } from "./strings/moonpie/commands";
-import { moonpieUser } from "./strings/moonpie/user";
-import { osuBeatmapRequests } from "./strings/osu/beatmapRequest";
-import { osuCommandReply } from "./strings/osu/commandReply";
-import { osuCommands } from "./strings/osu/commands";
-import { spotifyCommandReply } from "./strings/spotify/commandReply";
-import { spotifyCommands } from "./strings/spotify/commands";
 // Type imports
 import type { Logger } from "winston";
 
@@ -51,7 +40,9 @@ export interface StringEntry {
  * @param stringEntries The string entries (with more information).
  * @returns The resulting array can be inserted into a map for easy setup.
  */
-const generateStringMap = (...stringEntries: StringEntry[]): StringMap => {
+export const generateStringMap = (
+  ...stringEntries: StringEntry[]
+): StringMap => {
   const mappedStringEntries = stringEntries.map<[string, string]>((a) => [
     a.id,
     a.default,
@@ -66,23 +57,6 @@ const generateStringMap = (...stringEntries: StringEntry[]): StringMap => {
 };
 
 /**
- * The default values for all strings.
- */
-export const defaultStringMap: StringMap = generateStringMap(
-  ...customCommandsBroadcastsCommands,
-  ...customCommandsBroadcastsCommandReply,
-  ...general,
-  ...moonpieCommandReply,
-  ...moonpieCommands,
-  ...moonpieUser,
-  ...osuBeatmapRequests,
-  ...osuCommandReply,
-  ...osuCommands,
-  ...spotifyCommandReply,
-  ...spotifyCommands
-);
-
-/**
  * Update the strings map with environment variable strings.
  *
  * @param strings The current string map.
@@ -90,7 +64,7 @@ export const defaultStringMap: StringMap = generateStringMap(
  * @returns The updated strings map.
  */
 export const updateStringsMapWithCustomEnvStrings = (
-  strings: StringMap = defaultStringMap,
+  strings: StringMap,
   logger: Logger
 ): StringMap => {
   const logStrings = createLogFunc(
@@ -102,7 +76,7 @@ export const updateStringsMapWithCustomEnvStrings = (
   let foundCustomStringsCounter = 0;
   let foundCustomNonDefaultStringsCounter = 0;
   // First check for the default string entries
-  for (const [key] of defaultStringMap.entries()) {
+  for (const [key] of strings.entries()) {
     const envValue = process.env[`${ENV_PREFIX_CUSTOM_STRINGS}${key}`];
     if (envValue !== undefined && envValue.trim().length > 0) {
       strings.set(key, envValue);

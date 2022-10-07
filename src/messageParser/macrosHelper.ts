@@ -4,7 +4,7 @@ import type {
   MessageParserMacroGenerator,
   MessageParserMacroInfo,
 } from "./macros";
-import type { EMPTY_OBJECT } from "../info/other";
+import type { EMPTY_OBJECT } from "../other/types";
 
 export const generateMacroMapFromMacroGenerator = <
   GENERATE_DATA extends EMPTY_OBJECT

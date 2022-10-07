@@ -16,7 +16,7 @@ import { messageParserById } from "../messageParser";
 // Type imports
 import type { ChatUserstate, Client } from "tmi.js";
 import type { MacroMap, PluginMap } from "../messageParser";
-import type { EMPTY_OBJECT } from "../info/other";
+import type { EMPTY_OBJECT } from "../other/types";
 import type { Logger } from "winston";
 import type { StringMap } from "../strings";
 

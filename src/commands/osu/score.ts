@@ -6,12 +6,12 @@ import {
   osuScore,
   osuScoreErrorNoBeatmap,
   osuScoreErrorNotFound,
-} from "../../strings/osu/commandReply";
+} from "../../info/strings/osu/commandReply";
 import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
-import { macroOsuScore } from "../../messageParser/macros/osuApi";
-import { macroOsuScoreRequest } from "../../messageParser/macros/osuScoreRequest";
-import { NOT_FOUND_STATUS_CODE } from "../../info/other";
+import { macroOsuScore } from "../../info/macros/osuApi";
+import { macroOsuScoreRequest } from "../../info/macros/osuScoreRequest";
+import { NOT_FOUND_STATUS_CODE } from "../../other/web";
 import { regexOsuChatHandlerCommandScore } from "../../info/regex";
 // Type imports
 import type {

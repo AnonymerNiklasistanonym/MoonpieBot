@@ -10,13 +10,13 @@ import {
 import {
   macroMoonpieLeaderboard,
   macroMoonpieLeaderboardEntry,
-} from "../../messageParser/macros/moonpie";
+} from "../../info/macros/moonpie";
 import {
   moonpieCommandReplyLeaderboardEntry,
   moonpieCommandReplyLeaderboardErrorNoEntriesFound,
   moonpieCommandReplyLeaderboardPrefix,
-} from "../../strings/moonpie/commandReply";
-import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../info/other";
+} from "../../info/strings/moonpie/commandReply";
+import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../other/twitch";
 import moonpieDb from "../../database/moonpieDb";
 import { regexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 // Type imports

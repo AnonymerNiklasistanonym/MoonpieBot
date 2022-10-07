@@ -13,9 +13,9 @@ import {
   customCommandsBroadcastsCommandsListCustomBroadcasts,
   customCommandsBroadcastsCommandsListCustomCommands,
   customCommandsBroadcastsCommandsString,
-} from "../../strings/customCommandsBroadcasts/commands";
+} from "../../info/strings/customCommandsBroadcasts/commands";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
-import { macroCommandEnabled } from "../../messageParser/macros/commands";
+import { macroCommandEnabled } from "../../info/macros/commands";
 import { regexCustomCommandsBroadcastsCommands } from "../../info/regex";
 // Type imports
 import type {

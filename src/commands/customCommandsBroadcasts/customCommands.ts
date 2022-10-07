@@ -9,7 +9,7 @@ import {
   customCommandsBroadcastsCommandReplyCCNotFound,
   customCommandsBroadcastsCommandReplyDelCC,
   customCommandsBroadcastsCommandReplyInvalidRegex,
-} from "../../strings/customCommandsBroadcasts/commandReply";
+} from "../../info/strings/customCommandsBroadcasts/commandReply";
 import {
   CustomCommandsBroadcastsCommands,
   LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
@@ -21,7 +21,7 @@ import {
 import { checkTwitchBadgeLevel } from "../../twitch";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
-import { macroCustomCommandInfo } from "../../messageParser/macros/customCommands";
+import { macroCustomCommandInfo } from "../../info/macros/customCommands";
 import { parseRegexStringArgument } from "../helper";
 // Type imports
 import type {

@@ -9,8 +9,7 @@ import {
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequestDemands,
   macroOsuBeatmapRequests,
-} from "../../messageParser/macros/osuBeatmapRequest";
-import { NOT_FOUND_STATUS_CODE, notUndefined } from "../../info/other";
+} from "../../info/macros/osuBeatmapRequest";
 import {
   osuBeatmapRequest,
   osuBeatmapRequestCurrentlyOff,
@@ -20,7 +19,7 @@ import {
   osuBeatmapRequestNoRedeem,
   osuBeatmapRequestNotFound,
   osuBeatmapRequestNotMeetingDemands,
-} from "../../strings/osu/beatmapRequest";
+} from "../../info/strings/osu/beatmapRequest";
 import {
   regexOsuBeatmapIdFromUrl,
   regexOsuBeatmapUrlSplitter,
@@ -29,10 +28,12 @@ import { createLogFunc } from "../../logging";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { generatePlugin } from "../../messageParser/plugins";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
-import { macroOsuBeatmap } from "../../messageParser/macros/osuApi";
+import { macroOsuBeatmap } from "../../info/macros/osuApi";
+import { NOT_FOUND_STATUS_CODE } from "../../other/web";
+import { notUndefined } from "../../other/types";
 import { OsuRequestsConfig } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import osuRequestsDb from "../../database/osuRequestsDb";
-import { pluginsTwitchChatGenerator } from "../../messageParser/plugins/twitchChat";
+import { pluginsTwitchChatGenerator } from "../../info/plugins/twitchChat";
 import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
 import type {
@@ -51,7 +52,7 @@ import type { Beatmap } from "osu-api-v2";
 import type { GetOsuRequestsConfigOut } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import type { Client as IrcClient } from "irc";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
-import type { PluginTwitchChatData } from "../../messageParser/plugins/twitchChat";
+import type { PluginTwitchChatData } from "../../info/plugins/twitchChat";
 import type { RegexOsuBeatmapIdFromUrl } from "../../info/regex";
 
 const MAX_LENGTH_PREVIOUS_REQUESTS = 15;

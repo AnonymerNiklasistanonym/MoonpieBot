@@ -6,11 +6,11 @@ import {
 import {
   macroMoonpieClaim,
   macroMoonpieLeaderboardEntry,
-} from "../../messageParser/macros/moonpie";
+} from "../../info/macros/moonpie";
 import {
   moonpieCommandReplyAlreadyClaimed,
   moonpieCommandReplyClaim,
-} from "../../strings/moonpie/commandReply";
+} from "../../info/strings/moonpie/commandReply";
 import {
   regexMoonpieChatHandlerCommandAbout,
   regexMoonpieChatHandlerCommandClaim,

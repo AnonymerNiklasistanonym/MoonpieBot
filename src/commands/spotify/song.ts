@@ -3,9 +3,9 @@ import {
   LOG_ID_CHAT_HANDLER_SPOTIFY,
   SpotifyCommands,
 } from "../../info/commands";
-import { macroSpotifySong } from "../../messageParser/macros/spotify";
+import { macroSpotifySong } from "../../info/macros/spotify";
 import { regexSpotifyChatHandlerCommandSong } from "../../info/regex";
-import { spotifyCommandReplySong } from "../../strings/spotify/commandReply";
+import { spotifyCommandReplySong } from "../../info/strings/spotify/commandReply";
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 // Type imports
 import type {

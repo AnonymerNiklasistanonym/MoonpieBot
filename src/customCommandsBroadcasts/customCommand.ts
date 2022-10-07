@@ -5,9 +5,9 @@ import {
 } from "../other/twitchBadgeParser";
 import customCommandsBroadcastsDb from "../database/customCommandsBroadcastsDb";
 import { messageParser } from "../messageParser";
-import { pluginsRegexGroupGenerator } from "../messageParser/plugins/regexGroup";
+import { pluginsRegexGroupGenerator } from "../info/plugins/regexGroup";
 // Type imports
-import type { EMPTY_OBJECT } from "../info/other";
+import type { EMPTY_OBJECT } from "../other/types";
 import type { PluginMap } from "../messageParser";
 import type { TwitchChatCommandHandler } from "../twitch";
 

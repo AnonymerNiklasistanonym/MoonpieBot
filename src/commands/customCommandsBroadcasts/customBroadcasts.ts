@@ -7,7 +7,7 @@ import {
   customCommandsBroadcastsCommandReplyCBNotFound,
   customCommandsBroadcastsCommandReplyDelCB,
   customCommandsBroadcastsCommandReplyInvalidCronString,
-} from "../../strings/customCommandsBroadcasts/commandReply";
+} from "../../info/strings/customCommandsBroadcasts/commandReply";
 import {
   CustomCommandsBroadcastsCommands,
   LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
@@ -19,7 +19,7 @@ import {
 import { checkTwitchBadgeLevel } from "../../twitch";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
-import { macroCustomBroadcastInfo } from "../../messageParser/macros/customBroadcast";
+import { macroCustomBroadcastInfo } from "../../info/macros/customBroadcast";
 import { parseRegexStringArgument } from "../helper";
 import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
 // Type imports

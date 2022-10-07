@@ -9,8 +9,8 @@ import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
-} from "../../strings/osu/commandReply";
-import { macroOsuPpRpRequest } from "../../messageParser/macros/osuPpRpRequest";
+} from "../../info/strings/osu/commandReply";
+import { macroOsuPpRpRequest } from "../../info/macros/osuPpRpRequest";
 import { regexOsuChatHandlerCommandRp } from "../../info/regex";
 // Type imports
 import type {

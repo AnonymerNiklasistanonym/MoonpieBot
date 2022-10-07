@@ -6,8 +6,8 @@ import {
 import {
   spotifyCommandsSong,
   spotifyCommandsString,
-} from "../../strings/spotify/commands";
-import { macroCommandEnabled } from "../../messageParser/macros/commands";
+} from "../../info/strings/spotify/commands";
+import { macroCommandEnabled } from "../../info/macros/commands";
 import { regexSpotifyChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {

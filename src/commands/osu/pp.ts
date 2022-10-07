@@ -6,8 +6,8 @@ import {
   errorMessageOsuApiCredentialsUndefined,
 } from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
-import { macroOsuPpRpRequest } from "../../messageParser/macros/osuPpRpRequest";
-import { osuCommandReplyPp } from "../../strings/osu/commandReply";
+import { macroOsuPpRpRequest } from "../../info/macros/osuPpRpRequest";
+import { osuCommandReplyPp } from "../../info/strings/osu/commandReply";
 import { regexOsuChatHandlerCommandPp } from "../../info/regex";
 // Type imports
 import type {

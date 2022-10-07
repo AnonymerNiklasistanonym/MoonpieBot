@@ -8,12 +8,8 @@ import type { MacroMap } from "./messageParser/macros";
 import type { PluginMap } from "./messageParser/plugins";
 import type { StringMap } from "./strings";
 // Local exports
-export { defaultMacros, generateMacroMap } from "./messageParser/macros";
-export {
-  defaultPlugins,
-  generatePlugin,
-  generatePluginMap,
-} from "./messageParser/plugins";
+export { generateMacroMap } from "./messageParser/macros";
+export { generatePlugin, generatePluginMap } from "./messageParser/plugins";
 export { generateMacroMapFromMacroGenerator } from "./messageParser/macrosHelper";
 // Type exports
 export type {
@@ -31,9 +27,9 @@ const LOG_ID = "message_parser";
 
 export const messageParser = async (
   messageString: undefined | string,
-  strings: StringMap = new Map(),
-  plugins: PluginMap = new Map(),
-  macros: MacroMap = new Map(),
+  strings: Readonly<StringMap> = new Map(),
+  plugins: Readonly<PluginMap> = new Map(),
+  macros: Readonly<MacroMap> = new Map(),
   logger: Logger
 ): Promise<string> => {
   const logMessageParser = createLogFunc(logger, LOG_ID);
@@ -69,9 +65,9 @@ export const messageParser = async (
 
 export const messageParserById = async (
   stringId: string,
-  strings: StringMap,
-  plugins: PluginMap = new Map(),
-  macros: MacroMap = new Map(),
+  strings: Readonly<StringMap>,
+  plugins: Readonly<PluginMap> = new Map(),
+  macros: Readonly<MacroMap> = new Map(),
   logger: Logger
 ): Promise<string> => {
   const stringFromId = strings.get(stringId);

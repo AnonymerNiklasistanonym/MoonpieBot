@@ -5,7 +5,7 @@ import {
   pluginCustomCommandDataRemoveId,
   pluginCustomCommandDataSetId,
   pluginCustomCommandDataSetNumberId,
-} from "../messageParser/plugins/customData";
+} from "./plugins/customData";
 import {
   pluginHelp,
   pluginIfGreater,
@@ -14,12 +14,12 @@ import {
   pluginIfUndefined,
   pluginRandomNumber,
   pluginTimeInSToHumanReadableStringShort,
-} from "../messageParser/plugins/general";
+} from "./plugins/general";
 import { convertRegexToString } from "../other/regexToString";
 import { createMessageParserMessage } from "../messageParser/createMessageParserMessage";
-import { pluginRegexGroupId } from "../messageParser/plugins/regexGroup";
-import { PluginTwitchApi } from "../messageParser/plugins/twitchApi";
-import { PluginTwitchChat } from "../messageParser/plugins/twitchChat";
+import { pluginRegexGroupId } from "./plugins/regexGroup";
+import { PluginTwitchApi } from "./plugins/twitchApi";
+import { PluginTwitchChat } from "./plugins/twitchChat";
 import { TwitchBadgeLevel } from "../other/twitchBadgeParser";
 // Type imports
 import type { CustomCommand } from "../customCommandsBroadcasts/customCommand";

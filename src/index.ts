@@ -16,11 +16,8 @@ import {
   getEnvVariableValueOrDefault,
   printEnvVariablesToConsole,
 } from "./env";
-import { defaultMacros, defaultMacrosOptional } from "./messageParser/macros";
-import {
-  defaultPlugins,
-  defaultPluginsOptional,
-} from "./messageParser/plugins";
+import { defaultMacros, defaultMacrosOptional } from "./info/macros";
+import { defaultPlugins, defaultPluginsOptional } from "./info/plugins";
 import { ENV_PREFIX, EnvVariable, envVariableInformation } from "./info/env";
 import {
   fileNameEnv,
@@ -30,7 +27,7 @@ import {
 } from "./info/files";
 import { cliHelpGenerator } from "./cli";
 import { createStringsVariableDocumentation } from "./documentation/strings";
-import { defaultStringMap } from "./strings";
+import { defaultStringMap } from "./info/strings";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getVersionFromObject } from "./version";
 import { main } from "./main";

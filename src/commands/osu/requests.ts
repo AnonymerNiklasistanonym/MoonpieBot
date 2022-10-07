@@ -3,14 +3,14 @@ import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   macroOsuBeatmapRequestDemands,
   macroOsuBeatmapRequests,
-} from "../../messageParser/macros/osuBeatmapRequest";
+} from "../../info/macros/osuBeatmapRequest";
 import {
   osuBeatmapRequestCurrentlyOff,
   osuBeatmapRequestCurrentlyOn,
   osuBeatmapRequestDemandsUpdated,
   osuBeatmapRequestTurnedOff,
   osuBeatmapRequestTurnedOn,
-} from "../../strings/osu/beatmapRequest";
+} from "../../info/strings/osu/beatmapRequest";
 import {
   regexOsuChatHandlerCommandRequests,
   regexOsuChatHandlerCommandRequestsSet,

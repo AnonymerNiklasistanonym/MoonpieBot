@@ -10,7 +10,7 @@ import {
   osuCommandReplyNpStreamCompanionFileNotRunning,
   osuCommandReplyNpStreamCompanionWebSocket,
   osuCommandReplyNpStreamCompanionWebSocketNotRunning,
-} from "../../strings/osu/commandReply";
+} from "../../info/strings/osu/commandReply";
 import {
   regexOsuBeatmapIdFromUrl,
   regexOsuChatHandlerCommandNp,
@@ -19,7 +19,7 @@ import {
 import { createLogFunc } from "../../logging";
 import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { getProcessInformationByName } from "../../other/processInformation";
-import { macroOsuWindowTitle } from "../../messageParser/macros/osuWindowTitle";
+import { macroOsuWindowTitle } from "../../info/macros/osuWindowTitle";
 // Type imports
 import type {
   CommandGenericDetectorInputEnabledCommands,

@@ -1,38 +1,3 @@
-// Local imports
-import {
-  pluginConvertToShortNumber,
-  pluginHelp,
-  pluginIfEmpty,
-  pluginIfEqual,
-  pluginIfFalse,
-  pluginIfGreater,
-  pluginIfNotEmpty,
-  pluginIfNotEqual,
-  pluginIfNotGreater,
-  pluginIfNotSmaller,
-  pluginIfNotUndefined,
-  pluginIfSmaller,
-  pluginIfTrue,
-  pluginIfUndefined,
-  pluginListFilterUndefined,
-  pluginListJoinCommaSpace,
-  pluginListSort,
-  pluginLowercase,
-  pluginRandomNumber,
-  pluginTimeInSToHumanReadableString,
-  pluginTimeInSToHumanReadableStringShort,
-  pluginTimeInSToStopwatchString,
-  pluginUppercase,
-} from "./plugins/general";
-import {
-  pluginsCustomCommandDataGenerator,
-  pluginsCustomCommandGenerator,
-} from "./plugins/customDataLogic";
-import { pluginsOsuGenerator } from "./plugins/osuApi";
-import { pluginsOsuStreamCompanionGenerator } from "./plugins/osuStreamCompanion";
-import { pluginSpotifyGenerator } from "./plugins/spotify";
-import { pluginsTwitchApiGenerator } from "./plugins/twitchApi";
-import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 // Type imports
 import type { ExportedMacroInformation, MacroMap, RequestHelp } from "./macros";
 import type { Logger } from "winston";
@@ -125,55 +90,15 @@ export const generatePlugin = <DATA>(
   },
 });
 
-const generatePluginInfo = <DATA>(
+export const generatePluginInfo = <DATA>(
   generator: MessageParserPluginGenerator<DATA>
 ): MessageParserPluginInfo => ({
   ...generator,
 });
 
-/**
- * The default values for all plugins.
- */
-export const defaultPlugins: MessageParserPlugin[] = [
-  pluginConvertToShortNumber,
-  pluginHelp,
-  pluginIfEmpty,
-  pluginIfEqual,
-  pluginIfFalse,
-  pluginIfGreater,
-  pluginIfNotEmpty,
-  pluginIfNotEqual,
-  pluginIfNotGreater,
-  pluginIfNotSmaller,
-  pluginIfNotUndefined,
-  pluginIfSmaller,
-  pluginIfTrue,
-  pluginIfUndefined,
-  pluginListFilterUndefined,
-  pluginListJoinCommaSpace,
-  pluginListSort,
-  pluginLowercase,
-  pluginRandomNumber,
-  pluginTimeInSToHumanReadableString,
-  pluginTimeInSToHumanReadableStringShort,
-  pluginTimeInSToStopwatchString,
-  pluginUppercase,
-];
-
 export interface MessageParserPluginInfo extends MessageParserPluginBase {
   signature?: PluginSignature;
 }
-
-export const defaultPluginsOptional: MessageParserPluginInfo[] = [
-  ...pluginsTwitchChatGenerator.map(generatePluginInfo),
-  ...pluginsOsuGenerator.map(generatePluginInfo),
-  ...pluginsOsuStreamCompanionGenerator.map(generatePluginInfo),
-  generatePluginInfo(pluginSpotifyGenerator),
-  generatePluginInfo(pluginSpotifyGenerator),
-  ...pluginsCustomCommandGenerator.map(generatePluginInfo),
-  ...pluginsCustomCommandDataGenerator.map(generatePluginInfo),
-  ...pluginsTwitchApiGenerator.map(generatePluginInfo),
-];
 
 export const generatePluginMap = (
   plugins: MessageParserPlugin[]

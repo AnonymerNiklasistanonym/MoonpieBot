@@ -22,21 +22,15 @@ import {
   TwitchClientListener,
 } from "./twitch";
 import {
-  defaultMacros,
-  defaultPlugins,
-  generateMacroMap,
-  generatePlugin,
-  generatePluginMap,
-} from "./messageParser";
-import {
-  defaultStringMap,
-  updateStringsMapWithCustomEnvStrings,
-} from "./strings";
-import {
   EnvVariable,
   EnvVariableOnOff,
   EnvVariableOtherListOptions,
 } from "./info/env";
+import {
+  generateMacroMap,
+  generatePlugin,
+  generatePluginMap,
+} from "./messageParser";
 import {
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrUndefined,
@@ -44,29 +38,33 @@ import {
 import {
   pluginsCustomCommandDataGenerator,
   pluginsCustomCommandGenerator,
-} from "./messageParser/plugins/customDataLogic";
+} from "./info/plugins/customDataLogic";
 import { createLogFunc } from "./logging";
 import { customCommandChatHandler } from "./customCommandsBroadcasts/customCommand";
 import { customCommandsBroadcastsChatHandler } from "./commands/customCommandsBroadcasts";
 import customCommandsBroadcastsDb from "./database/customCommandsBroadcastsDb";
+import { defaultMacros } from "./info/macros";
+import { defaultPlugins } from "./info/plugins";
+import { defaultStringMap } from "./info/strings";
 import { generateOutputFileNameMoonpieDbBackup } from "./info/files";
 import { getVersionFromObject } from "./version";
-import { macroOsuApi } from "./messageParser/macros/osuApi";
+import { macroOsuApi } from "./info/macros/osuApi";
 import { moonpieChatHandler } from "./commands/moonpie";
 import moonpieDb from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
 import osuRequestsDb from "./database/osuRequestsDb";
-import { pluginsOsuGenerator } from "./messageParser/plugins/osuApi";
-import { pluginsOsuStreamCompanionGenerator } from "./messageParser/plugins/osuStreamCompanion";
-import { pluginSpotifyGenerator } from "./messageParser/plugins/spotify";
-import { pluginsTwitchApiGenerator } from "./messageParser/plugins/twitchApi";
-import { pluginsTwitchChatGenerator } from "./messageParser/plugins/twitchChat";
+import { pluginsOsuGenerator } from "./info/plugins/osuApi";
+import { pluginsOsuStreamCompanionGenerator } from "./info/plugins/osuStreamCompanion";
+import { pluginSpotifyGenerator } from "./info/plugins/spotify";
+import { pluginsTwitchApiGenerator } from "./info/plugins/twitchApi";
+import { pluginsTwitchChatGenerator } from "./info/plugins/twitchChat";
 import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
 import { SpotifyConfig } from "./database/spotifyDb/requests/spotifyConfig";
 import spotifyDb from "./database/spotifyDb";
+import { updateStringsMapWithCustomEnvStrings } from "./strings";
 import { version } from "./info/version";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
@@ -76,8 +74,8 @@ import type { CustomCommand } from "./customCommandsBroadcasts/customCommand";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
 import type { OsuIrcBotSendMessageFunc } from "./commands/osu/beatmap";
-import type { PluginTwitchApiData } from "./messageParser/plugins/twitchApi";
-import type { PluginTwitchChatData } from "./messageParser/plugins/twitchChat";
+import type { PluginTwitchApiData } from "./info/plugins/twitchApi";
+import type { PluginTwitchChatData } from "./info/plugins/twitchChat";
 import type { ScheduledTask } from "node-cron";
 import type SpotifyWebApi from "spotify-web-api-node";
 import type { StreamCompanionConnection } from "./osuStreamCompanion";

@@ -3,14 +3,14 @@ import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
 } from "../../info/commands";
-import { moonpieCommandReplyAbout } from "../../strings/moonpie/commandReply";
+import { moonpieCommandReplyAbout } from "../../info/strings/moonpie/commandReply";
 import { regexMoonpieChatHandlerCommandAbout } from "../../info/regex";
 // Type imports
 import type {
   CommandGenericDetectorInputEnabledCommands,
   TwitchChatCommandHandler,
 } from "../../twitch";
-import type { EMPTY_OBJECT } from "../../info/other";
+import type { EMPTY_OBJECT } from "../../other/types";
 
 /**
  * About command: Send the name, version and source code link of the bot.

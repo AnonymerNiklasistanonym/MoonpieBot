@@ -3,14 +3,8 @@
 // Package imports
 import path from "path";
 // Local imports
-import {
-  defaultMacros,
-  defaultMacrosOptional,
-} from "../src/messageParser/macros";
-import {
-  defaultPlugins,
-  defaultPluginsOptional,
-} from "../src/messageParser/plugins";
+import { defaultMacros, defaultMacrosOptional } from "../src/info/macros";
+import { defaultPlugins, defaultPluginsOptional } from "../src/info/plugins";
 import {
   fileNameEnvExample,
   fileNameEnvStringsExample,
@@ -18,7 +12,7 @@ import {
 import { createConsoleLogger } from "../src/logging";
 import { createEnvVariableDocumentation } from "../src/env";
 import { createStringsVariableDocumentation } from "../src/documentation/strings";
-import { defaultStringMap } from "../src/strings";
+import { defaultStringMap } from "../src/info/strings";
 
 const logger = createConsoleLogger("create_example_files");
 

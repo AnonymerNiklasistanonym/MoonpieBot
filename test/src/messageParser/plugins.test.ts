@@ -3,11 +3,12 @@
 // Package imports
 import { expect } from "chai";
 // Local imports
-import { defaultPlugins, messageParser } from "../../../src/messageParser";
 import { createMessageParserMessage } from "../../../src/messageParser/createMessageParserMessage";
+import { defaultPlugins } from "../../../src/info/plugins";
 import { getTestLogger } from "../logger";
+import { messageParser } from "../../../src/messageParser";
 import { ParseTreeNodeError } from "../../../src/messageParser/errors";
-import { pluginRandomNumber } from "../../../src/messageParser/plugins/general";
+import { pluginRandomNumber } from "../../../src/info/plugins/general";
 // Type imports
 import type {
   MessageParserPlugin,

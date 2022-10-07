@@ -11,7 +11,7 @@ import {
   pluginTimeInSToHumanReadableString,
   pluginTimeInSToStopwatchString,
   pluginUppercase,
-} from "../../src/messageParser/plugins/general";
+} from "../../src/info/plugins/general";
 import { getTestLogger } from "./logger";
 import { messageParser } from "../../src/messageParser";
 import pluginsTestSuite from "./messageParser/plugins.test";
