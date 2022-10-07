@@ -37,11 +37,11 @@ Remove-Item "node_modules" -Recurse -ErrorAction Ignore
 Remove-Item "bin" -Recurse -ErrorAction Ignore
 npm install
 npm run build
-npm run create:windowsInstallerConfig
 npm run package:windows
 
 # Create the windows installer
 if ($makensisWasFound) {
+    npm run create:windowsInstallerConfig
     Set-Location installer
     Set-Location windows_installer
     makensis windows_installer.nsi
