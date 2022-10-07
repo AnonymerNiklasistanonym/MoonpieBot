@@ -7,7 +7,7 @@ import { roundNumber } from "../../other/round";
 //import { writeJsonFile } from "../../other/fileOperations";
 // Type imports
 import type { Beatmap, BeatmapUserScore } from "osu-api-v2";
-import type { MessageParserMacroGenerator } from "../../messageParser/macros";
+import type { MessageParserMacroGenerator } from "../../messageParser";
 
 export enum MacroOsuApi {
   DEFAULT_USER_ID = "DEFAULT_USER_ID",

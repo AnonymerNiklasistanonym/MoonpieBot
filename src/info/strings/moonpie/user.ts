@@ -7,12 +7,12 @@ import {
   MacroMoonpieUserSet,
   macroMoonpieUserSet,
 } from "../../macros/moonpie";
-import { createMessageParserMessage } from "../../../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { pluginIfNotEqual } from "../../plugins/general";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
-import { StringEntry } from "../../../strings";
+import { StringEntry } from "../../../messageParser";
 
 const MOONPIE_USER_STRING_ID = `${MOONPIE_STRING_ID}_USER`;
 

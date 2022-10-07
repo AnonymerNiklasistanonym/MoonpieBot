@@ -9,22 +9,22 @@ import { spotifyCommandReplySong } from "../../info/strings/spotify/commandReply
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type SpotifyWebApi from "spotify-web-api-node";
 
 export interface CommandSongCreateReplyInput {
   spotifyWebApi: SpotifyWebApi;
 }
 export type CommandSongDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands;
 /**
  * Song command:
  * Send a message about the currently played and last played song on Spotify
  * (or only the last played song if currently no song is played).
  */
-export const commandSong: TwitchChatCommandHandler<
+export const commandSong: ChatMessageHandlerReplyCreator<
   CommandSongCreateReplyInput,
   CommandSongDetectorInput
 > = {

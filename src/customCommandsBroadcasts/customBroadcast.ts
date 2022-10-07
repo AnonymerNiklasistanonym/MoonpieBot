@@ -2,13 +2,13 @@
 import cron, { ScheduledTask } from "node-cron";
 // Local imports
 import { createLogFunc } from "../logging";
-import { logTwitchMessageBroadcast } from "../twitch";
+import { logBroadcastedMessage } from "../chatMessageHandler";
 import { messageParser } from "../messageParser";
 // Type imports
 import type { MacroMap, PluginMap } from "../messageParser";
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
-import type { StringMap } from "../strings";
+import type { StringMap } from "../messageParser";
 
 /**
  * The logging ID of this module.
@@ -61,7 +61,7 @@ export const createBroadcastScheduledTask = (
       )
         .then((parsedMessage) => client.say(channel, parsedMessage))
         .then((sentMessage) => {
-          logTwitchMessageBroadcast(logger, sentMessage, "timer");
+          logBroadcastedMessage(logger, sentMessage, "timer");
         })
         .catch(logger.error);
     }

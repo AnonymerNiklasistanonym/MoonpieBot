@@ -2,7 +2,7 @@
 import {
   convertTwitchBadgeStringToLevel,
   TwitchBadgeLevel,
-} from "../../other/twitchBadgeParser";
+} from "../../twitch";
 import {
   customCommandsBroadcastsCommandReplyAddCC,
   customCommandsBroadcastsCommandReplyAddCCAlreadyExists,
@@ -18,20 +18,20 @@ import {
   regexCustomCommandAdd,
   regexCustomCommandDelete,
 } from "../../info/regex";
-import { checkTwitchBadgeLevel } from "../../twitch";
+import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { macroCustomCommandInfo } from "../../info/macros/customCommands";
 import { parseRegexStringArgument } from "../helper";
 // Type imports
 import type {
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
+import type {
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath,
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
 } from "../customCommandsBroadcasts";
-import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
 import type {
   RegexCustomCommandAdd,
   RegexCustomCommandDelete,
@@ -47,10 +47,10 @@ export interface CommandAddDetectorOutput {
 /**
  * Add a custom command.
  */
-export const commandAddCC: TwitchChatCommandHandler<
+export const commandAddCC: ChatMessageHandlerReplyCreator<
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
     CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandAddDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
@@ -162,10 +162,10 @@ export interface CommandDeleteDetectorOutput {
 /**
  * Delete a custom command.
  */
-export const commandDelCC: TwitchChatCommandHandler<
+export const commandDelCC: ChatMessageHandlerReplyCreator<
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
     CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandDeleteDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {

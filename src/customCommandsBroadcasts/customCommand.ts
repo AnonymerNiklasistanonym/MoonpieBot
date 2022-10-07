@@ -1,15 +1,12 @@
 // Local imports
-import {
-  parseTwitchBadgeLevel,
-  TwitchBadgeLevel,
-} from "../other/twitchBadgeParser";
+import { parseTwitchBadgeLevel, TwitchBadgeLevel } from "../twitch";
 import customCommandsBroadcastsDb from "../database/customCommandsBroadcastsDb";
 import { messageParser } from "../messageParser";
 import { pluginsRegexGroupGenerator } from "../info/plugins/regexGroup";
 // Type imports
+import type { ChatMessageHandlerReplyCreator } from "../chatMessageHandler";
 import type { EMPTY_OBJECT } from "../other/types";
 import type { PluginMap } from "../messageParser";
-import type { TwitchChatCommandHandler } from "../twitch";
 
 /**
  * The logging ID of this module.
@@ -48,7 +45,7 @@ export interface CommandHandleCustomCommandDetectorDataOut {
 export const customCommandChatHandler = (
   customCommandIdRegex: Omit<CustomCommand, "message" | "description">,
   pathDatabase: string
-): TwitchChatCommandHandler<
+): ChatMessageHandlerReplyCreator<
   EMPTY_OBJECT,
   EMPTY_OBJECT,
   CommandHandleCustomCommandDetectorDataOut

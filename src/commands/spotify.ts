@@ -1,7 +1,7 @@
 // Local imports
 import { commandCommands } from "./spotify/commands";
 import { commandSong } from "./spotify/song";
-import { runTwitchCommandHandler } from "../twitch";
+import { runChatMessageHandlerReplyCreator } from "../chatMessageHandler";
 // Type imports
 import type {
   CommandCommandsCreateReplyInput,
@@ -11,7 +11,7 @@ import type {
   CommandSongCreateReplyInput,
   CommandSongDetectorInput,
 } from "./spotify/song";
-import type { TwitchChatHandler } from "../twitch";
+import type { ChatMessageHandler } from "../chatMessageHandler";
 
 export interface SpotifyChatHandlerData
   extends CommandCommandsCreateReplyInput,
@@ -19,7 +19,7 @@ export interface SpotifyChatHandlerData
     CommandSongCreateReplyInput,
     CommandSongDetectorInput {}
 
-export const spotifyChatHandler: TwitchChatHandler<
+export const spotifyChatHandler: ChatMessageHandler<
   SpotifyChatHandlerData
 > = async (
   client,
@@ -35,7 +35,7 @@ export const spotifyChatHandler: TwitchChatHandler<
   // Handle commands
   await Promise.all(
     [commandSong].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -51,7 +51,7 @@ export const spotifyChatHandler: TwitchChatHandler<
   );
   await Promise.all(
     [commandCommands].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,

@@ -9,11 +9,13 @@ import {
   commandDelCC,
 } from "./customCommandsBroadcasts/customCommands";
 import { commandCommands } from "./customCommandsBroadcasts/commands";
-import { runTwitchCommandHandler } from "../twitch";
+import { runChatMessageHandlerReplyCreator } from "../chatMessageHandler";
 // Type imports
 // TODO Add types from command inputs
-import type { CommandGenericDetectorInputEnabledCommands } from "../twitch";
-import type { TwitchChatHandler } from "../twitch";
+import type {
+  ChatMessageHandler,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../chatMessageHandler";
 
 export interface CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath {
   /**
@@ -38,9 +40,9 @@ export interface CustomCommandsBroadcastsRefreshHelper {
 export interface CustomCommandsBroadcastsChatHandlerData
   extends CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath,
     CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
-    CommandGenericDetectorInputEnabledCommands {}
+    ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands {}
 
-export const customCommandsBroadcastsChatHandler: TwitchChatHandler<
+export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
   CustomCommandsBroadcastsChatHandlerData
 > = async (
   client,
@@ -56,7 +58,7 @@ export const customCommandsBroadcastsChatHandler: TwitchChatHandler<
   // Handle commands
   await Promise.all(
     [commandCommands].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -72,7 +74,7 @@ export const customCommandsBroadcastsChatHandler: TwitchChatHandler<
   );
   await Promise.all(
     [commandAddCC].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -88,7 +90,7 @@ export const customCommandsBroadcastsChatHandler: TwitchChatHandler<
   );
   await Promise.all(
     [commandDelCC].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -104,7 +106,7 @@ export const customCommandsBroadcastsChatHandler: TwitchChatHandler<
   );
   await Promise.all(
     [commandAddCB].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -120,7 +122,7 @@ export const customCommandsBroadcastsChatHandler: TwitchChatHandler<
   );
   await Promise.all(
     [commandDelCB].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,

@@ -16,8 +16,12 @@ import { getTestLogger } from "./logger";
 import { messageParser } from "../../src/messageParser";
 import pluginsTestSuite from "./messageParser/plugins.test";
 // Type imports
-import type { MacroMap, PluginFunc, PluginMap } from "../../src/messageParser";
-import type { StringMap } from "../../src/strings";
+import type {
+  MacroMap,
+  PluginFunc,
+  PluginMap,
+  StringMap,
+} from "../../src/messageParser";
 
 describe("messageParser", () => {
   const logger = getTestLogger("messageParser");

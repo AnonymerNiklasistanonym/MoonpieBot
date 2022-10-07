@@ -4,7 +4,7 @@ import {
   errorMessageUserNameUndefined,
 } from "../../error";
 // Type imports
-import type { MessageParserPluginGenerator } from "../../messageParser/plugins";
+import type { MessageParserPluginGenerator } from "../../messageParser";
 
 export enum PluginTwitchChat {
   /** Insert the Twitch channel name where the current message was written. */

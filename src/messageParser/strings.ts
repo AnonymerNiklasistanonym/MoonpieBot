@@ -3,8 +3,8 @@
  */
 
 // Local imports
-import { createLogFunc } from "./logging";
-import { ENV_PREFIX_CUSTOM_STRINGS } from "./info/env";
+import { createLogFunc } from "../logging";
+import { ENV_PREFIX_CUSTOM_STRINGS } from "../info/env";
 // Type imports
 import type { Logger } from "winston";
 

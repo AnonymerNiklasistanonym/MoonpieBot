@@ -37,14 +37,14 @@ import {
   pluginIfTrue,
   pluginTimeInSToStopwatchString,
 } from "../../plugins/general";
-import { createMessageParserMessage } from "../../../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../../../messageParser";
 import { OSU_STRING_ID } from "../osu";
 import { osuBeatmapRequestRefTopScore } from "./beatmapRequest";
 import { PluginOsuApi } from "../../plugins/osuApi";
 import { PluginOsuStreamCompanion } from "../../plugins/osuStreamCompanion";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
-import type { StringEntry } from "../../../strings";
+import type { StringEntry } from "../../../messageParser";
 
 const OSU_COMMAND_REPLY_STRING_ID = `${OSU_STRING_ID}_COMMAND_REPLY`;
 

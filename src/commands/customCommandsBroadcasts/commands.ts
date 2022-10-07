@@ -19,20 +19,16 @@ import { macroCommandEnabled } from "../../info/macros/commands";
 import { regexCustomCommandsBroadcastsCommands } from "../../info/regex";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 
-export type CommandCommandsCreateReplyInput =
-  CommandGenericDetectorInputEnabledCommands;
-export type CommandCommandsDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
 /**
  * Commands command: Send all available commands of the bot in chat.
  */
-export const commandCommands: TwitchChatCommandHandler<
-  CommandCommandsCreateReplyInput,
-  CommandCommandsDetectorInput
+export const commandCommands: ChatMessageHandlerReplyCreator<
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
   createReply: (_channel, _tags, data) => {
     return {

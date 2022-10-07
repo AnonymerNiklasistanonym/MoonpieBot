@@ -5,8 +5,8 @@
 // Local imports
 import { LoggerInformation } from "../logging";
 // Type imports
+import type { ChatMessageHandlerInfo } from "./runChatMessageHandler";
 import type { Logger } from "winston";
-import type { TwitchChatCommandHandlerInfo } from "./twitchChatCommandHandler";
 
 /**
  * Log a sent Twitch broadcast message.
@@ -15,7 +15,7 @@ import type { TwitchChatCommandHandlerInfo } from "./twitchChatCommandHandler";
  * @param sentMessage The sent message information.
  * @param broadcastSourceId The ID of the broadcast source.
  */
-export const logTwitchMessageBroadcast = (
+export const logBroadcastedMessage = (
   logger: Logger,
   sentMessage: string[],
   broadcastSourceId: string
@@ -36,11 +36,11 @@ export const logTwitchMessageBroadcast = (
  * @param message The message that something was detected in.
  * @param detectedCommand The command that was detected.
  */
-export const logTwitchMessageCommandDetected = (
+export const logDetectedCommandInChatMessage = (
   logger: Logger,
   messageId: string,
   message: Readonly<string[]>,
-  detectedCommand: TwitchChatCommandHandlerInfo
+  detectedCommand: ChatMessageHandlerInfo
 ): void => {
   logger.log({
     level: "debug",
@@ -59,9 +59,9 @@ export const logTwitchMessageCommandDetected = (
  * @param commandReplySentMessage The command reply.
  * @param replyToMessageId The ID of the message that is replied to.
  */
-export const logTwitchMessageCommandReply = (
+export const logChatMessageReply = (
   logger: Logger,
-  detectedCommand: TwitchChatCommandHandlerInfo,
+  detectedCommand: ChatMessageHandlerInfo,
   commandReplySentMessage: string[],
   replyToMessageId: string
 ): void => {

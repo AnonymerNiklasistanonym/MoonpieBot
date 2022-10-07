@@ -7,11 +7,11 @@ import {
   MacroCustomCommandInfo,
   macroCustomCommandInfo,
 } from "../../macros/customCommands";
-import { createMessageParserMessage } from "../../../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../../../messageParser";
 import { CUSTOM_COMMANDS_BROADCASTS_STRING_ID } from "../customCommandsBroadcasts";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
-import type { StringEntry } from "../../../strings";
+import type { StringEntry } from "../../../messageParser";
 
 const CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID = `${CUSTOM_COMMANDS_BROADCASTS_STRING_ID}_COMMAND_REPLY`;
 

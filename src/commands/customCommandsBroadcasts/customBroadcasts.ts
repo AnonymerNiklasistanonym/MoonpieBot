@@ -16,21 +16,21 @@ import {
   regexCustomBroadcastAdd,
   regexCustomBroadcastDelete,
 } from "../../info/regex";
-import { checkTwitchBadgeLevel } from "../../twitch";
+import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { macroCustomBroadcastInfo } from "../../info/macros/customBroadcast";
 import { parseRegexStringArgument } from "../helper";
-import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
+import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
+import type {
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type {
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath,
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
 } from "../customCommandsBroadcasts";
-import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
 import type {
   RegexCustomBroadcastAdd,
   RegexCustomBroadcastDelete,
@@ -44,10 +44,10 @@ export interface CommandAddDetectorOutput {
 /**
  * Add a custom command.
  */
-export const commandAddCB: TwitchChatCommandHandler<
+export const commandAddCB: ChatMessageHandlerReplyCreator<
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
     CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandAddDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
@@ -144,10 +144,10 @@ export interface CommandDeleteDetectorOutput {
 /**
  * Delete a custom command.
  */
-export const commandDelCB: TwitchChatCommandHandler<
+export const commandDelCB: ChatMessageHandlerReplyCreator<
   CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
     CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandDeleteDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {

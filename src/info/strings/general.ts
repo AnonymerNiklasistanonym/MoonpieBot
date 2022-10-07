@@ -1,9 +1,9 @@
 // Local imports
 import { MacroPermissionError, macroPermissionError } from "../macros/general";
-import { createMessageParserMessage } from "../../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../../messageParser";
 import { PluginTwitchChat } from "../plugins/twitchChat";
 // Type imports
-import type { StringEntry } from "../../strings";
+import type { StringEntry } from "../../messageParser";
 
 export const GENERAL_STRING_ID = "GENERAL";
 

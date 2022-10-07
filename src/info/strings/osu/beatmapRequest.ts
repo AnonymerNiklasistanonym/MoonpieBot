@@ -23,13 +23,13 @@ import {
   pluginIfTrue,
   pluginTimeInSToStopwatchString,
 } from "../../plugins/general";
-import { createMessageParserMessage } from "../../../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../../../messageParser";
 import { OSU_IRC_NEWLINE } from "../../../osuIrc";
 import { OSU_STRING_ID } from "../osu";
 import { PluginOsuApi } from "../../plugins/osuApi";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
-import type { StringEntry } from "../../../strings";
+import type { StringEntry } from "../../../messageParser";
 
 const OSU_BEATMAP_REQUEST_STRING_ID = `${OSU_STRING_ID}_BEATMAP_REQUEST`;
 

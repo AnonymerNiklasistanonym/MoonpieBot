@@ -26,9 +26,9 @@ import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import moonpieDb from "../../database/moonpieDb";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type { CommandMoonpieGenericDataMoonpieDbPath } from "../moonpie";
 
 export interface CommandClaimCreateReplyInput
@@ -43,9 +43,9 @@ export interface CommandClaimCreateReplyInput
  * Claim command: Claim a moonpie if no moonpie was claimed in the last 24
  * hours.
  */
-export const commandClaim: TwitchChatCommandHandler<
+export const commandClaim: ChatMessageHandlerReplyCreator<
   CommandClaimCreateReplyInput,
-  CommandGenericDetectorInputEnabledCommands
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
   createReply: async (_channel, tags, data, logger) => {
     // Check if a moonpie entry already exists

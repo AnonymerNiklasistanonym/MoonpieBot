@@ -10,18 +10,14 @@ export {
   CreateTwitchClientErrorCode,
   TwitchClientListener,
 } from "./twitch/twitchClient";
-export { checkTwitchBadgeLevel } from "./twitch/twitchBadge";
-export { logTwitchMessageBroadcast } from "./twitch/twitchLog";
-export { runTwitchCommandHandler } from "./twitch/twitchChatCommandHandler";
-// Local type exports
-export type {
-  ChatUserstateIdUserNameId,
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-  TwitchChatCommandHandlerCreateReply,
-  TwitchChatCommandHandlerDetect,
-  TwitchChatCommandHandlerDetectorDataOutput,
-  TwitchChatCommandHandlerInfo,
-  TwitchChatCommandHandlerReply,
-} from "./twitch/twitchChatCommandHandler";
-export type { TwitchChatHandler } from "./twitch/twitchChatHandler";
+export {
+  TwitchBadgeLevel,
+  parseTwitchBadgeLevel,
+  convertTwitchBadgeLevelToString,
+  convertTwitchBadgeStringToLevel,
+} from "./twitch/twitchBadgeParser";
+
+/**
+ * The maximum amount of characters of a Twitch message.
+ */
+export const MAX_LENGTH_OF_A_TWITCH_MESSAGE = 499;

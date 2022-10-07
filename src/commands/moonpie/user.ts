@@ -22,15 +22,15 @@ import {
   regexMoonpieChatHandlerCommandUserRemove,
   regexMoonpieChatHandlerCommandUserSet,
 } from "../../info/regex";
-import { checkTwitchBadgeLevel } from "../../twitch";
+import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import moonpieDb from "../../database/moonpieDb";
-import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
+import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type {
   RegexMoonpieChatHandlerCommandUserAdd,
   RegexMoonpieChatHandlerCommandUserDelete,
@@ -43,9 +43,9 @@ import type { CommandMoonpieGenericDataMoonpieDbPath } from "../moonpie";
 export interface CommandGetDetectorOutput {
   userNameMoonpieDb: string;
 }
-export const commandGet: TwitchChatCommandHandler<
+export const commandGet: ChatMessageHandlerReplyCreator<
   CommandMoonpieGenericDataMoonpieDbPath,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandGetDetectorOutput
 > = {
   createReply: async (_channel, _tags, data, logger) => {
@@ -122,9 +122,9 @@ export interface CommandSetDetectorOutput {
 /**
  * Set command: Set the moonpie count of someone (multiple operations available).
  */
-export const commandSet: TwitchChatCommandHandler<
+export const commandSet: ChatMessageHandlerReplyCreator<
   CommandMoonpieGenericDataMoonpieDbPath,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandSetDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
@@ -290,9 +290,9 @@ export interface CommandDeleteDetectorOutput {
 /**
  * Delete command: Remove a moonpie database entry from the database.
  */
-export const commandDelete: TwitchChatCommandHandler<
+export const commandDelete: ChatMessageHandlerReplyCreator<
   CommandMoonpieGenericDataMoonpieDbPath,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandDeleteDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {

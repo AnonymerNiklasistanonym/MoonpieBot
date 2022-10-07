@@ -5,7 +5,7 @@ import {
   convertTwitchBadgeLevelToString,
   convertTwitchBadgeStringToLevel,
   TwitchBadgeLevel,
-} from "../../../other/twitchBadgeParser";
+} from "../../../twitch";
 import { CustomCommandsBroadcastsDbError, customCommandsTable } from "../info";
 import { createLogMethod } from "../../logging";
 // Type imports

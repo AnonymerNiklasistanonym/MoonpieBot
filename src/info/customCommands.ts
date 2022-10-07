@@ -16,11 +16,11 @@ import {
   pluginTimeInSToHumanReadableStringShort,
 } from "./plugins/general";
 import { convertRegexToString } from "../other/regexToString";
-import { createMessageParserMessage } from "../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../messageParser";
 import { pluginRegexGroupId } from "./plugins/regexGroup";
 import { PluginTwitchApi } from "./plugins/twitchApi";
 import { PluginTwitchChat } from "./plugins/twitchChat";
-import { TwitchBadgeLevel } from "../other/twitchBadgeParser";
+import { TwitchBadgeLevel } from "../twitch";
 // Type imports
 import type { CustomCommand } from "../customCommandsBroadcasts/customCommand";
 

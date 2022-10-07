@@ -15,9 +15,9 @@ import { NOT_FOUND_STATUS_CODE } from "../../other/web";
 import { regexOsuChatHandlerCommandScore } from "../../info/regex";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type {
   CommandOsuGenericDataExtraBeatmapRequestsInfo,
   OsuApiV2Credentials,
@@ -42,9 +42,9 @@ export interface CommandScoreDetectorOutput {
  * Get the score of the last requested map of either the default user or a
  * custom supplied user.
  */
-export const commandScore: TwitchChatCommandHandler<
+export const commandScore: ChatMessageHandlerReplyCreator<
   CommandScoreCreateReplyInput & CommandOsuGenericDataExtraBeatmapRequestsInfo,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandScoreDetectorOutput
 > = {
   createReply: async (_channel, _tags, data, logger) => {

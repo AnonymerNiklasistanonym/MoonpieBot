@@ -16,11 +16,7 @@ import {
   createStreamCompanionFileConnection,
   createStreamCompanionWebSocketConnection,
 } from "./osuStreamCompanion";
-import {
-  createTwitchClient,
-  runTwitchCommandHandler,
-  TwitchClientListener,
-} from "./twitch";
+import { createTwitchClient, TwitchClientListener } from "./twitch";
 import {
   EnvVariable,
   EnvVariableOnOff,
@@ -30,6 +26,7 @@ import {
   generateMacroMap,
   generatePlugin,
   generatePluginMap,
+  updateStringsMapWithCustomEnvStrings,
 } from "./messageParser";
 import {
   getEnvVariableValueOrDefault,
@@ -60,11 +57,11 @@ import { pluginsOsuStreamCompanionGenerator } from "./info/plugins/osuStreamComp
 import { pluginSpotifyGenerator } from "./info/plugins/spotify";
 import { pluginsTwitchApiGenerator } from "./info/plugins/twitchApi";
 import { pluginsTwitchChatGenerator } from "./info/plugins/twitchChat";
+import { runChatMessageHandlerReplyCreator } from "./chatMessageHandler";
 import { setupSpotifyAuthentication } from "./spotify";
 import { spotifyChatHandler } from "./commands/spotify";
 import { SpotifyConfig } from "./database/spotifyDb/requests/spotifyConfig";
 import spotifyDb from "./database/spotifyDb";
-import { updateStringsMapWithCustomEnvStrings } from "./strings";
 import { version } from "./info/version";
 import { writeJsonFile } from "./other/fileOperations";
 // Type imports
@@ -682,7 +679,7 @@ export const main = async (
         });
 
         try {
-          const executed = await runTwitchCommandHandler(
+          const executed = await runChatMessageHandlerReplyCreator(
             twitchClient,
             channel,
             tags,

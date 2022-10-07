@@ -3,25 +3,23 @@ import { promises as fs } from "fs";
 // Local imports
 import { defaultStringMap } from "../info/strings";
 import { ENV_PREFIX_CUSTOM_STRINGS } from "../info/env";
+import { FileDocumentationPartType } from "../other/splitTextAtLength";
 import { generateFileDocumentation } from "../other/splitTextAtLength";
 import { generatePluginAndMacroDocumentation } from "../documentation/messageParser";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
-import {
-  FileDocumentationPartType,
+import type {
+  FileDocumentationParts,
   FileDocumentationPartValue,
 } from "../other/splitTextAtLength";
 import type {
   MessageParserMacro,
   MessageParserMacroDocumentation,
-} from "../messageParser/macros";
-import type {
   MessageParserPlugin,
   MessageParserPluginInfo,
-} from "../messageParser/plugins";
-import type { FileDocumentationParts } from "../other/splitTextAtLength";
+} from "../messageParser";
 import type { Logger } from "winston";
-import type { StringMap } from "../strings";
+import type { StringMap } from "../messageParser";
 
 export const createStringsVariableDocumentation = async (
   path: string,

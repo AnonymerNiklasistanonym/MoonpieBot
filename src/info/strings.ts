@@ -6,7 +6,7 @@
 import { customCommandsBroadcastsCommandReply } from "./strings/customCommandsBroadcasts/commandReply";
 import { customCommandsBroadcastsCommands } from "./strings/customCommandsBroadcasts/commands";
 import { general } from "./strings/general";
-import { generateStringMap } from "../strings";
+import { generateStringMap } from "../messageParser";
 import { moonpieCommandReply } from "./strings/moonpie/commandReply";
 import { moonpieCommands } from "./strings/moonpie/commands";
 import { moonpieUser } from "./strings/moonpie/user";
@@ -16,7 +16,7 @@ import { osuCommands } from "./strings/osu/commands";
 import { spotifyCommandReply } from "./strings/spotify/commandReply";
 import { spotifyCommands } from "./strings/spotify/commands";
 // Type imports
-import type { StringMap } from "../strings";
+import type { StringMap } from "../messageParser";
 
 /**
  * The default values for all strings.

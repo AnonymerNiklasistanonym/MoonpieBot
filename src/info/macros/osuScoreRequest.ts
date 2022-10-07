@@ -1,5 +1,5 @@
 // Type imports
-import type { MessageParserMacroGenerator } from "../../messageParser/macros";
+import type { MessageParserMacroGenerator } from "../../messageParser";
 
 export enum MacroOsuScoreRequest {
   BEATMAP_ID = "BEATMAP_ID",

@@ -5,14 +5,14 @@ import {
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../plugins/general";
-import { createMessageParserMessage } from "../../../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../../../messageParser";
 import { CUSTOM_COMMANDS_BROADCASTS_STRING_ID } from "../customCommandsBroadcasts";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../macros/commands";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../../messageParser/createMessageParserMessage";
-import type { StringEntry } from "../../../strings";
+import type { MessageForMessageElementPlugin } from "../../../messageParser";
+import type { StringEntry } from "../../../messageParser";
 
 const CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID = `${CUSTOM_COMMANDS_BROADCASTS_STRING_ID}_COMMANDS`;
 

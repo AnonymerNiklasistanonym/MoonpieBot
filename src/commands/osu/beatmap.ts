@@ -6,6 +6,10 @@ import {
   errorMessageOsuApiDbPathUndefined,
 } from "../../error";
 import {
+  generateMacroMapFromMacroGenerator,
+  generatePlugin,
+} from "../../messageParser";
+import {
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequestDemands,
   macroOsuBeatmapRequests,
@@ -25,8 +29,6 @@ import {
   regexOsuBeatmapUrlSplitter,
 } from "../../info/regex";
 import { createLogFunc } from "../../logging";
-import { generateMacroMapFromMacroGenerator } from "../../messageParser";
-import { generatePlugin } from "../../messageParser/plugins";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { macroOsuBeatmap } from "../../info/macros/osuApi";
 import { NOT_FOUND_STATUS_CODE } from "../../other/web";
@@ -37,10 +39,10 @@ import { pluginsTwitchChatGenerator } from "../../info/plugins/twitchChat";
 import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-  TwitchChatCommandHandlerReply,
-} from "../../twitch";
+  ChatMessageHandlerReply,
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type {
   CommandOsuGenericDataExtraBeatmapRequestsInfo,
   CommandOsuGenericDataOsuApiDbPath,
@@ -116,8 +118,8 @@ export const sendBeatmapRequest = (
   beatmap?: Beatmap,
   osuIrcRequestTarget?: string,
   osuIrcBot?: OsuIrcBotSendMessageFunc
-): TwitchChatCommandHandlerReply[] => {
-  const commandRepliesBeatmap: TwitchChatCommandHandlerReply[] = [];
+): ChatMessageHandlerReply[] => {
+  const commandRepliesBeatmap: ChatMessageHandlerReply[] = [];
   let twitchPluginOverride: PluginMap | undefined;
   if (messageParserTwitchPluginData) {
     // Overwrite the user name and id for the correct requestor name
@@ -196,14 +198,14 @@ export interface CommandBeatmapDetectorOutput {
   beatmapRequests: BeatmapRequest[];
 }
 export interface CommandBeatmapDetectorInput
-  extends CommandGenericDetectorInputEnabledCommands {
+  extends ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands {
   enableOsuBeatmapRequests?: boolean;
 }
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
  * the current top score of the default osu User in the chat.
  */
-export const commandBeatmap: TwitchChatCommandHandler<
+export const commandBeatmap: ChatMessageHandlerReplyCreator<
   CommandBeatmapCreateReplyInput &
     CommandOsuGenericDataExtraBeatmapRequestsInfo,
   CommandBeatmapDetectorInput,
@@ -271,7 +273,7 @@ export const commandBeatmap: TwitchChatCommandHandler<
       data.osuApiV2Credentials.clientSecret
     );
 
-    const commandReplies: TwitchChatCommandHandlerReply[] = [];
+    const commandReplies: ChatMessageHandlerReply[] = [];
 
     for (const beatmapRequest of data.beatmapRequests) {
       const osuBeatmapRequestMacros: MacroMap = new Map();

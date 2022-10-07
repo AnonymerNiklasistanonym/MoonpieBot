@@ -22,9 +22,9 @@ import { getProcessInformationByName } from "../../other/processInformation";
 import { macroOsuWindowTitle } from "../../info/macros/osuWindowTitle";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type {
   CommandOsuGenericDataExtraBeatmapRequestsInfo,
   CommandOsuGenericDataOsuApiV2Credentials,
@@ -48,9 +48,9 @@ export interface CommandNpCreateReplyInput
  * Send the map that is currently being played in osu (via the window title
  * because the web api is not supporting it).
  */
-export const commandNp: TwitchChatCommandHandler<
+export const commandNp: ChatMessageHandlerReplyCreator<
   CommandNpCreateReplyInput & CommandOsuGenericDataExtraBeatmapRequestsInfo,
-  CommandGenericDetectorInputEnabledCommands
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
   createReply: async (_channel, _tags, data, logger) => {
     const logCmdNp = createLogFunc(

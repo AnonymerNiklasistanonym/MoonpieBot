@@ -4,11 +4,13 @@ import { commandAbout } from "./moonpie/about";
 import { commandClaim } from "./moonpie/claim";
 import { commandCommands } from "./moonpie/commands";
 import { commandLeaderboard } from "./moonpie/leaderboard";
-import { runTwitchCommandHandler } from "../twitch";
+import { runChatMessageHandlerReplyCreator } from "../chatMessageHandler";
 // Type imports
+import type {
+  ChatMessageHandler,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../chatMessageHandler";
 import type { CommandClaimCreateReplyInput } from "./moonpie/claim";
-import type { CommandGenericDetectorInputEnabledCommands } from "../twitch";
-import type { TwitchChatHandler } from "../twitch";
 
 export interface CommandMoonpieGenericDataMoonpieDbPath {
   /**
@@ -19,10 +21,10 @@ export interface CommandMoonpieGenericDataMoonpieDbPath {
 
 export interface MoonpieChatHandlerData
   extends CommandMoonpieGenericDataMoonpieDbPath,
-    CommandGenericDetectorInputEnabledCommands,
+    ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
     CommandClaimCreateReplyInput {}
 
-export const moonpieChatHandler: TwitchChatHandler<
+export const moonpieChatHandler: ChatMessageHandler<
   MoonpieChatHandlerData
 > = async (
   client,
@@ -38,7 +40,7 @@ export const moonpieChatHandler: TwitchChatHandler<
   // Handle commands
   await Promise.all(
     [commandAbout, commandClaim, commandLeaderboard].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -54,7 +56,7 @@ export const moonpieChatHandler: TwitchChatHandler<
   );
   await Promise.all(
     [commandSet].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -70,7 +72,7 @@ export const moonpieChatHandler: TwitchChatHandler<
   );
   await Promise.all(
     [commandGet, commandDelete].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -86,7 +88,7 @@ export const moonpieChatHandler: TwitchChatHandler<
   );
   await Promise.all(
     [commandCommands].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,

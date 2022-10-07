@@ -1,11 +1,11 @@
 // Local imports
-import { generateMacroMapFromMacroGenerator } from "../../messageParser/macrosHelper";
+import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 // Type imports
 import {
   macroOsuStreamCompanionCurrentMapFile,
   macroOsuStreamCompanionCurrentMapWebSocket,
 } from "../macros/osuStreamCompanion";
-import type { MessageParserPluginGenerator } from "../../messageParser/plugins";
+import type { MessageParserPluginGenerator } from "../../messageParser";
 import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 
 export enum PluginOsuStreamCompanion {

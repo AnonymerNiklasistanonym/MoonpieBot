@@ -1,5 +1,5 @@
 // Local imports
-import { createMessageParserMessage } from "../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../messageParser";
 import { pluginRandomNumber } from "./plugins/general";
 // Type imports
 import type { CustomBroadcast } from "../customCommandsBroadcasts/customBroadcast";

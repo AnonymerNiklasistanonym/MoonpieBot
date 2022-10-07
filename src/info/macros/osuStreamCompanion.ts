@@ -5,7 +5,7 @@ import type {
   StreamCompanionFileData,
   StreamCompanionWebSocketData,
 } from "../../osuStreamCompanion";
-import type { MessageParserMacroGenerator } from "../../messageParser/macros";
+import type { MessageParserMacroGenerator } from "../../messageParser";
 
 export enum MacroOsuStreamCompanionCurrentMapWebSocket {
   AR = "AR",

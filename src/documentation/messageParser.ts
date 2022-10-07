@@ -1,10 +1,11 @@
 // Local imports
 import {
+  createPluginSignature,
   generateMacroMap,
   generatePluginMap,
   messageParser,
 } from "../messageParser";
-import { createMessageParserMessage } from "../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../messageParser";
 import { FileDocumentationPartType } from "../other/splitTextAtLength";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
@@ -16,82 +17,11 @@ import type {
   MessageParserMacro,
   MessageParserMacroDocumentation,
   MessageParserMacroGenerator,
-} from "../messageParser/macros";
-import type {
   MessageParserPlugin,
   MessageParserPluginInfo,
-  PluginFunc,
-  PluginSignature,
-} from "../messageParser/plugins";
+} from "../messageParser";
 import type { Logger } from "winston";
-import type { StringMap } from "../strings";
-
-export const createPluginSignatureString = async (
-  logger: Logger,
-  pluginName: string,
-  pluginFunc?: PluginFunc,
-  pluginSignatureObject?: PluginSignature
-): Promise<string> => {
-  // Check for plugin signature
-  const argumentSignatures: string[] = [];
-  let scopeSignature: string | undefined;
-  try {
-    let pluginSignature;
-    if (pluginFunc !== undefined) {
-      pluginSignature = await pluginFunc(logger, undefined, true);
-    }
-    if (pluginSignatureObject !== undefined) {
-      pluginSignature = pluginSignatureObject;
-    }
-    if (
-      typeof pluginSignature === "object" &&
-      !(pluginSignature instanceof Map) &&
-      pluginSignature?.type === "signature"
-    ) {
-      if (pluginSignature.argument) {
-        if (Array.isArray(pluginSignature.argument)) {
-          argumentSignatures.push(...pluginSignature.argument);
-        } else {
-          argumentSignatures.push(pluginSignature.argument);
-        }
-      }
-      if (pluginSignature.scope) {
-        scopeSignature = pluginSignature.scope;
-      }
-      if (
-        pluginSignature.exportedMacros &&
-        pluginSignature.exportedMacros.length > 0
-      ) {
-        if (scopeSignature === undefined) {
-          scopeSignature = "";
-        }
-        if (scopeSignature.length > 0) {
-          scopeSignature += ";";
-        }
-        for (const exportedMacro of pluginSignature.exportedMacros) {
-          scopeSignature += `%${exportedMacro.id}:[${exportedMacro.keys
-            .sort(genericStringSorter)
-            .join(",")}]%`;
-        }
-      }
-    }
-  } catch (err) {
-    // ignore
-  }
-  if (argumentSignatures.length === 0) {
-    return `$(${pluginName}${scopeSignature ? "|" + scopeSignature : ""})`;
-  }
-  return argumentSignatures
-    .map(
-      (argumentSignature) =>
-        `$(${pluginName}${
-          argumentSignature && argumentSignature.length > 0
-            ? "=" + argumentSignature
-            : ""
-        }${scopeSignature ? "|" + scopeSignature : ""})`
-    )
-    .join(",");
-};
+import type { StringMap } from "../messageParser";
 
 export const generatePluginAndMacroDocumentation = async (
   strings: StringMap,
@@ -119,7 +49,7 @@ export const generatePluginAndMacroDocumentation = async (
     const pluginEntry: FileDocumentationPartValue = {
       description: plugin.description,
       prefix: ">",
-      title: await createPluginSignatureString(logger, plugin.id, plugin.func),
+      title: await createPluginSignature(logger, plugin.id, plugin.func),
       type: FileDocumentationPartType.VALUE,
     };
     if (plugin.examples && plugin.examples.length > 0) {
@@ -227,7 +157,7 @@ export const generatePluginAndMacroDocumentation = async (
       const pluginEntry: FileDocumentationPartValue = {
         description: plugin.description,
         prefix: ">",
-        title: await createPluginSignatureString(
+        title: await createPluginSignature(
           logger,
           plugin.id,
           undefined,

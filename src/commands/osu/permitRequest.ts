@@ -1,16 +1,16 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
-import { checkTwitchBadgeLevel } from "../../twitch";
+import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { osuBeatmapRequestNoBlockedRequestsError } from "../../info/strings/osu/beatmapRequest";
 import { regexOsuChatHandlerCommandPermitRequest } from "../../info/regex";
 import { sendBeatmapRequest } from "./beatmap";
-import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
+import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-  TwitchChatCommandHandlerReply,
-} from "../../twitch";
+  ChatMessageHandlerReply,
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type {
   CommandOsuGenericDataExtraBeatmapRequestsInfo,
   CommandOsuGenericDataOsuIrcData,
@@ -24,10 +24,10 @@ export interface CommandBeatmapPermitRequestCreateReplyInput
  * Post information about the last blocked request in chat and send them
  * if enabled via IRC to the client.
  */
-export const commandBeatmapPermitRequest: TwitchChatCommandHandler<
+export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
   CommandBeatmapPermitRequestCreateReplyInput &
     CommandOsuGenericDataExtraBeatmapRequestsInfo,
-  CommandGenericDetectorInputEnabledCommands
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
   createReply: (channel, tags, data) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
@@ -55,7 +55,7 @@ export const commandBeatmapPermitRequest: TwitchChatCommandHandler<
     );
     data.beatmapRequestsInfo.blockedBeatmapRequest = undefined;
 
-    const commandReplies: TwitchChatCommandHandlerReply[] = [];
+    const commandReplies: ChatMessageHandlerReply[] = [];
 
     commandReplies.push(
       ...sendBeatmapRequest(

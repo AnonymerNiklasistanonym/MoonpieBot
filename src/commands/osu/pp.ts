@@ -11,9 +11,9 @@ import { osuCommandReplyPp } from "../../info/strings/osu/commandReply";
 import { regexOsuChatHandlerCommandPp } from "../../info/regex";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type { CommandOsuGenericDataOsuApiV2Credentials } from "../osu";
 import type { RegexOsuChatHandlerCommandPp } from "../../info/regex";
 
@@ -41,9 +41,9 @@ export interface CommandPpRpDetectorOutput {
  * PP (from performance points) command:
  * Get performance/general information of an Osu account.
  */
-export const commandPp: TwitchChatCommandHandler<
+export const commandPp: ChatMessageHandlerReplyCreator<
   CommandPpRpCreateReplyInput,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandPpRpDetectorOutput
 > = {
   createReply: async (_channel, _tags, data) => {

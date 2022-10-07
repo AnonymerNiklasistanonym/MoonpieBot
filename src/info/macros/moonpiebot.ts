@@ -9,7 +9,7 @@ import {
 import { getVersionFromObject } from "../../version";
 import { version } from "../version";
 // Type imports
-import type { MessageParserMacro } from "../../messageParser/macros";
+import type { MessageParserMacro } from "../../messageParser";
 
 export enum MacroMoonpieBot {
   AUTHOR = "AUTHOR",

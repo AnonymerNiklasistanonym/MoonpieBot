@@ -1,5 +1,5 @@
 // Type imports
-import type { MessageParserMacroGenerator } from "../../messageParser/macros";
+import type { MessageParserMacroGenerator } from "../../messageParser";
 
 export interface MacroCommandsEnabledData<ENUM_TYPE> {
   convertEnumValueToInfo: (enumValue: ENUM_TYPE) => [string, boolean];

@@ -1,8 +1,8 @@
 // Local imports
 import { genericStringSorter } from "../../other/genericStringSorter";
-import { ParseTreeNodeErrorCode } from "../../messageParser/errors";
+import { ParseTreeNodeErrorCode } from "../../messageParser";
 // Type imports
-import type { MessageParserPlugin } from "../../messageParser/plugins";
+import type { MessageParserPlugin } from "../../messageParser";
 
 const pluginIfEmptyLogic = (content?: string): boolean =>
   content === undefined || content.trim().length === 0;

@@ -7,13 +7,13 @@ import { createMessageParserMessage } from "../../../src/messageParser/createMes
 import { defaultPlugins } from "../../../src/info/plugins";
 import { getTestLogger } from "../logger";
 import { messageParser } from "../../../src/messageParser";
-import { ParseTreeNodeError } from "../../../src/messageParser/errors";
+import { ParseTreeNodeError } from "../../../src/messageParser";
 import { pluginRandomNumber } from "../../../src/info/plugins/general";
 // Type imports
 import type {
   MessageParserPlugin,
   MessageParserPluginExample,
-} from "../../../src/messageParser/plugins";
+} from "../../../src/messageParser";
 import type { Logger } from "winston";
 
 const testPlugin = async (

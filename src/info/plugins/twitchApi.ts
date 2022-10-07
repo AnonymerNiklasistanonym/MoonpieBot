@@ -2,7 +2,7 @@
 import { errorMessageUserIdUndefined } from "../../error";
 // Type imports
 import type { ApiClient } from "@twurple/api/lib";
-import type { MessageParserPluginGenerator } from "../../messageParser/plugins";
+import type { MessageParserPluginGenerator } from "../../messageParser";
 
 export enum PluginTwitchApi {
   GET_FOLLOW_AGE = "TWITCH_API_GET_FOLLOW_AGE",

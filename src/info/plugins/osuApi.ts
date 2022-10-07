@@ -9,11 +9,11 @@ import {
   macroOsuScore,
   macroOsuUser,
 } from "../macros/osuApi";
-import { generateMacroMapFromMacroGenerator } from "../../messageParser/macrosHelper";
+import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { NOT_FOUND_STATUS_CODE } from "../../other/web";
 // Type imports
 import type { MacroMap } from "../../messageParser";
-import type { MessageParserPluginGenerator } from "../../messageParser/plugins";
+import type { MessageParserPluginGenerator } from "../../messageParser";
 import type { OsuApiV2Credentials } from "../../commands/osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 

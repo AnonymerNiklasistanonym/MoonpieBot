@@ -7,17 +7,17 @@ import { moonpieCommandReplyAbout } from "../../info/strings/moonpie/commandRepl
 import { regexMoonpieChatHandlerCommandAbout } from "../../info/regex";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type { EMPTY_OBJECT } from "../../other/types";
 
 /**
  * About command: Send the name, version and source code link of the bot.
  */
-export const commandAbout: TwitchChatCommandHandler<
+export const commandAbout: ChatMessageHandlerReplyCreator<
   EMPTY_OBJECT,
-  CommandGenericDetectorInputEnabledCommands
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
   createReply: () => ({ messageId: moonpieCommandReplyAbout.id }),
   detect: (_tags, message, data) => {

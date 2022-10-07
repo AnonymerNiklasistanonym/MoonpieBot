@@ -1,5 +1,5 @@
 // Type imports
-import type { MessageParserMacroGenerator } from "../../messageParser/macros";
+import type { MessageParserMacroGenerator } from "../../messageParser";
 import type { SpotifyGetCurrentAndRecentSongs } from "../../spotify";
 
 export enum SpotifySongMacro {

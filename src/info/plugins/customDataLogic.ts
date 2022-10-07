@@ -14,7 +14,7 @@ import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsD
 // Type imports
 import type { CustomCommand } from "../../customCommandsBroadcasts/customCommand";
 import type { Logger } from "winston";
-import type { MessageParserPluginGenerator } from "../../messageParser/plugins";
+import type { MessageParserPluginGenerator } from "../../messageParser";
 
 export interface PluginsCustomCommandData {
   customCommand: CustomCommand;

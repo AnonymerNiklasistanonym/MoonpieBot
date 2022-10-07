@@ -5,14 +5,14 @@ import {
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../plugins/general";
-import { createMessageParserMessage } from "../../../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../../../messageParser";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../macros/commands";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../../messageParser/createMessageParserMessage";
-import type { StringEntry } from "../../../strings";
+import type { MessageForMessageElementPlugin } from "../../../messageParser";
+import type { StringEntry } from "../../../messageParser";
 
 const SPOTIFY_COMMANDS_STRING_ID = `${SPOTIFY_STRING_ID}_COMMANDS`;
 

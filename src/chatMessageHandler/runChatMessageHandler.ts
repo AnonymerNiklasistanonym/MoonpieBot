@@ -9,22 +9,22 @@ import {
   errorMessageUserNameUndefined,
 } from "../error";
 import {
-  logTwitchMessageCommandDetected,
-  logTwitchMessageCommandReply,
-} from "./twitchLog";
+  logChatMessageReply,
+  logDetectedCommandInChatMessage,
+} from "./logChatMessage";
 import { messageParserById } from "../messageParser";
 // Type imports
-import type { ChatUserstate, Client } from "tmi.js";
+import type { Client, ChatUserstate as TwitchChatUserState } from "tmi.js";
 import type { MacroMap, PluginMap } from "../messageParser";
 import type { EMPTY_OBJECT } from "../other/types";
 import type { Logger } from "winston";
-import type { StringMap } from "../strings";
+import type { StringMap } from "../messageParser";
 
 /**
- * The same as ChatUserstate but it was already checked that some properties
- * exist.
+ * Information about the current chat message and user.
  */
-export interface ChatUserstateIdUserNameId extends ChatUserstate {
+export interface ChatMessageHandlerReplyCreatorChatUserState
+  extends TwitchChatUserState {
   id: string;
   "user-id": string;
   username: string;
@@ -36,27 +36,27 @@ export interface ChatUserstateIdUserNameId extends ChatUserstate {
  * @typeParam DATAThe additional data the command needs for execution.
  * @returns One or more sent replies.
  */
-export type TwitchChatCommandHandlerCreateReply<DATA = EMPTY_OBJECT> = (
+export type ChatMessageHandlerCreateReply<DATA = EMPTY_OBJECT> = (
   /** The Twitch channel where the current message was written. */
   channel: Readonly<string>,
   /**
    * The Twitch (user) chat state (the user name/id/badges of the user that
    * wrote the current message).
    */
-  tags: Readonly<ChatUserstateIdUserNameId>,
+  tags: Readonly<ChatMessageHandlerReplyCreatorChatUserState>,
   /** The additional data necessary for execution. */
   data: DATA,
   /** The global logger. */
   logger: Readonly<Logger>
 ) =>
-  | Promise<TwitchChatCommandHandlerReply | TwitchChatCommandHandlerReply[]>
-  | TwitchChatCommandHandlerReply
-  | TwitchChatCommandHandlerReply[];
+  | Promise<ChatMessageHandlerReply | ChatMessageHandlerReply[]>
+  | ChatMessageHandlerReply
+  | ChatMessageHandlerReply[];
 
 /**
  * Object that represents a successful reply done by a command handler.
  */
-export interface TwitchChatCommandHandlerReply {
+export interface ChatMessageHandlerReply {
   /** Additional macro map to generate text from strings. */
   additionalMacros?: Readonly<MacroMap>;
   /** Additional plugin map to generate text from strings. */
@@ -82,7 +82,7 @@ export interface TwitchChatCommandHandlerReply {
 /**
  * Default generic interface for enabled commands as detector input.
  */
-export interface CommandGenericDetectorInputEnabledCommands {
+export interface ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands {
   /**
    * The enabled commands for the current Twitch chat handler.
    */
@@ -99,14 +99,14 @@ export interface CommandGenericDetectorInputEnabledCommands {
  * successfully detects a command (like regular expression group matches).
  * @returns Either false or an object with information from the detection.
  */
-export type TwitchChatCommandHandlerDetect<
+export type ChatMessageHandlerDetect<
   INPUT_DATA extends object = EMPTY_OBJECT,
   OUTPUT_DATA extends object = EMPTY_OBJECT
 > = (
-  tags: Readonly<ChatUserstate>,
+  tags: Readonly<TwitchChatUserState>,
   message: Readonly<string>,
   data: Readonly<INPUT_DATA>
-) => false | TwitchChatCommandHandlerDetectorDataOutput<OUTPUT_DATA>;
+) => false | ChatMessageHandlerReplyCreatorDetectorDataOutput<OUTPUT_DATA>;
 
 /**
  * The data that was parsed from a successful detected command by a message.
@@ -114,7 +114,7 @@ export type TwitchChatCommandHandlerDetect<
  * @typeParam DETECTED_DATA Data that the command detector should return when it
  * successfully detects a command (like regular expression group matches).
  */
-export interface TwitchChatCommandHandlerDetectorDataOutput<
+export interface ChatMessageHandlerReplyCreatorDetectorDataOutput<
   DETECTED_DATA extends object = EMPTY_OBJECT
 > {
   /**
@@ -125,7 +125,9 @@ export interface TwitchChatCommandHandlerDetectorDataOutput<
 }
 
 /**
- * The structure of a Twitch message command manager object.
+ * The structure of a chat message handler that has a method
+ * to check a message if it should create a reply and
+ * a method to create a reply.
  *
  * @typeParam CREATE_REPLY_INPUT_DATA The data that is necessary to create a reply.
  * @typeParam DETECTOR_INPUT_DATA The data that is necessary to detect if a reply
@@ -133,7 +135,7 @@ export interface TwitchChatCommandHandlerDetectorDataOutput<
  * @typeParam DETECTOR_OUTPUT_DATA The data that is created by the reply detector
  * for further use when creating the reply.
  */
-export interface TwitchChatCommandHandler<
+export interface ChatMessageHandlerReplyCreator<
   CREATE_REPLY_INPUT_DATA extends object = EMPTY_OBJECT,
   DETECTOR_INPUT_DATA extends object = EMPTY_OBJECT,
   DETECTOR_OUTPUT_DATA extends object = EMPTY_OBJECT
@@ -142,24 +144,19 @@ export interface TwitchChatCommandHandler<
    * The method that handles the detected command with additional and forwarded
    * data from the detector.
    */
-  createReply: TwitchChatCommandHandlerCreateReply<
+  createReply: ChatMessageHandlerCreateReply<
     CREATE_REPLY_INPUT_DATA & DETECTOR_OUTPUT_DATA
   >;
   /** The method that detects if something should be handled. */
-  detect: TwitchChatCommandHandlerDetect<
-    DETECTOR_INPUT_DATA,
-    DETECTOR_OUTPUT_DATA
-  >;
-  /** Information about the command handler. */
-  info: TwitchChatCommandHandlerInfo;
-  zTypeHelperDetectorInput?: DETECTOR_INPUT_DATA;
-  zTypeHelperDetectorOutput?: DETECTOR_OUTPUT_DATA;
+  detect: ChatMessageHandlerDetect<DETECTOR_INPUT_DATA, DETECTOR_OUTPUT_DATA>;
+  /** Information about the chat message handler. */
+  info: ChatMessageHandlerInfo;
 }
 
 /**
- * Information about the Twitch chat command manager.
+ * Information about a chat message handler.
  */
-export interface TwitchChatCommandHandlerInfo {
+export interface ChatMessageHandlerInfo {
   /** The ID of the chat handler that this command belongs to. */
   chatHandlerId: string;
   /** The ID of the command manager. */
@@ -167,7 +164,7 @@ export interface TwitchChatCommandHandlerInfo {
 }
 
 /**
- * Generic method to handle a Twitch command.
+ * Generic method to handle a chat message.
  *
  * @param client Twitch client.
  * @param channel Twitch channel.
@@ -178,7 +175,7 @@ export interface TwitchChatCommandHandlerInfo {
  * @param globalPlugins Global plugins.
  * @param globalMacros Global macros.
  * @param logger Global logger.
- * @param twitchCommandHandler The Twitch command handler.
+ * @param chatMessageHandler The Twitch command handler.
  * @typeParam CREATE_REPLY_INPUT_DATA The data that is necessary to create a reply.
  * @typeParam DETECTOR_INPUT_DATA The data that is necessary to detect if a reply
  * should be created.
@@ -186,7 +183,7 @@ export interface TwitchChatCommandHandlerInfo {
  * for further use when creating the reply.
  * @returns True if the command was detected and a reply was sent.
  */
-export const runTwitchCommandHandler = async <
+export const runChatMessageHandlerReplyCreator = async <
   DATA extends CREATE_REPLY_INPUT_DATA & DETECTOR_INPUT_DATA,
   CREATE_REPLY_INPUT_DATA extends object = EMPTY_OBJECT,
   DETECTOR_INPUT_DATA extends object = EMPTY_OBJECT,
@@ -194,25 +191,21 @@ export const runTwitchCommandHandler = async <
 >(
   client: Readonly<Client>,
   channel: Readonly<string>,
-  tags: Readonly<ChatUserstate>,
+  tags: Readonly<TwitchChatUserState>,
   message: Readonly<string>,
   data: DATA,
   globalStrings: Readonly<StringMap>,
   globalPlugins: Readonly<PluginMap>,
   globalMacros: Readonly<MacroMap>,
   logger: Readonly<Logger>,
-  twitchCommandHandler: TwitchChatCommandHandler<
+  chatMessageHandler: ChatMessageHandlerReplyCreator<
     CREATE_REPLY_INPUT_DATA,
     DETECTOR_INPUT_DATA,
     DETECTOR_OUTPUT_DATA
   >
 ): Promise<boolean> => {
-  const twitchCommandDetected = twitchCommandHandler.detect(
-    tags,
-    message,
-    data
-  );
-  if (twitchCommandDetected) {
+  const detectedCommand = chatMessageHandler.detect(tags, message, data);
+  if (detectedCommand !== false) {
     if (tags.id === undefined) {
       throw errorMessageIdUndefined();
     }
@@ -222,47 +215,52 @@ export const runTwitchCommandHandler = async <
     if (tags["user-id"] === undefined) {
       throw errorMessageUserIdUndefined();
     }
-    logTwitchMessageCommandDetected(
+    logDetectedCommandInChatMessage(
       logger,
       tags.id,
       [tags.username, message],
-      twitchCommandHandler.info
+      chatMessageHandler.info
     );
-    const twitchCommandReply = await twitchCommandHandler.createReply(
+    const replyOrReplies = await chatMessageHandler.createReply(
       channel,
-      tags as ChatUserstateIdUserNameId,
-      { ...data, ...twitchCommandDetected.data },
+      tags as ChatMessageHandlerReplyCreatorChatUserState,
+      { ...data, ...detectedCommand.data },
       logger
     );
-    const twitchCommandReplies = Array.isArray(twitchCommandReply)
-      ? twitchCommandReply
-      : [twitchCommandReply];
-    for (const a of twitchCommandReplies) {
-      const replyMacros = a.additionalMacros
-        ? new Map([...globalMacros, ...a.additionalMacros])
+    const replies = Array.isArray(replyOrReplies)
+      ? replyOrReplies
+      : [replyOrReplies];
+    for (const reply of replies) {
+      const replyMacros = reply.additionalMacros
+        ? new Map([...globalMacros, ...reply.additionalMacros])
         : globalMacros;
-      const replyPlugins = a.additionalPlugins
-        ? new Map([...globalPlugins, ...a.additionalPlugins])
+      const replyPlugins = reply.additionalPlugins
+        ? new Map([...globalPlugins, ...reply.additionalPlugins])
         : globalPlugins;
       const messageToSend =
-        typeof a.messageId === "string"
+        typeof reply.messageId === "string"
           ? await messageParserById(
-              a.messageId,
+              reply.messageId,
               globalStrings,
               replyPlugins,
               replyMacros,
               logger
             )
-          : await a.messageId(globalStrings, replyPlugins, replyMacros, logger);
-      if (a.isError) {
+          : await reply.messageId(
+              globalStrings,
+              replyPlugins,
+              replyMacros,
+              logger
+            );
+      if (reply.isError) {
         throw Error(messageToSend);
       }
-      const sentMessage = a.customSendFunc
-        ? await a.customSendFunc(messageToSend, logger)
+      const sentMessage = reply.customSendFunc
+        ? await reply.customSendFunc(messageToSend, logger)
         : await client.say(channel, messageToSend);
-      logTwitchMessageCommandReply(
+      logChatMessageReply(
         logger,
-        twitchCommandHandler.info,
+        chatMessageHandler.info,
         sentMessage,
         tags.id
       );

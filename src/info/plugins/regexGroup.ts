@@ -1,5 +1,5 @@
 // Type imports
-import type { MessageParserPluginGenerator } from "../../messageParser/plugins";
+import type { MessageParserPluginGenerator } from "../../messageParser";
 
 export const pluginRegexGroupId = "REGEX_GROUP";
 

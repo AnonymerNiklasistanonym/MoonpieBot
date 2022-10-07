@@ -11,18 +11,18 @@ import { macroCommandEnabled } from "../../info/macros/commands";
 import { regexSpotifyChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 
 export type CommandCommandsCreateReplyInput =
-  CommandGenericDetectorInputEnabledCommands;
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands;
 export type CommandCommandsDetectorInput =
-  CommandGenericDetectorInputEnabledCommands;
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands;
 /**
  * Commands command: Send all available commands of the bot in chat.
  */
-export const commandCommands: TwitchChatCommandHandler<
+export const commandCommands: ChatMessageHandlerReplyCreator<
   CommandCommandsCreateReplyInput,
   CommandCommandsDetectorInput
 > = {

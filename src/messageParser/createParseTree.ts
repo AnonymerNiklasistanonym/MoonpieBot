@@ -4,7 +4,7 @@
 
 // Type imports
 import type { Logger } from "winston";
-import type { StringMap } from "../strings";
+import type { StringMap } from "./strings";
 // Type exports
 export type {
   MessageParserMacroDocumentation,

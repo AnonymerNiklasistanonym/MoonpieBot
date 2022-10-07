@@ -1,16 +1,16 @@
 // Local imports
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
-import { checkTwitchBadgeLevel } from "../../twitch";
+import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { osuBeatmapRequestNoRequestsError } from "../../info/strings/osu/beatmapRequest";
 import { regexOsuChatHandlerCommandLastRequest } from "../../info/regex";
 import { sendBeatmapRequest } from "./beatmap";
-import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
+import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-  TwitchChatCommandHandlerReply,
-} from "../../twitch";
+  ChatMessageHandlerReply,
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type {
   CommandOsuGenericDataExtraBeatmapRequestsInfo,
   CommandOsuGenericDataOsuIrcData,
@@ -28,10 +28,10 @@ export interface CommandBeatmapLastRequestDetectorOutput {
  * Post information about the last beatmap request in chat and resend them
  * if enabled via IRC to the client.
  */
-export const commandBeatmapLastRequest: TwitchChatCommandHandler<
+export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
   CommandBeatmapLastRequestCreateReplyInput &
     CommandOsuGenericDataExtraBeatmapRequestsInfo,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandBeatmapLastRequestDetectorOutput
 > = {
   createReply: (channel, tags, data) => {
@@ -54,7 +54,7 @@ export const commandBeatmapLastRequest: TwitchChatCommandHandler<
       };
     }
 
-    const commandReplies: TwitchChatCommandHandlerReply[] = [];
+    const commandReplies: ChatMessageHandlerReply[] = [];
     const previousBeatmapRequests =
       data.beatmapRequestsInfo.previousBeatmapRequests
         .slice(0, data.beatmapRequestCount)

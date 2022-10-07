@@ -1,12 +1,12 @@
 // Local imports
 import { pluginIfFalse, pluginIfTrue } from "../../plugins/general";
-import { createMessageParserMessage } from "../../../messageParser/createMessageParserMessage";
+import { createMessageParserMessage } from "../../../messageParser";
 import { macroSpotifySong } from "../../macros/spotify";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
 import { SpotifySongMacro } from "../../macros/spotify";
 // Type imports
-import type { StringEntry } from "../../../strings";
+import type { StringEntry } from "../../../messageParser";
 
 const SPOTIFY_COMMAND_REPLY_STRING_ID = `${SPOTIFY_STRING_ID}_COMMAND_REPLY`;
 

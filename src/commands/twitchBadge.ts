@@ -3,20 +3,17 @@
  */
 
 // Local imports
-import {
-  parseTwitchBadgeLevel,
-  TwitchBadgeLevel,
-} from "../other/twitchBadgeParser";
+import { parseTwitchBadgeLevel, TwitchBadgeLevel } from "../twitch";
 import { generalUserPermissionError } from "../info/strings/general";
 import { macroPermissionError } from "../info/macros/general";
 // Type imports
-import type { ChatUserstate } from "tmi.js";
-import type { TwitchChatCommandHandlerReply } from "./twitchChatCommandHandler";
+import type { ChatMessageHandlerReply } from "../chatMessageHandler";
+import type { ChatUserstate as TwitchChatUserState } from "tmi.js";
 
 export const checkTwitchBadgeLevel = (
-  tags: Readonly<ChatUserstate>,
+  tags: Readonly<TwitchChatUserState>,
   expectedBadgeLevel: TwitchBadgeLevel
-): TwitchChatCommandHandlerReply | undefined => {
+): ChatMessageHandlerReply | undefined => {
   const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
   if (twitchBadgeLevel < expectedBadgeLevel) {
     return {

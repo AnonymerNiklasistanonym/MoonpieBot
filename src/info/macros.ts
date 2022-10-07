@@ -22,7 +22,7 @@ import {
   macroOsuStreamCompanionCurrentMapFile,
   macroOsuStreamCompanionCurrentMapWebSocket,
 } from "./macros/osuStreamCompanion";
-import { checkMacrosForDuplicates } from "../messageParser/macrosHelper";
+import { checkMacrosForDuplicates } from "../messageParser";
 import { macroCommandEnabled } from "./macros/commands";
 import { macroCustomBroadcastInfo } from "./macros/customBroadcast";
 import { macroCustomCommandInfo } from "./macros/customCommands";
@@ -36,7 +36,7 @@ import { macroSpotifySong } from "./macros/spotify";
 import type {
   MessageParserMacro,
   MessageParserMacroDocumentation,
-} from "../messageParser/macros";
+} from "../messageParser";
 
 /**
  * The default values for all macros.

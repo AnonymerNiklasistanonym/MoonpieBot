@@ -14,9 +14,9 @@ import { macroOsuPpRpRequest } from "../../info/macros/osuPpRpRequest";
 import { regexOsuChatHandlerCommandRp } from "../../info/regex";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type {
   CommandPpRpCreateReplyInput,
   CommandPpRpDetectorOutput,
@@ -32,9 +32,9 @@ export interface CommandRpCreateReplyInputExtra
  * RP (recently played) command:
  * Send the map that was most recently played in osu (via the web api).
  */
-export const commandRp: TwitchChatCommandHandler<
+export const commandRp: ChatMessageHandlerReplyCreator<
   CommandRpCreateReplyInputExtra,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandPpRpDetectorOutput
 > = {
   createReply: async (_channel, _tags, data) => {

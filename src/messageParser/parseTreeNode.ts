@@ -5,7 +5,7 @@
 // Local imports
 import { ParseTreeNodeError, ParseTreeNodeErrorCode } from "./errors";
 import { createLogFunc } from "../logging";
-import { createPluginSignatureString } from "../documentation/messageParser";
+import { createPluginSignature } from "../messageParser/plugins";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
 import type { Logger } from "winston";
@@ -209,7 +209,7 @@ export const parseTreeNode = async (
           const stringsPlugins: string[] = [];
           for (const pluginForSignature of plugins.entries()) {
             stringsPlugins.push(
-              await createPluginSignatureString(
+              await createPluginSignature(
                 logger,
                 pluginForSignature[0],
                 pluginForSignature[1]

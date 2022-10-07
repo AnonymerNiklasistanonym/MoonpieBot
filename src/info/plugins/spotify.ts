@@ -1,10 +1,10 @@
 // Local imports
-import { generateMacroMapFromMacroGenerator } from "../../messageParser/macrosHelper";
+import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { macroSpotifySong } from "../macros/spotify";
 import { spotifyGetCurrentAndRecentSongs } from "../../spotify";
 // Type imports
-import type { MacroMap } from "../../messageParser/macros";
-import type { MessageParserPluginGenerator } from "../../messageParser/plugins";
+import type { MacroMap } from "../../messageParser";
+import type { MessageParserPluginGenerator } from "../../messageParser";
 import type SpotifyWebApi from "spotify-web-api-node";
 
 export interface PluginSpotifyData {

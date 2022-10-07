@@ -11,8 +11,12 @@ import { commandNp } from "./osu/np";
 import { commandPp } from "./osu/pp";
 import { commandRp } from "./osu/rp";
 import { commandScore } from "./osu/score";
-import { runTwitchCommandHandler } from "../twitch";
+import { runChatMessageHandlerReplyCreator } from "../chatMessageHandler";
 // Type imports
+import type {
+  ChatMessageHandler,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../chatMessageHandler";
 import type {
   CommandBeatmapRequestsSetUnsetCreateReplyInput,
   CommandBeatmapRequestsSetUnsetDetectorInput,
@@ -21,12 +25,10 @@ import type { Beatmap } from "osu-api-v2";
 import type { CommandBeatmapCreateReplyInput } from "./osu/beatmap";
 import type { CommandBeatmapLastRequestCreateReplyInput } from "./osu/lastRequest";
 import type { CommandCommandsCreateReplyInput } from "./osu/commands";
-import type { CommandGenericDetectorInputEnabledCommands } from "../twitch";
 import type { CommandNpCreateReplyInput } from "./osu/np";
 import type { CommandPpRpCreateReplyInput } from "./osu/pp";
 import type { CommandScoreCreateReplyInput } from "./osu/score";
 import type { OsuIrcBotSendMessageFunc } from "./osu/beatmap";
-import type { TwitchChatHandler } from "../twitch";
 
 export interface CommandOsuGenericDataOsuApiDbPath {
   /**
@@ -104,7 +106,7 @@ export interface OsuChatHandlerData
   extends CommandOsuGenericDataOsuApiDbPath,
     CommandOsuGenericDataOsuApiV2Credentials,
     CommandOsuGenericDataOsuIrcData,
-    CommandGenericDetectorInputEnabledCommands,
+    ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
     CommandCommandsCreateReplyInput,
     CommandNpCreateReplyInput,
     CommandPpRpCreateReplyInput,
@@ -114,7 +116,7 @@ export interface OsuChatHandlerData
     CommandBeatmapRequestsSetUnsetDetectorInput,
     CommandBeatmapRequestsSetUnsetCreateReplyInput {}
 
-export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
+export const osuChatHandler: ChatMessageHandler<OsuChatHandlerData> = async (
   client,
   channel,
   tags,
@@ -128,7 +130,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   // Handle commands
   await Promise.all(
     [commandNp, commandPp, commandRp].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -144,7 +146,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   );
   await Promise.all(
     [commandScore].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -160,7 +162,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   );
   await Promise.all(
     [commandBeatmapRequests].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -176,7 +178,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   );
   await Promise.all(
     [commandBeatmapRequestsSetUnset].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -192,7 +194,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   );
   await Promise.all(
     [commandBeatmapLastRequest].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -208,7 +210,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   );
   await Promise.all(
     [commandBeatmapPermitRequest].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -224,7 +226,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   );
   await Promise.all(
     [commandBeatmap].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,
@@ -240,7 +242,7 @@ export const osuChatHandler: TwitchChatHandler<OsuChatHandlerData> = async (
   );
   await Promise.all(
     [commandCommands].map((command) =>
-      runTwitchCommandHandler(
+      runChatMessageHandlerReplyCreator(
         client,
         channel,
         tags,

@@ -16,14 +16,14 @@ import {
   moonpieCommandReplyLeaderboardErrorNoEntriesFound,
   moonpieCommandReplyLeaderboardPrefix,
 } from "../../info/strings/moonpie/commandReply";
-import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../other/twitch";
+import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../twitch";
 import moonpieDb from "../../database/moonpieDb";
 import { regexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type { CommandMoonpieGenericDataMoonpieDbPath } from "../moonpie";
 import type { RegexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex";
 
@@ -35,9 +35,9 @@ export interface CommandLeaderboardDetectorOutput {
 /**
  * Leaderboard command: Reply with the moonpie count leaderboard list (top 15).
  */
-export const commandLeaderboard: TwitchChatCommandHandler<
+export const commandLeaderboard: ChatMessageHandlerReplyCreator<
   CommandMoonpieGenericDataMoonpieDbPath,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandLeaderboardDetectorOutput
 > = {
   createReply: async (_channel, _tags, data, logger) => {

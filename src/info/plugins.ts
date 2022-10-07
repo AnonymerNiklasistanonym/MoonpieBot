@@ -28,7 +28,7 @@ import {
   pluginsCustomCommandDataGenerator,
   pluginsCustomCommandGenerator,
 } from "./plugins/customDataLogic";
-import { generatePluginInfo } from "../messageParser/plugins";
+import { generatePluginInfo } from "../messageParser";
 import { pluginsOsuGenerator } from "./plugins/osuApi";
 import { pluginsOsuStreamCompanionGenerator } from "./plugins/osuStreamCompanion";
 import { pluginSpotifyGenerator } from "./plugins/spotify";
@@ -38,7 +38,7 @@ import { pluginsTwitchChatGenerator } from "./plugins/twitchChat";
 import type {
   MessageParserPlugin,
   MessageParserPluginInfo,
-} from "../messageParser/plugins";
+} from "../messageParser";
 
 /**
  * The default values for all plugins.

@@ -16,11 +16,11 @@ import {
   regexOsuChatHandlerCommandRequestsSet,
   regexOsuChatHandlerCommandRequestsUnset,
 } from "../../info/regex";
-import { checkTwitchBadgeLevel } from "../../twitch";
+import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { errorMessageOsuApiDbPathUndefined } from "../../error";
 import { OsuRequestsConfig } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import osuRequestsDb from "../../database/osuRequestsDb";
-import { TwitchBadgeLevel } from "../../other/twitchBadgeParser";
+import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
 import type {
   BeatmapRequestsInfo,
@@ -28,12 +28,14 @@ import type {
   CommandOsuGenericDataOsuApiDbPath,
 } from "../osu";
 import type {
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
+import type {
   RegexOsuChatHandlerCommandRequests,
   RegexOsuChatHandlerCommandRequestsSet,
   RegexOsuChatHandlerCommandRequestsUnset,
 } from "../../info/regex";
-import type { CommandGenericDetectorInputEnabledCommands } from "../../twitch";
-import type { TwitchChatCommandHandler } from "../../twitch";
 
 export enum BeatmapRequestsType {
   INFO = "INFO",
@@ -48,10 +50,10 @@ export interface CommandBeatmapRequestsDetectorOutput {
  * Post information about a osu Beatmap in the chat and if existing also show
  * the current top score of the default osu User in the chat.
  */
-export const commandBeatmapRequests: TwitchChatCommandHandler<
+export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
   CommandOsuGenericDataOsuApiDbPath &
     CommandOsuGenericDataExtraBeatmapRequestsInfo,
-  CommandGenericDetectorInputEnabledCommands,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandBeatmapRequestsDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
@@ -299,7 +301,7 @@ export interface CommandBeatmapRequestsSetUnsetDetectorInput {
   enabledCommands: string[];
 }
 
-export const commandBeatmapRequestsSetUnset: TwitchChatCommandHandler<
+export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
   CommandBeatmapRequestsSetUnsetCreateReplyInputExtra,
   CommandBeatmapRequestsSetUnsetDetectorInput,
   CommandBeatmapRequestsSetUnsetDetectorOutput

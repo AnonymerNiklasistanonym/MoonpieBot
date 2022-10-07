@@ -1,30 +1,32 @@
 /*
- * Generic helper functions to handle Twitch chat messages.
+ * Generic helper functions to handle chat messages.
  */
 
 // Type imports
-import type { ChatUserstate, Client } from "tmi.js";
 import type { MacroMap, PluginMap } from "../messageParser";
+import type {
+  ChatUserstate as TwitchChatState,
+  Client as TwitchClient,
+} from "tmi.js";
 import type { EMPTY_OBJECT } from "../other/types";
 import type { Logger } from "winston";
-import type { StringMap } from "../strings";
+import type { StringMap } from "../messageParser";
 
 /**
- * A global type for all Twitch chat (message) handler functions.
- * This makes it really easy to manage changes across the whole bot.
+ * A type for all chat message handler functions.
  *
- * @typeParam DATA The additional data the chat handler needs for execution.
+ * @typeParam DATA The additional data the chat message handler needs for run.
  */
-export type TwitchChatHandler<DATA extends object = EMPTY_OBJECT> = (
+export type ChatMessageHandler<DATA extends object = EMPTY_OBJECT> = (
   /** The Twitch client. */
-  client: Readonly<Client>,
+  client: Readonly<TwitchClient>,
   /** The Twitch channel where the current message was written. */
   channel: Readonly<string>,
   /**
    * The Twitch (user) chat state (the user name/id/badges of the user that
    * wrote the current message).
    */
-  tags: Readonly<ChatUserstate>,
+  tags: Readonly<TwitchChatState>,
   /** The current Twitch message. */
   message: Readonly<string>,
   /** The additional data necessary for execution. */

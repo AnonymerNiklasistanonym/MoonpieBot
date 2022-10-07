@@ -17,9 +17,9 @@ import { macroCommandEnabled } from "../../info/macros/commands";
 import { regexOsuChatHandlerCommandCommands } from "../../info/regex";
 // Type imports
 import type {
-  CommandGenericDetectorInputEnabledCommands,
-  TwitchChatCommandHandler,
-} from "../../twitch";
+  ChatMessageHandlerReplyCreator,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+} from "../../chatMessageHandler";
 import type {
   StreamCompanionConnection,
   StreamCompanionFileData,
@@ -27,7 +27,7 @@ import type {
 } from "../../osuStreamCompanion";
 
 export interface CommandCommandsCreateReplyInput
-  extends CommandGenericDetectorInputEnabledCommands {
+  extends ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands {
   /**
    * If available get the current map data using StreamCompanion.
    */
@@ -36,9 +36,9 @@ export interface CommandCommandsCreateReplyInput
 /**
  * Commands command: Send all available commands of the bot in chat.
  */
-export const commandCommands: TwitchChatCommandHandler<
+export const commandCommands: ChatMessageHandlerReplyCreator<
   CommandCommandsCreateReplyInput,
-  CommandGenericDetectorInputEnabledCommands
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
   createReply: async (_channel, _tags, data) => {
     let streamCompanionInfo:

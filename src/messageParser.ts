@@ -6,19 +6,46 @@ import { parseTreeNode } from "./messageParser/parseTreeNode";
 import type { Logger } from "winston";
 import type { MacroMap } from "./messageParser/macros";
 import type { PluginMap } from "./messageParser/plugins";
-import type { StringMap } from "./strings";
+import type { StringMap } from "./messageParser/strings";
 // Local exports
+export {
+  ParseTreeNodeError,
+  ParseTreeNodeErrorCode,
+} from "./messageParser/errors";
+export {
+  createPluginSignature,
+  generatePlugin,
+  generatePluginMap,
+  generatePluginInfo,
+} from "./messageParser/plugins";
+export { createMessageParserMessage } from "./messageParser/createMessageParserMessage";
 export { generateMacroMap } from "./messageParser/macros";
-export { generatePlugin, generatePluginMap } from "./messageParser/plugins";
-export { generateMacroMapFromMacroGenerator } from "./messageParser/macrosHelper";
+export {
+  checkMacrosForDuplicates,
+  generateMacroMapFromMacroGenerator,
+} from "./messageParser/macrosHelper";
+export {
+  generateStringMap,
+  updateStringsMapWithCustomEnvStrings,
+} from "./messageParser/strings";
 // Type exports
 export type {
+  MacroMap,
+  MessageParserMacro,
   MessageParserMacroDocumentation,
   MessageParserMacroGenerator,
 } from "./messageParser/macros";
-export type { PluginFunc, PluginMap } from "./messageParser/plugins";
-export type { MacroMap } from "./messageParser/macros";
-export type { MessageParserPluginInfo } from "./messageParser/plugins";
+export type {
+  MessageParserPlugin,
+  MessageParserPluginExample,
+  MessageParserPluginGenerator,
+  MessageParserPluginInfo,
+  PluginFunc,
+  PluginMap,
+  PluginSignature,
+} from "./messageParser/plugins";
+export type { StringEntry, StringMap } from "./messageParser/strings";
+export type { MessageForMessageElementPlugin } from "./messageParser/createMessageParserMessage";
 
 /**
  * The logging ID of this module.
