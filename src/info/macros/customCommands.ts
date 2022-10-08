@@ -61,3 +61,36 @@ export const macroCustomCommandInfo: MessageParserMacroGenerator<
   id: "CUSTOM_COMMAND_INFO",
   keys: Object.values(MacroCustomCommandInfo),
 };
+
+export interface MacroCustomCommandInfoEditData {
+  option: string;
+  optionValue: string;
+}
+export enum MacroCustomCommandInfoEdit {
+  OPTION = "OPTION",
+  OPTION_VALUE = "OPTION_VALUE",
+}
+export const macroCustomCommandInfoEdit: MessageParserMacroGenerator<
+  MacroCustomCommandInfoEditData,
+  MacroCustomCommandInfoEdit
+> = {
+  exampleData: {
+    option: "ID",
+    optionValue: "new ID",
+  },
+  generate: (data) =>
+    Object.values(MacroCustomCommandInfoEdit).map((macroId) => {
+      let macroValue;
+      switch (macroId) {
+        case MacroCustomCommandInfoEdit.OPTION:
+          macroValue = data.option;
+          break;
+        case MacroCustomCommandInfoEdit.OPTION_VALUE:
+          macroValue = data.optionValue;
+          break;
+      }
+      return [macroId, macroValue];
+    }),
+  id: "CUSTOM_COMMAND_INFO_EDIT",
+  keys: Object.values(MacroCustomCommandInfoEdit),
+};

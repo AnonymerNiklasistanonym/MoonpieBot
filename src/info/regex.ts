@@ -505,6 +505,22 @@ export interface RegexCustomCommandListOffset {
 export const regexCustomCommandList =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^\s*!listccs?(?:\s+(?<customCommandOffset>[0-9]+?)|\s+(?<customCommandId>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
+export interface RegexCustomCommandEdit {
+  customCommandId: string;
+  customCommandOption: string;
+  customCommandOptionValue: string;
+}
+/**
+ * Regex to recognize the !editcc command.
+ *
+ * @example
+ * ```text
+ * !editcc ID message NEW_MESSAGE
+ * ```
+ */
+export const regexCustomCommandEdit =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!editcc\s+(?<customCommandId>'.+?'|(?!')\S+(?!'))\s+(?<customCommandOption>\S+)\s+(?<customCommandOptionValue>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
 
 export interface RegexCustomBroadcastAdd {
   customBroadcastCronString: string;

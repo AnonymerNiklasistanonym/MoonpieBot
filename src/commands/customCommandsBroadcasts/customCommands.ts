@@ -9,6 +9,7 @@ import {
   customCommandsBroadcastsCommandReplyAddCCAlreadyExists,
   customCommandsBroadcastsCommandReplyCCNotFound,
   customCommandsBroadcastsCommandReplyDelCC,
+  customCommandsBroadcastsCommandReplyEditCC,
   customCommandsBroadcastsCommandReplyInvalidRegex,
   customCommandsBroadcastsCommandReplyListCC,
   customCommandsBroadcastsCommandReplyListCCsEntry,
@@ -23,15 +24,20 @@ import {
   messageParserById,
 } from "../../messageParser";
 import {
+  macroCustomCommandInfo,
+  macroCustomCommandInfoEdit,
+} from "../../info/macros/customCommands";
+import {
   regexCustomCommandAdd,
   regexCustomCommandDelete,
+  regexCustomCommandEdit,
+  RegexCustomCommandEdit,
   RegexCustomCommandList,
   regexCustomCommandList,
   RegexCustomCommandListOffset,
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
-import { macroCustomCommandInfo } from "../../info/macros/customCommands";
 import { parseRegexStringArgument } from "../helper";
 // Type imports
 import type {
@@ -46,6 +52,68 @@ import type {
   RegexCustomCommandAdd,
   RegexCustomCommandDelete,
 } from "../../info/regex";
+
+enum CustomCommandValueOptions {
+  COOLDOWN_IN_S = "cooldownInS",
+  COUNT = "count",
+  DESCRIPTION = "description",
+  ID = "id",
+  MESSAGE = "message",
+  REGEX = "regex",
+  USER_LEVEL = "userLevel",
+}
+const validateCustomCommandValue = (
+  option: CustomCommandValueOptions,
+  optionValue?: string
+): string => {
+  switch (option) {
+    case CustomCommandValueOptions.COOLDOWN_IN_S:
+    case CustomCommandValueOptions.COUNT:
+      if (optionValue === undefined) {
+        throw Error("Number value was undefined!");
+      }
+      // eslint-disable-next-line no-case-declarations
+      const floatValue = parseFloat(optionValue);
+      if (isNaN(floatValue)) {
+        throw Error("Number value was NaN!");
+      }
+      if (!isFinite(floatValue)) {
+        throw Error("Number value was not finite!");
+      }
+      break;
+    case CustomCommandValueOptions.DESCRIPTION:
+    case CustomCommandValueOptions.ID:
+      if (optionValue === undefined) {
+        throw Error("String value was undefined!");
+      }
+      break;
+    case CustomCommandValueOptions.MESSAGE:
+      if (optionValue === undefined) {
+        throw Error("String value was undefined!");
+      }
+      // TODO
+      break;
+    case CustomCommandValueOptions.REGEX:
+      if (optionValue === undefined) {
+        throw Error("String value was undefined!");
+      }
+      try {
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        new RegExp(optionValue, "i");
+      } catch (err) {
+        // TODO Add error information
+        throw Error(`Regex value was bad (${(err as Error).message})!`);
+      }
+      break;
+    case CustomCommandValueOptions.USER_LEVEL:
+      if (optionValue === undefined) {
+        throw Error("String value was undefined!");
+      }
+      // TODO
+      break;
+  }
+  return optionValue;
+};
 
 export interface CommandAddDetectorOutput {
   customCommandCooldownInS?: number;
@@ -80,13 +148,14 @@ export const commandAddCC: ChatMessageHandlerReplyCreator<
       userLevel: data.customCommandUserLevel,
     };
 
-    // TODO Validate message
-
+    // Validate options
+    // TODO Message validation
     try {
-      // eslint-disable-next-line security/detect-non-literal-regexp
-      new RegExp(data.customCommandRegex, "i");
+      validateCustomCommandValue(
+        CustomCommandValueOptions.REGEX,
+        data.customCommandRegex
+      );
     } catch (err) {
-      // TODO Add error information
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(
           macroCustomCommandInfo,
@@ -398,5 +467,143 @@ export const commandListCCs: ChatMessageHandlerReplyCreator<
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
     id: CustomCommandsBroadcastsCommands.LIST_CUSTOM_COMMANDS,
+  },
+};
+
+export interface CommandEditDetectorOutput {
+  customCommandId: string;
+  customCommandOption: string;
+  customCommandOptionValue: string;
+}
+export const commandEditCC: ChatMessageHandlerReplyCreator<
+  CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
+    CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+  CommandEditDetectorOutput
+> = {
+  createReply: async (_channel, tags, data, logger) => {
+    const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
+      tags,
+      TwitchBadgeLevel.MODERATOR
+    );
+    if (twitchBadgeLevelCheck !== undefined) {
+      return twitchBadgeLevelCheck;
+    }
+
+    const exists =
+      await customCommandsBroadcastsDb.requests.customCommand.existsEntry(
+        data.customCommandsBroadcastsDbPath,
+        { id: data.customCommandId },
+        logger
+      );
+    if (!exists) {
+      return {
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroCustomCommandInfo,
+          { id: data.customCommandId }
+        ),
+        messageId: customCommandsBroadcastsCommandReplyCCNotFound.id,
+      };
+    }
+
+    let option: undefined | CustomCommandValueOptions;
+    for (const value of Object.values(CustomCommandValueOptions)) {
+      if (value.toLowerCase() === data.customCommandOption.toLowerCase()) {
+        option = value;
+      }
+    }
+
+    if (option === undefined) {
+      throw Error(
+        `Unknown set option '${
+          data.customCommandOption
+        }' (supported: ${Object.values(CustomCommandValueOptions).join(",")})`
+      );
+    }
+
+    // Validate options
+    validateCustomCommandValue(option, data.customCommandOptionValue);
+
+    await customCommandsBroadcastsDb.requests.customCommand.updateEntry(
+      data.customCommandsBroadcastsDbPath,
+      {
+        cooldownInS:
+          option === CustomCommandValueOptions.COOLDOWN_IN_S
+            ? parseFloat(data.customCommandOptionValue)
+            : undefined,
+        countNew:
+          option === CustomCommandValueOptions.COUNT
+            ? parseInt(data.customCommandOptionValue)
+            : undefined,
+        description:
+          option === CustomCommandValueOptions.DESCRIPTION
+            ? data.customCommandOptionValue
+            : undefined,
+        id: data.customCommandId,
+        idNew:
+          option === CustomCommandValueOptions.ID
+            ? data.customCommandOptionValue
+            : undefined,
+        message:
+          option === CustomCommandValueOptions.MESSAGE
+            ? data.customCommandOptionValue
+            : undefined,
+        regex:
+          option === CustomCommandValueOptions.REGEX
+            ? data.customCommandOptionValue
+            : undefined,
+        userLevel:
+          option === CustomCommandValueOptions.USER_LEVEL
+            ? convertTwitchBadgeStringToLevel(data.customCommandOptionValue)
+            : undefined,
+      },
+      logger
+    );
+    data.customCommandsBroadcastsRefreshHelper.refreshCustomCommands = true;
+
+    return {
+      additionalMacros: new Map([
+        ...generateMacroMapFromMacroGenerator(macroCustomCommandInfo, {
+          id: data.customCommandId,
+        }),
+        ...generateMacroMapFromMacroGenerator(macroCustomCommandInfoEdit, {
+          option,
+          optionValue: data.customCommandOptionValue,
+        }),
+      ]),
+      messageId: customCommandsBroadcastsCommandReplyEditCC.id,
+    };
+  },
+  detect: (_tags, message, data) => {
+    if (
+      !data.enabledCommands.includes(
+        CustomCommandsBroadcastsCommands.EDIT_CUSTOM_COMMAND
+      )
+    ) {
+      return false;
+    }
+    const match = message.match(regexCustomCommandEdit);
+    if (match) {
+      const matchGroups = match.groups as undefined | RegexCustomCommandEdit;
+      if (!matchGroups) {
+        throw Error("RegexCustomCommandEdit groups undefined");
+      }
+      return {
+        data: {
+          customCommandId: parseRegexStringArgument(
+            matchGroups.customCommandId
+          ),
+          customCommandOption: matchGroups.customCommandOption,
+          customCommandOptionValue: parseRegexStringArgument(
+            matchGroups.customCommandOptionValue
+          ),
+        },
+      };
+    }
+    return false;
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
+    id: CustomCommandsBroadcastsCommands.EDIT_CUSTOM_COMMAND,
   },
 };

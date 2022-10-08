@@ -1,5 +1,9 @@
 // Local imports
 import {
+  macroCustomCommandInfo,
+  macroCustomCommandInfoEdit,
+} from "./macros/customCommands";
+import {
   macroMoonpieClaim,
   macroMoonpieLeaderboard,
   macroMoonpieLeaderboardEntry,
@@ -25,7 +29,6 @@ import {
 import { checkMacrosForDuplicates } from "../messageParser";
 import { macroCommandEnabled } from "./macros/commands";
 import { macroCustomBroadcastInfo } from "./macros/customBroadcast";
-import { macroCustomCommandInfo } from "./macros/customCommands";
 import { macroMoonpieBot } from "./macros/moonpiebot";
 import { macroOsuPpRpRequest } from "./macros/osuPpRpRequest";
 import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
@@ -54,6 +57,7 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
     "default-optional",
     macroCustomBroadcastInfo,
     macroCustomCommandInfo,
+    macroCustomCommandInfoEdit,
     macroMoonpieClaim,
     macroCommandEnabled,
     macroMoonpieLeaderboard,

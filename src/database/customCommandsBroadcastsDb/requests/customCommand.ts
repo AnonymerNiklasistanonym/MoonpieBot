@@ -289,6 +289,7 @@ export interface UpdateInput {
   countNew?: number;
   description?: string;
   id: string;
+  idNew?: string;
   message?: string;
   regex?: string;
   timestampLastExecution?: number;
@@ -326,6 +327,10 @@ export const updateEntry = async (
   if (input.description !== undefined) {
     columns.push(customCommandsTable.columns.description.name);
     values.push(input.description);
+  }
+  if (input.idNew !== undefined) {
+    columns.push(customCommandsTable.columns.id.name);
+    values.push(input.idNew);
   }
   if (input.message !== undefined) {
     columns.push(customCommandsTable.columns.message.name);

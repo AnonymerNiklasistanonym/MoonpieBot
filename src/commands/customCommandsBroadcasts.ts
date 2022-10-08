@@ -8,6 +8,7 @@ import {
 import {
   commandAddCC,
   commandDelCC,
+  commandEditCC,
   commandListCCs,
 } from "./customCommandsBroadcasts/customCommands";
 import { commandCommands } from "./customCommandsBroadcasts/commands";
@@ -92,6 +93,22 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
   );
   await Promise.all(
     [commandDelCC].map((command) =>
+      runChatMessageHandlerReplyCreator(
+        client,
+        channel,
+        tags,
+        message,
+        data,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
+  await Promise.all(
+    [commandEditCC].map((command) =>
       runChatMessageHandlerReplyCreator(
         client,
         channel,

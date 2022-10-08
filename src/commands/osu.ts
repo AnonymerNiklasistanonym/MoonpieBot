@@ -17,10 +17,6 @@ import type {
   ChatMessageHandler,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
 } from "../chatMessageHandler";
-import type {
-  CommandBeatmapRequestsSetUnsetCreateReplyInput,
-  CommandBeatmapRequestsSetUnsetDetectorInput,
-} from "./osu/requests";
 import type { Beatmap } from "osu-api-v2";
 import type { CommandBeatmapCreateReplyInput } from "./osu/beatmap";
 import type { CommandBeatmapLastRequestCreateReplyInput } from "./osu/lastRequest";
@@ -112,9 +108,7 @@ export interface OsuChatHandlerData
     CommandPpRpCreateReplyInput,
     CommandScoreCreateReplyInput,
     CommandBeatmapCreateReplyInput,
-    CommandBeatmapLastRequestCreateReplyInput,
-    CommandBeatmapRequestsSetUnsetDetectorInput,
-    CommandBeatmapRequestsSetUnsetCreateReplyInput {}
+    CommandBeatmapLastRequestCreateReplyInput {}
 
 export const osuChatHandler: ChatMessageHandler<OsuChatHandlerData> = async (
   client,

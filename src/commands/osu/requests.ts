@@ -259,10 +259,8 @@ const validateSetValue = (
   }
 };
 
-export type CommandBeatmapRequestsSetUnsetCreateReplyInput =
-  CommandOsuGenericDataOsuApiDbPath;
 export interface CommandBeatmapRequestsSetUnsetCreateReplyInputExtra
-  extends CommandBeatmapRequestsSetUnsetCreateReplyInput {
+  extends CommandOsuGenericDataOsuApiDbPath {
   beatmapRequestsInfo: BeatmapRequestsInfo;
 }
 export enum BeatmapRequestsSetUnsetType {
@@ -274,13 +272,10 @@ export interface CommandBeatmapRequestsSetUnsetDetectorOutput {
   beatmapRequestsSetOptionValue?: string;
   beatmapRequestsSetType: BeatmapRequestsSetUnsetType;
 }
-export interface CommandBeatmapRequestsSetUnsetDetectorInput {
-  enabledCommands: string[];
-}
 
 export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
   CommandBeatmapRequestsSetUnsetCreateReplyInputExtra,
-  CommandBeatmapRequestsSetUnsetDetectorInput,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandBeatmapRequestsSetUnsetDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {

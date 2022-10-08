@@ -11,6 +11,8 @@ import {
 import {
   MacroCustomCommandInfo,
   macroCustomCommandInfo,
+  MacroCustomCommandInfoEdit,
+  macroCustomCommandInfoEdit,
 } from "../../macros/customCommands";
 import { CUSTOM_COMMANDS_BROADCASTS_STRING_ID } from "../customCommandsBroadcasts";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
@@ -76,6 +78,31 @@ export const customCommandsBroadcastsCommandReplyDelCC: StringEntry = {
     ")",
   ]),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_DEL_CC`,
+};
+export const customCommandsBroadcastsCommandReplyEditCC: StringEntry = {
+  default: createMessageParserMessage<
+    MacroCustomCommandInfo | MacroCustomCommandInfoEdit
+  >([
+    "@",
+    { name: PluginTwitchChat.USER, type: "plugin" },
+    " You edited a command (",
+    generateMessageParserMessageMacro(
+      macroCustomCommandInfo,
+      MacroCustomCommandInfo.ID
+    ),
+    "): '",
+    generateMessageParserMessageMacro(
+      macroCustomCommandInfoEdit,
+      MacroCustomCommandInfoEdit.OPTION
+    ),
+    "' => ",
+    generateMessageParserMessageMacro(
+      macroCustomCommandInfoEdit,
+      MacroCustomCommandInfoEdit.OPTION_VALUE
+    ),
+    "'",
+  ]),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_EDIT_CC`,
 };
 export const customCommandsBroadcastsCommandReplyCCNotFound: StringEntry = {
   default: createMessageParserMessage<MacroCustomCommandInfo>([
@@ -206,6 +233,32 @@ export const customCommandsBroadcastsCommandReplyListCC: StringEntry = {
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CC_LIST`,
 };
 
+export const customCommandsBroadcastsCommandReplyEditCB: StringEntry = {
+  default: createMessageParserMessage<
+    MacroCustomBroadcastInfo | MacroCustomCommandInfoEdit
+  >([
+    "@",
+    { name: PluginTwitchChat.USER, type: "plugin" },
+    " You edited a broadcast (",
+    generateMessageParserMessageMacro(
+      macroCustomBroadcastInfo,
+      MacroCustomBroadcastInfo.ID
+    ),
+    "): '",
+    generateMessageParserMessageMacro(
+      macroCustomCommandInfoEdit,
+      MacroCustomCommandInfoEdit.OPTION
+    ),
+    "' => ",
+    generateMessageParserMessageMacro(
+      macroCustomCommandInfoEdit,
+      MacroCustomCommandInfoEdit.OPTION_VALUE
+    ),
+    "'",
+  ]),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_EDIT_CB`,
+};
+
 export const customCommandsBroadcastsCommandReplyListCBsPrefix: StringEntry = {
   default: createMessageParserMessage(
     ["@", { name: PluginTwitchChat.USER, type: "plugin" }, " "],
@@ -255,6 +308,8 @@ export const customCommandsBroadcastsCommandReply: StringEntry[] = [
   customCommandsBroadcastsCommandReplyInvalidCronString,
   customCommandsBroadcastsCommandReplyCBNotFound,
   customCommandsBroadcastsCommandReplyDelCB,
+  customCommandsBroadcastsCommandReplyEditCC,
+  customCommandsBroadcastsCommandReplyEditCB,
   customCommandsBroadcastsCommandReplyAddCC,
   customCommandsBroadcastsCommandReplyAddCCAlreadyExists,
   customCommandsBroadcastsCommandReplyInvalidRegex,
