@@ -57,3 +57,19 @@ export enum OsuRequestsDbError {
   NOT_FOUND = "OSU_REQUESTS_CONFIG_NOT_FOUND",
   NO_ACCESS = "OSU_REQUESTS_CONFIG_NO_ACCESS",
 }
+/**
+ * All possible requests configuration options (It's in this file in case of
+ * changes are being made so that a migration can be done).
+ */
+export enum OsuRequestsConfig {
+  AR_MAX = "arMax",
+  AR_MIN = "arMin",
+  CS_MAX = "csMax",
+  CS_MIN = "csMin",
+  LENGTH_IN_MIN_MAX = "lengthInMinMax",
+  LENGTH_IN_MIN_MIN = "lengthInMinMin",
+  MESSAGE_OFF = "messageOff",
+  MESSAGE_ON = "messageOn",
+  STAR_MAX = "starMax",
+  STAR_MIN = "starMin",
+}

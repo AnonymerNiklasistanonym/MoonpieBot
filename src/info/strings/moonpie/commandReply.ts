@@ -1,4 +1,9 @@
 // Local imports
+import {
+  createMessageParserMessage,
+  generateMessageParserMessageMacro,
+  generateMessageParserMessageReference,
+} from "../../../messageParser";
 import { MacroMoonpieBot, macroMoonpieBot } from "../../macros/moonpiebot";
 import {
   MacroMoonpieClaim,
@@ -14,7 +19,6 @@ import {
   pluginIfNotUndefined,
   pluginTimeInSToHumanReadableStringShort,
 } from "../../plugins/general";
-import { createMessageParserMessage } from "../../../messageParser";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
@@ -23,38 +27,36 @@ import type { StringEntry } from "../../../messageParser";
 const MOONPIE_COMMAND_REPLY_STRING_ID = `${MOONPIE_STRING_ID}_COMMAND_REPLY`;
 
 export const moonpieCommandReplyAbout: StringEntry = {
-  default: createMessageParserMessage([
+  default: createMessageParserMessage<MacroMoonpieBot>([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",
-    { key: MacroMoonpieBot.NAME, name: macroMoonpieBot.id, type: "macro" },
+    generateMessageParserMessageMacro(macroMoonpieBot, MacroMoonpieBot.NAME),
     " ",
-    { key: MacroMoonpieBot.VERSION, name: macroMoonpieBot.id, type: "macro" },
+    generateMessageParserMessageMacro(macroMoonpieBot, MacroMoonpieBot.VERSION),
     " (",
-    { key: MacroMoonpieBot.URL, name: macroMoonpieBot.id, type: "macro" },
+    generateMessageParserMessageMacro(macroMoonpieBot, MacroMoonpieBot.URL),
     ")",
   ]),
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ABOUT`,
 };
 
 export const moonpieCommandReplyClaim: StringEntry = {
-  default: createMessageParserMessage([
+  default: createMessageParserMessage<MacroMoonpieLeaderboardEntry>([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " You just claimed a moonpie! You have now ",
-    {
-      key: MacroMoonpieLeaderboardEntry.COUNT,
-      name: macroMoonpieLeaderboardEntry.id,
-      type: "macro",
-    },
+    generateMessageParserMessageMacro(
+      macroMoonpieLeaderboardEntry,
+      MacroMoonpieLeaderboardEntry.COUNT
+    ),
     " moonpie",
     {
       args: [
-        {
-          key: MacroMoonpieLeaderboardEntry.COUNT,
-          name: macroMoonpieLeaderboardEntry.id,
-          type: "macro",
-        },
+        generateMessageParserMessageMacro(
+          macroMoonpieLeaderboardEntry,
+          MacroMoonpieLeaderboardEntry.COUNT
+        ),
         "!==1",
       ],
       name: pluginIfNotEqual.id,
@@ -62,45 +64,43 @@ export const moonpieCommandReplyClaim: StringEntry = {
       type: "plugin",
     },
     " and are rank ",
-    {
-      key: MacroMoonpieLeaderboardEntry.RANK,
-      name: macroMoonpieLeaderboardEntry.id,
-      type: "macro",
-    },
+    generateMessageParserMessageMacro(
+      macroMoonpieLeaderboardEntry,
+      MacroMoonpieLeaderboardEntry.RANK
+    ),
     " on the leaderboard!",
   ]),
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_CLAIM`,
 };
 
 const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
-  default: createMessageParserMessage(
+  default: createMessageParserMessage<
+    MacroMoonpieClaim | MacroMoonpieLeaderboardEntry
+  >(
     [
       "You already claimed a moonpie for today (",
       {
-        args: {
-          key: MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S,
-          name: macroMoonpieClaim.id,
-          type: "macro",
-        },
+        args: generateMessageParserMessageMacro(
+          macroMoonpieClaim,
+          MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S
+        ),
         name: pluginTimeInSToHumanReadableStringShort.id,
         type: "plugin",
       },
       " ago - next claim can be made in ",
       {
-        args: {
-          key: MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S,
-          name: macroMoonpieClaim.id,
-          type: "macro",
-        },
+        args: generateMessageParserMessageMacro(
+          macroMoonpieClaim,
+          MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S
+        ),
         name: pluginTimeInSToHumanReadableStringShort.id,
         type: "plugin",
       },
       ") and are rank ",
-      {
-        key: MacroMoonpieLeaderboardEntry.RANK,
-        name: macroMoonpieLeaderboardEntry.id,
-        type: "macro",
-      },
+      generateMessageParserMessageMacro(
+        macroMoonpieLeaderboardEntry,
+        MacroMoonpieLeaderboardEntry.RANK
+      ),
       " on the leaderboard!",
     ],
     true
@@ -131,10 +131,9 @@ export const moonpieCommandReplyAlreadyClaimed: StringEntry = {
         `===${starTwitchId}`,
       ],
       name: pluginIfEqual.id,
-      scope: {
-        name: moonpieCommandReplyAlreadyClaimedRefStar.id,
-        type: "reference",
-      },
+      scope: generateMessageParserMessageReference(
+        moonpieCommandReplyAlreadyClaimedRefStar
+      ),
       type: "plugin",
     },
     {
@@ -143,10 +142,9 @@ export const moonpieCommandReplyAlreadyClaimed: StringEntry = {
         `!==${starTwitchId}`,
       ],
       name: pluginIfNotEqual.id,
-      scope: {
-        name: moonpieCommandReplyAlreadyClaimedRefNormal.id,
-        type: "reference",
-      },
+      scope: generateMessageParserMessageReference(
+        moonpieCommandReplyAlreadyClaimedRefNormal
+      ),
       type: "plugin",
     },
   ]),
@@ -162,25 +160,22 @@ export const moonpieCommandReplyLeaderboardPrefix: StringEntry = {
 };
 
 export const moonpieCommandReplyLeaderboardEntry: StringEntry = {
-  default: createMessageParserMessage(
+  default: createMessageParserMessage<MacroMoonpieLeaderboardEntry>(
     [
-      {
-        key: MacroMoonpieLeaderboardEntry.RANK,
-        name: macroMoonpieLeaderboardEntry.id,
-        type: "macro",
-      },
+      generateMessageParserMessageMacro(
+        macroMoonpieLeaderboardEntry,
+        MacroMoonpieLeaderboardEntry.RANK
+      ),
       ". ",
-      {
-        key: MacroMoonpieLeaderboardEntry.NAME,
-        name: macroMoonpieLeaderboardEntry.id,
-        type: "macro",
-      },
+      generateMessageParserMessageMacro(
+        macroMoonpieLeaderboardEntry,
+        MacroMoonpieLeaderboardEntry.NAME
+      ),
       " (",
-      {
-        key: MacroMoonpieLeaderboardEntry.COUNT,
-        name: macroMoonpieLeaderboardEntry.id,
-        type: "macro",
-      },
+      generateMessageParserMessageMacro(
+        macroMoonpieLeaderboardEntry,
+        MacroMoonpieLeaderboardEntry.COUNT
+      ),
       ")",
     ],
     true
@@ -189,22 +184,20 @@ export const moonpieCommandReplyLeaderboardEntry: StringEntry = {
 };
 
 export const moonpieCommandReplyLeaderboardErrorNoEntriesFound: StringEntry = {
-  default: createMessageParserMessage([
+  default: createMessageParserMessage<MacroMoonpieLeaderboard>([
     "No leaderboard entries were found",
     {
-      args: {
-        key: MacroMoonpieLeaderboard.STARTING_RANK,
-        name: macroMoonpieLeaderboard.id,
-        type: "macro",
-      },
+      args: generateMessageParserMessageMacro(
+        macroMoonpieLeaderboard,
+        MacroMoonpieLeaderboard.STARTING_RANK
+      ),
       name: pluginIfNotUndefined.id,
       scope: [
         " (starting from rank ",
-        {
-          key: MacroMoonpieLeaderboard.STARTING_RANK,
-          name: macroMoonpieLeaderboard.id,
-          type: "macro",
-        },
+        generateMessageParserMessageMacro(
+          macroMoonpieLeaderboard,
+          MacroMoonpieLeaderboard.STARTING_RANK
+        ),
         ")",
       ],
       type: "plugin",

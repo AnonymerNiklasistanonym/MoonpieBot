@@ -5,15 +5,14 @@ export interface MacroCommandsEnabledData<ENUM_TYPE> {
   convertEnumValueToInfo: (enumValue: ENUM_TYPE) => [string, boolean];
   enumValues: ENUM_TYPE[];
 }
-
 enum MacroCommandEnabledExample {
   ABOUT = "COMMAND_ABOUT",
   COMMANDS = "COMMAND_COMMANDS",
   HELP = "COMMAND_HELP",
 }
-
 export const macroCommandEnabled: MessageParserMacroGenerator<
-  MacroCommandsEnabledData<string>
+  MacroCommandsEnabledData<string>,
+  string
 > = {
   description:
     "Available in !commands commands to see what commands are enabled",

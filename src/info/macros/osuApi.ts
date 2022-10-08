@@ -7,17 +7,23 @@ import { roundNumber } from "../../other/round";
 //import { writeJsonFile } from "../../other/fileOperations";
 // Type imports
 import type { Beatmap, BeatmapUserScore } from "osu-api-v2";
-import type { MessageParserMacroGenerator } from "../../messageParser";
+import type {
+  MacroDictionaryEntry,
+  MessageParserMacroGenerator,
+} from "../../messageParser";
 
-export enum MacroOsuApi {
-  DEFAULT_USER_ID = "DEFAULT_USER_ID",
-}
 export interface MacroOsuApiData {
   osuApiDefaultId: string;
 }
-export const macroOsuApi: MessageParserMacroGenerator<MacroOsuApiData> = {
+export enum MacroOsuApi {
+  DEFAULT_USER_ID = "DEFAULT_USER_ID",
+}
+export const macroOsuApi: MessageParserMacroGenerator<
+  MacroOsuApiData,
+  MacroOsuApi
+> = {
   generate: (data) =>
-    Object.values(MacroOsuApi).map<[MacroOsuApi, string]>((macroId) => {
+    Object.values(MacroOsuApi).map((macroId) => {
       let macroValue;
       switch (macroId) {
         case MacroOsuApi.DEFAULT_USER_ID:
@@ -49,6 +55,9 @@ const mapRankStatusIntToStr = (rankStatusInt: RankStatusInt) => {
   }
 };
 
+export interface MacroOsuBeatmapData {
+  beatmap: Beatmap;
+}
 export enum MacroOsuBeatmap {
   ACC = "ACC",
   AR = "AR",
@@ -75,112 +84,112 @@ export enum MacroOsuBeatmap {
   URL = "URL",
   VERSION = "VERSION",
 }
-export interface MacroOsuBeatmapData {
-  beatmap: Beatmap;
+export const macroOsuBeatmap: MessageParserMacroGenerator<
+  MacroOsuBeatmapData,
+  MacroOsuBeatmap
+> = {
+  generate: (data) => {
+    const beatmapUpdate = new Date(data.beatmap.last_updated);
+
+    return Object.values(MacroOsuBeatmap).map((macroId) => {
+      let macroValue;
+      switch (macroId) {
+        case MacroOsuBeatmap.ACC:
+          macroValue = roundNumber(data.beatmap.accuracy, 1);
+          break;
+        case MacroOsuBeatmap.AR:
+          macroValue = roundNumber(data.beatmap.ar, 1);
+          break;
+        case MacroOsuBeatmap.ARTIST:
+          macroValue = data.beatmap.beatmapset?.artist;
+          break;
+        case MacroOsuBeatmap.BPM:
+          macroValue = data.beatmap.bpm;
+          break;
+        case MacroOsuBeatmap.CC:
+          macroValue = data.beatmap.count_circles;
+          break;
+        case MacroOsuBeatmap.CREATOR_USER_NAME:
+          macroValue = data.beatmap.beatmapset?.creator;
+          break;
+        case MacroOsuBeatmap.CS:
+          macroValue = roundNumber(data.beatmap.cs, 1);
+          break;
+        case MacroOsuBeatmap.DIFFICULTY_RATING:
+          macroValue = roundNumber(data.beatmap.difficulty_rating, 1);
+          break;
+        case MacroOsuBeatmap.DRAIN:
+          macroValue = roundNumber(data.beatmap.drain, 1);
+          break;
+        case MacroOsuBeatmap.HAS_LEADERBOARD:
+          macroValue =
+            data.beatmap.ranked === RankStatusInt.APPROVED ||
+            data.beatmap.ranked === RankStatusInt.LOVED ||
+            data.beatmap.ranked === RankStatusInt.QUALIFIED ||
+            data.beatmap.ranked === RankStatusInt.RANKED;
+          break;
+        case MacroOsuBeatmap.ID:
+          macroValue = data.beatmap.id;
+          break;
+        case MacroOsuBeatmap.LAST_UPDATED_MONTH:
+          macroValue = monthNames[beatmapUpdate.getMonth()];
+          break;
+        case MacroOsuBeatmap.LAST_UPDATED_YEAR:
+          macroValue = beatmapUpdate.getFullYear();
+          break;
+        case MacroOsuBeatmap.LENGTH_IN_S:
+          macroValue = data.beatmap.total_length;
+          break;
+        case MacroOsuBeatmap.MAX_COMBO:
+          macroValue = data.beatmap.max_combo;
+          break;
+        case MacroOsuBeatmap.PASS_COUNT:
+          macroValue = data.beatmap.passcount;
+          break;
+        case MacroOsuBeatmap.PLAY_COUNT:
+          macroValue = data.beatmap.playcount;
+          break;
+        case MacroOsuBeatmap.RANKED_STATUS:
+          macroValue = mapRankStatusIntToStr(data.beatmap.ranked);
+          break;
+        case MacroOsuBeatmap.SET_ID:
+          macroValue = data.beatmap.beatmapset?.id;
+          break;
+        case MacroOsuBeatmap.SLC:
+          macroValue = data.beatmap.count_sliders;
+          break;
+        case MacroOsuBeatmap.SPC:
+          macroValue = data.beatmap.count_spinners;
+          break;
+        case MacroOsuBeatmap.TITLE:
+          macroValue = data.beatmap.beatmapset?.title;
+          break;
+        case MacroOsuBeatmap.URL:
+          macroValue = data.beatmap.url;
+          break;
+        case MacroOsuBeatmap.VERSION:
+          macroValue = data.beatmap.version;
+          break;
+      }
+      if (typeof macroValue === "boolean") {
+        macroValue = macroValue ? "true" : "false";
+      }
+      if (typeof macroValue === "undefined") {
+        macroValue = "undefined";
+      }
+      if (typeof macroValue === "number") {
+        macroValue = `${macroValue}`;
+      }
+      return [macroId, macroValue];
+    });
+  },
+  id: "OSU_BEATMAP",
+  keys: Object.values(MacroOsuBeatmap),
+};
+
+export interface MacroOsuScoreData {
+  beatmapScore?: BeatmapUserScore;
 }
-export const macroOsuBeatmap: MessageParserMacroGenerator<MacroOsuBeatmapData> =
-  {
-    generate: (data) => {
-      const beatmapUpdate = new Date(data.beatmap.last_updated);
-
-      return Object.values(MacroOsuBeatmap).map<[MacroOsuBeatmap, string]>(
-        (macroId) => {
-          let macroValue;
-          switch (macroId) {
-            case MacroOsuBeatmap.ACC:
-              macroValue = roundNumber(data.beatmap.accuracy, 1);
-              break;
-            case MacroOsuBeatmap.AR:
-              macroValue = roundNumber(data.beatmap.ar, 1);
-              break;
-            case MacroOsuBeatmap.ARTIST:
-              macroValue = data.beatmap.beatmapset?.artist;
-              break;
-            case MacroOsuBeatmap.BPM:
-              macroValue = data.beatmap.bpm;
-              break;
-            case MacroOsuBeatmap.CC:
-              macroValue = data.beatmap.count_circles;
-              break;
-            case MacroOsuBeatmap.CREATOR_USER_NAME:
-              macroValue = data.beatmap.beatmapset?.creator;
-              break;
-            case MacroOsuBeatmap.CS:
-              macroValue = roundNumber(data.beatmap.cs, 1);
-              break;
-            case MacroOsuBeatmap.DIFFICULTY_RATING:
-              macroValue = roundNumber(data.beatmap.difficulty_rating, 1);
-              break;
-            case MacroOsuBeatmap.DRAIN:
-              macroValue = roundNumber(data.beatmap.drain, 1);
-              break;
-            case MacroOsuBeatmap.HAS_LEADERBOARD:
-              macroValue =
-                data.beatmap.ranked === RankStatusInt.APPROVED ||
-                data.beatmap.ranked === RankStatusInt.LOVED ||
-                data.beatmap.ranked === RankStatusInt.QUALIFIED ||
-                data.beatmap.ranked === RankStatusInt.RANKED;
-              break;
-            case MacroOsuBeatmap.ID:
-              macroValue = data.beatmap.id;
-              break;
-            case MacroOsuBeatmap.LAST_UPDATED_MONTH:
-              macroValue = monthNames[beatmapUpdate.getMonth()];
-              break;
-            case MacroOsuBeatmap.LAST_UPDATED_YEAR:
-              macroValue = beatmapUpdate.getFullYear();
-              break;
-            case MacroOsuBeatmap.LENGTH_IN_S:
-              macroValue = data.beatmap.total_length;
-              break;
-            case MacroOsuBeatmap.MAX_COMBO:
-              macroValue = data.beatmap.max_combo;
-              break;
-            case MacroOsuBeatmap.PASS_COUNT:
-              macroValue = data.beatmap.passcount;
-              break;
-            case MacroOsuBeatmap.PLAY_COUNT:
-              macroValue = data.beatmap.playcount;
-              break;
-            case MacroOsuBeatmap.RANKED_STATUS:
-              macroValue = mapRankStatusIntToStr(data.beatmap.ranked);
-              break;
-            case MacroOsuBeatmap.SET_ID:
-              macroValue = data.beatmap.beatmapset?.id;
-              break;
-            case MacroOsuBeatmap.SLC:
-              macroValue = data.beatmap.count_sliders;
-              break;
-            case MacroOsuBeatmap.SPC:
-              macroValue = data.beatmap.count_spinners;
-              break;
-            case MacroOsuBeatmap.TITLE:
-              macroValue = data.beatmap.beatmapset?.title;
-              break;
-            case MacroOsuBeatmap.URL:
-              macroValue = data.beatmap.url;
-              break;
-            case MacroOsuBeatmap.VERSION:
-              macroValue = data.beatmap.version;
-              break;
-          }
-          if (typeof macroValue === "boolean") {
-            macroValue = macroValue ? "true" : "false";
-          }
-          if (typeof macroValue === "undefined") {
-            macroValue = "undefined";
-          }
-          if (typeof macroValue === "number") {
-            macroValue = `${macroValue}`;
-          }
-          return [macroId, macroValue];
-        }
-      );
-    },
-    id: "OSU_BEATMAP",
-    keys: Object.values(MacroOsuBeatmap),
-  };
-
 export enum MacroOsuScore {
   ACC = "ACC",
   ARTIST = "ARTIST",
@@ -197,6 +206,7 @@ export enum MacroOsuScore {
   HAS_REPLAY = "HAS_REPLAY",
   ID = "ID",
   MAX_COMBO = "MAX_COMBO",
+  /** Empty string if no mods are found. */
   MODS = "MODS",
   PASSED = "PASSED",
   PP = "PP",
@@ -206,115 +216,21 @@ export enum MacroOsuScore {
   USER_NAME = "USER_NAME",
   VERSION = "VERSION",
 }
-export interface MacroOsuScoreData {
-  beatmapScore?: BeatmapUserScore;
-}
-export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
+export const macroOsuScore: MessageParserMacroGenerator<
+  MacroOsuScoreData,
+  MacroOsuScore
+> = {
   generate: (data) => {
     const beatmapScore = data.beatmapScore;
     if (beatmapScore === undefined) {
-      return Object.values(MacroOsuScore).map<[MacroOsuScore, string]>(
-        (macroId) => {
-          let macroValue;
-          switch (macroId) {
-            case MacroOsuScore.EXISTS:
-              macroValue = false;
-              break;
-            default:
-              macroValue = undefined;
-              break;
-          }
-          if (typeof macroValue === "boolean") {
-            macroValue = macroValue ? "true" : "false";
-          }
-          if (typeof macroValue === "undefined") {
-            macroValue = "undefined";
-          }
-          return [macroId, macroValue];
-        }
-      );
-    }
-
-    const score = beatmapScore.score;
-    const scoreDate = new Date(score.created_at);
-    const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
-
-    return Object.values(MacroOsuScore).map<[MacroOsuScore, string]>(
-      (macroId) => {
+      return Object.values(MacroOsuScore).map((macroId) => {
         let macroValue;
         switch (macroId) {
-          case MacroOsuScore.ACC:
-            macroValue = roundNumber(score.accuracy * 100, 1);
-            break;
-          case MacroOsuScore.ARTIST:
-            macroValue = score.beatmapset?.artist;
-            break;
-          case MacroOsuScore.BEATMAP_ID:
-            macroValue = score.beatmap?.id;
-            break;
-          case MacroOsuScore.COUNT_100:
-            macroValue = score.statistics.count_100;
-            break;
-          case MacroOsuScore.COUNT_300:
-            macroValue = score.statistics.count_300;
-            break;
-          case MacroOsuScore.COUNT_50:
-            macroValue = score.statistics.count_50;
-            break;
-          case MacroOsuScore.COUNT_MISS:
-            macroValue = score.statistics.count_miss;
-            break;
-          case MacroOsuScore.DATE_MONTH:
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            macroValue = monthNames[scoreDate.getMonth()];
-            break;
-          case MacroOsuScore.DATE_YEAR:
-            macroValue = scoreDate.getFullYear();
-            break;
           case MacroOsuScore.EXISTS:
-            macroValue =
-              beatmapScore.position !== undefined &&
-              beatmapScore.position !== -1;
+            macroValue = false;
             break;
-          case MacroOsuScore.FC:
-            macroValue = score.perfect;
-            break;
-          //case MacroOsuScore.GLOBAL_RANK:
-          //  break;
-          case MacroOsuScore.HAS_REPLAY:
-            macroValue = score.replay;
-            break;
-          case MacroOsuScore.ID:
-            macroValue = score.id;
-            break;
-          case MacroOsuScore.MAX_COMBO:
-            macroValue = score.max_combo;
-            break;
-          case MacroOsuScore.MODS:
-            macroValue = score.mods.join(",");
-            break;
-          case MacroOsuScore.PASSED:
-            macroValue = score.passed;
-            break;
-          case MacroOsuScore.PP:
-            if (score.pp !== null && score.pp !== undefined) {
-              macroValue = roundNumber(score.pp, 1);
-            }
-            break;
-          case MacroOsuScore.RANK:
-            macroValue = score.rank;
-            break;
-          case MacroOsuScore.TIME_IN_S_AGO:
-            macroValue = roundNumber(scoreDateRangeMs / 1000, 0);
-            break;
-          case MacroOsuScore.USER_ID:
-            macroValue = score.user?.id;
-            break;
-          case MacroOsuScore.USER_NAME:
-            macroValue = score.user?.username;
-            break;
-          case MacroOsuScore.VERSION:
-            macroValue = score.beatmap?.version;
+          default:
+            macroValue = undefined;
             break;
         }
         if (typeof macroValue === "boolean") {
@@ -323,17 +239,109 @@ export const macroOsuScore: MessageParserMacroGenerator<MacroOsuScoreData> = {
         if (typeof macroValue === "undefined") {
           macroValue = "undefined";
         }
-        if (typeof macroValue === "number") {
-          macroValue = `${macroValue}`;
-        }
         return [macroId, macroValue];
+      });
+    }
+
+    const score = beatmapScore.score;
+    const scoreDate = new Date(score.created_at);
+    const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
+
+    return Object.values(MacroOsuScore).map((macroId) => {
+      let macroValue;
+      switch (macroId) {
+        case MacroOsuScore.ACC:
+          macroValue = roundNumber(score.accuracy * 100, 1);
+          break;
+        case MacroOsuScore.ARTIST:
+          macroValue = score.beatmapset?.artist;
+          break;
+        case MacroOsuScore.BEATMAP_ID:
+          macroValue = score.beatmap?.id;
+          break;
+        case MacroOsuScore.COUNT_100:
+          macroValue = score.statistics.count_100;
+          break;
+        case MacroOsuScore.COUNT_300:
+          macroValue = score.statistics.count_300;
+          break;
+        case MacroOsuScore.COUNT_50:
+          macroValue = score.statistics.count_50;
+          break;
+        case MacroOsuScore.COUNT_MISS:
+          macroValue = score.statistics.count_miss;
+          break;
+        case MacroOsuScore.DATE_MONTH:
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          macroValue = monthNames[scoreDate.getMonth()];
+          break;
+        case MacroOsuScore.DATE_YEAR:
+          macroValue = scoreDate.getFullYear();
+          break;
+        case MacroOsuScore.EXISTS:
+          macroValue =
+            beatmapScore.position !== undefined && beatmapScore.position !== -1;
+          break;
+        case MacroOsuScore.FC:
+          macroValue = score.perfect;
+          break;
+        //case MacroOsuScore.GLOBAL_RANK:
+        //  break;
+        case MacroOsuScore.HAS_REPLAY:
+          macroValue = score.replay;
+          break;
+        case MacroOsuScore.ID:
+          macroValue = score.id;
+          break;
+        case MacroOsuScore.MAX_COMBO:
+          macroValue = score.max_combo;
+          break;
+        case MacroOsuScore.MODS:
+          macroValue = score.mods.join(",");
+          break;
+        case MacroOsuScore.PASSED:
+          macroValue = score.passed;
+          break;
+        case MacroOsuScore.PP:
+          if (score.pp !== null && score.pp !== undefined) {
+            macroValue = roundNumber(score.pp, 1);
+          }
+          break;
+        case MacroOsuScore.RANK:
+          macroValue = score.rank;
+          break;
+        case MacroOsuScore.TIME_IN_S_AGO:
+          macroValue = roundNumber(scoreDateRangeMs / 1000, 0);
+          break;
+        case MacroOsuScore.USER_ID:
+          macroValue = score.user?.id;
+          break;
+        case MacroOsuScore.USER_NAME:
+          macroValue = score.user?.username;
+          break;
+        case MacroOsuScore.VERSION:
+          macroValue = score.beatmap?.version;
+          break;
       }
-    );
+      if (typeof macroValue === "boolean") {
+        macroValue = macroValue ? "true" : "false";
+      }
+      if (typeof macroValue === "undefined") {
+        macroValue = "undefined";
+      }
+      if (typeof macroValue === "number") {
+        macroValue = `${macroValue}`;
+      }
+      return [macroId, macroValue];
+    });
   },
   id: "OSU_SCORE",
   keys: Object.values(MacroOsuScore),
 };
 
+export interface MacroOsuMostRecentPlayData {
+  score?: Score;
+}
 export enum MacroOsuMostRecentPlay {
   ACC = "ACC",
   ARTIST = "ARTIST",
@@ -360,41 +368,37 @@ export enum MacroOsuMostRecentPlay {
   USER_NAME = "USER_NAME",
   VERSION = "VERSION",
 }
-export interface MacroOsuMostRecentPlayData {
-  score?: Score;
-}
-export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRecentPlayData> =
-  {
-    generate: (data) => {
-      const score = data.score;
-      if (score === undefined) {
-        return Object.values(MacroOsuMostRecentPlay).map<
-          [MacroOsuMostRecentPlay, string]
-        >((macroId) => {
-          let macroValue;
-          switch (macroId) {
-            case MacroOsuMostRecentPlay.FOUND:
-              macroValue = false;
-              break;
-            default:
-              macroValue = undefined;
-              break;
-          }
-          if (typeof macroValue === "boolean") {
-            macroValue = macroValue ? "true" : "false";
-          }
-          if (macroValue === undefined) {
-            macroValue = "undefined";
-          }
-          return [macroId, macroValue];
-        });
-      }
-      const scoreDate = new Date(score.created_at);
-      const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
+export const macroOsuMostRecentPlay: MessageParserMacroGenerator<
+  MacroOsuMostRecentPlayData,
+  MacroOsuMostRecentPlay
+> = {
+  generate: (data) => {
+    const score = data.score;
+    if (score === undefined) {
+      return Object.values(MacroOsuMostRecentPlay).map((macroId) => {
+        let macroValue;
+        switch (macroId) {
+          case MacroOsuMostRecentPlay.FOUND:
+            macroValue = false;
+            break;
+          default:
+            macroValue = undefined;
+            break;
+        }
+        if (typeof macroValue === "boolean") {
+          macroValue = macroValue ? "true" : "false";
+        }
+        if (macroValue === undefined) {
+          macroValue = "undefined";
+        }
+        return [macroId, macroValue];
+      });
+    }
+    const scoreDate = new Date(score.created_at);
+    const scoreDateRangeMs = new Date().getTime() - scoreDate.getTime();
 
-      const macroEntries = Object.values(MacroOsuMostRecentPlay).map<
-        [MacroOsuMostRecentPlay, string]
-      >((macroId) => {
+    const macroEntries: MacroDictionaryEntry<MacroOsuMostRecentPlay>[] =
+      Object.values(MacroOsuMostRecentPlay).map((macroId) => {
         let macroValue;
         switch (macroId) {
           case MacroOsuMostRecentPlay.ACC:
@@ -487,7 +491,7 @@ export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRec
         return [macroId, macroValue];
       });
 
-      /*
+    /*
     writeJsonFile(
       path.join(
         __dirname,
@@ -501,12 +505,15 @@ export const macroOsuMostRecentPlay: MessageParserMacroGenerator<MacroOsuMostRec
     ).catch(console.error);
     */
 
-      return macroEntries;
-    },
-    id: "OSU_MOST_RECENT_PLAY",
-    keys: Object.values(MacroOsuMostRecentPlay),
-  };
+    return macroEntries;
+  },
+  id: "OSU_MOST_RECENT_PLAY",
+  keys: Object.values(MacroOsuMostRecentPlay),
+};
 
+export interface MacroOsuUserData {
+  user: User;
+}
 export enum MacroOsuUser {
   ACC = "ACC",
   COUNTRY = "COUNTRY",
@@ -528,12 +535,12 @@ export enum MacroOsuUser {
   PLAY_STYLE = "PLAY_STYLE",
   PP = "PP",
 }
-export interface MacroOsuUserData {
-  user: User;
-}
 const OSU_ACHIEVEMENT_ID_TUTEL = 151;
 const OSU_ACHIEVEMENT_ID_BUNNY = 6;
-export const macroOsuUser: MessageParserMacroGenerator<MacroOsuUserData> = {
+export const macroOsuUser: MessageParserMacroGenerator<
+  MacroOsuUserData,
+  MacroOsuUser
+> = {
   generate: (data) => {
     const joinDate = new Date(data.user.join_date);
     const joinDateMonth = joinDate.getMonth();
@@ -545,9 +552,9 @@ export const macroOsuUser: MessageParserMacroGenerator<MacroOsuUserData> = {
       userAchievements.findIndex((a) => a.achievement_id === achievementId) >
         -1;
 
-    const macroEntries = Object.values(MacroOsuUser).map<
-      [MacroOsuUser, string]
-    >((macroId) => {
+    const macroEntries: MacroDictionaryEntry<MacroOsuUser>[] = Object.values(
+      MacroOsuUser
+    ).map((macroId) => {
       let macroValue;
       switch (macroId) {
         case MacroOsuUser.ACC:

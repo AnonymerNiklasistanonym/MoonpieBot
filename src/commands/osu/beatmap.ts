@@ -33,7 +33,7 @@ import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { macroOsuBeatmap } from "../../info/macros/osuApi";
 import { NOT_FOUND_STATUS_CODE } from "../../other/web";
 import { notUndefined } from "../../other/types";
-import { OsuRequestsConfig } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
+import { OsuRequestsConfig } from "../../database/osuRequestsDb/info";
 import osuRequestsDb from "../../database/osuRequestsDb";
 import { pluginsTwitchChatGenerator } from "../../info/plugins/twitchChat";
 import { tryToSendOsuIrcMessage } from "../../osuIrc";
@@ -91,6 +91,19 @@ const checkIfBeatmapMatchesDemands = (
           return false;
         }
         break;
+      case OsuRequestsConfig.LENGTH_IN_MIN_MAX:
+        if (beatmap.total_length / 60.0 > parseFloat(demand.optionValue)) {
+          return false;
+        }
+        break;
+      case OsuRequestsConfig.LENGTH_IN_MIN_MIN:
+        if (beatmap.total_length / 60.0 < parseFloat(demand.optionValue)) {
+          return false;
+        }
+        break;
+      case OsuRequestsConfig.MESSAGE_OFF:
+      case OsuRequestsConfig.MESSAGE_ON:
+        break;
       case OsuRequestsConfig.STAR_MAX:
         if (beatmap.difficulty_rating > parseFloat(demand.optionValue)) {
           return false;
@@ -100,9 +113,6 @@ const checkIfBeatmapMatchesDemands = (
         if (beatmap.difficulty_rating < parseFloat(demand.optionValue)) {
           return false;
         }
-        break;
-      default:
-        // Ignore unknown options or messages
         break;
     }
   }
@@ -305,43 +315,21 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
               userId: tags["user-id"],
               userName: tags.username,
             };
-            osuBeatmapRequestMacros.set(
-              macroOsuBeatmapRequests.id,
-              new Map(
-                macroOsuBeatmapRequests.generate({
+            return {
+              additionalMacros: new Map([
+                ...osuBeatmapRequestMacros,
+                ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
                   customMessage: osuRequestsConfigEntries.find(
                     (a) => a.option === OsuRequestsConfig.MESSAGE_ON
                   )?.optionValue,
-                })
-              )
-            );
-            osuBeatmapRequestMacros.set(
-              macroOsuBeatmapRequestDemands.id,
-              new Map(
-                macroOsuBeatmapRequestDemands.generate({
-                  arRangeMax: osuRequestsConfigEntries.find(
-                    (a) => a.option === OsuRequestsConfig.AR_MAX
-                  )?.optionValue,
-                  arRangeMin: osuRequestsConfigEntries.find(
-                    (a) => a.option === OsuRequestsConfig.AR_MIN
-                  )?.optionValue,
-                  csRangeMax: osuRequestsConfigEntries.find(
-                    (a) => a.option === OsuRequestsConfig.CS_MAX
-                  )?.optionValue,
-                  csRangeMin: osuRequestsConfigEntries.find(
-                    (a) => a.option === OsuRequestsConfig.CS_MIN
-                  )?.optionValue,
-                  starRangeMax: osuRequestsConfigEntries.find(
-                    (a) => a.option === OsuRequestsConfig.STAR_MAX
-                  )?.optionValue,
-                  starRangeMin: osuRequestsConfigEntries.find(
-                    (a) => a.option === OsuRequestsConfig.STAR_MIN
-                  )?.optionValue,
-                })
-              )
-            );
-            return {
-              additionalMacros: osuBeatmapRequestMacros,
+                }),
+                ...generateMacroMapFromMacroGenerator(
+                  macroOsuBeatmapRequestDemands,
+                  {
+                    osuRequestsConfigEntries,
+                  }
+                ),
+              ]),
               isError: true,
               messageId: osuBeatmapRequestNotMeetingDemands.id,
             };

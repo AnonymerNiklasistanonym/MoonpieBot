@@ -1,17 +1,15 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Local imports
-import {
-  createOrUpdateEntry,
-  OsuRequestsConfig,
-} from "./requests/osuRequestsConfig";
 import { getVersionFromObject, isSameVersion } from "../../version";
 import {
+  OsuRequestsConfig,
   osuRequestsConfigTable,
   osuRequestsConfigTableV001,
   versionCurrent,
 } from "./info";
 import { createLogMethod } from "../logging";
+import { createOrUpdateEntry } from "./requests/osuRequestsConfig";
 import { genericSetupDatabase } from "../generic/setup";
 // Type imports
 import type { Logger } from "winston";

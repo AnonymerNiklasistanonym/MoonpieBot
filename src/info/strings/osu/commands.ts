@@ -11,7 +11,7 @@ import { macroCommandEnabled } from "../../macros/commands";
 import { OSU_STRING_ID } from "../osu";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../../messageParser";
+import type { MessageForParserMessagePlugin } from "../../../messageParser";
 import type { StringEntry } from "../../../messageParser";
 
 const OSU_COMMANDS_STRING_ID = `${OSU_STRING_ID}_COMMANDS`;
@@ -110,7 +110,7 @@ export const osuCommandsString: StringEntry = {
             osuCommandsScore,
           ]
             .map(
-              (a): MessageForMessageElementPlugin => ({
+              (a): MessageForParserMessagePlugin => ({
                 args: {
                   key: a.id,
                   name: macroCommandEnabled.id,
@@ -124,7 +124,7 @@ export const osuCommandsString: StringEntry = {
                 type: "plugin",
               })
             )
-            .reduce<(MessageForMessageElementPlugin | string)[]>(
+            .reduce<(MessageForParserMessagePlugin | string)[]>(
               (prev, curr) => prev.concat([curr, ";"]),
               []
             ),

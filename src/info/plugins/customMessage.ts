@@ -1,12 +1,12 @@
 // Type imports
 import {
   createMessageParserMessage,
-  MessageForMessageElements,
+  MessageForParserMessageElements,
   MessageParserPluginGenerator,
 } from "../../messageParser";
 
 export interface PluginCustomMessageData {
-  messageParserInput: MessageForMessageElements[];
+  messageParserInput: MessageForParserMessageElements[];
 }
 
 export const pluginCustomMessageGenerator: MessageParserPluginGenerator<PluginCustomMessageData> =

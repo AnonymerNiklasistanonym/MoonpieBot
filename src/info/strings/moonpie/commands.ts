@@ -1,17 +1,21 @@
 // Local imports
 import {
+  createMessageParserMessage,
+  generateMessageParserMessageMacro,
+  generateMessageParserMessageReference,
+} from "../../../messageParser";
+import {
   pluginIfTrue,
   pluginListFilterUndefined,
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../plugins/general";
-import { createMessageParserMessage } from "../../../messageParser";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../macros/commands";
 import { MOONPIE_STRING_ID } from "../moonpie";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../../messageParser";
+import type { MessageForParserMessagePlugin } from "../../../messageParser";
 import type { StringEntry } from "../../../messageParser";
 
 const MOONPIE_COMMANDS_STRING_ID = `${MOONPIE_STRING_ID}_COMMANDS`;
@@ -82,10 +86,7 @@ export const moonpieCommandsPrefix: StringEntry = {
 };
 export const moonpieCommandsString: StringEntry = {
   default: createMessageParserMessage([
-    {
-      name: moonpieCommandsPrefix.id,
-      type: "reference",
-    },
+    generateMessageParserMessageReference(moonpieCommandsPrefix),
     {
       args: {
         args: {
@@ -100,29 +101,22 @@ export const moonpieCommandsString: StringEntry = {
             moonpieCommandsAbout,
           ]
             .map(
-              (a): MessageForMessageElementPlugin => ({
-                args: {
-                  key: a.id,
-                  name: macroCommandEnabled.id,
-                  type: "macro",
-                },
+              (a): MessageForParserMessagePlugin => ({
+                args: generateMessageParserMessageMacro(
+                  macroCommandEnabled,
+                  a.id
+                ),
                 name: pluginIfTrue.id,
-                scope: {
-                  name: a.id,
-                  type: "reference",
-                },
+                scope: generateMessageParserMessageReference(a),
                 type: "plugin",
               })
             )
-            .reduce<(MessageForMessageElementPlugin | string)[]>(
+            .reduce<(MessageForParserMessagePlugin | string)[]>(
               (prev, curr) => prev.concat([curr, ";"]),
               []
             ),
           name: pluginListFilterUndefined.id,
-          scope: {
-            name: generalCommandsNone.id,
-            type: "reference",
-          },
+          scope: generateMessageParserMessageReference(generalCommandsNone),
           type: "plugin",
         },
         name: pluginListSort.id,

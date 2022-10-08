@@ -20,10 +20,10 @@ export enum MacroMoonpieBot {
   URL = "URL",
   VERSION = "VERSION",
 }
-export const macroMoonpieBot: MessageParserMacro = {
+export const macroMoonpieBot: MessageParserMacro<MacroMoonpieBot> = {
   id: "MOONPIEBOT",
   values: new Map(
-    Object.values(MacroMoonpieBot).map<[MacroMoonpieBot, string]>((macroId) => {
+    Object.values(MacroMoonpieBot).map((macroId) => {
       let macroValue;
       switch (macroId) {
         case MacroMoonpieBot.NAME:

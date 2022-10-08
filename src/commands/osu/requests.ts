@@ -18,7 +18,8 @@ import {
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { errorMessageOsuApiDbPathUndefined } from "../../error";
-import { OsuRequestsConfig } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
+import { generateMacroMapFromMacroGenerator } from "../../messageParser";
+import { OsuRequestsConfig } from "../../database/osuRequestsDb/info";
 import osuRequestsDb from "../../database/osuRequestsDb";
 import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
@@ -143,59 +144,33 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
             (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
           ) === undefined
         ) {
-          macros.set(
-            macroOsuBeatmapRequests.id,
-            new Map(
-              macroOsuBeatmapRequests.generate({
+          return {
+            additionalMacros: new Map([
+              ...macros,
+              ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
                 customMessage: osuRequestsConfigEntries.find(
                   (a) => a.option === OsuRequestsConfig.MESSAGE_ON
                 )?.optionValue,
-              })
-            )
-          );
-
-          macros.set(
-            macroOsuBeatmapRequestDemands.id,
-            new Map(
-              macroOsuBeatmapRequestDemands.generate({
-                arRangeMax: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.AR_MAX
-                )?.optionValue,
-                arRangeMin: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.AR_MIN
-                )?.optionValue,
-                csRangeMax: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.CS_MAX
-                )?.optionValue,
-                csRangeMin: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.CS_MIN
-                )?.optionValue,
-                starRangeMax: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.STAR_MAX
-                )?.optionValue,
-                starRangeMin: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.STAR_MIN
-                )?.optionValue,
-              })
-            )
-          );
-          return {
-            additionalMacros: macros,
+              }),
+              ...generateMacroMapFromMacroGenerator(
+                macroOsuBeatmapRequestDemands,
+                {
+                  osuRequestsConfigEntries,
+                }
+              ),
+            ]),
             messageId: osuBeatmapRequestCurrentlyOn.id,
           };
         } else {
-          macros.set(
-            macroOsuBeatmapRequests.id,
-            new Map(
-              macroOsuBeatmapRequests.generate({
+          return {
+            additionalMacros: new Map([
+              ...macros,
+              ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
                 customMessage: osuRequestsConfigEntries.find(
                   (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
                 )?.optionValue,
-              })
-            )
-          );
-          return {
-            additionalMacros: macros,
+              }),
+            ]),
             messageId: osuBeatmapRequestCurrentlyOff.id,
           };
         }
@@ -258,6 +233,8 @@ const validateSetValue = (
     case OsuRequestsConfig.AR_MIN:
     case OsuRequestsConfig.CS_MAX:
     case OsuRequestsConfig.CS_MIN:
+    case OsuRequestsConfig.LENGTH_IN_MIN_MAX:
+    case OsuRequestsConfig.LENGTH_IN_MIN_MIN:
     case OsuRequestsConfig.STAR_MAX:
     case OsuRequestsConfig.STAR_MIN:
       if (optionValue === undefined) {
@@ -318,8 +295,6 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
       return twitchBadgeLevelCheck;
     }
 
-    const macros = new Map();
-
     let option: undefined | OsuRequestsConfig;
     for (const value of Object.values(OsuRequestsConfig)) {
       if (value.toLowerCase() === data.beatmapRequestsSetOption.toLowerCase()) {
@@ -365,45 +340,17 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
         logger
       );
 
-    macros.set(
-      macroOsuBeatmapRequests.id,
-      new Map(
-        macroOsuBeatmapRequests.generate({
+    return {
+      additionalMacros: new Map([
+        ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
           customMessage: osuRequestsConfigEntries.find(
             (a) => a.option === OsuRequestsConfig.MESSAGE_ON
           )?.optionValue,
-        })
-      )
-    );
-
-    macros.set(
-      macroOsuBeatmapRequestDemands.id,
-      new Map(
-        macroOsuBeatmapRequestDemands.generate({
-          arRangeMax: osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.AR_MAX
-          )?.optionValue,
-          arRangeMin: osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.AR_MIN
-          )?.optionValue,
-          csRangeMax: osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.CS_MAX
-          )?.optionValue,
-          csRangeMin: osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.CS_MIN
-          )?.optionValue,
-          starRangeMax: osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.STAR_MAX
-          )?.optionValue,
-          starRangeMin: osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.STAR_MIN
-          )?.optionValue,
-        })
-      )
-    );
-
-    return {
-      additionalMacros: macros,
+        }),
+        ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequestDemands, {
+          osuRequestsConfigEntries,
+        }),
+      ]),
       messageId: osuBeatmapRequestDemandsUpdated.id,
     };
   },

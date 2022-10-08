@@ -1,35 +1,76 @@
-interface MessageForMessageElement {
+// Type imports
+import type {
+  MessageParserMacro,
+  MessageParserMacroDocumentation,
+} from "./macros";
+import type { StringEntry } from "./strings";
+
+interface MessageForParserMessageElement {
   type: string;
 }
-export type MessageForMessageElements =
+export type MessageForParserMessageElements<
+  MACRO_ENUM extends string = string
+> =
   | string
-  | MessageForMessageElementMacro
-  | MessageForMessageElementPlugin
-  | MessageForMessageElementReference;
+  | MessageForParserMessageMacro<MACRO_ENUM>
+  | MessageForParserMessagePlugin
+  | MessageForParserMessageReference;
 
-export interface MessageForMessageElementPlugin
-  extends MessageForMessageElement {
-  args?: MessageForMessageElements[] | MessageForMessageElements;
+export interface MessageForParserMessagePlugin<
+  MACRO_ENUM extends string = string
+> extends MessageForParserMessageElement {
+  args?:
+    | MessageForParserMessageElements<MACRO_ENUM>[]
+    | MessageForParserMessageElements<MACRO_ENUM>;
   name: string;
-  scope?: MessageForMessageElements[] | MessageForMessageElements;
+  scope?:
+    | MessageForParserMessageElements<MACRO_ENUM>[]
+    | MessageForParserMessageElements<MACRO_ENUM>;
   type: "plugin";
 }
 
-export interface MessageForMessageElementMacro
-  extends MessageForMessageElement {
-  key: string;
+export interface MessageForParserMessageMacro<
+  MACRO_ENUM extends string = string
+> extends MessageForParserMessageElement {
+  key: MACRO_ENUM;
   name: string;
   type: "macro";
 }
 
-export interface MessageForMessageElementReference
-  extends MessageForMessageElement {
+export interface MessageForParserMessageReference
+  extends MessageForParserMessageElement {
   name: string;
   type: "reference";
 }
 
-export const createMessageParserMessage = (
-  message: MessageForMessageElements[],
+export const generateMessageParserMessageMacro = <MACRO_ENUM extends string>(
+  macro:
+    | MessageParserMacro<MACRO_ENUM>
+    | MessageParserMacroDocumentation<MACRO_ENUM>,
+  key: MACRO_ENUM
+): MessageForParserMessageMacro<MACRO_ENUM> => ({
+  key,
+  name: macro.id,
+  type: "macro",
+});
+
+export const generateMessageParserMessageReference = (
+  stringEntry: StringEntry
+): MessageForParserMessageReference => ({
+  name: stringEntry.id,
+  type: "reference",
+});
+
+/**
+ * Create a message string for the message parser.
+ *
+ * @param message The message represented by an array of elements to be parsed to a string.
+ * @param insidePlugin Set this to true so it can be used inside a plugin (so characters get correctly escaped).
+ * @template MACRO_ENUM Represents for type safety all supported macros.
+ * @returns The message parser message string.
+ */
+export const createMessageParserMessage = <MACRO_ENUM extends string = string>(
+  message: MessageForParserMessageElements<MACRO_ENUM>[],
   insidePlugin = false
 ): string =>
   message

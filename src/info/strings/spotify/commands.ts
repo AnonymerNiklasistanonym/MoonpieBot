@@ -11,7 +11,7 @@ import { macroCommandEnabled } from "../../macros/commands";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 import { SPOTIFY_STRING_ID } from "../spotify";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../../messageParser";
+import type { MessageForParserMessagePlugin } from "../../../messageParser";
 import type { StringEntry } from "../../../messageParser";
 
 const SPOTIFY_COMMANDS_STRING_ID = `${SPOTIFY_STRING_ID}_COMMANDS`;
@@ -45,7 +45,7 @@ export const spotifyCommandsString: StringEntry = {
         args: {
           args: [spotifyCommandsSong]
             .map(
-              (a): MessageForMessageElementPlugin => ({
+              (a): MessageForParserMessagePlugin => ({
                 args: {
                   key: a.id,
                   name: macroCommandEnabled.id,
@@ -59,7 +59,7 @@ export const spotifyCommandsString: StringEntry = {
                 type: "plugin",
               })
             )
-            .reduce<(MessageForMessageElementPlugin | string)[]>(
+            .reduce<(MessageForParserMessagePlugin | string)[]>(
               (prev, curr) => prev.concat([curr, ";"]),
               []
             ),

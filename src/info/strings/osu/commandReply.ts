@@ -873,7 +873,7 @@ export const osuScoreErrorNotFound: StringEntry = {
 };
 
 export const osuScore: StringEntry = {
-  default: createMessageParserMessage([
+  default: createMessageParserMessage<MacroOsuScoreRequest | MacroOsuScore>([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
     " ",

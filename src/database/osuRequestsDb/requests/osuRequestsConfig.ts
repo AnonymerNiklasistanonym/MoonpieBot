@@ -1,22 +1,15 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Local imports
-import { osuRequestsConfigTable, OsuRequestsDbError } from "../info";
+import {
+  OsuRequestsConfig,
+  osuRequestsConfigTable,
+  OsuRequestsDbError,
+} from "../info";
 import { createLogMethod } from "../../logging";
 // Type imports
 import type { ExistsDbOut } from "sqlite3-promise-query-api";
 import type { Logger } from "winston";
-
-export enum OsuRequestsConfig {
-  AR_MAX = "arMax",
-  AR_MIN = "arMin",
-  CS_MAX = "csMax",
-  CS_MIN = "csMin",
-  MESSAGE_OFF = "messageOff",
-  MESSAGE_ON = "messageOn",
-  STAR_MAX = "starMax",
-  STAR_MIN = "starMin",
-}
 
 // Create
 // -----------------------------------------------------------------------------

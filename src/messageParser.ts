@@ -18,7 +18,11 @@ export {
   generatePluginMap,
   generatePluginInfo,
 } from "./messageParser/plugins";
-export { createMessageParserMessage } from "./messageParser/createMessageParserMessage";
+export {
+  createMessageParserMessage,
+  generateMessageParserMessageMacro,
+  generateMessageParserMessageReference,
+} from "./messageParser/createMessageParserMessage";
 export { generateMacroMap } from "./messageParser/macros";
 export {
   checkMacrosForDuplicates,
@@ -31,6 +35,8 @@ export {
 // Type exports
 export type {
   MacroMap,
+  MacroDictionary,
+  MacroDictionaryEntry,
   MessageParserMacro,
   MessageParserMacroDocumentation,
   MessageParserMacroGenerator,
@@ -46,10 +52,10 @@ export type {
 } from "./messageParser/plugins";
 export type { StringEntry, StringMap } from "./messageParser/strings";
 export type {
-  MessageForMessageElements,
-  MessageForMessageElementMacro,
-  MessageForMessageElementReference,
-  MessageForMessageElementPlugin,
+  MessageForParserMessageElements,
+  MessageForParserMessageMacro,
+  MessageForParserMessageReference,
+  MessageForParserMessagePlugin,
 } from "./messageParser/createMessageParserMessage";
 
 /**

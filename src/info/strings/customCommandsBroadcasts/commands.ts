@@ -11,7 +11,7 @@ import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../macros/commands";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
-import type { MessageForMessageElementPlugin } from "../../../messageParser";
+import type { MessageForParserMessagePlugin } from "../../../messageParser";
 import type { StringEntry } from "../../../messageParser";
 
 const CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID = `${CUSTOM_COMMANDS_BROADCASTS_STRING_ID}_COMMANDS`;
@@ -103,7 +103,7 @@ export const customCommandsBroadcastsCommandsString: StringEntry = {
             customCommandsBroadcastsCommandsListCustomCommands,
           ]
             .map(
-              (a): MessageForMessageElementPlugin => ({
+              (a): MessageForParserMessagePlugin => ({
                 args: {
                   key: a.id,
                   name: macroCommandEnabled.id,
@@ -117,7 +117,7 @@ export const customCommandsBroadcastsCommandsString: StringEntry = {
                 type: "plugin",
               })
             )
-            .reduce<(MessageForMessageElementPlugin | string)[]>(
+            .reduce<(MessageForParserMessagePlugin | string)[]>(
               (prev, curr) => prev.concat([curr, ";"]),
               []
             ),
