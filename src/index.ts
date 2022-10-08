@@ -20,12 +20,14 @@ import { defaultMacros, defaultMacrosOptional } from "./info/macros";
 import { defaultPlugins, defaultPluginsOptional } from "./info/plugins";
 import { ENV_PREFIX, EnvVariable, envVariableInformation } from "./info/env";
 import {
+  fileNameCustomCommandsBroadcastsExample,
   fileNameEnv,
   fileNameEnvExample,
   fileNameEnvStrings,
   fileNameEnvStringsExample,
 } from "./info/files";
 import { cliHelpGenerator } from "./cli";
+import { createCustomCommandsBroadcastsDocumentation } from "./documentation/customCommandsBroadcasts";
 import { createStringsVariableDocumentation } from "./documentation/strings";
 import { defaultStringMap } from "./info/strings";
 import { genericStringSorter } from "./other/genericStringSorter";
@@ -129,6 +131,9 @@ const entryPoint = async () => {
           defaultPluginsOptional,
           defaultMacrosOptional,
           logger
+        ),
+        createCustomCommandsBroadcastsDocumentation(
+          path.join(configDir, fileNameCustomCommandsBroadcastsExample)
         ),
       ]);
       process.exit(0);

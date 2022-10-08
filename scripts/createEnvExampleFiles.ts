@@ -14,7 +14,7 @@ import { createEnvVariableDocumentation } from "../src/env";
 import { createStringsVariableDocumentation } from "../src/documentation/strings";
 import { defaultStringMap } from "../src/info/strings";
 
-const logger = createConsoleLogger("create_example_files");
+const logger = createConsoleLogger("create_example_files_env");
 
 // The "config dir" is the root of the repository
 const configDir = path.join(__dirname, "..");

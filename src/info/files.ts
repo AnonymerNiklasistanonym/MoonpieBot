@@ -13,6 +13,10 @@ export const fileNameEnvStrings = `${fileNameEnv}.strings`;
 /** The example file of {@link fileNameEnvStrings}. */
 export const fileNameEnvStringsExample = `${fileNameEnvStrings}${EXAMPLE_SUFFIX}`;
 
+/** The file name of the file that contains examples for custom commands and broadcasts. */
+export const fileNameCustomCommandsBroadcastsExample =
+  "customCommandsBroadcasts.example.txt";
+
 /**
  * A function to create the filename for the moonpie database backups depending
  * on the current day.

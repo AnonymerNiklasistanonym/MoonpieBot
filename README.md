@@ -14,7 +14,7 @@ A custom Twitch chat bot.
   - [Default: moonpie](#default-moonpie)
   - [Optional: osu!](#optional-osu)
   - [Optional: Spotify](#optional-spotify)
-  - [Optional: Custom commands/timers](#optional-custom-commandstimers)
+  - [Optional: Custom commands/broadcasts](#optional-custom-commandsbroadcasts)
   - [Optional: Custom strings/messages](#optional-custom-stringsmessages)
 - [Setup](#setup)
   - [Build it yourself](#build-it-yourself)
@@ -103,43 +103,54 @@ After a successful authentication (the bot will automatically open a website for
 
 **Every command can be optionally disabled.**
 
-### Optional: Custom commands/timers
+### Optional: Custom commands/broadcasts
 
-A file called `customCommands.json` can be provided that enables to write custom commands of the style:
+This program has per default the ability to add/edit/delete custom commands and broadcasts if you are at least a moderator in the chat.
+The commands and broadcasts are persistently saved in a database.
 
-```json
-{
-    "id": "Command name",
-    "channels": [
-        "channelName"
-    ],
-    "message": "Text $(macroName) $(macroName-macroArg-macroArg=macroValue)",
-    "regexString": "!regexExpression",
-    "count": 2,
-    "userLevel": "everyone"
-}
+Add a custom command with an ID, a RegEx expression to detect it and capture contents of the match (https://regex101.com/) and a message:
+
+```text
+!addcc ID REGEX MESSAGE
 ```
 
-An example file for this is [`customCommands.example.json`](./customCommands.example.json).
+Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported:
 
-A file called `customTimers.json` can be provided that enables to write custom timers of the style:
-
-```json
-{
-    "id": "Timer name (will broadcast message every 30s)",
-    "channels": [
-        "channelName"
-    ],
-    "message": "Text $(macroName) $(macroName-macroArg-macroArg=macroValue)",
-    "cronString": "*/30 * * * * *"
-}
+```text
+!addcc ID REGEX MESSAGE -ul=mod -cd=10
 ```
 
-An example file for this is [`customTimers.example.json`](./customTimers.example.json).
+A single property can be edited of an existing custom command:
+
+```text
+!editcc PROPERTY NEW_VALUE
+```
+
+And using the custom command ID it can be deleted:
+
+```text
+!delcc ID
+```
+
+Add a custom broadcast with an ID, a cron expression to determine when the broadcast should be sent (https://crontab.cronhub.io/) and a message
+
+```text
+!addcb ID CRON_STRING MESSAGE
+```
+
+A single property can be edited of an existing custom broadcast:
+
+```text
+!editcb PROPERTY NEW_VALUE
+```
+
+An example file for this is [`customCommandsBroadcasts.example.txt`](./customCommandsBroadcasts.example.txt).
 
 For some macros to work (like Twitch API connections for `!so`/`!followage`/`!settitle`/`!setgame`) additional Twitch API credentials need to be provided since the default Twitch API connection is only configured to read and write chat messages.
 
 Additionally commands support a (global) *data* structure that enables set/get (add/remove for numbers) of a value across commands which for example enables a (video game) easy death counter that can be manipulated by mods while everyone can use a different command to see the current count.
+
+The supported macros and logic plugins are also documented in the next section.
 
 ### Optional: Custom strings/messages
 
@@ -154,7 +165,8 @@ To do this there are:
 - Plugins: `$(PLUGIN=OPTIONAL_PLUGIN_VALUE|OPTIONAL_PLUGIN_SCOPE)` that can for example evaluate a request like for example setting the stream title or evaluating if the plugin scope text should be displayed in respect to the plugin value
 - References: `$[STRING_REFERENCE]` that simply reference another string that will then be inserted
 
-To override the default strings and add custom ones you can create a `.env.strings` file ([there is an example for the file](./.env.strings.example) where all the default values are listed and can be uncommented and edited).
+To override the default strings and add custom ones you can create a `.env.strings` file.
+There is an example file [`.env.strings.example`](./.env.strings.example) for this where all the default values are listed and can be uncommented/edited which also contains the plugin and macro documentation.
 
 ## Setup
 

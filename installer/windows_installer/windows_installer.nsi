@@ -235,12 +235,9 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   ;Set output path to the config directory and list the files that should be put
   ;into it
   SetOutPath "$AppData\${PRODUCT}"
-  File "..\..\.env.example"
-  File "..\..\.env.strings.example"
-  File "..\..\customCommands.example.json"
-  File "..\..\customTimers.example.json"
-  File "..\..\customCommands.schema.json"
-  File "..\..\customTimers.schema.json"
+  File "..\..\${FILE_NAME_ENV_EXAMPLE}"
+  File "..\..\${FILE_NAME_ENV_STRINGS_EXAMPLE}"
+  File "..\..\${FILE_NAME_CUSTOM_COMMANDS_BROADCASTS_EXAMPLE}"
 
   ;Add install directory to the user path
   EnVar::SetHKCU
