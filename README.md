@@ -120,7 +120,7 @@ Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are al
 !addcc ID REGEX MESSAGE -ul=mod -cd=10
 ```
 
-A single property can be edited of an existing custom command:
+A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing custom command:
 
 ```text
 !editcc PROPERTY NEW_VALUE
@@ -138,7 +138,7 @@ Add a custom broadcast with an ID, a cron expression to determine when the broad
 !addcb ID CRON_STRING MESSAGE
 ```
 
-A single property can be edited of an existing custom broadcast:
+A single property (cronString, description, id, message) can be edited of an existing custom broadcast:
 
 ```text
 !editcb PROPERTY NEW_VALUE

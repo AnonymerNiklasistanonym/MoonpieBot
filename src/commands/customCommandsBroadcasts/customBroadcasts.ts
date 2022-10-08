@@ -5,7 +5,9 @@ import {
   customCommandsBroadcastsCommandReplyAddCB,
   customCommandsBroadcastsCommandReplyAddCBAlreadyExists,
   customCommandsBroadcastsCommandReplyCBNotFound,
+  customCommandsBroadcastsCommandReplyCBsNotFound,
   customCommandsBroadcastsCommandReplyDelCB,
+  customCommandsBroadcastsCommandReplyEditCB,
   customCommandsBroadcastsCommandReplyInvalidCronString,
   customCommandsBroadcastsCommandReplyListCB,
   customCommandsBroadcastsCommandReplyListCBsEntry,
@@ -23,11 +25,14 @@ import { MAX_LENGTH_OF_A_TWITCH_MESSAGE, TwitchBadgeLevel } from "../../twitch";
 import {
   regexCustomBroadcastAdd,
   regexCustomBroadcastDelete,
+  regexCustomBroadcastEdit,
+  RegexCustomBroadcastEdit,
   regexCustomBroadcastList,
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
 import { macroCustomBroadcastInfo } from "../../info/macros/customBroadcast";
+import { macroCustomCommandBroadcastInfoEdit } from "../../info/macros/customCommands";
 import { parseRegexStringArgument } from "../helper";
 // Type imports
 import type {
@@ -46,6 +51,41 @@ import type {
   RegexCustomBroadcastList,
   RegexCustomBroadcastListOffset,
 } from "../../info/regex";
+
+export enum CustomBroadcastValueOptions {
+  CRON_STRING = "cronString",
+  DESCRIPTION = "description",
+  ID = "id",
+  MESSAGE = "message",
+}
+const validateCustomBroadcastValue = (
+  option: CustomBroadcastValueOptions,
+  optionValue?: string
+): string => {
+  switch (option) {
+    case CustomBroadcastValueOptions.DESCRIPTION:
+    case CustomBroadcastValueOptions.ID:
+      if (optionValue === undefined) {
+        throw Error("String value was undefined!");
+      }
+      break;
+    case CustomBroadcastValueOptions.MESSAGE:
+      if (optionValue === undefined) {
+        throw Error("String value was undefined!");
+      }
+      // TODO
+      break;
+    case CustomBroadcastValueOptions.CRON_STRING:
+      if (optionValue === undefined) {
+        throw Error("String value was undefined!");
+      }
+      if (!cron.validate(optionValue)) {
+        throw Error("Cron string not valid!");
+      }
+      break;
+  }
+  return optionValue;
+};
 
 export interface CommandAddDetectorOutput {
   customBroadcastCronString: string;
@@ -77,7 +117,12 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
     };
 
     // TODO Validate message
-    if (!cron.validate(customBroadcastInfo.cronString)) {
+    try {
+      validateCustomBroadcastValue(
+        CustomBroadcastValueOptions.CRON_STRING,
+        customBroadcastInfo.cronString
+      );
+    } catch (err) {
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(
           macroCustomBroadcastInfo,
@@ -293,6 +338,10 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
         logger
       );
 
+    if (customBroadcastInfos.length === 0) {
+      return { messageId: customCommandsBroadcastsCommandReplyCBsNotFound.id };
+    }
+
     // TODO Think about a better implementation
     return {
       messageId: async (
@@ -383,5 +432,134 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
     id: CustomCommandsBroadcastsCommands.LIST_CUSTOM_BROADCASTS,
+  },
+};
+
+export interface CommandEditDetectorOutput {
+  customBroadcastId: string;
+  customBroadcastOption: string;
+  customBroadcastOptionValue: string;
+}
+export const commandEditCB: ChatMessageHandlerReplyCreator<
+  CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsDbPath &
+    CommandCustomCommandsBroadcastsGenericDataCustomCommandsBroadcastsRefreshHelper,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+  CommandEditDetectorOutput
+> = {
+  createReply: async (_channel, tags, data, logger) => {
+    const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
+      tags,
+      TwitchBadgeLevel.MODERATOR
+    );
+    if (twitchBadgeLevelCheck !== undefined) {
+      return twitchBadgeLevelCheck;
+    }
+
+    const exists =
+      await customCommandsBroadcastsDb.requests.customBroadcast.existsEntry(
+        data.customCommandsBroadcastsDbPath,
+        { id: data.customBroadcastId },
+        logger
+      );
+    if (!exists) {
+      return {
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroCustomBroadcastInfo,
+          { id: data.customBroadcastId }
+        ),
+        messageId: customCommandsBroadcastsCommandReplyCBNotFound.id,
+      };
+    }
+
+    let option: undefined | CustomBroadcastValueOptions;
+    for (const value of Object.values(CustomBroadcastValueOptions)) {
+      if (value.toLowerCase() === data.customBroadcastOption.toLowerCase()) {
+        option = value;
+      }
+    }
+
+    if (option === undefined) {
+      throw Error(
+        `Unknown set option '${
+          data.customBroadcastOption
+        }' (supported: ${Object.values(CustomBroadcastValueOptions).join(",")})`
+      );
+    }
+
+    // Validate options
+    validateCustomBroadcastValue(option, data.customBroadcastOptionValue);
+
+    await customCommandsBroadcastsDb.requests.customBroadcast.updateEntry(
+      data.customCommandsBroadcastsDbPath,
+      {
+        cronString:
+          option === CustomBroadcastValueOptions.CRON_STRING
+            ? data.customBroadcastOptionValue
+            : undefined,
+        description:
+          option === CustomBroadcastValueOptions.DESCRIPTION
+            ? data.customBroadcastOptionValue
+            : undefined,
+        id: data.customBroadcastId,
+        idNew:
+          option === CustomBroadcastValueOptions.ID
+            ? data.customBroadcastOptionValue
+            : undefined,
+        message:
+          option === CustomBroadcastValueOptions.MESSAGE
+            ? data.customBroadcastOptionValue
+            : undefined,
+      },
+      logger
+    );
+    data.customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts = true;
+
+    return {
+      additionalMacros: new Map([
+        ...generateMacroMapFromMacroGenerator(macroCustomBroadcastInfo, {
+          id: data.customBroadcastId,
+        }),
+        ...generateMacroMapFromMacroGenerator(
+          macroCustomCommandBroadcastInfoEdit,
+          {
+            option,
+            optionValue: data.customBroadcastOptionValue,
+          }
+        ),
+      ]),
+      messageId: customCommandsBroadcastsCommandReplyEditCB.id,
+    };
+  },
+  detect: (_tags, message, data) => {
+    if (
+      !data.enabledCommands.includes(
+        CustomCommandsBroadcastsCommands.EDIT_CUSTOM_BROADCAST
+      )
+    ) {
+      return false;
+    }
+    const match = message.match(regexCustomBroadcastEdit);
+    if (match) {
+      const matchGroups = match.groups as undefined | RegexCustomBroadcastEdit;
+      if (!matchGroups) {
+        throw Error("RegexCustomBroadcastEdit groups undefined");
+      }
+      return {
+        data: {
+          customBroadcastId: parseRegexStringArgument(
+            matchGroups.customBroadcastId
+          ),
+          customBroadcastOption: matchGroups.customBroadcastOption,
+          customBroadcastOptionValue: parseRegexStringArgument(
+            matchGroups.customBroadcastOptionValue
+          ),
+        },
+      };
+    }
+    return false;
+  },
+  info: {
+    chatHandlerId: LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
+    id: CustomCommandsBroadcastsCommands.EDIT_CUSTOM_BROADCAST,
   },
 };

@@ -7,7 +7,9 @@ import {
   generateFileDocumentation,
 } from "../other/splitTextAtLength";
 import { customBroadcastsInformation } from "../info/customBroadcasts";
+import { CustomBroadcastValueOptions } from "../commands/customCommandsBroadcasts/customBroadcasts";
 import { customCommandsInformation } from "../info/customCommands";
+import { CustomCommandValueOptions } from "../commands/customCommandsBroadcasts/customCommands";
 import { escapeStringIfWhiteSpace } from "../other/whiteSpaceChecker";
 // Type imports
 import type { CustomBroadcast } from "../customCommandsBroadcasts/customBroadcast";
@@ -91,8 +93,9 @@ export const createCustomCommandsBroadcastsDocumentation = async (
     }),
   });
   data.push({
-    description:
-      "A single property can be edited of an existing custom command",
+    description: `A single property (${Object.values(
+      CustomCommandValueOptions
+    ).join(", ")}) can be edited of an existing custom command`,
     isComment: false,
     prefix: ">",
     type: FileDocumentationPartType.VALUE,
@@ -120,8 +123,9 @@ export const createCustomCommandsBroadcastsDocumentation = async (
     }),
   });
   data.push({
-    description:
-      "A single property can be edited of an existing custom broadcast",
+    description: `A single property (${Object.values(
+      CustomBroadcastValueOptions
+    ).join(", ")}) can be edited of an existing custom broadcast`,
     isComment: false,
     prefix: ">",
     type: FileDocumentationPartType.VALUE,

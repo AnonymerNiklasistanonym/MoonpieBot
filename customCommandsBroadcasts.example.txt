@@ -8,7 +8,8 @@
 # > Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none)
 #   are also supported
 !addcc ID REGEX MESSAGE -ul=mod -cd=10
-# > A single property can be edited of an existing custom command
+# > A single property (cooldownInS, count, description, id, message, regex,
+#   userLevel) can be edited of an existing custom command
 !editcc PROPERTY NEW_VALUE
 # > And using the custom command ID it can be deleted
 !delcc ID
@@ -16,7 +17,8 @@
 # > Add a custom broadcast with an ID, a cron expression to determine when the
 #   broadcast should be sent (https://crontab.cronhub.io/) and a message
 !addcb ID CRON_STRING MESSAGE
-# > A single property can be edited of an existing custom broadcast
+# > A single property (cronString, description, id, message) can be edited of an
+#   existing custom broadcast
 !editcb PROPERTY NEW_VALUE
 # > And using the custom broadcast ID it can be deleted
 !delcb ID

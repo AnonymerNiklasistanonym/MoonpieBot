@@ -1,9 +1,10 @@
-// Source: https://dev.to/chrismilson/zip-iterator-in-typescript-ldm
-
-type Iterableify<T> = { [K in keyof T]: Iterable<T[K]> };
+/** (Source: https://dev.to/chrismilson/zip-iterator-in-typescript-ldm). */
+export type Iterableify<T> = { [K in keyof T]: Iterable<T[K]> };
 
 /**
  * Python zip generator function.
+ *
+ * (Source: https://dev.to/chrismilson/zip-iterator-in-typescript-ldm).
  *
  * @param toZip The arrays that should be zipped.
  * @yields Both arrays merged into one array.

@@ -9,10 +9,10 @@ import {
   MacroCustomBroadcastInfo,
 } from "../../macros/customBroadcast";
 import {
+  MacroCustomCommandBroadcastInfoEdit,
+  macroCustomCommandBroadcastInfoEdit,
   MacroCustomCommandInfo,
   macroCustomCommandInfo,
-  MacroCustomCommandInfoEdit,
-  macroCustomCommandInfoEdit,
 } from "../../macros/customCommands";
 import { CUSTOM_COMMANDS_BROADCASTS_STRING_ID } from "../customCommandsBroadcasts";
 import { pluginIfNotEmpty } from "../../plugins/general";
@@ -82,7 +82,7 @@ export const customCommandsBroadcastsCommandReplyDelCC: StringEntry = {
 };
 export const customCommandsBroadcastsCommandReplyEditCC: StringEntry = {
   default: createMessageParserMessage<
-    MacroCustomCommandInfo | MacroCustomCommandInfoEdit
+    MacroCustomCommandInfo | MacroCustomCommandBroadcastInfoEdit
   >([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -91,15 +91,15 @@ export const customCommandsBroadcastsCommandReplyEditCC: StringEntry = {
       macroCustomCommandInfo,
       MacroCustomCommandInfo.ID
     ),
-    "): '",
+    "): ",
     generateMessageParserMessageMacro(
-      macroCustomCommandInfoEdit,
-      MacroCustomCommandInfoEdit.OPTION
+      macroCustomCommandBroadcastInfoEdit,
+      MacroCustomCommandBroadcastInfoEdit.OPTION
     ),
-    "' => ",
+    "='",
     generateMessageParserMessageMacro(
-      macroCustomCommandInfoEdit,
-      MacroCustomCommandInfoEdit.OPTION_VALUE
+      macroCustomCommandBroadcastInfoEdit,
+      MacroCustomCommandBroadcastInfoEdit.OPTION_VALUE
     ),
     "'",
   ]),
@@ -117,6 +117,14 @@ export const customCommandsBroadcastsCommandReplyCCNotFound: StringEntry = {
     "' was found!",
   ]),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CC_NOT_FOUND`,
+};
+export const customCommandsBroadcastsCommandReplyCCsNotFound: StringEntry = {
+  default: createMessageParserMessage<MacroCustomCommandInfo>([
+    "@",
+    { name: PluginTwitchChat.USER, type: "plugin" },
+    " No command was found!",
+  ]),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CCS_NOT_FOUND`,
 };
 export const customCommandsBroadcastsCommandReplyAddCB: StringEntry = {
   default: createMessageParserMessage<MacroCustomBroadcastInfo>([
@@ -175,6 +183,14 @@ export const customCommandsBroadcastsCommandReplyCBNotFound: StringEntry = {
     "' was found!",
   ]),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CB_NOT_FOUND`,
+};
+export const customCommandsBroadcastsCommandReplyCBsNotFound: StringEntry = {
+  default: createMessageParserMessage<MacroCustomCommandInfo>([
+    "@",
+    { name: PluginTwitchChat.USER, type: "plugin" },
+    " No broadcast was found!",
+  ]),
+  id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CBS_NOT_FOUND`,
 };
 export const customCommandsBroadcastsCommandReplyInvalidCronString: StringEntry =
   {
@@ -252,7 +268,7 @@ export const customCommandsBroadcastsCommandReplyListCC: StringEntry = {
 
 export const customCommandsBroadcastsCommandReplyEditCB: StringEntry = {
   default: createMessageParserMessage<
-    MacroCustomBroadcastInfo | MacroCustomCommandInfoEdit
+    MacroCustomBroadcastInfo | MacroCustomCommandBroadcastInfoEdit
   >([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -261,15 +277,15 @@ export const customCommandsBroadcastsCommandReplyEditCB: StringEntry = {
       macroCustomBroadcastInfo,
       MacroCustomBroadcastInfo.ID
     ),
-    "): '",
+    "): ",
     generateMessageParserMessageMacro(
-      macroCustomCommandInfoEdit,
-      MacroCustomCommandInfoEdit.OPTION
+      macroCustomCommandBroadcastInfoEdit,
+      MacroCustomCommandBroadcastInfoEdit.OPTION
     ),
-    "' => ",
+    "='",
     generateMessageParserMessageMacro(
-      macroCustomCommandInfoEdit,
-      MacroCustomCommandInfoEdit.OPTION_VALUE
+      macroCustomCommandBroadcastInfoEdit,
+      MacroCustomCommandBroadcastInfoEdit.OPTION_VALUE
     ),
     "'",
   ]),
@@ -285,19 +301,35 @@ export const customCommandsBroadcastsCommandReplyListCBsPrefix: StringEntry = {
 };
 
 export const customCommandsBroadcastsCommandReplyListCBsEntry: StringEntry = {
-  default: createMessageParserMessage(
+  default: createMessageParserMessage<MacroCustomBroadcastInfo>(
     [
       "'",
       generateMessageParserMessageMacro(
         macroCustomBroadcastInfo,
         MacroCustomBroadcastInfo.ID
       ),
-      "' (",
+      "' [",
       generateMessageParserMessageMacro(
         macroCustomBroadcastInfo,
         MacroCustomBroadcastInfo.CRON_STRING
       ),
-      ")",
+      "]",
+      {
+        args: generateMessageParserMessageMacro(
+          macroCustomBroadcastInfo,
+          MacroCustomBroadcastInfo.DESCRIPTION
+        ),
+        name: pluginIfNotEmpty.id,
+        scope: [
+          " (",
+          generateMessageParserMessageMacro(
+            macroCustomBroadcastInfo,
+            MacroCustomBroadcastInfo.DESCRIPTION
+          ),
+          ")",
+        ],
+        type: "plugin",
+      },
     ],
     true
   ),
@@ -322,20 +354,22 @@ export const customCommandsBroadcastsCommandReplyListCB: StringEntry = {
 export const customCommandsBroadcastsCommandReply: StringEntry[] = [
   customCommandsBroadcastsCommandReplyAddCB,
   customCommandsBroadcastsCommandReplyAddCBAlreadyExists,
-  customCommandsBroadcastsCommandReplyInvalidCronString,
-  customCommandsBroadcastsCommandReplyCBNotFound,
-  customCommandsBroadcastsCommandReplyDelCB,
-  customCommandsBroadcastsCommandReplyEditCC,
-  customCommandsBroadcastsCommandReplyEditCB,
   customCommandsBroadcastsCommandReplyAddCC,
   customCommandsBroadcastsCommandReplyAddCCAlreadyExists,
-  customCommandsBroadcastsCommandReplyInvalidRegex,
-  customCommandsBroadcastsCommandReplyListCCsPrefix,
-  customCommandsBroadcastsCommandReplyListCCsEntry,
-  customCommandsBroadcastsCommandReplyListCC,
-  customCommandsBroadcastsCommandReplyListCBsPrefix,
-  customCommandsBroadcastsCommandReplyListCBsEntry,
-  customCommandsBroadcastsCommandReplyListCB,
+  customCommandsBroadcastsCommandReplyCBNotFound,
+  customCommandsBroadcastsCommandReplyCBsNotFound,
   customCommandsBroadcastsCommandReplyCCNotFound,
+  customCommandsBroadcastsCommandReplyCCsNotFound,
+  customCommandsBroadcastsCommandReplyDelCB,
   customCommandsBroadcastsCommandReplyDelCC,
+  customCommandsBroadcastsCommandReplyEditCB,
+  customCommandsBroadcastsCommandReplyEditCC,
+  customCommandsBroadcastsCommandReplyInvalidCronString,
+  customCommandsBroadcastsCommandReplyInvalidRegex,
+  customCommandsBroadcastsCommandReplyListCB,
+  customCommandsBroadcastsCommandReplyListCBsEntry,
+  customCommandsBroadcastsCommandReplyListCBsPrefix,
+  customCommandsBroadcastsCommandReplyListCC,
+  customCommandsBroadcastsCommandReplyListCCsEntry,
+  customCommandsBroadcastsCommandReplyListCCsPrefix,
 ];

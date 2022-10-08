@@ -6,8 +6,8 @@ import {
   versionCurrent,
 } from "./info";
 //import { customBroadcastsInformation } from "../../info/customBroadcasts";
-import customCommandsBroadcastsDb from "../customCommandsBroadcastsDb";
-import { customCommandsInformation } from "../../info/customCommands";
+//import customCommandsBroadcastsDb from "../customCommandsBroadcastsDb";
+//import { customCommandsInformation } from "../../info/customCommands";
 import { genericSetupDatabase } from "../generic/setup";
 import { getVersionFromObject } from "../../version";
 // Type imports
@@ -38,6 +38,7 @@ export const setup = async (
           },current=${getVersionFromObject(currentVersion, "")})!`
         );
       },
+      /*
       setupInitialData: async () => {
         for (const exampleEntry of customCommandsInformation) {
           await customCommandsBroadcastsDb.requests.customCommand.createEntry(
@@ -54,19 +55,20 @@ export const setup = async (
             logger
           );
         }
-        //for (const exampleEntry of customBroadcastsInformation) {
-        //  await customCommandsBroadcastsDb.requests.customBroadcast.createEntry(
-        //    databasePath,
-        //    {
-        //      cronString: exampleEntry.cronString,
-        //      description: exampleEntry.description,
-        //      id: exampleEntry.id,
-        //      message: exampleEntry.message,
-        //    },
-        //    logger
-        //  );
-        //}
+        for (const exampleEntry of customBroadcastsInformation) {
+          await customCommandsBroadcastsDb.requests.customBroadcast.createEntry(
+            databasePath,
+            {
+              cronString: exampleEntry.cronString,
+              description: exampleEntry.description,
+              id: exampleEntry.id,
+              message: exampleEntry.message,
+            },
+            logger
+          );
+        }
       },
+      */
     },
     logger
   );

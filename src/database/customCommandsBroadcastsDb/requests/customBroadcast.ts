@@ -220,6 +220,7 @@ export interface UpdateInput {
   cronString?: string;
   description?: string;
   id: string;
+  idNew?: string;
   message?: string;
 }
 
@@ -248,6 +249,10 @@ export const updateEntry = async (
   if (input.message !== undefined) {
     columns.push(customBroadcastsTable.columns.message.name);
     values.push(input.message);
+  }
+  if (input.idNew !== undefined) {
+    columns.push(customBroadcastsTable.columns.id.name);
+    values.push(input.idNew);
   }
   const postResult = await db.requests.post(
     databasePath,

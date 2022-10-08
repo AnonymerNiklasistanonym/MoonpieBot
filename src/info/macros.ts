@@ -1,7 +1,7 @@
 // Local imports
 import {
+  macroCustomCommandBroadcastInfoEdit,
   macroCustomCommandInfo,
-  macroCustomCommandInfoEdit,
 } from "./macros/customCommands";
 import {
   macroMoonpieClaim,
@@ -57,7 +57,7 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
     "default-optional",
     macroCustomBroadcastInfo,
     macroCustomCommandInfo,
-    macroCustomCommandInfoEdit,
+    macroCustomCommandBroadcastInfoEdit,
     macroMoonpieClaim,
     macroCommandEnabled,
     macroMoonpieLeaderboard,

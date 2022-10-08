@@ -8,6 +8,7 @@ import {
   customCommandsBroadcastsCommandReplyAddCC,
   customCommandsBroadcastsCommandReplyAddCCAlreadyExists,
   customCommandsBroadcastsCommandReplyCCNotFound,
+  customCommandsBroadcastsCommandReplyCCsNotFound,
   customCommandsBroadcastsCommandReplyDelCC,
   customCommandsBroadcastsCommandReplyEditCC,
   customCommandsBroadcastsCommandReplyInvalidRegex,
@@ -24,8 +25,8 @@ import {
   messageParserById,
 } from "../../messageParser";
 import {
+  macroCustomCommandBroadcastInfoEdit,
   macroCustomCommandInfo,
-  macroCustomCommandInfoEdit,
 } from "../../info/macros/customCommands";
 import {
   regexCustomCommandAdd,
@@ -53,7 +54,7 @@ import type {
   RegexCustomCommandDelete,
 } from "../../info/regex";
 
-enum CustomCommandValueOptions {
+export enum CustomCommandValueOptions {
   COOLDOWN_IN_S = "cooldownInS",
   COUNT = "count",
   DESCRIPTION = "description",
@@ -377,6 +378,10 @@ export const commandListCCs: ChatMessageHandlerReplyCreator<
         logger
       );
 
+    if (customCommandInfos.length === 0) {
+      return { messageId: customCommandsBroadcastsCommandReplyCCsNotFound.id };
+    }
+
     // TODO Think about a better implementation
     return {
       messageId: async (
@@ -566,10 +571,13 @@ export const commandEditCC: ChatMessageHandlerReplyCreator<
         ...generateMacroMapFromMacroGenerator(macroCustomCommandInfo, {
           id: data.customCommandId,
         }),
-        ...generateMacroMapFromMacroGenerator(macroCustomCommandInfoEdit, {
-          option,
-          optionValue: data.customCommandOptionValue,
-        }),
+        ...generateMacroMapFromMacroGenerator(
+          macroCustomCommandBroadcastInfoEdit,
+          {
+            option,
+            optionValue: data.customCommandOptionValue,
+          }
+        ),
       ]),
       messageId: customCommandsBroadcastsCommandReplyEditCC.id,
     };

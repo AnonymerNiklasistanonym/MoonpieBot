@@ -76,31 +76,31 @@ export interface MacroCustomCommandInfoEditData {
   option: string;
   optionValue: string;
 }
-export enum MacroCustomCommandInfoEdit {
+export enum MacroCustomCommandBroadcastInfoEdit {
   OPTION = "OPTION",
   OPTION_VALUE = "OPTION_VALUE",
 }
-export const macroCustomCommandInfoEdit: MessageParserMacroGenerator<
+export const macroCustomCommandBroadcastInfoEdit: MessageParserMacroGenerator<
   MacroCustomCommandInfoEditData,
-  MacroCustomCommandInfoEdit
+  MacroCustomCommandBroadcastInfoEdit
 > = {
   exampleData: {
     option: "ID",
     optionValue: "new ID",
   },
   generate: (data) =>
-    Object.values(MacroCustomCommandInfoEdit).map((macroId) => {
+    Object.values(MacroCustomCommandBroadcastInfoEdit).map((macroId) => {
       let macroValue;
       switch (macroId) {
-        case MacroCustomCommandInfoEdit.OPTION:
+        case MacroCustomCommandBroadcastInfoEdit.OPTION:
           macroValue = data.option;
           break;
-        case MacroCustomCommandInfoEdit.OPTION_VALUE:
+        case MacroCustomCommandBroadcastInfoEdit.OPTION_VALUE:
           macroValue = data.optionValue;
           break;
       }
       return [macroId, macroValue];
     }),
-  id: "CUSTOM_COMMAND_INFO_EDIT",
-  keys: Object.values(MacroCustomCommandInfoEdit),
+  id: "CUSTOM_COMMAND_BROADCAST_INFO_EDIT",
+  keys: Object.values(MacroCustomCommandBroadcastInfoEdit),
 };

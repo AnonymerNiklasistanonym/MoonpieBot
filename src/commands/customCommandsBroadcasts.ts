@@ -1,8 +1,8 @@
 // Local imports
-// TODO Add commands
 import {
   commandAddCB,
   commandDelCB,
+  commandEditCB,
   commandListCBs,
 } from "./customCommandsBroadcasts/customBroadcasts";
 import {
@@ -14,7 +14,6 @@ import {
 import { commandCommands } from "./customCommandsBroadcasts/commands";
 import { runChatMessageHandlerReplyCreator } from "../chatMessageHandler";
 // Type imports
-// TODO Add types from command inputs
 import type {
   ChatMessageHandler,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
@@ -187,5 +186,20 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
       )
     )
   );
-  // TODO Add other commands
+  await Promise.all(
+    [commandEditCB].map((command) =>
+      runChatMessageHandlerReplyCreator(
+        client,
+        channel,
+        tags,
+        message,
+        data,
+        globalStrings,
+        globalPlugins,
+        globalMacros,
+        logger,
+        command
+      )
+    )
+  );
 };

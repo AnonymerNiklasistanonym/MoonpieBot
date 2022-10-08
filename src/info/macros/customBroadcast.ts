@@ -3,11 +3,14 @@ import type { MessageParserMacroGenerator } from "../../messageParser";
 
 export interface MacroCustomBroadcastInfoData {
   cronString?: string;
+  description?: string;
   id: string;
   message?: string;
 }
 export enum MacroCustomBroadcastInfo {
   CRON_STRING = "CRON_STRING",
+  /** Is an empty string if undefined. */
+  DESCRIPTION = "DESCRIPTION",
   ID = "ID",
   MESSAGE = "MESSAGE",
 }
@@ -27,6 +30,9 @@ export const macroCustomBroadcastInfo: MessageParserMacroGenerator<
       switch (macroId) {
         case MacroCustomBroadcastInfo.CRON_STRING:
           macroValue = data.cronString;
+          break;
+        case MacroCustomBroadcastInfo.DESCRIPTION:
+          macroValue = data.description !== undefined ? data.description : "";
           break;
         case MacroCustomBroadcastInfo.ID:
           macroValue = data.id;

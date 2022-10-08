@@ -37,7 +37,6 @@ export const regexOsuChatHandlerCommandRequests =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^\s*!osuRequests(?:(?:\s+(?<requestsOn>on)|\s+(?<requestsOff>off))(?:\s+(?<requestsOnOffMessage>.*?)\s*$|\s|$)?)?(?:\s|$)/i;
 
-// TODO Implement
 export interface RegexOsuChatHandlerCommandRequestsSet {
   setOption: string;
   setOptionValue: string;
@@ -60,7 +59,7 @@ export interface RegexOsuChatHandlerCommandRequestsSet {
  */
 export const regexOsuChatHandlerCommandRequestsSet =
   /^\s*!osuRequests\s+set\s+(?<setOption>\S+)\s+(?<setOptionValue>.+?)(?:\s*$)/i;
-// TODO Implement
+
 export interface RegexOsuChatHandlerCommandRequestsUnset {
   unsetOption: string;
 }
@@ -450,7 +449,7 @@ export const regexSpotifyChatHandlerCommandSong = /^\s*!song(?:\s|$)/i;
  * ```
  */
 export const regexCustomCommandsBroadcastsCommands =
-  /^\s*!(?:ccs?|cbs?)\s+commands(?:\s*$)/i;
+  /^\s*!(?:ccs?|cbs?|ccs?cbs?)\s+commands(?:\s*$)/i;
 
 export interface RegexCustomCommandAdd {
   customCommandCooldownInS?: string;
@@ -515,7 +514,7 @@ export interface RegexCustomCommandEdit {
  *
  * @example
  * ```text
- * !editcc ID message NEW_MESSAGE
+ * !editcc ID OPTION OPTION_VALUE
  * ```
  */
 export const regexCustomCommandEdit =
@@ -574,28 +573,19 @@ export interface RegexCustomBroadcastListOffset {
 export const regexCustomBroadcastList =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^\s*!listcbs?(?:\s+(?<customBroadcastOffset>[0-9]+?)|\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
-
-// TODO Implement
-export interface RegexCustomCommandSet {
-  customCommandId: string;
-  customCommandOption: string;
-  customCommandOptionValue: string;
+export interface RegexCustomBroadcastEdit {
+  customBroadcastId: string;
+  customBroadcastOption: string;
+  customBroadcastOptionValue: string;
 }
 /**
- * Regex to recognize the !customCommand set $ID $OPTION $VALUE command.
+ * Regex to recognize the !editcb command.
  *
  * @example
  * ```text
- * !customCommand set ping regex ^\s*!ping(?:\s*$)
- * ```
- * @example
- * ```text
- * !customCommand set ping message @$(USER) pong
- * ```
- * @example
- * ```text
- * !customCommand set ping level everyone
+ * !editcb ID OPTION OPTION_VALUE
  * ```
  */
-export const regexCustomCommandSet =
-  /^\s*!customCommand\s+set\s+(?<customCommandId>\S+?)\s+(?<customCommandOption>\S+)\s+(?<customCommandOptionValue>.+?)(?:\s*$)/i;
+export const regexCustomBroadcastEdit =
+  // eslint-disable-next-line security/detect-unsafe-regex
+  /^\s*!editcb\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!'))\s+(?<customBroadcastOption>\S+)\s+(?<customBroadcastOptionValue>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
