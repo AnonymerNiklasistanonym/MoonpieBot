@@ -6,6 +6,7 @@ import type { TwitchBadgeLevel } from "../../twitch";
 
 export interface MacroCustomCommandInfoData {
   cooldownInS?: number;
+  description?: string;
   id: string;
   message?: string;
   regex?: string;
@@ -13,6 +14,8 @@ export interface MacroCustomCommandInfoData {
 }
 export enum MacroCustomCommandInfo {
   COOLDOWN_IN_S = "COOLDOWN_IN_S",
+  /** Is empty string even if undefined. */
+  DESCRIPTION = "DESCRIPTION",
   ID = "ID",
   MESSAGE = "MESSAGE",
   REGEX = "REGEX",
@@ -37,6 +40,13 @@ export const macroCustomCommandInfo: MessageParserMacroGenerator<
           break;
         case MacroCustomCommandInfo.ID:
           macroValue = data.id;
+          break;
+        case MacroCustomCommandInfo.DESCRIPTION:
+          if (data.description !== undefined) {
+            macroValue = data.description;
+          } else {
+            macroValue = "";
+          }
           break;
         case MacroCustomCommandInfo.MESSAGE:
           macroValue = data.message;

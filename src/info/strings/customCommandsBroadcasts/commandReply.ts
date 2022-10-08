@@ -15,6 +15,7 @@ import {
   macroCustomCommandInfoEdit,
 } from "../../macros/customCommands";
 import { CUSTOM_COMMANDS_BROADCASTS_STRING_ID } from "../customCommandsBroadcasts";
+import { pluginIfNotEmpty } from "../../plugins/general";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
 // Type imports
 import type { StringEntry } from "../../../messageParser";
@@ -206,12 +207,28 @@ export const customCommandsBroadcastsCommandReplyListCCsEntry: StringEntry = {
         macroCustomCommandInfo,
         MacroCustomCommandInfo.ID
       ),
-      "' (",
+      "' /",
       generateMessageParserMessageMacro(
         macroCustomCommandInfo,
         MacroCustomCommandInfo.REGEX
       ),
-      ")",
+      "/i",
+      {
+        args: generateMessageParserMessageMacro(
+          macroCustomCommandInfo,
+          MacroCustomCommandInfo.DESCRIPTION
+        ),
+        name: pluginIfNotEmpty.id,
+        scope: [
+          " (",
+          generateMessageParserMessageMacro(
+            macroCustomCommandInfo,
+            MacroCustomCommandInfo.DESCRIPTION
+          ),
+          ")",
+        ],
+        type: "plugin",
+      },
     ],
     true
   ),

@@ -32,7 +32,8 @@ const defaultExampleCommandValues = {
 export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
-    id: `Reply > ${PluginTwitchChat.USER}`,
+    description: `Reply > ${PluginTwitchChat.USER}`,
+    id: "ping",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -42,7 +43,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Random numbers > ${pluginRandomNumber.id}`,
+    description: `Random numbers > ${pluginRandomNumber.id}`,
+    id: "random",
     message: createMessageParserMessage([
       { args: "0<->100", name: pluginRandomNumber.id, type: "plugin" },
       "%",
@@ -51,7 +53,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Count command calls > ${pluginRegexGroupId}`,
+    description: `Count command calls > ${pluginRegexGroupId}`,
+    id: "count",
     message: createMessageParserMessage([
       "the test command was called ",
       { name: pluginRegexGroupId, type: "plugin" },
@@ -68,7 +71,8 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     cooldownInS: 30,
-    id: "Add a cooldown to a command",
+    description: "Add a cooldown to a command",
+    id: "cooldown",
     message: createMessageParserMessage([
       "This command can only be executed every 30s",
     ]),
@@ -77,7 +81,8 @@ export const customCommandsInformation: CustomCommand[] = [
   {
     ...defaultExampleCommandValues,
     count: 20,
-    id: `Reference parts of a message > ${pluginRegexGroupId},${pluginIfNotUndefined.id}`,
+    description: `Reference parts of a message > ${pluginRegexGroupId},${pluginIfNotUndefined.id}`,
+    id: "references",
     message: createMessageParserMessage([
       "Detected the command !regex with ",
       {
@@ -101,7 +106,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Use Twitch API for more specific shout outs > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME}`,
+    description: `Use Twitch API for more specific shoutouts > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME}`,
+    id: "shoutout",
     message: createMessageParserMessage([
       "/announce Go check out ",
       { args: "1", name: pluginRegexGroupId, type: "plugin" },
@@ -120,7 +126,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Use Twitch API to get the follow age > ${pluginRegexGroupId},${PluginTwitchApi.GET_FOLLOW_AGE},${pluginTimeInSToHumanReadableStringShort.id}`,
+    description: `Use Twitch API to get the follow age > ${pluginRegexGroupId},${PluginTwitchApi.GET_FOLLOW_AGE},${pluginTimeInSToHumanReadableStringShort.id}`,
+    id: "followage",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -165,7 +172,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Use Twitch API to get/set the title > ${pluginRegexGroupId},${PluginTwitchApi.GET_TITLE},${PluginTwitchApi.SET_TITLE} [user:edit:broadcast scope necessary to set the title]`,
+    description: `Use Twitch API to get/set the title > ${pluginRegexGroupId},${PluginTwitchApi.GET_TITLE},${PluginTwitchApi.SET_TITLE} [user:edit:broadcast scope necessary to set the title]`,
+    id: "title",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -199,7 +207,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Use Twitch API to get/set the game > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME},${PluginTwitchApi.SET_GAME} [user:edit:broadcast scope necessary to set the game]`,
+    description: `Use Twitch API to get/set the game > ${pluginRegexGroupId},${PluginTwitchApi.GET_GAME},${PluginTwitchApi.SET_GAME} [user:edit:broadcast scope necessary to set the game]`,
+    id: "game",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -234,7 +243,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Death counter that works across commands [1/4] > ${pluginCustomCommandDataAddId}`,
+    description: `Death counter that works across commands [1/4] > ${pluginCustomCommandDataAddId}`,
+    id: "death counter add",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -260,7 +270,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Death counter that works across commands [2/4] > ${pluginCustomCommandDataGetId}`,
+    description: `Death counter that works across commands [2/4] > ${pluginCustomCommandDataGetId}`,
+    id: "death counter get",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -289,7 +300,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Death counter that works across commands [3/4] > ${pluginCustomCommandDataSetId}`,
+    description: `Death counter that works across commands [3/4] > ${pluginCustomCommandDataSetId}`,
+    id: "death counter set",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -345,7 +357,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `Death counter that works across commands [4/4] > ${pluginCustomCommandDataRemoveId}`,
+    description: `Death counter that works across commands [4/4] > ${pluginCustomCommandDataRemoveId}`,
+    id: "death counter remove",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
@@ -375,7 +388,8 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    id: `List all available macros and plugins for debugging > ${pluginHelp.id}`,
+    description: `List all available macros and plugins for debugging > ${pluginHelp.id}`,
+    id: "help",
     message: createMessageParserMessage([
       { name: pluginHelp.id, type: "plugin" },
     ]),
