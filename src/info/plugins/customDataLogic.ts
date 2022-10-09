@@ -433,8 +433,19 @@ const customDataListLogic = async (
         throw Error(
           `Can't remove list element from empty list ('${content.trim()}')`
         );
+      } else if (parseInt(args[1]) >= entry.value.length) {
+        throw Error(
+          `Can't remove list element with index bigger than list length ('${content.trim()}'/${
+            entry.value.length
+          })`
+        );
       } else {
-        const removedElements = entry.value.splice(parseInt(args[0]), 1);
+        const removedElements = entry.value.splice(parseInt(args[1]), 1);
+        if (removedElements[0] === undefined) {
+          throw Error(
+            `No element was removed from custom data list ('${content.trim()}')`
+          );
+        }
         await customCommandsBroadcastsDb.requests.customData.updateEntry(
           customCommandsBroadcastsDbPath,
           { id: args[0], value: entry.value, valueType: entry.valueType },
