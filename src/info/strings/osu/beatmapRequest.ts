@@ -26,6 +26,7 @@ import {
   pluginIfNotEmpty,
   pluginIfNotUndefined,
   pluginIfTrue,
+  pluginListJoinCommaSpace,
   pluginTimeInSToStopwatchString,
 } from "../../plugins/general";
 import { OSU_IRC_NEWLINE } from "../../../osuIrc";
@@ -350,127 +351,146 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
       scope: [
         " (",
         {
-          args: generateMessageParserMessageMacro(
-            macroOsuBeatmapRequestDemands,
-            MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN
-          ),
-          name: pluginIfNotUndefined.id,
-          scope: [
-            " >",
-            generateMessageParserMessageMacro(
-              macroOsuBeatmapRequestDemands,
-              MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN
-            ),
-            "*",
+          args: [
+            {
+              args: generateMessageParserMessageMacro(
+                macroOsuBeatmapRequestDemands,
+                MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN
+              ),
+              name: pluginIfNotUndefined.id,
+              scope: [
+                ">",
+                generateMessageParserMessageMacro(
+                  macroOsuBeatmapRequestDemands,
+                  MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN
+                ),
+                "*;",
+              ],
+              type: "plugin",
+            },
+            {
+              args: generateMessageParserMessageMacro(
+                macroOsuBeatmapRequestDemands,
+                MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX
+              ),
+              name: pluginIfNotUndefined.id,
+              scope: [
+                "<",
+                generateMessageParserMessageMacro(
+                  macroOsuBeatmapRequestDemands,
+                  MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX
+                ),
+                "*;",
+              ],
+              type: "plugin",
+            },
+            {
+              args: generateMessageParserMessageMacro(
+                macroOsuBeatmapRequestDemands,
+                MacroOsuBeatmapRequestDemands.AR_RANGE_MIN
+              ),
+              name: pluginIfNotUndefined.id,
+              scope: [
+                "AR>",
+                generateMessageParserMessageMacro(
+                  macroOsuBeatmapRequestDemands,
+                  MacroOsuBeatmapRequestDemands.AR_RANGE_MIN
+                ),
+                ";",
+              ],
+              type: "plugin",
+            },
+            {
+              args: generateMessageParserMessageMacro(
+                macroOsuBeatmapRequestDemands,
+                MacroOsuBeatmapRequestDemands.AR_RANGE_MAX
+              ),
+              name: pluginIfNotUndefined.id,
+              scope: [
+                "AR<",
+                generateMessageParserMessageMacro(
+                  macroOsuBeatmapRequestDemands,
+                  MacroOsuBeatmapRequestDemands.AR_RANGE_MAX
+                ),
+                ";",
+              ],
+              type: "plugin",
+            },
+            {
+              args: generateMessageParserMessageMacro(
+                macroOsuBeatmapRequestDemands,
+                MacroOsuBeatmapRequestDemands.CS_RANGE_MIN
+              ),
+              name: pluginIfNotUndefined.id,
+              scope: [
+                "CS>",
+                generateMessageParserMessageMacro(
+                  macroOsuBeatmapRequestDemands,
+                  MacroOsuBeatmapRequestDemands.CS_RANGE_MIN
+                ),
+                ";",
+              ],
+              type: "plugin",
+            },
+            {
+              args: generateMessageParserMessageMacro(
+                macroOsuBeatmapRequestDemands,
+                MacroOsuBeatmapRequestDemands.CS_RANGE_MAX
+              ),
+              name: pluginIfNotUndefined.id,
+              scope: [
+                "CS<",
+                generateMessageParserMessageMacro(
+                  macroOsuBeatmapRequestDemands,
+                  MacroOsuBeatmapRequestDemands.CS_RANGE_MAX
+                ),
+                ";",
+              ],
+              type: "plugin",
+            },
+            {
+              args: generateMessageParserMessageMacro(
+                macroOsuBeatmapRequestDemands,
+                MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN
+              ),
+              name: pluginIfNotUndefined.id,
+              scope: [
+                ">",
+                generateMessageParserMessageMacro(
+                  macroOsuBeatmapRequestDemands,
+                  MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN
+                ),
+                "min;",
+              ],
+              type: "plugin",
+            },
+            {
+              args: generateMessageParserMessageMacro(
+                macroOsuBeatmapRequestDemands,
+                MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX
+              ),
+              name: pluginIfNotUndefined.id,
+              scope: [
+                "<",
+                generateMessageParserMessageMacro(
+                  macroOsuBeatmapRequestDemands,
+                  MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX
+                ),
+                "min;",
+              ],
+              type: "plugin",
+            },
+            {
+              args: generateMessageParserMessageMacro(
+                macroOsuBeatmapRequestDemands,
+                MacroOsuBeatmapRequestDemands.REDEEM_ID
+              ),
+              name: pluginIfNotUndefined.id,
+              scope: "only via channel points redeem;",
+              type: "plugin",
+            },
           ],
-          type: "plugin",
-        },
-        {
-          args: generateMessageParserMessageMacro(
-            macroOsuBeatmapRequestDemands,
-            MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX
-          ),
-          name: pluginIfNotUndefined.id,
-          scope: [
-            " <",
-            generateMessageParserMessageMacro(
-              macroOsuBeatmapRequestDemands,
-              MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX
-            ),
-            "*",
-          ],
-          type: "plugin",
-        },
-        {
-          args: generateMessageParserMessageMacro(
-            macroOsuBeatmapRequestDemands,
-            MacroOsuBeatmapRequestDemands.AR_RANGE_MIN
-          ),
-          name: pluginIfNotUndefined.id,
-          scope: [
-            " AR>",
-            generateMessageParserMessageMacro(
-              macroOsuBeatmapRequestDemands,
-              MacroOsuBeatmapRequestDemands.AR_RANGE_MIN
-            ),
-          ],
-          type: "plugin",
-        },
-        {
-          args: generateMessageParserMessageMacro(
-            macroOsuBeatmapRequestDemands,
-            MacroOsuBeatmapRequestDemands.AR_RANGE_MAX
-          ),
-          name: pluginIfNotUndefined.id,
-          scope: [
-            " AR<",
-            generateMessageParserMessageMacro(
-              macroOsuBeatmapRequestDemands,
-              MacroOsuBeatmapRequestDemands.AR_RANGE_MAX
-            ),
-          ],
-          type: "plugin",
-        },
-        {
-          args: generateMessageParserMessageMacro(
-            macroOsuBeatmapRequestDemands,
-            MacroOsuBeatmapRequestDemands.CS_RANGE_MIN
-          ),
-          name: pluginIfNotUndefined.id,
-          scope: [
-            " CS>",
-            generateMessageParserMessageMacro(
-              macroOsuBeatmapRequestDemands,
-              MacroOsuBeatmapRequestDemands.CS_RANGE_MIN
-            ),
-          ],
-          type: "plugin",
-        },
-        {
-          args: generateMessageParserMessageMacro(
-            macroOsuBeatmapRequestDemands,
-            MacroOsuBeatmapRequestDemands.CS_RANGE_MAX
-          ),
-          name: pluginIfNotUndefined.id,
-          scope: [
-            " CS<",
-            generateMessageParserMessageMacro(
-              macroOsuBeatmapRequestDemands,
-              MacroOsuBeatmapRequestDemands.CS_RANGE_MAX
-            ),
-          ],
-          type: "plugin",
-        },
-        {
-          args: generateMessageParserMessageMacro(
-            macroOsuBeatmapRequestDemands,
-            MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN
-          ),
-          name: pluginIfNotUndefined.id,
-          scope: [
-            " >",
-            generateMessageParserMessageMacro(
-              macroOsuBeatmapRequestDemands,
-              MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN
-            ),
-            "min",
-          ],
-          type: "plugin",
-        },
-        {
-          args: generateMessageParserMessageMacro(
-            macroOsuBeatmapRequestDemands,
-            MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX
-          ),
-          name: pluginIfNotUndefined.id,
-          scope: [
-            " <",
-            generateMessageParserMessageMacro(
-              macroOsuBeatmapRequestDemands,
-              MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX
-            ),
-            "min",
-          ],
+          name: pluginListJoinCommaSpace.id,
           type: "plugin",
         },
         ")",

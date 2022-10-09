@@ -79,6 +79,7 @@ export enum MacroOsuBeatmapRequestDemands {
   HAS_DEMANDS = "HAS_DEMANDS",
   LENGTH_IN_MIN_RANGE_MAX = "LENGTH_IN_MIN_RANGE_MAX",
   LENGTH_IN_MIN_RANGE_MIN = "LENGTH_IN_MIN_RANGE_MIN",
+  REDEEM_ID = "REDEEM_ID",
   STAR_RANGE_MAX = "STAR_RANGE_MAX",
   STAR_RANGE_MIN = "STAR_RANGE_MIN",
 }
@@ -127,6 +128,7 @@ export const macroOsuBeatmapRequestDemands: MessageParserMacroGenerator<
             OsuRequestsConfig.CS_MIN,
             OsuRequestsConfig.LENGTH_IN_MIN_MAX,
             OsuRequestsConfig.LENGTH_IN_MIN_MIN,
+            OsuRequestsConfig.REDEEM_ID,
             OsuRequestsConfig.STAR_MAX,
             OsuRequestsConfig.STAR_MIN,
           ]
@@ -143,6 +145,12 @@ export const macroOsuBeatmapRequestDemands: MessageParserMacroGenerator<
           macroValue = getConfigEntry(
             data.osuRequestsConfigEntries,
             OsuRequestsConfig.LENGTH_IN_MIN_MIN
+          );
+          break;
+        case MacroOsuBeatmapRequestDemands.REDEEM_ID:
+          macroValue = getConfigEntry(
+            data.osuRequestsConfigEntries,
+            OsuRequestsConfig.REDEEM_ID
           );
           break;
         case MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX:
