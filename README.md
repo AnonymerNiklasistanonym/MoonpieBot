@@ -149,9 +149,12 @@ Custom broadcasts will be scheduled at start of the bot and rescheduled on any c
 | `!addcc ID REGEX MESSAGE`, `!addcc ID REGEX MESSAGE -ul=mod -cd=10` | mod | Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported |
 | `!editcc PROPERTY NEW_VALUE` | mod | A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command |
 | `!delcc ID` | mod | Using the command ID an added command can be deleted |
+| `!listccs ($OFFSET/$ID)` | everyone | List all added commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command) |
 | `!addcb ID CRON_STRING MESSAGE` | mod | Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message |
 | `!editcb PROPERTY NEW_VALUE` | mod | A single property (cronString, description, id, message) can be edited of an existing broadcast |
 | `!delcb ID` | mod | Using the broadcast ID an added broadcast can be deleted |
+| `!listcbs ($OFFSET/$ID)` | everyone | List all added callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast) |
+| `!cccb commands` | everyone | See all (other) available/enabled custom commands/broadcasts commands |
 
 An example file for this is [`customCommandsBroadcasts.example.txt`](./customCommandsBroadcasts.example.txt).
 

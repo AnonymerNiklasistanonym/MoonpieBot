@@ -288,15 +288,7 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandListDetectorOutput
 > = {
-  createReply: async (_channel, tags, data, logger) => {
-    const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
-      tags,
-      TwitchBadgeLevel.MODERATOR
-    );
-    if (twitchBadgeLevelCheck !== undefined) {
-      return twitchBadgeLevelCheck;
-    }
-
+  createReply: async (_channel, _tags, data, logger) => {
     if (data.customBroadcastId !== undefined) {
       const exists =
         await customCommandsBroadcastsDb.requests.customBroadcast.existsEntry(
