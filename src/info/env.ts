@@ -281,14 +281,14 @@ export const envVariableInformation: CliEnvVariableInformation<
   {
     block: EnvVariableBlock.OSU_API,
     default: EnvVariableOnOff.OFF,
-    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) additionally output more detailed information about the map in the chat.`,
+    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) additionally output more detailed information about the map in the chat. This can also be set at runtime and stored persistently in a database but if provided will override the current value in the database on start of the bot.`,
     legacyNames: ["OSU_RECOGNIZE_MAP_REQUESTS_DETAILED"],
     name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
     supportedValues: { values: Object.values(EnvVariableOnOff) },
   },
   {
     block: EnvVariableBlock.OSU_API,
-    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) make it that only messages that used a channel point redeem will be recognized as requests.`,
+    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) make it that only messages that used a channel point redeem will be recognized as requests. This can also be set at runtime and stored persistently in a database but if provided will override the current value in the database on start of the bot.`,
     example: "651f5474-07c2-4406-9e59-37d66fd34069",
     name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID,
   },

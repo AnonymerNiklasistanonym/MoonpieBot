@@ -103,11 +103,11 @@ Supported values: "*OFF*", "*ON*"
 : The database file path that contains the persistent osu! map requests data.
 
 **MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED**="*OFF*"
-: If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) additionally output more detailed information about the map in the chat.
+: If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) additionally output more detailed information about the map in the chat. This can also be set at runtime and stored persistently in a database but if provided will override the current value in the database on start of the bot.
 Supported values: "*OFF*", "*ON*"
 
 **MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID**
-: If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) make it that only messages that used a channel point redeem will be recognized as requests.
+: If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) make it that only messages that used a channel point redeem will be recognized as requests. This can also be set at runtime and stored persistently in a database but if provided will override the current value in the database on start of the bot.
 Example: "*651f5474-07c2-4406-9e59-37d66fd34069*"
 
 **MOONPIE_CONFIG_OSU_IRC_PASSWORD**

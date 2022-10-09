@@ -8,14 +8,12 @@ A custom Twitch chat bot.
 
 ![MoonpieBot icon](res/icons/moonpiebot.png)
 
-**ATTENTION: You need a runtime that implements `fetch` which means you need for example [Node.js v18+](https://nodejs.org/en/blog/announcements/v18-release-announce/).**
-
 - [Features](#features)
   - [Default: moonpie](#default-moonpie)
   - [Optional: osu!](#optional-osu)
   - [Optional: Spotify](#optional-spotify)
-  - [Optional: Custom commands/broadcasts](#optional-custom-commandsbroadcasts)
-  - [Optional: Custom strings/messages](#optional-custom-stringsmessages)
+  - [Default: Custom text/strings/messages](#default-custom-textstringsmessages)
+  - [Default: Custom commands/broadcasts](#default-custom-commandsbroadcasts)
 - [Setup](#setup)
   - [Build it yourself](#build-it-yourself)
   - [Binary releases](#binary-releases)
@@ -24,9 +22,7 @@ A custom Twitch chat bot.
   - [Package managers](#package-managers)
     - [Pacman](#pacman)
 - [Migrate to a new version](#migrate-to-a-new-version)
-- [Helping Resources](#helping-resources)
 - [Examples](#examples)
-- [TODOs](#todos)
 - [Implementation](#implementation)
 - [Inspect Database](#inspect-database)
 - [Development](#development)
@@ -39,9 +35,11 @@ A custom Twitch chat bot.
 
 ## Features
 
-Given a Twitch account name, a connected OAuth token and the channel name where the bot should be deployed will imitate the given account in the given channel.
+**Given a Twitch account name, a connected OAuth token and the channel name(s) where the bot should be deployed** will imitate the given account in the given channel.
 
-All features are optional (which means they can be enabled and disabled) but the moonpie feature is enabled per default.
+The following list contains all supported features of the bot.
+
+**All (default) features can be disabled.**
 
 ### Default: moonpie
 
@@ -54,38 +52,36 @@ All features are optional (which means they can be enabled and disabled) but the
   | `!moonpie leaderboard` | everyone | Show the top 15 moonpie holders |
   | `!moonpie get $USER` | everyone | Return the current count and the leaderboard position of `$USER` if found in database |
   | `!moonpie about` | everyone | Show the version and source code link of the bot |
-  | `!moonpie add $USER $COUNT` | broadcaster badge | Add moonpie `$COUNT` to `$USER` if found in database |
-  | `!moonpie remove $USER $COUNT` | broadcaster badge | Remove moonpie `$COUNT` to `$USER` if found in database |
-  | `!moonpie set $USER $COUNT` | broadcaster badge | Set moonpie `$COUNT` to `$USER` if found in database |
-  | `!moonpie delete $USER` | broadcaster badge | Delete a `$USER` from the database if found in database |
+  | `!moonpie add $USER $COUNT` | broadcaster | Add moonpie `$COUNT` to `$USER` if found in database |
+  | `!moonpie remove $USER $COUNT` | broadcaster | Remove moonpie `$COUNT` to `$USER` if found in database |
+  | `!moonpie set $USER $COUNT` | broadcaster | Set moonpie `$COUNT` to `$USER` if found in database |
+  | `!moonpie delete $USER` | broadcaster | Delete a `$USER` from the database if found in database |
 
 **Every command can be optionally disabled.**
 
 ### Optional: osu!
 
-Given an osu! OAuth client ID/secret and a default (streamer) osu! ID the bot can additionally fetch some osu! related information.
+**Given an osu! OAuth client ID/secret and a default (streamer) osu! ID** the bot can additionally fetch some osu! related information.
+
+The `!np` and `!osu commands` are available **if instead of the former only a [StreamCompanion](https://github.com/Piotrekol/StreamCompanion) URL (`localhost:20727`) or directory path (`C:\Program Files (x86)\StreamCompanion\Files`) is provided**.
 
 | Command | Permissions | Description |
 | ------ | -- | -------- |
 | `!rp ($OSU_ID/$OSU_NAME)` | everyone | Get the most recent play of the streamer or of the given osu! player ID |
 | `!pp ($OSU_ID/$OSU_NAME)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given osu! player ID |
-| `!np` | everyone | Get a link to the currently being played map (this can be either done by using the osu! window text [default, slow and only works if the map is being played] or if [StreamCompanion](https://github.com/Piotrekol/StreamCompanion) is configured and running it can use this information instead which works always, is very fast and contains detailed information even regarding the current selected mods) |
-| `!score $OSU_NAME` | everyone | Get the score of an osu! user of the last requested beatmap |
-| `!osu commands` | everyone | See all available osu! commands |
+| `!np` | everyone | Get a link to the currently being played map (**if an optional StreamCompanion URL/directory path is provided** this information will be used to get the current map information, otherwise the osu! window text will be used and searched for **using the given osu! credentials** [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map]) |
+| `!score $OSU_NAME` | everyone | Get the score of an osu! user of the last mentioned beatmap |
 | `!osuRequests` | everyone | Get if map requests are currently enabled and with which demands if there are any |
 | `!osuRequests on/off ($MESSAGE)` | mod | Turn map requests on or off with an optional message |
-| `!osuRequests set/unset $OPTION ($VALUE)` | mod | Set map request demands (`arMin`, `arMax`, `csMin`, `csMax`, `starMin`, `starMax`, ...) |
-| `!osuLastRequest ($COUNT)` | mod | Resend the last request or multiple ones in case of a client restart |
+| `!osuRequests set $OPTION $VALUE`, `!osuRequests unset $OPTION` | mod | Set map request demands/options (`arMax`, `arMin`, `csMax`, `csMin`, `detailed`, `lengthInMinMax`, `lengthInMinMin`, `redeemId`, `starMax`, `starMin`) or unset them back to their default value |
+| `!osuLastRequest ($COUNT)` | mod | Resend the last request (or multiple if `$COUNT` is provided) in case of a osu! client restart |
 | `!osuPermitRequest` | mod | Permit the last blocked map request |
+| `!osu commands` | everyone | See all (other) available/enabled osu! commands |
 
-It can recognize beatmap links in chat and print map information (and if existing the top score on the map) to the chat **if enabled**.
-(This can be toggled at runtime via the commands `!osuRequests on/off`)
-Given an osu! IRC login it can even send these beatmap links to the osu! client.
-
-Added demands regarding star rating, AR and CS will block map requests from coming through.
+**If optionally enabled** beatmap links in chat can be recognized and print map information (and if existing the top score on the map) to the chat.
+**Given an osu! IRC login and osu! name** it can even send these recognized beatmap links to the osu! client of the specified osu! name.
+**If demands are set** they will block map requests from coming through.
 (The latest blocked map request can still be permitted using the `!osuPermitRequest` command)
-
-It is also possible that only the `!np` command is enabled when a StreamCompanion URL (`localhost:20727`) or a directory path (`C:\Program Files (x86)\StreamCompanion\Files`) can be found in the configuration even if no other osu! related configurations is set.
 
 *Everything is currently optimized and written for osu! standard which means you need to open an issue if you want to use it with another game mode!*
 
@@ -93,84 +89,85 @@ It is also possible that only the `!np` command is enabled when a StreamCompanio
 
 ### Optional: Spotify
 
-Given a Spotify client ID/secret the bot can additionally fetch some Spotify related information.
+**Given a Spotify client ID/secret** the bot can additionally fetch some Spotify related information.
 
 After a successful authentication (the bot will automatically open a website for the authentication) you will be able to copy the access and refresh token so next time the authentication does not necessarily need to be repeated in the browser.
 
 | Command | Permissions | Description |
 | ------ | -- | -------- |
 | `!song` | everyone | Get the currently playing song title/artist and album (if not a single) as well as the same information about the 2 previously played songs |
+| `!spotify commands` | everyone | See all (other) available/enabled Spotify commands |
 
 **Every command can be optionally disabled.**
 
-### Optional: Custom commands/broadcasts
+### Default: Custom text/strings/messages
 
-This program has per default the ability to add/edit/delete custom commands and broadcasts if you are at least a moderator in the chat.
+Most messages can be customized to a high degree because this application uses a message parser that can parse a *normal* text/string and replace certain parts with runtime information like a user name in a message reply (`@$(USER) ping` becomes at runtime to `@john_smith ping`).
+
+To achieve this the logic consists of:
+
+- Macros: `%MACRO_TITLE:MACRO_NAME%` that simply get replaced with a string value (`%MOONPIEBOT:VERSION%` becomes at runtime to `v0.0.27`)
+- Plugins: `$(PLUGIN=OPTIONAL_PLUGIN_VALUE|OPTIONAL_PLUGIN_SCOPE)` that can for example evaluate a request like for example setting the stream title or evaluating if the plugin scope text should be displayed in respect to the plugin value (the optional plugin value will be parsed before the evaluation so you can nest plugins)
+- References: `$[STRING_REFERENCE]` that simply reference another string that will then be inserted which reduces redundant entries
+
+To override the default strings and add additional custom ones you can create a `.env.strings` file.
+There is an example file [`.env.strings.example`](./.env.strings.example) for this where all the default values are listed and can be uncommented/edited which also contains the plugin and macro documentation.
+
+Example:
+
+```sh
+# .env.strings file content
+
+# Default value (commented and only here for reference)
+#MOONPIE_CUSTOM_STRING_MOONPIE_COMMAND_REPLY_ABOUT=@$(USER) %MOONPIEBOT:NAME% %MOONPIEBOT:VERSION%
+# Customized value (will override the default MOONPIE_COMMAND_REPLY_ABOUT string)
+MOONPIE_CUSTOM_STRING_MOONPIE_COMMAND_REPLY_ABOUT=@$(USER) %MOONPIEBOT:NAME% %MOONPIEBOT:VERSION% (custom string) $[ABC]
+# Custom string that can be referenced in any other string
+MOONPIE_CUSTOM_STRING_ABC=Custom reference 69
+```
+
+If you now type in chat `!moonpie about` instead of the default reply the reply will also contain `(custom string) Custom reference 69` at the end.
+
+---
+
+**For some macros to work** (like Twitch API connections for `!so`/`!followage`/`!settitle`/`!setgame`, osu! api requests or Spotify api requests) **additional API credentials need to be provided** (most of them use the same credentials as the optional features with the same name).
+
+Even though to run the bot default Twitch API credentials are already provided these credentials are only configured to read and write chat messages and are unable to change the stream title or fetch information about Twitch accounts.
+
+Everything should be explained in more detail in the [`.env.example`](./.env.example) file.
+
+### Default: Custom commands/broadcasts
+
+This program has per default the ability to add/edit/delete custom commands and custom broadcasts using the chat.
 The commands and broadcasts are persistently saved in a database.
 
-Add a custom command with an ID, a RegEx expression to detect it and capture contents of the match (https://regex101.com/) and a message:
+Custom commands will be checked for every new message.
+Custom broadcasts will be scheduled at start of the bot and rescheduled on any change.
 
-```text
-!addcc ID REGEX MESSAGE
-```
-
-Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported:
-
-```text
-!addcc ID REGEX MESSAGE -ul=mod -cd=10
-```
-
-A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing custom command:
-
-```text
-!editcc PROPERTY NEW_VALUE
-```
-
-And using the custom command ID it can be deleted:
-
-```text
-!delcc ID
-```
-
-Add a custom broadcast with an ID, a cron expression to determine when the broadcast should be sent (https://crontab.cronhub.io/) and a message
-
-```text
-!addcb ID CRON_STRING MESSAGE
-```
-
-A single property (cronString, description, id, message) can be edited of an existing custom broadcast:
-
-```text
-!editcb PROPERTY NEW_VALUE
-```
+| Command | Permissions | Description |
+| ------ | -- | -------- |
+| `!addcc ID REGEX MESSAGE`, `!addcc ID REGEX MESSAGE -ul=mod -cd=10` | mod | Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported |
+| `!editcc PROPERTY NEW_VALUE` | mod | A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command |
+| `!delcc ID` | mod | Using the command ID an added command can be deleted |
+| `!addcb ID CRON_STRING MESSAGE` | mod | Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message |
+| `!editcb PROPERTY NEW_VALUE` | mod | A single property (cronString, description, id, message) can be edited of an existing broadcast |
+| `!delcb ID` | mod | Using the broadcast ID an added broadcast can be deleted |
 
 An example file for this is [`customCommandsBroadcasts.example.txt`](./customCommandsBroadcasts.example.txt).
 
-For some macros to work (like Twitch API connections for `!so`/`!followage`/`!settitle`/`!setgame`) additional Twitch API credentials need to be provided since the default Twitch API connection is only configured to read and write chat messages.
+The custom commands/broadcasts messages use a custom message parser so next to *normal text* they can contain advanced logic.
+The supported logic is documented in the [previous section](#default-custom-textstringsmessages).
 
-Additionally commands support a (global) *data* structure that enables set/get (add/remove for numbers) of a value across commands which for example enables a (video game) easy death counter that can be manipulated by mods while everyone can use a different command to see the current count.
+A specific group of plugins that only custom commands/broadcasts support are global custom data plugins.
+They enable to store persistently a text, number or a list of them in a database and change them or run operations on them (there are useful real life examples of this in the previously mentioned example file).
 
-The supported macros and logic plugins are also documented in the next section.
-
-### Optional: Custom strings/messages
-
-Most messages can be customized to a high degree using a custom message parser that can also easily be extended consisting of plugins and macros.
-
-The idea is that instead of a final message (in English) there is a way to replace the default string with a custom one.
-Important variables and values will then at runtime be parsed and inserted into the string.
-
-To do this there are:
-
-- Macros: `%MACRO_TITLE:MACRO_NAME%` that simply get replaced with a string value
-- Plugins: `$(PLUGIN=OPTIONAL_PLUGIN_VALUE|OPTIONAL_PLUGIN_SCOPE)` that can for example evaluate a request like for example setting the stream title or evaluating if the plugin scope text should be displayed in respect to the plugin value
-- References: `$[STRING_REFERENCE]` that simply reference another string that will then be inserted
-
-To override the default strings and add custom ones you can create a `.env.strings` file.
-There is an example file [`.env.strings.example`](./.env.strings.example) for this where all the default values are listed and can be uncommented/edited which also contains the plugin and macro documentation.
+**Every command can be optionally disabled.**
 
 ## Setup
 
 ### Build it yourself
+
+**ATTENTION: If you build this program yourself you need a node runtime that implements `fetch` which means you need for example [Node.js v18+](https://nodejs.org/en/blog/announcements/v18-release-announce/).**
 
 1. Install a recent version of [Node.js](https://nodejs.org/en/download/) so the `node` and `npm` command are available
 2. Get the source code of the bot
@@ -221,7 +218,7 @@ There is an example file [`.env.strings.example`](./.env.strings.example) for th
    - Detailed list of steps to get a Twitch OAuth token:
 
      1. Log into your twitch account (or better the account of the bot) in the browser
-     2. Visit the webpage https://twitchapps.com/tmi/
+     2. Visit the webpage [twitchapps.com/tmi](https://twitchapps.com/tmi/)
      3. Follow the instructions and click `Connect`
      4. After enabling permission you get forwarded to a page where you can get the token
 
@@ -316,14 +313,6 @@ In case there will be a database change I will try to migrate that on the softwa
    ```
 
    After following all those steps you don't need to to the previous steps any more until there is an update.
-
-## Helping Resources
-
-To add custom commands a regex needs to be created.
-For easily testing a custom regex you can use https://regex101.com/.
-
-To add custom timers a cron string needs to be created.
-For easily seeing to what a cron string resolves to you can use https://crontab.cronhub.io/.
 
 ## Examples
 
@@ -461,24 +450,6 @@ In the following there is a list of some possible configurations (`.env` files):
    - Supports the osu! related "!osuRequests" command which can toggle if beatmap requests are on(=default) or off
    - Supports simple custom commands/timers that don't need special APIs in their messages
 
-## TODOs
-
-Things that should still be added:
-
-- [ ] Add possibility for custom commands to be added/deleted/edited from the Twitch chat (moderator level)
-
-Not important things that can be added if time:
-
-- [ ] Database
-  - [ ] (*not important*) Add more tests
-  - [ ] (*not important*) Add better `ROW_NUMBER () OVER ()` integration
-  - [ ] (*not important*) Add better `lower()` integration
-- [ ] Commands:
-  - [ ] (*not important*) Add admin integration to allow more than the broadcaster to use certain commands (like !moonpie set/add/remove)
-    - [ ] `!moonpie add-admin $USER`
-    - [ ] `!moonpie remove-admin $USER`
-- [ ] (*not important*) Check if the bot can see if a stream is happening and otherwise blocking claiming moonpies
-
 ## Implementation
 
 Not every detail but the big components on which this bot is made of:
@@ -498,12 +469,16 @@ Not every detail but the big components on which this bot is made of:
       - `irc` (connect to osu! client via IRC protocol)
       - `node-cron` (run timers based on cron strings)
       - `osu-api-v2` (connect to the osu! API v2)
+      - `spotify-web-api-node` (connect to the Spotify API)
+      - `open` (open the browser to setup the initial Spotify API connection refresh token)
+      - `reconnecting-websocket` (connect to the StreamCompanion websocket server)
   - Development:
     - `eslint` (for code format and linting)
     - `mocha` (for tests)
     - `nodemon` (live restart of bot after changes have been made)
     - `nyc` (for code coverage)
     - `prettier` (for code format)
+    - `typedoc` (for HTML documentation)
 
 ## Inspect Database
 
@@ -531,11 +506,11 @@ cross-env NODE_PATH=. nyc mocha -- "test/src/database.test.ts"
 
 ### Configuration files
 
-- TypeScript: `.tsconfig.json`, `.tsconfig.eslint` (special script for linting tests)
+- TypeScript: `.tsconfig.json`, `.tsconfig.eslint` (special script for linting tests/scripts)
 - ESLint (linting): `.eslintrc.json`, `.eslintignore`
 - Mocha (testing): `.mocharc.json`
 - Istanbul (code coverage): `.nycrc`
-- Nodemon (automatically recompile project on changes): `nodemon.json`
+- Nodemon (automatically recompile project on file changes): `nodemon.json`
 
 ### How to handle versions
 
@@ -595,7 +570,7 @@ For documentation purposes several plugins can be used:
 
 ## Profiling
 
-- Node.js profiling: https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27
+- [Node.js profiling:](https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27)
 
   - Start application with custom inspect option:
 
@@ -613,7 +588,7 @@ For documentation purposes several plugins can be used:
       - You can get a heap change visualization with the same kind of snapshot information by setting the profiling type to *Allocation instrumentation on timeline*
     - CPU: In the tab *Profiler* you can record the application as long as you want, if you stop the profiler you will get a table of what parts of the code were used the most
 
-- Simple profiling: https://nodejs.org/en/docs/guides/simple-profiling/
+- [Simple profiling:](https://nodejs.org/en/docs/guides/simple-profiling/)
 
   ```sh
   # Track all calls
@@ -625,7 +600,7 @@ For documentation purposes several plugins can be used:
         "profile_perf_flamegraph": "stackvis perf < perfs.out > flamegraph.htm",
   ```
 
-- Flamegraph: https://nodejs.org/en/docs/guides/diagnostics-flamegraph/
+- [Flamegraph:](https://nodejs.org/en/docs/guides/diagnostics-flamegraph/)
 
   ```sh
   # Track all calls using perf
