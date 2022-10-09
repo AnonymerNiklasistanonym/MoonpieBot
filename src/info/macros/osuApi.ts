@@ -13,7 +13,7 @@ import type {
 } from "../../messageParser";
 
 export interface MacroOsuApiData {
-  osuApiDefaultId: string;
+  osuApiDefaultId: number;
 }
 export enum MacroOsuApi {
   DEFAULT_USER_ID = "DEFAULT_USER_ID",
@@ -27,7 +27,7 @@ export const macroOsuApi: MessageParserMacroGenerator<
       let macroValue;
       switch (macroId) {
         case MacroOsuApi.DEFAULT_USER_ID:
-          macroValue = data.osuApiDefaultId;
+          macroValue = `${data.osuApiDefaultId}`;
           break;
       }
       return [macroId, macroValue];

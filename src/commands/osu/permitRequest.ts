@@ -2,6 +2,8 @@
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { osuBeatmapRequestNoBlockedRequestsError } from "../../info/strings/osu/beatmapRequest";
+import { OsuRequestsConfig } from "../../database/osuRequestsDb/info";
+import osuRequestsDb from "../../database/osuRequestsDb";
 import { regexOsuChatHandlerCommandPermitRequest } from "../../info/regex";
 import { sendBeatmapRequest } from "./beatmap";
 import { TwitchBadgeLevel } from "../../twitch";
@@ -13,6 +15,7 @@ import type {
 } from "../../chatMessageHandler";
 import type {
   CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandOsuGenericDataOsuApiDbPath,
   CommandOsuGenericDataOsuIrcData,
 } from "../osu";
 
@@ -26,10 +29,11 @@ export interface CommandBeatmapPermitRequestCreateReplyInput
  */
 export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
   CommandBeatmapPermitRequestCreateReplyInput &
-    CommandOsuGenericDataExtraBeatmapRequestsInfo,
+    CommandOsuGenericDataExtraBeatmapRequestsInfo &
+    CommandOsuGenericDataOsuApiDbPath,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
-  createReply: (channel, tags, data) => {
+  createReply: async (channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
       TwitchBadgeLevel.MODERATOR
@@ -57,9 +61,17 @@ export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
 
     const commandReplies: ChatMessageHandlerReply[] = [];
 
+    const osuRequestsConfigEntries =
+      await osuRequestsDb.requests.osuRequestsConfig.getEntries(
+        data.osuApiDbPath,
+        logger
+      );
+
     commandReplies.push(
       ...sendBeatmapRequest(
-        data.enableOsuBeatmapRequestsDetailed,
+        osuRequestsConfigEntries.find(
+          (a) => a.option === OsuRequestsConfig.DETAILED
+        )?.optionValue === "true",
         undefined,
         {
           channelName: channel.slice(1),

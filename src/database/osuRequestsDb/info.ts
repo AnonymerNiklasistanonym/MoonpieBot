@@ -66,10 +66,12 @@ export enum OsuRequestsConfig {
   AR_MIN = "arMin",
   CS_MAX = "csMax",
   CS_MIN = "csMin",
+  DETAILED = "detailed",
   LENGTH_IN_MIN_MAX = "lengthInMinMax",
   LENGTH_IN_MIN_MIN = "lengthInMinMin",
   MESSAGE_OFF = "messageOff",
   MESSAGE_ON = "messageOn",
+  REDEEM_ID = "redeemId",
   STAR_MAX = "starMax",
   STAR_MIN = "starMin",
 }

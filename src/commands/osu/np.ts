@@ -17,7 +17,6 @@ import {
   regexOsuWindowTitleNowPlaying,
 } from "../../info/regex";
 import { createLogFunc } from "../../logging";
-import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { getProcessInformationByName } from "../../other/processInformation";
 import { macroOsuWindowTitle } from "../../info/macros/osuWindowTitle";
 // Type imports
@@ -28,28 +27,26 @@ import type {
 import type {
   CommandOsuGenericDataExtraBeatmapRequestsInfo,
   CommandOsuGenericDataOsuApiV2Credentials,
+  CommandOsuGenericDataStreamCompanionFunc,
 } from "../osu";
 import type {
   RegexOsuBeatmapIdFromUrl,
   RegexOsuWindowTitleNowPlaying,
 } from "../../info/regex";
 import type { MacroMap } from "../../messageParser";
-import type { StreamCompanionConnection } from "../../osuStreamCompanion";
 
-export interface CommandNpCreateReplyInput
-  extends CommandOsuGenericDataOsuApiV2Credentials {
-  /**
-   * If available get the current map data using StreamCompanion.
-   */
-  osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
-}
 /**
  * NP (now playing) command:
  * Send the map that is currently being played in osu (via the window title
  * because the web api is not supporting it).
  */
 export const commandNp: ChatMessageHandlerReplyCreator<
-  CommandNpCreateReplyInput & CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  (
+    | (CommandOsuGenericDataStreamCompanionFunc &
+        CommandOsuGenericDataOsuApiV2Credentials)
+    | Required<CommandOsuGenericDataStreamCompanionFunc>
+  ) &
+    CommandOsuGenericDataExtraBeatmapRequestsInfo,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
   createReply: async (_channel, _tags, data, logger) => {
@@ -131,89 +128,91 @@ export const commandNp: ChatMessageHandlerReplyCreator<
       return {
         messageId: osuCommandReplyNpStreamCompanionFileNotRunning.id,
       };
-    }
-    if (data.osuApiV2Credentials === undefined) {
-      throw errorMessageOsuApiCredentialsUndefined();
-    }
-    const osuProcessInformation = await getProcessInformationByName("osu");
-    if (
-      osuProcessInformation.platform === "win32" &&
-      osuProcessInformation.processInformation !== undefined &&
-      osuProcessInformation.processInformation["Window Title"] !== "osu!"
-    ) {
-      const match = osuProcessInformation.processInformation[
-        "Window Title"
-      ].match(regexOsuWindowTitleNowPlaying);
-      if (match != null) {
-        const matchGroups = match.groups as
-          | undefined
-          | RegexOsuWindowTitleNowPlaying;
-        if (!matchGroups) {
-          throw Error("RegexOsuWindowTitleNowPlaying groups undefined");
-        }
-        let mapId;
-        try {
-          const oauthAccessToken = await osuApiV2.oauth.clientCredentialsGrant(
-            data.osuApiV2Credentials.clientId,
-            data.osuApiV2Credentials.clientSecret
-          );
+    } else if ("osuApiV2Credentials" in data) {
+      const osuProcessInformation = await getProcessInformationByName("osu");
+      if (
+        osuProcessInformation.platform === "win32" &&
+        osuProcessInformation.processInformation !== undefined &&
+        osuProcessInformation.processInformation["Window Title"] !== "osu!"
+      ) {
+        const match = osuProcessInformation.processInformation[
+          "Window Title"
+        ].match(regexOsuWindowTitleNowPlaying);
+        if (match != null) {
+          const matchGroups = match.groups as
+            | undefined
+            | RegexOsuWindowTitleNowPlaying;
+          if (!matchGroups) {
+            throw Error("RegexOsuWindowTitleNowPlaying groups undefined");
+          }
+          let mapId;
+          try {
+            const oauthAccessToken =
+              await osuApiV2.oauth.clientCredentialsGrant(
+                data.osuApiV2Credentials.clientId,
+                data.osuApiV2Credentials.clientSecret
+              );
 
-          const searchResult = await osuApiV2.beatmapsets.search(
-            oauthAccessToken,
-            `title='${matchGroups.title}' artist='${matchGroups.artist}'`,
-            false
-          );
-          if (
-            searchResult.beatmapsets !== undefined &&
-            Array.isArray(searchResult.beatmapsets) &&
-            searchResult.beatmapsets.length >= 1
-          ) {
-            const exactMatch = searchResult.beatmapsets.find((a) => {
-              const titleIsTheSame =
-                a.title.trim().toLocaleLowerCase() ===
-                matchGroups.title.trim().toLocaleLowerCase();
-              const diffNameCanBeFound = a.beatmaps?.find(
-                (b) =>
-                  b.version.trim().toLocaleLowerCase() ===
-                  matchGroups.version.trim().toLocaleLowerCase()
-              );
-              return titleIsTheSame && diffNameCanBeFound;
-            });
-            if (exactMatch) {
-              const exactBeatmapDiff = exactMatch.beatmaps?.find(
-                (a) =>
-                  a.version.trim().toLocaleLowerCase() ===
-                  matchGroups.version.trim().toLocaleLowerCase()
-              );
-              if (exactBeatmapDiff) {
-                data.beatmapRequestsInfo.lastMentionedBeatmapId =
-                  exactBeatmapDiff.id;
-                mapId = exactBeatmapDiff.id;
+            const searchResult = await osuApiV2.beatmapsets.search(
+              oauthAccessToken,
+              `title='${matchGroups.title}' artist='${matchGroups.artist}'`,
+              false
+            );
+            if (
+              searchResult.beatmapsets !== undefined &&
+              Array.isArray(searchResult.beatmapsets) &&
+              searchResult.beatmapsets.length >= 1
+            ) {
+              const exactMatch = searchResult.beatmapsets.find((a) => {
+                const titleIsTheSame =
+                  a.title.trim().toLocaleLowerCase() ===
+                  matchGroups.title.trim().toLocaleLowerCase();
+                const diffNameCanBeFound = a.beatmaps?.find(
+                  (b) =>
+                    b.version.trim().toLocaleLowerCase() ===
+                    matchGroups.version.trim().toLocaleLowerCase()
+                );
+                return titleIsTheSame && diffNameCanBeFound;
+              });
+              if (exactMatch) {
+                const exactBeatmapDiff = exactMatch.beatmaps?.find(
+                  (a) =>
+                    a.version.trim().toLocaleLowerCase() ===
+                    matchGroups.version.trim().toLocaleLowerCase()
+                );
+                if (exactBeatmapDiff) {
+                  data.beatmapRequestsInfo.lastMentionedBeatmapId =
+                    exactBeatmapDiff.id;
+                  mapId = exactBeatmapDiff.id;
+                }
               }
             }
+          } catch (err) {
+            logCmdNp.warn((err as Error).message);
           }
-        } catch (err) {
-          logCmdNp.warn((err as Error).message);
+          const customMacros: MacroMap = new Map();
+          customMacros.set(
+            macroOsuWindowTitle.id,
+            new Map(
+              macroOsuWindowTitle.generate({
+                artist: matchGroups.artist,
+                mapId,
+                title: matchGroups.title,
+                version: matchGroups.version,
+              })
+            )
+          );
+          return {
+            additionalMacros: customMacros,
+            messageId: osuCommandReplyNp.id,
+          };
         }
-        const customMacros: MacroMap = new Map();
-        customMacros.set(
-          macroOsuWindowTitle.id,
-          new Map(
-            macroOsuWindowTitle.generate({
-              artist: matchGroups.artist,
-              mapId,
-              title: matchGroups.title,
-              version: matchGroups.version,
-            })
-          )
-        );
-        return {
-          additionalMacros: customMacros,
-          messageId: osuCommandReplyNp.id,
-        };
       }
+      return { messageId: osuCommandReplyNpNoMap.id };
     }
-    return { messageId: osuCommandReplyNpNoMap.id };
+    throw Error(
+      "Neither an osu!api credentials nor a StreamCompanion connection was found"
+    );
   },
   detect: (_tags, message, data) => {
     if (!data.enabledCommands.includes(OsuCommands.NP)) {

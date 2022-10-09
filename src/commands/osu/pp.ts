@@ -1,11 +1,8 @@
 // Package imports
 import osuApiV2, { GameMode } from "osu-api-v2";
 // Local imports
-import {
-  errorMessageDefaultOsuIdUndefined,
-  errorMessageOsuApiCredentialsUndefined,
-} from "../../error";
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
+import { errorMessageDefaultOsuIdUndefined } from "../../error";
 import { macroOsuPpRpRequest } from "../../info/macros/osuPpRpRequest";
 import { osuCommandReplyPp } from "../../info/strings/osu/commandReply";
 import { regexOsuChatHandlerCommandPp } from "../../info/regex";
@@ -47,9 +44,6 @@ export const commandPp: ChatMessageHandlerReplyCreator<
   CommandPpRpDetectorOutput
 > = {
   createReply: async (_channel, _tags, data) => {
-    if (data.osuApiV2Credentials === undefined) {
-      throw errorMessageOsuApiCredentialsUndefined();
-    }
     if (data.defaultOsuId === undefined) {
       throw errorMessageDefaultOsuIdUndefined();
     }

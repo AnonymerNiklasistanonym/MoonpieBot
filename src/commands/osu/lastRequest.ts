@@ -2,6 +2,8 @@
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { osuBeatmapRequestNoRequestsError } from "../../info/strings/osu/beatmapRequest";
+import { OsuRequestsConfig } from "../../database/osuRequestsDb/info";
+import osuRequestsDb from "../../database/osuRequestsDb";
 import { regexOsuChatHandlerCommandLastRequest } from "../../info/regex";
 import { sendBeatmapRequest } from "./beatmap";
 import { TwitchBadgeLevel } from "../../twitch";
@@ -13,6 +15,7 @@ import type {
 } from "../../chatMessageHandler";
 import type {
   CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandOsuGenericDataOsuApiDbPath,
   CommandOsuGenericDataOsuIrcData,
 } from "../osu";
 import type { RegexOsuChatHandlerCommandLastRequest } from "../../info/regex";
@@ -30,11 +33,12 @@ export interface CommandBeatmapLastRequestDetectorOutput {
  */
 export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
   CommandBeatmapLastRequestCreateReplyInput &
-    CommandOsuGenericDataExtraBeatmapRequestsInfo,
+    CommandOsuGenericDataExtraBeatmapRequestsInfo &
+    CommandOsuGenericDataOsuApiDbPath,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandBeatmapLastRequestDetectorOutput
 > = {
-  createReply: (channel, tags, data) => {
+  createReply: async (channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
       TwitchBadgeLevel.MODERATOR
@@ -60,13 +64,23 @@ export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
         .slice(0, data.beatmapRequestCount)
         .reverse();
 
+    const osuRequestsConfigEntries =
+      await osuRequestsDb.requests.osuRequestsConfig.getEntries(
+        data.osuApiDbPath,
+        logger
+      );
+    const detailedReply =
+      osuRequestsConfigEntries.find(
+        (a) => a.option === OsuRequestsConfig.DETAILED
+      )?.optionValue === "true";
+
     for (const previousBeatmapRequest of previousBeatmapRequests) {
       data.beatmapRequestsInfo.lastMentionedBeatmapId =
         previousBeatmapRequest.data.id;
 
       commandReplies.push(
         ...sendBeatmapRequest(
-          data.enableOsuBeatmapRequestsDetailed,
+          detailedReply,
           undefined,
           {
             channelName: channel.slice(1),

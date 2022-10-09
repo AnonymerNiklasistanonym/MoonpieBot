@@ -47,6 +47,7 @@ import moonpieDb from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
+import { OsuRequestsConfig } from "./database/osuRequestsDb/info";
 import osuRequestsDb from "./database/osuRequestsDb";
 import { pluginCountGenerator } from "./info/plugins/count";
 import { pluginsCustomCommandDataGenerator } from "./info/plugins/customDataLogic";
@@ -73,7 +74,6 @@ import type { PluginTwitchApiData } from "./info/plugins/twitchApi";
 import type { PluginTwitchChatData } from "./info/plugins/twitchChat";
 import type { ScheduledTask } from "node-cron";
 import type SpotifyWebApi from "spotify-web-api-node";
-import type { StreamCompanionConnection } from "./osuStreamCompanion";
 
 /**
  * The logging ID of this module.
@@ -177,11 +177,9 @@ export const main = async (
       EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS,
       configDir
     ) === EnvVariableOnOff.ON;
-  const osuApiBeatmapRequestsDetailed =
-    getEnvVariableValueOrDefault(
-      EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
-      configDir
-    ) === EnvVariableOnOff.ON;
+  const osuApiBeatmapRequestsDetailed = getEnvVariableValueOrUndefined(
+    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED
+  );
   const pathDatabaseOsuApi = path.resolve(
     configDir,
     getEnvVariableValueOrDefault(
@@ -249,11 +247,30 @@ export const main = async (
     });
   }
   // > osu! API
-  const enableOsu = osuApiClientId && osuApiClientSecret && osuApiDefaultId;
+  const osuApiDefaultIdNumber = osuApiDefaultId
+    ? parseInt(osuApiDefaultId)
+    : undefined;
+  if (osuApiDefaultIdNumber !== undefined && isNaN(osuApiDefaultIdNumber)) {
+    throw Error(
+      "osu!api default ID was not undefined but could not be parsed to a number"
+    );
+  }
+  const osuApiClientIdNumber = osuApiClientId
+    ? parseInt(osuApiClientId)
+    : undefined;
+  if (osuApiClientIdNumber !== undefined && isNaN(osuApiClientIdNumber)) {
+    throw Error(
+      "osu!api client ID was not undefined but could not be parsed to a number"
+    );
+  }
+  /** If this is true it means that osu API credentials were found. */
+  const enableOsuApi =
+    osuApiClientIdNumber !== undefined &&
+    osuApiClientSecret !== undefined &&
+    osuApiDefaultIdNumber !== undefined;
+  /** If this is true it means that osu IRC credentials were found. */
   const enableOsuIrc = osuIrcPassword && osuIrcUsername && osuIrcRequestTarget;
   const enableOsuBeatmapRequests = osuApiBeatmapRequests;
-  const enableOsuBeatmapRequestsDetailed = osuApiBeatmapRequestsDetailed;
-  const enableOsuBeatmapRequestsRedeemId = osuApiBeatmapRequestsRedeemId;
   // Remove commands that should not be usable if map requests are off
   if (!enableOsuBeatmapRequests) {
     for (const command of [
@@ -268,23 +285,26 @@ export const main = async (
     }
   }
   let osuIrcBot: OsuIrcBotSendMessageFunc | undefined;
-  if (enableOsu && enableOsuBeatmapRequests && enableOsuIrc) {
+  if (enableOsuApi && enableOsuBeatmapRequests && enableOsuIrc) {
     osuIrcBot = (id: string) =>
       createOsuIrcConnection(osuIrcUsername, osuIrcPassword, id, logger);
   }
   // > osu! StreamCompanion
-  let osuStreamCompanionCurrentMapData: undefined | StreamCompanionConnection;
-  if (osuStreamCompanionUrl) {
-    osuStreamCompanionCurrentMapData = createStreamCompanionWebSocketConnection(
-      osuStreamCompanionUrl,
-      logger
-    );
-  } else if (osuStreamCompanionDirPath) {
-    osuStreamCompanionCurrentMapData = createStreamCompanionFileConnection(
-      osuStreamCompanionDirPath,
-      logger
-    );
-  }
+  /**
+   * If this is not undefined it means there is a function to get the current
+   * map data via a StreamCompanion interface.
+   */
+  const osuStreamCompanionCurrentMapData = osuStreamCompanionUrl
+    ? createStreamCompanionWebSocketConnection(osuStreamCompanionUrl, logger)
+    : osuStreamCompanionDirPath
+    ? createStreamCompanionFileConnection(osuStreamCompanionDirPath, logger)
+    : undefined;
+  /** If this is true it means that osu StreamCompanion func exists. */
+  const enableOsuStreamCompanion =
+    osuStreamCompanionCurrentMapData !== undefined;
+  // > Spotify API
+  /** If this is true it means that spotify API credentials were found. */
+  const enableSpotifyApi = spotifyApiClientId && spotifyApiClientSecret;
 
   // Setup/Migrate/Backup moonpie database
   const setupMigrateBackupMoonpieDatabase = async () => {
@@ -315,7 +335,7 @@ export const main = async (
   const setupMigrateOsuRequestsDatabase = async () => {
     // Only touch the database if it will be used
     if (
-      enableOsu &&
+      enableOsuApi &&
       osuEnableCommands.length > 0 &&
       !(
         osuEnableCommands.length === 1 &&
@@ -324,6 +344,29 @@ export const main = async (
     ) {
       // Setup database tables (or do nothing if they already exist)
       await osuRequestsDb.setup(pathDatabaseOsuApi, logger);
+      if (osuApiBeatmapRequestsDetailed !== undefined) {
+        await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
+          pathDatabaseOsuApi,
+          {
+            option: OsuRequestsConfig.DETAILED,
+            optionValue:
+              osuApiBeatmapRequestsDetailed === EnvVariableOnOff.ON
+                ? "true"
+                : "false",
+          },
+          logger
+        );
+      }
+      if (osuApiBeatmapRequestsRedeemId !== undefined) {
+        await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
+          pathDatabaseOsuApi,
+          {
+            option: OsuRequestsConfig.REDEEM_ID,
+            optionValue: osuApiBeatmapRequestsRedeemId,
+          },
+          logger
+        );
+      }
     }
   };
 
@@ -338,11 +381,7 @@ export const main = async (
 
   // Setup/Migrate spotify database
   const setupMigrateSpotifyDatabase = async () => {
-    // Only touch the moonpie database if it will be used
-    if (
-      spotifyApiClientId !== undefined &&
-      spotifyApiClientSecret !== undefined
-    ) {
+    if (enableSpotifyApi) {
       // Setup database tables (or do nothing if they already exist)
       await spotifyDb.setup(pathDatabaseSpotify, logger);
       if (spotifyApiRefreshToken !== undefined) {
@@ -368,7 +407,7 @@ export const main = async (
 
   // Setup Spotify API
   let spotifyWebApi: undefined | SpotifyWebApi;
-  if (spotifyApiClientId && spotifyApiClientSecret) {
+  if (enableSpotifyApi) {
     spotifyWebApi = await setupSpotifyAuthentication(
       spotifyApiClientId,
       spotifyApiClientSecret,
@@ -384,28 +423,25 @@ export const main = async (
   );
   const macroMap = generateMacroMap(defaultMacros);
   const pluginMap = generatePluginMap(defaultPlugins);
-  if (osuApiDefaultId) {
+  if (enableOsuApi) {
     macroMap.set(
       macroOsuApi.id,
-      new Map(macroOsuApi.generate({ osuApiDefaultId }))
+      new Map(macroOsuApi.generate({ osuApiDefaultId: osuApiDefaultIdNumber }))
     );
-  }
-  if (osuApiClientId && osuApiClientSecret) {
     pluginsOsuGenerator.map((plugin) => {
       const pluginReady = generatePlugin(plugin, {
         osuApiV2Credentials: {
-          clientId: parseInt(osuApiClientId),
+          clientId: osuApiClientIdNumber,
           clientSecret: osuApiClientSecret,
         },
       });
       pluginMap.set(pluginReady.id, pluginReady.func);
     });
   }
-  const temp = osuStreamCompanionCurrentMapData;
-  if (temp !== undefined) {
+  if (osuStreamCompanionCurrentMapData !== undefined) {
     pluginsOsuStreamCompanionGenerator.map((plugin) => {
       const pluginReady = generatePlugin(plugin, {
-        streamCompanionDataFunc: temp,
+        streamCompanionDataFunc: osuStreamCompanionCurrentMapData,
       });
       pluginMap.set(pluginReady.id, pluginReady.func);
     });
@@ -562,40 +598,52 @@ export const main = async (
       );
     }
 
-    if (enableOsu || osuStreamCompanionCurrentMapData !== undefined) {
+    if (enableOsuApi || enableOsuStreamCompanion) {
       try {
-        await osuChatHandler(
-          twitchClient,
-          channel,
-          tags,
-          message,
-          enableOsu
-            ? {
-                defaultOsuId: parseInt(osuApiDefaultId),
-                enableOsuBeatmapRequests,
-                enableOsuBeatmapRequestsDetailed,
-                enableOsuBeatmapRequestsRedeemId,
-                enabledCommands: osuEnableCommands,
-                osuApiDbPath: pathDatabaseOsuApi,
-                osuApiV2Credentials: {
-                  clientId: parseInt(osuApiClientId),
-                  clientSecret: osuApiClientSecret,
-                },
-                osuIrcBot,
-                osuIrcRequestTarget,
-                osuStreamCompanionCurrentMapData,
-              }
-            : {
-                enabledCommands: osuEnableCommands.filter(
-                  (a) => a === OsuCommands.NP || a === OsuCommands.COMMANDS
-                ),
-                osuStreamCompanionCurrentMapData,
+        if (enableOsuApi) {
+          await osuChatHandler(
+            twitchClient,
+            channel,
+            tags,
+            message,
+            {
+              defaultOsuId: osuApiDefaultIdNumber,
+              enableOsuBeatmapRequests,
+              enabledCommands: osuEnableCommands,
+              osuApiDbPath: pathDatabaseOsuApi,
+              osuApiV2Credentials: {
+                clientId: osuApiClientIdNumber,
+                clientSecret: osuApiClientSecret,
               },
-          stringMap,
-          pluginMapChannel,
-          macroMapChannel,
-          logger
-        );
+              osuIrcBot,
+              osuIrcRequestTarget,
+              osuStreamCompanionCurrentMapData,
+            },
+            stringMap,
+            pluginMapChannel,
+            macroMapChannel,
+            logger
+          );
+        } else if (enableOsuStreamCompanion) {
+          await osuChatHandler(
+            twitchClient,
+            channel,
+            tags,
+            message,
+            {
+              // If osu api credentials are not available only allow the
+              // !osu commands and !np command to be enabled
+              enabledCommands: osuEnableCommands.filter(
+                (a) => a === OsuCommands.NP || a === OsuCommands.COMMANDS
+              ),
+              osuStreamCompanionCurrentMapData,
+            },
+            stringMap,
+            pluginMapChannel,
+            macroMapChannel,
+            logger
+          );
+        }
       } catch (err) {
         await chatHandlerErrorMessage(
           channel,
@@ -806,7 +854,7 @@ export const main = async (
   await twitchClient.connect();
 
   // Send osu! IRC message when bot is started
-  if (enableOsu && osuIrcBot && osuIrcRequestTarget) {
+  if (enableOsuApi && osuIrcBot && osuIrcRequestTarget) {
     try {
       await tryToSendOsuIrcMessage(
         osuIrcBot,

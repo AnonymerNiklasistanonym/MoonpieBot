@@ -2,10 +2,6 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
-  errorMessageOsuApiCredentialsUndefined,
-  errorMessageOsuApiDbPathUndefined,
-} from "../../error";
-import {
   generateMacroMapFromMacroGenerator,
   generatePlugin,
 } from "../../messageParser";
@@ -101,8 +97,10 @@ const checkIfBeatmapMatchesDemands = (
           return false;
         }
         break;
+      case OsuRequestsConfig.DETAILED:
       case OsuRequestsConfig.MESSAGE_OFF:
       case OsuRequestsConfig.MESSAGE_ON:
+      case OsuRequestsConfig.REDEEM_ID:
         break;
       case OsuRequestsConfig.STAR_MAX:
         if (beatmap.difficulty_rating > parseFloat(demand.optionValue)) {
@@ -120,7 +118,7 @@ const checkIfBeatmapMatchesDemands = (
 };
 
 export const sendBeatmapRequest = (
-  detailedMapRequests: boolean | undefined,
+  detailedMapRequests: boolean,
   messageParserMacros: MacroMap = new Map(),
   messageParserTwitchPluginData: PluginTwitchChatData | undefined,
   beatmapRequestId: number,
@@ -194,12 +192,6 @@ export interface CommandBeatmapCreateReplyInput
    */
   defaultOsuId?: number;
   enableOsuBeatmapRequests?: boolean;
-  enableOsuBeatmapRequestsDetailed?: boolean;
-  /**
-   * If string not empty/undefined check if the beatmap request was redeemed or
-   * just a normal chat message.
-   */
-  enableOsuBeatmapRequestsRedeemId?: string;
 }
 export interface CommandBeatmapDetectorOutput {
   /**
@@ -222,27 +214,28 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
   CommandBeatmapDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
-    if (data.osuApiV2Credentials === undefined) {
-      throw errorMessageOsuApiCredentialsUndefined();
-    }
-    if (data.osuApiDbPath === undefined) {
-      throw errorMessageOsuApiDbPathUndefined();
-    }
-
     const logCmdBeatmap = createLogFunc(
       logger,
       LOG_ID_CHAT_HANDLER_OSU,
       "beatmap"
     );
 
+    const osuRequestsConfigEntries =
+      await osuRequestsDb.requests.osuRequestsConfig.getEntries(
+        data.osuApiDbPath,
+        logger
+      );
+
+    const redeemId = osuRequestsConfigEntries.find(
+      (a) => a.option === OsuRequestsConfig.REDEEM_ID
+    )?.optionValue;
     if (
-      data.enableOsuBeatmapRequestsRedeemId !== undefined &&
-      tags["custom-reward-id"] !== data.enableOsuBeatmapRequestsRedeemId
+      redeemId !== undefined &&
+      redeemId.length > 0 &&
+      tags["custom-reward-id"] !== redeemId
     ) {
       logger.info(
-        `For the beatmap request the redeem ID "${
-          data.enableOsuBeatmapRequestsRedeemId
-        }" was expected but found was ${
+        `For the beatmap request the redeem ID "${redeemId}" was expected but found was ${
           tags["custom-reward-id"]
             ? `"${tags["custom-reward-id"] as string}"`
             : "no id"
@@ -252,12 +245,6 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
         messageId: osuBeatmapRequestNoRedeem.id,
       };
     }
-
-    const osuRequestsConfigEntries =
-      await osuRequestsDb.requests.osuRequestsConfig.getEntries(
-        data.osuApiDbPath,
-        logger
-      );
 
     if (
       osuRequestsConfigEntries.find(
@@ -367,7 +354,9 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
 
       commandReplies.push(
         ...sendBeatmapRequest(
-          data.enableOsuBeatmapRequestsDetailed,
+          osuRequestsConfigEntries.find(
+            (a) => a.option === OsuRequestsConfig.DETAILED
+          )?.optionValue === "true",
           osuBeatmapRequestMacros,
           undefined,
           beatmapRequest.beatmapId,

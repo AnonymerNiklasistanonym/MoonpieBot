@@ -8,7 +8,6 @@ import {
   osuScoreErrorNotFound,
 } from "../../info/strings/osu/commandReply";
 import { createLogFunc } from "../../logging";
-import { errorMessageOsuApiCredentialsUndefined } from "../../error";
 import { macroOsuScore } from "../../info/macros/osuApi";
 import { macroOsuScoreRequest } from "../../info/macros/osuScoreRequest";
 import { NOT_FOUND_STATUS_CODE } from "../../other/web";
@@ -20,17 +19,11 @@ import type {
 } from "../../chatMessageHandler";
 import type {
   CommandOsuGenericDataExtraBeatmapRequestsInfo,
-  OsuApiV2Credentials,
+  CommandOsuGenericDataOsuApiV2Credentials,
 } from "../osu";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { RegexOsuChatHandlerCommandScore } from "../../info/regex";
 
-export interface CommandScoreCreateReplyInput {
-  /**
-   * The osu API (v2) credentials.
-   */
-  osuApiV2Credentials?: Readonly<OsuApiV2Credentials>;
-}
 export interface CommandScoreDetectorOutput {
   /**
    * The osu account name for which the score should be fetched.
@@ -43,15 +36,12 @@ export interface CommandScoreDetectorOutput {
  * custom supplied user.
  */
 export const commandScore: ChatMessageHandlerReplyCreator<
-  CommandScoreCreateReplyInput & CommandOsuGenericDataExtraBeatmapRequestsInfo,
+  CommandOsuGenericDataOsuApiV2Credentials &
+    CommandOsuGenericDataExtraBeatmapRequestsInfo,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandScoreDetectorOutput
 > = {
   createReply: async (_channel, _tags, data, logger) => {
-    if (data.osuApiV2Credentials === undefined) {
-      throw errorMessageOsuApiCredentialsUndefined();
-    }
-
     if (data.beatmapRequestsInfo.lastMentionedBeatmapId === undefined) {
       return {
         isError: true,

@@ -17,7 +17,6 @@ import {
   regexOsuChatHandlerCommandRequestsUnset,
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
-import { errorMessageOsuApiDbPathUndefined } from "../../error";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { OsuRequestsConfig } from "../../database/osuRequestsDb/info";
 import osuRequestsDb from "../../database/osuRequestsDb";
@@ -58,9 +57,6 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
   CommandBeatmapRequestsDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
-    if (data.osuApiDbPath === undefined) {
-      throw errorMessageOsuApiDbPathUndefined();
-    }
     if (
       data.beatmapRequestsType === BeatmapRequestsType.TURN_OFF ||
       data.beatmapRequestsType === BeatmapRequestsType.TURN_ON
@@ -252,10 +248,23 @@ const validateSetValue = (
 
     case OsuRequestsConfig.MESSAGE_OFF:
     case OsuRequestsConfig.MESSAGE_ON:
+    case OsuRequestsConfig.REDEEM_ID:
       if (optionValue === undefined) {
         throw Error("String value was undefined!");
       }
       return optionValue;
+
+    case OsuRequestsConfig.DETAILED:
+      if (optionValue === undefined) {
+        throw Error("Boolean value was undefined!");
+      }
+      if (
+        optionValue.toLowerCase() !== "true" &&
+        optionValue.toLowerCase() !== "false"
+      ) {
+        throw Error(`Boolean value was not true/false (${optionValue})!`);
+      }
+      return optionValue.toLowerCase();
   }
 };
 
@@ -279,9 +288,6 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
   CommandBeatmapRequestsSetUnsetDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
-    if (data.osuApiDbPath === undefined) {
-      throw errorMessageOsuApiDbPathUndefined();
-    }
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
       TwitchBadgeLevel.MODERATOR

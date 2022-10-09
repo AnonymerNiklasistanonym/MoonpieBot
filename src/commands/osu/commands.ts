@@ -20,34 +20,21 @@ import type {
   ChatMessageHandlerReplyCreator,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
 } from "../../chatMessageHandler";
-import type {
-  StreamCompanionConnection,
-  StreamCompanionFileData,
-  StreamCompanionWebSocketData,
-} from "../../osuStreamCompanion";
+import type { CommandOsuGenericDataStreamCompanionFunc } from "../osu";
 
-export interface CommandCommandsCreateReplyInput
-  extends ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands {
-  /**
-   * If available get the current map data using StreamCompanion.
-   */
-  osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
-}
 /**
  * Commands command: Send all available commands of the bot in chat.
  */
 export const commandCommands: ChatMessageHandlerReplyCreator<
-  CommandCommandsCreateReplyInput,
+  CommandOsuGenericDataStreamCompanionFunc &
+    ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
   createReply: async (_channel, _tags, data) => {
-    let streamCompanionInfo:
-      | StreamCompanionFileData
-      | StreamCompanionWebSocketData
-      | undefined;
-    if (data.osuStreamCompanionCurrentMapData !== undefined) {
-      streamCompanionInfo = await data.osuStreamCompanionCurrentMapData();
-    }
+    const streamCompanionInfo =
+      data.osuStreamCompanionCurrentMapData !== undefined
+        ? await data?.osuStreamCompanionCurrentMapData()
+        : undefined;
 
     return {
       additionalMacros: generateMacroMapFromMacroGenerator(

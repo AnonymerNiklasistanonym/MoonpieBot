@@ -20,24 +20,22 @@ import type {
 import type { Beatmap } from "osu-api-v2";
 import type { CommandBeatmapCreateReplyInput } from "./osu/beatmap";
 import type { CommandBeatmapLastRequestCreateReplyInput } from "./osu/lastRequest";
-import type { CommandCommandsCreateReplyInput } from "./osu/commands";
-import type { CommandNpCreateReplyInput } from "./osu/np";
 import type { CommandPpRpCreateReplyInput } from "./osu/pp";
-import type { CommandScoreCreateReplyInput } from "./osu/score";
 import type { OsuIrcBotSendMessageFunc } from "./osu/beatmap";
+import { StreamCompanionConnection } from "src/osuStreamCompanion";
 
 export interface CommandOsuGenericDataOsuApiDbPath {
   /**
    * Database file path of the osu api database.
    */
-  osuApiDbPath?: string;
+  osuApiDbPath: string;
 }
 
 export interface CommandOsuGenericDataOsuApiV2Credentials {
   /**
    * The osu API (v2) credentials.
    */
-  osuApiV2Credentials?: Readonly<OsuApiV2Credentials>;
+  osuApiV2Credentials: Readonly<OsuApiV2Credentials>;
 }
 
 export interface CommandOsuGenericDataOsuIrcData {
@@ -57,6 +55,13 @@ export interface CommandOsuGenericDataExtraBeatmapRequestsInfo {
    * Is only available to the osu chat handler.
    */
   beatmapRequestsInfo: BeatmapRequestsInfo;
+}
+
+export interface CommandOsuGenericDataStreamCompanionFunc {
+  /**
+   * If available get the current map data using StreamCompanion.
+   */
+  osuStreamCompanionCurrentMapData?: StreamCompanionConnection;
 }
 
 export interface OsuApiV2Credentials {
@@ -98,19 +103,22 @@ const beatmapRequestsInfo: BeatmapRequestsInfo = {
   previousBeatmapRequests: [],
 };
 
-export interface OsuChatHandlerData
+export interface OsuChatHandlerDataOsuApi
   extends CommandOsuGenericDataOsuApiDbPath,
     CommandOsuGenericDataOsuApiV2Credentials,
     CommandOsuGenericDataOsuIrcData,
+    CommandOsuGenericDataStreamCompanionFunc,
     ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
-    CommandCommandsCreateReplyInput,
-    CommandNpCreateReplyInput,
     CommandPpRpCreateReplyInput,
-    CommandScoreCreateReplyInput,
     CommandBeatmapCreateReplyInput,
     CommandBeatmapLastRequestCreateReplyInput {}
+export interface OsuChatHandlerDataStreamCompanionOnly
+  extends ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
+    Required<CommandOsuGenericDataStreamCompanionFunc> {}
 
-export const osuChatHandler: ChatMessageHandler<OsuChatHandlerData> = async (
+export const osuChatHandler: ChatMessageHandler<
+  OsuChatHandlerDataOsuApi | OsuChatHandlerDataStreamCompanionOnly
+> = async (
   client,
   channel,
   tags,
@@ -123,103 +131,7 @@ export const osuChatHandler: ChatMessageHandler<OsuChatHandlerData> = async (
 ) => {
   // Handle commands
   await Promise.all(
-    [commandNp, commandPp, commandRp].map((command) =>
-      runChatMessageHandlerReplyCreator(
-        client,
-        channel,
-        tags,
-        message,
-        { ...data, beatmapRequestsInfo },
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger,
-        command
-      )
-    )
-  );
-  await Promise.all(
-    [commandScore].map((command) =>
-      runChatMessageHandlerReplyCreator(
-        client,
-        channel,
-        tags,
-        message,
-        { ...data, beatmapRequestsInfo },
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger,
-        command
-      )
-    )
-  );
-  await Promise.all(
-    [commandBeatmapRequests].map((command) =>
-      runChatMessageHandlerReplyCreator(
-        client,
-        channel,
-        tags,
-        message,
-        { ...data, beatmapRequestsInfo },
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger,
-        command
-      )
-    )
-  );
-  await Promise.all(
-    [commandBeatmapRequestsSetUnset].map((command) =>
-      runChatMessageHandlerReplyCreator(
-        client,
-        channel,
-        tags,
-        message,
-        { ...data, beatmapRequestsInfo },
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger,
-        command
-      )
-    )
-  );
-  await Promise.all(
-    [commandBeatmapLastRequest].map((command) =>
-      runChatMessageHandlerReplyCreator(
-        client,
-        channel,
-        tags,
-        message,
-        { ...data, beatmapRequestsInfo },
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger,
-        command
-      )
-    )
-  );
-  await Promise.all(
-    [commandBeatmapPermitRequest].map((command) =>
-      runChatMessageHandlerReplyCreator(
-        client,
-        channel,
-        tags,
-        message,
-        { ...data, beatmapRequestsInfo },
-        globalStrings,
-        globalPlugins,
-        globalMacros,
-        logger,
-        command
-      )
-    )
-  );
-  await Promise.all(
-    [commandBeatmap].map((command) =>
+    [commandNp].map((command) =>
       runChatMessageHandlerReplyCreator(
         client,
         channel,
@@ -250,4 +162,118 @@ export const osuChatHandler: ChatMessageHandler<OsuChatHandlerData> = async (
       )
     )
   );
+  if ("osuApiDbPath" in data) {
+    await Promise.all(
+      [commandPp, commandRp].map((command) =>
+        runChatMessageHandlerReplyCreator(
+          client,
+          channel,
+          tags,
+          message,
+          { ...data, beatmapRequestsInfo },
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger,
+          command
+        )
+      )
+    );
+    await Promise.all(
+      [commandScore].map((command) =>
+        runChatMessageHandlerReplyCreator(
+          client,
+          channel,
+          tags,
+          message,
+          { ...data, beatmapRequestsInfo },
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger,
+          command
+        )
+      )
+    );
+    await Promise.all(
+      [commandBeatmapRequests].map((command) =>
+        runChatMessageHandlerReplyCreator(
+          client,
+          channel,
+          tags,
+          message,
+          { ...data, beatmapRequestsInfo },
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger,
+          command
+        )
+      )
+    );
+    await Promise.all(
+      [commandBeatmapRequestsSetUnset].map((command) =>
+        runChatMessageHandlerReplyCreator(
+          client,
+          channel,
+          tags,
+          message,
+          { ...data, beatmapRequestsInfo },
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger,
+          command
+        )
+      )
+    );
+    await Promise.all(
+      [commandBeatmapLastRequest].map((command) =>
+        runChatMessageHandlerReplyCreator(
+          client,
+          channel,
+          tags,
+          message,
+          { ...data, beatmapRequestsInfo },
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger,
+          command
+        )
+      )
+    );
+    await Promise.all(
+      [commandBeatmapPermitRequest].map((command) =>
+        runChatMessageHandlerReplyCreator(
+          client,
+          channel,
+          tags,
+          message,
+          { ...data, beatmapRequestsInfo },
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger,
+          command
+        )
+      )
+    );
+    await Promise.all(
+      [commandBeatmap].map((command) =>
+        runChatMessageHandlerReplyCreator(
+          client,
+          channel,
+          tags,
+          message,
+          { ...data, beatmapRequestsInfo },
+          globalStrings,
+          globalPlugins,
+          globalMacros,
+          logger,
+          command
+        )
+      )
+    );
+  }
 };
