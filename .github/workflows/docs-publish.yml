@@ -15,6 +15,8 @@ on:
 env:
   # The name of the application
   APPLICATION_NAME: moonpiebot
+  # The URL to the repository source files
+  GITHUB_URL_REPO: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -60,10 +62,10 @@ jobs:
           mkdir -p docs/res/icons
           cp res/icons/${{ env.APPLICATION_NAME }}.png docs/res/icons/
           # Rename paths to example files
-          sed -i "s#href=\"./.env#href=\"$GITHUB_URL_REPO/.env#g" docs/index.html
-          sed -i "s#href=\"./installer#href=\"$GITHUB_URL_REPO/installer#g" docs/index.html
-          sed -i "s#href=\"./custom#href=\"$GITHUB_URL_REPO/custom#g" docs/index.html
-          sed -i "s#href=\"src/#href=\"$GITHUB_URL_REPO/src/#g" docs/index.html
+          sed -i "s#href=\"./.env#href=\"${{ env.GITHUB_URL_REPO }}/.env#g" docs/index.html
+          sed -i "s#href=\"./installer#href=\"${{ env.GITHUB_URL_REPO }}/installer#g" docs/index.html
+          sed -i "s#href=\"./custom#href=\"${{ env.GITHUB_URL_REPO }}/custom#g" docs/index.html
+          sed -i "s#href=\"src/#href=\"${{ env.GITHUB_URL_REPO }}/src/#g" docs/index.html
           # Add favicon (doesn't work for more than the first page)
           cp res/icons/${{ env.APPLICATION_NAME }}.ico docs/favicon.ico
           sed -i "s#</title>#</title><link rel=\"icon\" type=\"image/x-icon\" href=\"./favicon.ico\">#g" docs/index.html
