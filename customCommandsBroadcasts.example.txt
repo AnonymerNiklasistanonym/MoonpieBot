@@ -28,12 +28,12 @@
 !addcc ping ^\s*!ping(?:\s|$) '@$(USER) pong'
 # > Random numbers > RANDOM_NUMBER
 !addcc random ^\s*!random(?:\s|$) $(RANDOM_NUMBER=0<->100)%
-# > Count command calls > REGEX_GROUP
-!addcc count ^\s*!count(?:\s|$) 'the test command was called $(REGEX_GROUP) time$(IF_GREATER=$(REGEX_GROUP)>1|s)'
+# > Count command calls > COUNT
+!addcc count ^\s*!count(?:\s|$) 'the test command was called $(COUNT) time$(IF_GREATER=$(COUNT)>1|s)'
 # > Add a cooldown to a command
 !addcc cooldown ^\s*!cooldown(?:\s|$) 'This command can only be executed every 30s' -cd=30
 # > Reference parts of a message > REGEX_GROUP,IF_NOT_UNDEFINED
-!addcc references ^\s*!regex(?:\s+(.*?)\s*$|\s|$) 'Detected the command !regex with $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|'$(REGEX_GROUP=1)' as query)$(IF_UNDEFINED=$(REGEX_GROUP=1)|no query after the command :\()'
+!addcc references ^\s*!regex(?:\s+(.*?)\s*$|\s|$) 'Detected the command !regex with $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|"$(REGEX_GROUP=1)" as query)$(IF_UNDEFINED=$(REGEX_GROUP=1)|no query after the command :\()'
 # > Use Twitch API for more specific shoutouts > REGEX_GROUP,TWITCH_API_GET_GAME
 !addcc shoutout ^\s*!so\s+@?(\S+)\s*(?:.*)$ '/announce Go check out $(REGEX_GROUP=1) at https://www.twitch.tv/$(REGEX_GROUP=1) <3 They were last playing $(TWITCH_API_GET_GAME=$(REGEX_GROUP=1))' -ul=mod
 # > Use Twitch API to get the follow age >
@@ -42,19 +42,29 @@
 # > Use Twitch API to get/set the title >
 #   REGEX_GROUP,TWITCH_API_GET_TITLE,TWITCH_API_SET_TITLE [user:edit:broadcast
 #   scope necessary to set the title]
-!addcc title ^\s*!title(?:\s+(.*?)\s*$|\s|$) '@$(USER)$(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)| You updated the title to '$(TWITCH_API_SET_TITLE=$(REGEX_GROUP=1))')$(IF_UNDEFINED=$(REGEX_GROUP=1)| The current title is '$(TWITCH_API_GET_TITLE)')' -ul=mod
+!addcc title ^\s*!title(?:\s+(.*?)\s*$|\s|$) '@$(USER)$(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)| You updated the title to "$(TWITCH_API_SET_TITLE=$(REGEX_GROUP=1))")$(IF_UNDEFINED=$(REGEX_GROUP=1)| The current title is "$(TWITCH_API_GET_TITLE)")' -ul=mod
 # > Use Twitch API to get/set the game >
 #   REGEX_GROUP,TWITCH_API_GET_GAME,TWITCH_API_SET_GAME [user:edit:broadcast
 #   scope necessary to set the game]
-!addcc game ^\s*!game(?:\s+(.*?)\s*$|\s|$) '@$(USER) $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|You updated the game to '$(TWITCH_API_SET_GAME=$(REGEX_GROUP=1))')$(IF_UNDEFINED=$(REGEX_GROUP=1)|The current game is '$(TWITCH_API_GET_GAME)')' -ul=mod
-# > Death counter that works across commands [1/4] > CUSTOM_COMMAND_DATA_ADD
-!addcc 'death counter add' ^\s*!death(?:\s|$) '@$(USER) death was added, streamer died $(CUSTOM_COMMAND_DATA_ADD=death+=1) time$(IF_NOT_EQUAL=$(CUSTOM_COMMAND_DATA_GET=death<>0)!==1|s)' -ul=mod
-# > Death counter that works across commands [2/4] > CUSTOM_COMMAND_DATA_GET
-!addcc 'death counter get' ^\s*!deaths(?:\s|$) '@$(USER) streamer died $(CUSTOM_COMMAND_DATA_GET=death<>0) time$(IF_NOT_EQUAL=$(CUSTOM_COMMAND_DATA_GET=death<>0)!==1|s)'
-# > Death counter that works across commands [3/4] > CUSTOM_COMMAND_DATA_SET
-!addcc 'death counter set' ^\s*!resetDeaths(?:\s+(.*?)\s*$|\s|$) '@$(USER) $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|deaths were set to '$(REGEX_GROUP=1)', streamer died $(CUSTOM_COMMAND_DATA_SET_NUMBER=death=#=$(REGEX_GROUP=1)))$(IF_UNDEFINED=$(REGEX_GROUP=1)|deaths were reset to 0, streamer died $(CUSTOM_COMMAND_DATA_SET_NUMBER=death=#=0)) time$(IF_NOT_EQUAL=$(CUSTOM_COMMAND_DATA_GET=death<>0)!==1|s)' -ul=mod
-# > Death counter that works across commands [4/4] > CUSTOM_COMMAND_DATA_REMOVE
-!addcc 'death counter remove' ^\s*!removeDeath(?:\s|$) '@$(USER) death was removed, streamer died $(CUSTOM_COMMAND_DATA_REMOVE=death-=1) time$(IF_NOT_EQUAL=$(CUSTOM_COMMAND_DATA_GET=death<>0)!==1|s)' -ul=mod
+!addcc game ^\s*!game(?:\s+(.*?)\s*$|\s|$) '@$(USER) $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|You updated the game to "$(TWITCH_API_SET_GAME=$(REGEX_GROUP=1))")$(IF_UNDEFINED=$(REGEX_GROUP=1)|The current game is "$(TWITCH_API_GET_GAME)")' -ul=mod
+# > Death counter that works across commands [1/4] > CUSTOM_DATA
+!addcc 'death counter add' ^\s*!death(?:\s|$) '@$(USER) death was added, streamer died $(CUSTOM_DATA=death+#=1) time$(IF_NOT_EQUAL=$(CUSTOM_DATA=death<#>0)!==1|s)' -ul=mod
+# > Death counter that works across commands [2/4] > CUSTOM_DATA
+!addcc 'death counter get' ^\s*!deaths(?:\s|$) '@$(USER) streamer died $(CUSTOM_DATA=death<#>0) time$(IF_NOT_EQUAL=$(CUSTOM_DATA=death<#>0)!==1|s)'
+# > Death counter that works across commands [3/4] > CUSTOM_DATA
+!addcc 'death counter set' ^\s*!resetDeaths(?:\s+(.*?)\s*$|\s|$) '@$(USER) $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|deaths were set to "$(REGEX_GROUP=1)", streamer died $(CUSTOM_DATA=death#=$(REGEX_GROUP=1)))$(IF_UNDEFINED=$(REGEX_GROUP=1)|deaths were reset to 0, streamer died $(CUSTOM_DATA=death#=0)) time$(IF_NOT_EQUAL=$(CUSTOM_DATA=death<#>0)!==1|s)' -ul=mod
+# > Death counter that works across commands [4/4] > CUSTOM_DATA
+!addcc 'death counter remove' ^\s*!removeDeath(?:\s|$) '@$(USER) death was removed, streamer died $(CUSTOM_DATA=death-#=1) time$(IF_NOT_EQUAL=$(CUSTOM_DATA=death<#>0)!==1|s)' -ul=mod
+# > Quote database [1/3] > CUSTOM_DATA_LIST
+!addcc 'quote list add' ^\s*!quoteAdd\s+(.*\s*)(?:\s|$) '@$(USER) Quote was added "$(CUSTOM_DATA_LIST=quote+=$(REGEX_GROUP=1))"' -ul=mod
+# > Quote database [2/3] > CUSTOM_DATA_LIST
+!addcc 'quote list get index or random' ^\s*!quote(?:\s+([0-9]+))?(?:\s|$) '@$(USER) Quote "$(IF_UNDEFINED=$(REGEX_GROUP=1)|$(CUSTOM_DATA_LIST=quote=@=$(RANDOM_NUMBER=0<-]$(CUSTOM_DATA_LIST_SIZE=quote))))$(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|$(CUSTOM_DATA_LIST=quote=@=$(REGEX_GROUP=1)))"'
+# > Quote database [3/3] > CUSTOM_DATA_LIST
+!addcc 'quote list remove index' ^\s*!quoteRemove\s+([0-9]+)(?:\s|$) '@$(USER) $(IF_UNDEFINED=$(REGEX_GROUP=1)|No quote index was found!)$(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|Removed quote: "$(CUSTOM_DATA_LIST=quote-@=$(REGEX_GROUP=1))")' -ul=mod
+# > Score metrics [1/2] > CUSTOM_DATA_LIST
+!addcc 'score list' ^\s*!scoresAdd\s+(-?[0-9]+)(?:\s|$) '@$(USER) $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|\(added to the scores $(CUSTOM_DATA_LIST=scores+#=$(REGEX_GROUP=1))\) )sum=$(CUSTOM_DATA_LIST_SUM=scores) average=$(CUSTOM_DATA_LIST_AVERAGE=scores) max=$(CUSTOM_DATA_LIST_MAX=scores) min=$(CUSTOM_DATA_LIST_MIN=scores) size=$(CUSTOM_DATA_LIST_SIZE=scores)' -ul=mod
+# > Score metrics [2/2] > CUSTOM_DATA_LIST
+!addcc 'scores list reset' ^\s*!scoresReset(?:\s|$) '@$(USER) Scores were reset$(CUSTOM_DATA_LIST_CLEAR_NUMBER=scores)' -ul=mod
 # > List all available macros and plugins for debugging > HELP
 !addcc help ^\s*!help(?:\s|$) $(HELP) -ul=mod
 

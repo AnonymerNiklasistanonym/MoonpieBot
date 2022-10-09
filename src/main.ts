@@ -32,10 +32,6 @@ import {
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrUndefined,
 } from "./env";
-import {
-  pluginsCustomCommandDataGenerator,
-  pluginsCustomCommandGenerator,
-} from "./info/plugins/customDataLogic";
 import { createLogFunc } from "./logging";
 import { customCommandChatHandler } from "./customCommandsBroadcasts/customCommand";
 import { customCommandsBroadcastsChatHandler } from "./commands/customCommandsBroadcasts";
@@ -52,6 +48,8 @@ import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
 import osuRequestsDb from "./database/osuRequestsDb";
+import { pluginCountGenerator } from "./info/plugins/count";
+import { pluginsCustomCommandDataGenerator } from "./info/plugins/customDataLogic";
 import { pluginsOsuGenerator } from "./info/plugins/osuApi";
 import { pluginsOsuStreamCompanionGenerator } from "./info/plugins/osuStreamCompanion";
 import { pluginSpotifyGenerator } from "./info/plugins/spotify";
@@ -675,10 +673,12 @@ export const main = async (
       for (const customCommand of customCommands) {
         const pluginsCustomCommand = new Map(pluginsCustomCommands);
         // Add plugins to manipulate custom command
-        pluginsCustomCommandGenerator.forEach((a) => {
-          const plugin = generatePlugin(a, { customCommand });
-          pluginsCustomCommand.set(plugin.id, plugin.func);
-        });
+        pluginsCustomCommand.set(
+          pluginCountGenerator.id,
+          pluginCountGenerator.generate({
+            count: customCommand.count,
+          })
+        );
 
         try {
           const executed = await runChatMessageHandlerReplyCreator(

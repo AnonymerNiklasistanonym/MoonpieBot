@@ -1,7 +1,11 @@
-const CUSTOM_COMMAND_DATA_PLUGIN_PREFIX = "CUSTOM_COMMAND_DATA_";
+const CUSTOM_DATA_PLUGIN_PREFIX = "CUSTOM_DATA";
 
-export const pluginCustomCommandDataSetId = `${CUSTOM_COMMAND_DATA_PLUGIN_PREFIX}SET`;
-export const pluginCustomCommandDataSetNumberId = `${CUSTOM_COMMAND_DATA_PLUGIN_PREFIX}SET_NUMBER`;
-export const pluginCustomCommandDataGetId = `${CUSTOM_COMMAND_DATA_PLUGIN_PREFIX}GET`;
-export const pluginCustomCommandDataAddId = `${CUSTOM_COMMAND_DATA_PLUGIN_PREFIX}ADD`;
-export const pluginCustomCommandDataRemoveId = `${CUSTOM_COMMAND_DATA_PLUGIN_PREFIX}REMOVE`;
+export const pluginCustomDataId = `${CUSTOM_DATA_PLUGIN_PREFIX}`;
+export const pluginCustomDataListId = `${CUSTOM_DATA_PLUGIN_PREFIX}_LIST`;
+export const pluginCustomDataListClearId = `${CUSTOM_DATA_PLUGIN_PREFIX}_LIST_CLEAR`;
+export const pluginCustomDataListClearNumberId = `${CUSTOM_DATA_PLUGIN_PREFIX}_LIST_CLEAR_NUMBER`;
+export const pluginCustomDataListSizeId = `${CUSTOM_DATA_PLUGIN_PREFIX}_LIST_SIZE`;
+export const pluginCustomDataListMaxId = `${CUSTOM_DATA_PLUGIN_PREFIX}_LIST_MAX`;
+export const pluginCustomDataListMinId = `${CUSTOM_DATA_PLUGIN_PREFIX}_LIST_MIN`;
+export const pluginCustomDataListAverageId = `${CUSTOM_DATA_PLUGIN_PREFIX}_LIST_AVERAGE`;
+export const pluginCustomDataListSumId = `${CUSTOM_DATA_PLUGIN_PREFIX}_LIST_SUM`;

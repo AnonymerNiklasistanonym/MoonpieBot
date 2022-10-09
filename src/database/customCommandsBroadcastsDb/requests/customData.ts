@@ -2,9 +2,9 @@
 import db from "sqlite3-promise-query-api";
 // Local imports
 import {
-  convertCustomDataValueStringToValue,
+  convertCustomDataDbStringToValue,
+  convertCustomDataValueToDbString,
   convertCustomDataValueTypeStringToValueType,
-  convertCustomDataValueValueToString,
   CustomDataValueType,
 } from "../../../customCommandsBroadcasts/customData";
 import { CustomCommandsBroadcastsDbError, customDataTable } from "../info";
@@ -50,7 +50,7 @@ export const existsEntry = async (
 export interface CreateInput {
   description?: string;
   id: string;
-  value: string | number | string[];
+  value: string | number | string[] | number[];
   valueType: CustomDataValueType;
 }
 
@@ -67,7 +67,7 @@ export const createEntry = async (
   ];
   const values: string[] = [
     input.id,
-    convertCustomDataValueValueToString(input.value, input.valueType),
+    convertCustomDataValueToDbString(input.value, input.valueType),
     input.valueType,
   ];
   if (input.description !== undefined) {
@@ -167,17 +167,27 @@ export const getEntry = async (
         return {
           ...runResult,
           description,
-          value: convertCustomDataValueStringToValue(
+          value: convertCustomDataDbStringToValue(
             runResult.value,
             valueType
           ) as number,
+          valueType,
+        };
+      case CustomDataValueType.NUMBER_LIST:
+        return {
+          ...runResult,
+          description,
+          value: convertCustomDataDbStringToValue(
+            runResult.value,
+            valueType
+          ) as number[],
           valueType,
         };
       case CustomDataValueType.STRING:
         return {
           ...runResult,
           description,
-          value: convertCustomDataValueStringToValue(
+          value: convertCustomDataDbStringToValue(
             runResult.value,
             valueType
           ) as string,
@@ -187,7 +197,7 @@ export const getEntry = async (
         return {
           ...runResult,
           description,
-          value: convertCustomDataValueStringToValue(
+          value: convertCustomDataDbStringToValue(
             runResult.value,
             valueType
           ) as string[],
@@ -204,7 +214,7 @@ export const getEntry = async (
 export interface UpdateInput {
   description?: string;
   id: string;
-  value: string | number | string[];
+  value: string | number | string[] | number[];
   valueType: CustomDataValueType;
 }
 
@@ -249,9 +259,7 @@ export const updateEntry = async (
     values.push(input.valueIncrease);
   } else {
     columns.push(customDataTable.columns.value.name);
-    values.push(
-      convertCustomDataValueValueToString(input.value, input.valueType)
-    );
+    values.push(convertCustomDataValueToDbString(input.value, input.valueType));
   }
   if (input.description !== undefined) {
     columns.push(customDataTable.columns.description.name);

@@ -24,11 +24,9 @@ import {
   pluginTimeInSToStopwatchString,
   pluginUppercase,
 } from "./plugins/general";
-import {
-  pluginsCustomCommandDataGenerator,
-  pluginsCustomCommandGenerator,
-} from "./plugins/customDataLogic";
 import { generatePluginInfo } from "../messageParser";
+import { pluginCountGenerator } from "./plugins/count";
+import { pluginsCustomCommandDataGenerator } from "./plugins/customDataLogic";
 import { pluginsOsuGenerator } from "./plugins/osuApi";
 import { pluginsOsuStreamCompanionGenerator } from "./plugins/osuStreamCompanion";
 import { pluginSpotifyGenerator } from "./plugins/spotify";
@@ -74,8 +72,7 @@ export const defaultPluginsOptional: MessageParserPluginInfo[] = [
   ...pluginsOsuGenerator.map(generatePluginInfo),
   ...pluginsOsuStreamCompanionGenerator.map(generatePluginInfo),
   generatePluginInfo(pluginSpotifyGenerator),
-  generatePluginInfo(pluginSpotifyGenerator),
-  ...pluginsCustomCommandGenerator.map(generatePluginInfo),
+  generatePluginInfo(pluginCountGenerator),
   ...pluginsCustomCommandDataGenerator.map(generatePluginInfo),
   ...pluginsTwitchApiGenerator.map(generatePluginInfo),
 ];

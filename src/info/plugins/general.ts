@@ -392,6 +392,11 @@ export const pluginRandomNumber: MessageParserPlugin = {
       hideOutput: true,
     },
     {
+      argument: "-100<-]0",
+      before: "Random number between -100 and -1: ",
+      hideOutput: true,
+    },
+    {
       argument: "0",
       expectedOutput: "0",
     },
@@ -399,11 +404,26 @@ export const pluginRandomNumber: MessageParserPlugin = {
       argument: "-100<->-100",
       expectedOutput: "-100",
     },
+    {
+      argument: "10<-]11",
+      expectedOutput: "10",
+    },
+    {
+      argument: "5[-]7",
+      expectedOutput: "6",
+    },
   ],
   func: (_logger, interval, signature) => {
     if (signature === true) {
       return {
-        argument: ["", "number", "number<->number"],
+        argument: [
+          "",
+          "number",
+          "number<->number",
+          "number[->number",
+          "number<-]number",
+          "number[-]number",
+        ],
         type: "signature",
       };
     }
@@ -413,7 +433,7 @@ export const pluginRandomNumber: MessageParserPlugin = {
     }
     const givenNumbers = interval
       .trim()
-      .split("<->")
+      .split(/(?:<->|\[-\]|\[->|<-\])/)
       .map((a) => parseInt(a));
     if (givenNumbers.length === 1) {
       if (givenNumbers[0] >= 0) {
@@ -423,6 +443,18 @@ export const pluginRandomNumber: MessageParserPlugin = {
       }
     }
     if (givenNumbers.length === 2) {
+      if (interval.includes("[-]")) {
+        return `${randomIntFromInterval(
+          givenNumbers[0] + 1,
+          givenNumbers[1] - 1
+        )}`;
+      }
+      if (interval.includes("<-]")) {
+        return `${randomIntFromInterval(givenNumbers[0], givenNumbers[1] - 1)}`;
+      }
+      if (interval.includes("[->")) {
+        return `${randomIntFromInterval(givenNumbers[0] + 1, givenNumbers[1])}`;
+      }
       return `${randomIntFromInterval(givenNumbers[0], givenNumbers[1])}`;
     }
     throw Error("More than 2 numbers were given");

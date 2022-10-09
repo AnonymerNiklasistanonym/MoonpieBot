@@ -8,6 +8,7 @@
  */
 export enum CustomDataValueType {
   NUMBER = "NUMBER",
+  NUMBER_LIST = "NUMBER_LIST",
   STRING = "STRING",
   STRING_LIST = "STRING_LIST",
 }
@@ -21,7 +22,7 @@ export interface CustomData {
   /** ID of the command. */
   id: string;
   /** The value of the data. */
-  value: string | number | string[];
+  value: string | number | string[] | number[];
   /** The value type of the data. */
   valueType: CustomDataValueType;
 }
@@ -29,6 +30,11 @@ export interface CustomData {
 export interface CustomDataNumber extends CustomData {
   value: number;
   valueType: CustomDataValueType.NUMBER;
+}
+
+export interface CustomDataNumberList extends CustomData {
+  value: number[];
+  valueType: CustomDataValueType.NUMBER_LIST;
 }
 
 export interface CustomDataString extends CustomData {
@@ -43,11 +49,12 @@ export interface CustomDataStringList extends CustomData {
 
 export type CustomDataTypes =
   | CustomDataNumber
+  | CustomDataNumberList
   | CustomDataString
   | CustomDataStringList;
 
-export const convertCustomDataValueValueToString = (
-  value: string | number | string[],
+export const convertCustomDataValueToDbString = (
+  value: string | number | string[] | number[],
   valueType: CustomDataValueType
 ): string => {
   switch (valueType) {
@@ -58,6 +65,17 @@ export const convertCustomDataValueValueToString = (
         );
       }
       return `${value}`;
+    case CustomDataValueType.NUMBER_LIST:
+      if (
+        typeof value !== "object" ||
+        !Array.isArray(value) ||
+        value.some((a) => typeof a !== "number")
+      ) {
+        throw Error(
+          `Custom data value type (${valueType}) does not fit the value (${typeof value})`
+        );
+      }
+      return JSON.stringify(value);
     case CustomDataValueType.STRING:
       if (typeof value !== "string") {
         throw Error(
@@ -66,39 +84,58 @@ export const convertCustomDataValueValueToString = (
       }
       return value;
     case CustomDataValueType.STRING_LIST:
-      if (typeof value !== "object" && !Array.isArray(value)) {
+      if (
+        typeof value !== "object" ||
+        !Array.isArray(value) ||
+        value.some((a) => typeof a !== "string")
+      ) {
         throw Error(
           `Custom data value type (${valueType}) does not fit the value (${typeof value})`
         );
       }
-      return `${JSON.stringify(value)}`;
+      return JSON.stringify(value);
   }
 };
 
-export const convertCustomDataValueStringToValue = (
+export const convertCustomDataDbStringToValue = (
   value: string,
   valueType: CustomDataValueType
-): string | number | string[] => {
+): string | number | string[] | number[] => {
   switch (valueType) {
     case CustomDataValueType.NUMBER:
       if (Number.isNaN(value)) {
         throw Error(`Custom data value is not a number (${value})`);
       }
       return Number(value);
+    case CustomDataValueType.NUMBER_LIST:
+      try {
+        const maybeStringArray = JSON.parse(value) as number[];
+        if (!Array.isArray(maybeStringArray)) {
+          throw Error(`Custom data value is not an array (${value})`);
+        }
+        if (maybeStringArray.some((a) => typeof a !== "number")) {
+          throw Error(
+            `Custom data value array entries not always a number (${value})`
+          );
+        }
+        return maybeStringArray;
+      } catch (err) {
+        throw Error(`Custom data value can not be parsed (${value})`);
+      }
     case CustomDataValueType.STRING:
       return value;
     case CustomDataValueType.STRING_LIST:
       try {
-        const maybeStringArray = JSON.parse(value) as [];
+        const maybeStringArray = JSON.parse(value) as string[];
         if (!Array.isArray(maybeStringArray)) {
           throw Error(`Custom data value is not an array (${value})`);
         }
-        if (maybeStringArray.filter((a) => typeof a !== "string").length > 0) {
+        if (maybeStringArray.some((a) => typeof a !== "string")) {
           throw Error(
             `Custom data value array entries not always a string (${value})`
           );
         }
-        return maybeStringArray as string[];
+        return maybeStringArray;
       } catch (err) {
         throw Error(`Custom data value can not be parsed (${value})`);
       }
@@ -111,6 +148,8 @@ export const convertCustomDataValueTypeStringToValueType = (
   switch (valueType) {
     case CustomDataValueType.NUMBER:
       return CustomDataValueType.NUMBER;
+    case CustomDataValueType.NUMBER_LIST:
+      return CustomDataValueType.NUMBER_LIST;
     case CustomDataValueType.STRING:
       return CustomDataValueType.STRING;
     case CustomDataValueType.STRING_LIST:

@@ -1,10 +1,13 @@
 // Local imports
 import {
-  pluginCustomCommandDataAddId,
-  pluginCustomCommandDataGetId,
-  pluginCustomCommandDataRemoveId,
-  pluginCustomCommandDataSetId,
-  pluginCustomCommandDataSetNumberId,
+  pluginCustomDataId,
+  pluginCustomDataListAverageId,
+  pluginCustomDataListClearNumberId,
+  pluginCustomDataListId,
+  pluginCustomDataListMaxId,
+  pluginCustomDataListMinId,
+  pluginCustomDataListSizeId,
+  pluginCustomDataListSumId,
 } from "./plugins/customData";
 import {
   pluginHelp,
@@ -23,6 +26,7 @@ import { PluginTwitchChat } from "./plugins/twitchChat";
 import { TwitchBadgeLevel } from "../twitch";
 // Type imports
 import type { CustomCommand } from "../customCommandsBroadcasts/customCommand";
+import { pluginCountGenerator } from "./plugins/count";
 
 const defaultExampleCommandValues = {
   count: 0,
@@ -53,14 +57,14 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    description: `Count command calls > ${pluginRegexGroupId}`,
+    description: `Count command calls > ${pluginCountGenerator.id}`,
     id: "count",
     message: createMessageParserMessage([
       "the test command was called ",
-      { name: pluginRegexGroupId, type: "plugin" },
+      { name: pluginCountGenerator.id, type: "plugin" },
       " time",
       {
-        args: [{ name: pluginRegexGroupId, type: "plugin" }, ">1"],
+        args: [{ name: pluginCountGenerator.id, type: "plugin" }, ">1"],
         name: pluginIfGreater.id,
         scope: "s",
         type: "plugin",
@@ -89,9 +93,11 @@ export const customCommandsInformation: CustomCommand[] = [
         args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfNotUndefined.id,
         scope: [
-          "'",
+          // eslint-disable-next-line prettier/prettier
+          "\"",
           { args: "1", name: pluginRegexGroupId, type: "plugin" },
-          "' as query",
+          // eslint-disable-next-line prettier/prettier
+          "\" as query",
         ],
         type: "plugin",
       },
@@ -181,13 +187,15 @@ export const customCommandsInformation: CustomCommand[] = [
         args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfNotUndefined.id,
         scope: [
-          " You updated the title to '",
+          // eslint-disable-next-line prettier/prettier
+          " You updated the title to \"",
           {
             args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
             name: PluginTwitchApi.SET_TITLE,
             type: "plugin",
           },
-          "'",
+          // eslint-disable-next-line prettier/prettier
+          "\"",
         ],
         type: "plugin",
       },
@@ -195,9 +203,11 @@ export const customCommandsInformation: CustomCommand[] = [
         args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfUndefined.id,
         scope: [
-          " The current title is '",
+          // eslint-disable-next-line prettier/prettier
+          " The current title is \"",
           { name: PluginTwitchApi.GET_TITLE, type: "plugin" },
-          "'",
+          // eslint-disable-next-line prettier/prettier
+          "\"",
         ],
         type: "plugin",
       },
@@ -217,13 +227,15 @@ export const customCommandsInformation: CustomCommand[] = [
         args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfNotUndefined.id,
         scope: [
-          "You updated the game to '",
+          // eslint-disable-next-line prettier/prettier
+          "You updated the game to \"",
           {
             args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
             name: PluginTwitchApi.SET_GAME,
             type: "plugin",
           },
-          "'",
+          // eslint-disable-next-line prettier/prettier
+          "\"",
         ],
         type: "plugin",
       },
@@ -231,9 +243,11 @@ export const customCommandsInformation: CustomCommand[] = [
         args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfUndefined.id,
         scope: [
-          "The current game is '",
+          // eslint-disable-next-line prettier/prettier
+          "The current game is \"",
           { name: PluginTwitchApi.GET_GAME, type: "plugin" },
-          "'",
+          // eslint-disable-next-line prettier/prettier
+          "\"",
         ],
         type: "plugin",
       },
@@ -243,19 +257,19 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    description: `Death counter that works across commands [1/4] > ${pluginCustomCommandDataAddId}`,
+    description: `Death counter that works across commands [1/4] > ${pluginCustomDataId}`,
     id: "death counter add",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " death was added, streamer died ",
-      { args: "death+=1", name: pluginCustomCommandDataAddId, type: "plugin" },
+      { args: "death+#=1", name: pluginCustomDataId, type: "plugin" },
       " time",
       {
         args: [
           {
-            args: "death<>0",
-            name: pluginCustomCommandDataGetId,
+            args: "death<#>0",
+            name: pluginCustomDataId,
             type: "plugin",
           },
           "!==1",
@@ -270,23 +284,23 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    description: `Death counter that works across commands [2/4] > ${pluginCustomCommandDataGetId}`,
+    description: `Death counter that works across commands [2/4] > ${pluginCustomDataId}`,
     id: "death counter get",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " streamer died ",
       {
-        args: "death<>0",
-        name: pluginCustomCommandDataGetId,
+        args: "death<#>0",
+        name: pluginCustomDataId,
         type: "plugin",
       },
       " time",
       {
         args: [
           {
-            args: "death<>0",
-            name: pluginCustomCommandDataGetId,
+            args: "death<#>0",
+            name: pluginCustomDataId,
             type: "plugin",
           },
           "!==1",
@@ -300,7 +314,7 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    description: `Death counter that works across commands [3/4] > ${pluginCustomCommandDataSetId}`,
+    description: `Death counter that works across commands [3/4] > ${pluginCustomDataId}`,
     id: "death counter set",
     message: createMessageParserMessage([
       "@",
@@ -310,15 +324,17 @@ export const customCommandsInformation: CustomCommand[] = [
         args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
         name: pluginIfNotUndefined.id,
         scope: [
-          "deaths were set to '",
+          // eslint-disable-next-line prettier/prettier
+          "deaths were set to \"",
           { args: "1", name: pluginRegexGroupId, type: "plugin" },
-          "', streamer died ",
+          // eslint-disable-next-line prettier/prettier
+          "\", streamer died ",
           {
             args: [
-              "death=#=",
+              "death#=",
               { args: "1", name: pluginRegexGroupId, type: "plugin" },
             ],
-            name: pluginCustomCommandDataSetNumberId,
+            name: pluginCustomDataId,
             type: "plugin",
           },
         ],
@@ -330,8 +346,8 @@ export const customCommandsInformation: CustomCommand[] = [
         scope: [
           "deaths were reset to 0, streamer died ",
           {
-            args: "death=#=0",
-            name: pluginCustomCommandDataSetNumberId,
+            args: "death#=0",
+            name: pluginCustomDataId,
             type: "plugin",
           },
         ],
@@ -341,8 +357,8 @@ export const customCommandsInformation: CustomCommand[] = [
       {
         args: [
           {
-            args: "death<>0",
-            name: pluginCustomCommandDataGetId,
+            args: "death<#>0",
+            name: pluginCustomDataId,
             type: "plugin",
           },
           "!==1",
@@ -357,23 +373,23 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
-    description: `Death counter that works across commands [4/4] > ${pluginCustomCommandDataRemoveId}`,
+    description: `Death counter that works across commands [4/4] > ${pluginCustomDataId}`,
     id: "death counter remove",
     message: createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
       " death was removed, streamer died ",
       {
-        args: "death-=1",
-        name: pluginCustomCommandDataRemoveId,
+        args: "death-#=1",
+        name: pluginCustomDataId,
         type: "plugin",
       },
       " time",
       {
         args: [
           {
-            args: "death<>0",
-            name: pluginCustomCommandDataGetId,
+            args: "death<#>0",
+            name: pluginCustomDataId,
             type: "plugin",
           },
           "!==1",
@@ -384,6 +400,226 @@ export const customCommandsInformation: CustomCommand[] = [
       },
     ]),
     regex: convertRegexToString(/^\s*!removeDeath(?:\s|$)/),
+    userLevel: TwitchBadgeLevel.MODERATOR,
+  },
+  {
+    ...defaultExampleCommandValues,
+    description: `Quote database [1/3] > ${pluginCustomDataListId}`,
+    id: "quote list add",
+    message: createMessageParserMessage([
+      "@",
+      { name: PluginTwitchChat.USER, type: "plugin" },
+      // eslint-disable-next-line prettier/prettier
+      " Quote was added \"",
+      {
+        args: [
+          "quote+=",
+          { args: "1", name: pluginRegexGroupId, type: "plugin" },
+        ],
+        name: pluginCustomDataListId,
+        type: "plugin",
+      },
+      // eslint-disable-next-line prettier/prettier
+      "\"",
+    ]),
+    regex: convertRegexToString(/^\s*!quoteAdd\s+(.*\s*)(?:\s|$)/),
+    userLevel: TwitchBadgeLevel.MODERATOR,
+  },
+  {
+    ...defaultExampleCommandValues,
+    description: `Quote database [2/3] > ${pluginCustomDataListId}`,
+    id: "quote list get index or random",
+    message: createMessageParserMessage([
+      "@",
+      { name: PluginTwitchChat.USER, type: "plugin" },
+      // eslint-disable-next-line prettier/prettier
+      " Quote \"",
+      {
+        args: {
+          args: "1",
+          name: pluginRegexGroupId,
+          type: "plugin",
+        },
+        name: pluginIfUndefined.id,
+        scope: {
+          args: [
+            "quote=@=",
+            {
+              args: [
+                "0<-]",
+                {
+                  args: "quote",
+                  name: pluginCustomDataListSizeId,
+                  type: "plugin",
+                },
+              ],
+              name: pluginRandomNumber.id,
+              type: "plugin",
+            },
+          ],
+          name: pluginCustomDataListId,
+          type: "plugin",
+        },
+        type: "plugin",
+      },
+      {
+        args: {
+          args: "1",
+          name: pluginRegexGroupId,
+          type: "plugin",
+        },
+        name: pluginIfNotUndefined.id,
+        scope: {
+          args: [
+            "quote=@=",
+            {
+              args: "1",
+              name: pluginRegexGroupId,
+              type: "plugin",
+            },
+          ],
+          name: pluginCustomDataListId,
+          type: "plugin",
+        },
+        type: "plugin",
+      },
+      // eslint-disable-next-line prettier/prettier
+      "\"",
+    ]),
+    // eslint-disable-next-line security/detect-unsafe-regex
+    regex: convertRegexToString(/^\s*!quote(?:\s+([0-9]+))?(?:\s|$)/),
+  },
+  {
+    ...defaultExampleCommandValues,
+    description: `Quote database [3/3] > ${pluginCustomDataListId}`,
+    id: "quote list remove index",
+    message: createMessageParserMessage([
+      "@",
+      { name: PluginTwitchChat.USER, type: "plugin" },
+      " ",
+      {
+        args: {
+          args: "1",
+          name: pluginRegexGroupId,
+          type: "plugin",
+        },
+        name: pluginIfUndefined.id,
+        scope: "No quote index was found!",
+        type: "plugin",
+      },
+      {
+        args: {
+          args: "1",
+          name: pluginRegexGroupId,
+          type: "plugin",
+        },
+        name: pluginIfNotUndefined.id,
+        scope: [
+          // eslint-disable-next-line prettier/prettier
+          "Removed quote: \"",
+          {
+            args: [
+              "quote-@=",
+              {
+                args: "1",
+                name: pluginRegexGroupId,
+                type: "plugin",
+              },
+            ],
+            name: pluginCustomDataListId,
+            type: "plugin",
+          },
+          // eslint-disable-next-line prettier/prettier
+          "\"",
+        ],
+        type: "plugin",
+      },
+    ]),
+    regex: convertRegexToString(/^\s*!quoteRemove\s+([0-9]+)(?:\s|$)/),
+    userLevel: TwitchBadgeLevel.MODERATOR,
+  },
+  {
+    ...defaultExampleCommandValues,
+    description: `Score metrics [1/2] > ${pluginCustomDataListId}`,
+    id: "score list",
+    message: createMessageParserMessage([
+      "@",
+      { name: PluginTwitchChat.USER, type: "plugin" },
+      " ",
+      {
+        args: {
+          args: "1",
+          name: pluginRegexGroupId,
+          type: "plugin",
+        },
+        name: pluginIfNotUndefined.id,
+        scope: [
+          "(added to the scores ",
+          {
+            args: [
+              "scores+#=",
+              {
+                args: "1",
+                name: pluginRegexGroupId,
+                type: "plugin",
+              },
+            ],
+            name: pluginCustomDataListId,
+            type: "plugin",
+          },
+          ") ",
+        ],
+        type: "plugin",
+      },
+      "sum=",
+      {
+        args: "scores",
+        name: pluginCustomDataListSumId,
+        type: "plugin",
+      },
+      " average=",
+      {
+        args: "scores",
+        name: pluginCustomDataListAverageId,
+        type: "plugin",
+      },
+      " max=",
+      {
+        args: "scores",
+        name: pluginCustomDataListMaxId,
+        type: "plugin",
+      },
+      " min=",
+      {
+        args: "scores",
+        name: pluginCustomDataListMinId,
+        type: "plugin",
+      },
+      " size=",
+      {
+        args: "scores",
+        name: pluginCustomDataListSizeId,
+        type: "plugin",
+      },
+    ]),
+    regex: convertRegexToString(/^\s*!scoresAdd\s+(-?[0-9]+)(?:\s|$)/),
+    userLevel: TwitchBadgeLevel.MODERATOR,
+  },
+  {
+    ...defaultExampleCommandValues,
+    description: `Score metrics [2/2] > ${pluginCustomDataListId}`,
+    id: "scores list reset",
+    message: createMessageParserMessage([
+      "@",
+      { name: PluginTwitchChat.USER, type: "plugin" },
+      " Scores were reset",
+      {
+        args: "scores",
+        name: pluginCustomDataListClearNumberId,
+        type: "plugin",
+      },
+    ]),
+    regex: convertRegexToString(/^\s*!scoresReset(?:\s|$)/),
     userLevel: TwitchBadgeLevel.MODERATOR,
   },
   {
