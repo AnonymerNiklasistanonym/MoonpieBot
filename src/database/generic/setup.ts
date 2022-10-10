@@ -5,9 +5,9 @@ import * as versionRequests from "./version/requests";
 import { createLogFunc } from "../../logging";
 import { createLogMethod } from "../logging";
 import { getVersionFromObject } from "../../version";
-import { versionTable } from "../generic/version/info";
+import { versionTable } from "../../info/databases/genericVersionDb";
 // Type imports
-import { DbVersionInfo } from "../generic/version/info";
+import { DbVersionInfo } from "../../info/databases/genericVersionDb";
 import type { Logger } from "winston";
 
 // TODO Make the setup step a generic method

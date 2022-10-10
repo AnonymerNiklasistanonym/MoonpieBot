@@ -29,7 +29,7 @@ import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { macroOsuBeatmap } from "../../info/macros/osuApi";
 import { NOT_FOUND_STATUS_CODE } from "../../other/web";
 import { notUndefined } from "../../other/types";
-import { OsuRequestsConfig } from "../../database/osuRequestsDb/info";
+import { OsuRequestsConfig } from "../../info/databases/osuRequestsDb";
 import osuRequestsDb from "../../database/osuRequestsDb";
 import { pluginsTwitchChatGenerator } from "../../info/plugins/twitchChat";
 import { tryToSendOsuIrcMessage } from "../../osuIrc";

@@ -7,7 +7,10 @@ import {
   convertCustomDataValueTypeStringToValueType,
   CustomDataValueType,
 } from "../../../customCommandsBroadcasts/customData";
-import { CustomCommandsBroadcastsDbError, customDataTable } from "../info";
+import {
+  CustomCommandsBroadcastsDbError,
+  customDataTable,
+} from "../../../info/databases/customCommandsBroadcastsDb";
 import { createLogMethod } from "../../logging";
 // Type imports
 import type { ExistsDbOut, UpdateColumn } from "sqlite3-promise-query-api";

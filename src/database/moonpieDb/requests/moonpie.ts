@@ -1,7 +1,10 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Local imports
-import { MoonpieDbError, moonpieTable } from "../info";
+import {
+  MoonpieDbError,
+  moonpieTable,
+} from "../../../info/databases/moonpieDb";
 import { createLogMethod } from "../../logging";
 // Type imports
 import type { ExistsDbOut } from "sqlite3-promise-query-api";

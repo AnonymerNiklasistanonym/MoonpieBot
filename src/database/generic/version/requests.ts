@@ -1,7 +1,10 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Local imports
-import { DbVersionRequestError, versionTable } from "./info";
+import {
+  DbVersionRequestError,
+  versionTable,
+} from "../../../info/databases/genericVersionDb";
 import { createLogMethod } from "../../logging";
 // Type imports
 import type { Logger } from "winston";

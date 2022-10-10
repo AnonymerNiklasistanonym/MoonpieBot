@@ -5,7 +5,7 @@ import {
   OsuRequestsConfig,
   osuRequestsConfigTable,
   OsuRequestsDbError,
-} from "../info";
+} from "../../../info/databases/osuRequestsDb";
 import { createLogMethod } from "../../logging";
 // Type imports
 import type { ExistsDbOut } from "sqlite3-promise-query-api";

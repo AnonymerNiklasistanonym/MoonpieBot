@@ -6,7 +6,10 @@ import {
   convertTwitchBadgeStringToLevel,
   TwitchBadgeLevel,
 } from "../../../twitch";
-import { CustomCommandsBroadcastsDbError, customCommandsTable } from "../info";
+import {
+  CustomCommandsBroadcastsDbError,
+  customCommandsTable,
+} from "../../../info/databases/customCommandsBroadcastsDb";
 import { createLogMethod } from "../../logging";
 // Type imports
 import type { ExistsDbOut, UpdateColumn } from "sqlite3-promise-query-api";

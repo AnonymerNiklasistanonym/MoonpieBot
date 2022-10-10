@@ -4,7 +4,7 @@ import {
   customCommandsTable,
   customDataTable,
   versionCurrent,
-} from "./info";
+} from "../../info/databases/customCommandsBroadcastsDb";
 //import { customBroadcastsInformation } from "../../info/customBroadcasts";
 //import customCommandsBroadcastsDb from "../customCommandsBroadcastsDb";
 //import { customCommandsInformation } from "../../info/customCommands";

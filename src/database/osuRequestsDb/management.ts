@@ -7,7 +7,7 @@ import {
   osuRequestsConfigTable,
   osuRequestsConfigTableV001,
   versionCurrent,
-} from "./info";
+} from "../../info/databases/osuRequestsDb";
 import { createLogMethod } from "../logging";
 import { createOrUpdateEntry } from "./requests/osuRequestsConfig";
 import { genericSetupDatabase } from "../generic/setup";

@@ -1,5 +1,5 @@
 // Local imports
-import { OsuRequestsConfig } from "../../database/osuRequestsDb/info";
+import { OsuRequestsConfig } from "../databases/osuRequestsDb";
 // Type imports
 import type { GetOsuRequestsConfigOut } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import type { MessageParserMacroGenerator } from "../../messageParser";

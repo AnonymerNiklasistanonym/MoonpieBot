@@ -4,7 +4,7 @@ import db from "sqlite3-promise-query-api";
 import {
   customBroadcastsTable,
   CustomCommandsBroadcastsDbError,
-} from "../info";
+} from "../../../info/databases/customCommandsBroadcastsDb";
 import { createLogMethod } from "../../logging";
 // Type imports
 import type { CustomBroadcast } from "../../../customCommandsBroadcasts/customBroadcast";

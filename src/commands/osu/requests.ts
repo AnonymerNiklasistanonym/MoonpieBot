@@ -18,7 +18,7 @@ import {
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
-import { OsuRequestsConfig } from "../../database/osuRequestsDb/info";
+import { OsuRequestsConfig } from "../../info/databases/osuRequestsDb";
 import osuRequestsDb from "../../database/osuRequestsDb";
 import { TwitchBadgeLevel } from "../../twitch";
 // Type imports

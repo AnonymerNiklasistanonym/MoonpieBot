@@ -8,7 +8,7 @@ import path from "path";
 import { getTestLogger } from "../../logger";
 import { itAllowFail } from "../../allowFail";
 import moonpieDb from "../../../../src/database/moonpieDb";
-import { MoonpieDbError } from "../../../../src/database/moonpieDb/info";
+import { MoonpieDbError } from "../../../../src/info/databases/moonpieDb";
 
 const githubCiMaxTimeout = 8000;
 

@@ -1,5 +1,8 @@
 // Local imports
-import { spotifyConfigTable, versionCurrent } from "./info";
+import {
+  spotifyConfigTable,
+  versionCurrent,
+} from "../../info/databases/spotifyDb";
 import { genericSetupDatabase } from "../generic/setup";
 import { getVersionFromObject } from "../../version";
 // Type imports

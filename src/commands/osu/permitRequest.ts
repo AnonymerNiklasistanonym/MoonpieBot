@@ -2,7 +2,7 @@
 import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { osuBeatmapRequestNoBlockedRequestsError } from "../../info/strings/osu/beatmapRequest";
-import { OsuRequestsConfig } from "../../database/osuRequestsDb/info";
+import { OsuRequestsConfig } from "../../info/databases/osuRequestsDb";
 import osuRequestsDb from "../../database/osuRequestsDb";
 import { regexOsuChatHandlerCommandPermitRequest } from "../../info/regex";
 import { sendBeatmapRequest } from "./beatmap";

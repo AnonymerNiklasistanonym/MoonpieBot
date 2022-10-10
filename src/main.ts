@@ -47,7 +47,7 @@ import moonpieDb from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
 import { OsuCommands } from "./info/commands";
-import { OsuRequestsConfig } from "./database/osuRequestsDb/info";
+import { OsuRequestsConfig } from "./info/databases/osuRequestsDb";
 import osuRequestsDb from "./database/osuRequestsDb";
 import { pluginCountGenerator } from "./info/plugins/count";
 import { pluginsCustomCommandDataGenerator } from "./info/plugins/customDataLogic";

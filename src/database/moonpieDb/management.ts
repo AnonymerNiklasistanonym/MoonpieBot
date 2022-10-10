@@ -1,5 +1,9 @@
 // Local imports
-import { moonpieLeaderboardView, moonpieTable, versionCurrent } from "./info";
+import {
+  moonpieLeaderboardView,
+  moonpieTable,
+  versionCurrent,
+} from "../../info/databases/moonpieDb";
 import { genericSetupDatabase } from "../generic/setup";
 import { getVersionFromObject } from "../../version";
 // Type imports
