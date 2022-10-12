@@ -1,18 +1,20 @@
 /* eslint-disable no-magic-numbers */
 
 // Package imports
-import chai from "chai";
 import { describe } from "mocha";
+import { expect } from "chai";
 import path from "path";
 // Local imports
 import { getTestLogger } from "../../logger";
 import { itAllowFail } from "../../allowFail";
 import moonpieDb from "../../../../src/database/moonpieDb";
 import { MoonpieDbError } from "../../../../src/info/databases/moonpieDb";
+// Type imports
+import type { Suite } from "mocha";
 
 const githubCiMaxTimeout = 8000;
 
-export default (databaseDirPath: string): Mocha.Suite => {
+export default (databaseDirPath: string): Suite => {
   return describe("backup", () => {
     const logger = getTestLogger("Backup");
 
@@ -27,8 +29,8 @@ export default (databaseDirPath: string): Mocha.Suite => {
         databasePath,
         logger
       );
-      chai.expect(backup1).to.be.an("array");
-      chai.expect(backup1.length).to.be.equal(0);
+      expect(backup1).to.be.an("array");
+      expect(backup1.length).to.be.equal(0);
 
       await moonpieDb.requests.moonpie.createEntry(
         databasePath,
@@ -63,21 +65,21 @@ export default (databaseDirPath: string): Mocha.Suite => {
         databasePath,
         logger
       );
-      chai.expect(backup2).to.be.an("array");
-      chai.expect(backup2.length).to.be.equal(2);
+      expect(backup2).to.be.an("array");
+      expect(backup2.length).to.be.equal(2);
       const id1 = backup2.find((a) => a.id === "1");
       const id2 = backup2.find((a) => a.id === "3");
-      chai.expect(id1).to.be.not.undefined;
-      chai.expect(id2).to.be.not.undefined;
+      expect(id1).to.be.not.undefined;
+      expect(id2).to.be.not.undefined;
       if (id1) {
-        chai.expect(id1.name).to.be.equal("one");
-        chai.expect(id1.count).to.be.equal(0);
-        chai.expect(id1.timestamp).to.be.a("number");
+        expect(id1.name).to.be.equal("one");
+        expect(id1.count).to.be.equal(0);
+        expect(id1.timestamp).to.be.a("number");
       }
       if (id2) {
-        chai.expect(id2.name).to.be.equal("four");
-        chai.expect(id2.count).to.be.equal(20);
-        chai.expect(id2.timestamp).to.be.equal(42);
+        expect(id2.name).to.be.equal("four");
+        expect(id2.count).to.be.equal(20);
+        expect(id2.timestamp).to.be.equal(42);
       }
 
       try {
@@ -85,7 +87,7 @@ export default (databaseDirPath: string): Mocha.Suite => {
           databasePath + "abc",
           logger
         );
-        chai.expect(false);
+        expect(false);
       } catch (err) {
         chai
           .expect((err as Error).message)

@@ -38,9 +38,9 @@ If this program is installed via a package it will use *$HOME/.local/share/moonp
 **MOONPIE_CONFIG_CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH**="*customCommandsBroadcasts.db*"
 : The database file path that contains the persistent custom commands and broadcasts data.
 
-**MOONPIE_CONFIG_CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS**="*add_custom_broadcast,add_custom_command,commands,delete_custom_broadcast,delete_custom_command,edit_custom_broadcast,edit_custom_command,list_custom_broadcasts,list_custom_commands*"
+**MOONPIE_CONFIG_CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS**="*add_broadcast,add_command,commands,delete_broadcast,delete_command,edit_broadcast,edit_command,list_broadcasts,list_commands*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
-Supported list values: "*add_custom_broadcast*", "*add_custom_command*", "*commands*", "*delete_custom_broadcast*", "*delete_custom_command*", "*edit_custom_broadcast*", "*edit_custom_command*", "*list_custom_broadcasts*", "*list_custom_commands*" (empty list value: "*none*")
+Supported list values: "*add_broadcast*", "*add_command*", "*commands*", "*delete_broadcast*", "*delete_command*", "*edit_broadcast*", "*edit_command*", "*list_broadcasts*", "*list_commands*" (empty list value: "*none*")
 
 **MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL**="*info*"
 : The log level of the log messages that are printed to the console.

@@ -1,6 +1,7 @@
 /* eslint-disable no-magic-numbers */
 
 // Package imports
+import { describe } from "mocha";
 import { expect } from "chai";
 // Local imports
 import {
@@ -15,6 +16,7 @@ import {
 import { getTestLogger } from "./logger";
 import { messageParser } from "../../src/messageParser";
 import pluginsTestSuite from "./messageParser/plugins.test";
+import stringsTestSuite from "./messageParser/strings.test";
 // Type imports
 import type {
   MacroMap,
@@ -394,4 +396,6 @@ describe("messageParser", () => {
   });
 
   pluginsTestSuite();
+
+  stringsTestSuite();
 });

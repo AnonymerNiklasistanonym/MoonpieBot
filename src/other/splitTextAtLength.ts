@@ -9,20 +9,25 @@
 export const splitTextAtLength = (
   textInput: string,
   splitLength: number
-): string[] => {
-  const allWords = textInput.split(" ");
-  const out = [""];
-  let first = true;
-  for (const word of allWords) {
-    if (out[out.length - 1].length + 1 + word.length > splitLength) {
-      out.push(word);
-    } else {
-      out[out.length - 1] += `${first ? "" : " "}${word}`;
-      first = false;
-    }
-  }
-  return out;
-};
+): string[] =>
+  textInput.split(" ").reduce(
+    (out, currentWord) => {
+      const outLast = out[out.length - 1];
+      if (outLast.length === 0) {
+        // If the current element is the empty string always append the word
+        out[out.length - 1] += currentWord;
+      } else if (outLast.length + 1 + currentWord.length <= splitLength) {
+        // If appending the current word is smaller than the split length plus
+        // one whitespace append the word and a whitespace
+        out[out.length - 1] += ` ${currentWord}`;
+      } else {
+        // Else create a new output element
+        out.push(currentWord);
+      }
+      return out;
+    },
+    [""]
+  );
 
 export enum FileDocumentationPartType {
   HEADING = "HEADING",

@@ -1,6 +1,7 @@
 /* eslint-disable no-magic-numbers */
 
 // Package imports
+import { describe } from "mocha";
 import { expect } from "chai";
 // Local imports
 import { createMessageParserMessage } from "../../../src/messageParser/createMessageParserMessage";
@@ -15,6 +16,7 @@ import type {
   MessageParserPluginExample,
 } from "../../../src/messageParser";
 import type { Logger } from "winston";
+import type { Suite } from "mocha";
 
 const testPlugin = async (
   plugin: MessageParserPlugin,
@@ -78,7 +80,7 @@ const testPlugin = async (
   }
 };
 
-export default (): Mocha.Suite => {
+export default (): Suite => {
   return describe("plugins", () => {
     const logger = getTestLogger("messageParser_plugins");
     it("default plugins", async () => {

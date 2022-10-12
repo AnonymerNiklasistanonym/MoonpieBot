@@ -73,13 +73,14 @@ export const updateStringsMapWithCustomEnvStrings = (
     "update_strings_with_custom_env_strings"
   );
 
+  const updatedStrings = new Map(strings);
   let foundCustomStringsCounter = 0;
   let foundCustomNonDefaultStringsCounter = 0;
   // First check for the default string entries
-  for (const [key] of strings.entries()) {
+  for (const [key] of updatedStrings.entries()) {
     const envValue = process.env[`${ENV_PREFIX_CUSTOM_STRINGS}${key}`];
     if (envValue !== undefined && envValue.trim().length > 0) {
-      strings.set(key, envValue);
+      updatedStrings.set(key, envValue);
       foundCustomStringsCounter++;
       logStrings.debug(`Found default custom string: ${key}=${envValue}`);
     }
@@ -88,12 +89,16 @@ export const updateStringsMapWithCustomEnvStrings = (
   Object.keys(process.env).forEach((key) => {
     if (
       key.startsWith(ENV_PREFIX_CUSTOM_STRINGS) &&
-      strings.get(key.slice(ENV_PREFIX_CUSTOM_STRINGS.length)) === undefined
+      updatedStrings.get(key.slice(ENV_PREFIX_CUSTOM_STRINGS.length)) ===
+        undefined
     ) {
       // eslint-disable-next-line security/detect-object-injection
       const envValue = process.env[key];
-      if (envValue !== undefined && envValue.trim().length > 0) {
-        strings.set(key.slice(ENV_PREFIX_CUSTOM_STRINGS.length), envValue);
+      if (envValue !== undefined) {
+        updatedStrings.set(
+          key.slice(ENV_PREFIX_CUSTOM_STRINGS.length),
+          envValue
+        );
         foundCustomNonDefaultStringsCounter++;
         logStrings.debug(`Found non-default custom string: ${key}=${envValue}`);
       }
@@ -114,5 +119,5 @@ export const updateStringsMapWithCustomEnvStrings = (
       }`
     );
   }
-  return strings;
+  return updatedStrings;
 };

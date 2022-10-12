@@ -1,3 +1,5 @@
+// Package imports
+import { it } from "mocha";
 // Type imports
 import type { Test } from "mocha";
 
@@ -11,11 +13,7 @@ export const itAllowFail = (
   }
   return it(title, function (...args) {
     return Promise.resolve()
-      .then(() => {
-        return callback.apply(this, args as unknown as []);
-      })
-      .catch(() => {
-        this.skip();
-      });
+      .then(() => callback.apply(this, args as unknown as []))
+      .catch(() => this.skip());
   });
 };
