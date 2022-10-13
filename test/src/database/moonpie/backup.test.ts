@@ -89,9 +89,7 @@ export default (databaseDirPath: string): Suite => {
         );
         expect(false);
       } catch (err) {
-        chai
-          .expect((err as Error).message)
-          .to.equal(MoonpieDbError.NOT_EXISTING);
+        expect((err as Error).message).to.equal(MoonpieDbError.NOT_EXISTING);
       }
     }).timeout(githubCiMaxTimeout);
   });

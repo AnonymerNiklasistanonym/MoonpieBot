@@ -53,9 +53,7 @@ export default (databaseDirPath: string): Suite => {
         );
         expect(false);
       } catch (err) {
-        chai
-          .expect((err as Error).message)
-          .to.equal(MoonpieDbError.ALREADY_EXISTS);
+        expect((err as Error).message).to.equal(MoonpieDbError.ALREADY_EXISTS);
       }
     }).timeout(githubCiMaxTimeout);
     itAllowFail("exists", process.platform === "win32", async () => {
@@ -144,9 +142,7 @@ export default (databaseDirPath: string): Suite => {
         await moonpieDb.requests.moonpie.getEntry(databasePath, "3", logger);
         expect(false);
       } catch (err) {
-        chai
-          .expect((err as Error).message)
-          .to.equal(MoonpieDbError.NOT_EXISTING);
+        expect((err as Error).message).to.equal(MoonpieDbError.NOT_EXISTING);
       }
 
       await moonpieDb.requests.moonpie.createEntry(
@@ -172,9 +168,7 @@ export default (databaseDirPath: string): Suite => {
         await moonpieDb.requests.moonpie.getEntry(databasePath, "7", logger);
         expect(false);
       } catch (err) {
-        chai
-          .expect((err as Error).message)
-          .to.equal(MoonpieDbError.NOT_EXISTING);
+        expect((err as Error).message).to.equal(MoonpieDbError.NOT_EXISTING);
       }
     }).timeout(githubCiMaxTimeout);
     itAllowFail("getMoonpieName", process.platform === "win32", async () => {
@@ -192,9 +186,7 @@ export default (databaseDirPath: string): Suite => {
         );
         expect(false);
       } catch (err) {
-        chai
-          .expect((err as Error).message)
-          .to.equal(MoonpieDbError.NOT_EXISTING);
+        expect((err as Error).message).to.equal(MoonpieDbError.NOT_EXISTING);
       }
 
       await moonpieDb.requests.moonpie.createEntry(
@@ -224,9 +216,7 @@ export default (databaseDirPath: string): Suite => {
         );
         expect(false);
       } catch (err) {
-        chai
-          .expect((err as Error).message)
-          .to.equal(MoonpieDbError.NOT_EXISTING);
+        expect((err as Error).message).to.equal(MoonpieDbError.NOT_EXISTING);
       }
     }).timeout(githubCiMaxTimeout);
     itAllowFail("update", process.platform === "win32", async () => {
@@ -245,9 +235,7 @@ export default (databaseDirPath: string): Suite => {
         );
         expect(false);
       } catch (err) {
-        chai
-          .expect((err as Error).message)
-          .to.equal(MoonpieDbError.NOT_EXISTING);
+        expect((err as Error).message).to.equal(MoonpieDbError.NOT_EXISTING);
       }
 
       await moonpieDb.requests.moonpie.createEntry(
@@ -430,9 +418,7 @@ export default (databaseDirPath: string): Suite => {
           );
           expect(false);
         } catch (err) {
-          chai
-            .expect((err as Error).message)
-            .to.equal(MoonpieDbError.NOT_EXISTING);
+          expect((err as Error).message).to.equal(MoonpieDbError.NOT_EXISTING);
         }
 
         await moonpieDb.requests.moonpie.createEntry(
@@ -511,9 +497,7 @@ export default (databaseDirPath: string): Suite => {
         await moonpieDb.requests.moonpie.removeEntry(databasePath, "1", logger);
         expect(false);
       } catch (err) {
-        chai
-          .expect((err as Error).message)
-          .to.equal(MoonpieDbError.NOT_EXISTING);
+        expect((err as Error).message).to.equal(MoonpieDbError.NOT_EXISTING);
       }
 
       await moonpieDb.requests.moonpie.createEntry(
@@ -563,9 +547,7 @@ export default (databaseDirPath: string): Suite => {
         );
         expect(false);
       } catch (err) {
-        chai
-          .expect((err as Error).message)
-          .to.equal(MoonpieDbError.NOT_EXISTING);
+        expect((err as Error).message).to.equal(MoonpieDbError.NOT_EXISTING);
       }
 
       await moonpieDb.requests.moonpie.createEntry(
