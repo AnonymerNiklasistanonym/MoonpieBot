@@ -589,3 +589,5 @@ export interface RegexCustomBroadcastEdit {
 export const regexCustomBroadcastEdit =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^\s*!editcb\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!'))\s+(?<customBroadcastOption>\S+)\s+(?<customBroadcastOptionValue>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+
+export const regexLurkChatHandlerCommandLurk = /^\s*!lurk(?:\s|$)/i;

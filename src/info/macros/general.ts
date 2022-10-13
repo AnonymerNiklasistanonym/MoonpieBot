@@ -1,7 +1,7 @@
-// Type imports
+// Local imports
 import { convertTwitchBadgeLevelToString } from "../../twitch";
-import type { MessageParserMacroGenerator } from "../../messageParser";
 // Type import
+import type { MessageParserMacroGenerator } from "../../messageParser";
 import type { TwitchBadgeLevel } from "../../twitch";
 
 export interface MacroPermissionErrorData {

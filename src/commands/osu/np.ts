@@ -218,8 +218,7 @@ export const commandNp: ChatMessageHandlerReplyCreator<
     if (!data.enabledCommands.includes(OsuCommands.NP)) {
       return false;
     }
-    const match = message.match(regexOsuChatHandlerCommandNp);
-    if (!match) {
+    if (!message.match(regexOsuChatHandlerCommandNp)) {
       return false;
     }
     return { data: {} };

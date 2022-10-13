@@ -41,6 +41,7 @@ import { defaultPlugins } from "./info/plugins";
 import { defaultStringMap } from "./info/strings";
 import { generateOutputFileNameMoonpieDbBackup } from "./info/files";
 import { getVersionFromObject } from "./version";
+import { lurkChatHandler } from "./commands/lurk";
 import { macroOsuApi } from "./info/macros/osuApi";
 import { moonpieChatHandler } from "./commands/moonpie";
 import moonpieDb from "./database/moonpieDb";
@@ -220,6 +221,11 @@ export const main = async (
   );
   const customCommandsBroadcastsEnableCommands = getEnvVariableValueOrDefault(
     EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
+    configDir
+  ).split(",");
+  // Lurk
+  const lurkEnableCommands = getEnvVariableValueOrDefault(
+    EnvVariable.LURK_ENABLED_COMMANDS,
     configDir
   ).split(",");
 
@@ -678,6 +684,29 @@ export const main = async (
           "Spotify"
         );
       }
+    }
+
+    try {
+      await lurkChatHandler(
+        twitchClient,
+        channel,
+        tags,
+        message,
+        {
+          enabledCommands: lurkEnableCommands,
+        },
+        stringMap,
+        pluginMapChannel,
+        macroMapChannel,
+        logger
+      );
+    } catch (err) {
+      await chatHandlerErrorMessage(
+        channel,
+        tags,
+        err as ErrorWithCode,
+        "Lurk"
+      );
     }
 
     try {

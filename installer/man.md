@@ -69,6 +69,10 @@ Example: "*oauth:abcdefghijklmnop*"
 : Turn on debug logs for the Twitch client to see all messages, joins, reconnects and more.
 Supported values: "*OFF*", "*ON*"
 
+**MOONPIE_CONFIG_LURK_ENABLED_COMMANDS**="*none*"
+: You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
+Supported list values: "*lurk*" (empty list value: "*none*")
+
 **MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS**="*about,add,claim,commands,delete,get,leaderboard,remove,set*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
 Supported list values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", "*get*", "*leaderboard*", "*remove*", "*set*" (empty list value: "*none*")

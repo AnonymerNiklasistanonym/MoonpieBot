@@ -7,6 +7,7 @@ import { customCommandsBroadcastsCommandReply } from "./strings/customCommandsBr
 import { customCommandsBroadcastsCommands } from "./strings/customCommandsBroadcasts/commands";
 import { general } from "./strings/general";
 import { generateStringMap } from "../messageParser";
+import { lurkCommandReply } from "./strings/lurk/commandReply";
 import { moonpieCommandReply } from "./strings/moonpie/commandReply";
 import { moonpieCommands } from "./strings/moonpie/commands";
 import { moonpieUser } from "./strings/moonpie/user";
@@ -25,6 +26,7 @@ export const defaultStringMap: StringMap = generateStringMap(
   ...customCommandsBroadcastsCommands,
   ...customCommandsBroadcastsCommandReply,
   ...general,
+  ...lurkCommandReply,
   ...moonpieCommandReply,
   ...moonpieCommands,
   ...moonpieUser,

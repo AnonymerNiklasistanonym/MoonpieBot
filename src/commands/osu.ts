@@ -22,7 +22,7 @@ import type { CommandBeatmapCreateReplyInput } from "./osu/beatmap";
 import type { CommandBeatmapLastRequestCreateReplyInput } from "./osu/lastRequest";
 import type { CommandPpRpCreateReplyInput } from "./osu/pp";
 import type { OsuIrcBotSendMessageFunc } from "./osu/beatmap";
-import { StreamCompanionConnection } from "src/osuStreamCompanion";
+import type { StreamCompanionConnection } from "../osuStreamCompanion";
 
 export interface CommandOsuGenericDataOsuApiDbPath {
   /**

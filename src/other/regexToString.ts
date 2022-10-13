@@ -7,6 +7,5 @@
  */
 export const convertRegexToString = (regex: RegExp): string => {
   const regexString = regex.toString();
-  const indexLastSlash = regexString.lastIndexOf("/");
-  return regexString.slice(1, indexLastSlash);
+  return regexString.slice(1, regexString.lastIndexOf("/"));
 };

@@ -46,3 +46,9 @@ export enum CustomCommandsBroadcastsCommands {
   LIST_CUSTOM_BROADCASTS = "list_broadcasts",
   LIST_CUSTOM_COMMANDS = "list_commands",
 }
+
+export const LOG_ID_CHAT_HANDLER_LURK = "lurk_chat_handler";
+
+export enum LurkCommands {
+  LURK = "lurk",
+}

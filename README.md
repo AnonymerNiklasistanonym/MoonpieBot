@@ -166,6 +166,16 @@ They enable to store persistently a text, number or a list of them in a database
 
 **Every command can be optionally disabled.**
 
+### Optional: Lurk
+
+A custom lurk command can be enabled that welcomes back chatters after they are gone for at least 3 min.
+
+| Command | Permissions | Description |
+| ------ | -- | -------- |
+| `!lurk` | everyone | Become a lurker |
+
+**Every command can be optionally disabled.**
+
 ## Setup
 
 ### Build it yourself

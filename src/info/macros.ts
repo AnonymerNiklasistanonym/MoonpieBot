@@ -35,6 +35,7 @@ import { macroOsuScoreRequest } from "./macros/osuScoreRequest";
 import { macroOsuWindowTitle } from "./macros/osuWindowTitle";
 import { macroPermissionError } from "./macros/general";
 import { macroSpotifySong } from "./macros/spotify";
+import { macroWelcomeBack } from "./macros/lurk";
 // Type imports
 import type {
   MessageParserMacro,
@@ -78,5 +79,6 @@ export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
     macroOsuUser,
     macroOsuWindowTitle,
     macroPermissionError,
-    macroSpotifySong
+    macroSpotifySong,
+    macroWelcomeBack
   );

@@ -5,14 +5,18 @@
 // Package imports
 import path from "path";
 // Local imports
-import { CustomCommandsBroadcastsCommands, MoonpieCommands } from "./commands";
+import {
+  CustomCommandsBroadcastsCommands,
+  LurkCommands,
+  MoonpieCommands,
+} from "./commands";
 import { fileNameEnv, fileNameEnvExample } from "./files";
 import { LoggerLevel } from "../logging";
 import { OsuCommands } from "./commands";
 import { SpotifyCommands } from "./commands";
 // Type imports
 import type { CliEnvVariableInformation } from "../cli";
-import { EnvVariableStructureElement } from "src/env";
+import type { EnvVariableStructureElement } from "../env";
 
 /**
  * ENV prefix.
@@ -54,6 +58,7 @@ export enum EnvVariable {
   LOGGING_CONSOLE_LOG_LEVEL = "LOGGING_CONSOLE_LOG_LEVEL",
   LOGGING_DIRECTORY_PATH = "LOGGING_DIRECTORY_PATH",
   LOGGING_FILE_LOG_LEVEL = "LOGGING_FILE_LOG_LEVEL",
+  LURK_ENABLED_COMMANDS = "LURK_ENABLED_COMMANDS",
   MOONPIE_CLAIM_COOLDOWN_HOURS = "MOONPIE_CLAIM_COOLDOWN_HOURS",
   MOONPIE_DATABASE_PATH = "MOONPIE_DATABASE_PATH",
   MOONPIE_ENABLE_COMMANDS = "MOONPIE_ENABLE_COMMANDS",
@@ -89,6 +94,7 @@ export enum EnvVariable {
 export enum EnvVariableBlock {
   CUSTOM_COMMANDS_BROADCASTS = "CUSTOM_COMMANDS_BROADCASTS",
   LOGGING = "LOGGING",
+  LURK = "LURK",
   MOONPIE = "MOONPIE",
   OSU = "OSU",
   OSU_API = "OSU_API",
@@ -191,6 +197,17 @@ export const envVariableInformation: CliEnvVariableInformation<
       "Turn on debug logs for the Twitch client to see all messages, joins, reconnects and more.",
     name: EnvVariable.TWITCH_DEBUG,
     supportedValues: { values: Object.values(EnvVariableOnOff) },
+  },
+  {
+    block: EnvVariableBlock.LURK,
+    default: EnvVariableOtherListOptions.NONE,
+    description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
+    name: EnvVariable.LURK_ENABLED_COMMANDS,
+    supportedValues: {
+      canBeJoinedAsList: true,
+      emptyListValue: EnvVariableOtherListOptions.NONE,
+      values: Object.values(LurkCommands),
+    },
   },
   {
     block: EnvVariableBlock.MOONPIE,
@@ -455,5 +472,10 @@ export const envVariableStructure: EnvVariableStructureElement<EnvVariableBlock>
       content:
         "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
       name: "TWITCH API",
+    },
+    {
+      block: EnvVariableBlock.LURK,
+      content: "Optional !lurk command that welcomes chatters back.",
+      name: "LURK",
     },
   ];
