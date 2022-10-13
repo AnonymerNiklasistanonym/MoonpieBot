@@ -6,232 +6,135 @@ import {
   messageParser,
 } from "../messageParser";
 import { createMessageParserMessage } from "../messageParser";
-import { FileDocumentationPartType } from "../other/splitTextAtLength";
+import { FileDocumentationPartType } from "./fileDocumentationGenerator";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
 import type {
   FileDocumentationParts,
   FileDocumentationPartValue,
-} from "../other/splitTextAtLength";
+} from "./fileDocumentationGenerator";
 import type {
+  MacroMap,
   MessageParserMacro,
   MessageParserMacroDocumentation,
   MessageParserMacroGenerator,
   MessageParserPlugin,
   MessageParserPluginInfo,
+  PluginMap,
 } from "../messageParser";
 import type { Logger } from "winston";
 import type { StringMap } from "../messageParser";
 
-export const generatePluginAndMacroDocumentation = async (
+const documentPlugin = async (
+  plugin: MessageParserPlugin | MessageParserPluginInfo,
   strings: StringMap,
-  plugins: MessageParserPlugin[],
-  macros: MessageParserMacro[],
-  optionalPlugins: undefined | MessageParserPluginInfo[],
-  optionalMacros: undefined | MessageParserMacroDocumentation[],
+  plugins: PluginMap,
+  macros: MacroMap,
   logger: Logger
-): Promise<FileDocumentationParts[]> => {
-  const pluginsMap = generatePluginMap(plugins);
-  const macrosMap = generateMacroMap(macros);
-  const output: FileDocumentationParts[] = [];
-  output.push({
-    title: "Supported Plugins",
-    type: FileDocumentationPartType.HEADING,
-  });
-  if (plugins.length === 0) {
-    output.push({
-      content: "None",
-      type: FileDocumentationPartType.TEXT,
-    });
-  }
-  const pluginEntries: FileDocumentationPartValue[] = [];
-  for (const plugin of plugins) {
-    const pluginEntry: FileDocumentationPartValue = {
-      description: plugin.description,
-      prefix: ">",
-      title: await createPluginSignature(logger, plugin.id, plugin.func),
-      type: FileDocumentationPartType.VALUE,
-    };
-    if (plugin.examples && plugin.examples.length > 0) {
-      pluginEntry.lists = [];
-      const pluginListExamples = [];
-      for (const example of plugin.examples) {
-        const exampleString = createMessageParserMessage([
-          example.before !== undefined ? example.before : "",
-          {
-            args: example.argument,
-            name: plugin.id,
-            scope: example.scope,
-            type: "plugin",
-          },
-          example.after !== undefined ? example.after : "",
-        ]);
-        // Don't render random number output because there is no seed
-        if (example.hideOutput) {
-          pluginListExamples.push(`"${exampleString}"`);
-        } else {
-          try {
-            const exampleStringOutput = await messageParser(
-              exampleString,
-              strings,
-              pluginsMap,
-              macrosMap,
-              logger
-            );
-            pluginListExamples.push(
-              `"${exampleString}" => "${exampleStringOutput}"`
-            );
-          } catch (err) {
-            if (example.expectedError !== undefined) {
-              pluginListExamples.push(
-                `"${exampleString}" => Plugin Error: "${
-                  (err as Error).message
-                }"`
-              );
-            } else if (example.expectedErrorCode !== undefined) {
-              pluginListExamples.push(
-                `"${exampleString}" => Parser Error: "${
-                  (err as Error).message
-                }"`
-              );
-            } else {
-              throw err;
-            }
+): Promise<FileDocumentationPartValue> => {
+  const pluginExampleList: [string, (string | string[])[]][] = [];
+  if (plugin.examples !== undefined) {
+    const pluginListExamples: string[][] = [];
+    for (const pluginExample of plugin.examples) {
+      const exampleString = createMessageParserMessage([
+        pluginExample.before !== undefined ? pluginExample.before : "",
+        {
+          args: pluginExample.argument,
+          name: plugin.id,
+          scope: pluginExample.scope,
+          type: "plugin",
+        },
+        pluginExample.after !== undefined ? pluginExample.after : "",
+      ]);
+      // Don't render random number or help -output because there is no seed
+      if (pluginExample.hideOutput) {
+        pluginListExamples.push([`"${exampleString}"`]);
+      } else {
+        try {
+          const exampleStringOutput = await messageParser(
+            exampleString,
+            strings,
+            plugins,
+            macros,
+            logger
+          );
+          pluginListExamples.push([
+            `"${exampleString}"`,
+            `=> "${exampleStringOutput}"`,
+          ]);
+        } catch (err) {
+          if (pluginExample.expectedError !== undefined) {
+            pluginListExamples.push([
+              `"${exampleString}"`,
+              "=> Plugin Error:",
+              `"${(err as Error).message}"`,
+            ]);
+          } else if (pluginExample.expectedErrorCode !== undefined) {
+            pluginListExamples.push([
+              `"${exampleString}"`,
+              "=> Parser Error:",
+              `"${(err as Error).message}"`,
+            ]);
+          } else {
+            throw err;
           }
         }
       }
-      pluginEntry.lists.push(["Examples", pluginListExamples]);
     }
-    pluginEntries.push(pluginEntry);
+    pluginExampleList.push(["Examples", pluginListExamples]);
   }
-  output.push(
-    ...pluginEntries.sort((a, b) => genericStringSorter(a.title, b.title))
-  );
-  output.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
-  output.push({
-    title: "Supported Macros",
-    type: FileDocumentationPartType.HEADING,
-  });
-  if (macros.length === 0) {
-    output.push({
-      content: "None",
-      type: FileDocumentationPartType.TEXT,
-    });
-  }
-  const macroEntries: FileDocumentationPartValue[] = [];
-  for (const macro of macros) {
-    const macroEntry: FileDocumentationPartValue = {
-      description: macro.description,
+  return {
+    description: {
+      lists: pluginExampleList,
       prefix: ">",
-      title: `%${macro.id}:KEY%`,
-      type: FileDocumentationPartType.VALUE,
-    };
-    macroEntry.lists = [];
-    const macroListKeys = [];
+      text: plugin.description !== undefined ? plugin.description : "TODO",
+    },
+    title: [
+      await createPluginSignature(
+        logger,
+        plugin.id,
+        "func" in plugin ? plugin.func : undefined,
+        "func" in plugin ? undefined : plugin.signature
+      ),
+    ],
+    type: FileDocumentationPartType.VALUE,
+  };
+};
+
+const documentMacro = async (
+  macro: MessageParserMacro<string> | MessageParserMacroDocumentation<string>,
+  strings: StringMap,
+  plugins: PluginMap,
+  macros: MacroMap,
+  logger: Logger
+): Promise<FileDocumentationPartValue> => {
+  const macroAdditionalLists: [string, (string | string[])[]][] = [];
+  let macroListKeysTitle = "Keys";
+  const macroListKeys: string[][] = [];
+  if ("values" in macro) {
     for (const [key] of macro.values.entries()) {
       const macroString = `%${macro.id}:${key}%`;
       const macroStringOutput = await messageParser(
         macroString,
         strings,
-        pluginsMap,
-        macrosMap,
+        plugins,
+        macros,
         logger
       );
-      macroListKeys.push(`"${macroString}" => "${macroStringOutput}"`);
+      macroListKeys.push([`"${macroString}"`, `=> "${macroStringOutput}"`]);
     }
-    macroEntry.lists.push(["Keys", macroListKeys]);
-    macroEntries.push(macroEntry);
-  }
-  output.push(
-    ...macroEntries.sort((a, b) => genericStringSorter(a.title, b.title))
-  );
-
-  if (optionalPlugins !== undefined && optionalPlugins.length > 0) {
-    output.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
-    output.push({
-      title: "Other Plugins (not generally available in all strings)",
-      type: FileDocumentationPartType.HEADING,
-    });
-    const optionalPluginEntries: FileDocumentationPartValue[] = [];
-    for (const plugin of optionalPlugins) {
-      const pluginEntry: FileDocumentationPartValue = {
-        description: plugin.description,
-        prefix: ">",
-        title: await createPluginSignature(
-          logger,
-          plugin.id,
-          undefined,
-          plugin.signature
-        ),
-        type: FileDocumentationPartType.VALUE,
-      };
-      if (plugin.examples && plugin.examples.length > 0) {
-        pluginEntry.lists = [];
-        const pluginListExamples = [];
-        for (const example of plugin.examples) {
-          let exampleString = "";
-          if (example.before) {
-            exampleString += example.before;
-          }
-          exampleString += `$(${plugin.id}`;
-          if (example.argument) {
-            exampleString += `=${example.argument}`;
-          }
-          if (example.scope) {
-            exampleString += `|${example.scope}`;
-          }
-          exampleString += ")";
-          if (example.after) {
-            exampleString += example.after;
-          }
-          const exampleStringOutput = await messageParser(
-            exampleString,
-            strings,
-            pluginsMap,
-            macrosMap,
-            logger
-          );
-          pluginListExamples.push(
-            `"${exampleString}" => "${exampleStringOutput}"`
-          );
-        }
-        pluginEntry.lists.push(["Examples", pluginListExamples]);
-      }
-      optionalPluginEntries.push(pluginEntry);
-    }
-    output.push(
-      ...optionalPluginEntries.sort((a, b) =>
-        genericStringSorter(a.title, b.title)
-      )
-    );
-  }
-
-  if (optionalMacros !== undefined && optionalMacros.length > 0) {
-    output.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
-    output.push({
-      title: "Other Macros (not generally available in all strings)",
-      type: FileDocumentationPartType.HEADING,
-    });
-    const optionalMacroEntries: FileDocumentationPartValue[] = [];
-    for (const optionalMacro of optionalMacros) {
-      const macroEntry: FileDocumentationPartValue = {
-        description: optionalMacro.description,
-        prefix: ">",
-        title: `%${optionalMacro.id}:KEY%`,
-        type: FileDocumentationPartType.VALUE,
-      };
-      macroEntry.lists = [];
-      const macroListKeys = [];
-      const macroGenerator = optionalMacro as
-        | MessageParserMacro
-        | MessageParserMacroGenerator;
-      if (
-        "generate" in macroGenerator &&
-        macroGenerator.exampleData !== undefined
-      ) {
-        const macroValues = macroGenerator.generate(macroGenerator.exampleData);
-        macroEntry.lists.push([
-          "Example data",
+  } else {
+    const macroGenerator = macro as
+      | MessageParserMacro
+      | MessageParserMacroGenerator;
+    if (
+      "generate" in macroGenerator &&
+      macroGenerator.exampleData !== undefined
+    ) {
+      const macroValues = macroGenerator.generate(macroGenerator.exampleData);
+      macroAdditionalLists.push([
+        "Example data",
+        [
           [
             JSON.stringify(macroGenerator.exampleData, (_key, val) => {
               // Include functions in stringify output
@@ -246,42 +149,126 @@ export const generatePluginAndMacroDocumentation = async (
               return val;
             }),
           ],
+        ],
+      ]);
+      for (const key of macroValues
+        .map((a) => a[0])
+        .sort(genericStringSorter)) {
+        const macroString = `%${macro.id}:${key}%`;
+        const extendedMacroMap = new Map([
+          ...macros,
+          [macro.id, new Map(macroValues)],
         ]);
-        for (const key of macroValues
-          .map((a) => a[0])
-          .sort(genericStringSorter)) {
-          const macroString = `%${optionalMacro.id}:${key}%`;
-          const extendedMacroMap = new Map([
-            ...macrosMap,
-            [optionalMacro.id, new Map(macroValues)],
-          ]);
-          const macroStringOutput = await messageParser(
-            macroString,
-            strings,
-            pluginsMap,
-            extendedMacroMap,
-            logger
-          );
-          macroListKeys.push(`"${macroString}" => "${macroStringOutput}"`);
-        }
-        macroEntry.lists.push([
-          "Keys generated by example data",
-          macroListKeys,
-        ]);
-      } else {
-        for (const key of optionalMacro.keys.sort(genericStringSorter)) {
-          const macroString = `%${optionalMacro.id}:${key}%`;
-          macroListKeys.push(`"${macroString}"`);
-        }
-        macroEntry.lists.push(["Keys", macroListKeys]);
+        const macroStringOutput = await messageParser(
+          macroString,
+          strings,
+          plugins,
+          extendedMacroMap,
+          logger
+        );
+        macroListKeys.push([`"${macroString}"`, `=> "${macroStringOutput}"`]);
       }
-      optionalMacroEntries.push(macroEntry);
+      macroListKeysTitle = "Keys generated by example data";
+    } else {
+      for (const key of macro.keys.sort(genericStringSorter)) {
+        const macroString = `%${macro.id}:${key}%`;
+        macroListKeys.push([`"${macroString}"`]);
+      }
     }
-    output.push(
-      ...optionalMacroEntries.sort((a, b) =>
-        genericStringSorter(a.title, b.title)
-      )
+  }
+
+  return {
+    description: {
+      lists: [...macroAdditionalLists, [macroListKeysTitle, macroListKeys]],
+      prefix: ">",
+      text: macro.description !== undefined ? macro.description : "TODO",
+    },
+    title: [`%${macro.id}:KEY%`],
+    type: FileDocumentationPartType.VALUE,
+  };
+};
+
+export const generatePluginAndMacroDocumentation = async (
+  strings: StringMap,
+  plugins: MessageParserPlugin[],
+  macros: MessageParserMacro[],
+  optionalPlugins: undefined | MessageParserPluginInfo[],
+  optionalMacros: undefined | MessageParserMacroDocumentation[],
+  logger: Logger
+): Promise<FileDocumentationParts[]> => {
+  const pluginMap = generatePluginMap(plugins);
+  const macroMap = generateMacroMap(macros);
+  const output: FileDocumentationParts[] = [];
+  output.push({
+    title: "Supported Plugins",
+    type: FileDocumentationPartType.HEADING,
+  });
+  if (plugins.length === 0) {
+    output.push({
+      text: "None",
+      type: FileDocumentationPartType.TEXT,
+    });
+  }
+  const pluginEntries: FileDocumentationPartValue[] = [];
+  for (const plugin of plugins.sort((a, b) =>
+    genericStringSorter(a.id, b.id)
+  )) {
+    pluginEntries.push(
+      await documentPlugin(plugin, strings, pluginMap, macroMap, logger)
     );
+  }
+  output.push(...pluginEntries);
+  output.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
+  output.push({
+    title: "Supported Macros",
+    type: FileDocumentationPartType.HEADING,
+  });
+  if (macros.length === 0) {
+    output.push({
+      text: "None",
+      type: FileDocumentationPartType.TEXT,
+    });
+  }
+  const macroEntries: FileDocumentationPartValue[] = [];
+  for (const macro of macros.sort((a, b) => genericStringSorter(a.id, b.id))) {
+    macroEntries.push(
+      await documentMacro(macro, strings, pluginMap, macroMap, logger)
+    );
+  }
+  output.push(...macroEntries);
+
+  if (optionalPlugins !== undefined && optionalPlugins.length > 0) {
+    output.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
+    output.push({
+      title: "Other Plugins (not generally available in all strings)",
+      type: FileDocumentationPartType.HEADING,
+    });
+    const optionalPluginEntries: FileDocumentationPartValue[] = [];
+    for (const plugin of optionalPlugins.sort((a, b) =>
+      genericStringSorter(a.id, b.id)
+    )) {
+      optionalPluginEntries.push(
+        await documentPlugin(plugin, strings, pluginMap, macroMap, logger)
+      );
+    }
+    output.push(...optionalPluginEntries);
+  }
+
+  if (optionalMacros !== undefined && optionalMacros.length > 0) {
+    output.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
+    output.push({
+      title: "Other Macros (not generally available in all strings)",
+      type: FileDocumentationPartType.HEADING,
+    });
+    const optionalMacroEntries: FileDocumentationPartValue[] = [];
+    for (const macro of optionalMacros.sort((a, b) =>
+      genericStringSorter(a.id, b.id)
+    )) {
+      optionalMacroEntries.push(
+        await documentMacro(macro, strings, pluginMap, macroMap, logger)
+      );
+    }
+    output.push(...optionalMacroEntries);
   }
 
   return output;

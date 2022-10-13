@@ -3,9 +3,9 @@ import { promises as fs } from "fs";
 // Local imports
 import { convertTwitchBadgeLevelToString, TwitchBadgeLevel } from "../twitch";
 import {
+  fileDocumentationGenerator,
   FileDocumentationPartType,
-  generateFileDocumentation,
-} from "../other/splitTextAtLength";
+} from "./fileDocumentationGenerator";
 import { customBroadcastsInformation } from "../info/customBroadcasts";
 import { CustomBroadcastValueOptions } from "../commands/customCommandsBroadcasts/customBroadcasts";
 import { customCommandsInformation } from "../info/customCommands";
@@ -14,7 +14,7 @@ import { escapeStringIfWhiteSpace } from "../other/whiteSpaceChecker";
 // Type imports
 import type { CustomBroadcast } from "../customCommandsBroadcasts/customBroadcast";
 import type { CustomCommand } from "../customCommandsBroadcasts/customCommand";
-import type { FileDocumentationParts } from "../other/splitTextAtLength";
+import type { FileDocumentationParts } from "./fileDocumentationGenerator";
 
 const addCustomCommandStringBuilder = (
   customCommand: Pick<CustomCommand, "id" | "regex" | "message"> &
@@ -54,17 +54,18 @@ export const createCustomCommandsBroadcastsDocumentation = async (
 ): Promise<void> => {
   const data: FileDocumentationParts[] = [];
   data.push({
-    content:
+    text:
       "This program has per default the ability to add/edit/delete custom commands and broadcasts if you are at least a moderator in the chat. " +
       "The commands and broadcasts are persistently saved in a database.",
     type: FileDocumentationPartType.TEXT,
   });
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   data.push({
-    description:
-      "Add a custom command with an ID, a RegEx expression to detect it and capture contents of the match (https://regex101.com/) and a message",
+    description: {
+      prefix: ">",
+      text: "Add a custom command with an ID, a RegEx expression to detect it and capture contents of the match (https://regex101.com/) and a message",
+    },
     isComment: false,
-    prefix: ">",
     type: FileDocumentationPartType.VALUE,
     value: addCustomCommandStringBuilder({
       id: "ID",
@@ -73,16 +74,18 @@ export const createCustomCommandsBroadcastsDocumentation = async (
     }),
   });
   data.push({
-    description: `Optionally a cooldown (in s) and user level (${Object.values(
-      TwitchBadgeLevel
-    )
-      .filter((a) => typeof a === "number")
-      .map<string>((a) =>
-        convertTwitchBadgeLevelToString(a as TwitchBadgeLevel)
+    description: {
+      prefix: ">",
+      text: `Optionally a cooldown (in s) and user level (${Object.values(
+        TwitchBadgeLevel
       )
-      .join(", ")}) are also supported`,
+        .filter((a) => typeof a === "number")
+        .map<string>((a) =>
+          convertTwitchBadgeLevelToString(a as TwitchBadgeLevel)
+        )
+        .join(", ")}) are also supported`,
+    },
     isComment: false,
-    prefix: ">",
     type: FileDocumentationPartType.VALUE,
     value: addCustomCommandStringBuilder({
       cooldownInS: 10,
@@ -93,28 +96,33 @@ export const createCustomCommandsBroadcastsDocumentation = async (
     }),
   });
   data.push({
-    description: `A single property (${Object.values(
-      CustomCommandValueOptions
-    ).join(", ")}) can be edited of an existing custom command`,
+    description: {
+      prefix: ">",
+      text: `A single property (${Object.values(CustomCommandValueOptions).join(
+        ", "
+      )}) can be edited of an existing custom command`,
+    },
     isComment: false,
-    prefix: ">",
     type: FileDocumentationPartType.VALUE,
     value: "!editcc PROPERTY NEW_VALUE",
   });
   data.push({
-    description: "And using the custom command ID it can be deleted",
+    description: {
+      prefix: ">",
+      text: "And using the custom command ID it can be deleted",
+    },
     isComment: false,
-    prefix: ">",
     type: FileDocumentationPartType.VALUE,
     value: "!delcc ID",
   });
 
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   data.push({
-    description:
-      "Add a custom broadcast with an ID, a cron expression to determine when the broadcast should be sent (https://crontab.cronhub.io/) and a message",
+    description: {
+      prefix: ">",
+      text: "Add a custom broadcast with an ID, a cron expression to determine when the broadcast should be sent (https://crontab.cronhub.io/) and a message",
+    },
     isComment: false,
-    prefix: ">",
     type: FileDocumentationPartType.VALUE,
     value: addCustomBroadcastStringBuilder({
       cronString: "CRON_STRING",
@@ -123,32 +131,41 @@ export const createCustomCommandsBroadcastsDocumentation = async (
     }),
   });
   data.push({
-    description: `A single property (${Object.values(
-      CustomBroadcastValueOptions
-    ).join(", ")}) can be edited of an existing custom broadcast`,
+    description: {
+      prefix: ">",
+      text: `A single property (${Object.values(
+        CustomBroadcastValueOptions
+      ).join(", ")}) can be edited of an existing custom broadcast`,
+    },
     isComment: false,
-    prefix: ">",
     type: FileDocumentationPartType.VALUE,
     value: "!editcb PROPERTY NEW_VALUE",
   });
   data.push({
-    description: "And using the custom broadcast ID it can be deleted",
+    description: {
+      prefix: ">",
+      text: "And using the custom broadcast ID it can be deleted",
+    },
     isComment: false,
-    prefix: ">",
     type: FileDocumentationPartType.VALUE,
     value: "!delcb ID",
   });
 
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   data.push({
-    content: "Custom command examples:",
+    text: "Custom command examples:",
     type: FileDocumentationPartType.TEXT,
   });
   for (const customCommand of customCommandsInformation) {
     data.push({
-      description: customCommand.description,
+      description:
+        customCommand.description !== undefined
+          ? {
+              prefix: ">",
+              text: customCommand.description,
+            }
+          : undefined,
       isComment: false,
-      prefix: ">",
       type: FileDocumentationPartType.VALUE,
       value: addCustomCommandStringBuilder(customCommand),
     });
@@ -156,19 +173,24 @@ export const createCustomCommandsBroadcastsDocumentation = async (
 
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   data.push({
-    content: "Custom broadcast examples:",
+    text: "Custom broadcast examples:",
     type: FileDocumentationPartType.TEXT,
   });
   for (const customBroadcast of customBroadcastsInformation) {
     data.push({
-      description: customBroadcast.description,
+      description:
+        customBroadcast.description !== undefined
+          ? {
+              prefix: ">",
+              text: customBroadcast.description,
+            }
+          : undefined,
       isComment: false,
-      prefix: ">",
       type: FileDocumentationPartType.VALUE,
       value: addCustomBroadcastStringBuilder(customBroadcast),
     });
   }
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(path, generateFileDocumentation(data));
+  await fs.writeFile(path, fileDocumentationGenerator(data));
 };

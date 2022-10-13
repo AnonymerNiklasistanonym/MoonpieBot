@@ -1,17 +1,19 @@
 // Package imports
 import { promises as fs } from "fs";
 // Local imports
+import {
+  fileDocumentationGenerator,
+  FileDocumentationPartType,
+} from "./fileDocumentationGenerator";
 import { defaultStringMap } from "../info/strings";
 import { ENV_PREFIX_CUSTOM_STRINGS } from "../info/env";
-import { FileDocumentationPartType } from "../other/splitTextAtLength";
-import { generateFileDocumentation } from "../other/splitTextAtLength";
 import { generatePluginAndMacroDocumentation } from "../documentation/messageParser";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
 import type {
   FileDocumentationParts,
   FileDocumentationPartValue,
-} from "../other/splitTextAtLength";
+} from "./fileDocumentationGenerator";
 import type {
   MessageParserMacro,
   MessageParserMacroDocumentation,
@@ -32,7 +34,7 @@ export const createStringsVariableDocumentation = async (
 ): Promise<void> => {
   const data: FileDocumentationParts[] = [];
   data.push({
-    content:
+    text:
       "This program allows to customize certain strings listed in this file. " +
       "To use a customized value instead of the default one uncomment the line. " +
       "Additionally there are plugins and macros that help with adding logic:",
@@ -52,7 +54,7 @@ export const createStringsVariableDocumentation = async (
     data.push(...pluginsAndMacroDocumentation);
     data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
     data.push({
-      content:
+      text:
         "Sometimes there are additional plugins/macros like $(USER). " +
         "These plugins/macros can only be used when they are provided. " +
         "So be sure to compare the default values plugins/macros for them.",
@@ -61,14 +63,14 @@ export const createStringsVariableDocumentation = async (
     data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   }
   data.push({
-    content:
+    text:
       "To use a customized value instead of the default one uncomment the line. " +
       `(The lines that start with ${ENV_PREFIX_CUSTOM_STRINGS})`,
     type: FileDocumentationPartType.TEXT,
   });
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
   data.push({
-    content:
+    text:
       "You can also reference other strings via $[REFERENCE]. " +
       `This will then be replaced by the string saved in ${ENV_PREFIX_CUSTOM_STRINGS}REFERENCE.`,
     type: FileDocumentationPartType.TEXT,
@@ -79,17 +81,13 @@ export const createStringsVariableDocumentation = async (
   for (const [key, defaultValue] of defaultStringMap.entries()) {
     if (defaultValue.endsWith(" ") || defaultValue.startsWith(" ")) {
       dataDefaultStrings.push({
-        description: undefined,
         isComment: true,
-        prefix: ">",
         type: FileDocumentationPartType.VALUE,
         value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}="${defaultValue}"`,
       });
     } else {
       dataDefaultStrings.push({
-        description: undefined,
         isComment: true,
-        prefix: ">",
         type: FileDocumentationPartType.VALUE,
         value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}=${defaultValue}`,
       });
@@ -100,5 +98,5 @@ export const createStringsVariableDocumentation = async (
   );
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(path, generateFileDocumentation(data));
+  await fs.writeFile(path, fileDocumentationGenerator(data));
 };

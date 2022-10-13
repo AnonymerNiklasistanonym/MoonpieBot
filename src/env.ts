@@ -9,16 +9,13 @@ import {
   envVariableStructure,
 } from "./info/env";
 import {
+  fileDocumentationGenerator,
   FileDocumentationPartType,
-  generateFileDocumentation,
-} from "./other/splitTextAtLength";
+} from "./documentation/fileDocumentationGenerator";
 import { escapeStringIfWhiteSpace } from "./other/whiteSpaceChecker";
 // Type imports
-import type {
-  FileDocumentationParts,
-  FileDocumentationPartValue,
-} from "./other/splitTextAtLength";
-import { CliEnvVariableInformation } from "./cli";
+import type { CliEnvVariableInformation } from "./cli";
+import type { FileDocumentationParts } from "./documentation/fileDocumentationGenerator";
 
 export interface EnvVariableStructureTextBlock {
   content: string;
@@ -301,88 +298,79 @@ export const createEnvVariableDocumentation = async (
       for (const envVariable in EnvVariable) {
         const envVariableInfo = getEnvVariableValueInformation(envVariable);
         if (envVariableInfo.block === structurePart.block) {
-          const envVariableEntry: FileDocumentationPartValue = {
-            description: envVariableInfo.description,
-            prefix: ">",
-            type: FileDocumentationPartType.VALUE,
-          };
+          const envInfos: string[] = [];
           if (
             envVariableInfo.supportedValues &&
             envVariableInfo.supportedValues.values.length > 0
           ) {
-            if (envVariableEntry.properties === undefined) {
-              envVariableEntry.properties = [];
-            }
-            envVariableEntry.properties.push([
+            envInfos.push(
               `Supported ${
                 envVariableInfo.supportedValues.canBeJoinedAsList ? "list " : ""
-              }values`,
-              envVariableInfo.supportedValues.values
+              }values: ${envVariableInfo.supportedValues.values
                 .map((a) => `'${a}'`)
                 .sort()
-                .join(", "),
-            ]);
+                .join(", ")}`
+            );
             if (envVariableInfo.supportedValues.emptyListValue) {
-              envVariableEntry.properties.push([
-                "Empty list value",
-                `'${envVariableInfo.supportedValues.emptyListValue}'`,
-              ]);
+              envInfos.push(
+                `Empty list value: '${envVariableInfo.supportedValues.emptyListValue}'`
+              );
             }
           }
-          envVariableEntry.infos = [];
-          if (envVariableInfo.required) {
-            envVariableEntry.infos.push("THIS VARIABLE IS REQUIRED!");
-          }
-          if (envVariableInfo.censor) {
-            envVariableEntry.infos.push("KEEP THIS VARIABLE PRIVATE!");
-          }
-          if (envVariableInfo.default) {
-            const defaultStrOrFunc = envVariableInfo.default;
-            envVariableEntry.value = `${ENV_PREFIX}${envVariable}=${
-              typeof defaultStrOrFunc === "function"
-                ? escapeStringIfWhiteSpace(defaultStrOrFunc(configDir))
-                : escapeStringIfWhiteSpace(defaultStrOrFunc)
-            }`;
-            envVariableEntry.isComment = !envVariableInfo.required;
-          } else if (envVariableInfo.example) {
-            envVariableEntry.infos.push(
-              "(The following line is only an example!)"
-            );
-            envVariableEntry.value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
-              envVariableInfo.example
-            )}`;
-            envVariableEntry.isComment = !envVariableInfo.required;
-          } else {
-            envVariableEntry.value = "ERROR";
-          }
-
           if (
             envVariableInfo.legacyNames &&
             envVariableInfo.legacyNames.length > 0
           ) {
-            if (envVariableEntry.properties === undefined) {
-              envVariableEntry.properties = [];
-            }
-            envVariableEntry.properties.push([
-              `Legacy name${envVariableInfo.legacyNames.length > 1 ? "s" : ""}`,
-              envVariableInfo.legacyNames
+            envInfos.push(
+              `Legacy name${
+                envVariableInfo.legacyNames.length > 1 ? "s" : ""
+              }: ${envVariableInfo.legacyNames
                 .map(getEnvVariableName)
                 .map((a) => `'${a}'`)
-                .join(", "),
-            ]);
+                .join(", ")}`
+            );
           }
-          data.push(envVariableEntry);
+          if (envVariableInfo.required) {
+            envInfos.push("THIS VARIABLE IS REQUIRED!");
+          }
+          if (envVariableInfo.censor) {
+            envInfos.push("KEEP THIS VARIABLE PRIVATE!");
+          }
+          let value = "ERROR";
+          if (envVariableInfo.default) {
+            const defaultStrOrFunc = envVariableInfo.default;
+            value = `${ENV_PREFIX}${envVariable}=${
+              typeof defaultStrOrFunc === "function"
+                ? escapeStringIfWhiteSpace(defaultStrOrFunc(configDir))
+                : escapeStringIfWhiteSpace(defaultStrOrFunc)
+            }`;
+          } else if (envVariableInfo.example) {
+            envInfos.push("(The following line is only an example!)");
+            value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
+              envVariableInfo.example
+            )}`;
+          }
+          data.push({
+            description: {
+              infos: envInfos,
+              prefix: ">",
+              text: envVariableInfo.description,
+            },
+            isComment: !envVariableInfo.required,
+            type: FileDocumentationPartType.VALUE,
+            value,
+          });
         }
       }
     } else {
       // Just a text block
       data.push({
-        content: structurePart.content,
+        text: structurePart.content,
         type: FileDocumentationPartType.TEXT,
       });
     }
   }
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(path, generateFileDocumentation(data));
+  await fs.writeFile(path, fileDocumentationGenerator(data));
 };
