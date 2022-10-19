@@ -257,6 +257,18 @@ export const customCommandsInformation: CustomCommand[] = [
   },
   {
     ...defaultExampleCommandValues,
+    description: `Use Twitch API to get random chatters > ${PluginTwitchApi.RANDOM_USER}`,
+    id: "random_user",
+    message: createMessageParserMessage([
+      { name: PluginTwitchChat.USER, type: "plugin" },
+      " gave ",
+      { name: PluginTwitchApi.RANDOM_USER, type: "plugin" },
+      " a warm hug",
+    ]),
+    regex: convertRegexToString(/^\s*!randomHug(?:\s|$)/),
+  },
+  {
+    ...defaultExampleCommandValues,
     description: `Death counter that works across commands [1/4] > ${pluginCustomDataId}`,
     id: "death counter add",
     message: createMessageParserMessage([

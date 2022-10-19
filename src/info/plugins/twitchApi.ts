@@ -8,6 +8,7 @@ export enum PluginTwitchApi {
   GET_FOLLOW_AGE = "TWITCH_API_GET_FOLLOW_AGE",
   GET_GAME = "TWITCH_API_GET_GAME",
   GET_TITLE = "TWITCH_API_GET_TITLE",
+  RANDOM_USER = "TWITCH_API_RANDOM_USER",
   SET_GAME = "TWITCH_API_SET_GAME",
   SET_TITLE = "TWITCH_API_SET_TITLE",
 }
@@ -21,6 +22,7 @@ export interface PluginTwitchApiData {
 export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitchApiData>[] =
   [
     {
+      description: "Set the streamed game in the current channel",
       generate: (data) => async (_, gameName) => {
         if (gameName === undefined || gameName.length === 0) {
           throw Error("Game name was undefined or empty");
@@ -56,6 +58,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
       },
     },
     {
+      description: "Get the streamed game in the current or a custom channel",
       generate: (data) => async (_, channelName) => {
         if (channelName === undefined || channelName.length === 0) {
           channelName = data.channelName;
@@ -85,6 +88,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
       },
     },
     {
+      description: "Get the stream title in the current or a custom channel",
       generate: (data) => async (_, channelName) => {
         if (channelName === undefined || channelName.length === 0) {
           channelName = data.channelName;
@@ -114,6 +118,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
       },
     },
     {
+      description: "Set the stream title in the current channel",
       generate: (data) => async (_, title) => {
         if (title === undefined || title.length === 0) {
           throw Error("Game name was undefined or empty");
@@ -143,6 +148,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
       },
     },
     {
+      description: "Get the follow age of a chatter in the current channel",
       generate: (data) => async (_, userName) => {
         try {
           const channelUserInfo =
@@ -190,6 +196,31 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
       id: PluginTwitchApi.GET_FOLLOW_AGE,
       signature: {
         argument: "userName",
+        type: "signature",
+      },
+    },
+    {
+      description: "Get a random chatter in the current channel",
+      generate: (data) => async () => {
+        try {
+          const channelChatters =
+            await data.twitchApiClient.unsupported.getChatters(
+              data.channelName
+            );
+          if (channelChatters.allChatters === undefined) {
+            throw Error("Twitch API client request getChatters failed");
+          }
+          return channelChatters.allChatters[
+            Math.floor(Math.random() * channelChatters.allChatters.length)
+          ];
+        } catch (err) {
+          throw Error(
+            `Chatters could not be fetched '${(err as Error).message}'`
+          );
+        }
+      },
+      id: PluginTwitchApi.RANDOM_USER,
+      signature: {
         type: "signature",
       },
     },

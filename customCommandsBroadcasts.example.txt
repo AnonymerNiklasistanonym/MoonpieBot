@@ -47,6 +47,8 @@
 #   REGEX_GROUP,TWITCH_API_GET_GAME,TWITCH_API_SET_GAME [user:edit:broadcast
 #   scope necessary to set the game]
 !addcc game ^\s*!game(?:\s+(.*?)\s*$|\s|$) '@$(USER) $(IF_NOT_UNDEFINED=$(REGEX_GROUP=1)|You updated the game to "$(TWITCH_API_SET_GAME=$(REGEX_GROUP=1))")$(IF_UNDEFINED=$(REGEX_GROUP=1)|The current game is "$(TWITCH_API_GET_GAME)")' -ul=mod
+# > Use Twitch API to get random chatters > TWITCH_API_RANDOM_USER
+!addcc random_user ^\s*!randomHug(?:\s|$) '$(USER) gave $(TWITCH_API_RANDOM_USER) a warm hug'
 # > Death counter that works across commands [1/4] > CUSTOM_DATA
 !addcc 'death counter add' ^\s*!death(?:\s|$) '@$(USER) death was added, streamer died $(CUSTOM_DATA=death+#=1) time$(IF_NOT_EQUAL=$(CUSTOM_DATA=death<#>0)!==1|s)' -ul=mod
 # > Death counter that works across commands [2/4] > CUSTOM_DATA
