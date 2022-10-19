@@ -123,7 +123,10 @@ export const osuBeatmapRequest: StringEntry = {
   default: createMessageParserMessage<
     MacroOsuApi | MacroOsuBeatmap | MacroOsuBeatmapRequest
   >([
-    { name: PluginTwitchChat.USER, type: "plugin" },
+    generateMessageParserMessageMacro(
+      macroOsuBeatmapRequest,
+      MacroOsuBeatmapRequest.REQUESTER
+    ),
     " requested ",
     generateMessageParserMessageMacro(macroOsuBeatmap, MacroOsuBeatmap.TITLE),
     " '",
@@ -227,7 +230,10 @@ export const osuBeatmapRequestDetailed: StringEntry = {
   default: createMessageParserMessage<
     MacroOsuApi | MacroOsuBeatmap | MacroOsuBeatmapRequest
   >([
-    { name: PluginTwitchChat.USER, type: "plugin" },
+    generateMessageParserMessageMacro(
+      macroOsuBeatmapRequest,
+      MacroOsuBeatmapRequest.REQUESTER
+    ),
     " requested ",
     generateMessageParserMessageMacro(macroOsuBeatmap, MacroOsuBeatmap.TITLE),
     " '",
@@ -510,9 +516,12 @@ export const osuBeatmapRequestNotMeetingDemands: StringEntry = {
 };
 
 const osuBeatmapRequestRefIrcRequestString: StringEntry = {
-  default: createMessageParserMessage<MacroOsuBeatmap>(
+  default: createMessageParserMessage<MacroOsuBeatmap | MacroOsuBeatmapRequest>(
     [
-      { name: PluginTwitchChat.USER, type: "plugin" },
+      generateMessageParserMessageMacro(
+        macroOsuBeatmapRequest,
+        MacroOsuBeatmapRequest.REQUESTER
+      ),
       " requested ",
       "[https://osu.ppy.sh/beatmapsets/",
       generateMessageParserMessageMacro(

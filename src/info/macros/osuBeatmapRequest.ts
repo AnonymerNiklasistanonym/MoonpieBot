@@ -7,10 +7,12 @@ import type { MessageParserMacroGenerator } from "../../messageParser";
 export interface MacroOsuBeatmapRequestData {
   comment?: string;
   id: number;
+  requester: string;
 }
 export enum MacroOsuBeatmapRequest {
   COMMENT = "COMMENT",
   ID = "ID",
+  REQUESTER = "REQUESTER",
 }
 export const macroOsuBeatmapRequest: MessageParserMacroGenerator<
   MacroOsuBeatmapRequestData,
@@ -29,6 +31,9 @@ export const macroOsuBeatmapRequest: MessageParserMacroGenerator<
           break;
         case MacroOsuBeatmapRequest.ID:
           macroValue = data.id;
+          break;
+        case MacroOsuBeatmapRequest.REQUESTER:
+          macroValue = data.requester;
           break;
       }
       if (typeof macroValue === "number") {

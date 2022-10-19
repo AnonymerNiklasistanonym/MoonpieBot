@@ -33,7 +33,7 @@ export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
     CommandOsuGenericDataOsuApiDbPath,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
-  createReply: async (channel, tags, data, logger) => {
+  createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
       TwitchBadgeLevel.MODERATOR
@@ -73,12 +73,8 @@ export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
           (a) => a.option === OsuRequestsConfig.DETAILED
         )?.optionValue === "true",
         undefined,
-        {
-          channelName: channel.slice(1),
-          userId: blockedBeatmapRequest.userId,
-          userName: blockedBeatmapRequest.userName,
-        },
         blockedBeatmapRequest.data.id,
+        blockedBeatmapRequest.userName,
         blockedBeatmapRequest.comment,
         blockedBeatmapRequest.data,
         data.osuIrcRequestTarget,

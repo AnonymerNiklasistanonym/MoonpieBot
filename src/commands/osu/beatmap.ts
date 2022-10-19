@@ -2,10 +2,6 @@
 import osuApiV2 from "osu-api-v2";
 // Local imports
 import {
-  generateMacroMapFromMacroGenerator,
-  generatePlugin,
-} from "../../messageParser";
-import {
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequestDemands,
   macroOsuBeatmapRequests,
@@ -25,13 +21,13 @@ import {
   regexOsuBeatmapUrlSplitter,
 } from "../../info/regex";
 import { createLogFunc } from "../../logging";
+import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { macroOsuBeatmap } from "../../info/macros/osuApi";
 import { NOT_FOUND_STATUS_CODE } from "../../other/web";
 import { notUndefined } from "../../other/types";
 import { OsuRequestsConfig } from "../../info/databases/osuRequestsDb";
 import osuRequestsDb from "../../database/osuRequestsDb";
-import { pluginsTwitchChatGenerator } from "../../info/plugins/twitchChat";
 import { tryToSendOsuIrcMessage } from "../../osuIrc";
 // Type imports
 import type {
@@ -45,12 +41,11 @@ import type {
   CommandOsuGenericDataOsuApiV2Credentials,
   CommandOsuGenericDataOsuIrcData,
 } from "../osu";
-import type { MacroMap, PluginMap } from "../../messageParser";
 import type { Beatmap } from "osu-api-v2";
 import type { GetOsuRequestsConfigOut } from "../../database/osuRequestsDb/requests/osuRequestsConfig";
 import type { Client as IrcClient } from "irc";
+import type { MacroMap } from "../../messageParser";
 import type { OsuApiV2WebRequestError } from "osu-api-v2";
-import type { PluginTwitchChatData } from "../../info/plugins/twitchChat";
 import type { RegexOsuBeatmapIdFromUrl } from "../../info/regex";
 
 const MAX_LENGTH_PREVIOUS_REQUESTS = 15;
@@ -120,32 +115,21 @@ const checkIfBeatmapMatchesDemands = (
 export const sendBeatmapRequest = (
   detailedMapRequests: boolean,
   messageParserMacros: MacroMap = new Map(),
-  messageParserTwitchPluginData: PluginTwitchChatData | undefined,
   beatmapRequestId: number,
+  beatmapRequester: string,
   beatmapRequestComment?: string,
   beatmap?: Beatmap,
   osuIrcRequestTarget?: string,
   osuIrcBot?: OsuIrcBotSendMessageFunc
 ): ChatMessageHandlerReply[] => {
   const commandRepliesBeatmap: ChatMessageHandlerReply[] = [];
-  let twitchPluginOverride: PluginMap | undefined;
-  if (messageParserTwitchPluginData) {
-    // Overwrite the user name and id for the correct requestor name
-    twitchPluginOverride = new Map();
-    pluginsTwitchChatGenerator.forEach((a) => {
-      const plugin = generatePlugin<PluginTwitchChatData>(
-        a,
-        messageParserTwitchPluginData
-      );
-      twitchPluginOverride?.set(plugin.id, plugin.func);
-    });
-  }
   messageParserMacros.set(
     macroOsuBeatmapRequest.id,
     new Map(
       macroOsuBeatmapRequest.generate({
         comment: beatmapRequestComment?.trim(),
         id: beatmapRequestId,
+        requester: beatmapRequester,
       })
     )
   );
@@ -164,7 +148,6 @@ export const sendBeatmapRequest = (
   if (osuIrcRequestTarget && osuIrcBot !== undefined) {
     commandRepliesBeatmap.push({
       additionalMacros: messageParserMacros,
-      additionalPlugins: twitchPluginOverride,
       customSendFunc: async (message, loggerSendFunc) => {
         await tryToSendOsuIrcMessage(
           osuIrcBot,
@@ -280,6 +263,7 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
           macroOsuBeatmapRequest.generate({
             comment: beatmapRequest.comment?.trim(),
             id: beatmapRequest.beatmapId,
+            requester: tags.username,
           })
         )
       );
@@ -358,8 +342,8 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
             (a) => a.option === OsuRequestsConfig.DETAILED
           )?.optionValue === "true",
           osuBeatmapRequestMacros,
-          undefined,
           beatmapRequest.beatmapId,
+          tags.username,
           beatmapRequest.comment,
           beatmap,
           data.osuIrcRequestTarget,

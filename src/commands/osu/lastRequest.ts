@@ -38,7 +38,7 @@ export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandBeatmapLastRequestDetectorOutput
 > = {
-  createReply: async (channel, tags, data, logger) => {
+  createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
       TwitchBadgeLevel.MODERATOR
@@ -82,12 +82,8 @@ export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
         ...sendBeatmapRequest(
           detailedReply,
           undefined,
-          {
-            channelName: channel.slice(1),
-            userId: previousBeatmapRequest.userId,
-            userName: previousBeatmapRequest.userName,
-          },
           previousBeatmapRequest.data.id,
+          previousBeatmapRequest.userName,
           previousBeatmapRequest.comment,
           previousBeatmapRequest.data,
           data.osuIrcRequestTarget,

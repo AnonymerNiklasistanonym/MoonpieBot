@@ -50,20 +50,36 @@ export const commandCommands: ChatMessageHandlerReplyCreator<
               case OsuCommands.PERMIT_REQUEST:
                 return [osuCommandsPermitRequest.id, enabled];
               case OsuCommands.NP:
+                if (data.osuStreamCompanionCurrentMapData !== undefined) {
+                  return [osuCommandsNp.id, false];
+                } else {
+                  return [osuCommandsNp.id, enabled];
+                }
+              case `${OsuCommands.NP}_STREAM_COMPANION_FILES`:
                 if (
                   data.osuStreamCompanionCurrentMapData !== undefined &&
                   streamCompanionInfo !== undefined &&
                   streamCompanionInfo.type === "file"
                 ) {
-                  return [osuCommandsNpStreamCompanionFile.id, enabled];
-                } else if (
+                  return [
+                    osuCommandsNpStreamCompanionFile.id,
+                    data.enabledCommands.includes(OsuCommands.NP),
+                  ];
+                } else {
+                  return [osuCommandsNpStreamCompanionFile.id, false];
+                }
+              case `${OsuCommands.NP}_STREAM_COMPANION_WEBSOCKET`:
+                if (
                   data.osuStreamCompanionCurrentMapData !== undefined &&
                   streamCompanionInfo !== undefined &&
                   streamCompanionInfo.type === "websocket"
                 ) {
-                  return [osuCommandsNpStreamCompanionWebsocket.id, enabled];
+                  return [
+                    osuCommandsNpStreamCompanionWebsocket.id,
+                    data.enabledCommands.includes(OsuCommands.NP),
+                  ];
                 } else {
-                  return [osuCommandsNp.id, enabled];
+                  return [osuCommandsNpStreamCompanionWebsocket.id, false];
                 }
               case OsuCommands.PP:
                 return [osuCommandsPp.id, enabled];
@@ -76,7 +92,11 @@ export const commandCommands: ChatMessageHandlerReplyCreator<
             }
             return ["undefined", false];
           },
-          enumValues: Object.values(OsuCommands),
+          enumValues: [
+            ...Object.values(OsuCommands),
+            `${OsuCommands.NP}_STREAM_COMPANION_FILES`,
+            `${OsuCommands.NP}_STREAM_COMPANION_WEBSOCKET`,
+          ],
         }
       ),
       messageId: osuCommandsString.id,
