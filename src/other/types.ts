@@ -6,10 +6,20 @@
  * @returns True if not undefined.
  */
 export const notUndefined = <TValue>(
-  value: TValue | undefined
-): value is TValue => {
-  return value !== undefined;
-};
+  value: Readonly<TValue> | undefined
+): value is TValue => value !== undefined;
+
+/**
+ * Convert a value to a custom value if undefined.
+ *
+ * @param value Any value.
+ * @param customValue Custom value to be used if value undefined.
+ * @returns Custom value if undefined otherwise the value.
+ */
+export const convertUndefinedToCustomValue = <TValue, TCustomValue>(
+  value: Readonly<TValue> | undefined,
+  customValue: Readonly<TCustomValue>
+): TValue | TCustomValue => (value === undefined ? customValue : value);
 
 /**
  * Type that describes a not undefined but empty object.
