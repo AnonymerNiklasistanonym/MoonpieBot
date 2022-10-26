@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/quotes */
-
 // Package imports
 import { describe } from "mocha";
 import { expect } from "chai";

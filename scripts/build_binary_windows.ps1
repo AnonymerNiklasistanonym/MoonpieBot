@@ -38,6 +38,7 @@ Remove-Item "bin" -Recurse -ErrorAction Ignore
 npm install
 npm run build
 npm run package:windows
+npm run package:windows:postfix
 
 # Create the windows installer
 if ($makensisWasFound) {

@@ -19,28 +19,42 @@ const LOG_ID = "osu_streamcompanion";
 
 /**
  * The data that StreamCompanion should watch for changes.
+ *
+ * Source: https://piotrekol.github.io/StreamCompanion/development/SC/api.html#json.
  */
-const OSU_STREAMCOMPANION_DATA = [
-  "titleRoman",
-  "artistRoman",
-  "diffName",
-  "mapid",
-  "mapsetid",
-  "maxCombo",
-  "mods",
-  "mAR",
-  "mCS",
-  "mOD",
-  "mHP",
-  "mStars",
-  "mBpm",
-];
+enum OsuStreamCompanionData {
+  AR = "mAR",
+  ARTIST_ROMAN = "artistRoman",
+  ARTIST_UNICODE = "artistUnicode",
+  BPM = "mBpm",
+  CREATOR = "creator",
+  CS = "mCS",
+  DIFF_NAME = "diffName",
+  HP = "mHP",
+  MAPSET_ID = "mapsetid",
+  MAP_ID = "mapid",
+  MAX_COMBO = "maxCombo",
+  MODS = "mods",
+  OD = "mOD",
+  OSU_IS_RUNNING = "osuIsRunning",
+  OSU_PP_95 = "osu_m95PP",
+  OSU_PP_96 = "osu_m96PP",
+  OSU_PP_97 = "osu_m97PP",
+  OSU_PP_98 = "osu_m98PP",
+  OSU_PP_99 = "osu_m99PP",
+  OSU_PP_SS = "osu_mSSPP",
+  STARS = "mStars",
+  TITLE_ROMAN = "titleRoman",
+  TITLE_UNICODE = "titleUnicode",
+}
 
 /**
  * A representation of the data that StreamCompanion should watch for changes.
  */
 export interface StreamCompanionWebSocketData extends StreamCompanionDataBase {
   artistRoman?: string;
+  artistUnicode?: string;
+  creator?: string;
   diffName?: string;
   mAR?: number;
   mBpm?: string;
@@ -52,12 +66,21 @@ export interface StreamCompanionWebSocketData extends StreamCompanionDataBase {
   mapsetid?: number;
   maxCombo?: number;
   mods?: string;
+  osuIsRunning?: boolean;
+  osu_m95PP?: null | number;
+  osu_m96PP?: null | number;
+  osu_m97PP?: null | number;
+  osu_m98PP?: null | number;
+  osu_m99PP?: null | number;
+  osu_mSSPP?: null | number;
   titleRoman?: string;
+  titleUnicode?: string;
   type: "websocket";
 }
 
 export interface StreamCompanionFileData extends StreamCompanionDataBase {
   currentMods: string;
+  custom: string;
   npAll: string;
   npPlayingDetails: string;
   npPlayingDl: string;
@@ -82,6 +105,7 @@ const fileNameNpAll = "np_all.txt";
 const fileNameNpPlayingDetails = "np_playing_details.txt";
 const fileNameNpPlayingDl = "np_playing_DL.txt";
 const fileNameCurrentMods = "current_mods.txt";
+const fileNameCustom = "custom.txt";
 
 /**
  * This method will setup an infinite loop that will continuously try to connect
@@ -103,23 +127,36 @@ export const createStreamCompanionFileConnection = (
   //);
   return async (): Promise<StreamCompanionFileData> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const npAll = await fs.readFile(
-      path.join(streamCompanionDirPath, fileNameNpAll)
-    );
+    const npAll = fs.readFile(path.join(streamCompanionDirPath, fileNameNpAll));
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const npPlayingDetails = await fs.readFile(
+    const npPlayingDetails = fs.readFile(
       path.join(streamCompanionDirPath, fileNameNpPlayingDetails)
     );
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const npPlayingDl = await fs.readFile(
+    const npPlayingDl = fs.readFile(
       path.join(streamCompanionDirPath, fileNameNpPlayingDl)
     );
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const currentMods = await fs.readFile(
+    const currentMods = fs.readFile(
       path.join(streamCompanionDirPath, fileNameCurrentMods)
     );
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const custom = fs.readFile(
+      path.join(streamCompanionDirPath, fileNameCustom)
+    );
+
+    // Wait for all promises concurrently for better performance
+    await Promise.allSettled([
+      npAll,
+      npPlayingDetails,
+      npPlayingDl,
+      currentMods,
+      custom,
+    ]);
+
     return {
       currentMods: currentMods.toString(),
+      custom: custom.toString(),
       npAll: npAll.toString(),
       npPlayingDetails: npPlayingDetails.toString(),
       npPlayingDl: npPlayingDl.toString(),
@@ -164,7 +201,7 @@ export const createStreamCompanionWebSocketConnection = (
     // Send token names which should be watched for value changes
     // https://piotrekol.github.io/StreamCompanion/development/SC/api.html#json
     // TODO: Check what happens for invalid/custom maps
-    ws.send(JSON.stringify(OSU_STREAMCOMPANION_DATA));
+    ws.send(JSON.stringify(Object.values(OsuStreamCompanionData)));
   };
   const cache: StreamCompanionWebSocketData = { type: "websocket" };
   ws.onmessage = (wsEvent) => {
