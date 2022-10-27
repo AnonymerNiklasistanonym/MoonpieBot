@@ -370,17 +370,20 @@ export interface RegexOsuBeatmapIdFromUrlBeatmapSets
   extends RegexOsuBeatmapIdFromUrlBase {
   beatmapIdBeatmapsets: string;
 }
+export interface RegexOsuBeatmapIdFromUrlBeatmapSetsDownload
+  extends RegexOsuBeatmapIdFromUrlBase {
+  beatmapIdBeatmapsetsDownload: string;
+}
 export type RegexOsuBeatmapIdFromUrl =
   | RegexOsuBeatmapIdFromUrlB
   | RegexOsuBeatmapIdFromUrlBeatmaps
-  | RegexOsuBeatmapIdFromUrlBeatmapSets;
+  | RegexOsuBeatmapIdFromUrlBeatmapSets
+  | RegexOsuBeatmapIdFromUrlBeatmapSetsDownload;
 /**
  * Regex that matches osu beatmap URLs in any message.
  *
- * - The first group is the osu beatmap ID number in the format `https://osu.ppy.sh/b/$ID`.
- * - The second group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmaps/$ID`.
- * - The third group is the osu beatmap ID number in the format `https://osu.ppy.sh/beatmapsets/MAPSETID#osu/$ID`.
- * - The fourth group is the optional comment string.
+ * It returns different named groups for the following number of links using
+ * the following type {@link RegexOsuBeatmapIdFromUrl} if there is a match.
  *
  * @example
  * ```text
@@ -392,12 +395,16 @@ export type RegexOsuBeatmapIdFromUrl =
  * ```
  * @example
  * ```text
+ * https://osu.ppy.sh/beatmapsets/908336/download $COMMENT
+ * ```
+ * @example
+ * ```text
  * https://osu.ppy.sh/beatmaps/2587891 $COMMENT
  * ```
  */
 export const regexOsuBeatmapIdFromUrl =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /https:\/\/osu\.ppy\.sh\/(?:b\/(?<beatmapIdB>\d+)|beatmaps\/(?<beatmapIdBeatmaps>\d+)|beatmapsets\/\d+\/?#\S+\/(?<beatmapIdBeatmapsets>\d+))(?:\s+(?<comment>\S.*?)\s*$)?/i;
+  /https:\/\/osu\.ppy\.sh\/(?:b\/(?<beatmapIdB>\d+)|beatmaps\/(?<beatmapIdBeatmaps>\d+)|beatmapsets\/\d+\/?#\S+\/(?<beatmapIdBeatmapsets>\d+)|beatmapsets\/(?<beatmapIdBeatmapsetsDownload>\d+)(?:\/download)?)\/?(?:\s+(?<comment>\S.*?)\s*$)?/i;
 
 export const regexOsuBeatmapUrlSplitter = (message: string): string[] =>
   message.split(/(?=https?:\/\/osu\.ppy\.sh\/(?:b|beatmaps|beatmapsets)\/)/);

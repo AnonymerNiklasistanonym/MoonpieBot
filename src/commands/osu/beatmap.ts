@@ -397,6 +397,12 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
         ) {
           beatmapId = matchGroups.beatmapIdBeatmapsets;
         }
+        if (
+          "beatmapIdBeatmapsetsDownload" in matchGroups &&
+          matchGroups.beatmapIdBeatmapsetsDownload !== undefined
+        ) {
+          beatmapId = matchGroups.beatmapIdBeatmapsetsDownload;
+        }
         if (beatmapId !== undefined) {
           return {
             beatmapId: parseInt(beatmapId),

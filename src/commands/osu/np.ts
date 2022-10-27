@@ -103,6 +103,12 @@ export const commandNp: ChatMessageHandlerReplyCreator<
               ) {
                 beatmapId = matchGroups.beatmapIdBeatmapsets;
               }
+              if (
+                "beatmapIdBeatmapsetsDownload" in matchGroups &&
+                matchGroups.beatmapIdBeatmapsetsDownload !== undefined
+              ) {
+                beatmapId = matchGroups.beatmapIdBeatmapsetsDownload;
+              }
               if (beatmapId !== undefined) {
                 data.beatmapRequestsInfo.lastMentionedBeatmapId =
                   parseInt(beatmapId);

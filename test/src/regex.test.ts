@@ -496,12 +496,24 @@ describe("regex", () => {
             input: "https://osi.ppy.sh/ba/2587891",
           },
           {
+            expected: null,
+            input: "https://osi.ppy.sh/beatmapsets/908336/download",
+          },
+          {
             expected: { beatmapIdBeatmapsets: "2554945" },
             input: "https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
           },
           {
+            expected: { beatmapIdBeatmapsets: "2554945" },
+            input: "https://osu.ppy.sh/beatmapsets/1228734#osu/2554945/",
+          },
+          {
             expected: { beatmapIdB: "2587891" },
             input: "  https://osu.ppy.sh/b/2587891",
+          },
+          {
+            expected: { beatmapIdB: "2587891" },
+            input: "  https://osu.ppy.sh/b/2587891/",
           },
           {
             expected: { beatmapIdBeatmapsets: "2554945" },
@@ -510,6 +522,22 @@ describe("regex", () => {
           {
             expected: { beatmapIdBeatmapsets: "2554945" },
             input: "  https://osu.ppy.sh/beatmapsets/1228734#osu/2554945",
+          },
+          {
+            expected: { beatmapIdBeatmapsetsDownload: "908336" },
+            input: "https://osu.ppy.sh/beatmapsets/908336/download",
+          },
+          {
+            expected: { beatmapIdBeatmapsetsDownload: "908336" },
+            input: "https://osu.ppy.sh/beatmapsets/908336/download/",
+          },
+          {
+            expected: { beatmapIdBeatmapsetsDownload: "908336" },
+            input: "https://osu.ppy.sh/beatmapsets/908336",
+          },
+          {
+            expected: { beatmapIdBeatmapsetsDownload: "908336" },
+            input: "https://osu.ppy.sh/beatmapsets/908336/",
           },
           {
             expected: { beatmapIdBeatmaps: "2587891" },
