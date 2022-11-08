@@ -22,7 +22,8 @@
     "scripts": {
         "build:dev": "tsc --sourceMap --removeComments false --pretty",
         "build": "tsc",
-        "create": "concurrently \"npm run create:envExamples\" \"npm run create:ccCbExamples\" \"npm run create:manPage\" \"npm run create:pkgbuilds\" \"npm run create:windowsInstallerConfig\"",
+        "create": "concurrently \"npm run create:envExamples\" \"npm run create:ccCbExamples\" \"npm run create:manPage\" \"npm run create:pkgbuilds\" \"npm run create:windowsInstallerConfig\" \"npm run create:customStrings\"",
+        "create:customStrings": "ts-node scripts/createCustomStrings.ts",
         "create:envExamples": "ts-node scripts/createEnvExampleFiles.ts",
         "create:ccCbExamples": "ts-node scripts/createCCCBExampleFile.ts",
         "create:manPage": "ts-node scripts/createManPageFile.ts",

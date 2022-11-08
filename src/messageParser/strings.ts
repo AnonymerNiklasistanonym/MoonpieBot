@@ -29,6 +29,10 @@ export interface StringEntry {
    */
   default: string;
   /**
+   * The description of the string entry.
+   */
+  description?: string;
+  /**
    * The unique ID of the string entry.
    */
   id: string;
