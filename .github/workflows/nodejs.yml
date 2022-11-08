@@ -4,16 +4,21 @@
 name: Node.js CI
 
 on:
-  # Run CI when a new version tag is created
+  # Run CI when a new branch or tag is created
+  # TODO Find way to not run when a new branch is pushed
   create:
     tags:
       - v*
   # Run CI when a new commit is pushed
   push:
-    branches: [ main, dev ]
+    branches:
+    - main
+    - dev
   # Run CI when a new pull request is created
   pull_request:
-    branches: [ main, dev ]
+    branches:
+    - main
+    - dev
 
 env:
   # The name of the application
