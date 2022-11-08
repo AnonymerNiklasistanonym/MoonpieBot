@@ -12,7 +12,7 @@ import type { Logger } from "winston";
  * The global Strings data structure that maps from a unique string ID to a
  * string value that can be overridden.
  */
-export type StringMap = Map<string, string>;
+export type StringMap = Map<string, Omit<StringEntry, "id">>;
 
 /**
  * The logging ID of this module.
@@ -24,6 +24,10 @@ const LOG_ID = "strings";
  * stored).
  */
 export interface StringEntry {
+  /**
+   * Alternative string values.
+   */
+  alternatives?: string[];
   /**
    * The default value.
    */
@@ -47,9 +51,9 @@ export interface StringEntry {
 export const generateStringMap = (
   ...stringEntries: StringEntry[]
 ): StringMap => {
-  const mappedStringEntries = stringEntries.map<[string, string]>((a) => [
+  const mappedStringEntries = stringEntries.map<[string, StringEntry]>((a) => [
     a.id,
-    a.default,
+    a,
   ]);
   // Check for duplicated IDs
   mappedStringEntries.forEach((value, index, array) => {
@@ -84,7 +88,7 @@ export const updateStringsMapWithCustomEnvStrings = (
   for (const [key] of updatedStrings.entries()) {
     const envValue = process.env[`${ENV_PREFIX_CUSTOM_STRINGS}${key}`];
     if (envValue !== undefined && envValue.trim().length > 0) {
-      updatedStrings.set(key, envValue);
+      updatedStrings.set(key, { default: envValue });
       foundCustomStringsCounter++;
       logStrings.debug(`Found default custom string: ${key}=${envValue}`);
     }
@@ -99,10 +103,9 @@ export const updateStringsMapWithCustomEnvStrings = (
       // eslint-disable-next-line security/detect-object-injection
       const envValue = process.env[key];
       if (envValue !== undefined) {
-        updatedStrings.set(
-          key.slice(ENV_PREFIX_CUSTOM_STRINGS.length),
-          envValue
-        );
+        updatedStrings.set(key.slice(ENV_PREFIX_CUSTOM_STRINGS.length), {
+          default: envValue,
+        });
         foundCustomNonDefaultStringsCounter++;
         logStrings.debug(`Found non-default custom string: ${key}=${envValue}`);
       }

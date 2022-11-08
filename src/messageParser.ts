@@ -108,9 +108,15 @@ export const messageParserById = async (
   macros: Readonly<MacroMap> = new Map(),
   logger: Logger
 ): Promise<string> => {
-  const stringFromId = strings.get(stringId);
-  if (stringFromId === undefined) {
+  const stringEntryFromId = strings.get(stringId);
+  if (stringEntryFromId === undefined) {
     throw Error(`Message string could not be found via its ID '${stringId}'`);
   }
-  return await messageParser(stringFromId, strings, plugins, macros, logger);
+  return await messageParser(
+    stringEntryFromId.default,
+    strings,
+    plugins,
+    macros,
+    logger
+  );
 };

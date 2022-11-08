@@ -79,13 +79,13 @@ export const osuCommandReplyNp: StringEntry = {
       },
       name: pluginIfNotUndefined.id,
       scope: [
-        " (https://osu.ppy.sh/beatmaps/",
+        " https://osu.ppy.sh/beatmaps/",
         {
           key: MacroOsuWindowTitle.MAP_ID_VIA_API,
           name: macroOsuWindowTitle.id,
           type: "macro",
         },
-        ")",
+        "",
       ],
       type: "plugin",
     },
@@ -246,7 +246,7 @@ export const osuCommandReplyNpStreamCompanionWebSocket: StringEntry = {
           },
           type: "plugin",
         },
-        "StreamCompanion)",
+        ")",
       ],
       type: "plugin",
     },
@@ -255,6 +255,41 @@ export const osuCommandReplyNpStreamCompanionWebSocket: StringEntry = {
 };
 
 export const osuCommandReplyNpStreamCompanionFile: StringEntry = {
+  alternatives: [
+    createMessageParserMessage([
+      "@",
+      { name: PluginTwitchChat.USER, type: "plugin" },
+      " Currently playing ",
+      {
+        name: PluginOsuStreamCompanion.CURRENT_MAP_FILE,
+        scope: [
+          {
+            key: MacroOsuStreamCompanionCurrentMapFile.CUSTOM,
+            name: macroOsuStreamCompanionCurrentMapFile.id,
+            type: "macro",
+          },
+          {
+            args: {
+              key: MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DL,
+              name: macroOsuStreamCompanionCurrentMapFile.id,
+              type: "macro",
+            },
+            name: pluginIfNotEmpty.id,
+            scope: [
+              " ",
+              {
+                key: MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DL,
+                name: macroOsuStreamCompanionCurrentMapFile.id,
+                type: "macro",
+              },
+            ],
+            type: "plugin",
+          },
+        ],
+        type: "plugin",
+      },
+    ]),
+  ],
   default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
@@ -306,21 +341,21 @@ export const osuCommandReplyNpStreamCompanionFile: StringEntry = {
           },
           name: pluginIfNotEmpty.id,
           scope: [
-            " [",
+            " ",
             {
               key: MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DL,
               name: macroOsuStreamCompanionCurrentMapFile.id,
               type: "macro",
             },
-            "]",
           ],
           type: "plugin",
         },
       ],
       type: "plugin",
     },
-    " (StreamCompanion)",
   ]),
+  description:
+    "For less information/stats open StreamCompanion, go to 'Settings', 'Output Patterns' select the column 'np_all' and edit the text cell labeled 'Formatting' to '!mapArtistTitle! !mapDiff!' instead of the default '!mapArtistTitle! !mapDiff! CS:!cs! AR:!ar! OD:!od! HP:!hp!'",
   id: `${OSU_COMMAND_REPLY_STRING_ID}_NP_STREAMCOMPANION_FILE`,
 };
 

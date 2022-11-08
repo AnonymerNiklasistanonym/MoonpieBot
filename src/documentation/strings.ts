@@ -7,11 +7,12 @@ import {
 } from "./fileDocumentationGenerator";
 import { defaultStringMap } from "../info/strings";
 import { ENV_PREFIX_CUSTOM_STRINGS } from "../info/env";
+import { escapeStringIfWhiteSpace } from "../other/whiteSpaceChecker";
 import { generatePluginAndMacroDocumentation } from "../documentation/messageParser";
-import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
 import type {
   FileDocumentationParts,
+  FileDocumentationPartText,
   FileDocumentationPartValue,
 } from "./fileDocumentationGenerator";
 import type {
@@ -77,25 +78,43 @@ export const createStringsVariableDocumentation = async (
   });
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
 
-  const dataDefaultStrings: FileDocumentationPartValue[] = [];
-  for (const [key, defaultValue] of defaultStringMap.entries()) {
-    if (defaultValue.endsWith(" ") || defaultValue.startsWith(" ")) {
+  const dataDefaultStrings: (
+    | FileDocumentationPartValue
+    | FileDocumentationPartText
+  )[] = [];
+  const sortedDefaultStrings = new Map([...defaultStringMap.entries()].sort());
+  for (const [key, stringEntry] of sortedDefaultStrings) {
+    if (stringEntry.description !== undefined) {
       dataDefaultStrings.push({
-        isComment: true,
-        type: FileDocumentationPartType.VALUE,
-        value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}="${defaultValue}"`,
-      });
-    } else {
-      dataDefaultStrings.push({
-        isComment: true,
-        type: FileDocumentationPartType.VALUE,
-        value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}=${defaultValue}`,
+        text: `> ${stringEntry.description}`,
+        type: FileDocumentationPartType.TEXT,
       });
     }
+    dataDefaultStrings.push({
+      isComment: true,
+      type: FileDocumentationPartType.VALUE,
+      value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}=${escapeStringIfWhiteSpace(
+        stringEntry.default
+      )}`,
+    });
+    if (
+      stringEntry.alternatives !== undefined &&
+      stringEntry.alternatives.length > 0
+    ) {
+      dataDefaultStrings.push({
+        text: "  Alternatives:",
+        type: FileDocumentationPartType.TEXT,
+      });
+      for (const alternative of stringEntry.alternatives) {
+        dataDefaultStrings.push({
+          isComment: true,
+          type: FileDocumentationPartType.VALUE,
+          value: `  - ${escapeStringIfWhiteSpace(alternative)}`,
+        });
+      }
+    }
   }
-  data.push(
-    ...dataDefaultStrings.sort((a, b) => genericStringSorter(a.value, b.value))
-  );
+  data.push(...dataDefaultStrings);
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(path, fileDocumentationGenerator(data));

@@ -456,15 +456,15 @@ export const createParseTree = (
       case ParseStateHelper.REFERENCE_WAS_CLOSED:
         parseStateHelper = ParseStateHelper.NOTHING;
         // eslint-disable-next-line no-case-declarations
-        const referenceString = strings.get(referenceName);
-        if (referenceString === undefined) {
+        const referenceStringEntry = strings.get(referenceName);
+        if (referenceStringEntry === undefined) {
           throw Error(
             `The reference '${referenceName}' from '${messageString}' was not found`
           );
         }
         // eslint-disable-next-line no-case-declarations
         const referenceParseTree = createParseTree(
-          referenceString,
+          referenceStringEntry.default,
           strings,
           undefined,
           undefined,
