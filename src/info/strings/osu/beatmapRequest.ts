@@ -133,7 +133,26 @@ export const osuBeatmapRequest: StringEntry = {
     generateMessageParserMessageMacro(macroOsuBeatmap, MacroOsuBeatmap.VERSION),
     "' by '",
     generateMessageParserMessageMacro(macroOsuBeatmap, MacroOsuBeatmap.ARTIST),
-    "'",
+    "' [",
+    generateMessageParserMessageMacro(
+      macroOsuBeatmap,
+      MacroOsuBeatmap.DIFFICULTY_RATING
+    ),
+    "* ",
+    {
+      args: generateMessageParserMessageMacro(
+        macroOsuBeatmap,
+        MacroOsuBeatmap.LENGTH_IN_S
+      ),
+      name: pluginTimeInSToStopwatchString.id,
+      type: "plugin",
+    },
+    " ",
+    generateMessageParserMessageMacro(
+      macroOsuBeatmap,
+      MacroOsuBeatmap.RANKED_STATUS
+    ),
+    "]",
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmap,
@@ -153,37 +172,27 @@ export const osuBeatmapRequest: StringEntry = {
           ),
         ],
         name: PluginOsuApi.SCORE,
-        scope: [
-          " - ",
-          {
-            args: generateMessageParserMessageMacro(
-              macroOsuScore,
-              MacroOsuScore.EXISTS
+        scope: {
+          args: generateMessageParserMessageMacro(
+            macroOsuScore,
+            MacroOsuScore.EXISTS
+          ),
+          name: pluginIfTrue.id,
+          scope: [
+            " - Best score: ",
+            generateMessageParserMessageReference(
+              osuBeatmapRequestRefTopScoreShort
             ),
-            name: pluginIfTrue.id,
-            scope: [
-              "Current top score is a ",
-              generateMessageParserMessageReference(
-                osuBeatmapRequestRefTopScoreShort
-              ),
-            ],
-            type: "plugin",
-          },
-          {
-            args: generateMessageParserMessageMacro(
-              macroOsuScore,
-              MacroOsuScore.EXISTS
-            ),
-            name: pluginIfFalse.id,
-            scope: "No score found",
-            type: "plugin",
-          },
-        ],
+          ],
+          type: "plugin",
+        },
         type: "plugin",
       },
       type: "plugin",
     },
   ]),
+  description:
+    "Message that is printed to chat if a beatmap is requested, was found and does comply with the rules",
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}`,
 };
 
