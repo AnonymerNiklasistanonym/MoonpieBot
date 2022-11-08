@@ -82,13 +82,13 @@ export const generatePlugin = <DATA>(
   data: DATA
 ): MessageParserPlugin => ({
   ...generator,
-  func: (logger, value, signature) => {
+  func: async (logger, value, signature) => {
     if (signature) {
       if (generator.signature !== undefined) {
         return generator.signature;
       }
     }
-    return generator.generate(data)(logger, value, signature);
+    return await generator.generate(data)(logger, value, signature);
   },
 });
 

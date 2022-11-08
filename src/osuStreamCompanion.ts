@@ -3,7 +3,7 @@
  */
 
 // Package imports
-import { promises as fs } from "fs";
+import { constants, promises as fs } from "fs";
 import path from "path";
 import ReconnectingWebSocket from "reconnecting-websocket";
 import WebSocket from "ws";
@@ -107,6 +107,16 @@ const fileNameNpPlayingDl = "np_playing_DL.txt";
 const fileNameCurrentMods = "current_mods.txt";
 const fileNameCustom = "custom.txt";
 
+const getFileContentIfExists = async (filePath: string) => {
+  try {
+    await fs.access(filePath, constants.F_OK);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    return await fs.readFile(filePath);
+  } catch (err) {
+    return `[Error: File not found (${filePath})]`;
+  }
+};
+
 /**
  * This method will setup an infinite loop that will continuously try to connect
  * to StreamCompanion.
@@ -116,32 +126,26 @@ const fileNameCustom = "custom.txt";
  * @returns A function that will use the file system interface to get the
  * StreamCompanion data.
  */
-export const createStreamCompanionFileConnection = (
-  streamCompanionDirPath: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _logger: Logger
-): StreamCompanionConnection => {
-  //const logStreamCompanion = createLogFunc(
-  //  logger,
-  //  LOG_ID
-  //);
-  return async (): Promise<StreamCompanionFileData> => {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const npAll = fs.readFile(path.join(streamCompanionDirPath, fileNameNpAll));
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const npPlayingDetails = fs.readFile(
+export const createStreamCompanionFileConnection =
+  (
+    streamCompanionDirPath: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _logger: Logger
+  ): StreamCompanionConnection =>
+  async (): Promise<StreamCompanionFileData> => {
+    const npAll = getFileContentIfExists(
+      path.join(streamCompanionDirPath, fileNameNpAll)
+    );
+    const npPlayingDetails = getFileContentIfExists(
       path.join(streamCompanionDirPath, fileNameNpPlayingDetails)
     );
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const npPlayingDl = fs.readFile(
+    const npPlayingDl = getFileContentIfExists(
       path.join(streamCompanionDirPath, fileNameNpPlayingDl)
     );
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const currentMods = fs.readFile(
+    const currentMods = getFileContentIfExists(
       path.join(streamCompanionDirPath, fileNameCurrentMods)
     );
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const custom = fs.readFile(
+    const custom = getFileContentIfExists(
       path.join(streamCompanionDirPath, fileNameCustom)
     );
 
@@ -154,16 +158,16 @@ export const createStreamCompanionFileConnection = (
       custom,
     ]);
 
+    // Somehow allSettled doesn't work so each promise needs to be awaited again
     return {
-      currentMods: currentMods.toString(),
-      custom: custom.toString(),
-      npAll: npAll.toString(),
-      npPlayingDetails: npPlayingDetails.toString(),
-      npPlayingDl: npPlayingDl.toString(),
+      currentMods: (await currentMods).toString(),
+      custom: (await custom).toString(),
+      npAll: (await npAll).toString(),
+      npPlayingDetails: (await npPlayingDetails).toString(),
+      npPlayingDl: (await npPlayingDl).toString(),
       type: "file",
     };
   };
-};
 
 /**
  * This method will setup an infinite loop that will continuously try to connect
