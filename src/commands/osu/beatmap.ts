@@ -93,6 +93,7 @@ const checkIfBeatmapMatchesDemands = (
         }
         break;
       case OsuRequestsConfig.DETAILED:
+      case OsuRequestsConfig.DETAILED_IRC:
       case OsuRequestsConfig.MESSAGE_OFF:
       case OsuRequestsConfig.MESSAGE_ON:
       case OsuRequestsConfig.REDEEM_ID:
@@ -114,6 +115,7 @@ const checkIfBeatmapMatchesDemands = (
 
 export const sendBeatmapRequest = (
   detailedMapRequests: boolean,
+  detailedMapRequestsIrc: boolean,
   messageParserMacros: MacroMap = new Map(),
   beatmapRequestId: number,
   beatmapRequester: string,
@@ -158,7 +160,7 @@ export const sendBeatmapRequest = (
         );
         return [osuIrcRequestTarget, message];
       },
-      messageId: detailedMapRequests
+      messageId: detailedMapRequestsIrc
         ? osuBeatmapRequestIrcDetailed.id
         : osuBeatmapRequestIrc.id,
     });
@@ -340,6 +342,9 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
         ...sendBeatmapRequest(
           osuRequestsConfigEntries.find(
             (a) => a.option === OsuRequestsConfig.DETAILED
+          )?.optionValue === "true",
+          osuRequestsConfigEntries.find(
+            (a) => a.option === OsuRequestsConfig.DETAILED_IRC
           )?.optionValue === "true",
           osuBeatmapRequestMacros,
           beatmapRequest.beatmapId,

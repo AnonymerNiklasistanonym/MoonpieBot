@@ -69,10 +69,6 @@ export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
         data.osuApiDbPath,
         logger
       );
-    const detailedReply =
-      osuRequestsConfigEntries.find(
-        (a) => a.option === OsuRequestsConfig.DETAILED
-      )?.optionValue === "true";
 
     for (const previousBeatmapRequest of previousBeatmapRequests) {
       data.beatmapRequestsInfo.lastMentionedBeatmapId =
@@ -80,7 +76,12 @@ export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
 
       commandReplies.push(
         ...sendBeatmapRequest(
-          detailedReply,
+          osuRequestsConfigEntries.find(
+            (a) => a.option === OsuRequestsConfig.DETAILED
+          )?.optionValue === "true",
+          osuRequestsConfigEntries.find(
+            (a) => a.option === OsuRequestsConfig.DETAILED_IRC
+          )?.optionValue === "true",
           undefined,
           previousBeatmapRequest.data.id,
           previousBeatmapRequest.userName,

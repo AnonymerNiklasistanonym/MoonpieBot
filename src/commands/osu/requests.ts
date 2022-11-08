@@ -255,6 +255,7 @@ const validateSetValue = (
       return optionValue;
 
     case OsuRequestsConfig.DETAILED:
+    case OsuRequestsConfig.DETAILED_IRC:
       if (optionValue === undefined) {
         throw Error("Boolean value was undefined!");
       }

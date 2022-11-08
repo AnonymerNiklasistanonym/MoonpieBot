@@ -72,6 +72,9 @@ export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
         osuRequestsConfigEntries.find(
           (a) => a.option === OsuRequestsConfig.DETAILED
         )?.optionValue === "true",
+        osuRequestsConfigEntries.find(
+          (a) => a.option === OsuRequestsConfig.DETAILED_IRC
+        )?.optionValue === "true",
         undefined,
         blockedBeatmapRequest.data.id,
         blockedBeatmapRequest.userName,

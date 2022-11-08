@@ -351,14 +351,23 @@ export const main = async (
       // Setup database tables (or do nothing if they already exist)
       await osuRequestsDb.setup(pathDatabaseOsuApi, logger);
       if (osuApiBeatmapRequestsDetailed !== undefined) {
+        const detailed =
+          osuApiBeatmapRequestsDetailed === EnvVariableOnOff.ON
+            ? "true"
+            : "false";
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           pathDatabaseOsuApi,
           {
             option: OsuRequestsConfig.DETAILED,
-            optionValue:
-              osuApiBeatmapRequestsDetailed === EnvVariableOnOff.ON
-                ? "true"
-                : "false",
+            optionValue: detailed,
+          },
+          logger
+        );
+        await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
+          pathDatabaseOsuApi,
+          {
+            option: OsuRequestsConfig.DETAILED_IRC,
+            optionValue: detailed,
           },
           logger
         );

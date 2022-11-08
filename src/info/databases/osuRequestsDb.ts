@@ -67,6 +67,7 @@ export enum OsuRequestsConfig {
   CS_MAX = "csMax",
   CS_MIN = "csMin",
   DETAILED = "detailed",
+  DETAILED_IRC = "detailedIrc",
   LENGTH_IN_MIN_MAX = "lengthInMinMax",
   LENGTH_IN_MIN_MIN = "lengthInMinMin",
   MESSAGE_OFF = "messageOff",
