@@ -80,7 +80,7 @@ describe("messageParser", () => {
   });
   context("references", () => {
     it("simple references", async () => {
-      const strings: StringMap = new Map([["abc", "def"]]);
+      const strings: StringMap = new Map([["abc", { default: "def" }]]);
       const message0 = "$[abc]";
       const output0 = await messageParser(
         message0,
@@ -102,7 +102,7 @@ describe("messageParser", () => {
       expect(output1).to.be.equal("Hey def!");
     });
     it("loops", async () => {
-      const strings: StringMap = new Map([["loop", "$[loop]"]]);
+      const strings: StringMap = new Map([["loop", { default: "$[loop]" }]]);
       const message0 = "$[loop]";
       let errorWasThrown = false;
       try {
@@ -115,8 +115,8 @@ describe("messageParser", () => {
     });
     it("plugins and macros inside reference", async () => {
       const strings: StringMap = new Map([
-        ["reference", "$(plugin_one|Hello $[reference2])"],
-        ["reference2", "$(plugin_uppercase=World) UwU!"],
+        ["reference", { default: "$(plugin_one|Hello $[reference2])" }],
+        ["reference2", { default: "$(plugin_uppercase=World) UwU!" }],
       ]);
       const plugins: PluginMap = new Map<string, PluginFunc>([
         ["plugin_one", () => new Map()],

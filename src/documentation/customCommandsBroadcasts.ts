@@ -20,13 +20,13 @@ const addCustomCommandStringBuilder = (
   customCommand: Pick<CustomCommand, "id" | "regex" | "message"> &
     Partial<CustomCommand>
 ): string =>
-  `!addcc ${escapeStringIfWhiteSpace(
-    customCommand.id,
-    "'"
-  )} ${escapeStringIfWhiteSpace(
-    customCommand.regex,
-    "'"
-  )} ${escapeStringIfWhiteSpace(customCommand.message, "'")}${
+  `!addcc ${escapeStringIfWhiteSpace(customCommand.id, {
+    surroundCharacter: "'",
+  })} ${escapeStringIfWhiteSpace(customCommand.regex, {
+    surroundCharacter: "'",
+  })} ${escapeStringIfWhiteSpace(customCommand.message, {
+    surroundCharacter: "'",
+  })}${
     customCommand.userLevel !== undefined &&
     customCommand.userLevel !== TwitchBadgeLevel.NONE
       ? ` -ul=${convertTwitchBadgeLevelToString(customCommand.userLevel)}`
@@ -41,13 +41,13 @@ const addCustomBroadcastStringBuilder = (
   customBroadcast: Pick<CustomBroadcast, "id" | "cronString" | "message"> &
     Partial<CustomBroadcast>
 ): string =>
-  `!addcb ${escapeStringIfWhiteSpace(
-    customBroadcast.id,
-    "'"
-  )} ${escapeStringIfWhiteSpace(
-    customBroadcast.cronString,
-    "'"
-  )} ${escapeStringIfWhiteSpace(customBroadcast.message, "'")}`;
+  `!addcb ${escapeStringIfWhiteSpace(customBroadcast.id, {
+    surroundCharacter: "'",
+  })} ${escapeStringIfWhiteSpace(customBroadcast.cronString, {
+    surroundCharacter: "'",
+  })} ${escapeStringIfWhiteSpace(customBroadcast.message, {
+    surroundCharacter: "'",
+  })}`;
 
 export const createCustomCommandsBroadcastsDocumentation = async (
   path: string

@@ -17,7 +17,9 @@ export default (): Suite => {
       expect(escapeStringIfWhiteSpace("hello")).to.be.equal("hello");
       expect(escapeStringIfWhiteSpace("he lo")).to.be.equal('"he lo"');
       expect(escapeStringIfWhiteSpace(" hello")).to.be.equal('" hello"');
-      expect(escapeStringIfWhiteSpace(" hello", "'")).to.be.equal("' hello'");
+      expect(
+        escapeStringIfWhiteSpace(" hello", { surroundCharacter: "'" })
+      ).to.be.equal("' hello'");
     });
     it("hasWhiteSpace", () => {
       expect(hasWhiteSpace("hello")).to.be.equal(false);
