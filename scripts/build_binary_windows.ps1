@@ -32,9 +32,11 @@ Set-Location $PSScriptRoot
 # Go to the root directory of this repository
 Set-Location ..
 
-# Install all dependencies and build the bot
-Remove-Item "node_modules" -Recurse -ErrorAction Ignore
+# Remove previous output files
+#Remove-Item "node_modules" -Recurse -ErrorAction Ignore
 Remove-Item "bin" -Recurse -ErrorAction Ignore
+
+# Install all dependencies and build the bot
 npm install
 npm run build
 npm run package:windows
