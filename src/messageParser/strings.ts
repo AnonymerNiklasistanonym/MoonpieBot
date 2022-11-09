@@ -12,7 +12,7 @@ import type { Logger } from "winston";
  * The global Strings data structure that maps from a unique string ID to a
  * string value that can be overridden.
  */
-export type StringMap = Map<string, Omit<StringEntry, "id">>;
+export type StringMap = Map<string, StringMapEntry>;
 
 /**
  * The logging ID of this module.
@@ -43,6 +43,16 @@ export interface StringEntry {
 }
 
 /**
+ * The data of a string entry stored in the string map.
+ */
+export interface StringMapEntry extends Omit<StringEntry, "id"> {
+  /** This is a custom entry. */
+  custom?: boolean;
+  /** This entry was updated. */
+  updated?: boolean;
+}
+
+/**
  * Generate a string list for fast usage in a map.
  *
  * @param stringEntries The string entries (with more information).
@@ -51,10 +61,9 @@ export interface StringEntry {
 export const generateStringMap = (
   ...stringEntries: StringEntry[]
 ): StringMap => {
-  const mappedStringEntries = stringEntries.map<[string, StringEntry]>((a) => [
-    a.id,
-    a,
-  ]);
+  const mappedStringEntries = stringEntries.map<[string, StringMapEntry]>(
+    (a) => [a.id, a]
+  );
   // Check for duplicated IDs
   mappedStringEntries.forEach((value, index, array) => {
     if (array.findIndex((a) => a[0] === value[0]) !== index) {
@@ -88,7 +97,8 @@ export const updateStringsMapWithCustomEnvStrings = (
   for (const [key] of updatedStrings.entries()) {
     const envValue = process.env[`${ENV_PREFIX_CUSTOM_STRINGS}${key}`];
     if (envValue !== undefined && envValue.trim().length > 0) {
-      updatedStrings.set(key, { default: envValue });
+      // Update the default string if there is a new one
+      updatedStrings.set(key, { default: envValue, updated: true });
       foundCustomStringsCounter++;
       logStrings.debug(`Found default custom string: ${key}=${envValue}`);
     }
@@ -104,7 +114,9 @@ export const updateStringsMapWithCustomEnvStrings = (
       const envValue = process.env[key];
       if (envValue !== undefined) {
         updatedStrings.set(key.slice(ENV_PREFIX_CUSTOM_STRINGS.length), {
+          custom: true,
           default: envValue,
+          updated: true,
         });
         foundCustomNonDefaultStringsCounter++;
         logStrings.debug(`Found non-default custom string: ${key}=${envValue}`);
