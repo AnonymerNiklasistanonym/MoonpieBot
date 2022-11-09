@@ -13,25 +13,17 @@ import {
 } from "./customCommandsBroadcasts/customBroadcast";
 import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuIrc";
 import {
-  createStreamCompanionFileConnection,
-  createStreamCompanionWebSocketConnection,
+  createStreamCompanionFileConnection as createStreamCompanionFile,
+  createStreamCompanionWebSocketConnection as createStreamCompanionWebSocket,
 } from "./osuStreamCompanion";
 import { createTwitchClient, TwitchClientListener } from "./twitch";
-import {
-  EnvVariable,
-  EnvVariableOnOff,
-  EnvVariableOtherListOptions,
-} from "./info/env";
+import { EnvVariableOnOff, EnvVariableOtherListOptions } from "./info/env";
 import {
   generateMacroMap,
   generatePlugin,
   generatePluginMap,
   updateStringsMapWithCustomEnvStrings,
 } from "./messageParser";
-import {
-  getEnvVariableValueOrDefault,
-  getEnvVariableValueOrUndefined,
-} from "./env";
 import { createLogFunc } from "./logging";
 import { customCommandChatHandler } from "./customCommandsBroadcasts/customCommand";
 import { customCommandsBroadcastsChatHandler } from "./commands/customCommandsBroadcasts";
@@ -40,6 +32,7 @@ import { defaultMacros } from "./info/macros";
 import { defaultPlugins } from "./info/plugins";
 import { defaultStringMap } from "./info/strings";
 import { generateOutputFileNameMoonpieDbBackup } from "./info/files";
+import { getMoonpieConfigFromEnv } from "./config";
 import { getVersionFromObject } from "./version";
 import { lurkChatHandler } from "./commands/lurk";
 import { macroOsuApi } from "./info/macros/osuApi";
@@ -105,178 +98,71 @@ export const main = async (
   const loggerMain = createLogFunc(logger, LOG_ID);
 
   // Read in paths/values from environment variables
+  const config = getMoonpieConfigFromEnv(configDir);
   // Twitch connection
-  const twitchName = getEnvVariableValueOrUndefined(EnvVariable.TWITCH_NAME);
-  const twitchOAuthToken = getEnvVariableValueOrUndefined(
-    EnvVariable.TWITCH_OAUTH_TOKEN
-  );
-  const twitchChannels = getEnvVariableValueOrUndefined(
-    EnvVariable.TWITCH_CHANNELS
-  );
-  const twitchDebug =
-    getEnvVariableValueOrUndefined(EnvVariable.TWITCH_DEBUG) ===
-    EnvVariableOnOff.ON;
-  // Twitch API
-  const twitchApiClientId = getEnvVariableValueOrUndefined(
-    EnvVariable.TWITCH_API_CLIENT_ID
-  );
-  const twitchApiAccessToken = getEnvVariableValueOrUndefined(
-    EnvVariable.TWITCH_API_ACCESS_TOKEN
-  );
-  // > Moonpie
-  const pathDatabaseMoonpie = path.resolve(
-    configDir,
-    getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
-  );
-  const moonpieCooldownHoursString = getEnvVariableValueOrDefault(
-    EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS,
-    configDir
-  );
   let moonpieClaimCooldownHoursNumber: number;
   try {
-    moonpieClaimCooldownHoursNumber = parseInt(moonpieCooldownHoursString);
+    moonpieClaimCooldownHoursNumber = parseInt(
+      config.moonpieCooldownHoursString
+    );
   } catch (err) {
     throw Error(
-      `The moonpie claim cooldown hours number string could not be parsed (${moonpieCooldownHoursString})`
+      `The moonpie claim cooldown hours number string could not be parsed (${config.moonpieCooldownHoursString})`
     );
   }
-  const moonpieEnableCommands = getEnvVariableValueOrDefault(
-    EnvVariable.MOONPIE_ENABLE_COMMANDS,
-    configDir
-  ).split(",");
-  // > Spotify
-  const pathDatabaseSpotify = path.resolve(
-    configDir,
-    getEnvVariableValueOrDefault(EnvVariable.SPOTIFY_DATABASE_PATH, configDir)
-  );
-  const spotifyEnableCommands = getEnvVariableValueOrDefault(
-    EnvVariable.SPOTIFY_ENABLE_COMMANDS,
-    configDir
-  ).split(",");
-  // > Spotify API
-  const spotifyApiClientId = getEnvVariableValueOrUndefined(
-    EnvVariable.SPOTIFY_API_CLIENT_ID
-  );
-  const spotifyApiClientSecret = getEnvVariableValueOrUndefined(
-    EnvVariable.SPOTIFY_API_CLIENT_SECRET
-  );
-  const spotifyApiRefreshToken = getEnvVariableValueOrUndefined(
-    EnvVariable.SPOTIFY_API_REFRESH_TOKEN
-  );
-  // > osu! API
-  const osuApiClientId = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_CLIENT_ID
-  );
-  const osuApiClientSecret = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_CLIENT_SECRET
-  );
-  const osuApiDefaultId = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_DEFAULT_ID
-  );
-  const osuApiBeatmapRequests =
-    getEnvVariableValueOrDefault(
-      EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS,
-      configDir
-    ) === EnvVariableOnOff.ON;
-  const osuApiBeatmapRequestsDetailed = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED
-  );
-  const pathDatabaseOsuApi = path.resolve(
-    configDir,
-    getEnvVariableValueOrDefault(
-      EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH,
-      configDir
-    )
-  );
-  const osuApiBeatmapRequestsRedeemId = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID
-  );
-  const osuIrcPassword = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_IRC_PASSWORD
-  );
-  const osuIrcUsername = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_IRC_USERNAME
-  );
-  const osuIrcRequestTarget = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_IRC_REQUEST_TARGET
-  );
-  const osuEnableCommands = getEnvVariableValueOrDefault(
-    EnvVariable.OSU_ENABLE_COMMANDS,
-    configDir
-  ).split(",");
-  // > osu! StreamCompanion
-  const osuStreamCompanionUrl = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_STREAM_COMPANION_URL
-  );
-  const osuStreamCompanionDirPath = getEnvVariableValueOrUndefined(
-    EnvVariable.OSU_STREAM_COMPANION_DIR_PATH
-  );
-  // > Custom commands and broadcasts
-  const pathDatabaseCustomCommandsBroadcasts = path.resolve(
-    configDir,
-    getEnvVariableValueOrDefault(
-      EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH,
-      configDir
-    )
-  );
-  const customCommandsBroadcastsEnableCommands = getEnvVariableValueOrDefault(
-    EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
-    configDir
-  ).split(",");
-  // Lurk
-  const lurkEnableCommands = getEnvVariableValueOrDefault(
-    EnvVariable.LURK_ENABLED_COMMANDS,
-    configDir
-  ).split(",");
 
   // Initialize global objects
   // Twitch connection
-  const twitchClientChannels = twitchChannels
+  const twitchClientChannels = config.twitchChannels
     ?.split(" ")
     .filter((a) => a.trim().length !== 0);
   const twitchClient = createTwitchClient(
-    twitchName,
-    twitchOAuthToken,
+    config.twitchName,
+    config.twitchOAuthToken,
     twitchClientChannels,
-    twitchDebug,
+    config.twitchDebug,
     logger
   );
   // Twitch API
   let twitchApiClient: undefined | ApiClient;
-  if (twitchApiClientId && twitchApiAccessToken) {
+  if (config.twitchApiClientId && config.twitchApiAccessToken) {
     const authProviderScopes = new StaticAuthProvider(
-      twitchApiClientId,
-      twitchApiAccessToken
+      config.twitchApiClientId,
+      config.twitchApiAccessToken
     );
     twitchApiClient = new ApiClient({
       authProvider: authProviderScopes,
     });
   }
   // > osu! API
-  const osuApiDefaultIdNumber = osuApiDefaultId
-    ? parseInt(osuApiDefaultId)
+  const osuApiDefaultIdNumber = config.osuApiDefaultId
+    ? parseInt(config.osuApiDefaultId)
     : undefined;
   if (osuApiDefaultIdNumber !== undefined && isNaN(osuApiDefaultIdNumber)) {
     throw Error(
       "osu!api default ID was not undefined but could not be parsed to a number"
     );
   }
-  const osuApiClientIdNumber = osuApiClientId
-    ? parseInt(osuApiClientId)
+  const osuApiClientIdNumber = config.osuApiClientId
+    ? parseInt(config.osuApiClientId)
     : undefined;
   if (osuApiClientIdNumber !== undefined && isNaN(osuApiClientIdNumber)) {
     throw Error(
       "osu!api client ID was not undefined but could not be parsed to a number"
     );
   }
+  const osuApiClientSecret = config.osuApiClientSecret;
   /** If this is true it means that osu API credentials were found. */
   const enableOsuApi =
     osuApiClientIdNumber !== undefined &&
     osuApiClientSecret !== undefined &&
     osuApiDefaultIdNumber !== undefined;
   /** If this is true it means that osu IRC credentials were found. */
-  const enableOsuIrc = osuIrcPassword && osuIrcUsername && osuIrcRequestTarget;
-  const enableOsuBeatmapRequests = osuApiBeatmapRequests;
+  const osuIrcUserName = config.osuIrcUsername;
+  const osuIrcPassword = config.osuIrcPassword;
+  const osuIrcRequestTarget = config.osuIrcRequestTarget;
+  const enableOsuIrc = osuIrcPassword && osuIrcUserName && osuIrcRequestTarget;
+  const enableOsuBeatmapRequests = config.osuApiBeatmapRequests;
   // Remove commands that should not be usable if map requests are off
   if (!enableOsuBeatmapRequests) {
     for (const command of [
@@ -284,49 +170,52 @@ export const main = async (
       OsuCommands.PERMIT_REQUEST,
       OsuCommands.REQUESTS,
     ]) {
-      const indexCommand = osuEnableCommands.findIndex((a) => a === command);
+      const indexCommand = config.osuEnableCommands.findIndex(
+        (a) => a === command
+      );
       if (indexCommand > -1) {
-        osuEnableCommands.splice(indexCommand, 1);
+        config.osuEnableCommands.splice(indexCommand, 1);
       }
     }
   }
   let osuIrcBot: OsuIrcBotSendMessageFunc | undefined;
   if (enableOsuApi && enableOsuBeatmapRequests && enableOsuIrc) {
     osuIrcBot = (id: string) =>
-      createOsuIrcConnection(osuIrcUsername, osuIrcPassword, id, logger);
+      createOsuIrcConnection(osuIrcUserName, osuIrcPassword, id, logger);
   }
   // > osu! StreamCompanion
   /**
    * If this is not undefined it means there is a function to get the current
    * map data via a StreamCompanion interface.
    */
-  const osuStreamCompanionCurrentMapData = osuStreamCompanionUrl
-    ? createStreamCompanionWebSocketConnection(osuStreamCompanionUrl, logger)
-    : osuStreamCompanionDirPath
-    ? createStreamCompanionFileConnection(osuStreamCompanionDirPath, logger)
+  const osuStreamCompanionCurrentMapData = config.osuStreamCompanionUrl
+    ? createStreamCompanionWebSocket(config.osuStreamCompanionUrl, logger)
+    : config.osuStreamCompanionDirPath
+    ? createStreamCompanionFile(config.osuStreamCompanionDirPath, logger)
     : undefined;
   /** If this is true it means that osu StreamCompanion func exists. */
   const enableOsuStreamCompanion =
     osuStreamCompanionCurrentMapData !== undefined;
   // > Spotify API
   /** If this is true it means that spotify API credentials were found. */
-  const enableSpotifyApi = spotifyApiClientId && spotifyApiClientSecret;
+  const enableSpotifyApi =
+    config.spotifyApiClientId && config.spotifyApiClientSecret;
 
   // Setup/Migrate/Backup moonpie database
   const setupMigrateBackupMoonpieDatabase = async () => {
     // Only touch the database if it will be used
     if (
-      moonpieEnableCommands.length > 0 &&
+      config.moonpieEnableCommands.length > 0 &&
       !(
-        moonpieEnableCommands.length === 1 &&
-        moonpieEnableCommands.includes(EnvVariableOtherListOptions.NONE)
+        config.moonpieEnableCommands.length === 1 &&
+        config.moonpieEnableCommands.includes(EnvVariableOtherListOptions.NONE)
       )
     ) {
       // Setup database tables (or do nothing if they already exist)
-      await moonpieDb.setup(pathDatabaseMoonpie, logger);
+      await moonpieDb.setup(config.pathDatabaseMoonpie, logger);
       const databaseBackupData =
         await moonpieDb.backup.exportMoonpieCountTableToJson(
-          pathDatabaseMoonpie,
+          config.pathDatabaseMoonpie,
           logger
         );
       const pathDatabaseBackup = path.join(
@@ -342,21 +231,21 @@ export const main = async (
     // Only touch the database if it will be used
     if (
       enableOsuApi &&
-      osuEnableCommands.length > 0 &&
+      config.osuEnableCommands.length > 0 &&
       !(
-        osuEnableCommands.length === 1 &&
-        osuEnableCommands.includes(EnvVariableOtherListOptions.NONE)
+        config.osuEnableCommands.length === 1 &&
+        config.osuEnableCommands.includes(EnvVariableOtherListOptions.NONE)
       )
     ) {
       // Setup database tables (or do nothing if they already exist)
-      await osuRequestsDb.setup(pathDatabaseOsuApi, logger);
-      if (osuApiBeatmapRequestsDetailed !== undefined) {
+      await osuRequestsDb.setup(config.pathDatabaseOsuApi, logger);
+      if (config.osuApiBeatmapRequestsDetailed !== undefined) {
         const detailed =
-          osuApiBeatmapRequestsDetailed === EnvVariableOnOff.ON
+          config.osuApiBeatmapRequestsDetailed === EnvVariableOnOff.ON
             ? "true"
             : "false";
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
-          pathDatabaseOsuApi,
+          config.pathDatabaseOsuApi,
           {
             option: OsuRequestsConfig.DETAILED,
             optionValue: detailed,
@@ -364,7 +253,7 @@ export const main = async (
           logger
         );
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
-          pathDatabaseOsuApi,
+          config.pathDatabaseOsuApi,
           {
             option: OsuRequestsConfig.DETAILED_IRC,
             optionValue: detailed,
@@ -372,12 +261,12 @@ export const main = async (
           logger
         );
       }
-      if (osuApiBeatmapRequestsRedeemId !== undefined) {
+      if (config.osuApiBeatmapRequestsRedeemId !== undefined) {
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
-          pathDatabaseOsuApi,
+          config.pathDatabaseOsuApi,
           {
             option: OsuRequestsConfig.REDEEM_ID,
-            optionValue: osuApiBeatmapRequestsRedeemId,
+            optionValue: config.osuApiBeatmapRequestsRedeemId,
           },
           logger
         );
@@ -389,7 +278,7 @@ export const main = async (
   const setupMigrateCustomCommandsBroadcastsDatabase = async () => {
     // Setup database tables (or do nothing if they already exist)
     await customCommandsBroadcastsDb.setup(
-      pathDatabaseCustomCommandsBroadcasts,
+      config.pathDatabaseCustomCommandsBroadcasts,
       logger
     );
   };
@@ -398,13 +287,13 @@ export const main = async (
   const setupMigrateSpotifyDatabase = async () => {
     if (enableSpotifyApi) {
       // Setup database tables (or do nothing if they already exist)
-      await spotifyDb.setup(pathDatabaseSpotify, logger);
-      if (spotifyApiRefreshToken !== undefined) {
+      await spotifyDb.setup(config.pathDatabaseSpotify, logger);
+      if (config.spotifyApiRefreshToken !== undefined) {
         await spotifyDb.requests.spotifyConfig.createOrUpdateEntry(
-          pathDatabaseSpotify,
+          config.pathDatabaseSpotify,
           {
             option: SpotifyConfig.REFRESH_TOKEN,
-            optionValue: spotifyApiRefreshToken,
+            optionValue: config.spotifyApiRefreshToken,
           },
           logger
         );
@@ -424,9 +313,9 @@ export const main = async (
   let spotifyWebApi: undefined | SpotifyWebApi;
   if (enableSpotifyApi) {
     spotifyWebApi = await setupSpotifyAuthentication(
-      spotifyApiClientId,
-      spotifyApiClientSecret,
-      pathDatabaseSpotify,
+      config.spotifyApiClientId,
+      config.spotifyApiClientSecret,
+      config.pathDatabaseSpotify,
       logger
     );
   }
@@ -482,7 +371,7 @@ export const main = async (
       customCommandsBroadcastsRefreshHelper.refreshCustomCommands = false;
       customCommands =
         await customCommandsBroadcastsDb.requests.customCommand.getEntries(
-          pathDatabaseCustomCommandsBroadcasts,
+          config.pathDatabaseCustomCommandsBroadcasts,
           undefined,
           logger
         );
@@ -492,7 +381,7 @@ export const main = async (
       customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts = false;
       customBroadcasts =
         await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
-          pathDatabaseCustomCommandsBroadcasts,
+          config.pathDatabaseCustomCommandsBroadcasts,
           undefined,
           logger
         );
@@ -595,9 +484,9 @@ export const main = async (
         tags,
         message,
         {
-          enabledCommands: moonpieEnableCommands,
+          enabledCommands: config.moonpieEnableCommands,
           moonpieClaimCooldownHours: moonpieClaimCooldownHoursNumber,
-          moonpieDbPath: pathDatabaseMoonpie,
+          moonpieDbPath: config.pathDatabaseMoonpie,
         },
         stringMap,
         pluginMapChannel,
@@ -624,8 +513,8 @@ export const main = async (
             {
               defaultOsuId: osuApiDefaultIdNumber,
               enableOsuBeatmapRequests,
-              enabledCommands: osuEnableCommands,
-              osuApiDbPath: pathDatabaseOsuApi,
+              enabledCommands: config.osuEnableCommands,
+              osuApiDbPath: config.pathDatabaseOsuApi,
               osuApiV2Credentials: {
                 clientId: osuApiClientIdNumber,
                 clientSecret: osuApiClientSecret,
@@ -648,7 +537,7 @@ export const main = async (
             {
               // If osu api credentials are not available only allow the
               // !osu commands and !np command to be enabled
-              enabledCommands: osuEnableCommands.filter(
+              enabledCommands: config.osuEnableCommands.filter(
                 (a) => a === OsuCommands.NP || a === OsuCommands.COMMANDS
               ),
               osuStreamCompanionCurrentMapData,
@@ -677,7 +566,7 @@ export const main = async (
           tags,
           message,
           {
-            enabledCommands: spotifyEnableCommands,
+            enabledCommands: config.spotifyEnableCommands,
             spotifyWebApi,
           },
           stringMap,
@@ -702,7 +591,7 @@ export const main = async (
         tags,
         message,
         {
-          enabledCommands: lurkEnableCommands,
+          enabledCommands: config.lurkEnableCommands,
         },
         stringMap,
         pluginMapChannel,
@@ -725,9 +614,10 @@ export const main = async (
         tags,
         message,
         {
-          customCommandsBroadcastsDbPath: pathDatabaseCustomCommandsBroadcasts,
+          customCommandsBroadcastsDbPath:
+            config.pathDatabaseCustomCommandsBroadcasts,
           customCommandsBroadcastsRefreshHelper,
-          enabledCommands: customCommandsBroadcastsEnableCommands,
+          enabledCommands: config.customCommandsBroadcastsEnableCommands,
         },
         stringMap,
         pluginMapChannel,
@@ -752,7 +642,7 @@ export const main = async (
       // Add plugins to manipulate custom command global data
       pluginsCustomCommandDataGenerator.forEach((a) => {
         const plugin = generatePlugin(a, {
-          databasePath: pathDatabaseCustomCommandsBroadcasts,
+          databasePath: config.pathDatabaseCustomCommandsBroadcasts,
         });
         pluginsCustomCommands.set(plugin.id, plugin.func);
       });
@@ -779,14 +669,14 @@ export const main = async (
             logger,
             customCommandChatHandler(
               customCommand,
-              pathDatabaseCustomCommandsBroadcasts
+              config.pathDatabaseCustomCommandsBroadcasts
             )
           );
           if (!executed) {
             continue;
           }
           await customCommandsBroadcastsDb.requests.customCommand.updateEntry(
-            pathDatabaseCustomCommandsBroadcasts,
+            config.pathDatabaseCustomCommandsBroadcasts,
             {
               countIncrease: 1,
               id: customCommand.id,

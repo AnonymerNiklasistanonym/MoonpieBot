@@ -16,6 +16,7 @@ import {
   websiteUrl,
 } from "../src/info/general";
 import { ENV_PREFIX, envVariableInformation } from "../src/info/env";
+import { cliOptionSignatureToString } from "../src/cli";
 import { cliOptionsInformation } from "../src/info/cli";
 import { getVersionFromObject } from "../src/version";
 import { version } from "../src/info/version";
@@ -67,7 +68,7 @@ export const createManPageFile = async (outputPath: string): Promise<void> => {
   for (const cliOption of cliOptionsInformation) {
     outputString += `${cliOption.name}`;
     if (cliOption.signature) {
-      outputString += ` ${cliOption.signature
+      outputString += ` ${cliOptionSignatureToString(cliOption.signature)
         .split(" ")
         .map((a) => "*" + a + "*")
         .join(" ")}`;

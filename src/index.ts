@@ -36,6 +36,7 @@ import { genericStringSorter } from "./other/genericStringSorter";
 import { getVersionFromObject } from "./version";
 import { main } from "./main";
 import { version } from "./info/version";
+import { getMoonpieConfigFromEnv } from "./config";
 
 /**
  * The logging ID of this module.
@@ -121,21 +122,6 @@ const entryPoint = async () => {
       ]);
       process.exit(0);
     }
-    if (cliOptions.exportData !== undefined) {
-      for (const exportData of cliOptions.exportData) {
-        console.log(
-          `TODO Export data '${exportData.type}'${
-            exportData.json ? " in JSON format" : ""
-          } to ${
-            exportData.outputFile ? `'${exportData.outputFile}'` : "console"
-          }`
-        );
-        if (exportData.outputFile === undefined) {
-          console.log("TODO");
-          process.exit(0);
-        }
-      }
-    }
 
     // ----------------------------------------------------------
     // Setup necessary globals
@@ -148,10 +134,6 @@ const entryPoint = async () => {
     dotenv.config({
       path: path.join(configDir, fileNameEnvStrings),
     });
-
-    // Print for debugging the (private/secret) environment values to the console
-    // (censor critical variables if not explicitly enabled)
-    printEnvVariablesToConsole(configDir, !cliOptions.disableCensoring);
 
     // Create logger
     const logDir = path.resolve(
@@ -175,7 +157,51 @@ const entryPoint = async () => {
     );
     const logIndex = createLogFunc(logger, LOG_ID);
 
-    // Call main method
+    // ----------------------------------------------------------
+    // Export data
+    // ----------------------------------------------------------
+
+    if (cliOptions.exportData !== undefined) {
+      for (const exportData of cliOptions.exportData) {
+        let data = "";
+        switch (exportData.type) {
+          case "env":
+            if (exportData.json) {
+              data = JSON.stringify(getMoonpieConfigFromEnv(configDir));
+            }
+            /* else {
+              data = createEnvVariableDocumentation(
+                path.join(configDir, fileNameEnvExample),
+                configDir
+              );
+            }*/
+            break;
+          default:
+            break;
+        }
+        if (exportData.outputFile) {
+          console.log(
+            `TODO Export data '${exportData.type}'${
+              exportData.json ? " in JSON format" : ""
+            } to ${
+              exportData.outputFile ? `'${exportData.outputFile}'` : "console"
+            }`
+          );
+        } else {
+          console.log(data);
+          process.exit(0);
+        }
+      }
+    }
+
+    // ----------------------------------------------------------
+    // Main method
+    // ----------------------------------------------------------
+
+    // Print for debugging the (private/secret) environment values to the console
+    // (censor critical variables if not explicitly enabled)
+    printEnvVariablesToConsole(configDir, !cliOptions.disableCensoring);
+
     try {
       logIndex.info(`${name} ${versionString} was started (logs: '${logDir}')`);
       logIndex.debug(`Config directory: '${configDir}'`);
