@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /*
  * Entry point of the bot that handles CLI options and prepares the necessary
  * basic functions like the process name, logger, configuration directory, ...
@@ -9,7 +11,7 @@ import { promises as fs } from "fs";
 import path from "path";
 // Local imports
 import { binaryName, name, usages } from "./info/general";
-import { CliOption, cliOptionsInformation } from "./info/cli";
+import { cliOptionsInformation, parseCliOptions } from "./info/cli";
 import { createConsoleLogger, createLogFunc, createLogger } from "./logging";
 import {
   createEnvVariableDocumentation,
@@ -62,37 +64,14 @@ const entryPoint = async () => {
     // $ node . --argument
     // $ programName --argument
     const cliArgs = process.argv.slice(2);
+    const cliOptions = parseCliOptions(cliArgs);
+    let configDir = process.cwd();
 
-    // Catch CLI version option
-    if (cliArgs.includes(CliOption.VERSION)) {
-      // eslint-disable-next-line no-console
+    if (cliOptions.showVersion) {
       console.log(versionString);
       process.exit(0);
     }
-
-    // Catch CLI config directory option
-    let configDir = process.cwd();
-    if (cliArgs.includes(CliOption.CONFIG_DIRECTORY)) {
-      // Get the last index so this argument can be overridden
-      const indexConfigDirArg =
-        cliArgs.lastIndexOf(CliOption.CONFIG_DIRECTORY) + 1;
-      // Make sure the a config directory can follow in the next argument
-      if (indexConfigDirArg < cliArgs.length) {
-        // eslint-disable-next-line security/detect-object-injection
-        configDir = cliArgs[indexConfigDirArg];
-        // Create config directory if it doesn't exist
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        await fs.mkdir(configDir, { recursive: true });
-      } else {
-        throw Error(
-          `Found '${CliOption.CONFIG_DIRECTORY}' but no config directory`
-        );
-      }
-    }
-
-    // Catch CLI help option
-    if (cliArgs.includes(CliOption.HELP)) {
-      // eslint-disable-next-line no-console
+    if (cliOptions.showHelp) {
       console.log(
         cliHelpGenerator(
           binaryName,
@@ -108,9 +87,13 @@ const entryPoint = async () => {
       );
       process.exit(0);
     }
-
-    // Catch CLI create example files option
-    if (cliArgs.includes(CliOption.CREATE_EXAMPLE_FILES)) {
+    if (cliOptions.customConfigDir !== undefined) {
+      configDir = cliOptions.customConfigDir;
+      // Create config directory if it doesn't exist
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.mkdir(configDir, { recursive: true });
+    }
+    if (cliOptions.createExampleFiles) {
       const logger = createConsoleLogger(
         name,
         getEnvVariableValueOrDefault(
@@ -138,6 +121,21 @@ const entryPoint = async () => {
       ]);
       process.exit(0);
     }
+    if (cliOptions.exportData !== undefined) {
+      for (const exportData of cliOptions.exportData) {
+        console.log(
+          `TODO Export data '${exportData.type}'${
+            exportData.json ? " in JSON format" : ""
+          } to ${
+            exportData.outputFile ? `'${exportData.outputFile}'` : "console"
+          }`
+        );
+        if (exportData.outputFile === undefined) {
+          console.log("TODO");
+          process.exit(0);
+        }
+      }
+    }
 
     // ----------------------------------------------------------
     // Setup necessary globals
@@ -153,10 +151,7 @@ const entryPoint = async () => {
 
     // Print for debugging the (private/secret) environment values to the console
     // (censor critical variables if not explicitly enabled)
-    printEnvVariablesToConsole(
-      configDir,
-      !cliArgs.includes(CliOption.DISABLE_CENSORING)
-    );
+    printEnvVariablesToConsole(configDir, !cliOptions.disableCensoring);
 
     // Create logger
     const logDir = path.resolve(

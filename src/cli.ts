@@ -18,6 +18,63 @@ export interface CliUsageInformation {
   signature: string;
 }
 
+export enum CliOptionSignaturePartType {
+  DIRECTORY,
+  ENUM,
+  FILE,
+  TEXT,
+}
+
+export interface CliOptionSignaturePart {
+  name: string;
+  optional?: boolean;
+  type: CliOptionSignaturePartType;
+}
+export interface CliOptionSignaturePartEnum extends CliOptionSignaturePart {
+  enumValues: string[];
+  type: CliOptionSignaturePartType.ENUM;
+}
+export interface CliOptionSignaturePartOther extends CliOptionSignaturePart {
+  type:
+    | CliOptionSignaturePartType.DIRECTORY
+    | CliOptionSignaturePartType.FILE
+    | CliOptionSignaturePartType.TEXT;
+}
+
+export type CliOptionSignatureParts =
+  | CliOptionSignaturePartOther
+  | CliOptionSignaturePartEnum;
+
+export const cliOptionSignatureToString = (
+  parts: CliOptionSignatureParts[]
+): string =>
+  parts
+    .map((a) => {
+      switch (a.type) {
+        case CliOptionSignaturePartType.DIRECTORY:
+          if (a.optional === true) {
+            return `[${a.name.toUpperCase()}_DIR]`;
+          }
+          return `${a.name.toUpperCase()}_DIR`;
+        case CliOptionSignaturePartType.ENUM:
+          if (a.optional === true) {
+            return `[${a.name.toUpperCase()}]`;
+          }
+          return `${a.name.toUpperCase()}`;
+        case CliOptionSignaturePartType.FILE:
+          if (a.optional === true) {
+            return `[${a.name.toUpperCase()}_FILE]`;
+          }
+          return `${a.name.toUpperCase()}_FILE`;
+        case CliOptionSignaturePartType.TEXT:
+          if (a.optional === true) {
+            return `[${a.name.toUpperCase()}]`;
+          }
+          return `${a.name.toUpperCase()}`;
+      }
+    })
+    .join(" ");
+
 /**
  * Generic information about a CLI option.
  */
@@ -33,7 +90,7 @@ export interface CliOptionInformation<NAME = string> {
   /** The name of the option. */
   name: NAME;
   /** The signature of the option. */
-  signature?: string;
+  signature?: CliOptionSignatureParts[];
 }
 
 export interface CliEnvVariableInformationSupportedValues {
@@ -115,8 +172,8 @@ export const cliHelpGenerator = (
       elements: cliOptionsInformation.map((a) => {
         let description = a.description;
         let content = a.name;
-        if (a.signature) {
-          content += ` ${a.signature}`;
+        if (a.signature !== undefined) {
+          content += ` ${cliOptionSignatureToString(a.signature)}`;
         }
         if (a.default) {
           description += `\nDefault: '${
