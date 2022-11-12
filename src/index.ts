@@ -33,10 +33,10 @@ import { createCustomCommandsBroadcastsDocumentation } from "./documentation/cus
 import { createStringsVariableDocumentation } from "./documentation/strings";
 import { defaultStringMap } from "./info/strings";
 import { genericStringSorter } from "./other/genericStringSorter";
+import { getMoonpieConfigFromEnv } from "./config";
 import { getVersionFromObject } from "./version";
 import { main } from "./main";
 import { version } from "./info/version";
-import { getMoonpieConfigFromEnv } from "./config";
 
 /**
  * The logging ID of this module.

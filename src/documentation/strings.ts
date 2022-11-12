@@ -94,7 +94,8 @@ export const createStringsVariableDocumentation = async (
       isComment: true,
       type: FileDocumentationPartType.VALUE,
       value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}=${escapeStringIfWhiteSpace(
-        stringEntry.default
+        stringEntry.default,
+        { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
       )}`,
     });
     if (
@@ -109,7 +110,10 @@ export const createStringsVariableDocumentation = async (
         dataDefaultStrings.push({
           isComment: true,
           type: FileDocumentationPartType.VALUE,
-          value: `  - ${escapeStringIfWhiteSpace(alternative)}`,
+          value: `  - ${escapeStringIfWhiteSpace(alternative, {
+            escapeCharacters: [["'", "\\'"]],
+            surroundCharacter: "'",
+          })}`,
         });
       }
     }

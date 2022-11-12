@@ -27,6 +27,9 @@ for (const stringEntryToPrint of stringEntriesToPrint) {
   console.log(
     `${ENV_PREFIX_CUSTOM_STRINGS}${
       stringEntryToPrint.id
-    }=${escapeStringIfWhiteSpace(stringEntryToPrint.default)}`
+    }=${escapeStringIfWhiteSpace(stringEntryToPrint.default, {
+      escapeCharacters: [["'", "\\'"]],
+      surroundCharacter: "'",
+    })}`
   );
 }

@@ -339,15 +339,23 @@ export const createEnvVariableDocumentation = async (
           let value = "ERROR";
           if (envVariableInfo.default) {
             const defaultStrOrFunc = envVariableInfo.default;
-            value = `${ENV_PREFIX}${envVariable}=${
+            value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
               typeof defaultStrOrFunc === "function"
-                ? escapeStringIfWhiteSpace(defaultStrOrFunc(configDir))
-                : escapeStringIfWhiteSpace(defaultStrOrFunc)
-            }`;
+                ? defaultStrOrFunc(configDir)
+                : defaultStrOrFunc,
+              {
+                escapeCharacters: [["'", "\\'"]],
+                surroundCharacter: "'",
+              }
+            )}`;
           } else if (envVariableInfo.example) {
             envInfos.push("(The following line is only an example!)");
             value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
-              envVariableInfo.example
+              envVariableInfo.example,
+              {
+                escapeCharacters: [["'", "\\'"]],
+                surroundCharacter: "'",
+              }
             )}`;
           }
           data.push({
