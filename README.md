@@ -9,7 +9,7 @@ A custom Twitch chat bot.
 ![MoonpieBot icon](res/icons/moonpiebot.png)
 
 - [Features](#features)
-  - [Default: moonpie](#default-moonpie)
+  - [Optional: moonpie](#optional-moonpie)
   - [Optional: osu!](#optional-osu)
   - [Optional: Spotify](#optional-spotify)
   - [Default: Custom text/strings/messages](#default-custom-textstringsmessages)
@@ -41,7 +41,7 @@ The following list contains all supported features of the bot.
 
 **All (default) features can be disabled.**
 
-### Default: moonpie
+### Optional: moonpie
 
 - Every day a user can claim a *moonpie* and the count is saved in a persistent database that can be accessed with the following commands:
 

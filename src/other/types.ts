@@ -25,3 +25,10 @@ export const convertUndefinedToCustomValue = <TValue, TCustomValue>(
  * Type that describes a not undefined but empty object.
  */
 export type EMPTY_OBJECT = Record<never, never>;
+
+/**
+ * Type that makes a whole object readonly.
+ *
+ * (Source: https://github.com/microsoft/TypeScript/issues/10725#issuecomment-699193070).
+ */
+export type DeepReadonly<T> = { readonly [K in keyof T]: DeepReadonly<T[K]> };

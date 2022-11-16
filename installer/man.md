@@ -1,6 +1,6 @@
 % MoonpieBot(1) moonpiebot 1.0.30b
 % AnonymerNiklasistanonym
-% October 2022
+% November 2022
 
 # NAME
 
@@ -26,6 +26,12 @@ If this program is installed via a package it will use *$HOME/.local/share/moonp
 
 **----create-example-files**
 : Creates example files (for custom commands and timers) in the specified configuration directory
+
+**----export-data** *TYPE* *[OUTPUT_FILE]*
+: Exports certain data for backups
+
+**----export-data**-json *TYPE* *[OUTPUT_FILE]*
+: Exports certain data for 3rd party support
 
 **----help**
 : Get instructions on how to run and configure this program
@@ -73,7 +79,7 @@ Supported values: "*OFF*", "*ON*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
 Supported list values: "*lurk*" (empty list value: "*none*")
 
-**MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS**="*about,add,claim,commands,delete,get,leaderboard,remove,set*"
+**MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS**="*none*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
 Supported list values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", "*get*", "*leaderboard*", "*remove*", "*set*" (empty list value: "*none*")
 

@@ -211,7 +211,7 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.MOONPIE,
-    default: Object.values(MoonpieCommands).sort().join(","),
+    default: EnvVariableOtherListOptions.NONE,
     description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
     legacyNames: ["ENABLE_COMMANDS"],
     name: EnvVariable.MOONPIE_ENABLE_COMMANDS,
@@ -430,8 +430,7 @@ export const envVariableStructure: EnvVariableStructureElement<EnvVariableBlock>
     },
     {
       block: EnvVariableBlock.MOONPIE,
-      content:
-        "Customize the moonpie functionality that is enabled per default.",
+      content: "Optional moonpie functionality.",
       name: "MOONPIE",
     },
     {

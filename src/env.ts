@@ -220,6 +220,20 @@ export const getEnvVariableValueOrUndefined = (
   }
   return envValue.value;
 };
+export const getEnvVariableValueOrError = (
+  envVariable: EnvVariable,
+  errorMessage?: string
+): string => {
+  const envValueOrUndefined = getEnvVariableValueOrUndefined(envVariable);
+  if (envValueOrUndefined === undefined) {
+    throw Error(
+      errorMessage
+        ? errorMessage
+        : `No environment value was found for ${envVariable}`
+    );
+  }
+  return envValueOrUndefined;
+};
 
 const getEnvVariableValueInformation = (
   envVariable: EnvVariable | string

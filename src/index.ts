@@ -206,7 +206,8 @@ const entryPoint = async () => {
       logIndex.info(`${name} ${versionString} was started (logs: '${logDir}')`);
       logIndex.debug(`Config directory: '${configDir}'`);
       logIndex.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
-      await main(logger, configDir, logDir);
+      const moonpieConfig = getMoonpieConfigFromEnv(configDir);
+      await main(logger, moonpieConfig, logDir);
       logIndex.debug("Main method finished without errors");
     } catch (err) {
       logIndex.error(err as Error);

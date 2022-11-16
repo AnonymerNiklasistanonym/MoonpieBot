@@ -34,7 +34,7 @@ export interface CustomBroadcast {
 
 export const createBroadcastScheduledTask = (
   client: Client,
-  channels: string[],
+  channels: Readonly<string[]>,
   customBroadcast: CustomBroadcast,
   globalStrings: StringMap,
   globalPlugins: PluginMap,

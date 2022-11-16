@@ -92,7 +92,7 @@ export enum TwitchClientListener {
 export const createTwitchClient = (
   twitchName: string | undefined,
   twitchOAuthToken: string | undefined,
-  twitchChannels: string[] | undefined,
+  twitchChannels: Readonly<string[]> | undefined,
   debug = false,
   logger: Logger
 ): Client => {
@@ -132,7 +132,7 @@ export const createTwitchClient = (
 
   // Create Twitch client that can listen to all specified channels
   return new tmiClient({
-    channels: twitchChannels,
+    channels: twitchChannels.slice(),
     connection: {
       reconnect: true,
       secure: true,

@@ -86,7 +86,7 @@ export interface ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledComman
   /**
    * The enabled commands for the current Twitch chat handler.
    */
-  enabledCommands: string[];
+  enabledCommands: Readonly<string[]>;
 }
 
 /**
