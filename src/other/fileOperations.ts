@@ -38,3 +38,14 @@ export const writeJsonFile = async <INPUT>(
   data: INPUT
 ): Promise<void> =>
   await fs.writeFile(filePath, JSON.stringify(data, undefined, JSON_SPACING));
+
+/**
+ * Write a text file.
+ *
+ * @param filePath Path of file/directory.
+ * @param data The new data of the text file.
+ */
+export const writeTextFile = async (
+  filePath: string,
+  data: string
+): Promise<void> => await fs.writeFile(filePath, data);

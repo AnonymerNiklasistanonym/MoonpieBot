@@ -14,6 +14,7 @@ import type { CliOptionInformation } from "../cli";
  */
 export enum CliOption {
   CONFIG_DIRECTORY = "--config-dir",
+  CREATE_BACKUP = "--create-backup",
   CREATE_EXAMPLE_FILES = "--create-example-files",
   DISABLE_CENSORING = "--disable-censoring",
   EXPORT_DATA = "--export-data",
@@ -31,7 +32,7 @@ export const cliOptionsInformation: CliOptionInformation<CliOption>[] = [
       process.cwd() === path.resolve(configDir) ? "." + path.sep : configDir,
     defaultValue: (configDir) => path.resolve(configDir),
     description:
-      "The directory that should contain all configurations and databases if not configured otherwise",
+      "Specify a custom directory that contains all configurations and databases",
     name: CliOption.CONFIG_DIRECTORY,
     signature: [{ name: "config", type: CliOptionSignaturePartType.DIRECTORY }],
   },
@@ -42,8 +43,26 @@ export const cliOptionsInformation: CliOptionInformation<CliOption>[] = [
   },
   {
     description:
-      "Creates example files (for custom commands and timers) in the specified configuration directory",
+      "Create a backup of all configurations and databases that can be found in the specified backup directory",
+    name: CliOption.CREATE_BACKUP,
+    signature: [
+      {
+        name: "backup",
+        type: CliOptionSignaturePartType.DIRECTORY,
+      },
+    ],
+  },
+  {
+    description:
+      "Creates example files (for custom commands and timers) in the specified example files directory if given or the current config directory",
     name: CliOption.CREATE_EXAMPLE_FILES,
+    signature: [
+      {
+        name: "example_files",
+        optional: true,
+        type: CliOptionSignaturePartType.DIRECTORY,
+      },
+    ],
   },
   {
     description: "Exports certain data for backups",
@@ -52,8 +71,8 @@ export const cliOptionsInformation: CliOptionInformation<CliOption>[] = [
       {
         enumValues: [
           "moonpie",
-          "custom_callbacks_broadcasts",
-          "osu_requests_config",
+          "custom_commands_broadcasts",
+          "osu_requests",
           "env",
           "env_strings",
         ],
@@ -74,8 +93,8 @@ export const cliOptionsInformation: CliOptionInformation<CliOption>[] = [
       {
         enumValues: [
           "moonpie",
-          "custom_callbacks_broadcasts",
-          "osu_requests_config",
+          "custom_commands_broadcasts",
+          "osu_requests",
           "env",
           "env_strings",
         ],
@@ -105,10 +124,16 @@ export interface ParsedCliOptionsExportData {
   type: string;
 }
 
+export interface ParsedCliOptionsCreateBackup {
+  backupDir: string;
+}
+
 export interface ParsedCliOptions {
+  createBackup?: ParsedCliOptionsCreateBackup;
   createExampleFiles?: boolean;
   customConfigDir?: string;
   disableCensoring?: boolean;
+  exampleFilesDir?: string;
   exportData?: ParsedCliOptionsExportData[];
   showHelp?: boolean;
   showVersion?: boolean;
@@ -126,6 +151,8 @@ export const parseCliOptions = (cliArgs: string[]): ParsedCliOptions => {
   const options: ParsedCliOptions = {};
 
   let lookingForConfigDir = false;
+  let lookingForBackupDir = false;
+  let lookingForExampleFilesDir = false;
   let lookingForExportDataType = false;
   let lookingForExportDataJsonType = false;
   let lookingForExportDataOutputFile = false;
@@ -135,6 +162,19 @@ export const parseCliOptions = (cliArgs: string[]): ParsedCliOptions => {
       options.customConfigDir = cliArg;
       lookingForConfigDir = false;
       continue;
+    }
+    if (lookingForBackupDir) {
+      return {
+        createBackup: { backupDir: cliArg },
+        customConfigDir: options.customConfigDir,
+      };
+    }
+    if (lookingForExampleFilesDir) {
+      return {
+        createExampleFiles: true,
+        customConfigDir: options.customConfigDir,
+        exampleFilesDir: cliArg,
+      };
     }
     if (lookingForExportDataType) {
       if (options.exportData === undefined) {
@@ -175,8 +215,12 @@ export const parseCliOptions = (cliArgs: string[]): ParsedCliOptions => {
       lookingForConfigDir = true;
       continue;
     }
+    if (cliArg === CliOption.CREATE_BACKUP) {
+      lookingForBackupDir = true;
+      continue;
+    }
     if (cliArg === CliOption.CREATE_EXAMPLE_FILES) {
-      options.createExampleFiles = true;
+      lookingForExampleFilesDir = true;
       continue;
     }
     if (cliArg === CliOption.DISABLE_CENSORING) {
@@ -197,6 +241,15 @@ export const parseCliOptions = (cliArgs: string[]): ParsedCliOptions => {
     throw Error(
       `Found '${CliOption.CONFIG_DIRECTORY}' but no config directory`
     );
+  }
+  if (lookingForBackupDir) {
+    throw Error(`Found '${CliOption.CREATE_BACKUP}' but no backup directory`);
+  }
+  if (lookingForExampleFilesDir) {
+    return {
+      createExampleFiles: true,
+      customConfigDir: options.customConfigDir,
+    };
   }
   if (lookingForExportDataType) {
     throw Error(`Found '${CliOption.EXPORT_DATA}' but no type`);

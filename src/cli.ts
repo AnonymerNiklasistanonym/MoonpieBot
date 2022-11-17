@@ -4,6 +4,7 @@
 
 // Local imports
 import { cliOutputGenerator } from "./documentation/cliOutputGenerator";
+import { genericStringSorter } from "./other/genericStringSorter";
 // Type imports
 import type {
   CliOutputElements,
@@ -58,9 +59,15 @@ export const cliOptionSignatureToString = (
           return `${a.name.toUpperCase()}_DIR`;
         case CliOptionSignaturePartType.ENUM:
           if (a.optional === true) {
-            return `[${a.name.toUpperCase()}]`;
+            return `[${a.enumValues
+              .map((b) => b.toUpperCase())
+              .sort(genericStringSorter)
+              .join("|")}]`;
           }
-          return `${a.name.toUpperCase()}`;
+          return `${a.enumValues
+            .map((b) => b.toUpperCase())
+            .sort(genericStringSorter)
+            .join("|")}`;
         case CliOptionSignaturePartType.FILE:
           if (a.optional === true) {
             return `[${a.name.toUpperCase()}_FILE]`;

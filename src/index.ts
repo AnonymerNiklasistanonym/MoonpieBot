@@ -27,16 +27,22 @@ import {
   fileNameEnvStrings,
   fileNameEnvStringsExample,
 } from "./info/files";
+import {
+  getMoonpieConfigFromEnv,
+  getMoonpieConfigMoonpieFromEnv,
+} from "./info/config/moonpieConfig";
 import { cliHelpGenerator } from "./cli";
 import { createCustomCommandsBroadcastsDocumentation } from "./documentation/customCommandsBroadcasts";
 import { createStringsVariableDocumentation } from "./documentation/strings";
 import { defaultStringMap } from "./info/strings";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getLoggerConfigFromEnv } from "./info/config/loggerConfig";
-import { getMoonpieConfigFromEnv } from "./info/config/moonpieConfig";
 import { getVersionFromObject } from "./version";
 import { main } from "./main";
+import moonpieDb from "./database/moonpieDb";
+import { updateStringsMapWithCustomEnvStrings } from "./messageParser";
 import { version } from "./info/version";
+import { writeTextFile } from "./other/fileOperations";
 
 /**
  * The logging ID of this module.
@@ -94,23 +100,34 @@ const entryPoint = async () => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.mkdir(configDir, { recursive: true });
     }
+    if (cliOptions.createBackup !== undefined) {
+      // TODO
+      console.log(
+        `TODO Create backup in '${cliOptions.createBackup.backupDir}'...`
+      );
+      process.exit(0);
+    }
     if (cliOptions.createExampleFiles) {
+      const exampleFilesDir = cliOptions.exampleFilesDir
+        ? cliOptions.exampleFilesDir
+        : configDir;
+      console.log(`Create example files in '${exampleFilesDir}'...`);
       await Promise.all([
         createEnvVariableDocumentation(
-          path.join(configDir, fileNameEnvExample),
+          path.join(exampleFilesDir, fileNameEnvExample),
           configDir
         ),
         createStringsVariableDocumentation(
-          path.join(configDir, fileNameEnvStringsExample),
+          path.join(exampleFilesDir, fileNameEnvStringsExample),
           defaultStringMap,
           defaultPlugins,
           defaultMacros,
           defaultPluginsOptional,
           defaultMacrosOptional,
-          createConsoleLogger(name)
+          createConsoleLogger(name, "off")
         ),
         createCustomCommandsBroadcastsDocumentation(
-          path.join(configDir, fileNameCustomCommandsBroadcastsExample)
+          path.join(exampleFilesDir, fileNameCustomCommandsBroadcastsExample)
         ),
       ]);
       process.exit(0);
@@ -144,35 +161,72 @@ const entryPoint = async () => {
     // ----------------------------------------------------------
 
     if (cliOptions.exportData !== undefined) {
+      // TODO
       for (const exportData of cliOptions.exportData) {
-        let data = "";
-        switch (exportData.type) {
+        let data = "TODO";
+        switch (exportData.type.toLowerCase()) {
           case "env":
             if (exportData.json) {
-              data = JSON.stringify(getMoonpieConfigFromEnv(configDir));
+              data = JSON.stringify({
+                configDir,
+                loggerConfig: getLoggerConfigFromEnv(configDir),
+                moonpieConfig: getMoonpieConfigFromEnv(configDir),
+              });
             }
-            /* else {
-              data = createEnvVariableDocumentation(
-                path.join(configDir, fileNameEnvExample),
-                configDir
+            break;
+          case "env_strings":
+            if (exportData.json) {
+              const updatedStrings = Array.from(
+                updateStringsMapWithCustomEnvStrings(
+                  defaultStringMap,
+                  createConsoleLogger(name, "off")
+                )
               );
-            }*/
+              data = JSON.stringify({
+                customStrings: updatedStrings
+                  .filter((a) => a[1].updated === true && a[1].custom === true)
+                  .map((a) => ({ id: a[0], value: a[1].default })),
+                defaultStrings: Array.from(defaultStringMap).map((a) => ({
+                  ...a[1],
+                  id: a[0],
+                })),
+                updatedStrings: updatedStrings
+                  .filter((a) => a[1].updated === true && a[1].custom !== true)
+                  .map((a) => ({ id: a[0], value: a[1].default })),
+              });
+            }
+            break;
+          case "moonpie":
+            if (exportData.json) {
+              const config = getMoonpieConfigMoonpieFromEnv(configDir);
+              await moonpieDb.setup(
+                config.databasePath,
+                createConsoleLogger(name, "off")
+              );
+              data = JSON.stringify({
+                databasePath: config.databasePath,
+                moonpieCounts:
+                  await moonpieDb.backup.exportMoonpieCountTableToJson(
+                    config.databasePath,
+                    createConsoleLogger(name, "off")
+                  ),
+              });
+            }
             break;
           default:
-            break;
+            throw Error(`Unknown export data type '${exportData.type}'`);
         }
         if (exportData.outputFile) {
           console.log(
-            `TODO Export data '${exportData.type}'${
+            `Export data '${exportData.type}'${
               exportData.json ? " in JSON format" : ""
-            } to ${
-              exportData.outputFile ? `'${exportData.outputFile}'` : "console"
-            }`
+            } to '${exportData.outputFile}'...`
           );
+          await writeTextFile(exportData.outputFile, data);
         } else {
           console.log(data);
-          process.exit(0);
         }
+        process.exit(0);
       }
     }
 

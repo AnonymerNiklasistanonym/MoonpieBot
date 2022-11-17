@@ -115,25 +115,7 @@ export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
   },
   // > Moonpie
   // eslint-disable-next-line sort-keys
-  moonpie: {
-    claimCooldownHours: convertToInt(
-      getEnvVariableValueOrDefault(
-        EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS,
-        configDir
-      ),
-      "The moonpie claim cooldown hours number string could not be parsed to an integer"
-    ),
-    databasePath: path.resolve(
-      configDir,
-      getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
-    ),
-    enableCommands: convertToStringArray(
-      getEnvVariableValueOrDefault(
-        EnvVariable.MOONPIE_ENABLE_COMMANDS,
-        configDir
-      )
-    ),
-  },
+  moonpie: getMoonpieConfigMoonpieFromEnv(configDir),
   // > Spotify
   spotify: {
     databasePath: path.resolve(
@@ -237,4 +219,23 @@ export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
       getEnvVariableValueOrDefault(EnvVariable.LURK_ENABLED_COMMANDS, configDir)
     ),
   },
+});
+
+export const getMoonpieConfigMoonpieFromEnv: GetConfig<MoonpieConfigMoonpie> = (
+  configDir
+) => ({
+  claimCooldownHours: convertToInt(
+    getEnvVariableValueOrDefault(
+      EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS,
+      configDir
+    ),
+    "The moonpie claim cooldown hours number string could not be parsed to an integer"
+  ),
+  databasePath: path.resolve(
+    configDir,
+    getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
+  ),
+  enableCommands: convertToStringArray(
+    getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS, configDir)
+  ),
 });
