@@ -22,6 +22,7 @@ import {
   generatePluginMap,
   updateStringsMapWithCustomEnvStrings,
 } from "./messageParser";
+import { MoonpieCommands, OsuCommands } from "./info/commands";
 import { createLogFunc } from "./logging";
 import { customCommandChatHandler } from "./customCommandsBroadcasts/customCommand";
 import { customCommandsBroadcastsChatHandler } from "./commands/customCommandsBroadcasts";
@@ -36,7 +37,6 @@ import { moonpieChatHandler } from "./commands/moonpie";
 import moonpieDb from "./database/moonpieDb";
 import { name } from "./info/general";
 import { osuChatHandler } from "./commands/osu";
-import { OsuCommands } from "./info/commands";
 import { OsuRequestsConfig } from "./info/databases/osuRequestsDb";
 import osuRequestsDb from "./database/osuRequestsDb";
 import { pluginCountGenerator } from "./info/plugins/count";
@@ -163,7 +163,9 @@ export const main = async (
     // Only touch the database if it will be used
     if (
       config.moonpie !== undefined &&
-      config.moonpie.enableCommands.length > 0
+      config.moonpie.enableCommands.filter(
+        (a) => a !== MoonpieCommands.COMMANDS && a !== MoonpieCommands.ABOUT
+      ).length > 0
     ) {
       // Setup database tables (or do nothing if they already exist)
       await moonpieDb.setup(config.moonpie.databasePath, logger);
@@ -175,7 +177,9 @@ export const main = async (
     // Only touch the database if it will be used
     if (
       config.osu !== undefined &&
-      config.osu.enableCommands.length > 0 &&
+      config.osu.enableCommands.filter(
+        (a) => a !== OsuCommands.COMMANDS && a !== OsuCommands.NP
+      ).length > 0 &&
       enableOsuApi
     ) {
       // Setup database tables (or do nothing if they already exist)

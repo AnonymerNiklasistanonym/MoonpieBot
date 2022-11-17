@@ -19,18 +19,21 @@ If this program is installed via a package it will use *$HOME/.local/share/moonp
 # OPTIONS
 
 **----config-dir** *CONFIG_DIR*
-: The directory that should contain all configurations and databases if not configured otherwise
+: Specify a custom directory that contains all configurations and databases
 
 **----disable-censoring**
 : Disabling the censoring stops the censoring of private tokens which is helpful to debug if the inputs are read correctly but should otherwise be avoided
 
-**----create-example-files**
-: Creates example files (for custom commands and timers) in the specified configuration directory
+**----create-backup** *BACKUP_DIR*
+: Create a backup of all configurations and databases that can be found in the specified backup directory
 
-**----export-data** *TYPE* *[OUTPUT_FILE]*
+**----create-example-files** *[EXAMPLE_FILES_DIR]*
+: Creates example files (for custom commands and timers) in the specified example files directory if given or the current config directory
+
+**----export-data** *CUSTOM_COMMANDS_BROADCASTS|ENV|ENV_STRINGS|MOONPIE|OSU_REQUESTS_CONFIG* *[OUTPUT_FILE]*
 : Exports certain data for backups
 
-**----export-data**-json *TYPE* *[OUTPUT_FILE]*
+**----export-data**-json *CUSTOM_COMMANDS_BROADCASTS|ENV|ENV_STRINGS|MOONPIE|OSU_REQUESTS_CONFIG* *[OUTPUT_FILE]*
 : Exports certain data for 3rd party support
 
 **----help**
@@ -61,7 +64,7 @@ Supported values: "*debug*", "*error*", "*info*", "*warn*"
 
 **MOONPIE_CONFIG_TWITCH_CHANNELS**
 : A with a space separated list of all the channels the bot should be active.
-Example: "*twitch_channel_name1 twitch_channel_name2*"
+Example: "*twitch_channel_name1,twitch_channel_name2*"
 
 **MOONPIE_CONFIG_TWITCH_NAME**
 : The name of the twitch account that should be imitated.
@@ -79,7 +82,7 @@ Supported values: "*OFF*", "*ON*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
 Supported list values: "*lurk*" (empty list value: "*none*")
 
-**MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS**="*none*"
+**MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS**="*about,commands*"
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
 Supported list values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", "*get*", "*leaderboard*", "*remove*", "*set*" (empty list value: "*none*")
 
@@ -105,19 +108,21 @@ Example: "*dadasfsafsafdsadffasfsafasfa*"
 : The default osu! account ID used to check for recent play or a top play on a map.
 Example: "*1185432*"
 
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS**="*OFF*"
-: Automatically recognize osu! beatmap links (=requests) in chat.
+**MOONPIE_CONFIG_OSU_API_REQUESTS_ON**
+: Automatically recognize osu! beatmap links (=requests) in chat. This can also be set at runtime (MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=requests) and stored persistently in a database (MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH) but if provided will override the current value in the database on start of the bot.
+Example: "*ON*"
 Supported values: "*OFF*", "*ON*"
 
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH**="*osu_map_requests.db*"
+**MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH**="*osu_requests_config.db*"
 : The database file path that contains the persistent osu! map requests data.
 
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED**="*OFF*"
-: If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) additionally output more detailed information about the map in the chat. This can also be set at runtime and stored persistently in a database but if provided will override the current value in the database on start of the bot.
+**MOONPIE_CONFIG_OSU_API_REQUESTS_DETAILED**
+: If recognizing is enabled (MOONPIE_CONFIG_OSU_API_REQUESTS_ON=ON) additionally output more detailed information about the map in the chat. This can also be set at runtime (MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=requests) and stored persistently in a database (MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH) but if provided will override the current value in the database on start of the bot.
+Example: "*ON*"
 Supported values: "*OFF*", "*ON*"
 
-**MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID**
-: If recognizing is enabled (MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON) make it that only messages that used a channel point redeem will be recognized as requests. This can also be set at runtime and stored persistently in a database but if provided will override the current value in the database on start of the bot.
+**MOONPIE_CONFIG_OSU_API_REQUESTS_REDEEM_ID**
+: If recognizing is enabled (MOONPIE_CONFIG_OSU_API_REQUESTS_ON=ON) make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime (MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=requests) and stored persistently in a database (MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH) but if provided will override the current value in the database on start of the bot.
 Example: "*651f5474-07c2-4406-9e59-37d66fd34069*"
 
 **MOONPIE_CONFIG_OSU_IRC_PASSWORD**

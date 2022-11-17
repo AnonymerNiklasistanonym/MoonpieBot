@@ -2,6 +2,9 @@
 import path from "path";
 // Local imports
 import {
+  convertFromBoolean,
+  convertFromInteger,
+  convertFromStringArray,
   convertToBoolean,
   convertToBooleanIfNotUndefined,
   convertToInt,
@@ -15,7 +18,7 @@ import {
 } from "../../env";
 import { EnvVariable } from "../env";
 // Type imports
-import type { GetConfig } from "../../config";
+import type { GetConfig, GetCustomEnvValueFromConfig } from "../../config";
 
 export interface MoonpieConfigTwitch {
   channels: string[];
@@ -105,7 +108,7 @@ export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
     name: getEnvVariableValueOrError(EnvVariable.TWITCH_NAME),
     oAuthToken: getEnvVariableValueOrError(EnvVariable.TWITCH_OAUTH_TOKEN),
   },
-  // Twitch API
+  // > Twitch API
   twitchApi: {
     // eslint-disable-next-line sort-keys
     accessToken: getEnvVariableValueOrUndefined(
@@ -148,19 +151,14 @@ export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
   },
   // > osu! API
   osuApi: {
-    beatmapRequests: convertToBoolean(
-      getEnvVariableValueOrDefault(
-        EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS,
-        configDir
-      )
+    beatmapRequests: convertToBooleanIfNotUndefined(
+      getEnvVariableValueOrUndefined(EnvVariable.OSU_API_REQUESTS_ON)
     ),
     beatmapRequestsDetailed: convertToBooleanIfNotUndefined(
-      getEnvVariableValueOrUndefined(
-        EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED
-      )
+      getEnvVariableValueOrUndefined(EnvVariable.OSU_API_REQUESTS_DETAILED)
     ),
     beatmapRequestsRedeemId: getEnvVariableValueOrUndefined(
-      EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID
+      EnvVariable.OSU_API_REQUESTS_REDEEM_ID
     ),
     clientId: convertToIntIfNotUndefined(
       getEnvVariableValueOrUndefined(EnvVariable.OSU_API_CLIENT_ID),
@@ -172,7 +170,7 @@ export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
     databasePath: path.resolve(
       configDir,
       getEnvVariableValueOrDefault(
-        EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH,
+        EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
         configDir
       )
     ),
@@ -239,3 +237,109 @@ export const getMoonpieConfigMoonpieFromEnv: GetConfig<MoonpieConfigMoonpie> = (
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS, configDir)
   ),
 });
+
+export const getCustomEnvValueFromMoonpieConfig: GetCustomEnvValueFromConfig<
+  MoonpieConfig
+> = (envVariable, config) => {
+  // Twitch connection
+  if (envVariable === EnvVariable.TWITCH_CHANNELS) {
+    return convertFromStringArray(config.twitch.channels);
+  }
+  if (envVariable === EnvVariable.TWITCH_DEBUG) {
+    return convertFromBoolean(config.twitch?.debug);
+  }
+  if (envVariable === EnvVariable.TWITCH_NAME) {
+    return config.twitch.name;
+  }
+  if (envVariable === EnvVariable.TWITCH_OAUTH_TOKEN) {
+    return config.twitch.oAuthToken;
+  }
+  // > Twitch API
+  if (envVariable === EnvVariable.TWITCH_API_ACCESS_TOKEN) {
+    return config.twitchApi?.accessToken;
+  }
+  if (envVariable === EnvVariable.TWITCH_API_CLIENT_ID) {
+    return config.twitchApi?.clientId;
+  }
+  // > Moonpie
+  if (envVariable === EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS) {
+    return convertFromInteger(config.moonpie?.claimCooldownHours);
+  }
+  if (envVariable === EnvVariable.MOONPIE_DATABASE_PATH) {
+    return config.moonpie?.databasePath;
+  }
+  if (envVariable === EnvVariable.MOONPIE_ENABLE_COMMANDS) {
+    return convertFromStringArray(config.moonpie?.enableCommands);
+  }
+  // > Spotify
+  if (envVariable === EnvVariable.SPOTIFY_DATABASE_PATH) {
+    return config.spotify?.databasePath;
+  }
+  if (envVariable === EnvVariable.SPOTIFY_ENABLE_COMMANDS) {
+    return convertFromStringArray(config.spotify?.enableCommands);
+  }
+  // > Spotify API
+  if (envVariable === EnvVariable.SPOTIFY_API_CLIENT_ID) {
+    return config.spotifyApi?.clientId;
+  }
+  if (envVariable === EnvVariable.SPOTIFY_API_CLIENT_SECRET) {
+    return config.spotifyApi?.clientSecret;
+  }
+  if (envVariable === EnvVariable.SPOTIFY_API_REFRESH_TOKEN) {
+    return config.spotifyApi?.refreshToken;
+  }
+  // > osu!
+  if (envVariable === EnvVariable.OSU_ENABLE_COMMANDS) {
+    return convertFromStringArray(config.osu?.enableCommands);
+  }
+  // > osu! API
+  if (envVariable === EnvVariable.OSU_API_REQUESTS_ON) {
+    return convertFromBoolean(config.osuApi?.beatmapRequests);
+  }
+  if (envVariable === EnvVariable.OSU_API_REQUESTS_DETAILED) {
+    return convertFromBoolean(config.osuApi?.beatmapRequestsDetailed);
+  }
+  if (envVariable === EnvVariable.OSU_API_REQUESTS_REDEEM_ID) {
+    return config.osuApi?.beatmapRequestsRedeemId;
+  }
+  if (envVariable === EnvVariable.OSU_API_CLIENT_ID) {
+    return convertFromInteger(config.osuApi?.clientId);
+  }
+  if (envVariable === EnvVariable.OSU_API_CLIENT_SECRET) {
+    return config.osuApi?.clientSecret;
+  }
+  if (envVariable === EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH) {
+    return config.osuApi?.databasePath;
+  }
+  if (envVariable === EnvVariable.OSU_API_DEFAULT_ID) {
+    return convertFromInteger(config.osuApi?.defaultId);
+  }
+  // > osu! IRC
+  if (envVariable === EnvVariable.OSU_IRC_PASSWORD) {
+    return config.osuIrc?.password;
+  }
+  if (envVariable === EnvVariable.OSU_IRC_USERNAME) {
+    return config.osuIrc?.username;
+  }
+  // > osu! StreamCompanion
+  if (envVariable === EnvVariable.OSU_STREAM_COMPANION_DIR_PATH) {
+    return config.osuStreamCompanion?.dirPath;
+  }
+  if (envVariable === EnvVariable.OSU_STREAM_COMPANION_URL) {
+    return config.osuStreamCompanion?.url;
+  }
+  // > Custom commands and broadcasts
+  if (envVariable === EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH) {
+    return config.customCommandsBroadcasts?.databasePath;
+  }
+  if (envVariable === EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS) {
+    return convertFromStringArray(
+      config.customCommandsBroadcasts?.enableCommands
+    );
+  }
+  // > Lurk
+  if (envVariable === EnvVariable.LURK_ENABLED_COMMANDS) {
+    return convertFromStringArray(config.lurk?.enableCommands);
+  }
+  return undefined;
+};

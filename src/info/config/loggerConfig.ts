@@ -4,7 +4,7 @@ import path from "path";
 import { EnvVariable } from "../env";
 import { getEnvVariableValueOrDefault } from "../../env";
 // Type imports
-import type { GetConfig } from "../../config";
+import type { GetConfig, GetCustomEnvValueFromConfig } from "../../config";
 
 export interface LoggerConfig {
   logDir: string;
@@ -27,3 +27,18 @@ export const getLoggerConfigFromEnv: GetConfig<LoggerConfig> = (configDir) => ({
     configDir
   ),
 });
+
+export const getCustomEnvValueFromLoggerConfig: GetCustomEnvValueFromConfig<
+  LoggerConfig
+> = (envVariable, config) => {
+  if (envVariable === EnvVariable.LOGGING_DIRECTORY_PATH) {
+    return config.logDir;
+  }
+  if (envVariable === EnvVariable.LOGGING_CONSOLE_LOG_LEVEL) {
+    return config.logLevelConsole;
+  }
+  if (envVariable === EnvVariable.LOGGING_FILE_LOG_LEVEL) {
+    return config.logLevelFile;
+  }
+  return undefined;
+};

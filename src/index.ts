@@ -26,8 +26,7 @@ import {
   exportDataEnvStrings,
   exportDataMoonpie,
   exportDataOsuRequests,
-  exportDataSpotify,
-} from "./export";
+} from "./info/export/exportData";
 import {
   fileNameCustomCommandsBroadcastsExample,
   fileNameEnv,
@@ -39,6 +38,7 @@ import { cliHelpGenerator } from "./cli";
 import { createCustomCommandsBroadcastsDocumentation } from "./documentation/customCommandsBroadcasts";
 import { createStringsVariableDocumentation } from "./documentation/strings";
 import { defaultStringMap } from "./info/strings";
+import { ExportDataTypes } from "./info/export";
 import { fileExists } from "./other/fileOperations";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getLoggerConfigFromEnv } from "./info/config/loggerConfig";
@@ -108,6 +108,8 @@ const entryPoint = async () => {
         ? cliOptions.exampleFilesDir
         : configDir;
       console.log(`Create example files in '${exampleFilesDir}'...`);
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.mkdir(exampleFilesDir, { recursive: true });
       await Promise.all([
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(
@@ -152,6 +154,8 @@ const entryPoint = async () => {
     if (cliOptions.createBackup !== undefined) {
       const backupDir = cliOptions.createBackup.backupDir;
       console.log(`Create backup in '${backupDir}'...`);
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.mkdir(backupDir, { recursive: true });
       // ENV variables
       console.log(`Create '${fileNameEnv}' file in '${backupDir}'...`);
       // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -204,27 +208,24 @@ const entryPoint = async () => {
     if (cliOptions.exportData !== undefined) {
       for (const exportData of cliOptions.exportData) {
         let data;
-        switch (exportData.type.toLowerCase()) {
-          case "custom_commands_broadcasts":
+        switch (exportData.type.toUpperCase()) {
+          case ExportDataTypes.CUSTOM_COMMANDS_BROADCASTS:
             data = await exportDataCustomCommandsBroadcasts(
               configDir,
               exportData.json
             );
             break;
-          case "env":
+          case ExportDataTypes.ENV:
             data = await exportDataEnv(configDir, exportData.json);
             break;
-          case "env_strings":
+          case ExportDataTypes.ENV_STRINGS:
             data = await exportDataEnvStrings(configDir, exportData.json);
             break;
-          case "moonpie":
+          case ExportDataTypes.MOONPIE:
             data = await exportDataMoonpie(configDir, exportData.json);
             break;
-          case "osu_requests":
+          case ExportDataTypes.OSU_REQUESTS_CONFIG:
             data = await exportDataOsuRequests(configDir, exportData.json);
-            break;
-          case "spotify":
-            data = await exportDataSpotify(configDir, exportData.json);
             break;
           default:
             throw Error(`Unknown export data type '${exportData.type}'`);
@@ -235,6 +236,10 @@ const entryPoint = async () => {
               exportData.json ? " in JSON format" : ""
             } to '${exportData.outputFile}'...`
           );
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          await fs.mkdir(path.dirname(exportData.outputFile), {
+            recursive: true,
+          });
           // eslint-disable-next-line security/detect-non-literal-fs-filename
           await fs.writeFile(exportData.outputFile, data);
         } else {

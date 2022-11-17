@@ -25,15 +25,17 @@ const envStringsExampleFile = path.join(configDir, fileNameEnvStringsExample);
 
 // -----------------------------------------------------------------------------
 
-console.log(`Create ENV example file '${envExampleFile}'...`);
-console.log(`Create ENV strings example file '${envStringsExampleFile}'...`);
-
-Promise.all([
+const createEnvExampleFile = async (filePath: string) => {
+  console.log(`Create ENV example file '${filePath}'...`);
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(envExampleFile, createEnvVariableDocumentation(configDir)),
+  await fs.writeFile(filePath, createEnvVariableDocumentation(configDir));
+};
+
+const createEnvStringsExampleFile = async (filePath: string) => {
+  console.log(`Create ENV strings example file '${filePath}'...`);
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
-    envStringsExampleFile,
+    filePath,
     await createStringsVariableDocumentation(
       defaultStringMap,
       defaultPlugins,
@@ -42,5 +44,10 @@ Promise.all([
       defaultMacrosOptional,
       logger
     )
-  ),
+  );
+};
+
+Promise.all([
+  createEnvExampleFile(envExampleFile),
+  createEnvStringsExampleFile(envStringsExampleFile),
 ]).catch(console.error);

@@ -7,6 +7,7 @@ import { defaultStringMap } from "../info/strings";
 import { ENV_PREFIX_CUSTOM_STRINGS } from "../info/env";
 import { escapeStringIfWhiteSpace } from "../other/whiteSpaceChecker";
 import { generatePluginAndMacroDocumentation } from "../documentation/messageParser";
+import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
 import type {
   FileDocumentationParts,
@@ -29,9 +30,7 @@ export const createStringsVariableDocumentation = async (
   optionalPlugins?: MessageParserPluginInfo[],
   optionalMacros?: MessageParserMacroDocumentation[],
   logger?: Logger,
-  // TODO Add custom values to the documentation instead of the default ones
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _updatedStringsMap?: StringMap
+  updatedStringsMap?: StringMap
 ): Promise<string> => {
   const data: FileDocumentationParts[] = [];
   data.push({
@@ -98,6 +97,25 @@ export const createStringsVariableDocumentation = async (
         { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
       )}`,
     });
+    if (updatedStringsMap !== undefined) {
+      const updatedString = updatedStringsMap.get(key);
+      if (
+        updatedString !== undefined &&
+        updatedString.default !== stringEntry.default
+      ) {
+        dataDefaultStrings.push({
+          text: "  Custom value:",
+          type: FileDocumentationPartType.TEXT,
+        });
+        dataDefaultStrings.push({
+          type: FileDocumentationPartType.VALUE,
+          value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}=${escapeStringIfWhiteSpace(
+            updatedString.default,
+            { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
+          )}`,
+        });
+      }
+    }
     if (
       stringEntry.alternatives !== undefined &&
       stringEntry.alternatives.length > 0
@@ -119,6 +137,30 @@ export const createStringsVariableDocumentation = async (
     }
   }
   data.push(...dataDefaultStrings);
+
+  if (updatedStringsMap !== undefined) {
+    const customStrings = Array.from(updatedStringsMap)
+      .filter((a) => a[1].custom === true)
+      .sort((a, b) => genericStringSorter(a[0], b[0]));
+    if (customStrings.length > 0) {
+      data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
+      data.push({
+        description:
+          "Strings that can be used as references and are not part of the default strings.",
+        title: "Custom Strings",
+        type: FileDocumentationPartType.HEADING,
+      });
+    }
+    for (const [customStringId, customStringValue] of customStrings) {
+      data.push({
+        type: FileDocumentationPartType.VALUE,
+        value: `${ENV_PREFIX_CUSTOM_STRINGS}${customStringId}=${escapeStringIfWhiteSpace(
+          customStringValue.default,
+          { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
+        )}`,
+      });
+    }
+  }
 
   return fileDocumentationGenerator(data);
 };

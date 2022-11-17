@@ -1,3 +1,5 @@
+// Package imports
+import path from "path";
 // Local imports
 import {
   ENV_LIST_SPLIT_CHARACTER,
@@ -11,6 +13,8 @@ import {
   FileDocumentationPartType,
 } from "./documentation/fileDocumentationGenerator";
 import { escapeStringIfWhiteSpace } from "./other/whiteSpaceChecker";
+import { getCustomEnvValueFromLoggerConfig } from "./info/config/loggerConfig";
+import { getCustomEnvValueFromMoonpieConfig } from "./info/config/moonpieConfig";
 // Type imports
 import type { CliEnvVariableInformation } from "./cli";
 import type { DeepReadonly } from "./other/types";
@@ -19,7 +23,11 @@ import type { LoggerConfig } from "./info/config/loggerConfig";
 import type { MoonpieConfig } from "./info/config/moonpieConfig";
 
 export interface EnvVariableStructureTextBlock {
+  /** The description of the text block. */
   content: string;
+  /** Set true if it should only appear in example files. */
+  exampleFile?: boolean;
+  /** The name of the text block. */
   name: string;
 }
 export interface EnvVariableStructureVariablesBlock<BLOCK = string>
@@ -296,15 +304,18 @@ export const getEnvVariableName = (
 
 export const createEnvVariableDocumentation = (
   configDir: string,
-  // TODO Add custom values to the documentation instead of the default ones
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _loggerConfig?: DeepReadonly<LoggerConfig>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _moonpieConfig?: DeepReadonly<MoonpieConfig>
+  loggerConfig?: DeepReadonly<LoggerConfig>,
+  moonpieConfig?: DeepReadonly<MoonpieConfig>
 ): string => {
   const data: FileDocumentationParts[] = [];
+  const documentWithCustomConfigValues =
+    loggerConfig !== undefined || moonpieConfig !== undefined;
 
   for (const structurePart of envVariableStructure) {
+    // Skip structure parts that should only appear i example files
+    if (structurePart.exampleFile && documentWithCustomConfigValues) {
+      continue;
+    }
     if ("block" in structurePart) {
       // Variable documentation block
       data.push({
@@ -360,12 +371,63 @@ export const createEnvVariableDocumentation = (
             envInfos.push("KEEP THIS VARIABLE PRIVATE!");
           }
           let value = "ERROR";
+          let defaultConfigValue: string | undefined;
           if (envVariableInfo.default) {
             const defaultStrOrFunc = envVariableInfo.default;
-            value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
+            defaultConfigValue =
               typeof defaultStrOrFunc === "function"
                 ? defaultStrOrFunc(configDir)
-                : defaultStrOrFunc,
+                : defaultStrOrFunc;
+          }
+          let defaultConfigValueValue: string | undefined;
+          if (envVariableInfo.defaultValue) {
+            const defaultStrOrFuncValue = envVariableInfo.defaultValue;
+            defaultConfigValueValue =
+              typeof defaultStrOrFuncValue === "function"
+                ? defaultStrOrFuncValue(configDir)
+                : defaultStrOrFuncValue;
+          }
+          let customConfigValue: string | undefined;
+          if (loggerConfig !== undefined && customConfigValue === undefined) {
+            customConfigValue = getCustomEnvValueFromLoggerConfig(
+              envVariable,
+              loggerConfig
+            );
+          }
+          if (moonpieConfig !== undefined && customConfigValue === undefined) {
+            customConfigValue = getCustomEnvValueFromMoonpieConfig(
+              envVariable,
+              moonpieConfig
+            );
+          }
+          if (
+            customConfigValue !== undefined &&
+            customConfigValue !== defaultConfigValue &&
+            customConfigValue !== defaultConfigValueValue
+          ) {
+            if (defaultConfigValue !== undefined) {
+              envInfos.push(
+                `(Default value: ${escapeStringIfWhiteSpace(
+                  defaultConfigValue,
+                  {
+                    escapeCharacters: [["'", "\\'"]],
+                    surroundCharacter: "'",
+                  }
+                )})`
+              );
+            }
+            value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
+              defaultConfigValueValue !== undefined
+                ? path.relative(configDir, customConfigValue)
+                : customConfigValue,
+              {
+                escapeCharacters: [["'", "\\'"]],
+                surroundCharacter: "'",
+              }
+            )}`;
+          } else if (defaultConfigValue !== undefined) {
+            value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
+              defaultConfigValue,
               {
                 escapeCharacters: [["'", "\\'"]],
                 surroundCharacter: "'",
@@ -387,7 +449,13 @@ export const createEnvVariableDocumentation = (
               prefix: ">",
               text: envVariableInfo.description,
             },
-            isComment: !envVariableInfo.required,
+            // Do not comment value line if required or custom value exists
+            isComment: !(
+              envVariableInfo.required ||
+              (customConfigValue !== undefined &&
+                customConfigValue !== defaultConfigValue &&
+                customConfigValue !== defaultConfigValueValue)
+            ),
             type: FileDocumentationPartType.VALUE,
             value,
           });

@@ -65,10 +65,10 @@ export enum EnvVariable {
   OSU_API_CLIENT_ID = "OSU_API_CLIENT_ID",
   OSU_API_CLIENT_SECRET = "OSU_API_CLIENT_SECRET",
   OSU_API_DEFAULT_ID = "OSU_API_DEFAULT_ID",
-  OSU_API_RECOGNIZE_MAP_REQUESTS = "OSU_API_RECOGNIZE_MAP_REQUESTS",
-  OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH = "OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH",
-  OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED = "OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED",
-  OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID = "OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID",
+  OSU_API_REQUESTS_CONFIG_DATABASE_PATH = "OSU_API_REQUESTS_CONFIG_DATABASE_PATH",
+  OSU_API_REQUESTS_DETAILED = "OSU_API_REQUESTS_DETAILED",
+  OSU_API_REQUESTS_ON = "OSU_API_REQUESTS_ON",
+  OSU_API_REQUESTS_REDEEM_ID = "OSU_API_REQUESTS_REDEEM_ID",
   OSU_ENABLE_COMMANDS = "OSU_ENABLE_COMMANDS",
   OSU_IRC_PASSWORD = "OSU_IRC_PASSWORD",
   OSU_IRC_REQUEST_TARGET = "OSU_IRC_REQUEST_TARGET",
@@ -130,7 +130,9 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
-    default: Object.values(CustomCommandsBroadcastsCommands).sort().join(","),
+    default: Object.values(CustomCommandsBroadcastsCommands)
+      .sort()
+      .join(ENV_LIST_SPLIT_CHARACTER),
     description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
     name: EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
     supportedValues: {
@@ -169,7 +171,9 @@ export const envVariableInformation: CliEnvVariableInformation<
     block: EnvVariableBlock.TWITCH,
     description:
       "A with a space separated list of all the channels the bot should be active.",
-    example: "twitch_channel_name1 twitch_channel_name2",
+    example: ["twitch_channel_name1", "twitch_channel_name2"].join(
+      ENV_LIST_SPLIT_CHARACTER
+    ),
     legacyNames: ["TWITCH_CHANNEL"],
     name: EnvVariable.TWITCH_CHANNELS,
     required: true,
@@ -211,7 +215,9 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.MOONPIE,
-    default: EnvVariableOtherListOptions.NONE,
+    default: [MoonpieCommands.ABOUT, MoonpieCommands.COMMANDS]
+      .sort()
+      .join(ENV_LIST_SPLIT_CHARACTER),
     description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
     legacyNames: ["ENABLE_COMMANDS"],
     name: EnvVariable.MOONPIE_ENABLE_COMMANDS,
@@ -242,7 +248,7 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.OSU,
-    default: Object.values(OsuCommands).sort().join(","),
+    default: Object.values(OsuCommands).sort().join(ENV_LIST_SPLIT_CHARACTER),
     description: `${ENABLE_COMMANDS_DEFAULT_DESCRIPTION} If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!`,
     name: EnvVariable.OSU_ENABLE_COMMANDS,
     supportedValues: {
@@ -278,36 +284,43 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.OSU_API,
-    default: EnvVariableOnOff.OFF,
-    description:
-      "Automatically recognize osu! beatmap links (=requests) in chat.",
-    legacyNames: ["OSU_RECOGNIZE_MAP_REQUESTS"],
-    name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS,
+    description: `Automatically recognize osu! beatmap links (=requests) in chat. This can also be set at runtime (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS}) and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
+    example: EnvVariableOnOff.ON,
+    legacyNames: [
+      "OSU_RECOGNIZE_MAP_REQUESTS",
+      "OSU_API_RECOGNIZE_MAP_REQUESTS",
+    ],
+    name: EnvVariable.OSU_API_REQUESTS_ON,
     supportedValues: { values: Object.values(EnvVariableOnOff) },
   },
   {
     block: EnvVariableBlock.OSU_API,
     default: (configDir) =>
-      path.relative(configDir, path.join(configDir, "osu_map_requests.db")),
+      path.relative(configDir, path.join(configDir, "osu_requests_config.db")),
     defaultValue: (configDir) =>
-      path.resolve(path.join(configDir, "osu_map_requests.db")),
+      path.resolve(path.join(configDir, "osu_requests_config.db")),
     description:
       "The database file path that contains the persistent osu! map requests data.",
-    name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH,
+    legacyNames: ["OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH"],
+    name: EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
   },
   {
     block: EnvVariableBlock.OSU_API,
-    default: EnvVariableOnOff.OFF,
-    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) additionally output more detailed information about the map in the chat. This can also be set at runtime and stored persistently in a database but if provided will override the current value in the database on start of the bot.`,
-    legacyNames: ["OSU_RECOGNIZE_MAP_REQUESTS_DETAILED"],
-    name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED,
+    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_ON}=${EnvVariableOnOff.ON}) additionally output more detailed information about the map in the chat. This can also be set at runtime (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS}) and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
+    example: EnvVariableOnOff.ON,
+    legacyNames: [
+      "OSU_RECOGNIZE_MAP_REQUESTS_DETAILED",
+      "OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED",
+    ],
+    name: EnvVariable.OSU_API_REQUESTS_DETAILED,
     supportedValues: { values: Object.values(EnvVariableOnOff) },
   },
   {
     block: EnvVariableBlock.OSU_API,
-    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS}=${EnvVariableOnOff.ON}) make it that only messages that used a channel point redeem will be recognized as requests. This can also be set at runtime and stored persistently in a database but if provided will override the current value in the database on start of the bot.`,
+    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_ON}=${EnvVariableOnOff.ON}) make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS}) and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
     example: "651f5474-07c2-4406-9e59-37d66fd34069",
-    name: EnvVariable.OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID,
+    legacyNames: ["OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID"],
+    name: EnvVariable.OSU_API_REQUESTS_REDEEM_ID,
   },
   {
     block: EnvVariableBlock.OSU_IRC,
@@ -344,7 +357,9 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.SPOTIFY,
-    default: Object.values(SpotifyCommands).sort().join(","),
+    default: Object.values(SpotifyCommands)
+      .sort()
+      .join(ENV_LIST_SPLIT_CHARACTER),
     description: `${ENABLE_COMMANDS_DEFAULT_DESCRIPTION} If you don't provide Spotify API credentials the commands won't be enabled!`,
     name: EnvVariable.SPOTIFY_ENABLE_COMMANDS,
     supportedValues: {
@@ -407,10 +422,12 @@ export const envVariableStructure: EnvVariableStructureElement<EnvVariableBlock>
     {
       content:
         "This is an example config file for the MoonpieBot that contains all environment variables that the bot uses.",
+      exampleFile: true,
       name: "File description",
     },
     {
       content: `You can either set the variables yourself or copy this file, rename it from \`${fileNameEnvExample}\` to \`${fileNameEnv}\` and edit it with your own values since this is just an example to show how it should look.`,
+      exampleFile: true,
       name: "File purpose",
     },
     {

@@ -1,9 +1,18 @@
 // Local imports
-import { EnvVariableOnOff, EnvVariableOtherListOptions } from "./info/env";
+import {
+  ENV_LIST_SPLIT_CHARACTER,
+  EnvVariableOnOff,
+  EnvVariableOtherListOptions,
+} from "./info/env";
 // Type imports
 import { DeepReadonly } from "./other/types";
 
 export type GetConfig<T> = (configDir: string) => DeepReadonly<T>;
+
+export type GetCustomEnvValueFromConfig<T> = (
+  envVariable: string,
+  config: DeepReadonly<T>
+) => string | undefined;
 
 /**
  * Convert variable value to a boolean value.
@@ -40,8 +49,9 @@ export const convertToBooleanIfNotUndefined = (
  */
 export const convertToStringArray = (variableValue: string): string[] => {
   const tempArray = variableValue
-    .split(" ")
-    .filter((a) => a.trim().length !== 0);
+    .split(ENV_LIST_SPLIT_CHARACTER)
+    .map((a) => a.trim())
+    .filter((a) => a.length > 0);
   if (tempArray.includes(EnvVariableOtherListOptions.NONE)) {
     return [];
   }
@@ -81,4 +91,30 @@ export const convertToIntIfNotUndefined = (
     return undefined;
   }
   return convertToInt(variableValue, errorMessage);
+};
+
+export const convertFromStringArray = (
+  stringArray?: Readonly<string[]>
+): string | undefined => {
+  if (stringArray === undefined) {
+    return undefined;
+  }
+  if (stringArray.length === 0) {
+    return EnvVariableOtherListOptions.NONE;
+  }
+  return stringArray.join(ENV_LIST_SPLIT_CHARACTER);
+};
+
+export const convertFromInteger = (num?: number): string | undefined => {
+  if (num === undefined) {
+    return undefined;
+  }
+  return `${num}`;
+};
+
+export const convertFromBoolean = (bool?: boolean): string | undefined => {
+  if (bool === undefined) {
+    return undefined;
+  }
+  return bool ? EnvVariableOnOff.ON : EnvVariableOnOff.OFF;
 };

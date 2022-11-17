@@ -6,6 +6,7 @@
 import path from "path";
 // Local imports
 import { CliOptionSignaturePartType } from "../cli";
+import { ExportDataTypes } from "./export";
 // Type imports
 import type { CliOptionInformation } from "../cli";
 
@@ -69,13 +70,7 @@ export const cliOptionsInformation: CliOptionInformation<CliOption>[] = [
     name: CliOption.EXPORT_DATA,
     signature: [
       {
-        enumValues: [
-          "moonpie",
-          "custom_commands_broadcasts",
-          "osu_requests",
-          "env",
-          "env_strings",
-        ],
+        enumValues: Object.values(ExportDataTypes),
         name: "type",
         type: CliOptionSignaturePartType.ENUM,
       },
@@ -91,13 +86,7 @@ export const cliOptionsInformation: CliOptionInformation<CliOption>[] = [
     name: CliOption.EXPORT_DATA_JSON,
     signature: [
       {
-        enumValues: [
-          "moonpie",
-          "custom_commands_broadcasts",
-          "osu_requests",
-          "env",
-          "env_strings",
-        ],
+        enumValues: Object.values(ExportDataTypes),
         name: "type",
         type: CliOptionSignaturePartType.ENUM,
       },
