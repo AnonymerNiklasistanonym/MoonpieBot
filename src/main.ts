@@ -4,7 +4,6 @@
 
 // Package imports
 import { ApiClient } from "@twurple/api";
-import path from "path";
 import { StaticAuthProvider } from "@twurple/auth";
 // Local imports
 import {
@@ -30,7 +29,6 @@ import customCommandsBroadcastsDb from "./database/customCommandsBroadcastsDb";
 import { defaultMacros } from "./info/macros";
 import { defaultPlugins } from "./info/plugins";
 import { defaultStringMap } from "./info/strings";
-import { generateOutputFileNameMoonpieDbBackup } from "./info/files";
 import { getVersionFromObject } from "./version";
 import { lurkChatHandler } from "./commands/lurk";
 import { macroOsuApi } from "./info/macros/osuApi";
@@ -54,7 +52,6 @@ import { spotifyChatHandler } from "./commands/spotify";
 import { SpotifyConfig } from "./database/spotifyDb/requests/spotifyConfig";
 import spotifyDb from "./database/spotifyDb";
 import { version } from "./info/version";
-import { writeJsonFile } from "./other/fileOperations";
 // Type imports
 import type { ChatUserstate } from "tmi.js";
 import type { CustomBroadcast } from "./customCommandsBroadcasts/customBroadcast";
@@ -62,7 +59,7 @@ import type { CustomCommand } from "./customCommandsBroadcasts/customCommand";
 import type { DeepReadonly } from "./other/types";
 import type { ErrorWithCode } from "./error";
 import type { Logger } from "winston";
-import type { MoonpieConfig } from "./config";
+import type { MoonpieConfig } from "./info/config/moonpieConfig";
 import type { OsuIrcBotSendMessageFunc } from "./commands/osu/beatmap";
 import type { PluginTwitchApiData } from "./info/plugins/twitchApi";
 import type { PluginTwitchChatData } from "./info/plugins/twitchChat";
@@ -92,8 +89,7 @@ const LOG_ID = "main";
  */
 export const main = async (
   logger: Logger,
-  config: DeepReadonly<MoonpieConfig>,
-  logDir: string
+  config: DeepReadonly<MoonpieConfig>
 ): Promise<void> => {
   const loggerMain = createLogFunc(logger, LOG_ID);
 
@@ -162,7 +158,7 @@ export const main = async (
     config.spotifyApi?.clientId !== undefined &&
     config.spotifyApi?.clientSecret !== undefined;
 
-  // Setup/Migrate/Backup moonpie database
+  // Setup/Migrate moonpie database
   const setupMigrateBackupMoonpieDatabase = async () => {
     // Only touch the database if it will be used
     if (
@@ -171,16 +167,6 @@ export const main = async (
     ) {
       // Setup database tables (or do nothing if they already exist)
       await moonpieDb.setup(config.moonpie.databasePath, logger);
-      const databaseBackupData =
-        await moonpieDb.backup.exportMoonpieCountTableToJson(
-          config.moonpie.databasePath,
-          logger
-        );
-      const pathDatabaseBackup = path.join(
-        logDir,
-        generateOutputFileNameMoonpieDbBackup()
-      );
-      await writeJsonFile(pathDatabaseBackup, databaseBackupData);
     }
   };
 

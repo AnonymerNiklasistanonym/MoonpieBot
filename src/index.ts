@@ -15,12 +15,11 @@ import { cliOptionsInformation, parseCliOptions } from "./info/cli";
 import { createConsoleLogger, createLogFunc, createLogger } from "./logging";
 import {
   createEnvVariableDocumentation,
-  getEnvVariableValueOrDefault,
   printEnvVariablesToConsole,
 } from "./env";
 import { defaultMacros, defaultMacrosOptional } from "./info/macros";
 import { defaultPlugins, defaultPluginsOptional } from "./info/plugins";
-import { ENV_PREFIX, EnvVariable, envVariableInformation } from "./info/env";
+import { ENV_PREFIX, envVariableInformation } from "./info/env";
 import {
   fileNameCustomCommandsBroadcastsExample,
   fileNameEnv,
@@ -33,7 +32,8 @@ import { createCustomCommandsBroadcastsDocumentation } from "./documentation/cus
 import { createStringsVariableDocumentation } from "./documentation/strings";
 import { defaultStringMap } from "./info/strings";
 import { genericStringSorter } from "./other/genericStringSorter";
-import { getMoonpieConfigFromEnv } from "./config";
+import { getLoggerConfigFromEnv } from "./info/config/loggerConfig";
+import { getMoonpieConfigFromEnv } from "./info/config/moonpieConfig";
 import { getVersionFromObject } from "./version";
 import { main } from "./main";
 import { version } from "./info/version";
@@ -95,13 +95,6 @@ const entryPoint = async () => {
       await fs.mkdir(configDir, { recursive: true });
     }
     if (cliOptions.createExampleFiles) {
-      const logger = createConsoleLogger(
-        name,
-        getEnvVariableValueOrDefault(
-          EnvVariable.LOGGING_CONSOLE_LOG_LEVEL,
-          configDir
-        )
-      );
       await Promise.all([
         createEnvVariableDocumentation(
           path.join(configDir, fileNameEnvExample),
@@ -114,7 +107,7 @@ const entryPoint = async () => {
           defaultMacros,
           defaultPluginsOptional,
           defaultMacrosOptional,
-          logger
+          createConsoleLogger(name)
         ),
         createCustomCommandsBroadcastsDocumentation(
           path.join(configDir, fileNameCustomCommandsBroadcastsExample)
@@ -136,24 +129,13 @@ const entryPoint = async () => {
     });
 
     // Create logger
-    const logDir = path.resolve(
-      configDir,
-      getEnvVariableValueOrDefault(
-        EnvVariable.LOGGING_DIRECTORY_PATH,
-        configDir
-      )
-    );
+    const loggerConfig = getLoggerConfigFromEnv(configDir);
+    const logDir = path.resolve(configDir, loggerConfig.logDir);
     const logger = createLogger(
       name,
       logDir,
-      getEnvVariableValueOrDefault(
-        EnvVariable.LOGGING_CONSOLE_LOG_LEVEL,
-        configDir
-      ),
-      getEnvVariableValueOrDefault(
-        EnvVariable.LOGGING_FILE_LOG_LEVEL,
-        configDir
-      )
+      loggerConfig.logLevelConsole,
+      loggerConfig.logLevelFile
     );
     const logIndex = createLogFunc(logger, LOG_ID);
 
@@ -207,7 +189,7 @@ const entryPoint = async () => {
       logIndex.debug(`Config directory: '${configDir}'`);
       logIndex.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
       const moonpieConfig = getMoonpieConfigFromEnv(configDir);
-      await main(logger, moonpieConfig, logDir);
+      await main(logger, moonpieConfig);
       logIndex.debug("Main method finished without errors");
     } catch (err) {
       logIndex.error(err as Error);

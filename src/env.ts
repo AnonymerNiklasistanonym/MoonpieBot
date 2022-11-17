@@ -45,7 +45,7 @@ export const printEnvVariablesToConsole = (
     let legacyString;
 
     const envVariableInfo = getEnvVariableValueInformation(envVariable);
-    let envVariableValueString = "Not found!";
+    let envVariableValueString;
     if (envVariableValue.value) {
       envVariableValueString = `"${envVariableValue.value}"`;
       if (censor && envVariableInfo.censor) {
@@ -70,28 +70,32 @@ export const printEnvVariablesToConsole = (
       }
     } else if (envVariableInfo.default) {
       const defaultStringOrFunc = envVariableInfo.default;
-      envVariableValueString += ` (default="${
+      envVariableValueString = `Not found (default="${
         typeof defaultStringOrFunc === "function"
           ? defaultStringOrFunc(configDir)
           : defaultStringOrFunc
       }")`;
-    } else if (envVariableInfo.example) {
-      envVariableValueString += ` (example="${envVariableInfo.example}")`;
     }
 
     if (envVariableInfo.required) {
-      envVariableValueString += " (REQUIRED!)";
+      if (envVariableValueString !== undefined) {
+        envVariableValueString += " (REQUIRED!)";
+      } else {
+        envVariableValueString = "NOT FOUND BUT IS REQUIRED!";
+      }
     }
 
-    // eslint-disable-next-line no-console
-    console.log(`${envVariableName}=${envVariableValueString}`);
-    if (legacyString) {
-      const legacyStrings = legacyString.split("\n");
+    if (envVariableValueString !== undefined) {
       // eslint-disable-next-line no-console
-      console.log(`\tWARNING: ${legacyStrings[0]}`);
-      for (const legacyStringParts of legacyStrings.slice(1)) {
+      console.log(`${envVariableName}=${envVariableValueString}`);
+      if (legacyString) {
+        const legacyStrings = legacyString.split("\n");
         // eslint-disable-next-line no-console
-        console.log(`\t> ${legacyStringParts}`);
+        console.log(`\tWARNING: ${legacyStrings[0]}`);
+        for (const legacyStringParts of legacyStrings.slice(1)) {
+          // eslint-disable-next-line no-console
+          console.log(`\t> ${legacyStringParts}`);
+        }
       }
     }
   }
