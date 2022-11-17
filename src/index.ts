@@ -21,28 +21,31 @@ import { defaultMacros, defaultMacrosOptional } from "./info/macros";
 import { defaultPlugins, defaultPluginsOptional } from "./info/plugins";
 import { ENV_PREFIX, envVariableInformation } from "./info/env";
 import {
+  exportDataCustomCommandsBroadcasts,
+  exportDataEnv,
+  exportDataEnvStrings,
+  exportDataMoonpie,
+  exportDataOsuRequests,
+  exportDataSpotify,
+} from "./export";
+import {
   fileNameCustomCommandsBroadcastsExample,
   fileNameEnv,
   fileNameEnvExample,
   fileNameEnvStrings,
   fileNameEnvStringsExample,
 } from "./info/files";
-import {
-  getMoonpieConfigFromEnv,
-  getMoonpieConfigMoonpieFromEnv,
-} from "./info/config/moonpieConfig";
 import { cliHelpGenerator } from "./cli";
 import { createCustomCommandsBroadcastsDocumentation } from "./documentation/customCommandsBroadcasts";
 import { createStringsVariableDocumentation } from "./documentation/strings";
 import { defaultStringMap } from "./info/strings";
+import { fileExists } from "./other/fileOperations";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getLoggerConfigFromEnv } from "./info/config/loggerConfig";
+import { getMoonpieConfigFromEnv } from "./info/config/moonpieConfig";
 import { getVersionFromObject } from "./version";
 import { main } from "./main";
-import moonpieDb from "./database/moonpieDb";
-import { updateStringsMapWithCustomEnvStrings } from "./messageParser";
 import { version } from "./info/version";
-import { writeTextFile } from "./other/fileOperations";
 
 /**
  * The logging ID of this module.
@@ -100,31 +103,28 @@ const entryPoint = async () => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.mkdir(configDir, { recursive: true });
     }
-    if (cliOptions.createBackup !== undefined) {
-      // TODO
-      console.log(
-        `TODO Create backup in '${cliOptions.createBackup.backupDir}'...`
-      );
-      process.exit(0);
-    }
     if (cliOptions.createExampleFiles) {
       const exampleFilesDir = cliOptions.exampleFilesDir
         ? cliOptions.exampleFilesDir
         : configDir;
       console.log(`Create example files in '${exampleFilesDir}'...`);
       await Promise.all([
-        createEnvVariableDocumentation(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.writeFile(
           path.join(exampleFilesDir, fileNameEnvExample),
-          configDir
+          createEnvVariableDocumentation(configDir)
         ),
-        createStringsVariableDocumentation(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.writeFile(
           path.join(exampleFilesDir, fileNameEnvStringsExample),
-          defaultStringMap,
-          defaultPlugins,
-          defaultMacros,
-          defaultPluginsOptional,
-          defaultMacrosOptional,
-          createConsoleLogger(name, "off")
+          await createStringsVariableDocumentation(
+            defaultStringMap,
+            defaultPlugins,
+            defaultMacros,
+            defaultPluginsOptional,
+            defaultMacrosOptional,
+            createConsoleLogger(name, "off")
+          )
         ),
         createCustomCommandsBroadcastsDocumentation(
           path.join(exampleFilesDir, fileNameCustomCommandsBroadcastsExample)
@@ -134,7 +134,7 @@ const entryPoint = async () => {
     }
 
     // ----------------------------------------------------------
-    // Setup necessary globals
+    // Load ENV variables from .env files
     // ----------------------------------------------------------
 
     // Load user specific environment variables from the .env files
@@ -144,6 +144,47 @@ const entryPoint = async () => {
     dotenv.config({
       path: path.join(configDir, fileNameEnvStrings),
     });
+
+    // ----------------------------------------------------------
+    // Create backup
+    // ----------------------------------------------------------
+
+    if (cliOptions.createBackup !== undefined) {
+      const backupDir = cliOptions.createBackup.backupDir;
+      console.log(`Create backup in '${backupDir}'...`);
+      // ENV variables
+      console.log(`Create '${fileNameEnv}' file in '${backupDir}'...`);
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(
+        path.join(backupDir, fileNameEnv),
+        await exportDataEnv(configDir)
+      );
+      console.log(`Create '${fileNameEnvStrings}' file in '${backupDir}'...`);
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(
+        path.join(backupDir, fileNameEnvStrings),
+        await exportDataEnvStrings(configDir)
+      );
+      // Databases
+      const config = getMoonpieConfigFromEnv(configDir);
+      const databasesToBackup = [
+        config.customCommandsBroadcasts?.databasePath,
+        config.moonpie?.databasePath,
+        config.osuApi?.databasePath,
+        config.spotify?.databasePath,
+      ];
+      for (const db of databasesToBackup) {
+        if (db !== undefined && (await fileExists(db))) {
+          console.log(`Copy database '${db}' to '${backupDir}'...`);
+          await fs.copyFile(db, path.join(backupDir, path.basename(db)));
+        }
+      }
+      process.exit(0);
+    }
+
+    // ----------------------------------------------------------
+    // Setup necessary globals
+    // ----------------------------------------------------------
 
     // Create logger
     const loggerConfig = getLoggerConfigFromEnv(configDir);
@@ -161,57 +202,29 @@ const entryPoint = async () => {
     // ----------------------------------------------------------
 
     if (cliOptions.exportData !== undefined) {
-      // TODO
       for (const exportData of cliOptions.exportData) {
-        let data = "TODO";
+        let data;
         switch (exportData.type.toLowerCase()) {
+          case "custom_commands_broadcasts":
+            data = await exportDataCustomCommandsBroadcasts(
+              configDir,
+              exportData.json
+            );
+            break;
           case "env":
-            if (exportData.json) {
-              data = JSON.stringify({
-                configDir,
-                loggerConfig: getLoggerConfigFromEnv(configDir),
-                moonpieConfig: getMoonpieConfigFromEnv(configDir),
-              });
-            }
+            data = await exportDataEnv(configDir, exportData.json);
             break;
           case "env_strings":
-            if (exportData.json) {
-              const updatedStrings = Array.from(
-                updateStringsMapWithCustomEnvStrings(
-                  defaultStringMap,
-                  createConsoleLogger(name, "off")
-                )
-              );
-              data = JSON.stringify({
-                customStrings: updatedStrings
-                  .filter((a) => a[1].updated === true && a[1].custom === true)
-                  .map((a) => ({ id: a[0], value: a[1].default })),
-                defaultStrings: Array.from(defaultStringMap).map((a) => ({
-                  ...a[1],
-                  id: a[0],
-                })),
-                updatedStrings: updatedStrings
-                  .filter((a) => a[1].updated === true && a[1].custom !== true)
-                  .map((a) => ({ id: a[0], value: a[1].default })),
-              });
-            }
+            data = await exportDataEnvStrings(configDir, exportData.json);
             break;
           case "moonpie":
-            if (exportData.json) {
-              const config = getMoonpieConfigMoonpieFromEnv(configDir);
-              await moonpieDb.setup(
-                config.databasePath,
-                createConsoleLogger(name, "off")
-              );
-              data = JSON.stringify({
-                databasePath: config.databasePath,
-                moonpieCounts:
-                  await moonpieDb.backup.exportMoonpieCountTableToJson(
-                    config.databasePath,
-                    createConsoleLogger(name, "off")
-                  ),
-              });
-            }
+            data = await exportDataMoonpie(configDir, exportData.json);
+            break;
+          case "osu_requests":
+            data = await exportDataOsuRequests(configDir, exportData.json);
+            break;
+          case "spotify":
+            data = await exportDataSpotify(configDir, exportData.json);
             break;
           default:
             throw Error(`Unknown export data type '${exportData.type}'`);
@@ -222,7 +235,8 @@ const entryPoint = async () => {
               exportData.json ? " in JSON format" : ""
             } to '${exportData.outputFile}'...`
           );
-          await writeTextFile(exportData.outputFile, data);
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          await fs.writeFile(exportData.outputFile, data);
         } else {
           console.log(data);
         }

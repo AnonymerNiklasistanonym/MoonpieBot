@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 
 // Package imports
+import { promises as fs } from "fs";
 import path from "path";
 // Local imports
 import { defaultMacros, defaultMacrosOptional } from "../src/info/macros";
@@ -28,14 +29,18 @@ console.log(`Create ENV example file '${envExampleFile}'...`);
 console.log(`Create ENV strings example file '${envStringsExampleFile}'...`);
 
 Promise.all([
-  createEnvVariableDocumentation(envExampleFile, configDir),
-  createStringsVariableDocumentation(
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.writeFile(envExampleFile, createEnvVariableDocumentation(configDir)),
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.writeFile(
     envStringsExampleFile,
-    defaultStringMap,
-    defaultPlugins,
-    defaultMacros,
-    defaultPluginsOptional,
-    defaultMacrosOptional,
-    logger
+    await createStringsVariableDocumentation(
+      defaultStringMap,
+      defaultPlugins,
+      defaultMacros,
+      defaultPluginsOptional,
+      defaultMacrosOptional,
+      logger
+    )
   ),
 ]).catch(console.error);

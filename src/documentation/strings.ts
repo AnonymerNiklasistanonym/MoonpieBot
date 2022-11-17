@@ -1,5 +1,3 @@
-// Package imports
-import { promises as fs } from "fs";
 // Local imports
 import {
   fileDocumentationGenerator,
@@ -25,14 +23,16 @@ import type { Logger } from "winston";
 import type { StringMap } from "../messageParser";
 
 export const createStringsVariableDocumentation = async (
-  path: string,
   strings: StringMap,
   plugins?: MessageParserPlugin[],
   macros?: MessageParserMacro[],
   optionalPlugins?: MessageParserPluginInfo[],
   optionalMacros?: MessageParserMacroDocumentation[],
-  logger?: Logger
-): Promise<void> => {
+  logger?: Logger,
+  // TODO Add custom values to the documentation instead of the default ones
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _updatedStringsMap?: StringMap
+): Promise<string> => {
   const data: FileDocumentationParts[] = [];
   data.push({
     text:
@@ -120,6 +120,5 @@ export const createStringsVariableDocumentation = async (
   }
   data.push(...dataDefaultStrings);
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(path, fileDocumentationGenerator(data));
+  return fileDocumentationGenerator(data);
 };

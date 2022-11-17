@@ -1,5 +1,3 @@
-// Package imports
-import { promises as fs } from "fs";
 // Local imports
 import {
   ENV_LIST_SPLIT_CHARACTER,
@@ -15,7 +13,10 @@ import {
 import { escapeStringIfWhiteSpace } from "./other/whiteSpaceChecker";
 // Type imports
 import type { CliEnvVariableInformation } from "./cli";
+import type { DeepReadonly } from "./other/types";
 import type { FileDocumentationParts } from "./documentation/fileDocumentationGenerator";
+import type { LoggerConfig } from "./info/config/loggerConfig";
+import type { MoonpieConfig } from "./info/config/moonpieConfig";
 
 export interface EnvVariableStructureTextBlock {
   content: string;
@@ -293,10 +294,14 @@ export const getEnvVariableName = (
   return `${ENV_PREFIX}${envVariable}`;
 };
 
-export const createEnvVariableDocumentation = async (
-  path: string,
-  configDir: string
-): Promise<void> => {
+export const createEnvVariableDocumentation = (
+  configDir: string,
+  // TODO Add custom values to the documentation instead of the default ones
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _loggerConfig?: DeepReadonly<LoggerConfig>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _moonpieConfig?: DeepReadonly<MoonpieConfig>
+): string => {
   const data: FileDocumentationParts[] = [];
 
   for (const structurePart of envVariableStructure) {
@@ -397,6 +402,5 @@ export const createEnvVariableDocumentation = async (
     }
   }
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(path, fileDocumentationGenerator(data));
+  return fileDocumentationGenerator(data);
 };
