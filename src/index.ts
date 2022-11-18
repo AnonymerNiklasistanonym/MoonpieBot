@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
 
 /*
- * Entry point of the bot that handles CLI options and prepares the necessary
- * basic functions like the process name, logger, configuration directory, ...
+ * Entry point of the bot:
+ * - handle CLI arguments
+ * - load config data
+ * - start main method
  */
 
 // Package imports
@@ -11,7 +13,7 @@ import { promises as fs } from "fs";
 import path from "path";
 // Local imports
 import { binaryName, name, usages } from "./info/general";
-import { cliOptionsInformation, parseCliOptions } from "./info/cli";
+import { cliOptionsInformation, parseCliArgs } from "./info/cli";
 import { createConsoleLogger, createLogFunc, createLogger } from "./logging";
 import {
   createEnvVariableDocumentation,
@@ -48,40 +50,30 @@ import { main } from "./main";
 import { version } from "./info/version";
 
 /**
- * The logging ID of this module.
- */
-const LOG_ID = "index";
-
-/**
  * The entry point of the bot.
  */
 const entryPoint = async () => {
+  // Change the title of the process/terminal
+  const versionString = getVersionFromObject(version);
+  process.title = `${name} ${versionString}`;
+  // Set the default config directory
+  let configDir = process.cwd();
+
   try {
-    // ----------------------------------------------------------
-    // Setup process
-    // ----------------------------------------------------------
-
-    // Change the title of the process/terminal
-    const versionString = getVersionFromObject(version);
-    process.title = `${name} ${versionString}`;
-
     // ----------------------------------------------------------
     // Handle CLI options
     // ----------------------------------------------------------
-
-    // Get additional command line arguments
     // $ npm run start -- --argument
     // $ node . --argument
     // $ programName --argument
-    const cliArgs = process.argv.slice(2);
-    const cliOptions = parseCliOptions(cliArgs);
-    let configDir = process.cwd();
-
-    if (cliOptions.showVersion) {
+    // ----------------------------------------------------------
+    const cliOptions = parseCliArgs(process.argv.slice(2));
+    // CLI options that terminate
+    if ("showVersion" in cliOptions && cliOptions.showVersion) {
       console.log(versionString);
       process.exit(0);
     }
-    if (cliOptions.showHelp) {
+    if ("showHelp" in cliOptions && cliOptions.showHelp) {
       console.log(
         cliHelpGenerator(
           binaryName,
@@ -97,13 +89,7 @@ const entryPoint = async () => {
       );
       process.exit(0);
     }
-    if (cliOptions.customConfigDir !== undefined) {
-      configDir = cliOptions.customConfigDir;
-      // Create config directory if it doesn't exist
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.mkdir(configDir, { recursive: true });
-    }
-    if (cliOptions.createExampleFiles) {
+    if ("createExampleFiles" in cliOptions && cliOptions.createExampleFiles) {
       const exampleFilesDir = cliOptions.exampleFilesDir
         ? cliOptions.exampleFilesDir
         : configDir;
@@ -136,10 +122,14 @@ const entryPoint = async () => {
     }
 
     // ----------------------------------------------------------
-    // Load ENV variables from .env files
+    // Load ENV variables from .env files in config directory
     // ----------------------------------------------------------
-
-    // Load user specific environment variables from the .env files
+    if ("customConfigDir" in cliOptions && cliOptions.customConfigDir) {
+      configDir = cliOptions.customConfigDir;
+      // Create config directory if it doesn't exist
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.mkdir(configDir, { recursive: true });
+    }
     dotenv.config({
       path: path.join(configDir, fileNameEnv),
     });
@@ -151,8 +141,8 @@ const entryPoint = async () => {
     // Create backup
     // ----------------------------------------------------------
 
-    if (cliOptions.createBackup !== undefined) {
-      const backupDir = cliOptions.createBackup.backupDir;
+    if ("createBackup" in cliOptions && cliOptions.createBackup) {
+      const backupDir = cliOptions.backupDir;
       console.log(`Create backup in '${backupDir}'...`);
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.mkdir(backupDir, { recursive: true });
@@ -199,13 +189,13 @@ const entryPoint = async () => {
       loggerConfig.logLevelConsole,
       loggerConfig.logLevelFile
     );
-    const logIndex = createLogFunc(logger, LOG_ID);
+    const logIndex = createLogFunc(logger, "index");
 
     // ----------------------------------------------------------
     // Export data
     // ----------------------------------------------------------
 
-    if (cliOptions.exportData !== undefined) {
+    if ("exportData" in cliOptions && cliOptions.exportData !== undefined) {
       for (const exportData of cliOptions.exportData) {
         let data;
         switch (exportData.type.toUpperCase()) {
@@ -253,9 +243,11 @@ const entryPoint = async () => {
     // Main method
     // ----------------------------------------------------------
 
-    // Print for debugging the (private/secret) environment values to the console
-    // (censor critical variables if not explicitly enabled)
-    printEnvVariablesToConsole(configDir, !cliOptions.disableCensoring);
+    if ("disableCensoring" in cliOptions && cliOptions.disableCensoring) {
+      // Print for debugging the (private/secret) environment values to the console
+      // (censor critical variables if not explicitly enabled)
+      printEnvVariablesToConsole(configDir, !cliOptions.disableCensoring);
+    }
 
     try {
       logIndex.info(`${name} ${versionString} was started (logs: '${logDir}')`);

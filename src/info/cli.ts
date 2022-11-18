@@ -9,6 +9,7 @@ import { CliOptionSignaturePartType } from "../cli";
 import { ExportDataTypes } from "./export";
 // Type imports
 import type { CliOptionInformation } from "../cli";
+import type { DeepReadonly } from "../other/types";
 
 /**
  * Supported CLI options.
@@ -113,22 +114,55 @@ export interface ParsedCliOptionsExportData {
   type: string;
 }
 
-export interface ParsedCliOptionsCreateBackup {
-  backupDir: string;
-}
+interface ParsedCliOptionsMerged
+  extends Partial<ParsedCliOptionsMainMethod>,
+    Partial<ParsedCliOptionsCreateBackup>,
+    Partial<ParsedCliOptionsCreateExampleFiles>,
+    Partial<ParsedCliOptionsCreateExportData>,
+    Partial<ParsedCliOptionsShowHelp>,
+    Partial<ParsedCliOptionsShowVersion> {}
 
-export interface ParsedCliOptions {
-  createBackup?: ParsedCliOptionsCreateBackup;
-  createExampleFiles?: boolean;
+export interface ParsedCliOptionsMainMethod {
   customConfigDir?: string;
   disableCensoring?: boolean;
+}
+export interface ParsedCliOptionsCreateBackup {
+  backupDir: string;
+  createBackup: true;
+  customConfigDir?: string;
+}
+export interface ParsedCliOptionsCreateExampleFiles {
+  createExampleFiles: true;
   exampleFilesDir?: string;
-  exportData?: ParsedCliOptionsExportData[];
-  showHelp?: boolean;
-  showVersion?: boolean;
+}
+export interface ParsedCliOptionsCreateExportData {
+  customConfigDir?: string;
+  exportData: ParsedCliOptionsExportData[];
+}
+export interface ParsedCliOptionsShowHelp {
+  showHelp: true;
+}
+export interface ParsedCliOptionsShowVersion {
+  showVersion: true;
 }
 
-export const parseCliOptions = (cliArgs: string[]): ParsedCliOptions => {
+export type ParsedCliOptions =
+  | ParsedCliOptionsMainMethod
+  | ParsedCliOptionsCreateBackup
+  | ParsedCliOptionsCreateExampleFiles
+  | ParsedCliOptionsCreateExportData
+  | ParsedCliOptionsShowHelp
+  | ParsedCliOptionsShowVersion;
+
+/**
+ * Parse CLI arguments.
+ *
+ * @param cliArgs CLI arguments.
+ * @returns Parsed CLI arguments.
+ */
+export const parseCliArgs = (
+  cliArgs: Readonly<string[]>
+): DeepReadonly<ParsedCliOptions> => {
   // Exit early if an argument was found that terminates the program
   if (cliArgs.includes(CliOption.HELP)) {
     return { showHelp: true };
@@ -137,7 +171,7 @@ export const parseCliOptions = (cliArgs: string[]): ParsedCliOptions => {
     return { showVersion: true };
   }
 
-  const options: ParsedCliOptions = {};
+  const options: ParsedCliOptionsMerged = {};
 
   let lookingForConfigDir = false;
   let lookingForBackupDir = false;
@@ -154,7 +188,8 @@ export const parseCliOptions = (cliArgs: string[]): ParsedCliOptions => {
     }
     if (lookingForBackupDir) {
       return {
-        createBackup: { backupDir: cliArg },
+        backupDir: cliArg,
+        createBackup: true,
         customConfigDir: options.customConfigDir,
       };
     }
