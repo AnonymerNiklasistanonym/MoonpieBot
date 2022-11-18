@@ -5,9 +5,12 @@ import {
   EnvVariableOtherListOptions,
 } from "./info/env";
 // Type imports
-import { DeepReadonly } from "./other/types";
+import { DeepReadonly, EMPTY_OBJECT } from "./other/types";
 
-export type GetConfig<T> = (configDir: string) => DeepReadonly<T>;
+export type GetConfig<T, CUSTOM_DATA extends EMPTY_OBJECT = EMPTY_OBJECT> = (
+  configDir: string,
+  customData?: CUSTOM_DATA
+) => DeepReadonly<T>;
 
 export type GetCustomEnvValueFromConfig<T> = (
   envVariable: string,

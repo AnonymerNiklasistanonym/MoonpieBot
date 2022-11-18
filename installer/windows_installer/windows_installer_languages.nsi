@@ -17,6 +17,16 @@ LangString LangStrUninstall ${LANG_GERMAN}  "Deinstalliere"
 LangString LangStrUninstall ${LANG_FINNISH} "Poista"
 LangString LangStrUninstall ${LANG_SPANISH} "Desinstalar"
 
+LangString LangStrBackup ${LANG_ENGLISH} "Backup"
+LangString LangStrBackup ${LANG_GERMAN}  "Backup"
+LangString LangStrBackup ${LANG_FINNISH} "Varmuuskopiointi"
+LangString LangStrBackup ${LANG_SPANISH} "Copia de seguridad de"
+
+LangString LangStrCustomConfig ${LANG_ENGLISH} "Custom config directory"
+LangString LangStrCustomConfig ${LANG_GERMAN}  "Benutzerdefiniertes Konfigurationsverzeichnis"
+LangString LangStrCustomConfig ${LANG_FINNISH} "Mukautettu konfiguraatiohakemisto"
+LangString LangStrCustomConfig ${LANG_SPANISH} "Directorio de configuración personalizado"
+
 LangString LangStrConfiguration1 ${LANG_ENGLISH} ""
 LangString LangStrConfiguration2 ${LANG_ENGLISH} " Configuration"
 LangString LangStrConfiguration1 ${LANG_GERMAN}  ""

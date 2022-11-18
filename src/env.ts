@@ -272,22 +272,29 @@ export const getEnvVariableValueOrDefault = (
 ): string => {
   const value = getEnvVariableValue(envVariable);
   if (value.value === undefined || value.value.trim().length === 0) {
-    const variableInformation = getEnvVariableValueInformation(envVariable);
-    if (variableInformation.defaultValue) {
-      if (typeof variableInformation.defaultValue === "function") {
-        return variableInformation.defaultValue(configDir);
-      }
-      return variableInformation.defaultValue;
-    }
-    if (variableInformation.default) {
-      if (typeof variableInformation.default === "function") {
-        return variableInformation.default(configDir);
-      }
-      return variableInformation.default;
-    }
-    throw Error(`The environment variable ${envVariable} has no default`);
+    return getEnvVariableValueDefault(envVariable, configDir);
   }
   return value.value;
+};
+
+export const getEnvVariableValueDefault = (
+  envVariable: EnvVariable,
+  configDir: string
+): string => {
+  const variableInformation = getEnvVariableValueInformation(envVariable);
+  if (variableInformation.defaultValue) {
+    if (typeof variableInformation.defaultValue === "function") {
+      return variableInformation.defaultValue(configDir);
+    }
+    return variableInformation.defaultValue;
+  }
+  if (variableInformation.default) {
+    if (typeof variableInformation.default === "function") {
+      return variableInformation.default(configDir);
+    }
+    return variableInformation.default;
+  }
+  throw Error(`The environment variable ${envVariable} has no default`);
 };
 
 /**

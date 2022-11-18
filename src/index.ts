@@ -146,12 +146,12 @@ const entryPoint = async () => {
       console.log(`Create backup in '${backupDir}'...`);
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.mkdir(backupDir, { recursive: true });
-      // ENV variables
+      // ENV variables (reset the database paths)
       console.log(`Create '${fileNameEnv}' file in '${backupDir}'...`);
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(
         path.join(backupDir, fileNameEnv),
-        await exportDataEnv(configDir)
+        await exportDataEnv(configDir, false, { resetDatabaseFilePaths: true })
       );
       console.log(`Create '${fileNameEnvStrings}' file in '${backupDir}'...`);
       // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -159,18 +159,25 @@ const entryPoint = async () => {
         path.join(backupDir, fileNameEnvStrings),
         await exportDataEnvStrings(configDir)
       );
-      // Databases
+      // Databases (reset their paths and copy them)
       const config = getMoonpieConfigFromEnv(configDir);
+      const configDbReset = getMoonpieConfigFromEnv(configDir, {
+        resetDatabaseFilePaths: true,
+      });
       const databasesToBackup = [
-        config.customCommandsBroadcasts?.databasePath,
-        config.moonpie?.databasePath,
-        config.osuApi?.databasePath,
-        config.spotify?.databasePath,
+        [
+          config.customCommandsBroadcasts?.databasePath,
+          configDbReset.customCommandsBroadcasts?.databasePath,
+        ],
+        [config.moonpie?.databasePath, configDbReset.moonpie?.databasePath],
+        [config.osuApi?.databasePath, configDbReset.osuApi?.databasePath],
+        [config.spotify?.databasePath, configDbReset.spotify?.databasePath],
       ];
-      for (const db of databasesToBackup) {
-        if (db !== undefined && (await fileExists(db))) {
-          console.log(`Copy database '${db}' to '${backupDir}'...`);
-          await fs.copyFile(db, path.join(backupDir, path.basename(db)));
+      for (const [db, dbReset] of databasesToBackup) {
+        if (db && dbReset && (await fileExists(db))) {
+          const newDb = path.join(backupDir, path.relative(configDir, dbReset));
+          console.log(`Copy database '${db}' to '${newDb}'...`);
+          await fs.copyFile(db, newDb);
         }
       }
       process.exit(0);
@@ -243,11 +250,12 @@ const entryPoint = async () => {
     // Main method
     // ----------------------------------------------------------
 
-    if ("disableCensoring" in cliOptions && cliOptions.disableCensoring) {
-      // Print for debugging the (private/secret) environment values to the console
-      // (censor critical variables if not explicitly enabled)
-      printEnvVariablesToConsole(configDir, !cliOptions.disableCensoring);
-    }
+    // Print for debugging the (private/secret) environment values to the console
+    // (censor critical variables if not explicitly enabled)
+    printEnvVariablesToConsole(
+      configDir,
+      !("disableCensoring" in cliOptions && cliOptions.disableCensoring)
+    );
 
     try {
       logIndex.info(`${name} ${versionString} was started (logs: '${logDir}')`);

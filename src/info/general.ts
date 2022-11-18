@@ -31,6 +31,9 @@ export const description = "A custom Twitch chat bot";
 /** Long description of the program. */
 export const longDescription = `Running this program will start a Twitch connected bot using information provided by either environment variables, a '${fileNameEnv}' file in the same directory or given a ${CliOption.CONFIG_DIRECTORY} argument a '${fileNameEnv}' file in the specified directory. Additionally log files and the databases are written to this directory if not specified otherwise by '${EnvVariable.LOGGING_DIRECTORY_PATH}', '${EnvVariable.MOONPIE_DATABASE_PATH}', '${EnvVariable.SPOTIFY_DATABASE_PATH}', '${EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH}'. Custom strings can also be written to '${fileNameEnvStrings}' to keep the '${fileNameEnv}' clean.`;
 
+export const defaultConfigDir = (windows: boolean): string =>
+  windows ? "%APPDATA%\\MoonpieBot" : "$HOME/.local/share/moonpiebot";
+
 /**
  * Additional package description of the program.
  *
@@ -40,9 +43,9 @@ export const longDescription = `Running this program will start a Twitch connect
 export const packageDescription = (windows: boolean): string =>
   `If this program is installed via a ${
     windows ? "installer" : "package"
-  } it will use ${
-    windows ? "%APPDATA%\\MoonpieBot" : "$HOME/.local/share/moonpiebot"
-  } as the default ${CliOption.CONFIG_DIRECTORY}.`;
+  } it will use ${defaultConfigDir(windows)} as the default ${
+    CliOption.CONFIG_DIRECTORY
+  }.`;
 
 /** Source code URL. */
 export const sourceCodeUrl =

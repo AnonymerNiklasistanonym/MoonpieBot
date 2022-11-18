@@ -197,8 +197,12 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   ;Set output path to the installation directory and list the files that should
   ;be put into it
   SetOutPath "$INSTDIR"
-  File ".\${PRODUCT_LOWERCASE}.bat"
+  File ".\${FILE_NAME_SCRIPT_MAIN}"
+  File ".\${FILE_NAME_SCRIPT_MAIN_CUSTOM_CONFIG_DIR}"
+  File ".\${FILE_NAME_SCRIPT_BACKUP}"
   File "..\..\res\icons\${PRODUCT_LOWERCASE}.ico"
+  File "..\..\res\icons\${PRODUCT_LOWERCASE}_green.ico"
+  File "..\..\res\icons\${PRODUCT_LOWERCASE}_orange.ico"
   ;Create a separate directory for binaries that shold be available to the
   ;terminal via the PATH environment variable
   CreateDirectory "$INSTDIR\${INSTDIR_BIN}"
@@ -225,7 +229,9 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
 
   ;Create start menu shortcut for program, config directory and uninstaller
   CreateDirectory "$SMPROGRAMS\${PRODUCT}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${FILE_NAME_SCRIPT_MAIN}" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrBackup) ${PRODUCT}.lnk" "$INSTDIR\${FILE_NAME_SCRIPT_BACKUP}" "" "$INSTDIR\${PRODUCT_LOWERCASE}_green.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT} ($(LangStrCustomConfig)).lnk" "$INSTDIR\${FILE_NAME_SCRIPT_MAIN_CUSTOM_CONFIG_DIR}" "" "$INSTDIR\${PRODUCT_LOWERCASE}_orange.ico" 0
   CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrConfiguration1)${PRODUCT}$(LangStrConfiguration2).lnk" "$AppData\${PRODUCT}"
   CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrUninstall) ${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" "" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" 0
 

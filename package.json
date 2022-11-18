@@ -28,7 +28,7 @@
         "create:ccCbExamples": "ts-node scripts/createCCCBExampleFile.ts",
         "create:manPage": "ts-node scripts/createManPageFile.ts",
         "create:pkgbuilds": "ts-node scripts/createPkgbuildFiles.ts",
-        "create:windowsInstallerConfig": "ts-node scripts/createWindowsInstallerConfigFile.ts",
+        "create:windowsInstallerConfig": "ts-node scripts/createWindowsInstallerConfigFiles.ts",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",
         "docs": "typedoc --tsconfig tsconfig.json",
         "findUnusedExports": "ts-unused-exports tsconfig.eslint.json --ignoreTestFiles --showLineNumber --allowUnusedTypes --excludePathsFromReport=test",

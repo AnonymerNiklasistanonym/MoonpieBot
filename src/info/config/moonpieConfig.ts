@@ -12,6 +12,7 @@ import {
   convertToStringArray,
 } from "../../config";
 import {
+  getEnvVariableValueDefault,
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrError,
   getEnvVariableValueOrUndefined,
@@ -94,9 +95,26 @@ export interface MoonpieConfig {
   twitchApi?: MoonpieConfigTwitchApi;
 }
 
-export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
-  configDir
-) => ({
+export interface MoonpieConfigCustomData {
+  resetDatabaseFilePaths?: boolean;
+}
+
+export const getDatabasePath = (
+  envVariable: EnvVariable,
+  configDir: string,
+  customData?: MoonpieConfigCustomData
+): string =>
+  path.resolve(
+    configDir,
+    customData?.resetDatabaseFilePaths === true
+      ? getEnvVariableValueDefault(envVariable, configDir)
+      : getEnvVariableValueOrDefault(envVariable, configDir)
+  );
+
+export const getMoonpieConfigFromEnv: GetConfig<
+  MoonpieConfig,
+  MoonpieConfigCustomData
+> = (configDir, customData) => ({
   // Twitch connection
   twitch: {
     channels: convertToStringArray(
@@ -118,12 +136,13 @@ export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
   },
   // > Moonpie
   // eslint-disable-next-line sort-keys
-  moonpie: getMoonpieConfigMoonpieFromEnv(configDir),
+  moonpie: getMoonpieConfigMoonpieFromEnv(configDir, customData),
   // > Spotify
   spotify: {
-    databasePath: path.resolve(
+    databasePath: getDatabasePath(
+      EnvVariable.SPOTIFY_DATABASE_PATH,
       configDir,
-      getEnvVariableValueOrDefault(EnvVariable.SPOTIFY_DATABASE_PATH, configDir)
+      customData
     ),
     enableCommands: convertToStringArray(
       getEnvVariableValueOrDefault(
@@ -167,12 +186,10 @@ export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
     clientSecret: getEnvVariableValueOrUndefined(
       EnvVariable.OSU_API_CLIENT_SECRET
     ),
-    databasePath: path.resolve(
+    databasePath: getDatabasePath(
+      EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
       configDir,
-      getEnvVariableValueOrDefault(
-        EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
-        configDir
-      )
+      customData
     ),
     defaultId: convertToIntIfNotUndefined(
       getEnvVariableValueOrUndefined(EnvVariable.OSU_API_DEFAULT_ID)
@@ -196,12 +213,10 @@ export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
   // > Custom commands and broadcasts
   // eslint-disable-next-line sort-keys
   customCommandsBroadcasts: {
-    databasePath: path.resolve(
+    databasePath: getDatabasePath(
+      EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH,
       configDir,
-      getEnvVariableValueOrDefault(
-        EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH,
-        configDir
-      )
+      customData
     ),
     enableCommands: convertToStringArray(
       getEnvVariableValueOrDefault(
@@ -219,9 +234,10 @@ export const getMoonpieConfigFromEnv: GetConfig<MoonpieConfig> = (
   },
 });
 
-export const getMoonpieConfigMoonpieFromEnv: GetConfig<MoonpieConfigMoonpie> = (
-  configDir
-) => ({
+export const getMoonpieConfigMoonpieFromEnv: GetConfig<
+  MoonpieConfigMoonpie,
+  MoonpieConfigCustomData
+> = (configDir, customData) => ({
   claimCooldownHours: convertToInt(
     getEnvVariableValueOrDefault(
       EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS,
@@ -229,9 +245,10 @@ export const getMoonpieConfigMoonpieFromEnv: GetConfig<MoonpieConfigMoonpie> = (
     ),
     "The moonpie claim cooldown hours number string could not be parsed to an integer"
   ),
-  databasePath: path.resolve(
+  databasePath: getDatabasePath(
+    EnvVariable.MOONPIE_DATABASE_PATH,
     configDir,
-    getEnvVariableValueOrDefault(EnvVariable.MOONPIE_DATABASE_PATH, configDir)
+    customData
   ),
   enableCommands: convertToStringArray(
     getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS, configDir)

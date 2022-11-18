@@ -22,9 +22,17 @@ import { updateStringsMapWithCustomEnvStrings } from "../../messageParser";
 import type { ExportData } from "../../export";
 import type { FileDocumentationPartValue } from "../../documentation/fileDocumentationGenerator";
 
-export const exportDataEnv: ExportData = (configDir, json) => {
+export interface ExportDataEnvCustomData {
+  resetDatabaseFilePaths?: boolean;
+}
+
+export const exportDataEnv: ExportData<ExportDataEnvCustomData> = (
+  configDir,
+  json,
+  customData
+) => {
   const loggerConfig = getLoggerConfigFromEnv(configDir);
-  const moonpieConfig = getMoonpieConfigFromEnv(configDir);
+  const moonpieConfig = getMoonpieConfigFromEnv(configDir, customData);
   if (json) {
     return JSON.stringify({
       configDir,
