@@ -173,7 +173,7 @@ export const main = async (
   };
 
   // Setup/Migrate osu!requests database
-  const setupMigrateOsuRequestsDatabase = async () => {
+  const setupMigrateOsuRequestsConfigDatabase = async () => {
     // Only touch the database if it will be used
     if (
       config.osu !== undefined &&
@@ -250,7 +250,7 @@ export const main = async (
   await Promise.all([
     setupMigrateBackupMoonpieDatabase(),
     setupMigrateCustomCommandsBroadcastsDatabase(),
-    setupMigrateOsuRequestsDatabase(),
+    setupMigrateOsuRequestsConfigDatabase(),
     setupMigrateSpotifyDatabase(),
   ]);
 
@@ -472,8 +472,15 @@ export const main = async (
             message,
             {
               defaultOsuId: config.osuApi.defaultId,
-              enableOsuBeatmapRequests: config.osuApi.beatmapRequests,
-              enabledCommands: config.osu.enableCommands,
+              enableOsuBeatmapRequests:
+                config.osu.enableCommands.includes(OsuCommands.REQUESTS) &&
+                config.osuApi.beatmapRequests !== false,
+              enabledCommands:
+                config.osuApi.beatmapRequests === false
+                  ? config.osu.enableCommands.filter(
+                      (a) => a !== OsuCommands.REQUESTS
+                    )
+                  : config.osu.enableCommands,
               osuApiDbPath: config.osuApi.databasePath,
               osuApiV2Credentials: {
                 clientId: config.osuApi.clientId,
