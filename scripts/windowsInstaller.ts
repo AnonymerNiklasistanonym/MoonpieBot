@@ -44,24 +44,31 @@ export const createWindowsInstallerConfigFile = async (
   await fs.writeFile(outputPath, outputString);
 };
 
-const getCustomDirDialogBatch = async (
+const batchExitProgram = "exit 0";
+const batchHideCommands = "@echo off";
+const batchShowCommands = "@echo on";
+const batchWaitForKeypress = "pause press [enter]";
+const batchSelectFolderDialog = async (
   powershellSelectDirectoryScriptPath: string,
   dialogTitle: string,
-  variableName: string
+  variableName: string,
+  onEmptyAction?: string
 ) => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const powershellSelectDirectoryScript = await fs.readFile(
     powershellSelectDirectoryScriptPath
   );
   const pscommand = "PScommand";
-  let outputString = "";
-  outputString += `set "${pscommand}="POWERSHELL ${powershellSelectDirectoryScript
+  let outputString = `set "${pscommand}="POWERSHELL ${powershellSelectDirectoryScript
     .toString()
     .replace("DIALOG_TITLE", dialogTitle)
     .split("\n")
     .map((a) => a.trim())
     .join("")}""\n`;
   outputString += `for /f "usebackq tokens=*" %%Q in (\`%${pscommand}%\`) do set ${variableName}=%%Q`;
+  if (onEmptyAction !== undefined) {
+    outputString += `\nif "%${variableName}%"=="" (${onEmptyAction})`;
+  }
   return outputString;
 };
 
@@ -72,18 +79,21 @@ export const createWindowsInstallerScriptFileMain = async (
   let outputString = "";
   const selectedCustomDirVarName = "SelectedCustomDir";
   if (powershellSelectDirectoryScriptPath !== undefined) {
-    outputString += `${await getCustomDirDialogBatch(
+    outputString += `${batchHideCommands}\n`;
+    outputString += `${await batchSelectFolderDialog(
       powershellSelectDirectoryScriptPath,
       "Select custom configuration directory",
-      selectedCustomDirVarName
+      selectedCustomDirVarName,
+      batchExitProgram
     )}\n`;
+    outputString += `${batchShowCommands}\n`;
   }
   outputString += `${binaryName}.exe ${CliOption.CONFIG_DIRECTORY} "${
     powershellSelectDirectoryScriptPath !== undefined
       ? `%${selectedCustomDirVarName}%`
       : defaultConfigDir(true)
   }" %*\n`;
-  outputString += "pause press [enter]\n";
+  outputString += `${batchWaitForKeypress}\n`;
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(outputPath, outputString);
@@ -94,18 +104,21 @@ export const createWindowsInstallerScriptFileBackup = async (
   powershellSelectDirectoryScriptPath: string
 ): Promise<void> => {
   let outputString = "";
+  outputString += `${batchHideCommands}\n`;
   const selectedBackupDirVarName = "SelectedBackupDir";
-  outputString += `${await getCustomDirDialogBatch(
+  outputString += `${await batchSelectFolderDialog(
     powershellSelectDirectoryScriptPath,
     "Select backup directory",
-    selectedBackupDirVarName
+    selectedBackupDirVarName,
+    batchExitProgram
   )}\n`;
+  outputString += `${batchShowCommands}\n`;
   outputString += `${binaryName}.exe ${
     CliOption.CONFIG_DIRECTORY
   } "${defaultConfigDir(true)}" ${
     CliOption.CREATE_BACKUP
   } "%${selectedBackupDirVarName}%" %*\n`;
-  outputString += "pause press [enter]\n";
+  outputString += `${batchWaitForKeypress}\n`;
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(outputPath, outputString);
