@@ -14,6 +14,7 @@ import path from "path";
 // Local imports
 import { binaryName, name, usages } from "./info/general";
 import { cliOptionsInformation, parseCliArgs } from "./info/cli";
+import { copyAndBackupFile, fileExists } from "./other/fileOperations";
 import { createConsoleLogger, createLogFunc, createLogger } from "./logging";
 import {
   createEnvVariableDocumentation,
@@ -41,7 +42,6 @@ import { createCustomCommandsBroadcastsDocumentation } from "./documentation/cus
 import { createStringsVariableDocumentation } from "./documentation/strings";
 import { defaultStringMap } from "./info/strings";
 import { ExportDataTypes } from "./info/export";
-import { fileExists } from "./other/fileOperations";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getLoggerConfigFromEnv } from "./info/config/loggerConfig";
 import { getMoonpieConfigFromEnv } from "./info/config/moonpieConfig";
@@ -122,6 +122,102 @@ const entryPoint = async () => {
     }
 
     // ----------------------------------------------------------
+    // Import backup
+    // ----------------------------------------------------------
+
+    if ("importBackup" in cliOptions && cliOptions.importBackup) {
+      if (cliOptions.customConfigDir !== undefined) {
+        configDir = cliOptions.customConfigDir;
+      }
+      const backupDir = cliOptions.backupDir;
+      console.log(`Import backup from '${backupDir}' to '${configDir}'...`);
+      // Create config directory if it doesn't exist
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.mkdir(configDir, { recursive: true });
+      // Check if backup directory exists
+      if (!(await fileExists(backupDir))) {
+        throw Error(`Backup directory '${backupDir}' does not exist!`);
+      }
+      // Load ENV variables from .env files in backup directory and override
+      // all values that were set in the command line with them
+      dotenv.config({
+        override: true,
+        path: path.join(backupDir, fileNameEnv),
+      });
+      dotenv.config({
+        override: true,
+        path: path.join(backupDir, fileNameEnvStrings),
+      });
+      // Copy and overwrite all detected files and save the old files in a directory
+      const backupDirCurrentConfig = path.join(
+        configDir,
+        `old_config_${new Date()
+          .toISOString()
+          .replace(/T/, " ")
+          .replace(/\..+/, "")
+          .replaceAll(/\s/g, "_")
+          .replaceAll(/:/g, "-")}`
+      );
+      const srcFileNameEnv = path.join(backupDir, fileNameEnv);
+      console.log(`Import '${srcFileNameEnv}' to '${configDir}'...`);
+      await copyAndBackupFile(
+        srcFileNameEnv,
+        path.join(configDir, fileNameEnv),
+        path.join(backupDirCurrentConfig, fileNameEnv),
+        true
+      );
+      const srcFileNameEnvStrings = path.join(backupDir, fileNameEnvStrings);
+      console.log(`Import '${srcFileNameEnvStrings}' to '${configDir}'...`);
+      await copyAndBackupFile(
+        srcFileNameEnvStrings,
+        path.join(configDir, fileNameEnvStrings),
+        path.join(backupDirCurrentConfig, fileNameEnvStrings),
+        true
+      );
+      // Overwrite the backed up configs with the latest config
+      console.log(`Overwrite '${fileNameEnv}' in '${configDir}'...`);
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(
+        path.join(configDir, fileNameEnv),
+        await exportDataEnv(configDir, false, {
+          resetDatabaseFilePaths: true,
+        })
+      );
+      console.log(`Overwrite '${fileNameEnvStrings}' in '${configDir}'...`);
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(
+        path.join(configDir, fileNameEnvStrings),
+        await exportDataEnvStrings(configDir, false)
+      );
+      // Copy databases
+      const configBackup = getMoonpieConfigFromEnv(backupDir);
+      const config = getMoonpieConfigFromEnv(configDir, {
+        resetDatabaseFilePaths: true,
+      });
+      const databasesToImport = [
+        [
+          configBackup.customCommandsBroadcasts?.databasePath,
+          config.customCommandsBroadcasts?.databasePath,
+        ],
+        [configBackup.moonpie?.databasePath, config.moonpie?.databasePath],
+        [configBackup.osuApi?.databasePath, config.osuApi?.databasePath],
+        [configBackup.spotify?.databasePath, config.spotify?.databasePath],
+      ];
+      for (const [dbBackup, db] of databasesToImport) {
+        if (dbBackup && db && (await fileExists(dbBackup))) {
+          console.log(`Import '${dbBackup}' to '${configDir}'...`);
+          await copyAndBackupFile(
+            dbBackup,
+            db,
+            path.join(backupDirCurrentConfig, path.basename(db)),
+            true
+          );
+        }
+      }
+      process.exit(0);
+    }
+
+    // ----------------------------------------------------------
     // Load ENV variables from .env files in config directory
     // ----------------------------------------------------------
     if ("customConfigDir" in cliOptions && cliOptions.customConfigDir) {
@@ -147,13 +243,13 @@ const entryPoint = async () => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.mkdir(backupDir, { recursive: true });
       // ENV variables (reset the database paths)
-      console.log(`Create '${fileNameEnv}' file in '${backupDir}'...`);
+      console.log(`Create '${fileNameEnv}' in '${backupDir}'...`);
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(
         path.join(backupDir, fileNameEnv),
         await exportDataEnv(configDir, false, { resetDatabaseFilePaths: true })
       );
-      console.log(`Create '${fileNameEnvStrings}' file in '${backupDir}'...`);
+      console.log(`Create '${fileNameEnvStrings}' in '${backupDir}'...`);
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(
         path.join(backupDir, fileNameEnvStrings),

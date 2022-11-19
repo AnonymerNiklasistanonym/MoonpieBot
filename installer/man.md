@@ -27,6 +27,9 @@ If this program is installed via a package it will use *$HOME/.local/share/moonp
 **----create-backup** *BACKUP_DIR*
 : Create a backup of all configurations and databases that can be found in the specified backup directory
 
+**----import-backup** *BACKUP_DIR*
+: Import a backup of all configurations and databases that can be found in the specified backup directory
+
 **----create-example-files** *[EXAMPLE_FILES_DIR]*
 : Creates example files (for custom commands and timers) in the specified example files directory if given or the current config directory
 

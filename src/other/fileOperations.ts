@@ -1,5 +1,8 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
+
+// Package imports
 import { promises as fs } from "fs";
+import path from "path";
 
 /**
  * Return if file/directory already exists.
@@ -9,6 +12,26 @@ import { promises as fs } from "fs";
  */
 export const fileExists = async (filePath: string): Promise<boolean> =>
   !!(await fs.stat(filePath).catch(() => false));
+
+export const copyAndBackupFile = async (
+  srcFilePath: string,
+  destFilePath: string,
+  destFilePathBackup: string,
+  ignoreSrcFileNotFound = false
+): Promise<void> => {
+  const srcFileNotFound = !(await fileExists(srcFilePath));
+  if (srcFileNotFound && !ignoreSrcFileNotFound) {
+    throw Error(`Source file was not found '${srcFilePath}'`);
+  }
+  if (await fileExists(destFilePath)) {
+    await fs.mkdir(path.dirname(destFilePathBackup), { recursive: true });
+    await fs.rename(destFilePath, destFilePathBackup);
+  }
+  if (srcFileNotFound && ignoreSrcFileNotFound) {
+    return;
+  }
+  await fs.copyFile(srcFilePath, destFilePath);
+};
 
 /**
  * Read a JSON file.

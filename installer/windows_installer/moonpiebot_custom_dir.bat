@@ -4,4 +4,5 @@ for /f "usebackq tokens=*" %%Q in (`%PScommand%`) do set SelectedCustomDir=%%Q
 if "%SelectedCustomDir%"=="" (exit 0)
 @echo on
 moonpiebot.exe --config-dir "%SelectedCustomDir%" %*
+@echo off
 pause press [enter]

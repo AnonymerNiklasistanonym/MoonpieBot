@@ -6,6 +6,7 @@ import path from "path";
 import {
   createWindowsInstallerConfigFile,
   createWindowsInstallerScriptFileBackup,
+  createWindowsInstallerScriptFileImport,
   createWindowsInstallerScriptFileMain,
 } from "./windowsInstaller";
 import { name } from "../src/info/general";
@@ -34,6 +35,10 @@ export const filePathWindowsScriptGlobalBackup = path.join(
   WINDOWS_INSTALLER_DIR,
   `${name.toLowerCase()}_backup.bat`
 );
+export const filePathWindowsScriptGlobalImport = path.join(
+  WINDOWS_INSTALLER_DIR,
+  `${name.toLowerCase()}_import.bat`
+);
 export const filePathPowershellScriptSelectDirectory = path.join(
   WINDOWS_INSTALLER_DIR,
   "select_directory.ps1"
@@ -50,6 +55,9 @@ console.log(
 console.log(
   `Create Windows script file backup '${filePathWindowsScriptGlobalBackup}'...`
 );
+console.log(
+  `Create Windows script file import '${filePathWindowsScriptGlobalImport}'...`
+);
 
 Promise.all([
   createWindowsInstallerConfigFile(
@@ -59,7 +67,8 @@ Promise.all([
       WINDOWS_INSTALLER_DIR,
       filePathWindowsScriptGlobalMainCustomDir
     ),
-    path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalBackup)
+    path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalBackup),
+    path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalImport)
   ),
   createWindowsInstallerScriptFileMain(filePathWindowsScriptGlobalMain),
   createWindowsInstallerScriptFileMain(
@@ -68,6 +77,10 @@ Promise.all([
   ),
   createWindowsInstallerScriptFileBackup(
     filePathWindowsScriptGlobalBackup,
+    filePathPowershellScriptSelectDirectory
+  ),
+  createWindowsInstallerScriptFileImport(
+    filePathWindowsScriptGlobalImport,
     filePathPowershellScriptSelectDirectory
   ),
 ]).catch(console.error);

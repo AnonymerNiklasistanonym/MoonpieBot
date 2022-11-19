@@ -9,6 +9,7 @@
 !define FILE_NAME_SCRIPT_MAIN "moonpiebot.bat"
 !define FILE_NAME_SCRIPT_MAIN_CUSTOM_CONFIG_DIR "moonpiebot_custom_dir.bat"
 !define FILE_NAME_SCRIPT_BACKUP "moonpiebot_backup.bat"
+!define FILE_NAME_SCRIPT_IMPORT "moonpiebot_import.bat"
 !define FILE_NAME_ENV_EXAMPLE ".env.example"
 !define FILE_NAME_ENV_STRINGS_EXAMPLE ".env.strings.example"
 !define FILE_NAME_CUSTOM_COMMANDS_BROADCASTS_EXAMPLE "customCommandsBroadcasts.example.txt"

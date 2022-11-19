@@ -22,6 +22,7 @@ export enum CliOption {
   EXPORT_DATA = "--export-data",
   EXPORT_DATA_JSON = "--export-data-json",
   HELP = "--help",
+  IMPORT_BACKUP = "--import-backup",
   VERSION = "--version",
 }
 
@@ -47,6 +48,17 @@ export const cliOptionsInformation: CliOptionInformation<CliOption>[] = [
     description:
       "Create a backup of all configurations and databases that can be found in the specified backup directory",
     name: CliOption.CREATE_BACKUP,
+    signature: [
+      {
+        name: "backup",
+        type: CliOptionSignaturePartType.DIRECTORY,
+      },
+    ],
+  },
+  {
+    description:
+      "Import a backup of all configurations and databases that can be found in the specified backup directory",
+    name: CliOption.IMPORT_BACKUP,
     signature: [
       {
         name: "backup",
@@ -131,6 +143,11 @@ export interface ParsedCliOptionsCreateBackup {
   createBackup: true;
   customConfigDir?: string;
 }
+export interface ParsedCliOptionsImportBackup {
+  backupDir: string;
+  customConfigDir?: string;
+  importBackup: true;
+}
 export interface ParsedCliOptionsCreateExampleFiles {
   createExampleFiles: true;
   exampleFilesDir?: string;
@@ -151,6 +168,7 @@ export type ParsedCliOptions =
   | ParsedCliOptionsCreateBackup
   | ParsedCliOptionsCreateExampleFiles
   | ParsedCliOptionsCreateExportData
+  | ParsedCliOptionsImportBackup
   | ParsedCliOptionsShowHelp
   | ParsedCliOptionsShowVersion;
 
@@ -175,6 +193,7 @@ export const parseCliArgs = (
 
   let lookingForConfigDir = false;
   let lookingForBackupDir = false;
+  let lookingForImportBackupDir = false;
   let lookingForExampleFilesDir = false;
   let lookingForExportDataType = false;
   let lookingForExportDataJsonType = false;
@@ -191,6 +210,13 @@ export const parseCliArgs = (
         backupDir: cliArg,
         createBackup: true,
         customConfigDir: options.customConfigDir,
+      };
+    }
+    if (lookingForImportBackupDir) {
+      return {
+        backupDir: cliArg,
+        customConfigDir: options.customConfigDir,
+        importBackup: true,
       };
     }
     if (lookingForExampleFilesDir) {
@@ -257,6 +283,10 @@ export const parseCliArgs = (
     }
     if (cliArg === CliOption.EXPORT_DATA_JSON) {
       lookingForExportDataJsonType = true;
+      continue;
+    }
+    if (cliArg === CliOption.IMPORT_BACKUP) {
+      lookingForImportBackupDir = true;
       continue;
     }
     throw Error(`Found unknown CLI option '${cliArg}'`);

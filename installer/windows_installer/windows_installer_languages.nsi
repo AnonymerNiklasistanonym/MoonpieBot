@@ -22,6 +22,11 @@ LangString LangStrBackup ${LANG_GERMAN}  "Backup"
 LangString LangStrBackup ${LANG_FINNISH} "Varmuuskopiointi"
 LangString LangStrBackup ${LANG_SPANISH} "Copia de seguridad de"
 
+LangString LangStrImport ${LANG_ENGLISH} "Import"
+LangString LangStrImport ${LANG_GERMAN}  "Import"
+LangString LangStrImport ${LANG_FINNISH} "Tuo"
+LangString LangStrImport ${LANG_SPANISH} "Importar"
+
 LangString LangStrCustomConfig ${LANG_ENGLISH} "Custom config directory"
 LangString LangStrCustomConfig ${LANG_GERMAN}  "Benutzerdefiniertes Konfigurationsverzeichnis"
 LangString LangStrCustomConfig ${LANG_FINNISH} "Mukautettu konfiguraatiohakemisto"

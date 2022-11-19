@@ -20,7 +20,8 @@ export const createWindowsInstallerConfigFile = async (
   outputPath: string,
   fileNameScriptMain: string,
   fileNameScriptMainCustomDir: string,
-  fileNameScriptBackup: string
+  fileNameScriptBackup: string,
+  fileNameScriptImport: string
 ): Promise<void> => {
   let outputString = "";
   outputString += ";Define name and lowercase name of the product\n";
@@ -36,6 +37,7 @@ export const createWindowsInstallerConfigFile = async (
   outputString += `!define FILE_NAME_SCRIPT_MAIN "${fileNameScriptMain}"\n`;
   outputString += `!define FILE_NAME_SCRIPT_MAIN_CUSTOM_CONFIG_DIR "${fileNameScriptMainCustomDir}"\n`;
   outputString += `!define FILE_NAME_SCRIPT_BACKUP "${fileNameScriptBackup}"\n`;
+  outputString += `!define FILE_NAME_SCRIPT_IMPORT "${fileNameScriptImport}"\n`;
   outputString += `!define FILE_NAME_ENV_EXAMPLE "${fileNameEnvExample}"\n`;
   outputString += `!define FILE_NAME_ENV_STRINGS_EXAMPLE "${fileNameEnvStringsExample}"\n`;
   outputString += `!define FILE_NAME_CUSTOM_COMMANDS_BROADCASTS_EXAMPLE "${fileNameCustomCommandsBroadcastsExample}"\n`;
@@ -93,6 +95,7 @@ export const createWindowsInstallerScriptFileMain = async (
       ? `%${selectedCustomDirVarName}%`
       : defaultConfigDir(true)
   }" %*\n`;
+  outputString += `${batchHideCommands}\n`;
   outputString += `${batchWaitForKeypress}\n`;
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -118,6 +121,33 @@ export const createWindowsInstallerScriptFileBackup = async (
   } "${defaultConfigDir(true)}" ${
     CliOption.CREATE_BACKUP
   } "%${selectedBackupDirVarName}%" %*\n`;
+  outputString += `${batchHideCommands}\n`;
+  outputString += `${batchWaitForKeypress}\n`;
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.writeFile(outputPath, outputString);
+};
+
+export const createWindowsInstallerScriptFileImport = async (
+  outputPath: string,
+  powershellSelectDirectoryScriptPath: string
+): Promise<void> => {
+  let outputString = "";
+  outputString += `${batchHideCommands}\n`;
+  const selectedBackupDirVarName = "SelectedBackupDir";
+  outputString += `${await batchSelectFolderDialog(
+    powershellSelectDirectoryScriptPath,
+    "Select backup directory to import",
+    selectedBackupDirVarName,
+    batchExitProgram
+  )}\n`;
+  outputString += `${batchShowCommands}\n`;
+  outputString += `${binaryName}.exe ${
+    CliOption.CONFIG_DIRECTORY
+  } "${defaultConfigDir(true)}" ${
+    CliOption.IMPORT_BACKUP
+  } "%${selectedBackupDirVarName}%" %*\n`;
+  outputString += `${batchHideCommands}\n`;
   outputString += `${batchWaitForKeypress}\n`;
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename

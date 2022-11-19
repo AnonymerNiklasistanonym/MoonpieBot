@@ -8,6 +8,7 @@ OUTPUT_ICO=moonpiebot.ico
 OUTPUT_ICO_GRAYSCALE=moonpiebot_greyscale.ico
 OUTPUT_ICO_GREEN=moonpiebot_green.ico
 OUTPUT_ICO_ORANGE=moonpiebot_orange.ico
+OUTPUT_ICO_PURPLE=moonpiebot_purple.ico
 
 # Create `ico` image file
 # https://iconhandbook.co.uk/reference/chart/windows/
@@ -19,3 +20,4 @@ convert "$OUTPUT_ICO" -colorspace gray "$OUTPUT_ICO_GRAYSCALE"
 # Create colored `ico` image files by converting the normal `ico` image file
 convert "$OUTPUT_ICO" -colorspace gray -colorspace rgb +level-colors ,Green "$OUTPUT_ICO_GREEN"
 convert "$OUTPUT_ICO" -colorspace gray -colorspace rgb +level-colors ,Orange "$OUTPUT_ICO_ORANGE"
+convert "$OUTPUT_ICO" -colorspace gray -colorspace rgb +level-colors ,Purple "$OUTPUT_ICO_PURPLE"
