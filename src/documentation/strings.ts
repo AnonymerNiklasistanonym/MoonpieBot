@@ -97,25 +97,6 @@ export const createStringsVariableDocumentation = async (
         { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
       )}`,
     });
-    if (updatedStringsMap !== undefined) {
-      const updatedString = updatedStringsMap.get(key);
-      if (
-        updatedString !== undefined &&
-        updatedString.default !== stringEntry.default
-      ) {
-        dataDefaultStrings.push({
-          text: "  Custom value:",
-          type: FileDocumentationPartType.TEXT,
-        });
-        dataDefaultStrings.push({
-          type: FileDocumentationPartType.VALUE,
-          value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}=${escapeStringIfWhiteSpace(
-            updatedString.default,
-            { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
-          )}`,
-        });
-      }
-    }
     if (
       stringEntry.alternatives !== undefined &&
       stringEntry.alternatives.length > 0
@@ -139,6 +120,28 @@ export const createStringsVariableDocumentation = async (
   data.push(...dataDefaultStrings);
 
   if (updatedStringsMap !== undefined) {
+    const updatedStrings = Array.from(updatedStringsMap)
+      .filter((a) => a[1].updated === true && a[1].custom !== true)
+      .sort((a, b) => genericStringSorter(a[0], b[0]));
+    if (updatedStrings.length > 0) {
+      data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
+      data.push({
+        description:
+          "Strings that will be used instead of their default strings counterparts.",
+        title: "Updated Strings",
+        type: FileDocumentationPartType.HEADING,
+      });
+    }
+    for (const [updatedStringId, updatedStringValue] of updatedStrings) {
+      data.push({
+        type: FileDocumentationPartType.VALUE,
+        value: `${ENV_PREFIX_CUSTOM_STRINGS}${updatedStringId}=${escapeStringIfWhiteSpace(
+          updatedStringValue.default,
+          { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
+        )}`,
+      });
+    }
+
     const customStrings = Array.from(updatedStringsMap)
       .filter((a) => a[1].custom === true)
       .sort((a, b) => genericStringSorter(a[0], b[0]));
