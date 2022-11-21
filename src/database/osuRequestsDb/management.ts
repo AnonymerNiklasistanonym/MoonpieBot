@@ -1,7 +1,7 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Local imports
-import { getVersionFromObject, isSameVersion } from "../../version";
+import { compareVersions, getVersionString } from "../../version";
 import {
   OsuRequestsConfig,
   osuRequestsConfigTable,
@@ -33,8 +33,13 @@ export const setup = async (
       migrateVersion: async (oldVersion, currentVersion) => {
         if (oldVersion !== undefined) {
           if (
-            isSameVersion(oldVersion, { major: 0, minor: 0, patch: 1 }) &&
-            isSameVersion(currentVersion, { major: 0, minor: 0, patch: 2 })
+            compareVersions(oldVersion, { major: 0, minor: 0, patch: 1 }) ===
+              0 &&
+            compareVersions(currentVersion, {
+              major: 0,
+              minor: 0,
+              patch: 2,
+            }) === 0
           ) {
             // Alter table to drop channel column that was in version 0.0.1 but
             // got removed in version 0.0.2
@@ -75,9 +80,10 @@ export const setup = async (
                   .includes(oldEntry.option)
               ) {
                 throw Error(
-                  `Could not successfully migrate database because the option is unknown: '${
-                    oldEntry.option
-                  }' (${Object.values(OsuRequestsConfig).join(",")})`
+                  "Could not successfully migrate database because the " +
+                    `option is unknown: '${oldEntry.option}' (${Object.values(
+                      OsuRequestsConfig
+                    ).join(",")})`
                 );
               }
             }
@@ -112,20 +118,18 @@ export const setup = async (
               );
             }
             logger.info(
-              `Successfully migrated '${databasePath}' from ${getVersionFromObject(
+              `Successfully migrated '${databasePath}' from ${getVersionString(
                 oldVersion,
                 ""
-              )} to ${getVersionFromObject(currentVersion, "")}`
+              )} to ${getVersionString(currentVersion, "")}`
             );
             return;
           }
         }
         throw Error(
           `No database migration was found (old=${
-            oldVersion !== undefined
-              ? getVersionFromObject(oldVersion, "")
-              : "none"
-          },current=${getVersionFromObject(currentVersion, "")})!`
+            oldVersion !== undefined ? getVersionString(oldVersion, "") : "none"
+          },current=${getVersionString(currentVersion, "")})!`
         );
       },
     },

@@ -13,7 +13,7 @@ import {
   fileNameEnvStringsExample,
 } from "../src/info/files";
 import { CliOption } from "../src/info/cli";
-import { getVersionFromObject } from "../src/version";
+import { getVersionString } from "../src/version";
 import { version } from "../src/info/version";
 
 export const createWindowsInstallerConfigFile = async (
@@ -26,11 +26,12 @@ export const createWindowsInstallerConfigFile = async (
   let outputString = "";
   outputString += ";Define name and lowercase name of the product\n";
   outputString += `!define PRODUCT "${name}"\n`;
-  outputString += `!define PRODUCT_LOWERCASE "${name.toLowerCase()}"\n`;
+  outputString += `!define PRODUCT_BINARY "${binaryName}"\n`;
   outputString += ";Define version of the product\n";
-  outputString += `!define PRODUCT_VERSION "${getVersionFromObject(
-    version
-  ).slice(1)}"\n`;
+  outputString += `!define PRODUCT_VERSION "${getVersionString(
+    version,
+    ""
+  )}"\n`;
   outputString += ";Define URL of the product\n";
   outputString += `!define PRODUCT_URL "${sourceCodeUrl}"\n`;
   outputString += ";Define local input file names\n";

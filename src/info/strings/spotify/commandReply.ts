@@ -1,5 +1,9 @@
 // Local imports
-import { pluginIfFalse, pluginIfTrue } from "../../plugins/general";
+import {
+  pluginIfFalse,
+  pluginIfNotEmpty,
+  pluginIfTrue,
+} from "../../plugins/general";
 import { createMessageParserMessage } from "../../../messageParser";
 import { macroSpotifySong } from "../../macros/spotify";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
@@ -24,13 +28,25 @@ const spotifyCommandReplyRefSongCurrent: StringEntry = {
         name: macroSpotifySong.id,
         type: "macro",
       },
-      "' by '",
-      {
-        key: SpotifySongMacro.CURRENT_ARTISTS,
-        name: macroSpotifySong.id,
-        type: "macro",
-      },
       "'",
+      {
+        args: {
+          key: SpotifySongMacro.CURRENT_ARTISTS,
+          name: macroSpotifySong.id,
+          type: "macro",
+        },
+        name: pluginIfNotEmpty.id,
+        scope: [
+          " by '",
+          {
+            key: SpotifySongMacro.CURRENT_ARTISTS,
+            name: macroSpotifySong.id,
+            type: "macro",
+          },
+          "'",
+        ],
+        type: "plugin",
+      },
       {
         args: {
           key: SpotifySongMacro.CURRENT_IS_SINGLE,
@@ -38,15 +54,24 @@ const spotifyCommandReplyRefSongCurrent: StringEntry = {
           type: "macro",
         },
         name: pluginIfFalse.id,
-        scope: [
-          " from '",
-          {
+        scope: {
+          args: {
             key: SpotifySongMacro.CURRENT_ALBUM,
             name: macroSpotifySong.id,
             type: "macro",
           },
-          "'",
-        ],
+          name: pluginIfNotEmpty.id,
+          scope: [
+            " from '",
+            {
+              key: SpotifySongMacro.CURRENT_ALBUM,
+              name: macroSpotifySong.id,
+              type: "macro",
+            },
+            "'",
+          ],
+          type: "plugin",
+        },
         type: "plugin",
       },
     ],
@@ -64,13 +89,25 @@ const spotifyCommandReplyRefSongPrevious: StringEntry = {
         name: macroSpotifySong.id,
         type: "macro",
       },
-      "' by '",
-      {
-        key: SpotifySongMacro.PREVIOUS_ARTISTS,
-        name: macroSpotifySong.id,
-        type: "macro",
-      },
       "'",
+      {
+        args: {
+          key: SpotifySongMacro.PREVIOUS_ARTISTS,
+          name: macroSpotifySong.id,
+          type: "macro",
+        },
+        name: pluginIfNotEmpty.id,
+        scope: [
+          " by '",
+          {
+            key: SpotifySongMacro.PREVIOUS_ARTISTS,
+            name: macroSpotifySong.id,
+            type: "macro",
+          },
+          "'",
+        ],
+        type: "plugin",
+      },
       {
         args: {
           key: SpotifySongMacro.PREVIOUS_IS_SINGLE,
@@ -78,15 +115,24 @@ const spotifyCommandReplyRefSongPrevious: StringEntry = {
           type: "macro",
         },
         name: pluginIfFalse.id,
-        scope: [
-          " from '",
-          {
+        scope: {
+          args: {
             key: SpotifySongMacro.PREVIOUS_ALBUM,
             name: macroSpotifySong.id,
             type: "macro",
           },
-          "'",
-        ],
+          name: pluginIfNotEmpty.id,
+          scope: [
+            " from '",
+            {
+              key: SpotifySongMacro.PREVIOUS_ALBUM,
+              name: macroSpotifySong.id,
+              type: "macro",
+            },
+            "'",
+          ],
+          type: "plugin",
+        },
         type: "plugin",
       },
     ],

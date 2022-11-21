@@ -13,9 +13,9 @@ export const regexMoonpieChatHandlerCommandAbout =
   /^\s*!moonpie\s+about(?:\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandRequests {
-  requestsOff?: "off";
-  requestsOn?: "on";
-  requestsOnOffMessage?: string;
+  message?: string;
+  off?: "off";
+  on?: "on";
 }
 /**
  * Regex to recognize the !osuRequests (on|off $OPTIONAL_MESSAGE) command.
@@ -35,11 +35,11 @@ export interface RegexOsuChatHandlerCommandRequests {
  */
 export const regexOsuChatHandlerCommandRequests =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!osuRequests(?:(?:\s+(?<requestsOn>on)|\s+(?<requestsOff>off))(?:\s+(?<requestsOnOffMessage>.*?)\s*$|\s|$)?)?(?:\s|$)/i;
+  /^\s*!osuRequests(?:(?:\s+(?<on>on)|\s+(?<off>off))(?:\s+(?<message>.*?)\s*$|\s|$)?)?(?:\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandRequestsSet {
-  setOption: string;
-  setOptionValue: string;
+  option: string;
+  optionValue: string;
 }
 /**
  * Regex to recognize the !osuRequests set $OPTION $VALUE command.
@@ -58,10 +58,10 @@ export interface RegexOsuChatHandlerCommandRequestsSet {
  * ```
  */
 export const regexOsuChatHandlerCommandRequestsSet =
-  /^\s*!osuRequests\s+set\s+(?<setOption>\S+)\s+(?<setOptionValue>.+?)(?:\s*$)/i;
+  /^\s*!osuRequests\s+set\s+(?<option>\S+)\s+(?<optionValue>.+?)(?:\s*$)/i;
 
 export interface RegexOsuChatHandlerCommandRequestsUnset {
-  unsetOption: string;
+  option: string;
 }
 /**
  * Regex to recognize the !osuRequests set $OPTION $VALUE command.
@@ -80,7 +80,7 @@ export interface RegexOsuChatHandlerCommandRequestsUnset {
  * ```
  */
 export const regexOsuChatHandlerCommandRequestsUnset =
-  /^\s*!osuRequests\s+unset\s+(?<unsetOption>\S+)(?:\s|$)/i;
+  /^\s*!osuRequests\s+unset\s+(?<option>\S+)(?:\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandLastRequest {
   lastRequestCount?: string;
@@ -182,10 +182,10 @@ export interface RegexMoonpieChatHandlerCommandUserGet {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserGet =
-  /^\s*!moonpie\s+get\s+(?<userName>\S+)(?:\s|$)/i;
+  /^\s*!moonpie\s+get\s+(?<userName>(?:'[^'"]+'|\S+))(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserSet {
-  moonpieCountSet: string;
+  countSet: string;
   userName: string;
 }
 /**
@@ -200,10 +200,10 @@ export interface RegexMoonpieChatHandlerCommandUserSet {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserSet =
-  /^\s*!moonpie\s+set\s+(?<userName>\S+)\s+(?<moonpieCountSet>[0-9]+)(?:\s|$)/i;
+  /^\s*!moonpie\s+set\s+(?<userName>(?:'[^'"]+'|\S+))\s+(?<countSet>[0-9]+)(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserAdd {
-  moonpieCountAdd: string;
+  countAdd: string;
   userName: string;
 }
 /**
@@ -218,10 +218,10 @@ export interface RegexMoonpieChatHandlerCommandUserAdd {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserAdd =
-  /^\s*!moonpie\s+add\s+(?<userName>\S+)\s+(?<moonpieCountAdd>[0-9]+)(?:\s|$)/i;
+  /^\s*!moonpie\s+add\s+(?<userName>(?:'[^'"]+'|\S+))\s+(?<countAdd>[0-9]+)(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserRemove {
-  moonpieCountRemove: string;
+  countRemove: string;
   userName: string;
 }
 /**
@@ -236,7 +236,7 @@ export interface RegexMoonpieChatHandlerCommandUserRemove {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserRemove =
-  /^\s*!moonpie\s+remove\s+(?<userName>\S+)\s+(?<moonpieCountRemove>[0-9]+)(?:\s|$)/i;
+  /^\s*!moonpie\s+remove\s+(?<userName>(?:'[^'"]+'|\S+))\s+(?<countRemove>[0-9]+)(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserDelete {
   userName: string;
@@ -252,7 +252,7 @@ export interface RegexMoonpieChatHandlerCommandUserDelete {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserDelete =
-  /^\s*!moonpie\s+delete\s+(?<userName>\S+)(?:\s|$)/i;
+  /^\s*!moonpie\s+delete\s+(?<userName>(?:'[^'"]+'|\S+))(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!osu commands` command.
@@ -305,7 +305,7 @@ export type RegexOsuChatHandlerCommandPp =
  * ```
  */
 export const regexOsuChatHandlerCommandPp =
-  /^\s*!pp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i;
+  /^\s*!pp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^'"]+'|\S+)))(?:\s|$)|\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandRpUserId {
   osuUserId: string;
@@ -337,7 +337,7 @@ export type RegexOsuChatHandlerCommandRp =
  * ```
  */
 export const regexOsuChatHandlerCommandRp =
-  /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i;
+  /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^'"]+'|\S+)))(?:\s|$)|\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandScore {
   osuUserName: string;
@@ -459,11 +459,11 @@ export const regexCustomCommandsBroadcastsCommands =
   /^\s*!(?:ccs?|cbs?|ccs?cbs?)\s+commands(?:\s*$)/i;
 
 export interface RegexCustomCommandAdd {
-  customCommandCooldownInS?: string;
-  customCommandId: string;
-  customCommandMessage: string;
-  customCommandRegex: string;
-  customCommandUserLevel?: "mod" | "vip" | "none" | "broadcaster";
+  cooldownInS?: string;
+  id: string;
+  message: string;
+  regex: string;
+  userLevel?: "mod" | "vip" | "none" | "broadcaster";
 }
 /**
  * Regex to recognize the !addcc command.
@@ -475,9 +475,9 @@ export interface RegexCustomCommandAdd {
  */
 export const regexCustomCommandAdd =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!addcc\s+(?<customCommandId>'.+?'|(?!')\S+(?!'))\s+(?<customCommandRegex>'.+?'|(?!')\S+(?!'))\s+(?<customCommandMessage>'.+?'|(?!')\S+(?!'))(?:\s+-ul=(?<customCommandUserLevel>mod|vip|none|broadcaster))?(?:\s+-cd=(?<customCommandCooldownInS>[0-9]+))?(?:\s|$)/i;
+  /^\s*!addcc\s+(?<id>'.+?'|(?!')\S+(?!'))\s+(?<regex>'.+?'|(?!')\S+(?!'))\s+(?<message>'.+?'|(?!')\S+(?!'))(?:\s+-ul=(?<userLevel>mod|vip|none|broadcaster))?(?:\s+-cd=(?<cooldownInS>[0-9]+))?(?:\s|$)/i;
 export interface RegexCustomCommandDelete {
-  customCommandId: string;
+  id: string;
 }
 /**
  * Regex to recognize the !delcc command.
@@ -489,12 +489,12 @@ export interface RegexCustomCommandDelete {
  */
 export const regexCustomCommandDelete =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!delcc\s+(?<customCommandId>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!delcc\s+(?<id>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
 export interface RegexCustomCommandList {
-  customCommandId?: string;
+  id?: string;
 }
 export interface RegexCustomCommandListOffset {
-  customCommandOffset?: string;
+  listOffset?: string;
 }
 /**
  * Regex to recognize the !listccs command.
@@ -510,11 +510,11 @@ export interface RegexCustomCommandListOffset {
  */
 export const regexCustomCommandList =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!listccs?(?:\s+(?<customCommandOffset>[0-9]+?)|\s+(?<customCommandId>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
+  /^\s*!listccs?(?:\s+(?<listOffset>[0-9]+?)|\s+(?<id>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
 export interface RegexCustomCommandEdit {
-  customCommandId: string;
-  customCommandOption: string;
-  customCommandOptionValue: string;
+  id: string;
+  option: string;
+  optionValue: string;
 }
 /**
  * Regex to recognize the !editcc command.
@@ -526,12 +526,12 @@ export interface RegexCustomCommandEdit {
  */
 export const regexCustomCommandEdit =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!editcc\s+(?<customCommandId>'.+?'|(?!')\S+(?!'))\s+(?<customCommandOption>\S+)\s+(?<customCommandOptionValue>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!editcc\s+(?<id>'.+?'|(?!')\S+(?!'))\s+(?<option>\S+)\s+(?<optionValue>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
 
 export interface RegexCustomBroadcastAdd {
-  customBroadcastCronString: string;
-  customBroadcastId: string;
-  customBroadcastMessage: string;
+  cronString: string;
+  id: string;
+  message: string;
 }
 /**
  * Regex to recognize the !addcc command.
@@ -543,9 +543,9 @@ export interface RegexCustomBroadcastAdd {
  */
 export const regexCustomBroadcastAdd =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!addcb\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!'))\s+(?<customBroadcastCronString>'.+?'|(?!')\S+(?!'))\s+(?<customBroadcastMessage>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!addcb\s+(?<id>'.+?'|(?!')\S+(?!'))\s+(?<cronString>'.+?'|(?!')\S+(?!'))\s+(?<message>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
 export interface RegexCustomBroadcastDelete {
-  customBroadcastId: string;
+  id: string;
 }
 /**
  * Regex to recognize the !delcb command.
@@ -557,13 +557,13 @@ export interface RegexCustomBroadcastDelete {
  */
 export const regexCustomBroadcastDelete =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!delcb\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!delcb\s+(?<id>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
 
 export interface RegexCustomBroadcastList {
-  customBroadcastId?: string;
+  id?: string;
 }
 export interface RegexCustomBroadcastListOffset {
-  customBroadcastOffset?: string;
+  listOffset?: string;
 }
 /**
  * Regex to recognize the !listcbs command.
@@ -579,11 +579,11 @@ export interface RegexCustomBroadcastListOffset {
  */
 export const regexCustomBroadcastList =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!listcbs?(?:\s+(?<customBroadcastOffset>[0-9]+?)|\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
+  /^\s*!listcbs?(?:\s+(?<listOffset>[0-9]+?)|\s+(?<id>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
 export interface RegexCustomBroadcastEdit {
-  customBroadcastId: string;
-  customBroadcastOption: string;
-  customBroadcastOptionValue: string;
+  id: string;
+  option: string;
+  optionValue: string;
 }
 /**
  * Regex to recognize the !editcb command.
@@ -595,6 +595,6 @@ export interface RegexCustomBroadcastEdit {
  */
 export const regexCustomBroadcastEdit =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!editcb\s+(?<customBroadcastId>'.+?'|(?!')\S+(?!'))\s+(?<customBroadcastOption>\S+)\s+(?<customBroadcastOptionValue>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!editcb\s+(?<id>'.+?'|(?!')\S+(?!'))\s+(?<option>\S+)\s+(?<optionValue>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
 
 export const regexLurkChatHandlerCommandLurk = /^\s*!lurk(?:\s|$)/i;

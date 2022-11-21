@@ -2,7 +2,7 @@
 import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
-} from "../../info/commands";
+} from "../../info/chatCommands";
 import {
   macroMoonpieClaim,
   macroMoonpieLeaderboardEntry,

@@ -1,5 +1,5 @@
 // Local imports
-import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/chatCommands";
 import {
   macroOsuBeatmapRequestDemands,
   macroOsuBeatmapRequests,
@@ -192,18 +192,18 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
     if (!matchGroups) {
       throw Error("RegexOsuChatHandlerCommandRequests groups undefined");
     }
-    if (matchGroups.requestsOn !== undefined) {
+    if (matchGroups.on !== undefined) {
       return {
         data: {
-          beatmapRequestsOnOffMessage: matchGroups.requestsOnOffMessage,
+          beatmapRequestsOnOffMessage: matchGroups.message,
           beatmapRequestsType: BeatmapRequestsType.TURN_ON,
         },
       };
     }
-    if (matchGroups.requestsOff !== undefined) {
+    if (matchGroups.off !== undefined) {
       return {
         data: {
-          beatmapRequestsOnOffMessage: matchGroups.requestsOnOffMessage,
+          beatmapRequestsOnOffMessage: matchGroups.message,
           beatmapRequestsType: BeatmapRequestsType.TURN_OFF,
         },
       };
@@ -371,8 +371,8 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
       }
       return {
         data: {
-          beatmapRequestsSetOption: matchGroups.setOption,
-          beatmapRequestsSetOptionValue: matchGroups.setOptionValue,
+          beatmapRequestsSetOption: matchGroups.option,
+          beatmapRequestsSetOptionValue: matchGroups.optionValue,
           beatmapRequestsSetType: BeatmapRequestsSetUnsetType.SET,
         },
       };
@@ -386,7 +386,7 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
       }
       return {
         data: {
-          beatmapRequestsSetOption: matchGroups.unsetOption,
+          beatmapRequestsSetOption: matchGroups.option,
           beatmapRequestsSetType: BeatmapRequestsSetUnsetType.UNSET,
         },
       };

@@ -2,7 +2,7 @@
 import {
   CustomCommandsBroadcastsCommands,
   LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
-} from "../../info/commands";
+} from "../../info/chatCommands";
 import {
   customCommandsBroadcastsCommandsAddCustomBroadcast,
   customCommandsBroadcastsCommandsAddCustomCommand,

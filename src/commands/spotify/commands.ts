@@ -2,7 +2,7 @@
 import {
   LOG_ID_CHAT_HANDLER_SPOTIFY,
   SpotifyCommands,
-} from "../../info/commands";
+} from "../../info/chatCommands";
 import {
   spotifyCommandsSong,
   spotifyCommandsString,

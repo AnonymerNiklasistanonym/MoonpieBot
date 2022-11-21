@@ -9,3 +9,9 @@ export const genericStringSorter = (
   }
   return stringA < stringB ? -1 : stringA > stringB ? 1 : 0;
 };
+
+export const genericFilterNonUniqueStrings = (
+  value: string,
+  index: number,
+  self: string[]
+): boolean => index === self.indexOf(value);

@@ -11,7 +11,7 @@ import {
   referencePV,
 } from "./pkgbuild";
 import { description, name, sourceCodeUrl } from "../src/info/general";
-import { getVersionFromObject } from "../src/version";
+import { getVersionString } from "../src/version";
 import { version } from "../src/info/version";
 // Type imports
 import type { PkgbuildCustomVariable, PkgbuildInfo } from "./pkgbuild";
@@ -250,7 +250,7 @@ export const pkgbuildInfo: PkgbuildInfo = {
   packageCmdsNote: "Define where files should be installed",
   pkgdesc: description,
   pkgname: referencePCV(defaultPCVApplicationName),
-  pkgver: getVersionFromObject(version, ""),
+  pkgver: getVersionString(version, ""),
   provides: referencePV("pkgname"),
   source: [
     {

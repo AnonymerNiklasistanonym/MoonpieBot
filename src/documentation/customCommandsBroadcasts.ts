@@ -3,13 +3,15 @@ import { promises as fs } from "fs";
 // Local imports
 import { convertTwitchBadgeLevelToString, TwitchBadgeLevel } from "../twitch";
 import {
+  CustomBroadcastValueOptions,
+  CustomCommandValueOptions,
+} from "../commands/customCommandsBroadcasts/valueOptions";
+import {
   fileDocumentationGenerator,
   FileDocumentationPartType,
 } from "./fileDocumentationGenerator";
 import { customBroadcastsInformation } from "../info/customBroadcasts";
-import { CustomBroadcastValueOptions } from "../commands/customCommandsBroadcasts/customBroadcasts";
 import { customCommandsInformation } from "../info/customCommands";
-import { CustomCommandValueOptions } from "../commands/customCommandsBroadcasts/customCommands";
 import { escapeStringIfWhiteSpace } from "../other/whiteSpaceChecker";
 // Type imports
 import type { CustomBroadcast } from "../customCommandsBroadcasts/customBroadcast";

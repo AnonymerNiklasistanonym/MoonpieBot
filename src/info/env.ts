@@ -7,13 +7,20 @@ import path from "path";
 // Local imports
 import {
   CustomCommandsBroadcastsCommands,
+  getChatCommandsCustomCommandsBroadcasts,
+  getChatCommandsLurk,
+  getChatCommandsMoonpie,
+  getChatCommandsOsu,
+  getChatCommandsSpotify,
   LurkCommands,
   MoonpieCommands,
-} from "./commands";
+} from "./chatCommands";
 import { fileNameEnv, fileNameEnvExample } from "./files";
+import { convertRegexToHumanString } from "../other/regexToString";
 import { LoggerLevel } from "../logging";
-import { OsuCommands } from "./commands";
-import { SpotifyCommands } from "./commands";
+import { OsuCommands } from "./chatCommands";
+import { regexOsuChatHandlerCommandRequestsSet } from "./regex";
+import { SpotifyCommands } from "./chatCommands";
 // Type imports
 import type { CliEnvVariableInformation } from "../cli";
 import type { EnvVariableStructureElement } from "../env";
@@ -54,11 +61,11 @@ export enum EnvVariableOtherListOptions {
  */
 export enum EnvVariable {
   CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH = "CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH",
-  CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS = "CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS",
+  CUSTOM_COMMANDS_BROADCASTS_ENABLE_COMMANDS = "CUSTOM_COMMANDS_BROADCASTS_ENABLE_COMMANDS",
   LOGGING_CONSOLE_LOG_LEVEL = "LOGGING_CONSOLE_LOG_LEVEL",
   LOGGING_DIRECTORY_PATH = "LOGGING_DIRECTORY_PATH",
   LOGGING_FILE_LOG_LEVEL = "LOGGING_FILE_LOG_LEVEL",
-  LURK_ENABLED_COMMANDS = "LURK_ENABLED_COMMANDS",
+  LURK_ENABLE_COMMANDS = "LURK_ENABLE_COMMANDS",
   MOONPIE_CLAIM_COOLDOWN_HOURS = "MOONPIE_CLAIM_COOLDOWN_HOURS",
   MOONPIE_DATABASE_PATH = "MOONPIE_DATABASE_PATH",
   MOONPIE_ENABLE_COMMANDS = "MOONPIE_ENABLE_COMMANDS",
@@ -133,11 +140,13 @@ export const envVariableInformation: CliEnvVariableInformation<
       .sort()
       .join(ENV_LIST_SPLIT_CHARACTER),
     description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
-    name: EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
+    name: EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLE_COMMANDS,
     supportedValues: {
       canBeJoinedAsList: true,
       emptyListValue: EnvVariableOtherListOptions.NONE,
-      values: Object.values(CustomCommandsBroadcastsCommands),
+      values: Object.values(CustomCommandsBroadcastsCommands)
+        .map((id) => getChatCommandsCustomCommandsBroadcasts(id))
+        .flat(),
     },
   },
   {
@@ -179,16 +188,16 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.TWITCH,
-    description: "The name of the twitch account that should be imitated.",
-    example: "twitch_channel_name",
+    description:
+      "The name of the twitch account/channel that should be imitated.",
+    example: "twitch_account_name",
     name: EnvVariable.TWITCH_NAME,
     required: true,
   },
   {
     block: EnvVariableBlock.TWITCH,
     censor: true,
-    description:
-      "A Twitch OAuth token (get it from: https://twitchapps.com/tmi/).",
+    description: `A Twitch OAuth token (get it from: https://twitchapps.com/tmi/) of the Twitch account specified in ${ENV_PREFIX}${EnvVariable.TWITCH_NAME}.`,
     example: "oauth:abcdefghijklmnop",
     name: EnvVariable.TWITCH_OAUTH_TOKEN,
     required: true,
@@ -205,11 +214,13 @@ export const envVariableInformation: CliEnvVariableInformation<
     block: EnvVariableBlock.LURK,
     default: EnvVariableOtherListOptions.NONE,
     description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
-    name: EnvVariable.LURK_ENABLED_COMMANDS,
+    name: EnvVariable.LURK_ENABLE_COMMANDS,
     supportedValues: {
       canBeJoinedAsList: true,
       emptyListValue: EnvVariableOtherListOptions.NONE,
-      values: Object.values(LurkCommands),
+      values: Object.values(LurkCommands)
+        .map((id) => getChatCommandsLurk(id))
+        .flat(),
     },
   },
   {
@@ -218,12 +229,17 @@ export const envVariableInformation: CliEnvVariableInformation<
       .sort()
       .join(ENV_LIST_SPLIT_CHARACTER),
     description: ENABLE_COMMANDS_DEFAULT_DESCRIPTION,
+    example: Object.values(MoonpieCommands)
+      .sort()
+      .join(ENV_LIST_SPLIT_CHARACTER),
     legacyNames: ["ENABLE_COMMANDS"],
     name: EnvVariable.MOONPIE_ENABLE_COMMANDS,
     supportedValues: {
       canBeJoinedAsList: true,
       emptyListValue: EnvVariableOtherListOptions.NONE,
-      values: Object.values(MoonpieCommands),
+      values: Object.values(MoonpieCommands)
+        .map((id) => getChatCommandsMoonpie(id))
+        .flat(),
     },
   },
   {
@@ -241,7 +257,7 @@ export const envVariableInformation: CliEnvVariableInformation<
     block: EnvVariableBlock.MOONPIE,
     default: "18",
     description:
-      "The number of hours for which a user is unable to claim a Moonpie after claiming one (less than 24 in case of daily streams).",
+      "The number of hours for which a user is unable to claim a moonpie after claiming one (less than 24 in case of daily streams).",
     legacyNames: ["MOONPIE_COOLDOWN_HOURS"],
     name: EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS,
   },
@@ -253,14 +269,16 @@ export const envVariableInformation: CliEnvVariableInformation<
     supportedValues: {
       canBeJoinedAsList: true,
       emptyListValue: EnvVariableOtherListOptions.NONE,
-      values: Object.values(OsuCommands),
+      values: Object.values(OsuCommands)
+        .map((id) => getChatCommandsOsu(id))
+        .flat(),
     },
   },
   {
     block: EnvVariableBlock.OSU_API,
     censor: true,
     description:
-      "The osu! client ID (and client secret) to use the osu! api v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).",
+      "The osu! client ID (and client secret) to use the osu! API v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).",
     example: "1234",
     legacyNames: ["OSU_CLIENT_ID"],
     name: EnvVariable.OSU_API_CLIENT_ID,
@@ -288,13 +306,21 @@ export const envVariableInformation: CliEnvVariableInformation<
     defaultValue: (configDir) =>
       path.resolve(path.join(configDir, "osu_requests_config.db")),
     description:
-      "The database file path that contains the persistent osu! map requests data.",
+      "The database file path that contains the persistent osu! (beatmap) requests configuration.",
     legacyNames: ["OSU_API_RECOGNIZE_MAP_REQUESTS_DATABASE_PATH"],
     name: EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
   },
   {
     block: EnvVariableBlock.OSU_API,
-    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS}) additionally output more detailed information about the map in the chat. This can also be set at runtime and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
+    description: `If beatmap requests are enabled (${ENV_PREFIX}${
+      EnvVariable.OSU_ENABLE_COMMANDS
+    }=${
+      OsuCommands.REQUESTS
+    }) additionally output more detailed information about the map in the chat. This can also be set at runtime (${convertRegexToHumanString(
+      regexOsuChatHandlerCommandRequestsSet
+    )}) and stored persistently in a database (${ENV_PREFIX}${
+      EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH
+    }) but if provided will override the current value in the database on start of the bot.`,
     example: EnvVariableOnOff.ON,
     legacyNames: [
       "OSU_RECOGNIZE_MAP_REQUESTS_DETAILED",
@@ -305,7 +331,15 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.OSU_API,
-    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS})  make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
+    description: `If beatmap requests are enabled (${ENV_PREFIX}${
+      EnvVariable.OSU_ENABLE_COMMANDS
+    }=${
+      OsuCommands.REQUESTS
+    }) make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime (${convertRegexToHumanString(
+      regexOsuChatHandlerCommandRequestsSet
+    )}) and stored persistently in a database (${ENV_PREFIX}${
+      EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH
+    }) but if provided will override the current value in the database on start of the bot.`,
     example: "651f5474-07c2-4406-9e59-37d66fd34069",
     legacyNames: ["OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID"],
     name: EnvVariable.OSU_API_REQUESTS_REDEEM_ID,
@@ -333,13 +367,13 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.OSU_STREAM_COMPANION,
-    description: `osu! StreamCompanion URL (websocket interface) to use a running StreamCompanion instance to always get the currently being played beatmap and used mods. (If ${EnvVariable.OSU_STREAM_COMPANION_DIR_PATH} is provided this interface will be used over it)`,
+    description: `osu! StreamCompanion URL (websocket interface) to use a running StreamCompanion instance to get the currently being played beatmap, used mods and more (Providing a value will ignore ${ENV_PREFIX}${EnvVariable.OSU_STREAM_COMPANION_DIR_PATH}). Many users have problem with the websocket interface but the file interface worked for everyone so far.`,
     example: "localhost:20727",
     name: EnvVariable.OSU_STREAM_COMPANION_URL,
   },
   {
     block: EnvVariableBlock.OSU_STREAM_COMPANION,
-    description: `osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance to always get the currently being played beatmap and used mods. You can configure the details via the integrated message parser but since it uses the output of StreamCompanion you can just configure it in there. Go to the section 'Output Patterns' and then edit the used rows (like 'np_all'). You can also change the 'Save event' of a row like for the current mods so the mods will be live updated even if no song is played. (If ${EnvVariable.OSU_STREAM_COMPANION_URL} is provided this interface will not be used)`,
+    description: `osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance to always get the currently being played beatmap, used mods and more (This is ignored if ${ENV_PREFIX}${EnvVariable.OSU_STREAM_COMPANION_URL} is also provided). To configure the StreamCompanion output and for example update certain values like the download link even when not playing a map you need to open StreamCompanion. Go to the section 'Output Patterns' and then edit the used rows (like 'np_all') to change the format. You can also change the 'Save event' of a row like for the current mods or download link so both will be live updated even if no song is played.`,
     example: "C:\\Program Files (x86)\\StreamCompanion\\Files",
     name: EnvVariable.OSU_STREAM_COMPANION_DIR_PATH,
   },
@@ -353,7 +387,9 @@ export const envVariableInformation: CliEnvVariableInformation<
     supportedValues: {
       canBeJoinedAsList: true,
       emptyListValue: EnvVariableOtherListOptions.NONE,
-      values: Object.values(SpotifyCommands),
+      values: Object.values(SpotifyCommands)
+        .map((id) => getChatCommandsSpotify(id))
+        .flat(),
     },
   },
   {
@@ -370,7 +406,7 @@ export const envVariableInformation: CliEnvVariableInformation<
     block: EnvVariableBlock.SPOTIFY_API,
     censor: true,
     description:
-      "Provide client id/secret to enable Twitch api calls or Spotify commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application). At the first start a browser window will open where you need to authenticate once.",
+      "Provide client id/secret to enable Spotify API calls or Spotify commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application - give the application the name 'MoonpieBot' and add the redirect URI 'http://localhost:9727' by clicking the button 'edit settings' after clicking on the application entry in the dashboard). At the first start a browser window will open where you need to successfully authenticate once.",
     example: "abcdefghijklmnop",
     name: EnvVariable.SPOTIFY_API_CLIENT_ID,
   },
@@ -392,7 +428,7 @@ export const envVariableInformation: CliEnvVariableInformation<
     block: EnvVariableBlock.TWITCH_API,
     censor: true,
     description:
-      "Provide client id/access token to enable Twitch api calls in commands (get them by using https://twitchtokengenerator.com with the scopes you want to have). The recommended scopes are: `user:edit:broadcast` to edit stream title/game, `user:read:broadcast`, `chat:read`, `chat:edit`.",
+      "Provide client id/access token to enable Twitch API calls in commands (get them by using https://twitchtokengenerator.com with the scopes you want to have). The recommended scopes are: `user:edit:broadcast` to edit stream title/game, `user:read:broadcast`, `chat:read`, `chat:edit`.",
     example: "abcdefghijklmnop",
     name: EnvVariable.TWITCH_API_ACCESS_TOKEN,
   },
@@ -430,30 +466,38 @@ export const envVariableStructure: EnvVariableStructureElement<EnvVariableBlock>
     {
       block: EnvVariableBlock.TWITCH,
       content:
-        "Required variables that need to be set for ANY configuration to connect to Twitch chat.",
+        "REQUIRED variables that need to be set for ANY configuration to connect to Twitch chat.",
       name: "TWITCH",
     },
     {
       block: EnvVariableBlock.MOONPIE,
-      content: "Optional moonpie functionality.",
+      content:
+        "Every day a user can claim a moonpie and the count is saved in a persistent database.",
       name: "MOONPIE",
     },
     {
       block: EnvVariableBlock.OSU,
-      content: "Optional osu! commands that can be enabled.",
+      content:
+        "Given a StreamCompanion connection osu! beatmap information (!np) can be provided or given an osu! OAuth client ID/secret and osu! ID plus an osu! IRC login the bot can enable beatmap requests or fetch other osu! related information.",
       name: "OSU",
     },
     {
       block: EnvVariableBlock.OSU_API,
       content:
-        "Optional osu! API connection that can be enabled to use more osu! commands or detect beatmap requests.",
+        "A osu! API connection can be enabled to enable beatmap requests and other osu! commands.",
       name: "OSU API",
     },
     {
       block: EnvVariableBlock.OSU_STREAM_COMPANION,
       content:
-        "Optional osu! StreamCompanion (https://github.com/Piotrekol/StreamCompanion) connection that can be enabled for a much better !np command via either a websocket or file interface.",
+        "A osu! StreamCompanion (https://github.com/Piotrekol/StreamCompanion) connection can be enabled for a much better !np command via either a websocket OR file interface.",
       name: "OSU STREAM COMPANION",
+    },
+    {
+      block: EnvVariableBlock.OSU_IRC,
+      content:
+        "Optional osu! IRC connection that can be enabled to send beatmap requests to the osu! client.",
+      name: "OSU IRC",
     },
     {
       block: EnvVariableBlock.SPOTIFY,
@@ -463,12 +507,13 @@ export const envVariableStructure: EnvVariableStructureElement<EnvVariableBlock>
     {
       block: EnvVariableBlock.SPOTIFY_API,
       content:
-        "Optional Spotify API connection that can be enabled to use Spotify commands.",
+        "Given a Spotify client ID/secret the bot can fetch some Spotify related information like the currently played song.",
       name: "SPOTIFY API",
     },
     {
       block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
-      content: "Optional configurations for custom commands and broadcasts.",
+      content:
+        "Custom commands and custom broadcasts can be added/edited/deleted via the Twitch chat which are persistently saved in a database. Custom commands will be checked for every new message. Custom broadcasts will be scheduled at start of the bot and rescheduled on any change.",
       name: "CUSTOM COMMANDS & BROADCASTS",
     },
     {
@@ -479,7 +524,7 @@ export const envVariableStructure: EnvVariableStructureElement<EnvVariableBlock>
     },
     {
       block: EnvVariableBlock.LURK,
-      content: "Optional !lurk command that welcomes chatters back.",
+      content: "Lurk command that welcomes chatters back.",
       name: "LURK",
     },
   ];

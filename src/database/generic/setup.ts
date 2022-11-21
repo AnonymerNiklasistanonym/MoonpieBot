@@ -4,7 +4,7 @@ import db, { SqliteTable, SqliteView } from "sqlite3-promise-query-api";
 import * as versionRequests from "./version/requests";
 import { createLogFunc } from "../../logging";
 import { createLogMethod } from "../logging";
-import { getVersionFromObject } from "../../version";
+import { getVersionString } from "../../version";
 import { versionTable } from "../../info/databases/genericVersionDb";
 // Type imports
 import { DbVersionInfo } from "../../info/databases/genericVersionDb";
@@ -95,7 +95,7 @@ export const genericSetupDatabase = async (
   const versions = await versionRequests.getEntries(databasePath, logger);
   if (versions.length === 0) {
     loggerDatabase.info(
-      `Database '${databasePath}' had no version (current: '${getVersionFromObject(
+      `Database '${databasePath}' had no version (current: '${getVersionString(
         currentVersion
       )}')`
     );
@@ -107,7 +107,7 @@ export const genericSetupDatabase = async (
   } else if (versions.length > 1) {
     throw Error(
       `Database '${databasePath}' had multiple versions, please check the database! (${versions
-        .map((a) => getVersionFromObject(a, ""))
+        .map((a) => getVersionString(a, ""))
         .join(",")})`
     );
   } else if (
@@ -116,10 +116,10 @@ export const genericSetupDatabase = async (
     versions[0].patch !== currentVersion.patch
   ) {
     loggerDatabase.info(
-      `Database '${databasePath}' version is different from the current version: ${getVersionFromObject(
+      `Database '${databasePath}' version is different from the current version: ${getVersionString(
         versions[0],
         ""
-      )} (current='${getVersionFromObject(currentVersion, "")}')`
+      )} (current='${getVersionString(currentVersion, "")}')`
     );
     if (options?.migrateVersion !== undefined) {
       await options?.migrateVersion(versions[0], currentVersion);
@@ -130,7 +130,7 @@ export const genericSetupDatabase = async (
   }
 
   loggerDatabase.debug(
-    `Database '${databasePath}'@${getVersionFromObject(
+    `Database '${databasePath}'@${getVersionString(
       currentVersion,
       ""
     )} was set up`

@@ -5,11 +5,16 @@ import {
   generateMessageParserMessageReference,
 } from "../../../messageParser";
 import {
+  getChatCommandsMoonpie,
+  MoonpieCommands,
+} from "../../../info/chatCommands";
+import {
   pluginIfTrue,
   pluginListFilterUndefined,
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../plugins/general";
+import { createShortCommandDescription } from "../../../chatCommand";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../macros/commands";
 import { MOONPIE_STRING_ID } from "../moonpie";
@@ -22,55 +27,98 @@ const MOONPIE_COMMANDS_STRING_ID = `${MOONPIE_STRING_ID}_COMMANDS`;
 
 export const moonpieCommandsClaim: StringEntry = {
   default: createMessageParserMessage(
-    ["!moonpie [claim one moonpie per day]"],
+    [
+      createShortCommandDescription(
+        MoonpieCommands.CLAIM,
+        getChatCommandsMoonpie
+      ),
+    ],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_CLAIM`,
 };
 export const moonpieCommandsLeaderboard: StringEntry = {
   default: createMessageParserMessage(
-    ["!moonpie leaderboard ($STARTING_RANK)"],
+    [
+      createShortCommandDescription(
+        MoonpieCommands.LEADERBOARD,
+        getChatCommandsMoonpie
+      ),
+    ],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_LEADERBOARD`,
 };
 export const moonpieCommandsGet: StringEntry = {
   default: createMessageParserMessage(
-    ["!moonpie get $USER [get moonpies of a user]"],
+    [
+      createShortCommandDescription(
+        MoonpieCommands.GET,
+        getChatCommandsMoonpie
+      ),
+    ],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_GET`,
 };
 export const moonpieCommandsSet: StringEntry = {
   default: createMessageParserMessage(
-    ["!moonpie set $USER $COUNT [set moonpies of a user]"],
+    [
+      createShortCommandDescription(
+        MoonpieCommands.SET,
+        getChatCommandsMoonpie
+      ),
+    ],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_SET`,
 };
 export const moonpieCommandsAdd: StringEntry = {
   default: createMessageParserMessage(
-    ["!moonpie add $USER $COUNT [add moonpies to a user]"],
+    [
+      createShortCommandDescription(
+        MoonpieCommands.ADD,
+        getChatCommandsMoonpie
+      ),
+    ],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_ADD`,
 };
 export const moonpieCommandsRemove: StringEntry = {
   default: createMessageParserMessage(
-    ["!moonpie remove $USER $COUNT [remove moonpies of a user]"],
+    [
+      createShortCommandDescription(
+        MoonpieCommands.REMOVE,
+        getChatCommandsMoonpie
+      ),
+    ],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_REMOVE`,
 };
 export const moonpieCommandsDelete: StringEntry = {
   default: createMessageParserMessage(
-    ["!moonpie delete $USER [remove a user from the database]"],
+    [
+      createShortCommandDescription(
+        MoonpieCommands.DELETE,
+        getChatCommandsMoonpie
+      ),
+    ],
     true
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_DELETE`,
 };
 export const moonpieCommandsAbout: StringEntry = {
-  default: createMessageParserMessage(["!moonpie about"], true),
+  default: createMessageParserMessage(
+    [
+      createShortCommandDescription(
+        MoonpieCommands.ABOUT,
+        getChatCommandsMoonpie
+      ),
+    ],
+    true
+  ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_ABOUT`,
 };
 export const moonpieCommandsPrefix: StringEntry = {
@@ -100,6 +148,7 @@ export const moonpieCommandsString: StringEntry = {
             moonpieCommandsDelete,
             moonpieCommandsAbout,
           ]
+            .sort()
             .map(
               (a): MessageForParserMessagePlugin => ({
                 args: generateMessageParserMessageMacro(

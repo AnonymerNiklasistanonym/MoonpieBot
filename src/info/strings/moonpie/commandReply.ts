@@ -45,7 +45,7 @@ export const moonpieCommandReplyClaim: StringEntry = {
   default: createMessageParserMessage<MacroMoonpieLeaderboardEntry>([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
-    " You just claimed a moonpie! You have now ",
+    " You just claimed a moonpie! You now have ",
     generateMessageParserMessageMacro(
       macroMoonpieLeaderboardEntry,
       MacroMoonpieLeaderboardEntry.COUNT

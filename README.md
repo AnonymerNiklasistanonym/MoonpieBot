@@ -1,5 +1,11 @@
 # MoonpieBot
 
+## TODO
+
+- Fix !osu requests command to set an acutal boolean if map requests are enabled or not instead of checking empty messages which is weird
+- Check each feature if it works
+- Double check regex expressions that can take a string with whitespaces
+
 [![github release](https://img.shields.io/github/release/AnonymerNiklasistanonym/MoonpieBot.svg?label=current+release)](https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases)
 [![CI](https://github.com/AnonymerNiklasistanonym/MoonpieBot/actions/workflows/nodejs.yml/badge.svg)](https://github.com/AnonymerNiklasistanonym/MoonpieBot/actions/workflows/nodejs.yml)
 ![](./coverage.svg)
@@ -9,7 +15,7 @@ A custom Twitch chat bot.
 ![MoonpieBot icon](res/icons/moonpiebot.png)
 
 - [Features](#features)
-  - [Optional: moonpie](#optional-moonpie)
+  - [Optional: Moonpie](#optional-moonpie)
   - [Optional: osu!](#optional-osu)
   - [Optional: Spotify](#optional-spotify)
   - [Default: Custom text/strings/messages](#default-custom-textstringsmessages)
@@ -23,7 +29,9 @@ A custom Twitch chat bot.
     - [Pacman](#pacman)
 - [Migrate to a new version](#migrate-to-a-new-version)
 - [Examples](#examples)
-- [Implementation](#implementation)
+  - [Example > Basic](#example--basic)
+  - [Example > Lune (Moonpie)](#example--lune-moonpie)
+  - [Example > Geo (Only osu! beatmap requests and !rp/!pp/!score)](#example--geo-only-osu-beatmap-requests-and-rpppscore)
 - [Inspect Database](#inspect-database)
 - [Development](#development)
   - [Tests](#tests)
@@ -33,72 +41,211 @@ A custom Twitch chat bot.
 - [Profiling](#profiling)
 - [Credits](#credits)
 
+## Configuration
+
+To supply configuration information you can either:
+
+[//]: # (BEGIN:DEFAULT_CONFIG_DIR_SECTION)
+
+- set environment variables
+- list the environment variables in a `.env` file in the same directory you run `moonpiebot`
+  If you use a desktop/start menu shortcut created by
+  - the Windows installer the directory becomes `%APPDATA%\MoonpieBot`
+  - a Linux package the directory becomes `$HOME/.local/share/moonpiebot`
+
+Note: Via the command line argument `--config-dir` or the Windows installer shortcut for a custom configuration directory you can always change the directory which is searched for the `.env` and other configuration files.
+
+[//]: # (END)
+
 ## Features
 
-**Given a Twitch account name, a connected OAuth token and the channel name(s) where the bot should be deployed** will imitate the given account in the given channel.
+**Given the following required information provided via:**
 
-The following list contains all supported features of the bot.
+[//]: # (BEGIN:LIST_ENV=TWITCH_NAME,TWITCH_OAUTH_TOKEN,TWITCH_CHANNELS)
 
-**All (default) features can be disabled.**
+- [x] The name of the twitch account/channel that should be imitated.
 
-### Optional: moonpie
+    Example: `MOONPIE_CONFIG_TWITCH_NAME=twitch_account_name`
+- [x] A Twitch OAuth token (get it from: https://twitchapps.com/tmi/) of the Twitch account specified in MOONPIE_CONFIG_TWITCH_NAME.
 
-- Every day a user can claim a *moonpie* and the count is saved in a persistent database that can be accessed with the following commands:
+    Example: `MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop`
+- [x] A with a space separated list of all the channels the bot should be active.
 
-  | Command | Permissions | Description |
-  | ------ | -- | -------- |
-  | `!moonpie` | everyone | (If not already claimed) Claim a moonpie and return the current count and the leaderboard position |
-  | `!moonpie commands` | everyone | See all available moonpie commands |
-  | `!moonpie leaderboard` | everyone | Show the top 15 moonpie holders |
-  | `!moonpie get $USER` | everyone | Return the current count and the leaderboard position of `$USER` if found in database |
-  | `!moonpie about` | everyone | Show the version and source code link of the bot |
-  | `!moonpie add $USER $COUNT` | broadcaster | Add moonpie `$COUNT` to `$USER` if found in database |
-  | `!moonpie remove $USER $COUNT` | broadcaster | Remove moonpie `$COUNT` to `$USER` if found in database |
-  | `!moonpie set $USER $COUNT` | broadcaster | Set moonpie `$COUNT` to `$USER` if found in database |
-  | `!moonpie delete $USER` | broadcaster | Delete a `$USER` from the database if found in database |
+    Example: `MOONPIE_CONFIG_TWITCH_CHANNELS=twitch_channel_name1,twitch_channel_name2`
 
-**Every command can be optionally disabled.**
+[//]: # (END)
+
+the bot will imitate this Twitch account in these Twitch channel(s).
+
+The following subsections contains all supported features of the bot:
+
+### Optional: Moonpie
+
+[//]: # (BEGIN:LIST_ENV_BLOCK=MOONPIE)
+
+Every day a user can claim a moonpie and the count is saved in a persistent database.
+
+- [ ] You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
+
+    Default: `MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS=about,commands`
+
+    Supported values: `about`, `add`, `claim`, `commands`, `delete`, `get`, `leaderboard`, `remove`, `set`
+- [ ] The database file path that contains the persistent moonpie data.
+
+    Default: `MOONPIE_CONFIG_MOONPIE_DATABASE_PATH=moonpie.db`
+- [ ] The number of hours for which a user is unable to claim a moonpie after claiming one (less than 24 in case of daily streams).
+
+    Default: `MOONPIE_CONFIG_MOONPIE_CLAIM_COOLDOWN_HOURS=18`
+
+[//]: # (END)
+
+[//]: # (BEGIN:TABLE_ENABLE_COMMANDS=MOONPIE)
+
+Chat | Command | Permissions | Description
+--- | --- | --- | ---
+`!moonpie about` | `about` | everyone | Get version information of the bot
+`!moonpie add userName countAdd` | `add` | broadcaster | Add moonpies to a user
+`!moonpie` | `claim` | everyone | (If not already claimed) Claim a moonpie once every set hours and return the current count and the leaderboard position
+`!moonpie commands` | `commands` | everyone | List all enabled commands
+`!moonpie delete userName` | `delete` | broadcaster | Delete moonpies of a user
+`!moonpie get userName` | `get` | everyone | Get moonpies of a user
+`!moonpie leaderboard[ startingRank]` | `leaderboard` | everyone | List the top moonpie holders
+`!moonpie remove userName countRemove` | `remove` | broadcaster | Remove moonpies from a user
+`!moonpie set userName countSet` | `set` | broadcaster | Set moonpies of a user
+
+[//]: # (END)
 
 ### Optional: osu!
 
-**Given an osu! OAuth client ID/secret and a default (streamer) osu! ID** the bot can additionally fetch some osu! related information.
+[//]: # (BEGIN:LIST_ENV_BLOCK=OSU)
 
-The `!np` and `!osu commands` are available **if instead of the former only a [StreamCompanion](https://github.com/Piotrekol/StreamCompanion) URL (`localhost:20727`) or directory path (`C:\Program Files (x86)\StreamCompanion\Files`) is provided**.
+Given a StreamCompanion connection osu! beatmap information (!np) can be provided or given an osu! OAuth client ID/secret and osu! ID plus an osu! IRC login the bot can enable beatmap requests or fetch other osu! related information.
 
-| Command | Permissions | Description |
-| ------ | -- | -------- |
-| `!rp ($OSU_ID/$OSU_NAME)` | everyone | Get the most recent play of the streamer or of the given osu! player ID |
-| `!pp ($OSU_ID/$OSU_NAME)` | everyone | Get general account information (pp, rank, country, ...) of the streamer or of the given osu! player ID |
-| `!np` | everyone | Get a link to the currently being played map (**if an optional StreamCompanion URL/directory path is provided** this information will be used to get the current map information, otherwise the osu! window text will be used and searched for **using the given osu! credentials** [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map]) |
-| `!score $OSU_NAME` | everyone | Get the score of an osu! user of the last mentioned beatmap |
-| `!osuRequests` | everyone | Get if map requests are currently enabled and with which demands if there are any |
-| `!osuRequests on/off ($MESSAGE)` | mod | Turn map requests on or off with an optional message |
-| `!osuRequests set $OPTION $VALUE`, `!osuRequests unset $OPTION` | mod | Set map request demands/options (`arMax`, `arMin`, `csMax`, `csMin`, `detailed`, `lengthInMinMax`, `lengthInMinMin`, `redeemId`, `starMax`, `starMin`) or unset them back to their default value |
-| `!osuLastRequest ($COUNT)` | mod | Resend the last request (or multiple if `$COUNT` is provided) in case of a osu! client restart |
-| `!osuPermitRequest` | mod | Permit the last blocked map request |
-| `!osu commands` | everyone | See all (other) available/enabled osu! commands |
+- [ ] You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide osu! API credentials and/or a StreamCompanion connection commands that need that won't be enabled!
 
-**If optionally enabled** beatmap links in chat can be recognized and print map information (and if existing the top score on the map) to the chat.
-**Given an osu! IRC login and osu! name** it can even send these recognized beatmap links to the osu! client of the specified osu! name.
-**If demands are set** they will block map requests from coming through.
-(The latest blocked map request can still be permitted using the `!osuPermitRequest` command)
+    Default: `MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=commands,last_request,np,permit_request,pp,requests,rp,score`
+
+    Supported values: `commands`, `last_request`, `np`, `permit_request`, `pp`, `requests`, `requests`, `requests`, `requests`, `rp`, `score`
+
+[//]: # (END)
+
+[//]: # (BEGIN:LIST_ENV_BLOCK=OSU_STREAM_COMPANION)
+
+A osu! StreamCompanion (https://github.com/Piotrekol/StreamCompanion) connection can be enabled for a much better !np command via either a websocket OR file interface.
+
+- [ ] osu! StreamCompanion URL (websocket interface) to use a running StreamCompanion instance to get the currently being played beatmap, used mods and more (Providing a value will ignore MOONPIE_CONFIG_OSU_STREAM_COMPANION_DIR_PATH). Many users have problem with the websocket interface but the file interface worked for everyone so far.
+
+    Example: `MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727`
+- [ ] osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance to always get the currently being played beatmap, used mods and more (This is ignored if MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL is also provided). To configure the StreamCompanion output and for example update certain values like the download link even when not playing a map you need to open StreamCompanion. Go to the section 'Output Patterns' and then edit the used rows (like 'np_all') to change the format. You can also change the 'Save event' of a row like for the current mods or download link so both will be live updated even if no song is played.
+
+    Example: `MOONPIE_CONFIG_OSU_STREAM_COMPANION_DIR_PATH=C:\Program Files (x86)\StreamCompanion\Files`
+
+[//]: # (END)
+
+[//]: # (BEGIN:LIST_ENV_BLOCK=OSU_API)
+
+A osu! API connection can be enabled to enable beatmap requests and other osu! commands.
+
+- [ ] The osu! client ID (and client secret) to use the osu! API v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).
+
+    Example: `MOONPIE_CONFIG_OSU_API_CLIENT_ID=1234`
+- [ ] Check the description of MOONPIE_CONFIG_OSU_API_CLIENT_ID.
+
+    Example: `MOONPIE_CONFIG_OSU_API_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa`
+- [ ] The default osu! account ID used to check for recent play or a top play on a map.
+
+    Example: `MOONPIE_CONFIG_OSU_API_DEFAULT_ID=1185432`
+- [ ] The database file path that contains the persistent osu! (beatmap) requests configuration.
+
+    Default: `MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH=osu_requests_config.db`
+- [ ] If beatmap requests are enabled (MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=requests) additionally output more detailed information about the map in the chat. This can also be set at runtime (!osuRequests set option optionValue) and stored persistently in a database (MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH) but if provided will override the current value in the database on start of the bot.
+
+    Example: `MOONPIE_CONFIG_OSU_API_REQUESTS_DETAILED=ON`
+
+    Supported values: `OFF`, `ON`
+- [ ] If beatmap requests are enabled (MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=requests) make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime (!osuRequests set option optionValue) and stored persistently in a database (MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH) but if provided will override the current value in the database on start of the bot.
+
+    Example: `MOONPIE_CONFIG_OSU_API_REQUESTS_REDEEM_ID=651f5474-07c2-4406-9e59-37d66fd34069`
+
+[//]: # (END)
+
+[//]: # (BEGIN:LIST_ENV_BLOCK=OSU_IRC)
+
+Optional osu! IRC connection that can be enabled to send beatmap requests to the osu! client.
+
+- [ ] The osu! irc server password and senderUserName. To get them go to https://osu.ppy.sh/p/irc and login (in case that clicking the 'Begin Email Verification' button does not reveal a text input refresh the page and click the button again -> this also means you get a new code!)
+
+    Example: `MOONPIE_CONFIG_OSU_IRC_PASSWORD=senderServerPassword`
+- [ ] Check the description of MOONPIE_CONFIG_OSU_IRC_PASSWORD.
+
+    Example: `MOONPIE_CONFIG_OSU_IRC_USERNAME=senderUserName`
+- [ ] The osu! account name that should receive the requests (can be the same account as the sender!).
+
+    Example: `MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET=receiverUserName`
+
+[//]: # (END)
+
+[//]: # (BEGIN:TABLE_ENABLE_COMMANDS=OSU)
+
+Chat | Command | Permissions | Description
+--- | --- | --- | ---
+`!osu commands` | `commands` | everyone | List all enabled commands
+`!osuLastRequest[ lastRequestCount]` | `last_request` | mod | Resend the last request (or requests if a custom count is provided) in case of a osu! client restart
+`!np` | `np` | everyone | Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
+`!osuPermitRequest` | `permit_request` | mod | Permit the last blocked map request
+`!pp[ (osuUserId\|osuUserName)]` | `pp` | everyone | Get general account information (pp, rank, country, ...) of the account or of the given osu! player
+`osuBeatmapUrl[ comment]` | `requests` | everyone | Request a beatmap requests using an osu! URL and optional comment
+`!osuRequests[( on\| off)[ message ]]` | `requests` | get=everyone on/off=mod | Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+`!osuRequests set option optionValue` | `requests` | mod | Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
+`!osuRequests unset option` | `requests` | mod | Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+`!rp[ (osuUserId\|osuUserName)]` | `rp` | everyone | Get the most recent play of the account or of the given osu! player
+`!score osuUserName` | `score` | everyone | Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+
+[//]: # (END)
 
 *Everything is currently optimized and written for osu! standard which means you need to open an issue if you want to use it with another game mode!*
 
-**Every command can be optionally disabled.**
-
 ### Optional: Spotify
 
-**Given a Spotify client ID/secret** the bot can additionally fetch some Spotify related information.
+[//]: # (BEGIN:LIST_ENV_BLOCK=SPOTIFY)
 
-After a successful authentication (the bot will automatically open a website for the authentication) you will be able to copy the access and refresh token so next time the authentication does not necessarily need to be repeated in the browser.
+Optional Spotify commands that can be enabled.
 
-| Command | Permissions | Description |
-| ------ | -- | -------- |
-| `!song` | everyone | Get the currently playing song title/artist and album (if not a single) as well as the same information about the 2 previously played songs |
-| `!spotify commands` | everyone | See all (other) available/enabled Spotify commands |
+- [ ] You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled). If you don't provide Spotify API credentials the commands won't be enabled!
 
-**Every command can be optionally disabled.**
+    Default: `MOONPIE_CONFIG_SPOTIFY_ENABLE_COMMANDS=commands,song`
+
+    Supported values: `commands`, `song`
+- [ ] The database file path that contains the persistent spotify data.
+
+    Default: `MOONPIE_CONFIG_SPOTIFY_DATABASE_PATH=spotify.db`
+
+[//]: # (END)
+
+[//]: # (BEGIN:LIST_ENV_BLOCK=SPOTIFY_API)
+
+Given a Spotify client ID/secret the bot can fetch some Spotify related information like the currently played song.
+
+- [ ] Provide client id/secret to enable Spotify API calls or Spotify commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application - give the application the name 'MoonpieBot' and add the redirect URI 'http://localhost:9727' by clicking the button 'edit settings' after clicking on the application entry in the dashboard). At the first start a browser window will open where you need to successfully authenticate once.
+
+    Example: `MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID=abcdefghijklmnop`
+- [ ] Check the description of MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID.
+
+    Example: `MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET=abcdefghijklmnop`
+- [ ] Providing this token is not necessary but optional. You can get this token by authenticating once successfully using the MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID and MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET. This will be done automatically by this program if both values are provided (the browser window will open after starting). After a successful authentication via this website the refresh token can be copied from there but since it will be automatically stored in a database this variable does not need to be provided. If a value is found it is automatically written into the database and does not need to be provided after that.
+
+    Example: `MOONPIE_CONFIG_SPOTIFY_API_REFRESH_TOKEN=abcdefghijklmnop`
+
+[//]: # (END)
+
+[//]: # (BEGIN:TABLE_ENABLE_COMMANDS=SPOTIFY)
+
+Chat | Command | Permissions | Description
+--- | --- | --- | ---
+`!spotify commands` | `commands` | everyone | List all enabled commands
+`!song` | `song` | everyone | Get the currently playing (and most recently played) song on the connected Spotify account
+
+[//]: # (END)
 
 ### Default: Custom text/strings/messages
 
@@ -138,23 +285,36 @@ Everything should be explained in more detail in the [`.env.example`](./.env.exa
 
 ### Default: Custom commands/broadcasts
 
-This program has per default the ability to add/edit/delete custom commands and custom broadcasts using the chat.
-The commands and broadcasts are persistently saved in a database.
+[//]: # (BEGIN:LIST_ENV_BLOCK=CUSTOM_COMMANDS_BROADCASTS)
 
-Custom commands will be checked for every new message.
-Custom broadcasts will be scheduled at start of the bot and rescheduled on any change.
+Custom commands and custom broadcasts can be added/edited/deleted via the Twitch chat which are persistently saved in a database. Custom commands will be checked for every new message. Custom broadcasts will be scheduled at start of the bot and rescheduled on any change.
 
-| Command | Permissions | Description |
-| ------ | -- | -------- |
-| `!addcc ID REGEX MESSAGE`, `!addcc ID REGEX MESSAGE -ul=mod -cd=10` | mod | Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported |
-| `!editcc PROPERTY NEW_VALUE` | mod | A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command |
-| `!delcc ID` | mod | Using the command ID an added command can be deleted |
-| `!listccs ($OFFSET/$ID)` | everyone | List all added commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command) |
-| `!addcb ID CRON_STRING MESSAGE` | mod | Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message |
-| `!editcb PROPERTY NEW_VALUE` | mod | A single property (cronString, description, id, message) can be edited of an existing broadcast |
-| `!delcb ID` | mod | Using the broadcast ID an added broadcast can be deleted |
-| `!listcbs ($OFFSET/$ID)` | everyone | List all added callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast) |
-| `!cccb commands` | everyone | See all (other) available/enabled custom commands/broadcasts commands |
+- [ ] The database file path that contains the persistent custom commands and broadcasts data.
+
+    Default: `MOONPIE_CONFIG_CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH=customCommandsBroadcasts.db`
+- [ ] You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
+
+    Default: `MOONPIE_CONFIG_CUSTOM_COMMANDS_BROADCASTS_ENABLE_COMMANDS=add_broadcast,add_command,commands,delete_broadcast,delete_command,edit_broadcast,edit_command,list_broadcasts,list_commands`
+
+    Supported values: `add_broadcast`, `add_command`, `commands`, `delete_broadcast`, `delete_command`, `edit_broadcast`, `edit_command`, `list_broadcasts`, `list_commands`
+
+[//]: # (END)
+
+[//]: # (BEGIN:TABLE_ENABLE_COMMANDS=CUSTOM_COMMANDS_BROADCASTS)
+
+Chat | Command | Permissions | Description
+--- | --- | --- | ---
+`!addcb id cronString message` | `add_broadcast` | mod | Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
+`!addcc id regex message[ -ul=userLevel][ -cd=cooldownInS]` | `add_command` | mod | Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
+`!(ccs\|cbs\|ccscbs) commands` | `commands` | everyone | List all enabled commands
+`!delcb id` | `delete_broadcast` | mod | Delete a broadcast
+`!delcc id` | `delete_command` | mod | Delete a command
+`!editcb id option optionValue` | `edit_broadcast` | mod | A single property (cronString, description, id, message) can be edited of an existing broadcast
+`!editcc id option optionValue` | `edit_command` | mod | A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
+`!listccs[ listOffset\| id]` | `list_broadcasts` | everyone | List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
+`!listcbs[ listOffset\| id]` | `list_commands` | everyone | List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
+
+[//]: # (END)
 
 An example file for this is [`customCommandsBroadcasts.example.txt`](./customCommandsBroadcasts.example.txt).
 
@@ -164,17 +324,27 @@ The supported logic is documented in the [previous section](#default-custom-text
 A specific group of plugins that only custom commands/broadcasts support are global custom data plugins.
 They enable to store persistently a text, number or a list of them in a database and change them or run operations on them (there are useful real life examples of this in the previously mentioned example file).
 
-**Every command can be optionally disabled.**
-
 ### Optional: Lurk
 
-A custom lurk command can be enabled that welcomes back chatters after they are gone for at least 3 min.
+[//]: # (BEGIN:LIST_ENV_BLOCK=LURK)
 
-| Command | Permissions | Description |
-| ------ | -- | -------- |
-| `!lurk` | everyone | Become a lurker |
+Lurk command that welcomes chatters back.
 
-**Every command can be optionally disabled.**
+- [ ] You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
+
+    Default: `MOONPIE_CONFIG_LURK_ENABLE_COMMANDS=none`
+
+    Supported values: `lurk`
+
+[//]: # (END)
+
+[//]: # (BEGIN:TABLE_ENABLE_COMMANDS=LURK)
+
+Chat | Command | Permissions | Description
+--- | --- | --- | ---
+`!lurk` | `lurk` | everyone | Using this lurk command chatters are welcomed back after they come back
+
+[//]: # (END)
 
 ## Setup
 
@@ -223,12 +393,15 @@ A custom lurk command can be enabled that welcomes back chatters after they are 
    npm prune --production
    ```
 
-6. Provide the necessary environment variables or a `.env` file in the source code directory with the following information:
+6. Provide a configuration (more details can be found in the [Features section](#features))
 
-   You can copy the [`.env.example`](./.env.example) file, rename it to `.env` and then edit the "variables" in there.
-   The file contains also the information about what variables need to be set.
+   - Either using environment variables
+   - Or using a `.env` file in the directory from which you are starting the bot
 
-   - Detailed list of steps to get a Twitch OAuth token:
+     You can copy the [`.env.example`](./.env.example) file, rename it to `.env` and then edit the "variables" in there.
+     The file contains also the information about what variables need to be set.
+
+   - A detailed list of steps to get a Twitch OAuth token:
 
      1. Log into your twitch account (or better the account of the bot) in the browser
      2. Visit the webpage [twitchapps.com/tmi](https://twitchapps.com/tmi/)
@@ -245,7 +418,7 @@ A custom lurk command can be enabled that welcomes back chatters after they are 
 
    If there are errors you can probably find advanced log messages in the log files in the directory `logs` that is created while running the bot.
 
-   Per default critical values like for example the Twitch OAuth-token will be censored so screenshots or screen-sharing can't leak this information.
+   Per default critical values like for example the Twitch OAuth-token will be censored so screenshots or accidentally screen-sharing can't leak this information.
    This censoring can be disabled by passing an additional command line argument which can be helpful in case of debugging:
 
    ```sh
@@ -258,9 +431,6 @@ A custom lurk command can be enabled that welcomes back chatters after they are 
 
 There is now a way to use the program without needing to install or build anything.
 You can download a binary for your operating system from the [latest release](https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases) and then just run it.
-
-All other rules from the previous section still apply, it's just that you don't have to install or build anything.
-You still need to have environment variables or a `.env` file in the same directory etc.
 
 #### Linux
 
@@ -282,7 +452,12 @@ You still need to have environment variables or a `.env` file in the same direct
 
 For Windows there is also an installer with which the program can be easily installed.
 The installation contains an uninstaller and a start menu/desktop shortcut so no terminal usage is necessary.
+
+[//]: # (BEGIN:DEFAULT_CONFIG_DIR_LOCATION=WINDOWS)
+
 The default location of the configuration/database/etc. files is `%APPDATA%\MoonpieBot`.
+
+[//]: # (END)
 
 ### Package managers
 
@@ -290,42 +465,19 @@ The default location of the configuration/database/etc. files is `%APPDATA%\Moon
 
 On Linux systems with `pacman` as their package manager (like Arch/Manjaro Linux) there is a way to install the program by using a `PKGBUILD` file.
 For more information check the [installer `README.md`](./installer/README.md).
+
+[//]: # (BEGIN:DEFAULT_CONFIG_DIR_LOCATION=LINUX)
+
 The default location of the configuration/database/etc. files is `$HOME/.local/share/moonpiebot`.
+
+[//]: # (END)
 
 ## Migrate to a new version
 
----
-
-**IMPORTANT:**
-
 Migrating to a new version CAN break the database, custom commands, etc.
-This means you should always backup (or don't overwrite) your old configuration file (`.env`), database file (`moonpie.db`) and custom commands/timers (`customCommands/Timers.json`).
+This means you should always backup your old configuration (there are shortcuts and command line arguments to do it).
 In case of a bug or error this means you can always go back to how it was before and lose nothing.
-
-In case there will be a database change I will try to migrate that on the software side but even if this is not happening it should be listed in this section what the breaking change was.
-
----
-
-1. In case of new dependencies always rerun:
-
-   ```sh
-   npm install
-   ```
-
-2. Then you need to rebuild the program:
-
-   ```sh
-   npm run build
-   ```
-
-3. You need to check if there were any breaking changes that require an update of the configuration file (`.env`), break the database structure or break custom commands/timers (`customCommands/Timers.json`).
-4. If everything checks out you can start it just like before:
-
-   ```sh
-   npm run start
-   ```
-
-   After following all those steps you don't need to to the previous steps any more until there is an update.
+Database migrations should be handled automatically and old tables remain in the database in case something goes wrong.
 
 ## Examples
 
@@ -333,165 +485,305 @@ In the following there is a list of some possible configurations (`.env` files):
 
 **For more details about the options check the example file [`.env.example`](./.env.example)**
 
-1. Default *Moonpie commands* bot configuration:
+### Example > Basic
 
-   ```sh
-   # Variables necessary for the Twitch chat (read/write) connection
-   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
-   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
-   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
-   ```
+[//]: # (BEGIN:ENV_EXAMPLE=BASIC)
 
-   - Supports all moonpie commands
-   - Supports simple custom commands/timers that don't need special APIs in their messages
+```sh
+################################################################################
+# TWITCH
+# ------------------------------------------------------------------------------
+# REQUIRED variables that need to be set for ANY configuration to connect to
+# Twitch chat.
+################################################################################
+# > A with a space separated list of all the channels the bot should be active.
+#   THIS VARIABLE IS REQUIRED!
+MOONPIE_CONFIG_TWITCH_CHANNELS=twitch_channel_name1,twitch_channel_name2
+# > The name of the twitch account/channel that should be imitated.
+#   THIS VARIABLE IS REQUIRED!
+MOONPIE_CONFIG_TWITCH_NAME=twitch_account_name
+# > A Twitch OAuth token (get it from: https://twitchapps.com/tmi/) of the
+#   Twitch account specified in MOONPIE_CONFIG_TWITCH_NAME.
+#   THIS VARIABLE IS REQUIRED!
+#   KEEP THIS VARIABLE PRIVATE!
+MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
+```
 
-2. osu! StreamCompanion *Now Playing* bot configuration:
+Supported features:
 
-   ```sh
-   # Variables necessary for the Twitch chat (read/write) connection
-   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
-   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
-   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+- ABOUT: Support a command for version information
+  - `!moonpie about` (everyone): Get version information of the bot
+  - `!moonpie commands` (everyone): List all enabled commands
+- CUSTOM_CS_BS: Support custom commands/broadcasts stored in database and commands to change them
+  - `!addcb id cronString message` (mod): Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
+  - `!addcc id regex message[ -ul=userLevel][ -cd=cooldownInS]` (mod): Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
+  - `!(ccs|cbs|ccscbs) commands` (everyone): List all enabled commands
+  - `!delcb id` (mod): Delete a broadcast
+  - `!delcc id` (mod): Delete a command
+  - `!editcb id option optionValue` (mod): A single property (cronString, description, id, message) can be edited of an existing broadcast
+  - `!editcc id option optionValue` (mod): A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
+  - `!listccs[ listOffset| id]` (everyone): List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
+  - `!listcbs[ listOffset| id]` (everyone): List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
 
-   # Variable necessary for the StreamCompanion connection
-   MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727
+[//]: # (END)
 
-   # Disable default moonpie commands
-   MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS=none
-   # Only enable the !np osu command
-   MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=np
-   ```
+### Example > Lune (Moonpie)
 
-   - Disables default moonpie commands
-   - Supports the osu! related now playing "!np" command which will use the StreamCompanion information
-   - Supports simple custom commands/timers that don't need special APIs in their messages
+[//]: # (BEGIN:ENV_EXAMPLE=LUNE)
 
-3. Default *Moonpie, osu! and Spotify commands* bot configuration: (***lune***)
+```sh
+################################################################################
+# TWITCH
+# ------------------------------------------------------------------------------
+# REQUIRED variables that need to be set for ANY configuration to connect to
+# Twitch chat.
+################################################################################
+# > A with a space separated list of all the channels the bot should be active.
+#   THIS VARIABLE IS REQUIRED!
+MOONPIE_CONFIG_TWITCH_CHANNELS=twitch_channel_name1,twitch_channel_name2
+# > The name of the twitch account/channel that should be imitated.
+#   THIS VARIABLE IS REQUIRED!
+MOONPIE_CONFIG_TWITCH_NAME=twitch_account_name
+# > A Twitch OAuth token (get it from: https://twitchapps.com/tmi/) of the
+#   Twitch account specified in MOONPIE_CONFIG_TWITCH_NAME.
+#   THIS VARIABLE IS REQUIRED!
+#   KEEP THIS VARIABLE PRIVATE!
+MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
 
-   ```sh
-   # Variables necessary for the Twitch chat (read/write) connection
-   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
-   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
-   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+################################################################################
+# MOONPIE
+# ------------------------------------------------------------------------------
+# Every day a user can claim a moonpie and the count is saved in a persistent
+# database.
+################################################################################
+# > You can provide a list of commands that should be enabled, if this is empty
+#   or not set all commands are enabled (set the value to 'none' if no commands
+#   should be enabled).
+#   Supported list values: 'about', 'add', 'claim', 'commands', 'delete', 'get',
+#   'leaderboard', 'remove', 'set'
+#   Empty list value: 'none'
+#   (Default value: about,commands)
+MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS=about,add,claim,commands,delete,get,leaderboard,remove,set
 
-   # Variables necessary to use the osu! API
-   MOONPIE_CONFIG_OSU_API_CLIENT_ID=1234
-   MOONPIE_CONFIG_OSU_API_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
-   # Variable of the user that should be checked for top scores
-   MOONPIE_CONFIG_OSU_API_DEFAULT_ID=1185432
-   # Variables that enables osu! beatmap requests (with detailed map information)
-   MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON
-   MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED=ON
+################################################################################
+# OSU API
+# ------------------------------------------------------------------------------
+# A osu! API connection can be enabled to enable beatmap requests and other osu!
+# commands.
+################################################################################
+# > The osu! client ID (and client secret) to use the osu! API v2. To get it go
+#   to your account settings, Click 'New OAuth application' and add a custom
+#   name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that
+#   you can copy the client ID (and client secret).
+#   KEEP THIS VARIABLE PRIVATE!
+MOONPIE_CONFIG_OSU_API_CLIENT_ID=1234
+# > Check the description of MOONPIE_CONFIG_OSU_API_CLIENT_ID.
+#   KEEP THIS VARIABLE PRIVATE!
+MOONPIE_CONFIG_OSU_API_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
+# > The default osu! account ID used to check for recent play or a top play on a
+#   map.
+MOONPIE_CONFIG_OSU_API_DEFAULT_ID=1185432
 
-   # Variables necessary to send recognized beatmaps to the osu! client via IRC
-   MOONPIE_CONFIG_OSU_IRC_PASSWORD=senderServerPassword
-   MOONPIE_CONFIG_OSU_IRC_USERNAME=senderUserName
-   MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET=receiverUserName
+################################################################################
+# OSU STREAM COMPANION
+# ------------------------------------------------------------------------------
+# A osu! StreamCompanion (https://github.com/Piotrekol/StreamCompanion)
+# connection can be enabled for a much better !np command via either a websocket
+# OR file interface.
+################################################################################
+# > osu! StreamCompanion directory (file interface) path to use a running
+#   StreamCompanion instance to always get the currently being played beatmap,
+#   used mods and more (This is ignored if
+#   MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL is also provided). To configure the
+#   StreamCompanion output and for example update certain values like the
+#   download link even when not playing a map you need to open StreamCompanion.
+#   Go to the section 'Output Patterns' and then edit the used rows (like
+#   'np_all') to change the format. You can also change the 'Save event' of a
+#   row like for the current mods or download link so both will be live updated
+#   even if no song is played.
+MOONPIE_CONFIG_OSU_STREAM_COMPANION_DIR_PATH='C:\Program Files (x86)\StreamCompanion\Files'
 
-   # Variable necessary for the StreamCompanion connection
-   MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL=localhost:20727
+################################################################################
+# OSU IRC
+# ------------------------------------------------------------------------------
+# Optional osu! IRC connection that can be enabled to send beatmap requests to
+# the osu! client.
+################################################################################
+# > The osu! irc server password and senderUserName. To get them go to
+#   https://osu.ppy.sh/p/irc and login (in case that clicking the 'Begin Email
+#   Verification' button does not reveal a text input refresh the page and click
+#   the button again -> this also means you get a new code!)
+#   KEEP THIS VARIABLE PRIVATE!
+MOONPIE_CONFIG_OSU_IRC_PASSWORD=senderServerPassword
+# > The osu! account name that should receive the requests (can be the same
+#   account as the sender!).
+MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET=receiverUserName
+# > Check the description of MOONPIE_CONFIG_OSU_IRC_PASSWORD.
+MOONPIE_CONFIG_OSU_IRC_USERNAME=senderUserName
+```
 
-   # Enable custom commands to make use of some Twitch API connections
-   MOONPIE_CONFIG_TWITCH_API_CLIENT_ID=abcdefghijklmnop
-   MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN=abcdefghijklmnop
+Supported features:
 
-   # Enable Spotify API connections and the !song command
-   MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID=abcdefghijklmnop
-   MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET=abcdefghijklmnop
-   MOONPIE_CONFIG_SPOTIFY_API_REFRESH_TOKEN=abcdefghijklmnop
-   ```
+- ABOUT: Support a command for version information
+  - `!moonpie about` (everyone): Get version information of the bot
+  - `!moonpie commands` (everyone): List all enabled commands
+- CUSTOM_CS_BS: Support custom commands/broadcasts stored in database and commands to change them
+  - `!addcb id cronString message` (mod): Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
+  - `!addcc id regex message[ -ul=userLevel][ -cd=cooldownInS]` (mod): Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
+  - `!(ccs|cbs|ccscbs) commands` (everyone): List all enabled commands
+  - `!delcb id` (mod): Delete a broadcast
+  - `!delcc id` (mod): Delete a command
+  - `!editcb id option optionValue` (mod): A single property (cronString, description, id, message) can be edited of an existing broadcast
+  - `!editcc id option optionValue` (mod): A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
+  - `!listccs[ listOffset| id]` (everyone): List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
+  - `!listcbs[ listOffset| id]` (everyone): List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
+- MOONPIE: Support moonpie database and commands to manage them
+  - `!moonpie add userName countAdd` (broadcaster): Add moonpies to a user
+  - `!moonpie` (everyone): (If not already claimed) Claim a moonpie once every set hours and return the current count and the leaderboard position
+  - `!moonpie commands` (everyone): List all enabled commands
+  - `!moonpie delete userName` (broadcaster): Delete moonpies of a user
+  - `!moonpie get userName` (everyone): Get moonpies of a user
+  - `!moonpie leaderboard[ startingRank]` (everyone): List the top moonpie holders
+  - `!moonpie remove userName countRemove` (broadcaster): Remove moonpies from a user
+  - `!moonpie set userName countSet` (broadcaster): Set moonpies of a user
+- OSU_API: Support osu! API calls in custom commands/broadcasts or in the enabled commands
+  - `!osu commands` (everyone): List all enabled commands
+  - `!np` (everyone): Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
+  - `!pp[ (osuUserId|osuUserName)]` (everyone): Get general account information (pp, rank, country, ...) of the account or of the given osu! player
+  - `!rp[ (osuUserId|osuUserName)]` (everyone): Get the most recent play of the account or of the given osu! player
+  - `!score osuUserName` (everyone): Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+- OSU_API_BEATMAP_REQUESTS: Support osu! beatmap requests in Twitch chat using the osu! API and commands to manage them
+  - `!osu commands` (everyone): List all enabled commands
+  - `osuBeatmapUrl[ comment]` (everyone): Request a beatmap requests using an osu! URL and optional comment
+  - `!osuRequests[( on| off)[ message ]]` (get=everyone on/off=mod): Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+  - `!osuRequests set option optionValue` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
+  - `!osuRequests unset option` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+- OSU_IRC_BEATMAP_REQUESTS: Support sending beatmap requests via IRC messages to the osu! client
+- OSU_STREAM_COMPANION_FILE: Support getting current map/client information from osu! via StreamCompanion using the file interface and will be used in the enabled commands instead of the osu! API
+  - `!osu commands` (everyone): List all enabled commands
+  - `!np` (everyone): Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
 
-   - Supports all moonpie commands
-   - Supports beatmap requests in chat which will use the osu! API
-   - Supports the osu! related now playing "!np" command which will use the StreamCompanion information
-   - Supports the osu! related most recent play "!rp" command which will use the osu! API
-   - Supports the osu! related "!osuRequests" command which can toggle if beatmap requests are on(=default) or off
-   - Supports simple custom commands/timers that don't need special APIs in their messages
-   - Supports advanced custom commands/timers that need access to a special Twitch API in their messages (set/get a game/title or the follow-age)
-   - Supports a Spotify related !song command for getting the currently played song
+[//]: # (END)
 
-4. Simple bot that can make use of the Twitch API (for getting the game of a channel or followage) in custom commands configuration:
+### Example > Geo (Only osu! beatmap requests and !rp/!pp/!score)
 
-   ```sh
-   # Variables necessary for the Twitch chat (read/write) connection
-   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
-   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
-   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+[//]: # (BEGIN:ENV_EXAMPLE=GEO)
 
-   # Disable default moonpie commands
-   MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS=none
+```sh
+################################################################################
+# TWITCH
+# ------------------------------------------------------------------------------
+# REQUIRED variables that need to be set for ANY configuration to connect to
+# Twitch chat.
+################################################################################
+# > A with a space separated list of all the channels the bot should be active.
+#   THIS VARIABLE IS REQUIRED!
+MOONPIE_CONFIG_TWITCH_CHANNELS=twitch_channel_name1,twitch_channel_name2
+# > The name of the twitch account/channel that should be imitated.
+#   THIS VARIABLE IS REQUIRED!
+MOONPIE_CONFIG_TWITCH_NAME=twitch_account_name
+# > A Twitch OAuth token (get it from: https://twitchapps.com/tmi/) of the
+#   Twitch account specified in MOONPIE_CONFIG_TWITCH_NAME.
+#   THIS VARIABLE IS REQUIRED!
+#   KEEP THIS VARIABLE PRIVATE!
+MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
 
-   # Enable custom commands to make use of some Twitch API connections
-   MOONPIE_CONFIG_TWITCH_API_CLIENT_ID=abcdefghijklmnop
-   MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN=abcdefghijklmnop
-   ```
+################################################################################
+# OSU
+# ------------------------------------------------------------------------------
+# Given a StreamCompanion connection osu! beatmap information (!np) can be
+# provided or given an osu! OAuth client ID/secret and osu! ID plus an osu! IRC
+# login the bot can enable beatmap requests or fetch other osu! related
+# information.
+################################################################################
+# > You can provide a list of commands that should be enabled, if this is empty
+#   or not set all commands are enabled (set the value to 'none' if no commands
+#   should be enabled). If you don't provide osu! API credentials and/or a
+#   StreamCompanion connection commands that need that won't be enabled!
+#   Supported list values: 'commands', 'last_request', 'np', 'permit_request',
+#   'pp', 'requests', 'rp', 'score'
+#   Empty list value: 'none'
+#   (Default value:
+#   commands,last_request,np,permit_request,pp,requests,rp,score)
+MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=commands,last_request,permit_request,pp,requests,rp,score
 
-   - Disables default moonpie commands
-   - Supports advanced custom commands/timers that need access to a special Twitch API in their messages (set/get a game/title or the follow-age)
+################################################################################
+# OSU API
+# ------------------------------------------------------------------------------
+# A osu! API connection can be enabled to enable beatmap requests and other osu!
+# commands.
+################################################################################
+# > The osu! client ID (and client secret) to use the osu! API v2. To get it go
+#   to your account settings, Click 'New OAuth application' and add a custom
+#   name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that
+#   you can copy the client ID (and client secret).
+#   KEEP THIS VARIABLE PRIVATE!
+MOONPIE_CONFIG_OSU_API_CLIENT_ID=1234
+# > Check the description of MOONPIE_CONFIG_OSU_API_CLIENT_ID.
+#   KEEP THIS VARIABLE PRIVATE!
+MOONPIE_CONFIG_OSU_API_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
+# > The default osu! account ID used to check for recent play or a top play on a
+#   map.
+MOONPIE_CONFIG_OSU_API_DEFAULT_ID=1185432
 
-5. osu! map requests and recent play bot configuration: (***geo***)
+################################################################################
+# OSU IRC
+# ------------------------------------------------------------------------------
+# Optional osu! IRC connection that can be enabled to send beatmap requests to
+# the osu! client.
+################################################################################
+# > The osu! irc server password and senderUserName. To get them go to
+#   https://osu.ppy.sh/p/irc and login (in case that clicking the 'Begin Email
+#   Verification' button does not reveal a text input refresh the page and click
+#   the button again -> this also means you get a new code!)
+#   KEEP THIS VARIABLE PRIVATE!
+MOONPIE_CONFIG_OSU_IRC_PASSWORD=senderServerPassword
+# > The osu! account name that should receive the requests (can be the same
+#   account as the sender!).
+MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET=receiverUserName
+# > Check the description of MOONPIE_CONFIG_OSU_IRC_PASSWORD.
+MOONPIE_CONFIG_OSU_IRC_USERNAME=senderUserName
 
-   ```sh
-   # Variables necessary for the Twitch chat (read/write) connection
-   MOONPIE_CONFIG_TWITCH_NAME=moonpiebot
-   MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN=oauth:abcdefghijklmnop
-   MOONPIE_CONFIG_TWITCH_CHANNELS=moonpiechannel anothermoonpiechannel
+################################################################################
+# CUSTOM COMMANDS & BROADCASTS
+# ------------------------------------------------------------------------------
+# Custom commands and custom broadcasts can be added/edited/deleted via the
+# Twitch chat which are persistently saved in a database. Custom commands will
+# be checked for every new message. Custom broadcasts will be scheduled at start
+# of the bot and rescheduled on any change.
+################################################################################
+# > You can provide a list of commands that should be enabled, if this is empty
+#   or not set all commands are enabled (set the value to 'none' if no commands
+#   should be enabled).
+#   Supported list values: 'add_broadcast', 'add_command', 'commands',
+#   'delete_broadcast', 'delete_command', 'edit_broadcast', 'edit_command',
+#   'list_broadcasts', 'list_commands'
+#   Empty list value: 'none'
+#   (Default value:
+#   add_broadcast,add_command,commands,delete_broadcast,delete_command,edit_broadcast,edit_command,list_broadcasts,list_commands)
+MOONPIE_CONFIG_CUSTOM_COMMANDS_BROADCASTS_ENABLE_COMMANDS=none
+```
 
-   # Disable default moonpie commands
-   MOONPIE_CONFIG_MOONPIE_ENABLE_COMMANDS=none
-   # Only enable the !rp and !osuRequests osu! command
-   MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=rp,requests
+Supported features:
 
-   # Variables necessary to use the osu! API
-   MOONPIE_CONFIG_OSU_API_CLIENT_ID=1234
-   MOONPIE_CONFIG_OSU_API_CLIENT_SECRET=dadasfsafsafdsadffasfsafasfa
-   # Variable of the user that should be checked for top scores
-   MOONPIE_CONFIG_OSU_API_DEFAULT_ID=1185432
-   # Variables that enables osu! beatmap requests (with detailed map information)
-   MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS=ON
-   MOONPIE_CONFIG_OSU_API_RECOGNIZE_MAP_REQUESTS_DETAILED=ON
+- ABOUT: Support a command for version information
+  - `!moonpie about` (everyone): Get version information of the bot
+  - `!moonpie commands` (everyone): List all enabled commands
+- CUSTOM_CS_BS: Support custom commands/broadcasts stored in database and commands to change them
+- OSU_API: Support osu! API calls in custom commands/broadcasts or in the enabled commands
+  - `!osu commands` (everyone): List all enabled commands
+  - `!pp[ (osuUserId|osuUserName)]` (everyone): Get general account information (pp, rank, country, ...) of the account or of the given osu! player
+  - `!rp[ (osuUserId|osuUserName)]` (everyone): Get the most recent play of the account or of the given osu! player
+  - `!score osuUserName` (everyone): Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+- OSU_API_BEATMAP_REQUESTS: Support osu! beatmap requests in Twitch chat using the osu! API and commands to manage them
+  - `!osu commands` (everyone): List all enabled commands
+  - `osuBeatmapUrl[ comment]` (everyone): Request a beatmap requests using an osu! URL and optional comment
+  - `!osuRequests[( on| off)[ message ]]` (get=everyone on/off=mod): Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+  - `!osuRequests set option optionValue` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
+  - `!osuRequests unset option` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+- OSU_IRC_BEATMAP_REQUESTS: Support sending beatmap requests via IRC messages to the osu! client
 
-   # Variables necessary to send recognized beatmaps to the osu! client via IRC
-   MOONPIE_CONFIG_OSU_IRC_PASSWORD=senderServerPassword
-   MOONPIE_CONFIG_OSU_IRC_USERNAME=senderUserName
-   MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET=receiverUserName
-   ```
-
-   - Disables default moonpie commands
-   - Supports beatmap requests in chat which will use the osu! API
-   - Supports the osu! related most recent play "!rp" command which will use the osu! API
-   - Supports the osu! related "!osuRequests" command which can toggle if beatmap requests are on(=default) or off
-   - Supports simple custom commands/timers that don't need special APIs in their messages
-
-## Implementation
-
-Not every detail but the big components on which this bot is made of:
-
-- Node.js
-- Typescript
-- Node.js dependencies:
-  - Production:
-    - Non optional features:
-      - `dotenv` (for reading in environment variables config)
-      - `sqlite3` (for a persistent database)
-      - `tmi.js` (for the Twitch chat connection)
-      - `winston` (for logging to a file)
-    - Optional features:
-      - `@twurple/api`/`@twurple/auth` (Twitch API connection for message macros)
-      - `csv-parser` (Windows window title output parsing)
-      - `irc` (connect to osu! client via IRC protocol)
-      - `node-cron` (run timers based on cron strings)
-      - `osu-api-v2` (connect to the osu! API v2)
-      - `spotify-web-api-node` (connect to the Spotify API)
-      - `open` (open the browser to setup the initial Spotify API connection refresh token)
-      - `reconnecting-websocket` (connect to the StreamCompanion websocket server)
-  - Development:
-    - `eslint` (for code format and linting)
-    - `mocha` (for tests)
-    - `nodemon` (live restart of bot after changes have been made)
-    - `nyc` (for code coverage)
-    - `prettier` (for code format)
-    - `typedoc` (for HTML documentation)
+[//]: # (END)
 
 ## Inspect Database
 

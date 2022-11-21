@@ -143,7 +143,7 @@ export const createOsuIrcConnection = (
       LOG_ID_CHAT_HANDLER_OSU_IRC,
       `${id}:self_message_listener`
     );
-    logOsuIrcSelfMsgListener.info(
+    logOsuIrcSelfMsgListener.debug(
       `osu! IRC message was sent to '${to}': '${text}'`
     );
     logOsuIrcSelfMsgListener.debug(JSON.stringify({ creationDate, text, to }));
@@ -164,11 +164,11 @@ export const tryToSendOsuIrcMessage = async (
 
   let osuIrcBotInstance: undefined | irc.Client = osuIrcBot(id);
   await new Promise<void>((resolve, reject) => {
-    logOsuIrc.info("Try to connect to osu! IRC channel");
+    logOsuIrc.debug("Try to connect to osu! IRC channel");
     osuIrcBotInstance?.connect(
       NUMBER_OF_RETRIES_TO_CONNECT_TO_OSU_IRC_SERVER,
       (reply) => {
-        logOsuIrc.info(
+        logOsuIrc.debug(
           `osu! IRC connection was established: ${reply.args.join(", ")}`
         );
         message
@@ -177,7 +177,7 @@ export const tryToSendOsuIrcMessage = async (
         osuIrcBotInstance?.disconnect("", () => {
           osuIrcBotInstance?.conn.end();
           osuIrcBotInstance = undefined;
-          logOsuIrc.info("osu! IRC connection was closed");
+          logOsuIrc.debug("osu! IRC connection was closed");
           resolve();
         });
       }

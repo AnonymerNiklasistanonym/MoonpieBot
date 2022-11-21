@@ -32,7 +32,7 @@
 
   ;Set name and output file
   Name "${PRODUCT}"
-  OutFile "..\..\bin\${PRODUCT_LOWERCASE}_setup.exe"
+  OutFile "..\..\bin\${PRODUCT_BINARY}_setup.exe"
 
   ;Set the default installation directory
   InstallDir "$PROGRAMFILES64\${PRODUCT}"
@@ -63,8 +63,8 @@
   !define MUI_LANGDLL_ALLLANGUAGES
 
   ;Use a custom (un-)install icon
-  !define MUI_ICON "..\..\res\icons\${PRODUCT_LOWERCASE}.ico"
-  !define MUI_UNICON "..\..\res\icons\${PRODUCT_LOWERCASE}_greyscale.ico"
+  !define MUI_ICON "..\..\res\icons\${PRODUCT_BINARY}.ico"
+  !define MUI_UNICON "..\..\res\icons\${PRODUCT_BINARY}_greyscale.ico"
 
   ;Use custom image files for the (un-)installer
   ;!define MUI_HEADERIMAGE_RIGHT
@@ -201,15 +201,15 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   File ".\${FILE_NAME_SCRIPT_MAIN_CUSTOM_CONFIG_DIR}"
   File ".\${FILE_NAME_SCRIPT_BACKUP}"
   File ".\${FILE_NAME_SCRIPT_IMPORT}"
-  File "..\..\res\icons\${PRODUCT_LOWERCASE}.ico"
-  File "..\..\res\icons\${PRODUCT_LOWERCASE}_green.ico"
-  File "..\..\res\icons\${PRODUCT_LOWERCASE}_orange.ico"
-  File "..\..\res\icons\${PRODUCT_LOWERCASE}_purple.ico"
+  File "..\..\res\icons\${PRODUCT_BINARY}.ico"
+  File "..\..\res\icons\${PRODUCT_BINARY}_green.ico"
+  File "..\..\res\icons\${PRODUCT_BINARY}_orange.ico"
+  File "..\..\res\icons\${PRODUCT_BINARY}_purple.ico"
   ;Create a separate directory for binaries that shold be available to the
   ;terminal via the PATH environment variable
   CreateDirectory "$INSTDIR\${INSTDIR_BIN}"
   SetOutPath "$INSTDIR\${INSTDIR_BIN}"
-  File "..\..\bin\${PRODUCT_LOWERCASE}.exe"
+  File "..\..\bin\${PRODUCT_BINARY}.exe"
   ;Reset the output path for shortcuts to the main install directory
   SetOutPath "$INSTDIR"
 
@@ -219,8 +219,8 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   ;Registry information for add/remove programs
   ;(https://nsis.sourceforge.io/Add_uninstall_information_to_Add/Remove_Programs)
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT} ${PRODUCT_VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$\"$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe$\""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "QuietUninstallString" "$\"$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe$\" /S"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" "$\"$INSTDIR\${PRODUCT_BINARY}_uninstaller.exe$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "QuietUninstallString" "$\"$INSTDIR\${PRODUCT_BINARY}_uninstaller.exe$\" /S"
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "URLInfoAbout" "$\"${PRODUCT_URL}$\""
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "NoModify" 1
@@ -231,15 +231,15 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
 
   ;Create start menu shortcut for program, config directory and uninstaller
   CreateDirectory "$SMPROGRAMS\${PRODUCT}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${FILE_NAME_SCRIPT_MAIN}" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrBackup) ${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${FILE_NAME_SCRIPT_BACKUP}" "" "$INSTDIR\${PRODUCT_LOWERCASE}_green.ico" 0
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrImport) ${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${FILE_NAME_SCRIPT_IMPORT}" "" "$INSTDIR\${PRODUCT_LOWERCASE}_purple.ico" 0
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT} ${PRODUCT_VERSION} ($(LangStrCustomConfig)).lnk" "$INSTDIR\${FILE_NAME_SCRIPT_MAIN_CUSTOM_CONFIG_DIR}" "" "$INSTDIR\${PRODUCT_LOWERCASE}_orange.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${FILE_NAME_SCRIPT_MAIN}" "" "$INSTDIR\${PRODUCT_BINARY}.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrBackup) ${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${FILE_NAME_SCRIPT_BACKUP}" "" "$INSTDIR\${PRODUCT_BINARY}_green.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrImport) ${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${FILE_NAME_SCRIPT_IMPORT}" "" "$INSTDIR\${PRODUCT_BINARY}_purple.ico" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\${PRODUCT} ${PRODUCT_VERSION} ($(LangStrCustomConfig)).lnk" "$INSTDIR\${FILE_NAME_SCRIPT_MAIN_CUSTOM_CONFIG_DIR}" "" "$INSTDIR\${PRODUCT_BINARY}_orange.ico" 0
   CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrConfiguration1)${PRODUCT}$(LangStrConfiguration2).lnk" "$AppData\${PRODUCT}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrUninstall) ${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" "" "$INSTDIR\${PRODUCT_LOWERCASE}_uninstaller.exe" 0
+  CreateShortCut "$SMPROGRAMS\${PRODUCT}\$(LangStrUninstall) ${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_BINARY}_uninstaller.exe" "" "$INSTDIR\${PRODUCT_BINARY}_uninstaller.exe" 0
 
   ;Create uninstaller
-  WriteUninstaller "${PRODUCT_LOWERCASE}_uninstaller.exe"
+  WriteUninstaller "${PRODUCT_BINARY}_uninstaller.exe"
 
   ;Set output path to the config directory and list the files that should be put
   ;into it
@@ -267,7 +267,7 @@ Section "${PRODUCT} ($(LangStrRequired))" Section1
   ${EndIf}
 
   ;Dump install log to file
-  StrCpy $0 "$TEMP\${PRODUCT_LOWERCASE}_install.log"
+  StrCpy $0 "$TEMP\${PRODUCT_BINARY}_install.log"
   Push $0
   Call DumpLog
 
@@ -339,6 +339,6 @@ Function createDesktopShortcut
   SetOutPath "$INSTDIR\${INSTDIR_BIN}"
 
   ;Create Desktop shortcut to main component
-  CreateShortCut "$DESKTOP\${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_LOWERCASE}.bat" "" "$INSTDIR\${PRODUCT_LOWERCASE}.ico" 0
+  CreateShortCut "$DESKTOP\${PRODUCT} ${PRODUCT_VERSION}.lnk" "$INSTDIR\${PRODUCT_BINARY}.bat" "" "$INSTDIR\${PRODUCT_BINARY}.ico" 0
 
 FunctionEnd

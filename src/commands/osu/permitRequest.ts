@@ -1,5 +1,5 @@
 // Local imports
-import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/chatCommands";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { osuBeatmapRequestNoBlockedRequestsError } from "../../info/strings/osu/beatmapRequest";
 import { OsuRequestsConfig } from "../../info/databases/osuRequestsDb";

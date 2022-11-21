@@ -1,10 +1,9 @@
-/**
- * Custom error interface with an optional error code.
- */
+/** Custom error interface with an optional error code. */
 export interface ErrorWithCode extends Error {
   code?: ErrorWithCodeCode;
 }
 
+/** Custom error codes. */
 export enum ErrorWithCodeCode {
   ENABLED_COMMANDS_UNDEFINED = "ENABLED_COMMANDS_UNDEFINED",
   MESSAGE_ID_UNDEFINED = "MESSAGE_ID_UNDEFINED",
@@ -13,6 +12,9 @@ export enum ErrorWithCodeCode {
   USER_NAME_UNDEFINED = "USER_NAME_UNDEFINED",
 }
 
+/**
+ * @returns Error for when the message ID of a Twitch message is undefined.
+ */
 export const errorMessageIdUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to reply to message! (messageId is undefined)"
@@ -21,6 +23,9 @@ export const errorMessageIdUndefined = (): ErrorWithCode => {
   return error;
 };
 
+/**
+ * @returns Error for when the message user name of a Twitch message is undefined.
+ */
 export const errorMessageUserNameUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to reply to message! (userName is undefined)"
@@ -29,6 +34,9 @@ export const errorMessageUserNameUndefined = (): ErrorWithCode => {
   return error;
 };
 
+/**
+ * @returns Error for when the message user ID of a Twitch message is undefined.
+ */
 export const errorMessageUserIdUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to reply to message! (userId is undefined)"
@@ -37,6 +45,9 @@ export const errorMessageUserIdUndefined = (): ErrorWithCode => {
   return error;
 };
 
+/**
+ * @returns Error for when the default osu user ID of a Twitch message is undefined.
+ */
 export const errorMessageDefaultOsuIdUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
     "Unable to reply to message! (defaultOsuId is undefined)"

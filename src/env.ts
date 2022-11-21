@@ -1,3 +1,7 @@
+/**
+ * Environment variable handling.
+ */
+
 // Package imports
 import path from "path";
 // Local imports
@@ -12,7 +16,9 @@ import {
   fileDocumentationGenerator,
   FileDocumentationPartType,
 } from "./documentation/fileDocumentationGenerator";
-import { escapeStringIfWhiteSpace } from "./other/whiteSpaceChecker";
+import { convertRegexToHumanString } from "./other/regexToString";
+import { escapeEnvVariableValue } from "./other/whiteSpaceChecker";
+import { genericFilterNonUniqueStrings } from "./other/genericStringSorter";
 import { getCustomEnvValueFromLoggerConfig } from "./info/config/loggerConfig";
 import { getCustomEnvValueFromMoonpieConfig } from "./info/config/moonpieConfig";
 // Type imports
@@ -39,10 +45,14 @@ export type EnvVariableStructureElement<BLOCK = string> =
   | EnvVariableStructureTextBlock
   | EnvVariableStructureVariablesBlock<BLOCK>;
 
-/**
- * Environment variable handling.
- */
+const CENSORED_CUSTOM_ENV_VALUE = "*******[secret]********";
 
+/**
+ * Print all environment variables to the console plus if found a custom value.
+ *
+ * @param configDir The configuration directory.
+ * @param censor Should the custom values be censored or not.
+ */
 export const printEnvVariablesToConsole = (
   configDir: string,
   censor = true
@@ -59,10 +69,10 @@ export const printEnvVariablesToConsole = (
       envVariableValueString = `"${envVariableValue.value}"`;
       if (censor && envVariableInfo.censor) {
         // Censor secret variables per default
-        envVariableValueString = "*******[secret]********";
+        envVariableValueString = CENSORED_CUSTOM_ENV_VALUE;
       }
       if (envVariableValue.value.length === 0) {
-        envVariableValueString = "Empty string!";
+        envVariableValueString = undefined;
       }
 
       // Add note if the value was derived via a legacy variable
@@ -180,14 +190,18 @@ export const getEnvVariableValue = (
       !value
         .split(ENV_LIST_SPLIT_CHARACTER)
         .filter((a) => a.length > 0)
-        .every((a) => supportedValues.values.includes(a)) &&
+        .every((a) =>
+          supportedValues.values
+            .map((b) => (typeof b === "string" ? b : b.id))
+            .includes(a)
+        ) &&
       value !== supportedValues.emptyListValue
     ) {
       throw Error(
         `The provided value list${
           envVariableInfo.censor ? "" : ` "${value}"`
         } for "${envVariableName}" is not supported (${supportedValues.values
-          .map((a) => `"${a}"`)
+          .map((a) => `"${typeof a === "string" ? a : a.id}"`)
           .join(ENV_LIST_SPLIT_CHARACTER)})${
           supportedValues.emptyListValue !== undefined
             ? ` [empty list value "${supportedValues.emptyListValue}"]`
@@ -197,11 +211,13 @@ export const getEnvVariableValue = (
     }
     if (
       supportedValues.canBeJoinedAsList !== true &&
-      !supportedValues.values.includes(value)
+      !supportedValues.values
+        .map((a) => (typeof a === "string" ? a : a.id))
+        .includes(value)
     ) {
       throw Error(
         `The provided value for "${envVariableName}" is not supported (${supportedValues.values
-          .map((a) => `"${a}"`)
+          .map((a) => `"${typeof a === "string" ? a : a.id}"`)
           .join(",")})`
       );
     }
@@ -309,27 +325,36 @@ export const getEnvVariableName = (
   return `${ENV_PREFIX}${envVariable}`;
 };
 
+export interface CreateEnvVariableDocumentationOptions {
+  createExampleConfigDocumentation?: boolean;
+}
+
 export const createEnvVariableDocumentation = (
   configDir: string,
   loggerConfig?: DeepReadonly<LoggerConfig>,
-  moonpieConfig?: DeepReadonly<MoonpieConfig>
+  moonpieConfig?: DeepReadonly<MoonpieConfig>,
+  options: CreateEnvVariableDocumentationOptions = {}
 ): string => {
   const data: FileDocumentationParts[] = [];
   const documentWithCustomConfigValues =
     loggerConfig !== undefined || moonpieConfig !== undefined;
 
   for (const structurePart of envVariableStructure) {
+    const blockData: FileDocumentationParts[] = [];
+    // Check if there are any non default values set
+    let nonDefaultValueFound = false;
+
     // Skip structure parts that should only appear i example files
     if (structurePart.exampleFile && documentWithCustomConfigValues) {
       continue;
     }
+    // Variable documentation block
     if ("block" in structurePart) {
-      // Variable documentation block
-      data.push({
+      blockData.push({
         count: 1,
         type: FileDocumentationPartType.NEWLINE,
       });
-      data.push({
+      blockData.push({
         description: structurePart.content,
         title: structurePart.name,
         type: FileDocumentationPartType.HEADING,
@@ -348,10 +373,30 @@ export const createEnvVariableDocumentation = (
               `Supported ${
                 envVariableInfo.supportedValues.canBeJoinedAsList ? "list " : ""
               }values: ${envVariableInfo.supportedValues.values
-                .map((a) => `'${a}'`)
+                .map((a) => `'${typeof a === "string" ? a : a.id}'`)
+                .filter(genericFilterNonUniqueStrings)
                 .sort()
                 .join(", ")}`
             );
+            for (const supportedValue of envVariableInfo.supportedValues
+              .values) {
+              if (
+                typeof supportedValue === "string" ||
+                options.createExampleConfigDocumentation
+              ) {
+                continue;
+              }
+              envInfos.push(
+                `- ${supportedValue.id}: ${supportedValue.description}`
+              );
+              envInfos.push(
+                `  (${supportedValue.permission}: ${
+                  typeof supportedValue.command === "string"
+                    ? supportedValue.command
+                    : convertRegexToHumanString(supportedValue.command)
+                })`
+              );
+            }
             if (envVariableInfo.supportedValues.emptyListValue) {
               envInfos.push(
                 `Empty list value: '${envVariableInfo.supportedValues.emptyListValue}'`
@@ -359,6 +404,7 @@ export const createEnvVariableDocumentation = (
             }
           }
           if (
+            options.createExampleConfigDocumentation !== true &&
             envVariableInfo.legacyNames &&
             envVariableInfo.legacyNames.length > 0
           ) {
@@ -414,67 +460,59 @@ export const createEnvVariableDocumentation = (
           ) {
             if (defaultConfigValue !== undefined) {
               envInfos.push(
-                `(Default value: ${escapeStringIfWhiteSpace(
-                  defaultConfigValue,
-                  {
-                    escapeCharacters: [["'", "\\'"]],
-                    surroundCharacter: "'",
-                  }
-                )})`
+                `(Default value: ${escapeEnvVariableValue(defaultConfigValue)})`
               );
             }
-            value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
+            value = `${ENV_PREFIX}${envVariable}=${escapeEnvVariableValue(
               defaultConfigValueValue !== undefined
                 ? path.relative(configDir, customConfigValue)
-                : customConfigValue,
-              {
-                escapeCharacters: [["'", "\\'"]],
-                surroundCharacter: "'",
-              }
+                : customConfigValue
             )}`;
           } else if (defaultConfigValue !== undefined) {
-            value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
-              defaultConfigValue,
-              {
-                escapeCharacters: [["'", "\\'"]],
-                surroundCharacter: "'",
-              }
+            value = `${ENV_PREFIX}${envVariable}=${escapeEnvVariableValue(
+              defaultConfigValue
             )}`;
           } else if (envVariableInfo.example) {
             envInfos.push("(The following line is only an example!)");
-            value = `${ENV_PREFIX}${envVariable}=${escapeStringIfWhiteSpace(
-              envVariableInfo.example,
-              {
-                escapeCharacters: [["'", "\\'"]],
-                surroundCharacter: "'",
-              }
+            value = `${ENV_PREFIX}${envVariable}=${escapeEnvVariableValue(
+              envVariableInfo.example
             )}`;
           }
-          data.push({
+          const isComment = !(
+            envVariableInfo.required ||
+            (customConfigValue !== undefined &&
+              customConfigValue !== defaultConfigValue &&
+              customConfigValue !== defaultConfigValueValue)
+          );
+          if (options.createExampleConfigDocumentation && isComment) {
+            continue;
+          } else {
+            nonDefaultValueFound = true;
+          }
+          blockData.push({
             description: {
               infos: envInfos,
               prefix: ">",
               text: envVariableInfo.description,
             },
             // Do not comment value line if required or custom value exists
-            isComment: !(
-              envVariableInfo.required ||
-              (customConfigValue !== undefined &&
-                customConfigValue !== defaultConfigValue &&
-                customConfigValue !== defaultConfigValueValue)
-            ),
+            isComment,
             type: FileDocumentationPartType.VALUE,
             value,
           });
         }
       }
-    } else {
+    } else if (options.createExampleConfigDocumentation !== true) {
       // Just a text block
-      data.push({
+      blockData.push({
         text: structurePart.content,
         type: FileDocumentationPartType.TEXT,
       });
     }
+    if (options.createExampleConfigDocumentation && !nonDefaultValueFound) {
+      continue;
+    }
+    data.push(...blockData);
   }
 
   return fileDocumentationGenerator(data);

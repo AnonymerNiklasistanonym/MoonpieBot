@@ -22,11 +22,12 @@
     "scripts": {
         "build:dev": "tsc --sourceMap --removeComments false --pretty",
         "build": "tsc",
-        "create": "concurrently \"npm run create:envExamples\" \"npm run create:ccCbExamples\" \"npm run create:manPage\" \"npm run create:pkgbuilds\" \"npm run create:windowsInstallerConfig\" \"npm run create:customStrings\"",
+        "create": "concurrently \"npm run create:envExamples\" \"npm run create:ccCbExamples\" \"npm run create:manPage\" \"npm run create:pkgbuilds\" \"npm run create:windowsInstallerConfig\" \"npm run create:customStrings\" \"npm run create:updateReadme\"",
         "create:customStrings": "ts-node scripts/createCustomStrings.ts",
         "create:envExamples": "ts-node scripts/createEnvExampleFiles.ts",
         "create:ccCbExamples": "ts-node scripts/createCCCBExampleFile.ts",
         "create:manPage": "ts-node scripts/createManPageFile.ts",
+        "create:updateReadme": "ts-node scripts/updateReadme.ts",
         "create:pkgbuilds": "ts-node scripts/createPkgbuildFiles.ts",
         "create:windowsInstallerConfig": "ts-node scripts/createWindowsInstallerConfigFiles.ts",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",

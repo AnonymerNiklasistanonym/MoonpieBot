@@ -1,7 +1,7 @@
 // Package imports
 import osuApiV2, { GameMode, ScoresType } from "osu-api-v2";
 // Local imports
-import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/chatCommands";
 import {
   osuCommandReplyRp,
   osuCommandReplyRpNotFound,
@@ -9,6 +9,7 @@ import {
 import { errorMessageDefaultOsuIdUndefined } from "../../error";
 import { macroOsuPpRpRequest } from "../../info/macros/osuPpRpRequest";
 import { regexOsuChatHandlerCommandRp } from "../../info/regex";
+import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -123,7 +124,9 @@ export const commandRp: ChatMessageHandlerReplyCreator<
     ) {
       return {
         data: {
-          customOsuName: matchGroups.osuUserName,
+          customOsuName: removeWhitespaceEscapeChatCommand(
+            matchGroups.osuUserName
+          ),
         },
       };
     }

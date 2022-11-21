@@ -2,7 +2,7 @@
 import {
   LOG_ID_CHAT_HANDLER_MOONPIE,
   MoonpieCommands,
-} from "../../info/commands";
+} from "../../info/chatCommands";
 import {
   macroMoonpieLeaderboardEntry,
   macroMoonpieUser,
@@ -25,6 +25,7 @@ import {
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import moonpieDb from "../../database/moonpieDb";
+import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
 import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
 import type {
@@ -106,7 +107,13 @@ export const commandGet: ChatMessageHandlerReplyCreator<
     if (!matchGroups) {
       throw Error("RegexMoonpieChatHandlerCommandUserGet groups undefined");
     }
-    return { data: { userNameMoonpieDb: matchGroups.userName } };
+    return {
+      data: {
+        userNameMoonpieDb: removeWhitespaceEscapeChatCommand(
+          matchGroups.userName
+        ),
+      },
+    };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,
@@ -237,7 +244,7 @@ export const commandSet: ChatMessageHandlerReplyCreator<
       return {
         data: {
           operation: "=",
-          setCount: parseInt(matchGroups.moonpieCountSet),
+          setCount: parseInt(matchGroups.countSet),
           userNameMoonpieDb: matchGroups.userName,
         },
       };
@@ -253,7 +260,7 @@ export const commandSet: ChatMessageHandlerReplyCreator<
       return {
         data: {
           operation: "+",
-          setCount: parseInt(matchGroups.moonpieCountAdd),
+          setCount: parseInt(matchGroups.countAdd),
           userNameMoonpieDb: matchGroups.userName,
         },
       };
@@ -271,8 +278,10 @@ export const commandSet: ChatMessageHandlerReplyCreator<
       return {
         data: {
           operation: "-",
-          setCount: parseInt(matchGroups.moonpieCountRemove),
-          userNameMoonpieDb: matchGroups.userName,
+          setCount: parseInt(matchGroups.countRemove),
+          userNameMoonpieDb: removeWhitespaceEscapeChatCommand(
+            matchGroups.userName
+          ),
         },
       };
     }
@@ -314,7 +323,7 @@ export const commandDelete: ChatMessageHandlerReplyCreator<
     ) {
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
-          name: data.userNameMoonpieDb,
+          name: removeWhitespaceEscapeChatCommand(data.userNameMoonpieDb),
         }),
         isError: true,
         messageId: moonpieUserNeverClaimedError.id,
@@ -348,7 +357,13 @@ export const commandDelete: ChatMessageHandlerReplyCreator<
     if (!matchGroups) {
       throw Error("RegexMoonpieChatHandlerCommandUserDelete groups undefined");
     }
-    return { data: { userNameMoonpieDb: matchGroups.userName } };
+    return {
+      data: {
+        userNameMoonpieDb: removeWhitespaceEscapeChatCommand(
+          matchGroups.userName
+        ),
+      },
+    };
   },
   info: {
     chatHandlerId: LOG_ID_CHAT_HANDLER_MOONPIE,

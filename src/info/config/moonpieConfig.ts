@@ -12,6 +12,13 @@ import {
   convertToStringArray,
 } from "../../config";
 import {
+  CustomCommandsBroadcastsCommands,
+  LurkCommands,
+  MoonpieCommands,
+  OsuCommands,
+  SpotifyCommands,
+} from "../chatCommands";
+import {
   getEnvVariableValueDefault,
   getEnvVariableValueOrDefault,
   getEnvVariableValueOrError,
@@ -38,8 +45,8 @@ export interface MoonpieConfigTwitchApi {
   clientId?: string;
 }
 
-export interface MoonpieConfigUtilChatHandler {
-  enableCommands: string[];
+export interface MoonpieConfigUtilChatHandler<T = string> {
+  enableCommands: T[];
 }
 
 export interface MoonpieConfigUtilDatabase {
@@ -47,13 +54,13 @@ export interface MoonpieConfigUtilDatabase {
 }
 
 export interface MoonpieConfigMoonpie
-  extends MoonpieConfigUtilChatHandler,
+  extends MoonpieConfigUtilChatHandler<MoonpieCommands>,
     MoonpieConfigUtilDatabase {
   claimCooldownHours: number;
 }
 
 export interface MoonpieConfigSpotify
-  extends MoonpieConfigUtilChatHandler,
+  extends MoonpieConfigUtilChatHandler<SpotifyCommands>,
     MoonpieConfigUtilDatabase {}
 
 export interface MoonpieConfigSpotifyApi {
@@ -63,7 +70,7 @@ export interface MoonpieConfigSpotifyApi {
 }
 
 export interface MoonpieConfigCustomCommandsBroadcasts
-  extends MoonpieConfigUtilChatHandler,
+  extends MoonpieConfigUtilChatHandler<CustomCommandsBroadcastsCommands>,
     MoonpieConfigUtilDatabase {}
 
 export interface MoonpieConfigOsuApi extends MoonpieConfigUtilDatabase {
@@ -87,9 +94,9 @@ export interface MoonpieConfigOsuStreamCompanion {
 
 export interface MoonpieConfig {
   customCommandsBroadcasts?: MoonpieConfigCustomCommandsBroadcasts;
-  lurk?: MoonpieConfigUtilChatHandler;
+  lurk?: MoonpieConfigUtilChatHandler<LurkCommands>;
   moonpie?: MoonpieConfigMoonpie;
-  osu?: MoonpieConfigUtilChatHandler;
+  osu?: MoonpieConfigUtilChatHandler<OsuCommands>;
   osuApi?: MoonpieConfigOsuApi;
   osuIrc?: MoonpieConfigOsuIrc;
   osuStreamCompanion?: MoonpieConfigOsuStreamCompanion;
@@ -162,7 +169,8 @@ export const getMoonpieConfigFromEnv: GetConfig<
         getEnvVariableValueOrDefault(
           EnvVariable.SPOTIFY_ENABLE_COMMANDS,
           configDir
-        )
+        ),
+        Object.values(SpotifyCommands)
       ),
     },
     // > Spotify API
@@ -194,7 +202,11 @@ export const getMoonpieConfigFromEnv: GetConfig<
     // eslint-disable-next-line sort-keys
     osu: {
       enableCommands: convertToStringArray(
-        getEnvVariableValueOrDefault(EnvVariable.OSU_ENABLE_COMMANDS, configDir)
+        getEnvVariableValueOrDefault(
+          EnvVariable.OSU_ENABLE_COMMANDS,
+          configDir
+        ),
+        Object.values(OsuCommands)
       ),
     },
     // > osu! API
@@ -274,19 +286,20 @@ export const getMoonpieConfigFromEnv: GetConfig<
       ),
       enableCommands: convertToStringArray(
         getEnvVariableValueOrDefault(
-          EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
+          EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLE_COMMANDS,
           configDir
-        )
+        ),
+        Object.values(CustomCommandsBroadcastsCommands)
       ),
     },
     // Lurk
-    // eslint-disable-next-line sort-keys
     lurk: {
       enableCommands: convertToStringArray(
         getEnvVariableValueOrDefault(
-          EnvVariable.LURK_ENABLED_COMMANDS,
+          EnvVariable.LURK_ENABLE_COMMANDS,
           configDir
-        )
+        ),
+        Object.values(LurkCommands)
       ),
     },
   };
@@ -313,7 +326,8 @@ export const getMoonpieConfigMoonpieFromEnv: GetConfig<
       getEnvVariableValueOrDefault(
         EnvVariable.MOONPIE_ENABLE_COMMANDS,
         configDir
-      )
+      ),
+      Object.values(MoonpieCommands)
     ),
   };
 };
@@ -398,6 +412,9 @@ export const getCustomEnvValueFromMoonpieConfig: GetCustomEnvValueFromConfig<
   if (envVariable === EnvVariable.OSU_IRC_USERNAME) {
     return config.osuIrc?.username;
   }
+  if (envVariable === EnvVariable.OSU_IRC_REQUEST_TARGET) {
+    return config.osuIrc?.requestTarget;
+  }
   // > osu! StreamCompanion
   if (envVariable === EnvVariable.OSU_STREAM_COMPANION_DIR_PATH) {
     return config.osuStreamCompanion?.dirPath;
@@ -409,13 +426,13 @@ export const getCustomEnvValueFromMoonpieConfig: GetCustomEnvValueFromConfig<
   if (envVariable === EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH) {
     return config.customCommandsBroadcasts?.databasePath;
   }
-  if (envVariable === EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS) {
+  if (envVariable === EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLE_COMMANDS) {
     return convertFromStringArray(
       config.customCommandsBroadcasts?.enableCommands
     );
   }
   // > Lurk
-  if (envVariable === EnvVariable.LURK_ENABLED_COMMANDS) {
+  if (envVariable === EnvVariable.LURK_ENABLE_COMMANDS) {
     return convertFromStringArray(config.lurk?.enableCommands);
   }
   return undefined;

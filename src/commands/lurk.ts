@@ -8,7 +8,7 @@ import type {
   ChatMessageHandler,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
 } from "../chatMessageHandler";
-import { LOG_ID_CHAT_HANDLER_LURK, LurkCommands } from "../info/commands";
+import { LOG_ID_CHAT_HANDLER_LURK, LurkCommands } from "../info/chatCommands";
 import {
   lurkCommandReplyLurk,
   lurkCommandReplyWelcomeBack,
@@ -95,8 +95,6 @@ export const commandLurk: ChatMessageHandlerReplyCreator<
   CommandLurkDetectorOutput
 > = {
   createReply: (_channel, tags, data) => {
-    // eslint-disable-next-line no-console
-    console.log(data.dateLurkStart, data.welcomeBack);
     if (data.welcomeBack === true) {
       data.lurkInfo.lurkers.delete(tags["user-id"]);
       return {

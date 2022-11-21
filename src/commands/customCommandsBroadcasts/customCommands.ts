@@ -19,7 +19,11 @@ import {
 import {
   CustomCommandsBroadcastsCommands,
   LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
-} from "../../info/commands";
+} from "../../info/chatCommands";
+import {
+  CustomCommandValueOptions,
+  validateCustomCommandValue,
+} from "./valueOptions";
 import {
   generateMacroMapFromMacroGenerator,
   messageParserById,
@@ -53,68 +57,6 @@ import type {
   RegexCustomCommandAdd,
   RegexCustomCommandDelete,
 } from "../../info/regex";
-
-export enum CustomCommandValueOptions {
-  COOLDOWN_IN_S = "cooldownInS",
-  COUNT = "count",
-  DESCRIPTION = "description",
-  ID = "id",
-  MESSAGE = "message",
-  REGEX = "regex",
-  USER_LEVEL = "userLevel",
-}
-const validateCustomCommandValue = (
-  option: CustomCommandValueOptions,
-  optionValue?: string
-): string => {
-  switch (option) {
-    case CustomCommandValueOptions.COOLDOWN_IN_S:
-    case CustomCommandValueOptions.COUNT:
-      if (optionValue === undefined) {
-        throw Error("Number value was undefined!");
-      }
-      // eslint-disable-next-line no-case-declarations
-      const floatValue = parseFloat(optionValue);
-      if (isNaN(floatValue)) {
-        throw Error("Number value was NaN!");
-      }
-      if (!isFinite(floatValue)) {
-        throw Error("Number value was not finite!");
-      }
-      break;
-    case CustomCommandValueOptions.DESCRIPTION:
-    case CustomCommandValueOptions.ID:
-      if (optionValue === undefined) {
-        throw Error("String value was undefined!");
-      }
-      break;
-    case CustomCommandValueOptions.MESSAGE:
-      if (optionValue === undefined) {
-        throw Error("String value was undefined!");
-      }
-      // TODO
-      break;
-    case CustomCommandValueOptions.REGEX:
-      if (optionValue === undefined) {
-        throw Error("String value was undefined!");
-      }
-      try {
-        // eslint-disable-next-line security/detect-non-literal-regexp
-        new RegExp(optionValue, "i");
-      } catch (err) {
-        // TODO Add error information
-        throw Error(`Regex value was bad (${(err as Error).message})!`);
-      }
-      break;
-    case CustomCommandValueOptions.USER_LEVEL:
-      if (optionValue === undefined) {
-        throw Error("String value was undefined!");
-      }
-      // TODO
-      break;
-  }
-  return optionValue;
-};
 
 export interface CommandAddDetectorOutput {
   customCommandCooldownInS?: number;
@@ -211,21 +153,15 @@ export const commandAddCC: ChatMessageHandlerReplyCreator<
     return {
       data: {
         customCommandCooldownInS:
-          matchGroups.customCommandCooldownInS !== undefined
-            ? parseInt(matchGroups.customCommandCooldownInS)
+          matchGroups.cooldownInS !== undefined
+            ? parseInt(matchGroups.cooldownInS)
             : undefined,
-        customCommandId: parseRegexStringArgument(matchGroups.customCommandId),
-        customCommandMessage: parseRegexStringArgument(
-          matchGroups.customCommandMessage
-        ),
-        customCommandRegex: parseRegexStringArgument(
-          matchGroups.customCommandRegex
-        ),
+        customCommandId: parseRegexStringArgument(matchGroups.id),
+        customCommandMessage: parseRegexStringArgument(matchGroups.message),
+        customCommandRegex: parseRegexStringArgument(matchGroups.regex),
         customCommandUserLevel:
-          matchGroups.customCommandUserLevel !== undefined
-            ? convertTwitchBadgeStringToLevel(
-                matchGroups.customCommandUserLevel
-              )
+          matchGroups.userLevel !== undefined
+            ? convertTwitchBadgeStringToLevel(matchGroups.userLevel)
             : undefined,
       },
     };
@@ -305,7 +241,7 @@ export const commandDelCC: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        customCommandId: parseRegexStringArgument(matchGroups.customCommandId),
+        customCommandId: parseRegexStringArgument(matchGroups.id),
       },
     };
   },
@@ -437,25 +373,17 @@ export const commandListCCs: ChatMessageHandlerReplyCreator<
     if (!matchGroups) {
       throw Error("RegexCustomCommandList groups undefined");
     }
-    if (
-      "customCommandOffset" in matchGroups &&
-      matchGroups.customCommandOffset !== undefined
-    ) {
+    if ("listOffset" in matchGroups && matchGroups.listOffset !== undefined) {
       return {
         data: {
-          customCommandOffset: parseInt(matchGroups.customCommandOffset),
+          customCommandOffset: parseInt(matchGroups.listOffset),
         },
       };
     }
-    if (
-      "customCommandId" in matchGroups &&
-      matchGroups.customCommandId !== undefined
-    ) {
+    if ("id" in matchGroups && matchGroups.id !== undefined) {
       return {
         data: {
-          customCommandId: parseRegexStringArgument(
-            matchGroups.customCommandId
-          ),
+          customCommandId: parseRegexStringArgument(matchGroups.id),
         },
       };
     }
@@ -590,12 +518,10 @@ export const commandEditCC: ChatMessageHandlerReplyCreator<
       }
       return {
         data: {
-          customCommandId: parseRegexStringArgument(
-            matchGroups.customCommandId
-          ),
-          customCommandOption: matchGroups.customCommandOption,
+          customCommandId: parseRegexStringArgument(matchGroups.id),
+          customCommandOption: matchGroups.option,
           customCommandOptionValue: parseRegexStringArgument(
-            matchGroups.customCommandOptionValue
+            matchGroups.optionValue
           ),
         },
       };

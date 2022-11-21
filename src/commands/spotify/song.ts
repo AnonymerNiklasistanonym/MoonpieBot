@@ -2,7 +2,7 @@
 import {
   LOG_ID_CHAT_HANDLER_SPOTIFY,
   SpotifyCommands,
-} from "../../info/commands";
+} from "../../info/chatCommands";
 import { macroSpotifySong } from "../../info/macros/spotify";
 import { regexSpotifyChatHandlerCommandSong } from "../../info/regex";
 import { spotifyCommandReplySong } from "../../info/strings/spotify/commandReply";

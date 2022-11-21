@@ -52,7 +52,7 @@ export const osuCommandReplyNp: StringEntry = {
   default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
-    " Currently playing '",
+    " Now playing '",
     {
       key: MacroOsuWindowTitle.TITLE,
       name: macroOsuWindowTitle.id,
@@ -97,7 +97,7 @@ export const osuCommandReplyNpStreamCompanionWebSocket: StringEntry = {
   default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
-    " Currently playing ",
+    " Now playing ",
     {
       name: PluginOsuStreamCompanion.CURRENT_MAP_WEBSOCKET,
       scope: [
@@ -259,7 +259,7 @@ export const osuCommandReplyNpStreamCompanionFile: StringEntry = {
     createMessageParserMessage([
       "@",
       { name: PluginTwitchChat.USER, type: "plugin" },
-      " Currently playing ",
+      " Now playing ",
       {
         name: PluginOsuStreamCompanion.CURRENT_MAP_FILE,
         scope: [
@@ -293,7 +293,7 @@ export const osuCommandReplyNpStreamCompanionFile: StringEntry = {
   default: createMessageParserMessage([
     "@",
     { name: PluginTwitchChat.USER, type: "plugin" },
-    " Currently playing ",
+    " Now playing ",
     {
       name: PluginOsuStreamCompanion.CURRENT_MAP_FILE,
       scope: [

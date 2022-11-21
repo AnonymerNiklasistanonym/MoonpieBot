@@ -29,3 +29,13 @@ export const escapeStringIfWhiteSpace = (
   }
   return `${options.surroundCharacter}${escapedString}${options.surroundCharacter}`;
 };
+export const escapeEnvVariableValue = (str: string): string =>
+  escapeStringIfWhiteSpace(str, {
+    escapeCharacters: [["'", "\\'"]],
+    surroundCharacter: "'",
+  });
+
+export const removeWhitespaceEscapeChatCommand = (str: string): string =>
+  str.startsWith("'") && str.endsWith("'")
+    ? str.substring(1, str.length - 1)
+    : str;

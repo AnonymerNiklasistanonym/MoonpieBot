@@ -22,7 +22,7 @@ export const pathsAreEqual = (path1: string, path2: string): boolean => {
   return path1 === path2;
 };
 
-interface CopyFileWithBackupOptions {
+export interface CopyFileWithBackupOptions {
   ignoreSrcDestSameFile: boolean;
   ignoreSrcFileNotFound: boolean;
 }

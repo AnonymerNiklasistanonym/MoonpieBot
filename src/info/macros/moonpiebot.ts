@@ -6,7 +6,7 @@ import {
   name,
   sourceCodeUrl,
 } from "../general";
-import { getVersionFromObject } from "../../version";
+import { getVersionString } from "../../version";
 import { version } from "../version";
 // Type imports
 import type { MessageParserMacro } from "../../messageParser";
@@ -30,7 +30,7 @@ export const macroMoonpieBot: MessageParserMacro<MacroMoonpieBot> = {
           macroValue = name;
           break;
         case MacroMoonpieBot.VERSION:
-          macroValue = getVersionFromObject(version);
+          macroValue = getVersionString(version);
           break;
         case MacroMoonpieBot.AUTHOR:
           macroValue = author;

@@ -1,11 +1,16 @@
 // Local imports
 import {
+  CustomCommandsBroadcastsCommands,
+  getChatCommandsCustomCommandsBroadcasts,
+} from "../../../info/chatCommands";
+import {
   pluginIfTrue,
   pluginListFilterUndefined,
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../plugins/general";
 import { createMessageParserMessage } from "../../../messageParser";
+import { createShortCommandDescription } from "../../../chatCommand";
 import { CUSTOM_COMMANDS_BROADCASTS_STRING_ID } from "../customCommandsBroadcasts";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../macros/commands";
@@ -19,7 +24,10 @@ const CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID = `${CUSTOM_COMMANDS_BROADCA
 export const customCommandsBroadcastsCommandsAddCustomCommand: StringEntry = {
   default: createMessageParserMessage(
     [
-      "!addcc $ID $REGEX MESSAGE (-ul=$USER_LEVEL) (-cd=$COOLDOWN_IN_S) [add custom command]",
+      createShortCommandDescription(
+        CustomCommandsBroadcastsCommands.ADD_CUSTOM_COMMAND,
+        getChatCommandsCustomCommandsBroadcasts
+      ),
     ],
     true
   ),
@@ -27,14 +35,24 @@ export const customCommandsBroadcastsCommandsAddCustomCommand: StringEntry = {
 };
 export const customCommandsBroadcastsCommandsAddCustomBroadcast: StringEntry = {
   default: createMessageParserMessage(
-    ["!addcb $ID $CRON_STRING MESSAGE [add custom broadcast]"],
+    [
+      createShortCommandDescription(
+        CustomCommandsBroadcastsCommands.ADD_CUSTOM_BROADCAST,
+        getChatCommandsCustomCommandsBroadcasts
+      ),
+    ],
     true
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_ADD_CUSTOM_BROADCAST`,
 };
 export const customCommandsBroadcastsCommandsEditCustomCommand: StringEntry = {
   default: createMessageParserMessage(
-    ["!editcc $ID $OPTION $OPTION_VALUE [edit command]"],
+    [
+      createShortCommandDescription(
+        CustomCommandsBroadcastsCommands.EDIT_CUSTOM_COMMAND,
+        getChatCommandsCustomCommandsBroadcasts
+      ),
+    ],
     true
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_EDIT_CUSTOM_COMMAND`,
@@ -42,24 +60,50 @@ export const customCommandsBroadcastsCommandsEditCustomCommand: StringEntry = {
 export const customCommandsBroadcastsCommandsEditCustomBroadcast: StringEntry =
   {
     default: createMessageParserMessage(
-      ["!editcb $ID $OPTION $OPTION_VALUE [edit broadcast]"],
+      [
+        createShortCommandDescription(
+          CustomCommandsBroadcastsCommands.EDIT_CUSTOM_BROADCAST,
+          getChatCommandsCustomCommandsBroadcasts
+        ),
+      ],
       true
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_EDIT_CUSTOM_BROADCAST`,
   };
 export const customCommandsBroadcastsCommandsListCustomCommands: StringEntry = {
-  default: createMessageParserMessage(["!listccs [list commands]"], true),
+  default: createMessageParserMessage(
+    [
+      createShortCommandDescription(
+        CustomCommandsBroadcastsCommands.LIST_CUSTOM_COMMANDS,
+        getChatCommandsCustomCommandsBroadcasts
+      ),
+    ],
+    true
+  ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_LIST_CUSTOM_COMMANDS`,
 };
 export const customCommandsBroadcastsCommandsListCustomBroadcasts: StringEntry =
   {
-    default: createMessageParserMessage(["!listcbs [list broadcasts]"], true),
+    default: createMessageParserMessage(
+      [
+        createShortCommandDescription(
+          CustomCommandsBroadcastsCommands.LIST_CUSTOM_BROADCASTS,
+          getChatCommandsCustomCommandsBroadcasts
+        ),
+      ],
+      true
+    ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_LIST_CUSTOM_BROADCAST`,
   };
 export const customCommandsBroadcastsCommandsDeleteCustomCommand: StringEntry =
   {
     default: createMessageParserMessage(
-      ["!delcc $ID [delete custom command]"],
+      [
+        createShortCommandDescription(
+          CustomCommandsBroadcastsCommands.DELETE_CUSTOM_COMMAND,
+          getChatCommandsCustomCommandsBroadcasts
+        ),
+      ],
       true
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_DELETE_CUSTOM_COMMAND`,
@@ -67,7 +111,12 @@ export const customCommandsBroadcastsCommandsDeleteCustomCommand: StringEntry =
 export const customCommandsBroadcastsCommandsDeleteCustomBroadcast: StringEntry =
   {
     default: createMessageParserMessage(
-      ["!delcb $ID [delete custom broadcast]"],
+      [
+        createShortCommandDescription(
+          CustomCommandsBroadcastsCommands.DELETE_CUSTOM_BROADCAST,
+          getChatCommandsCustomCommandsBroadcasts
+        ),
+      ],
       true
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_DELETE_CUSTOM_BROADCAST`,
@@ -102,6 +151,7 @@ export const customCommandsBroadcastsCommandsString: StringEntry = {
             customCommandsBroadcastsCommandsListCustomBroadcasts,
             customCommandsBroadcastsCommandsListCustomCommands,
           ]
+            .sort()
             .map(
               (a): MessageForParserMessagePlugin => ({
                 args: {

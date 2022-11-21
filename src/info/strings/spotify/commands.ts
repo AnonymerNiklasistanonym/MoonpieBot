@@ -1,11 +1,16 @@
 // Local imports
 import {
+  getChatCommandsSpotify,
+  SpotifyCommands,
+} from "../../../info/chatCommands";
+import {
   pluginIfTrue,
   pluginListFilterUndefined,
   pluginListJoinCommaSpace,
   pluginListSort,
 } from "../../plugins/general";
 import { createMessageParserMessage } from "../../../messageParser";
+import { createShortCommandDescription } from "../../../chatCommand";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../macros/commands";
 import { PluginTwitchChat } from "../../plugins/twitchChat";
@@ -16,14 +21,19 @@ import type { StringEntry } from "../../../messageParser";
 
 const SPOTIFY_COMMANDS_STRING_ID = `${SPOTIFY_STRING_ID}_COMMANDS`;
 
-export const spotifyCommandsSong: StringEntry = {
+export const spotifyCommandsSong: Readonly<StringEntry> = {
   default: createMessageParserMessage(
-    ["!song [now playing and previously played song]"],
+    [
+      createShortCommandDescription(
+        SpotifyCommands.SONG,
+        getChatCommandsSpotify
+      ),
+    ],
     true
   ),
   id: `${SPOTIFY_COMMANDS_STRING_ID}_SONG`,
 };
-export const spotifyCommandsPrefix: StringEntry = {
+export const spotifyCommandsPrefix: Readonly<StringEntry> = {
   default: createMessageParserMessage(
     [
       "@",
@@ -34,7 +44,7 @@ export const spotifyCommandsPrefix: StringEntry = {
   ),
   id: `${SPOTIFY_COMMANDS_STRING_ID}_PREFIX`,
 };
-export const spotifyCommandsString: StringEntry = {
+export const spotifyCommandsString: Readonly<StringEntry> = {
   default: createMessageParserMessage([
     {
       name: spotifyCommandsPrefix.id,
@@ -44,6 +54,7 @@ export const spotifyCommandsString: StringEntry = {
       args: {
         args: {
           args: [spotifyCommandsSong]
+            .sort()
             .map(
               (a): MessageForParserMessagePlugin => ({
                 args: {
@@ -80,7 +91,7 @@ export const spotifyCommandsString: StringEntry = {
   id: `${SPOTIFY_COMMANDS_STRING_ID}_STRING`,
 };
 
-export const spotifyCommands: StringEntry[] = [
+export const spotifyCommands: Readonly<StringEntry[]> = [
   spotifyCommandsSong,
   spotifyCommandsPrefix,
   spotifyCommandsString,

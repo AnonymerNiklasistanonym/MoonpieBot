@@ -3,13 +3,18 @@
  */
 
 // Local imports
+import {
+  genericFilterNonUniqueStrings,
+  genericStringSorter,
+} from "./other/genericStringSorter";
 import { cliOutputGenerator } from "./documentation/cliOutputGenerator";
-import { genericStringSorter } from "./other/genericStringSorter";
 // Type imports
 import type {
   CliOutputElements,
   CliOutputOptions,
 } from "./documentation/cliOutputGenerator";
+import { ChatCommand } from "./chatCommand";
+import { convertRegexToHumanString } from "./other/regexToString";
 
 /**
  * Generic information about the usage of the program.
@@ -103,7 +108,7 @@ export interface CliOptionInformation<NAME = string> {
 export interface CliEnvVariableInformationSupportedValues {
   canBeJoinedAsList?: boolean;
   emptyListValue?: string;
-  values: string[];
+  values: string[] | Readonly<ChatCommand[]>;
 }
 
 /**
@@ -221,21 +226,32 @@ export const cliHelpGenerator = (
         ) {
           if (a.supportedValues.canBeJoinedAsList === true) {
             description += `\nSupported list values: ${a.supportedValues.values
-              .map((b) => `'${b}'`)
+              .map((b) => `'${typeof b === "string" ? b : b.id}'`)
+              .filter(genericFilterNonUniqueStrings)
               .join(", ")}`;
             if (a.supportedValues.emptyListValue) {
               description += ` (empty list value: '${a.supportedValues.emptyListValue}')`;
             }
           } else {
             description += `\nSupported values: ${a.supportedValues.values
-              .map((b) => `'${b}'`)
+              .map((b) => `'${typeof b === "string" ? b : b.id}'`)
+              .filter(genericFilterNonUniqueStrings)
               .join(", ")}`;
           }
+          for (const supportedValue of a.supportedValues.values) {
+            if (typeof supportedValue === "string") {
+              break;
+            }
+            description += `\n- ${supportedValue.id}: ${
+              supportedValue.description
+            } (${supportedValue.permission}: ${
+              typeof supportedValue.command === "string"
+                ? supportedValue.command
+                : convertRegexToHumanString(supportedValue.command)
+            })`;
+          }
         }
-        return {
-          content,
-          description,
-        };
+        return { content, description };
       }),
       title: "Environment variables",
       type: "list",

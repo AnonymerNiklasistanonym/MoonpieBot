@@ -1,6 +1,6 @@
 ;Define name and lowercase name of the product
 !define PRODUCT "MoonpieBot"
-!define PRODUCT_LOWERCASE "moonpiebot"
+!define PRODUCT_BINARY "moonpiebot"
 ;Define version of the product
 !define PRODUCT_VERSION "1.0.30b"
 ;Define URL of the product

@@ -229,31 +229,31 @@ describe("regex", () => {
           { expected: null, input: "!moonpie set user 100k" },
           { expected: null, input: "!moonpie set user -10" },
           {
-            expected: { moonpieCountSet: "100", userName: "user" },
+            expected: { countSet: "100", userName: "user" },
             input: "!moonpie set user 100",
           },
           {
-            expected: { moonpieCountSet: "100", userName: "user" },
+            expected: { countSet: "100", userName: "user" },
             input: "   !moonpie set user 100   ",
           },
           {
-            expected: { moonpieCountSet: "100", userName: "user" },
+            expected: { countSet: "100", userName: "user" },
             input: "   !moonpie    set    user   100   ",
           },
           {
-            expected: { moonpieCountSet: "100", userName: "user" },
+            expected: { countSet: "100", userName: "user" },
             input: "!moonpie set user 100 message",
           },
           {
-            expected: { moonpieCountSet: "100", userName: "user" },
+            expected: { countSet: "100", userName: "user" },
             input: "!moonpie set user 100 message after that",
           },
           {
-            expected: { moonpieCountSet: "100", userName: "user" },
+            expected: { countSet: "100", userName: "user" },
             input: "!moonpie set user 100 200",
           },
           {
-            expected: { moonpieCountSet: "42", userName: "user" },
+            expected: { countSet: "42", userName: "user" },
             input: "!moonpie set user 42",
           },
         ];
@@ -268,7 +268,7 @@ describe("regex", () => {
             a.expected == null
               ? a.expected
               : {
-                  moonpieCountAdd: a.expected.moonpieCountSet,
+                  countAdd: a.expected.countSet,
                   userName: a.expected.userName,
                 },
           input: a.input.replace(/set/g, "add"),
@@ -282,7 +282,7 @@ describe("regex", () => {
             a.expected == null
               ? a.expected
               : {
-                  moonpieCountRemove: a.expected.moonpieCountSet,
+                  countRemove: a.expected.countSet,
                   userName: a.expected.userName,
                 },
           input: a.input.replace(/set/g, "remove"),
@@ -397,17 +397,14 @@ describe("regex", () => {
           { expected: {}, input: "!osuRequests onnn" },
           { expected: {}, input: "!osuRequests ofmessage" },
           { expected: {}, input: "!osuRequests offf message" },
-          { expected: { requestsOn: "on" }, input: "!osuRequests on" },
-          { expected: { requestsOff: "off" }, input: "!osuRequests off" },
+          { expected: { on: "on" }, input: "!osuRequests on" },
+          { expected: { off: "off" }, input: "!osuRequests off" },
           {
-            expected: { requestsOff: "off", requestsOnOffMessage: "custom" },
+            expected: { message: "custom", off: "off" },
             input: "!osuRequests off custom",
           },
           {
-            expected: {
-              requestsOff: "off",
-              requestsOnOffMessage: "custom message",
-            },
+            expected: { message: "custom message", off: "off" },
             input: "!osuRequests off custom message  ",
           },
         ];

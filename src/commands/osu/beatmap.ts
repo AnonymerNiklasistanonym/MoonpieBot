@@ -1,7 +1,7 @@
 // Package imports
 import osuApiV2 from "osu-api-v2";
 // Local imports
-import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/chatCommands";
 import {
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequestDemands,

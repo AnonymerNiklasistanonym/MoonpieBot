@@ -45,7 +45,7 @@ import { ExportDataTypes } from "./info/export";
 import { genericStringSorter } from "./other/genericStringSorter";
 import { getLoggerConfigFromEnv } from "./info/config/loggerConfig";
 import { getMoonpieConfigFromEnv } from "./info/config/moonpieConfig";
-import { getVersionFromObject } from "./version";
+import { getVersionString } from "./version";
 import { main } from "./main";
 import { version } from "./info/version";
 
@@ -54,7 +54,7 @@ import { version } from "./info/version";
  */
 const entryPoint = async () => {
   // Change the title of the process/terminal
-  const versionString = getVersionFromObject(version);
+  const versionString = getVersionString(version);
   process.title = `${name} ${versionString}`;
   // Set the default config directory
   let configDir = process.cwd();

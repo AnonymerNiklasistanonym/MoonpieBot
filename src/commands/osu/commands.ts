@@ -1,5 +1,5 @@
 // Local imports
-import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/chatCommands";
 import {
   osuCommandsLastRequest,
   osuCommandsNp,

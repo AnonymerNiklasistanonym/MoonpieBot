@@ -1,4 +1,5 @@
 // Local imports
+import { getChatCommandsOsu, OsuCommands } from "../../../info/chatCommands";
 import {
   pluginIfTrue,
   pluginListFilterUndefined,
@@ -6,6 +7,7 @@ import {
   pluginListSort,
 } from "../../plugins/general";
 import { createMessageParserMessage } from "../../../messageParser";
+import { createShortCommandDescription } from "../../../chatCommand";
 import { generalCommandsNone } from "../general";
 import { macroCommandEnabled } from "../../macros/commands";
 import { OSU_STRING_ID } from "../osu";
@@ -18,62 +20,79 @@ const OSU_COMMANDS_STRING_ID = `${OSU_STRING_ID}_COMMANDS`;
 
 export const osuCommandsLastRequest: StringEntry = {
   default: createMessageParserMessage(
-    ["!osuLastRequest ($COUNT) [resend previous requests]"],
+    [
+      createShortCommandDescription(
+        OsuCommands.LAST_REQUEST,
+        getChatCommandsOsu
+      ),
+    ],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_LAST_REQUEST`,
 };
 export const osuCommandsPermitRequest: StringEntry = {
   default: createMessageParserMessage(
-    ["!osuPermitRequest [send blocked requests]"],
+    [
+      createShortCommandDescription(
+        OsuCommands.PERMIT_REQUEST,
+        getChatCommandsOsu
+      ),
+    ],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_PERMIT_REQUEST`,
 };
 export const osuCommandsNp: StringEntry = {
-  default: createMessageParserMessage(["!np [now playing]"], true),
+  default: createMessageParserMessage(
+    [createShortCommandDescription(OsuCommands.NP, getChatCommandsOsu)],
+    true
+  ),
   id: `${OSU_COMMANDS_STRING_ID}_NP`,
 };
 export const osuCommandsNpStreamCompanionWebsocket: StringEntry = {
   default: createMessageParserMessage(
-    ["!np [now playing using StreamCompanion (websockets)]"],
+    [
+      createShortCommandDescription(OsuCommands.NP, getChatCommandsOsu) +
+        " using StreamCompanion (websockets)",
+    ],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_NP_STREAM_COMPANION_WEBSOCKET`,
 };
 export const osuCommandsNpStreamCompanionFile: StringEntry = {
   default: createMessageParserMessage(
-    ["!np [now playing StreamCompanion (files)]"],
+    [
+      createShortCommandDescription(OsuCommands.NP, getChatCommandsOsu) +
+        " using StreamCompanion (files)",
+    ],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_NP_STREAM_COMPANION_FILES`,
 };
 export const osuCommandsPp: StringEntry = {
   default: createMessageParserMessage(
-    ["!pp ($USER_ID/$USER_NAME) [osu! profile information]"],
+    [createShortCommandDescription(OsuCommands.PP, getChatCommandsOsu)],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_PP`,
 };
 export const osuCommandsRequests: StringEntry = {
   default: createMessageParserMessage(
-    [
-      "!osuRequests (on/off ($REASON)|set/unset $OPTION ($VALUE)) [get/set osu requests demands]",
-    ],
+    [createShortCommandDescription(OsuCommands.REQUESTS, getChatCommandsOsu)],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_REQUESTS`,
 };
 export const osuCommandsRp: StringEntry = {
   default: createMessageParserMessage(
-    ["!rp ($USER_ID/$USER_NAME) [recent play]"],
+    [createShortCommandDescription(OsuCommands.RP, getChatCommandsOsu)],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_RP`,
 };
 export const osuCommandsScore: StringEntry = {
   default: createMessageParserMessage(
-    ["!score $USER_ID/$USER_NAME [get score on the last mentioned map]"],
+    [createShortCommandDescription(OsuCommands.SCORE, getChatCommandsOsu)],
     true
   ),
   id: `${OSU_COMMANDS_STRING_ID}_SCORE`,
@@ -109,6 +128,7 @@ export const osuCommandsString: StringEntry = {
             osuCommandsRp,
             osuCommandsScore,
           ]
+            .sort()
             .map(
               (a): MessageForParserMessagePlugin => ({
                 args: {

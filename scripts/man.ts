@@ -18,15 +18,18 @@ import {
 import { ENV_PREFIX, envVariableInformation } from "../src/info/env";
 import { cliOptionSignatureToString } from "../src/cli";
 import { cliOptionsInformation } from "../src/info/cli";
-import { getVersionFromObject } from "../src/version";
+import { convertRegexToHumanString } from "../src/other/regexToString";
+import { genericFilterNonUniqueStrings } from "../src/other/genericStringSorter";
+import { getVersionString } from "../src/version";
 import { version } from "../src/info/version";
 
 export const createManPageFile = async (outputPath: string): Promise<void> => {
   let outputString = "";
   // Header
-  outputString += `% ${name}(1) ${binaryName} ${getVersionFromObject(
-    version
-  ).slice(1)}\n`;
+  outputString += `% ${name}(1) ${binaryName} ${getVersionString(
+    version,
+    ""
+  )}\n`;
   outputString += `% ${author}\n`;
   const currentDate = new Date();
   const monthNames = [
@@ -96,17 +99,36 @@ export const createManPageFile = async (outputPath: string): Promise<void> => {
     ) {
       if (envVariable.supportedValues.canBeJoinedAsList === true) {
         outputString += `Supported list values: ${envVariable.supportedValues.values
-          .map((b) => `"*${b}*"`)
+          .map((b) => `"*${typeof b === "string" ? b : b.id}*"`)
+          .filter(genericFilterNonUniqueStrings)
           .join(", ")}`;
         if (envVariable.supportedValues.emptyListValue) {
           outputString += ` (empty list value: "*${envVariable.supportedValues.emptyListValue}*")`;
         }
       } else {
         outputString += `Supported values: ${envVariable.supportedValues.values
-          .map((b) => `"*${b}*"`)
+          .map((b) => `"*${typeof b === "string" ? b : b.id}*"`)
+          .filter(genericFilterNonUniqueStrings)
           .join(", ")}`;
       }
-      outputString += "\n";
+      let first = true;
+      for (const command of envVariable.supportedValues.values) {
+        if (typeof command === "string") {
+          continue;
+        }
+        if (first) {
+          first = false;
+          outputString += "\n\n";
+        }
+        outputString += `- "*${command.id}*": "*${
+          typeof command.command === "string"
+            ? command.command
+            : convertRegexToHumanString(command.command)
+        }*" (${command.permission}) - ${command.description}\n`;
+      }
+      if (first) {
+        outputString += "\n";
+      }
     }
     outputString += "\n";
   }

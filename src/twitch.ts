@@ -18,6 +18,7 @@ export {
 } from "./twitch/twitchBadgeParser";
 
 /**
- * The maximum amount of characters of a Twitch message.
+ * The maximum amount of characters in a Twitch message before it is split into
+ * more than one.
  */
 export const MAX_LENGTH_OF_A_TWITCH_MESSAGE = 499;

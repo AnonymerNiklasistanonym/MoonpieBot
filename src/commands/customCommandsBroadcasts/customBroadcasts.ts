@@ -1,6 +1,8 @@
-// Package imports
-import cron from "node-cron";
 // Local imports
+import {
+  CustomBroadcastValueOptions,
+  validateCustomBroadcastValue,
+} from "./valueOptions";
 import {
   customCommandsBroadcastsCommandReplyAddCB,
   customCommandsBroadcastsCommandReplyAddCBAlreadyExists,
@@ -16,7 +18,7 @@ import {
 import {
   CustomCommandsBroadcastsCommands,
   LOG_ID_CHAT_HANDLER_CUSTOM_COMMANDS_BROADCASTS,
-} from "../../info/commands";
+} from "../../info/chatCommands";
 import {
   generateMacroMapFromMacroGenerator,
   messageParserById,
@@ -51,41 +53,6 @@ import type {
   RegexCustomBroadcastList,
   RegexCustomBroadcastListOffset,
 } from "../../info/regex";
-
-export enum CustomBroadcastValueOptions {
-  CRON_STRING = "cronString",
-  DESCRIPTION = "description",
-  ID = "id",
-  MESSAGE = "message",
-}
-const validateCustomBroadcastValue = (
-  option: CustomBroadcastValueOptions,
-  optionValue?: string
-): string => {
-  switch (option) {
-    case CustomBroadcastValueOptions.DESCRIPTION:
-    case CustomBroadcastValueOptions.ID:
-      if (optionValue === undefined) {
-        throw Error("String value was undefined!");
-      }
-      break;
-    case CustomBroadcastValueOptions.MESSAGE:
-      if (optionValue === undefined) {
-        throw Error("String value was undefined!");
-      }
-      // TODO
-      break;
-    case CustomBroadcastValueOptions.CRON_STRING:
-      if (optionValue === undefined) {
-        throw Error("String value was undefined!");
-      }
-      if (!cron.validate(optionValue)) {
-        throw Error("Cron string not valid!");
-      }
-      break;
-  }
-  return optionValue;
-};
 
 export interface CommandAddDetectorOutput {
   customBroadcastCronString: string;
@@ -177,14 +144,10 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
     return {
       data: {
         customBroadcastCronString: parseRegexStringArgument(
-          matchGroups.customBroadcastCronString
+          matchGroups.cronString
         ),
-        customBroadcastId: parseRegexStringArgument(
-          matchGroups.customBroadcastId
-        ),
-        customBroadcastMessage: parseRegexStringArgument(
-          matchGroups.customBroadcastMessage
-        ),
+        customBroadcastId: parseRegexStringArgument(matchGroups.id),
+        customBroadcastMessage: parseRegexStringArgument(matchGroups.message),
       },
     };
   },
@@ -263,9 +226,7 @@ export const commandDelCB: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        customBroadcastId: parseRegexStringArgument(
-          matchGroups.customBroadcastId
-        ),
+        customBroadcastId: parseRegexStringArgument(matchGroups.id),
       },
     };
   },
@@ -397,25 +358,17 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
     if (!matchGroups) {
       throw Error("RegexCustomBroadcastList groups undefined");
     }
-    if (
-      "customBroadcastOffset" in matchGroups &&
-      matchGroups.customBroadcastOffset !== undefined
-    ) {
+    if ("listOffset" in matchGroups && matchGroups.listOffset !== undefined) {
       return {
         data: {
-          customBroadcastOffset: parseInt(matchGroups.customBroadcastOffset),
+          customBroadcastOffset: parseInt(matchGroups.listOffset),
         },
       };
     }
-    if (
-      "customBroadcastId" in matchGroups &&
-      matchGroups.customBroadcastId !== undefined
-    ) {
+    if ("id" in matchGroups && matchGroups.id !== undefined) {
       return {
         data: {
-          customBroadcastId: parseRegexStringArgument(
-            matchGroups.customBroadcastId
-          ),
+          customBroadcastId: parseRegexStringArgument(matchGroups.id),
         },
       };
     }
@@ -538,12 +491,10 @@ export const commandEditCB: ChatMessageHandlerReplyCreator<
       }
       return {
         data: {
-          customBroadcastId: parseRegexStringArgument(
-            matchGroups.customBroadcastId
-          ),
-          customBroadcastOption: matchGroups.customBroadcastOption,
+          customBroadcastId: parseRegexStringArgument(matchGroups.id),
+          customBroadcastOption: matchGroups.option,
           customBroadcastOptionValue: parseRegexStringArgument(
-            matchGroups.customBroadcastOptionValue
+            matchGroups.optionValue
           ),
         },
       };

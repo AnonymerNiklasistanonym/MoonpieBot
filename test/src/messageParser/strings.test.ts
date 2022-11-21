@@ -97,6 +97,7 @@ export default (): Suite => {
         updateDefaultStringInMap.get("MOONPIE_COMMAND_REPLY_ABOUT")
       ).to.deep.equal({
         default: "@$(USER) %MOONPIEBOT:NAME% %MOONPIEBOT:VERSION% Custom",
+        updated: true,
       });
       sandbox.restore();
 
@@ -117,11 +118,12 @@ export default (): Suite => {
       );
       expect(
         updateDefaultStringsInMap.get("MOONPIE_COMMANDS_ABOUT")
-      ).to.deep.equal({ default: "!moonpie about Custom" });
+      ).to.deep.equal({ default: "!moonpie about Custom", updated: true });
       expect(
         updateDefaultStringsInMap.get("MOONPIE_COMMAND_REPLY_ABOUT")
       ).to.deep.equal({
         default: "@$(USER) %MOONPIEBOT:NAME% %MOONPIEBOT:VERSION% Custom",
+        updated: true,
       });
       sandbox.restore();
 
@@ -133,7 +135,11 @@ export default (): Suite => {
         logger
       );
       compareStringMaps(defaultStringMap, customStringInMap, [], ["ABC"]);
-      expect(customStringInMap.get("ABC")).to.deep.equal({ default: "test" });
+      expect(customStringInMap.get("ABC")).to.deep.equal({
+        custom: true,
+        default: "test",
+        updated: true,
+      });
       sandbox.restore();
 
       sandbox.stub(process, "env").value({
@@ -151,10 +157,14 @@ export default (): Suite => {
         ["ABC", "DEF"]
       );
       expect(customStringsInMap.get("ABC")).to.deep.equal({
+        custom: true,
         default: "test_abc",
+        updated: true,
       });
       expect(customStringsInMap.get("DEF")).to.deep.equal({
+        custom: true,
         default: "test_def",
+        updated: true,
       });
       sandbox.restore();
     });

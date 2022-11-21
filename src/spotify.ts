@@ -1,3 +1,7 @@
+/*
+ * Spotify API client creation, authentication and queries.
+ */
+
 // Package imports
 import fetch from "node-fetch";
 import http from "http";
@@ -6,9 +10,10 @@ import SpotifyWebApi from "spotify-web-api-node";
 // Local imports
 import { createLogFunc } from "./logging";
 import { SpotifyConfig } from "./database/spotifyDb/requests/spotifyConfig";
+import spotifyDb from "./database/spotifyDb";
 // Type imports
 import type { Logger } from "winston";
-import spotifyDb from "./database/spotifyDb";
+import type { Server } from "http";
 
 /**
  * The logging ID of this module.
@@ -16,53 +21,56 @@ import spotifyDb from "./database/spotifyDb";
 const LOG_ID = "spotify";
 
 const REDIRECT_URL = "http://localhost";
-const REDIRECT_PORT = 8888;
+const REDIRECT_PORT = 9727;
 
 const OK_STATUS_CODE = 200;
 const FORBIDDEN_STATUS_CODE = 403;
 
-/**
- * Get current song and recently played songs on Spotify.
- *
- * @param spotifyClientId The Spotify client ID.
- * @param spotifyClientSecret The Spotify client secret.
- * @param spotifyDatabasePath The path to the Spotify database to save the
- * refresh token if not available already.
- * @param logger Used for logging.
- * @returns Currently playing and recently played songs data.
- */
-export const setupSpotifyAuthentication = async (
-  spotifyClientId: string,
-  spotifyClientSecret: string,
+const SPOTIFY_API_URL = "https://accounts.spotify.com";
+const generateSpotifyUrlRefreshTokenGrant = (spotifyClientId: string) =>
+  SPOTIFY_API_URL +
+  "/authorize" +
+  "?response_type=code" +
+  "&redirect_uri=" +
+  encodeURIComponent(`${REDIRECT_URL}:${REDIRECT_PORT}`) +
+  "&client_id=" +
+  encodeURIComponent(spotifyClientId) +
+  "&scope=" +
+  encodeURIComponent("user-read-currently-playing user-read-recently-played");
+
+const HTML_CODE_FORWARD_CURRENT_MODIFIED_LOCATION =
+  "<html><body></body><script>" +
+  "alert(window.location.href.replace('#', '?'));" +
+  "window.location = window.location.href.replace('#', '?');" +
+  "</script></html>";
+
+const generateHtmlCodeRefreshTokenGrantOk = (refreshToken: string) =>
+  "<html><style>" +
+  ".spoiler{ color: black; background-color:black; }" +
+  ".spoiler:hover{ color: white; }" +
+  "</style><body><p>" +
+  "Spotify API connection was successful. You can now close this window." +
+  "</p><br><p>" +
+  "If you want to use the refresh token otherwise you can copy it:" +
+  // eslint-disable-next-line @typescript-eslint/quotes
+  '</p><br><p>Refresh Token: <span class="spoiler">' +
+  (refreshToken ? refreshToken : "ERROR") +
+  "</span></p></body><script>" +
+  // eslint-disable-next-line @typescript-eslint/quotes
+  'window.history.replaceState({}, document.title, " / ");' +
+  "</script></html>";
+
+const generateHtmlCodeRefreshTokenGrantBad = (error: Error) =>
+  "<html><body>" +
+  `Spotify API connection was not successful: ${error.message}` +
+  "</body></html>";
+
+const spotifyRefreshTokenGrantServer = (
+  spotifyApi: SpotifyWebApi,
   spotifyDatabasePath: string,
   logger: Logger
-): Promise<SpotifyWebApi> => {
-  const logSpotify = createLogFunc(logger, LOG_ID, "authentication");
-
-  const spotifyConfigDbEntries =
-    await spotifyDb.requests.spotifyConfig.getEntries(
-      spotifyDatabasePath,
-      logger
-    );
-  const spotifyRefreshToken = spotifyConfigDbEntries.find(
-    (a) => a.option === SpotifyConfig.REFRESH_TOKEN
-  )?.optionValue;
-
-  const spotifyApi = new SpotifyWebApi({
-    clientId: spotifyClientId,
-    clientSecret: spotifyClientSecret,
-    redirectUri: `${REDIRECT_URL}:${REDIRECT_PORT}`,
-  });
-
-  if (spotifyRefreshToken !== undefined) {
-    spotifyApi.setRefreshToken(spotifyRefreshToken);
-    // Refresh the access token
-    const response = await spotifyApi.refreshAccessToken();
-    spotifyApi.setAccessToken(response.body.access_token);
-    return spotifyApi;
-  }
-
-  // If no refresh token is found start authentication process
+): Server => {
+  const logSpotify = createLogFunc(logger, LOG_ID, "refresh_token_grant");
   const server = http.createServer((req, res) => {
     logSpotify.debug(
       `Spotify API redirect was detected ${JSON.stringify({
@@ -76,9 +84,7 @@ export const setupSpotifyAuthentication = async (
     if (req.url && req.headers.host) {
       if (req.url.endsWith("/")) {
         res.writeHead(OK_STATUS_CODE);
-        res.end(
-          "<html><body></body><script>window.location = window.location.href.replace('#', '?');</script></html>"
-        );
+        res.end(HTML_CODE_FORWARD_CURRENT_MODIFIED_LOCATION);
       } else {
         const url = new URL(req.headers.host + req.url);
         const codeToken = url.searchParams.get("code");
@@ -105,65 +111,139 @@ export const setupSpotifyAuthentication = async (
             .then(() => {
               // Tell user that the page can now be closed and clear the private tokens from the URL
               const refreshToken = spotifyApi.getRefreshToken();
+              if (refreshToken === undefined) {
+                throw Error(
+                  "Unexpected undefined refresh token after successful " +
+                    "authentication"
+                );
+              }
               res.writeHead(OK_STATUS_CODE);
-              res.end(
-                `<html><style>.spoiler{
-                  color: black;
-                  background-color:black;
-                }
-                .spoiler:hover{
-                  color: white;
-                }</style><body><p>Spotify API connection was successful. You can now close this window.</p><br><p>If you want to use the refresh token otherwise you can copy it:</p><br><p>Refresh Token: <span class="spoiler">${
-                  refreshToken ? refreshToken : "ERROR"
-                }</span></p></body><script>window.history.replaceState({}, document.title, "/");</script></html>`
-              );
+              res.end(generateHtmlCodeRefreshTokenGrantOk(refreshToken));
               logSpotify.info("Spotify API connection was successful");
+              server.close();
             })
             .catch((err) => {
               res.writeHead(FORBIDDEN_STATUS_CODE);
-              res.end(
-                `<html><body>Spotify API connection was not successful: ${
-                  (err as Error).message
-                }</body></html>`
-              );
+              res.end(generateHtmlCodeRefreshTokenGrantBad(err as Error));
+              server.close();
+              throw err;
             });
         } else {
           res.writeHead(FORBIDDEN_STATUS_CODE);
-          res.end(
-            "<html><body>Spotify API connection was not successful: Code was not found!</body></html>"
-          );
+          const error = Error("Code was not found!");
+          res.end(generateHtmlCodeRefreshTokenGrantBad(error));
+          server.close();
+          throw error;
         }
       }
     } else {
+      // Unsupported path
+      const error = Error(
+        "Spotify authentication server encountered request with no url and host"
+      );
+      logSpotify.error(error);
       res.writeHead(FORBIDDEN_STATUS_CODE);
-      res.end("Error");
+      res.end(error.message);
     }
   });
+  return server;
+};
+
+interface SpotifyApiErrorBody {
+  error?: string;
+  error_description?: string;
+}
+
+interface SpotifyApiError extends Error {
+  body?: SpotifyApiErrorBody;
+}
+
+/**
+ * Setup Spotify authentication so that API calls can be used and return a
+ * working API client.
+ *
+ * @param spotifyClientId The Spotify API client ID.
+ * @param spotifyClientSecret The Spotify API client secret.
+ * @param spotifyDatabasePath The path to the Spotify database to save the
+ * refresh token if not available already.
+ * @param logger Used for logging.
+ * @returns The Spotify API client.
+ */
+export const setupAndGetSpotifyApiClient = async (
+  spotifyClientId: string,
+  spotifyClientSecret: string,
+  spotifyDatabasePath: string,
+  logger: Logger
+): Promise<SpotifyWebApi> => {
+  const logSpotify = createLogFunc(logger, LOG_ID, "authentication");
+
+  const spotifyConfigDbEntries =
+    await spotifyDb.requests.spotifyConfig.getEntries(
+      spotifyDatabasePath,
+      logger
+    );
+  const spotifyRefreshToken = spotifyConfigDbEntries.find(
+    (a) => a.option === SpotifyConfig.REFRESH_TOKEN
+  )?.optionValue;
+
+  const spotifyApi = new SpotifyWebApi({
+    clientId: spotifyClientId,
+    clientSecret: spotifyClientSecret,
+    redirectUri: `${REDIRECT_URL}:${REDIRECT_PORT}`,
+    refreshToken: spotifyRefreshToken,
+  });
+
+  // Refresh the access token if refresh token was found
+  if (spotifyApi.getRefreshToken() !== undefined) {
+    try {
+      const response = await spotifyApi.refreshAccessToken();
+      spotifyApi.setAccessToken(response.body.access_token);
+      return spotifyApi;
+    } catch (error) {
+      logSpotify.error(
+        Error(
+          "Using the found refresh token gave an error: " +
+            (error as Error).message +
+            ` (${JSON.stringify((error as SpotifyApiError)?.body)})`
+        )
+      );
+      logSpotify.info("Try to grant refresh token again");
+    }
+  }
+
+  // Request refresh token if no refresh token is found
+  const server = spotifyRefreshTokenGrantServer(
+    spotifyApi,
+    spotifyDatabasePath,
+    logger
+  );
+  // > Start server to catch authentication URL
   await new Promise<void>((resolve) => {
     server.listen(REDIRECT_PORT, undefined, () => {
-      logSpotify.info("Server started");
+      logSpotify.info(`Server started on port ${REDIRECT_PORT}`);
+      resolve();
+    });
+  });
+  // > Open authentication URL
+  const response = await fetch(
+    generateSpotifyUrlRefreshTokenGrant(spotifyClientId)
+  );
+  if (response.ok) {
+    logSpotify.info(
+      `Grant the Spotify refresh token using the following URL: ${response.url}`
+    );
+    await open(response.url);
+  }
+
+  // > Wait until server is closed
+  await new Promise<void>((resolve) => {
+    server.on("close", () => {
+      logSpotify.info("Server closed");
       resolve();
     });
   });
 
-  const SPOTIFY_API_URL = "https://accounts.spotify.com";
-  let url = SPOTIFY_API_URL + "/authorize";
-  url += "?response_type=code";
-  url +=
-    "&redirect_uri=" + encodeURIComponent(`${REDIRECT_URL}:${REDIRECT_PORT}`);
-  url += "&client_id=" + encodeURIComponent(spotifyClientId);
-  url +=
-    "&scope=" +
-    encodeURIComponent("user-read-currently-playing user-read-recently-played");
-
-  // Request authentication if no refresh token is found
-  if (spotifyApi.getRefreshToken() === undefined) {
-    const response = await fetch(url);
-    if (response.ok) {
-      await open(response.url);
-    }
-  }
-
+  // Return Spotify API that is guaranteed to exist and work
   return spotifyApi;
 };
 

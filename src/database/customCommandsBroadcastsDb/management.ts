@@ -9,7 +9,7 @@ import {
 //import customCommandsBroadcastsDb from "../customCommandsBroadcastsDb";
 //import { customCommandsInformation } from "../../info/customCommands";
 import { genericSetupDatabase } from "../generic/setup";
-import { getVersionFromObject } from "../../version";
+import { getVersionString } from "../../version";
 // Type imports
 import type { Logger } from "winston";
 
@@ -32,10 +32,8 @@ export const setup = async (
       migrateVersion: (oldVersion, currentVersion) => {
         throw Error(
           `No database migration was found (old=${
-            oldVersion !== undefined
-              ? getVersionFromObject(oldVersion, "")
-              : "none"
-          },current=${getVersionFromObject(currentVersion, "")})!`
+            oldVersion !== undefined ? getVersionString(oldVersion, "") : "none"
+          },current=${getVersionString(currentVersion, "")})!`
         );
       },
       /*

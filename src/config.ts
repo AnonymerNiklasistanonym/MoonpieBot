@@ -48,9 +48,13 @@ export const convertToBooleanIfNotUndefined = (
  * Convert variable value to a string array.
  *
  * @param variableValue Input string.
+ * @param supportedValues All supported values.
  * @returns StringArray.
  */
-export const convertToStringArray = (variableValue: string): string[] => {
+export const convertToStringArray = <T extends string = string>(
+  variableValue: string,
+  supportedValues?: T[]
+): DeepReadonly<T[]> => {
   const tempArray = variableValue
     .split(ENV_LIST_SPLIT_CHARACTER)
     .map((a) => a.trim())
@@ -58,7 +62,19 @@ export const convertToStringArray = (variableValue: string): string[] => {
   if (tempArray.includes(EnvVariableOtherListOptions.NONE)) {
     return [];
   }
-  return tempArray;
+  if (supportedValues !== undefined) {
+    for (const tempValue of tempArray) {
+      if (!supportedValues.map((a) => a.toString()).includes(tempValue)) {
+        throw Error(
+          `Found unexpected '${tempValue}' while only supporting ${supportedValues
+            .map((a) => `'${a}'`)
+            .join(",")}`
+        );
+      }
+    }
+    return supportedValues.filter((a) => tempArray.includes(a));
+  }
+  return tempArray as T[];
 };
 
 /**

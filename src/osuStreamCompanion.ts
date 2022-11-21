@@ -169,6 +169,10 @@ export const createStreamCompanionFileConnection =
     };
   };
 
+const generateStreamCompanionWebsocketUrl = (streamCompanionUrl: string) =>
+  `ws://${streamCompanionUrl}/tokens`;
+const WEBSOCKET_RECONNECT_TIMEOUT_IN_S = 10;
+
 /**
  * This method will setup an infinite loop that will continuously try to connect
  * to StreamCompanion.
@@ -187,17 +191,16 @@ export const createStreamCompanionWebSocketConnection = (
   // Automatically reconnect on loss of connection - this means StreamCompanion
   // does not need to be run all the time but only when needed
   let connectedToStreamCompanion = false;
-  const websocketUrl = `ws://${streamCompanionUrl}/tokens`;
-  const websocketReconnectTimeoutInS = 10;
+  const websocketUrl = generateStreamCompanionWebsocketUrl(streamCompanionUrl);
   const ws = new ReconnectingWebSocket(websocketUrl, [], {
     WebSocket: WebSocket,
-    connectionTimeout: websocketReconnectTimeoutInS * 1000,
+    connectionTimeout: WEBSOCKET_RECONNECT_TIMEOUT_IN_S * 1000,
   });
   logStreamCompanion.info(
     `Try to connect to StreamCompanion via '${
       // eslint-disable-next-line no-underscore-dangle
       (ws as unknown as ReconnectingWebSocketHelper)._url
-    }' (url=${websocketUrl}, timeout=${websocketReconnectTimeoutInS}s)`
+    }' (url=${websocketUrl}, timeout=${WEBSOCKET_RECONNECT_TIMEOUT_IN_S}s)`
   );
   ws.onopen = () => {
     connectedToStreamCompanion = true;

@@ -1,7 +1,7 @@
 // Package imports
 import osuApiV2 from "osu-api-v2";
 // Local imports
-import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/chatCommands";
 import {
   osuScore,
   osuScoreErrorNoBeatmap,
@@ -12,6 +12,7 @@ import { macroOsuScore } from "../../info/macros/osuApi";
 import { macroOsuScoreRequest } from "../../info/macros/osuScoreRequest";
 import { NOT_FOUND_STATUS_CODE } from "../../other/web";
 import { regexOsuChatHandlerCommandScore } from "../../info/regex";
+import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -138,10 +139,9 @@ export const commandScore: ChatMessageHandlerReplyCreator<
     if (!matchGroups) {
       throw Error("RegexOsuChatHandlerCommandScore groups undefined");
     }
-    let osuUserName = matchGroups.osuUserName;
-    if (osuUserName.startsWith("'") && osuUserName.endsWith("'")) {
-      osuUserName = osuUserName.substring(1, osuUserName.length - 1);
-    }
+    const osuUserName = removeWhitespaceEscapeChatCommand(
+      matchGroups.osuUserName
+    );
     return { data: { osuUserName } };
   },
   info: {
