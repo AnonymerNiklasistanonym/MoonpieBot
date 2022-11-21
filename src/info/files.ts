@@ -18,20 +18,18 @@ export const fileNameCustomCommandsBroadcastsExample =
   "customCommandsBroadcasts.example.txt";
 
 /**
- * A function to create the filename for the moonpie database backups depending
- * on the current day.
+ * A function to create the directory name of an old MoonpieBot configuration depending
+ * on the current date.
  *
  * @param date The current date.
  * @returns The file name.
  */
-export const generateOutputFileNameMoonpieDbBackup = (
+export const generateOutputDirNameOldConfig = (
   date: Date = new Date()
-): string => {
-  const PAD_DAY_MONTH_TO_2_DIGITS_FACTOR = 2;
-  const dateDay = `0${date.getDate()}`.slice(-PAD_DAY_MONTH_TO_2_DIGITS_FACTOR);
-  const DateMonth = `0${date.getMonth() + 1}`.slice(
-    -PAD_DAY_MONTH_TO_2_DIGITS_FACTOR
-  );
-  const dateYear = date.getFullYear();
-  return `db_backup_moonpie_${dateYear}-${DateMonth}-${dateDay}.json`;
-};
+): string =>
+  `old_config_${date
+    .toISOString()
+    .replace(/T/, " ")
+    .replace(/\..+/, "")
+    .replaceAll(/\s/g, "_")
+    .replaceAll(/:/g, "-")}`;
