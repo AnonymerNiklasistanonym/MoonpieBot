@@ -12,7 +12,9 @@ import {
 } from "./info/files";
 import { getMoonpieConfigFromEnv } from "./info/config/moonpieConfig";
 // Type imports
+import type { DeepReadonly } from "./other/types";
 import type { Logger } from "winston";
+import type { MoonpieConfig } from "./info/config/moonpieConfig";
 
 interface CopyFile {
   new: string;
@@ -35,6 +37,56 @@ export const copyFiles = async (
       { ignoreSrcDestSameFile: true, ignoreSrcFileNotFound: true }
     );
   }
+};
+
+/**
+ * Get a list of files that should be copied for a backup.
+ *
+ * @param backupDir The directory where the backup should be created.
+ * @param configDir The current config directory.
+ * @param config The current config.
+ * @param backupConfig The updated config for the backup.
+ * @returns List of files to backup if they exist.
+ */
+export const getBackupFiles = (
+  backupDir: string,
+  configDir: string,
+  config: DeepReadonly<MoonpieConfig>,
+  backupConfig: DeepReadonly<MoonpieConfig>
+): CopyFile[] => {
+  const filesToCopy: CopyFile[] = [
+    {
+      new: path.join(backupDir, `${fileNameEnv}.original`),
+      old: path.join(configDir, fileNameEnv),
+    },
+    {
+      new: path.join(backupDir, `${fileNameEnvStrings}.original`),
+      old: path.join(configDir, fileNameEnvStrings),
+    },
+    {
+      new: path.join(backupDir, fileNameEnv),
+      old: path.join(configDir, fileNameEnv),
+    },
+    {
+      new: path.join(backupDir, fileNameEnvStrings),
+      old: path.join(configDir, fileNameEnvStrings),
+    },
+  ];
+  const possibleDatabases = [
+    [
+      config.customCommandsBroadcasts?.databasePath,
+      backupConfig.customCommandsBroadcasts?.databasePath,
+    ],
+    [config.moonpie?.databasePath, backupConfig.moonpie?.databasePath],
+    [config.osuApi?.databasePath, backupConfig.osuApi?.databasePath],
+    [config.spotify?.databasePath, backupConfig.spotify?.databasePath],
+  ];
+  for (const [configDb, backupConfigDb] of possibleDatabases) {
+    if (configDb && backupConfigDb) {
+      filesToCopy.push({ new: backupConfigDb, old: configDb });
+    }
+  }
+  return filesToCopy;
 };
 
 /**
@@ -68,8 +120,8 @@ export const importBackup = async (
     path: path.join(backupDir, fileNameEnvStrings),
   });
   // Get the current backup config (to early exit in case of errors)
-  const configToImport = getMoonpieConfigFromEnv(backupDir);
-  const configUpdated = getMoonpieConfigFromEnv(configDir, {
+  const configToImport = await getMoonpieConfigFromEnv(backupDir);
+  const configUpdated = await getMoonpieConfigFromEnv(configDir, {
     resetDatabaseFilePaths: true,
   });
   // Copy and overwrite all supported files and if they would overwrite existing files with
@@ -78,39 +130,11 @@ export const importBackup = async (
     configDir,
     generateOutputDirNameOldConfig()
   );
-  const filesToCopy = [
-    {
-      new: path.join(configDir, fileNameEnv),
-      old: path.join(backupDir, fileNameEnv),
-    },
-    {
-      new: path.join(configDir, fileNameEnvStrings),
-      old: path.join(backupDir, fileNameEnvStrings),
-    },
-    {
-      new: path.join(configDir, `${fileNameEnv}.original`),
-      old: path.join(backupDir, fileNameEnv),
-    },
-    {
-      new: path.join(configDir, `${fileNameEnvStrings}.original`),
-      old: path.join(backupDir, fileNameEnvStrings),
-    },
-  ];
-  const possibleDatabases = [
-    [
-      configToImport.customCommandsBroadcasts?.databasePath,
-      configUpdated.customCommandsBroadcasts?.databasePath,
-    ],
-    [configToImport.moonpie?.databasePath, configUpdated.moonpie?.databasePath],
-    [configToImport.osuApi?.databasePath, configUpdated.osuApi?.databasePath],
-    [configToImport.spotify?.databasePath, configUpdated.spotify?.databasePath],
-  ];
-  for (const [dbBackup, db] of possibleDatabases) {
-    if (dbBackup && db) {
-      filesToCopy.push({ new: db, old: dbBackup });
-    }
-  }
-  await copyFiles(filesToCopy, backupDirCurrentConfig, logger);
+  await copyFiles(
+    getBackupFiles(configDir, backupDir, configToImport, configUpdated),
+    backupDirCurrentConfig,
+    logger
+  );
   // Overwrite the backed up configs with the parsed and updated config
   // (Updated to fix for example paths or deprecated variables)
   logger.info(`Create updated '${fileNameEnv}' in '${configDir}'...`);
@@ -118,6 +142,7 @@ export const importBackup = async (
   await fs.writeFile(
     path.join(configDir, fileNameEnv),
     await exportDataEnv(configDir, false, {
+      removeAttributesStoredInDatabases: true,
       resetDatabaseFilePaths: true,
     })
   );
@@ -134,41 +159,44 @@ export const createBackup = async (
   backupDir: string,
   logger: Logger
 ): Promise<void> => {
-  logger.info(`Create backup in '${backupDir}'...`);
+  logger.info(`Create backup in '${backupDir}' from '${configDir}'...`);
+  // Create config/backup directory if it doesn't exist
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.mkdir(backupDir, { recursive: true });
-  // ENV variables (reset the database paths)
-  logger.info(`Create '${fileNameEnv}' in '${backupDir}'...`);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.mkdir(configDir, { recursive: true });
+  // Get the current backup config (to early exit in case of errors)
+  const config = await getMoonpieConfigFromEnv(configDir);
+  const backupConfig = await getMoonpieConfigFromEnv(backupDir, {
+    removeAttributesStoredInDatabases: true,
+    resetDatabaseFilePaths: true,
+  });
+  // Copy and overwrite all supported files and if they would overwrite existing files with
+  // the same name save the old files in a new directory
+  const backupDirCurrentConfig = path.join(
+    backupDir,
+    generateOutputDirNameOldConfig()
+  );
+  await copyFiles(
+    getBackupFiles(backupDir, configDir, config, backupConfig),
+    backupDirCurrentConfig,
+    logger
+  );
+  // Overwrite the backed up configs with the parsed and updated config
+  // (Updated to fix for example paths or deprecated variables)
+  logger.info(`Create updated '${fileNameEnv}' in '${backupDir}'...`);
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
     path.join(backupDir, fileNameEnv),
-    await exportDataEnv(configDir, false, { resetDatabaseFilePaths: true })
+    await exportDataEnv(backupDir, false, {
+      removeAttributesStoredInDatabases: true,
+      resetDatabaseFilePaths: true,
+    })
   );
-  logger.info(`Create '${fileNameEnvStrings}' in '${backupDir}'...`);
+  logger.info(`Create updated '${fileNameEnvStrings}' in '${backupDir}'...`);
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
     path.join(backupDir, fileNameEnvStrings),
-    await exportDataEnvStrings(configDir)
+    await exportDataEnvStrings(backupDir, false)
   );
-  // Databases (reset their paths and copy them)
-  const config = getMoonpieConfigFromEnv(configDir);
-  const configDbReset = getMoonpieConfigFromEnv(configDir, {
-    resetDatabaseFilePaths: true,
-  });
-  const databasesToBackup = [
-    [
-      config.customCommandsBroadcasts?.databasePath,
-      configDbReset.customCommandsBroadcasts?.databasePath,
-    ],
-    [config.moonpie?.databasePath, configDbReset.moonpie?.databasePath],
-    [config.osuApi?.databasePath, configDbReset.osuApi?.databasePath],
-    [config.spotify?.databasePath, configDbReset.spotify?.databasePath],
-  ];
-  for (const [db, dbReset] of databasesToBackup) {
-    if (db && dbReset && (await fileExists(db))) {
-      const newDb = path.join(backupDir, path.relative(configDir, dbReset));
-      logger.info(`Copy database '${db}' to '${newDb}'...`);
-      await fs.copyFile(db, newDb);
-    }
-  }
 };

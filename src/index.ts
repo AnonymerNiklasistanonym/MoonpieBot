@@ -168,7 +168,7 @@ const entryPoint = async () => {
     // ----------------------------------------------------------
 
     // Create logger
-    const loggerConfig = getLoggerConfigFromEnv(configDir);
+    const loggerConfig = await getLoggerConfigFromEnv(configDir);
     const logDir = path.resolve(configDir, loggerConfig.logDir);
     const logger = createLogger(
       name,
@@ -241,7 +241,7 @@ const entryPoint = async () => {
       logIndex.info(`${name} ${versionString} was started (logs: '${logDir}')`);
       logIndex.debug(`Config directory: '${configDir}'`);
       logIndex.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
-      const moonpieConfig = getMoonpieConfigFromEnv(configDir);
+      const moonpieConfig = await getMoonpieConfigFromEnv(configDir);
       await main(logger, moonpieConfig);
       logIndex.debug("Main method finished without errors");
     } catch (err) {

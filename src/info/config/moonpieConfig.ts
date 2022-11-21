@@ -18,6 +18,7 @@ import {
   getEnvVariableValueOrUndefined,
 } from "../../env";
 import { EnvVariable } from "../env";
+import { removeSpotifyApiRefreshTokenIfFoundInDb } from "./moonpieConfig/checkSpotifyApiDb";
 // Type imports
 import type { GetConfig, GetCustomEnvValueFromConfig } from "../../config";
 
@@ -96,6 +97,13 @@ export interface MoonpieConfig {
 }
 
 export interface MoonpieConfigCustomData {
+  /**
+   * If this is true remove all attributes that are already stored in databases.
+   */
+  removeAttributesStoredInDatabases?: boolean;
+  /**
+   * If this is true update all database file paths to their default file path.
+   */
   resetDatabaseFilePaths?: boolean;
 }
 
@@ -114,146 +122,173 @@ export const getDatabasePath = (
 export const getMoonpieConfigFromEnv: GetConfig<
   MoonpieConfig,
   MoonpieConfigCustomData
-> = (configDir, customData) => ({
-  // Twitch connection
-  twitch: {
-    channels: convertToStringArray(
-      getEnvVariableValueOrError(EnvVariable.TWITCH_CHANNELS)
-    ),
-    debug: convertToBoolean(
-      getEnvVariableValueOrUndefined(EnvVariable.TWITCH_DEBUG)
-    ),
-    name: getEnvVariableValueOrError(EnvVariable.TWITCH_NAME),
-    oAuthToken: getEnvVariableValueOrError(EnvVariable.TWITCH_OAUTH_TOKEN),
-  },
-  // > Twitch API
-  twitchApi: {
+> = async (configDir, customData) => {
+  return {
+    // Twitch connection
+    twitch: {
+      channels: convertToStringArray(
+        getEnvVariableValueOrError(EnvVariable.TWITCH_CHANNELS)
+      ),
+      debug: convertToBoolean(
+        getEnvVariableValueOrUndefined(EnvVariable.TWITCH_DEBUG)
+      ),
+      name: getEnvVariableValueOrError(EnvVariable.TWITCH_NAME),
+      oAuthToken: getEnvVariableValueOrError(EnvVariable.TWITCH_OAUTH_TOKEN),
+    },
+    // > Twitch API
+    twitchApi: {
+      // eslint-disable-next-line sort-keys
+      accessToken: getEnvVariableValueOrUndefined(
+        EnvVariable.TWITCH_API_ACCESS_TOKEN
+      ),
+      clientId: getEnvVariableValueOrUndefined(
+        EnvVariable.TWITCH_API_CLIENT_ID
+      ),
+    },
+    // > Moonpie
     // eslint-disable-next-line sort-keys
-    accessToken: getEnvVariableValueOrUndefined(
-      EnvVariable.TWITCH_API_ACCESS_TOKEN
-    ),
-    clientId: getEnvVariableValueOrUndefined(EnvVariable.TWITCH_API_CLIENT_ID),
-  },
-  // > Moonpie
-  // eslint-disable-next-line sort-keys
-  moonpie: getMoonpieConfigMoonpieFromEnv(configDir, customData),
-  // > Spotify
-  spotify: {
-    databasePath: getDatabasePath(
-      EnvVariable.SPOTIFY_DATABASE_PATH,
-      configDir,
-      customData
-    ),
-    enableCommands: convertToStringArray(
-      getEnvVariableValueOrDefault(
-        EnvVariable.SPOTIFY_ENABLE_COMMANDS,
-        configDir
-      )
-    ),
-  },
-  // > Spotify API
-  spotifyApi: {
-    clientId: getEnvVariableValueOrUndefined(EnvVariable.SPOTIFY_API_CLIENT_ID),
-    clientSecret: getEnvVariableValueOrUndefined(
-      EnvVariable.SPOTIFY_API_CLIENT_SECRET
-    ),
-    refreshToken: getEnvVariableValueOrUndefined(
-      EnvVariable.SPOTIFY_API_REFRESH_TOKEN
-    ),
-  },
-  // > osu!
-  // eslint-disable-next-line sort-keys
-  osu: {
-    enableCommands: convertToStringArray(
-      getEnvVariableValueOrDefault(EnvVariable.OSU_ENABLE_COMMANDS, configDir)
-    ),
-  },
-  // > osu! API
-  osuApi: {
-    beatmapRequests: convertToBooleanIfNotUndefined(
-      getEnvVariableValueOrUndefined(EnvVariable.OSU_API_REQUESTS_ON)
-    ),
-    beatmapRequestsDetailed: convertToBooleanIfNotUndefined(
-      getEnvVariableValueOrUndefined(EnvVariable.OSU_API_REQUESTS_DETAILED)
-    ),
-    beatmapRequestsRedeemId: getEnvVariableValueOrUndefined(
-      EnvVariable.OSU_API_REQUESTS_REDEEM_ID
-    ),
-    clientId: convertToIntIfNotUndefined(
-      getEnvVariableValueOrUndefined(EnvVariable.OSU_API_CLIENT_ID),
-      "The osu! api client ID string could not be parsed to an integer"
-    ),
-    clientSecret: getEnvVariableValueOrUndefined(
-      EnvVariable.OSU_API_CLIENT_SECRET
-    ),
-    databasePath: getDatabasePath(
-      EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
-      configDir,
-      customData
-    ),
-    defaultId: convertToIntIfNotUndefined(
-      getEnvVariableValueOrUndefined(EnvVariable.OSU_API_DEFAULT_ID)
-    ),
-  },
-  // > osu! IRC
-  osuIrc: {
-    password: getEnvVariableValueOrUndefined(EnvVariable.OSU_IRC_PASSWORD),
-    requestTarget: getEnvVariableValueOrUndefined(
-      EnvVariable.OSU_IRC_REQUEST_TARGET
-    ),
-    username: getEnvVariableValueOrUndefined(EnvVariable.OSU_IRC_USERNAME),
-  },
-  // > osu! StreamCompanion
-  osuStreamCompanion: {
-    dirPath: getEnvVariableValueOrUndefined(
-      EnvVariable.OSU_STREAM_COMPANION_DIR_PATH
-    ),
-    url: getEnvVariableValueOrUndefined(EnvVariable.OSU_STREAM_COMPANION_URL),
-  },
-  // > Custom commands and broadcasts
-  // eslint-disable-next-line sort-keys
-  customCommandsBroadcasts: {
-    databasePath: getDatabasePath(
-      EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH,
-      configDir,
-      customData
-    ),
-    enableCommands: convertToStringArray(
-      getEnvVariableValueOrDefault(
-        EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
-        configDir
-      )
-    ),
-  },
-  // Lurk
-  // eslint-disable-next-line sort-keys
-  lurk: {
-    enableCommands: convertToStringArray(
-      getEnvVariableValueOrDefault(EnvVariable.LURK_ENABLED_COMMANDS, configDir)
-    ),
-  },
-});
+    moonpie: await getMoonpieConfigMoonpieFromEnv(configDir, customData),
+    // > Spotify
+    spotify: {
+      databasePath: getDatabasePath(
+        EnvVariable.SPOTIFY_DATABASE_PATH,
+        configDir,
+        customData
+      ),
+      enableCommands: convertToStringArray(
+        getEnvVariableValueOrDefault(
+          EnvVariable.SPOTIFY_ENABLE_COMMANDS,
+          configDir
+        )
+      ),
+    },
+    // > Spotify API
+    spotifyApi: {
+      clientId: getEnvVariableValueOrUndefined(
+        EnvVariable.SPOTIFY_API_CLIENT_ID
+      ),
+      clientSecret: getEnvVariableValueOrUndefined(
+        EnvVariable.SPOTIFY_API_CLIENT_SECRET
+      ),
+      // Remove the refresh token value if it is found in database
+      refreshToken:
+        customData?.removeAttributesStoredInDatabases === true
+          ? await removeSpotifyApiRefreshTokenIfFoundInDb(
+              getDatabasePath(
+                EnvVariable.SPOTIFY_DATABASE_PATH,
+                configDir,
+                customData
+              ),
+              getEnvVariableValueOrUndefined(
+                EnvVariable.SPOTIFY_API_REFRESH_TOKEN
+              )
+            )
+          : getEnvVariableValueOrUndefined(
+              EnvVariable.SPOTIFY_API_REFRESH_TOKEN
+            ),
+    },
+    // > osu!
+    // eslint-disable-next-line sort-keys
+    osu: {
+      enableCommands: convertToStringArray(
+        getEnvVariableValueOrDefault(EnvVariable.OSU_ENABLE_COMMANDS, configDir)
+      ),
+    },
+    // > osu! API
+    osuApi: {
+      beatmapRequests: convertToBooleanIfNotUndefined(
+        getEnvVariableValueOrUndefined(EnvVariable.OSU_API_REQUESTS_ON)
+      ),
+      beatmapRequestsDetailed: convertToBooleanIfNotUndefined(
+        getEnvVariableValueOrUndefined(EnvVariable.OSU_API_REQUESTS_DETAILED)
+      ),
+      beatmapRequestsRedeemId: getEnvVariableValueOrUndefined(
+        EnvVariable.OSU_API_REQUESTS_REDEEM_ID
+      ),
+      clientId: convertToIntIfNotUndefined(
+        getEnvVariableValueOrUndefined(EnvVariable.OSU_API_CLIENT_ID),
+        "The osu! api client ID string could not be parsed to an integer"
+      ),
+      clientSecret: getEnvVariableValueOrUndefined(
+        EnvVariable.OSU_API_CLIENT_SECRET
+      ),
+      databasePath: getDatabasePath(
+        EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
+        configDir,
+        customData
+      ),
+      defaultId: convertToIntIfNotUndefined(
+        getEnvVariableValueOrUndefined(EnvVariable.OSU_API_DEFAULT_ID)
+      ),
+    },
+    // > osu! IRC
+    osuIrc: {
+      password: getEnvVariableValueOrUndefined(EnvVariable.OSU_IRC_PASSWORD),
+      requestTarget: getEnvVariableValueOrUndefined(
+        EnvVariable.OSU_IRC_REQUEST_TARGET
+      ),
+      username: getEnvVariableValueOrUndefined(EnvVariable.OSU_IRC_USERNAME),
+    },
+    // > osu! StreamCompanion
+    osuStreamCompanion: {
+      dirPath: getEnvVariableValueOrUndefined(
+        EnvVariable.OSU_STREAM_COMPANION_DIR_PATH
+      ),
+      url: getEnvVariableValueOrUndefined(EnvVariable.OSU_STREAM_COMPANION_URL),
+    },
+    // > Custom commands and broadcasts
+    // eslint-disable-next-line sort-keys
+    customCommandsBroadcasts: {
+      databasePath: getDatabasePath(
+        EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH,
+        configDir,
+        customData
+      ),
+      enableCommands: convertToStringArray(
+        getEnvVariableValueOrDefault(
+          EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLED_COMMANDS,
+          configDir
+        )
+      ),
+    },
+    // Lurk
+    // eslint-disable-next-line sort-keys
+    lurk: {
+      enableCommands: convertToStringArray(
+        getEnvVariableValueOrDefault(
+          EnvVariable.LURK_ENABLED_COMMANDS,
+          configDir
+        )
+      ),
+    },
+  };
+};
 
 export const getMoonpieConfigMoonpieFromEnv: GetConfig<
   MoonpieConfigMoonpie,
   MoonpieConfigCustomData
-> = (configDir, customData) => ({
-  claimCooldownHours: convertToInt(
-    getEnvVariableValueOrDefault(
-      EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS,
-      configDir
+> = (configDir, customData) => {
+  return {
+    claimCooldownHours: convertToInt(
+      getEnvVariableValueOrDefault(
+        EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS,
+        configDir
+      ),
+      "The moonpie claim cooldown hours number string could not be parsed to an integer"
     ),
-    "The moonpie claim cooldown hours number string could not be parsed to an integer"
-  ),
-  databasePath: getDatabasePath(
-    EnvVariable.MOONPIE_DATABASE_PATH,
-    configDir,
-    customData
-  ),
-  enableCommands: convertToStringArray(
-    getEnvVariableValueOrDefault(EnvVariable.MOONPIE_ENABLE_COMMANDS, configDir)
-  ),
-});
+    databasePath: getDatabasePath(
+      EnvVariable.MOONPIE_DATABASE_PATH,
+      configDir,
+      customData
+    ),
+    enableCommands: convertToStringArray(
+      getEnvVariableValueOrDefault(
+        EnvVariable.MOONPIE_ENABLE_COMMANDS,
+        configDir
+      )
+    ),
+  };
+};
 
 export const getCustomEnvValueFromMoonpieConfig: GetCustomEnvValueFromConfig<
   MoonpieConfig

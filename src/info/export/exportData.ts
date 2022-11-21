@@ -21,18 +21,15 @@ import { updateStringsMapWithCustomEnvStrings } from "../../messageParser";
 // Type imports
 import type { ExportData } from "../../export";
 import type { FileDocumentationPartValue } from "../../documentation/fileDocumentationGenerator";
+import type { MoonpieConfigCustomData } from "../config/moonpieConfig";
 
-export interface ExportDataEnvCustomData {
-  resetDatabaseFilePaths?: boolean;
-}
-
-export const exportDataEnv: ExportData<ExportDataEnvCustomData> = (
+export const exportDataEnv: ExportData<MoonpieConfigCustomData> = async (
   configDir,
   json,
   customData
-) => {
-  const loggerConfig = getLoggerConfigFromEnv(configDir);
-  const moonpieConfig = getMoonpieConfigFromEnv(configDir, customData);
+): Promise<string> => {
+  const loggerConfig = await getLoggerConfigFromEnv(configDir);
+  const moonpieConfig = await getMoonpieConfigFromEnv(configDir, customData);
   if (json) {
     return JSON.stringify({
       configDir,
@@ -78,7 +75,7 @@ const setMoonpieCommandBuilder = (user: string, count: number): string =>
   `!moonpie set ${user} ${count}`;
 
 export const exportDataMoonpie: ExportData = async (configDir, json) => {
-  const config = getMoonpieConfigMoonpieFromEnv(configDir);
+  const config = await getMoonpieConfigMoonpieFromEnv(configDir);
   await moonpieDb.setup(config.databasePath, createConsoleLogger(name, "off"));
   const moonpieCounts = await moonpieDb.backup.exportMoonpieCountTableToJson(
     config.databasePath,

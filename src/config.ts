@@ -10,7 +10,7 @@ import { DeepReadonly, EMPTY_OBJECT } from "./other/types";
 export type GetConfig<T, CUSTOM_DATA extends EMPTY_OBJECT = EMPTY_OBJECT> = (
   configDir: string,
   customData?: CUSTOM_DATA
-) => DeepReadonly<T>;
+) => DeepReadonly<T> | Promise<DeepReadonly<T>>;
 
 export type GetCustomEnvValueFromConfig<T> = (
   envVariable: string,

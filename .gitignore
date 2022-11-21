@@ -173,8 +173,9 @@ tmp/
 
 # Private secret files
 .env
-customTimers.json
-customCommands.json
+.env.original
+.env.strings
+.env.strings.original
 *.db
 *.db-journal
 
@@ -203,3 +204,6 @@ macro_cache_*
 
 # GitHub Actions downloads
 *.zip
+
+# Old config directories created by backups
+old_config_*
