@@ -472,15 +472,7 @@ export const main = async (
             message,
             {
               defaultOsuId: config.osuApi.defaultId,
-              enableOsuBeatmapRequests:
-                config.osu.enableCommands.includes(OsuCommands.REQUESTS) &&
-                config.osuApi.beatmapRequests !== false,
-              enabledCommands:
-                config.osuApi.beatmapRequests === false
-                  ? config.osu.enableCommands.filter(
-                      (a) => a !== OsuCommands.REQUESTS
-                    )
-                  : config.osu.enableCommands,
+              enabledCommands: config.osu.enableCommands,
               osuApiDbPath: config.osuApi.databasePath,
               osuApiV2Credentials: {
                 clientId: config.osuApi.clientId,

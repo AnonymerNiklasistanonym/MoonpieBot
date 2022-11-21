@@ -19,16 +19,12 @@ import type {
   CommandOsuGenericDataOsuIrcData,
 } from "../osu";
 
-export interface CommandBeatmapPermitRequestCreateReplyInput
-  extends CommandOsuGenericDataOsuIrcData {
-  enableOsuBeatmapRequestsDetailed?: boolean;
-}
 /**
  * Post information about the last blocked request in chat and send them
  * if enabled via IRC to the client.
  */
 export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
-  CommandBeatmapPermitRequestCreateReplyInput &
+  CommandOsuGenericDataOsuIrcData &
     CommandOsuGenericDataExtraBeatmapRequestsInfo &
     CommandOsuGenericDataOsuApiDbPath,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands

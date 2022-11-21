@@ -19,7 +19,6 @@ import type {
 } from "../chatMessageHandler";
 import type { Beatmap } from "osu-api-v2";
 import type { CommandBeatmapCreateReplyInput } from "./osu/beatmap";
-import type { CommandBeatmapLastRequestCreateReplyInput } from "./osu/lastRequest";
 import type { CommandPpRpCreateReplyInput } from "./osu/pp";
 import type { OsuIrcBotSendMessageFunc } from "./osu/beatmap";
 import type { StreamCompanionConnection } from "../osuStreamCompanion";
@@ -110,8 +109,7 @@ export interface OsuChatHandlerDataOsuApi
     CommandOsuGenericDataStreamCompanionFunc,
     ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
     CommandPpRpCreateReplyInput,
-    CommandBeatmapCreateReplyInput,
-    CommandBeatmapLastRequestCreateReplyInput {}
+    CommandBeatmapCreateReplyInput {}
 export interface OsuChatHandlerDataStreamCompanionOnly
   extends ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
     Required<CommandOsuGenericDataStreamCompanionFunc> {}

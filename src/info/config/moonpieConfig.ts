@@ -17,8 +17,12 @@ import {
   getEnvVariableValueOrError,
   getEnvVariableValueOrUndefined,
 } from "../../env";
+import {
+  removeOsuApiDetailedRequestsIfFoundInDb,
+  removeOsuApiRequestsRedeemIdIfFoundInDb,
+} from "./moonpieConfig/checkOsuApiDb";
 import { EnvVariable } from "../env";
-import { removeSpotifyApiRefreshTokenIfFoundInDb } from "./moonpieConfig/checkSpotifyApiDb";
+import { removeSpotifyApiRefreshTokenIfFoundInDb } from "./moonpieConfig/checkSpotifyDb";
 // Type imports
 import type { GetConfig, GetCustomEnvValueFromConfig } from "../../config";
 
@@ -63,7 +67,6 @@ export interface MoonpieConfigCustomCommandsBroadcasts
     MoonpieConfigUtilDatabase {}
 
 export interface MoonpieConfigOsuApi extends MoonpieConfigUtilDatabase {
-  beatmapRequests?: boolean;
   beatmapRequestsDetailed?: boolean;
   beatmapRequestsRedeemId?: string;
   clientId?: number;
@@ -196,15 +199,40 @@ export const getMoonpieConfigFromEnv: GetConfig<
     },
     // > osu! API
     osuApi: {
-      beatmapRequests: convertToBooleanIfNotUndefined(
-        getEnvVariableValueOrUndefined(EnvVariable.OSU_API_REQUESTS_ON)
-      ),
-      beatmapRequestsDetailed: convertToBooleanIfNotUndefined(
-        getEnvVariableValueOrUndefined(EnvVariable.OSU_API_REQUESTS_DETAILED)
-      ),
-      beatmapRequestsRedeemId: getEnvVariableValueOrUndefined(
-        EnvVariable.OSU_API_REQUESTS_REDEEM_ID
-      ),
+      beatmapRequestsDetailed:
+        customData?.removeAttributesStoredInDatabases === true
+          ? await removeOsuApiDetailedRequestsIfFoundInDb(
+              getDatabasePath(
+                EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
+                configDir,
+                customData
+              ),
+              convertToBooleanIfNotUndefined(
+                getEnvVariableValueOrUndefined(
+                  EnvVariable.OSU_API_REQUESTS_DETAILED
+                )
+              )
+            )
+          : convertToBooleanIfNotUndefined(
+              getEnvVariableValueOrUndefined(
+                EnvVariable.OSU_API_REQUESTS_DETAILED
+              )
+            ),
+      beatmapRequestsRedeemId:
+        customData?.removeAttributesStoredInDatabases === true
+          ? await removeOsuApiRequestsRedeemIdIfFoundInDb(
+              getDatabasePath(
+                EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
+                configDir,
+                customData
+              ),
+              getEnvVariableValueOrUndefined(
+                EnvVariable.OSU_API_REQUESTS_REDEEM_ID
+              )
+            )
+          : getEnvVariableValueOrUndefined(
+              EnvVariable.OSU_API_REQUESTS_REDEEM_ID
+            ),
       clientId: convertToIntIfNotUndefined(
         getEnvVariableValueOrUndefined(EnvVariable.OSU_API_CLIENT_ID),
         "The osu! api client ID string could not be parsed to an integer"
@@ -345,9 +373,6 @@ export const getCustomEnvValueFromMoonpieConfig: GetCustomEnvValueFromConfig<
     return convertFromStringArray(config.osu?.enableCommands);
   }
   // > osu! API
-  if (envVariable === EnvVariable.OSU_API_REQUESTS_ON) {
-    return convertFromBoolean(config.osuApi?.beatmapRequests);
-  }
   if (envVariable === EnvVariable.OSU_API_REQUESTS_DETAILED) {
     return convertFromBoolean(config.osuApi?.beatmapRequestsDetailed);
   }

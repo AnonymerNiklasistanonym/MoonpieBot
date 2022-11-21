@@ -1,6 +1,7 @@
 // Package imports
 import osuApiV2 from "osu-api-v2";
 // Local imports
+import { LOG_ID_CHAT_HANDLER_OSU, OsuCommands } from "../../info/commands";
 import {
   macroOsuBeatmapRequest,
   macroOsuBeatmapRequestDemands,
@@ -22,7 +23,6 @@ import {
 } from "../../info/regex";
 import { createLogFunc } from "../../logging";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
-import { LOG_ID_CHAT_HANDLER_OSU } from "../../info/commands";
 import { macroOsuBeatmap } from "../../info/macros/osuApi";
 import { NOT_FOUND_STATUS_CODE } from "../../other/web";
 import { notUndefined } from "../../other/types";
@@ -176,17 +176,12 @@ export interface CommandBeatmapCreateReplyInput
    * The default osu user ID.
    */
   defaultOsuId?: number;
-  enableOsuBeatmapRequests?: boolean;
 }
 export interface CommandBeatmapDetectorOutput {
   /**
    * The found beatmap requests.
    */
   beatmapRequests: BeatmapRequest[];
-}
-export interface CommandBeatmapDetectorInput
-  extends ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands {
-  enableOsuBeatmapRequests?: boolean;
 }
 /**
  * Post information about a osu Beatmap in the chat and if existing also show
@@ -195,7 +190,7 @@ export interface CommandBeatmapDetectorInput
 export const commandBeatmap: ChatMessageHandlerReplyCreator<
   CommandBeatmapCreateReplyInput &
     CommandOsuGenericDataExtraBeatmapRequestsInfo,
-  CommandBeatmapDetectorInput,
+  ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandBeatmapDetectorOutput
 > = {
   createReply: async (_channel, tags, data, logger) => {
@@ -359,7 +354,7 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
     return commandReplies;
   },
   detect: (_tags, message, data) => {
-    if (!data.enableOsuBeatmapRequests) {
+    if (!data.enabledCommands.includes(OsuCommands.REQUESTS)) {
       return false;
     }
     if (!message.match(regexOsuBeatmapIdFromUrl)) {

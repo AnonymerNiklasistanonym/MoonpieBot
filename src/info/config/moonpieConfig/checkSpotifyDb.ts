@@ -1,5 +1,6 @@
 // Local imports
 import { createConsoleLogger } from "../../../logging";
+import { fileExists } from "../../../other/fileOperations";
 import { SpotifyConfig } from "../../../database/spotifyDb/requests/spotifyConfig";
 import spotifyDb from "../../../database/spotifyDb";
 
@@ -10,16 +11,24 @@ export const removeSpotifyApiRefreshTokenIfFoundInDb = async (
   if (spotifyApiRefreshToken === undefined) {
     return undefined;
   }
+  if (!(await fileExists(spotifyDatabasePath))) {
+    return spotifyApiRefreshToken;
+  }
+  const consoleLogger = createConsoleLogger(
+    "removeSpotifyApiRefreshTokenIfFoundInDb",
+    "error"
+  );
+  await spotifyDb.setup(spotifyDatabasePath, consoleLogger);
   const entries = await spotifyDb.requests.spotifyConfig.getEntries(
     spotifyDatabasePath,
-    createConsoleLogger("checkSpotifyApiDbRefreshToken", "error")
+    consoleLogger
   );
-  const refreshToken = entries.find(
+  const spotifyApiRefreshTokenDb = entries.find(
     (a) => a.option === SpotifyConfig.REFRESH_TOKEN
   );
   if (
-    refreshToken !== undefined &&
-    refreshToken.optionValue === spotifyApiRefreshToken
+    spotifyApiRefreshTokenDb !== undefined &&
+    spotifyApiRefreshTokenDb.optionValue === spotifyApiRefreshToken
   ) {
     return undefined;
   }

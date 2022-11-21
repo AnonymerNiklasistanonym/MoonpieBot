@@ -20,10 +20,6 @@ import type {
 } from "../osu";
 import type { RegexOsuChatHandlerCommandLastRequest } from "../../info/regex";
 
-export interface CommandBeatmapLastRequestCreateReplyInput
-  extends CommandOsuGenericDataOsuIrcData {
-  enableOsuBeatmapRequestsDetailed?: boolean;
-}
 export interface CommandBeatmapLastRequestDetectorOutput {
   beatmapRequestCount: number;
 }
@@ -32,7 +28,7 @@ export interface CommandBeatmapLastRequestDetectorOutput {
  * if enabled via IRC to the client.
  */
 export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
-  CommandBeatmapLastRequestCreateReplyInput &
+  CommandOsuGenericDataOsuIrcData &
     CommandOsuGenericDataExtraBeatmapRequestsInfo &
     CommandOsuGenericDataOsuApiDbPath,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,

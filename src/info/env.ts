@@ -67,7 +67,6 @@ export enum EnvVariable {
   OSU_API_DEFAULT_ID = "OSU_API_DEFAULT_ID",
   OSU_API_REQUESTS_CONFIG_DATABASE_PATH = "OSU_API_REQUESTS_CONFIG_DATABASE_PATH",
   OSU_API_REQUESTS_DETAILED = "OSU_API_REQUESTS_DETAILED",
-  OSU_API_REQUESTS_ON = "OSU_API_REQUESTS_ON",
   OSU_API_REQUESTS_REDEEM_ID = "OSU_API_REQUESTS_REDEEM_ID",
   OSU_ENABLE_COMMANDS = "OSU_ENABLE_COMMANDS",
   OSU_IRC_PASSWORD = "OSU_IRC_PASSWORD",
@@ -284,17 +283,6 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.OSU_API,
-    description: `Automatically recognize osu! beatmap links (=requests) in chat. This can also be set at runtime (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS}) and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
-    example: EnvVariableOnOff.ON,
-    legacyNames: [
-      "OSU_RECOGNIZE_MAP_REQUESTS",
-      "OSU_API_RECOGNIZE_MAP_REQUESTS",
-    ],
-    name: EnvVariable.OSU_API_REQUESTS_ON,
-    supportedValues: { values: Object.values(EnvVariableOnOff) },
-  },
-  {
-    block: EnvVariableBlock.OSU_API,
     default: (configDir) =>
       path.relative(configDir, path.join(configDir, "osu_requests_config.db")),
     defaultValue: (configDir) =>
@@ -306,7 +294,7 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.OSU_API,
-    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_ON}=${EnvVariableOnOff.ON}) additionally output more detailed information about the map in the chat. This can also be set at runtime (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS}) and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
+    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS}) additionally output more detailed information about the map in the chat. This can also be set at runtime and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
     example: EnvVariableOnOff.ON,
     legacyNames: [
       "OSU_RECOGNIZE_MAP_REQUESTS_DETAILED",
@@ -317,7 +305,7 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
   {
     block: EnvVariableBlock.OSU_API,
-    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_ON}=${EnvVariableOnOff.ON}) make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS}) and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
+    description: `If recognizing is enabled (${ENV_PREFIX}${EnvVariable.OSU_ENABLE_COMMANDS}=${OsuCommands.REQUESTS})  make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime and stored persistently in a database (${ENV_PREFIX}${EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH}) but if provided will override the current value in the database on start of the bot.`,
     example: "651f5474-07c2-4406-9e59-37d66fd34069",
     legacyNames: ["OSU_API_RECOGNIZE_MAP_REQUESTS_REDEEM_ID"],
     name: EnvVariable.OSU_API_REQUESTS_REDEEM_ID,
