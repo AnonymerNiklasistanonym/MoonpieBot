@@ -18,7 +18,7 @@ import {
   envVariableStructure,
 } from "../src/info/env";
 import { CliOption } from "../src/info/cli";
-import { convertRegexToHumanString } from "../src/other/regexToString";
+import { convertRegexToHumanStringDetailed } from "../src/other/regexToString";
 import { createConsoleLogger } from "../src/logging";
 import { fileNameEnv } from "../src/info/files";
 import { getFeatures } from "../src/info/features";
@@ -339,7 +339,7 @@ const createEnvExample = async (
       output += `${indent}  - \`${
         typeof chatCommand.command === "string"
           ? chatCommand.command
-          : convertRegexToHumanString(chatCommand.command)
+          : convertRegexToHumanStringDetailed(chatCommand.command)
       }\` (${chatCommand.permission}): ${chatCommand.description}\n`;
     }
     return output;
@@ -443,7 +443,7 @@ const createTableEnableCommands = (envVarName: string): string => {
       [
         `\`${(typeof supportedValue.command === "string"
           ? supportedValue.command
-          : convertRegexToHumanString(supportedValue.command)
+          : convertRegexToHumanStringDetailed(supportedValue.command)
         ).replace(/\|/g, "\\|")}\``,
         `\`${supportedValue.id}\``,
         supportedValue.permission,

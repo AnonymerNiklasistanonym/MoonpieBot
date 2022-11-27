@@ -80,6 +80,22 @@ const convertRegexToHumanReadableStringHelper = (
       continue;
     }
     if (!escapeSymbol && regexString.at(i) === "?") {
+      if (currentElement.type === "text") {
+        // Optional character was found
+        const optionalCharacter = currentElement.content.substring(
+          currentElement.content.length - 1,
+          currentElement.content.length
+        );
+        currentElement.content = currentElement.content.slice(
+          0,
+          currentElement.content.length - 1
+        );
+        elements.push(currentElement);
+        currentElement = {
+          content: optionalCharacter,
+          type: "text",
+        };
+      }
       currentElement.optional = true;
       i += 1;
       continue;
@@ -201,53 +217,6 @@ const splitArrayAtElement = <TYPE>(
   return arrays;
 };
 
-const convertSimpleRegexElementToString = (
-  element: SimpleRegexElements
-): string => {
-  switch (element.type) {
-    case "end":
-    case "start":
-    case "non_whitespace":
-      return "";
-    case "whitespace":
-      return " ";
-    case "match_bracket":
-      return "";
-    case "group":
-      if (element.name !== undefined) {
-        return element.name;
-      }
-      // eslint-disable-next-line no-case-declarations
-      const groupElements = splitArrayAtElement(
-        element.content,
-        (a) => a.type === "group_separator"
-      );
-      // eslint-disable-next-line no-case-declarations
-      const groupElementsFiltered = groupElements
-        .map((a) => a.map((b) => convertSimpleRegexElementToString(b)).join(""))
-        .filter((c) => c.trim().length > 0);
-      if (groupElementsFiltered.length !== groupElements.length) {
-        element.optional = true;
-      }
-      if (groupElementsFiltered.length === 0) {
-        return "";
-      }
-      // eslint-disable-next-line no-case-declarations
-      const groupContent = groupElementsFiltered.join("|");
-      if (element.optional) {
-        return `[${groupContent}]`;
-      }
-      if (groupElementsFiltered.length === 1) {
-        return groupContent;
-      }
-      return `(${groupContent})`;
-    case "group_separator":
-      throw Error("Group separators should never appear");
-    case "text":
-      return element.content;
-  }
-};
-
 /**
  * This method converts a regex to a string.
  * It will remove all modifiers/flags.
@@ -262,12 +231,187 @@ export const convertRegexToHumanString = (
   regex: DeepReadonly<RegExp>
 ): string => {
   const result = convertRegexToHumanReadableStringHelper(regex.source, false);
-  return toHumanStringRegexGroups(result.elements);
+  return result.elements
+    .map((a) => convertToStringNew(a, regexConvertOptionsHuman))
+    .join("")
+    .trim();
+};
+export const convertRegexToHumanStringDetailed = (
+  regex: DeepReadonly<RegExp>
+): string => {
+  const result = convertRegexToHumanReadableStringHelper(regex.source, false);
+  // eslint-disable-next-line no-console
+  console.log(
+    "Default:",
+    result.elements.map((a) => convertToStringNew(a)).join("")
+  );
+  // eslint-disable-next-line no-console
+  console.log(
+    "Human:",
+    result.elements
+      .map((a) => convertToStringNew(a, regexConvertOptionsHuman))
+      .join("")
+  );
+  // eslint-disable-next-line no-console
+  console.log(
+    "Human (Detailed):",
+    result.elements
+      .map((a) => convertToStringNew(a, regexConvertOptionsHumanDetailed))
+      .join("")
+  );
+  return result.elements
+    .map((a) => convertToStringNew(a, regexConvertOptionsHumanDetailed))
+    .join("")
+    .trim();
 };
 
-const toHumanStringRegexGroups = (elements: SimpleRegexElements[]): string =>
-  elements
-    .map((a) => convertSimpleRegexElementToString(a))
-    .join("")
-    .replace(/\s\s+/g, " ")
-    .trim();
+interface RegexConvertToStringOptions {
+  renderEmptyGroupCases?: boolean;
+  renderEndSymbol?: boolean;
+  renderGroupsHumanReadable?: boolean;
+  renderMatchBracketSymbol?: boolean;
+  renderNonWhitespaceSymbol?: boolean;
+  renderOnlyGroupName?: boolean;
+  renderStartSymbol?: boolean;
+  renderTextHumanReadable?: boolean;
+  renderWhitespaceSymbol?: boolean;
+}
+
+const regexConvertOptionsHumanDetailed: Readonly<RegexConvertToStringOptions> =
+  {
+    renderEmptyGroupCases: false,
+    renderEndSymbol: false,
+    renderGroupsHumanReadable: true,
+    renderMatchBracketSymbol: false,
+    renderNonWhitespaceSymbol: false,
+    renderStartSymbol: false,
+    renderTextHumanReadable: true,
+    renderWhitespaceSymbol: false,
+  };
+const regexConvertOptionsHuman: Readonly<RegexConvertToStringOptions> = {
+  ...regexConvertOptionsHumanDetailed,
+  renderOnlyGroupName: true,
+};
+
+export const convertToStringNew = (
+  element: SimpleRegexElements,
+  options: RegexConvertToStringOptions = {}
+): string => {
+  switch (element.type) {
+    case "end":
+      return options.renderEndSymbol !== false ? "$" : "";
+    case "start":
+      return options.renderStartSymbol !== false ? "^" : "";
+    case "group_separator":
+      return "|";
+    case "whitespace":
+      // eslint-disable-next-line no-case-declarations
+      let outputWhitespace =
+        options.renderWhitespaceSymbol !== false ? "\\s" : " ";
+      if (options.renderWhitespaceSymbol !== false && element.modifier) {
+        outputWhitespace += element.modifier;
+      } else if (element.modifier === "*") {
+        outputWhitespace = "";
+      }
+      if (element.optional === true) {
+        outputWhitespace += "?";
+      }
+      return outputWhitespace;
+    case "text":
+      if (element.optional === true) {
+        if (options.renderTextHumanReadable) {
+          return `[${element.content}]`;
+        }
+        return element.content + "?";
+      }
+      return element.content;
+    case "non_whitespace":
+      // eslint-disable-next-line no-case-declarations
+      let outputNonWhitespace =
+        options.renderNonWhitespaceSymbol !== false ? "\\S" : "CHARACTER";
+      if (options.renderWhitespaceSymbol !== false && element.modifier) {
+        outputNonWhitespace += element.modifier;
+      } else if (element.modifier === "*") {
+        outputNonWhitespace = "OPTIONAL_TEXT";
+      } else if (element.modifier === "+") {
+        outputNonWhitespace = "TEXT";
+      }
+      if (element.optional === true) {
+        outputNonWhitespace += "?";
+      }
+      return outputNonWhitespace;
+    case "match_bracket":
+      // eslint-disable-next-line no-case-declarations
+      let outputMatchBracket = `[${element.content}]`;
+      if (options.renderMatchBracketSymbol === false) {
+        if (element.content === "^'") {
+          if (element.modifier === "*") {
+            outputMatchBracket = "OPTIONAL_TEXT";
+          } else if (element.modifier === "+") {
+            outputMatchBracket = "TEXT";
+          }
+        }
+        if (element.content === "0-9") {
+          if (element.modifier === "*") {
+            outputMatchBracket = "OPTIONAL_NUMBERS";
+          } else if (element.modifier === "+") {
+            outputMatchBracket = "NUMBERS";
+          } else {
+            outputMatchBracket = "NUMBER";
+          }
+        }
+      }
+      if (options.renderMatchBracketSymbol !== false && element.modifier) {
+        outputMatchBracket += element.modifier;
+      }
+      if (options.renderMatchBracketSymbol !== false && element.optional) {
+        outputMatchBracket += "?";
+      }
+      return outputMatchBracket;
+    case "group":
+      if (options.renderEmptyGroupCases !== false) {
+        return `(${element.notCaptured ? "?:" : ""}${
+          element.name ? `?<${element.name}>` : ""
+        }${element.content
+          .map((a) => convertToStringNew(a, options))
+          .join("")}${element.modifier ? element.modifier : ""}${
+          element.optional ? "?" : ""
+        })`;
+      }
+      // eslint-disable-next-line no-case-declarations
+      const groupElements = splitArrayAtElement(
+        element.content,
+        (a) => a.type === "group_separator"
+      );
+      // eslint-disable-next-line no-case-declarations
+      const groupElementsFiltered = groupElements
+        .map((a) => a.map((b) => convertToStringNew(b, options)).join(""))
+        .filter((c) => c.trim().length > 0);
+      if (groupElementsFiltered.length !== groupElements.length) {
+        element.optional = true;
+      }
+      if (groupElementsFiltered.length === 0) {
+        return "";
+      }
+      // eslint-disable-next-line no-case-declarations
+      const groupContent = groupElementsFiltered.join("/");
+      // eslint-disable-next-line no-case-declarations
+      let finalContent = groupContent;
+      if (groupElementsFiltered.length !== 1) {
+        finalContent = `(${finalContent})`;
+      }
+      if (element.name) {
+        finalContent = `${element.name}:=${finalContent}`;
+      }
+      if (groupContent === element.name) {
+        finalContent = element.name;
+      }
+      if (options.renderOnlyGroupName === true && element.name) {
+        finalContent = element.name;
+      }
+      if (element.optional) {
+        finalContent = `[${finalContent}]`;
+      }
+      return finalContent;
+  }
+};

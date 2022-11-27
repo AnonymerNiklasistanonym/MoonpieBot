@@ -18,7 +18,7 @@ import {
 import { ENV_PREFIX, envVariableInformation } from "../src/info/env";
 import { cliOptionSignatureToString } from "../src/cli";
 import { cliOptionsInformation } from "../src/info/cli";
-import { convertRegexToHumanString } from "../src/other/regexToString";
+import { convertRegexToHumanStringDetailed } from "../src/other/regexToString";
 import { genericFilterNonUniqueStrings } from "../src/other/genericStringSorter";
 import { getVersionString } from "../src/version";
 import { version } from "../src/info/version";
@@ -123,7 +123,7 @@ export const createManPageFile = async (outputPath: string): Promise<void> => {
         outputString += `- "*${command.id}*": "*${
           typeof command.command === "string"
             ? command.command
-            : convertRegexToHumanString(command.command)
+            : convertRegexToHumanStringDetailed(command.command)
         }*" (${command.permission}) - ${command.description}\n`;
       }
       if (first) {

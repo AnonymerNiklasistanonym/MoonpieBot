@@ -54,15 +54,15 @@ If this program is installed via a package it will use *$HOME/.local/share/moonp
 : You can provide a list of commands that should be enabled, if this is empty or not set all commands are enabled (set the value to 'none' if no commands should be enabled).
 Supported list values: "*add_broadcast*", "*add_command*", "*commands*", "*delete_broadcast*", "*delete_command*", "*edit_broadcast*", "*edit_command*", "*list_broadcasts*", "*list_commands*" (empty list value: "*none*")
 
-- "*add_broadcast*": "*!addcb id cronString message*" (mod) - Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
-- "*add_command*": "*!addcc id regex message[ -ul=userLevel][ -cd=cooldownInS]*" (mod) - Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
-- "*commands*": "*!(ccs|cbs|ccscbs) commands*" (everyone) - List all enabled commands
-- "*delete_broadcast*": "*!delcb id*" (mod) - Delete a broadcast
-- "*delete_command*": "*!delcc id*" (mod) - Delete a command
-- "*edit_broadcast*": "*!editcb id option optionValue*" (mod) - A single property (cronString, description, id, message) can be edited of an existing broadcast
-- "*edit_command*": "*!editcc id option optionValue*" (mod) - A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
-- "*list_broadcasts*": "*!listccs[ listOffset| id]*" (everyone) - List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
-- "*list_commands*": "*!listcbs[ listOffset| id]*" (everyone) - List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
+- "*add_broadcast*": "*!addcb id:=('TEXT'/TEXT) cronString:=('TEXT'/TEXT) message:=('TEXT'/TEXT)*" (mod) - Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
+- "*add_command*": "*!addcc id:=('TEXT'/TEXT) regex:=('TEXT'/TEXT) message:=('TEXT'/TEXT)[ -ul=userLevel:=(mod/vip/none/broadcaster)][ -cd=cooldownInS:=NUMBERS]*" (mod) - Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
+- "*commands*": "*!(cc[s]/cb[s]/cc[scb][s]) commands*" (everyone) - List all enabled commands
+- "*delete_broadcast*": "*!delcb id:=('TEXT'/TEXT)*" (mod) - Delete a broadcast
+- "*delete_command*": "*!delcc id:=('TEXT'/TEXT)*" (mod) - Delete a command
+- "*edit_broadcast*": "*!editcb id:=('TEXT'/TEXT) option:=TEXT optionValue:=('TEXT'/TEXT)*" (mod) - A single property (cronString, description, id, message) can be edited of an existing broadcast
+- "*edit_command*": "*!editcc id:=('TEXT'/TEXT) option:=TEXT optionValue:=('TEXT'/TEXT)*" (mod) - A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
+- "*list_broadcasts*": "*!listcc[s][( listOffset:=NUMBERS/ id:=('TEXT'/TEXT))]*" (everyone) - List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
+- "*list_commands*": "*!listcb[s][( listOffset:=NUMBERS/ id:=('TEXT'/TEXT))]*" (everyone) - List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
 
 **MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL**="*info*"
 : The log level of the log messages that are printed to the console.
@@ -103,14 +103,14 @@ Example: "*about,add,claim,commands,delete,get,leaderboard,remove,set*"
 Supported list values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", "*get*", "*leaderboard*", "*remove*", "*set*" (empty list value: "*none*")
 
 - "*about*": "*!moonpie about*" (everyone) - Get version information of the bot
-- "*add*": "*!moonpie add userName countAdd*" (broadcaster) - Add moonpies to a user
+- "*add*": "*!moonpie add userName:=('TEXT'/TEXT) countAdd:=NUMBERS*" (broadcaster) - Add moonpies to a user
 - "*claim*": "*!moonpie*" (everyone) - (If not already claimed) Claim a moonpie once every set hours and return the current count and the leaderboard position
 - "*commands*": "*!moonpie commands*" (everyone) - List all enabled commands
-- "*delete*": "*!moonpie delete userName*" (broadcaster) - Delete moonpies of a user
-- "*get*": "*!moonpie get userName*" (everyone) - Get moonpies of a user
-- "*leaderboard*": "*!moonpie leaderboard[ startingRank]*" (everyone) - List the top moonpie holders
-- "*remove*": "*!moonpie remove userName countRemove*" (broadcaster) - Remove moonpies from a user
-- "*set*": "*!moonpie set userName countSet*" (broadcaster) - Set moonpies of a user
+- "*delete*": "*!moonpie delete userName:=('TEXT'/TEXT)*" (broadcaster) - Delete moonpies of a user
+- "*get*": "*!moonpie get userName:=('TEXT'/TEXT)*" (everyone) - Get moonpies of a user
+- "*leaderboard*": "*!moonpie leaderboard[ startingRank:=NUMBERS]*" (everyone) - List the top moonpie holders
+- "*remove*": "*!moonpie remove userName:=('TEXT'/TEXT) countRemove:=NUMBERS*" (broadcaster) - Remove moonpies from a user
+- "*set*": "*!moonpie set userName:=('TEXT'/TEXT) countSet:=NUMBERS*" (broadcaster) - Set moonpies of a user
 
 **MOONPIE_CONFIG_MOONPIE_DATABASE_PATH**="*moonpie.db*"
 : The database file path that contains the persistent moonpie data.
@@ -123,16 +123,16 @@ Supported list values: "*about*", "*add*", "*claim*", "*commands*", "*delete*", 
 Supported list values: "*commands*", "*last_request*", "*np*", "*permit_request*", "*pp*", "*requests*", "*rp*", "*score*" (empty list value: "*none*")
 
 - "*commands*": "*!osu commands*" (everyone) - List all enabled commands
-- "*last_request*": "*!osuLastRequest[ lastRequestCount]*" (mod) - Resend the last request (or requests if a custom count is provided) in case of a osu! client restart
+- "*last_request*": "*!osuLastRequest[ lastRequestCount:=NUMBERS]*" (mod) - Resend the last request (or requests if a custom count is provided) in case of a osu! client restart
 - "*np*": "*!np*" (everyone) - Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
 - "*permit_request*": "*!osuPermitRequest*" (mod) - Permit the last blocked map request
-- "*pp*": "*!pp[ (osuUserId|osuUserName)]*" (everyone) - Get general account information (pp, rank, country, ...) of the account or of the given osu! player
+- "*pp*": "*!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]*" (everyone) - Get general account information (pp, rank, country, ...) of the account or of the given osu! player
 - "*requests*": "*osuBeatmapUrl[ comment]*" (everyone) - Request a beatmap requests using an osu! URL and optional comment
-- "*requests*": "*!osuRequests[( on| off)[ message ]]*" (get=everyone on/off=mod) - Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
-- "*requests*": "*!osuRequests set option optionValue*" (mod) - Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
-- "*requests*": "*!osuRequests unset option*" (mod) - Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
-- "*rp*": "*!rp[ (osuUserId|osuUserName)]*" (everyone) - Get the most recent play of the account or of the given osu! player
-- "*score*": "*!score osuUserName*" (everyone) - Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+- "*requests*": "*!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]*" (get=everyone on/off=mod) - Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+- "*requests*": "*!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)*" (mod) - Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
+- "*requests*": "*!osuRequests unset option:=TEXT*" (mod) - Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+- "*rp*": "*!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]*" (everyone) - Get the most recent play of the account or of the given osu! player
+- "*score*": "*!score osuUserName:=('TEXT'/TEXT)*" (everyone) - Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 
 **MOONPIE_CONFIG_OSU_API_CLIENT_ID**
 : The osu! client ID (and client secret) to use the osu! API v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).

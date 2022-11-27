@@ -4,6 +4,7 @@ import { expect } from "chai";
 // Local imports
 import {
   convertRegexToHumanString,
+  convertRegexToHumanStringDetailed,
   convertRegexToString,
 } from "../../../src/other/regexToString";
 // Type imports
@@ -18,14 +19,23 @@ export default (): Suite => {
       );
       expect(
         convertRegexToHumanString(
-          /^\s*!score\s+(?<osuUserName>(?:'[^'"]+'|\S+))(?:\s|$)/i
+          /^\s*!score\s+(?<osuUserName>(?:'[^']+'|\S+))(?:\s|$)/i
         )
       ).to.be.equal("!score osuUserName");
       expect(
-        convertRegexToHumanString(
-          /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i
+        convertRegexToHumanStringDetailed(
+          /^\s*!score\s+(?<osuUserName>(?:'[^']+'|\S+))(?:\s|$)/i
         )
-      ).to.be.equal("!rp[ (osuUserId|osuUserName)]");
+      ).to.be.equal("!score osuUserName=('TEXT'/TEXT)");
+      expect(
+        convertRegexToHumanString(
+          /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^']+'|\S+)))(?:\s|$)|\s|$)/i
+        )
+      ).to.be.equal("!rp[ (osuUserId/osuUserName)]");
     });
+
+    // convertRegexToHumanString2(
+    //   /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>\S+))(?:\s|$)|\s|$)/i
+    // );
   });
 };

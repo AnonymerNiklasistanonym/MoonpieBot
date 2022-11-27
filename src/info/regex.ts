@@ -35,7 +35,7 @@ export interface RegexOsuChatHandlerCommandRequests {
  */
 export const regexOsuChatHandlerCommandRequests =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!osuRequests(?:(?:\s+(?<on>on)|\s+(?<off>off))(?:\s+(?<message>.*?)\s*$|\s|$)?)?(?:\s|$)/i;
+  /^\s*!osuRequests(?:(?:\s+(?<on>on)|\s+(?<off>off))(?:\s+(?<message>'[^']+'|\S+)\s*$|\s|$)?)?(?:\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandRequestsSet {
   option: string;
@@ -58,7 +58,7 @@ export interface RegexOsuChatHandlerCommandRequestsSet {
  * ```
  */
 export const regexOsuChatHandlerCommandRequestsSet =
-  /^\s*!osuRequests\s+set\s+(?<option>\S+)\s+(?<optionValue>.+?)(?:\s*$)/i;
+  /^\s*!osuRequests\s+set\s+(?<option>\S+)\s+(?<optionValue>'[^']+'|\S+)(?:\s*$)/i;
 
 export interface RegexOsuChatHandlerCommandRequestsUnset {
   option: string;
@@ -182,7 +182,7 @@ export interface RegexMoonpieChatHandlerCommandUserGet {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserGet =
-  /^\s*!moonpie\s+get\s+(?<userName>(?:'[^'"]+'|\S+))(?:\s|$)/i;
+  /^\s*!moonpie\s+get\s+(?<userName>(?:'[^']+'|\S+))(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserSet {
   countSet: string;
@@ -200,7 +200,7 @@ export interface RegexMoonpieChatHandlerCommandUserSet {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserSet =
-  /^\s*!moonpie\s+set\s+(?<userName>(?:'[^'"]+'|\S+))\s+(?<countSet>[0-9]+)(?:\s|$)/i;
+  /^\s*!moonpie\s+set\s+(?<userName>(?:'[^']+'|\S+))\s+(?<countSet>[0-9]+)(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserAdd {
   countAdd: string;
@@ -218,7 +218,7 @@ export interface RegexMoonpieChatHandlerCommandUserAdd {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserAdd =
-  /^\s*!moonpie\s+add\s+(?<userName>(?:'[^'"]+'|\S+))\s+(?<countAdd>[0-9]+)(?:\s|$)/i;
+  /^\s*!moonpie\s+add\s+(?<userName>(?:'[^']+'|\S+))\s+(?<countAdd>[0-9]+)(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserRemove {
   countRemove: string;
@@ -236,7 +236,7 @@ export interface RegexMoonpieChatHandlerCommandUserRemove {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserRemove =
-  /^\s*!moonpie\s+remove\s+(?<userName>(?:'[^'"]+'|\S+))\s+(?<countRemove>[0-9]+)(?:\s|$)/i;
+  /^\s*!moonpie\s+remove\s+(?<userName>(?:'[^']+'|\S+))\s+(?<countRemove>[0-9]+)(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserDelete {
   userName: string;
@@ -252,7 +252,7 @@ export interface RegexMoonpieChatHandlerCommandUserDelete {
  * ```
  */
 export const regexMoonpieChatHandlerCommandUserDelete =
-  /^\s*!moonpie\s+delete\s+(?<userName>(?:'[^'"]+'|\S+))(?:\s|$)/i;
+  /^\s*!moonpie\s+delete\s+(?<userName>(?:'[^']+'|\S+))(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!osu commands` command.
@@ -305,7 +305,7 @@ export type RegexOsuChatHandlerCommandPp =
  * ```
  */
 export const regexOsuChatHandlerCommandPp =
-  /^\s*!pp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^'"]+'|\S+)))(?:\s|$)|\s|$)/i;
+  /^\s*!pp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^']+'|\S+)))(?:\s|$)|\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandRpUserId {
   osuUserId: string;
@@ -337,7 +337,7 @@ export type RegexOsuChatHandlerCommandRp =
  * ```
  */
 export const regexOsuChatHandlerCommandRp =
-  /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^'"]+'|\S+)))(?:\s|$)|\s|$)/i;
+  /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^']+'|\S+)))(?:\s|$)|\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandScore {
   osuUserName: string;
@@ -353,7 +353,7 @@ export interface RegexOsuChatHandlerCommandScore {
  * ```
  */
 export const regexOsuChatHandlerCommandScore =
-  /^\s*!score\s+(?<osuUserName>(?:'[^'"]+'|\S+))(?:\s|$)/i;
+  /^\s*!score\s+(?<osuUserName>(?:'[^']+'|\S+))(?:\s|$)/i;
 
 export interface RegexOsuBeatmapIdFromUrlBase {
   comment?: string;
@@ -475,7 +475,7 @@ export interface RegexCustomCommandAdd {
  */
 export const regexCustomCommandAdd =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!addcc\s+(?<id>'.+?'|(?!')\S+(?!'))\s+(?<regex>'.+?'|(?!')\S+(?!'))\s+(?<message>'.+?'|(?!')\S+(?!'))(?:\s+-ul=(?<userLevel>mod|vip|none|broadcaster))?(?:\s+-cd=(?<cooldownInS>[0-9]+))?(?:\s|$)/i;
+  /^\s*!addcc\s+(?<id>'[^']+'|\S+)\s+(?<regex>'[^']+'|\S+)\s+(?<message>'[^']+'|\S+)(?:\s+-ul=(?<userLevel>mod|vip|none|broadcaster))?(?:\s+-cd=(?<cooldownInS>[0-9]+))?(?:\s|$)/i;
 export interface RegexCustomCommandDelete {
   id: string;
 }
@@ -489,7 +489,7 @@ export interface RegexCustomCommandDelete {
  */
 export const regexCustomCommandDelete =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!delcc\s+(?<id>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!delcc\s+(?<id>'[^']+'|\S+)(?:\s|$)/i;
 export interface RegexCustomCommandList {
   id?: string;
 }
@@ -510,7 +510,7 @@ export interface RegexCustomCommandListOffset {
  */
 export const regexCustomCommandList =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!listccs?(?:\s+(?<listOffset>[0-9]+?)|\s+(?<id>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
+  /^\s*!listccs?(?:\s+(?<listOffset>[0-9]+?)|\s+(?<id>'[^']+'|\S+))?(?:\s|$)/i;
 export interface RegexCustomCommandEdit {
   id: string;
   option: string;
@@ -526,7 +526,7 @@ export interface RegexCustomCommandEdit {
  */
 export const regexCustomCommandEdit =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!editcc\s+(?<id>'.+?'|(?!')\S+(?!'))\s+(?<option>\S+)\s+(?<optionValue>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!editcc\s+(?<id>'[^']+'|\S+)\s+(?<option>\S+)\s+(?<optionValue>'[^']+'|\S+)(?:\s|$)/i;
 
 export interface RegexCustomBroadcastAdd {
   cronString: string;
@@ -543,7 +543,7 @@ export interface RegexCustomBroadcastAdd {
  */
 export const regexCustomBroadcastAdd =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!addcb\s+(?<id>'.+?'|(?!')\S+(?!'))\s+(?<cronString>'.+?'|(?!')\S+(?!'))\s+(?<message>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!addcb\s+(?<id>'[^']+'|\S+)\s+(?<cronString>'[^']+'|\S+)\s+(?<message>'[^']+'|\S+)(?:\s|$)/i;
 export interface RegexCustomBroadcastDelete {
   id: string;
 }
@@ -557,7 +557,7 @@ export interface RegexCustomBroadcastDelete {
  */
 export const regexCustomBroadcastDelete =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!delcb\s+(?<id>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!delcb\s+(?<id>'[^']+'|\S+)(?:\s|$)/i;
 
 export interface RegexCustomBroadcastList {
   id?: string;
@@ -579,7 +579,7 @@ export interface RegexCustomBroadcastListOffset {
  */
 export const regexCustomBroadcastList =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!listcbs?(?:\s+(?<listOffset>[0-9]+?)|\s+(?<id>'.+?'|(?!')\S+(?!')))?(?:\s|$)/i;
+  /^\s*!listcbs?(?:\s+(?<listOffset>[0-9]+?)|\s+(?<id>'[^']+'|\S+))?(?:\s|$)/i;
 export interface RegexCustomBroadcastEdit {
   id: string;
   option: string;
@@ -595,6 +595,6 @@ export interface RegexCustomBroadcastEdit {
  */
 export const regexCustomBroadcastEdit =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^\s*!editcb\s+(?<id>'.+?'|(?!')\S+(?!'))\s+(?<option>\S+)\s+(?<optionValue>'.+?'|(?!')\S+(?!'))(?:\s|$)/i;
+  /^\s*!editcb\s+(?<id>'[^']+'|\S+)\s+(?<option>\S+)\s+(?<optionValue>'[^']+'|\S+)(?:\s|$)/i;
 
 export const regexLurkChatHandlerCommandLurk = /^\s*!lurk(?:\s|$)/i;

@@ -16,7 +16,7 @@ import {
   fileDocumentationGenerator,
   FileDocumentationPartType,
 } from "./documentation/fileDocumentationGenerator";
-import { convertRegexToHumanString } from "./other/regexToString";
+import { convertRegexToHumanStringDetailed } from "./other/regexToString";
 import { escapeEnvVariableValue } from "./other/whiteSpaceChecker";
 import { genericFilterNonUniqueStrings } from "./other/genericStringSorter";
 import { getCustomEnvValueFromLoggerConfig } from "./info/config/loggerConfig";
@@ -393,7 +393,7 @@ export const createEnvVariableDocumentation = (
                 `  (${supportedValue.permission}: ${
                   typeof supportedValue.command === "string"
                     ? supportedValue.command
-                    : convertRegexToHumanString(supportedValue.command)
+                    : convertRegexToHumanStringDetailed(supportedValue.command)
                 })`
               );
             }

@@ -104,14 +104,14 @@ Every day a user can claim a moonpie and the count is saved in a persistent data
 Chat | Command | Permissions | Description
 --- | --- | --- | ---
 `!moonpie about` | `about` | everyone | Get version information of the bot
-`!moonpie add userName countAdd` | `add` | broadcaster | Add moonpies to a user
+`!moonpie add userName:=('TEXT'/TEXT) countAdd:=NUMBERS` | `add` | broadcaster | Add moonpies to a user
 `!moonpie` | `claim` | everyone | (If not already claimed) Claim a moonpie once every set hours and return the current count and the leaderboard position
 `!moonpie commands` | `commands` | everyone | List all enabled commands
-`!moonpie delete userName` | `delete` | broadcaster | Delete moonpies of a user
-`!moonpie get userName` | `get` | everyone | Get moonpies of a user
-`!moonpie leaderboard[ startingRank]` | `leaderboard` | everyone | List the top moonpie holders
-`!moonpie remove userName countRemove` | `remove` | broadcaster | Remove moonpies from a user
-`!moonpie set userName countSet` | `set` | broadcaster | Set moonpies of a user
+`!moonpie delete userName:=('TEXT'/TEXT)` | `delete` | broadcaster | Delete moonpies of a user
+`!moonpie get userName:=('TEXT'/TEXT)` | `get` | everyone | Get moonpies of a user
+`!moonpie leaderboard[ startingRank:=NUMBERS]` | `leaderboard` | everyone | List the top moonpie holders
+`!moonpie remove userName:=('TEXT'/TEXT) countRemove:=NUMBERS` | `remove` | broadcaster | Remove moonpies from a user
+`!moonpie set userName:=('TEXT'/TEXT) countSet:=NUMBERS` | `set` | broadcaster | Set moonpies of a user
 
 [//]: # (END)
 
@@ -190,16 +190,16 @@ Optional osu! IRC connection that can be enabled to send beatmap requests to the
 Chat | Command | Permissions | Description
 --- | --- | --- | ---
 `!osu commands` | `commands` | everyone | List all enabled commands
-`!osuLastRequest[ lastRequestCount]` | `last_request` | mod | Resend the last request (or requests if a custom count is provided) in case of a osu! client restart
+`!osuLastRequest[ lastRequestCount:=NUMBERS]` | `last_request` | mod | Resend the last request (or requests if a custom count is provided) in case of a osu! client restart
 `!np` | `np` | everyone | Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
 `!osuPermitRequest` | `permit_request` | mod | Permit the last blocked map request
-`!pp[ (osuUserId\|osuUserName)]` | `pp` | everyone | Get general account information (pp, rank, country, ...) of the account or of the given osu! player
+`!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` | `pp` | everyone | Get general account information (pp, rank, country, ...) of the account or of the given osu! player
 `osuBeatmapUrl[ comment]` | `requests` | everyone | Request a beatmap requests using an osu! URL and optional comment
-`!osuRequests[( on\| off)[ message ]]` | `requests` | get=everyone on/off=mod | Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
-`!osuRequests set option optionValue` | `requests` | mod | Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
-`!osuRequests unset option` | `requests` | mod | Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
-`!rp[ (osuUserId\|osuUserName)]` | `rp` | everyone | Get the most recent play of the account or of the given osu! player
-`!score osuUserName` | `score` | everyone | Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+`!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` | `requests` | get=everyone on/off=mod | Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+`!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` | `requests` | mod | Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
+`!osuRequests unset option:=TEXT` | `requests` | mod | Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+`!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` | `rp` | everyone | Get the most recent play of the account or of the given osu! player
+`!score osuUserName:=('TEXT'/TEXT)` | `score` | everyone | Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 
 [//]: # (END)
 
@@ -304,15 +304,15 @@ Custom commands and custom broadcasts can be added/edited/deleted via the Twitch
 
 Chat | Command | Permissions | Description
 --- | --- | --- | ---
-`!addcb id cronString message` | `add_broadcast` | mod | Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
-`!addcc id regex message[ -ul=userLevel][ -cd=cooldownInS]` | `add_command` | mod | Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
-`!(ccs\|cbs\|ccscbs) commands` | `commands` | everyone | List all enabled commands
-`!delcb id` | `delete_broadcast` | mod | Delete a broadcast
-`!delcc id` | `delete_command` | mod | Delete a command
-`!editcb id option optionValue` | `edit_broadcast` | mod | A single property (cronString, description, id, message) can be edited of an existing broadcast
-`!editcc id option optionValue` | `edit_command` | mod | A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
-`!listccs[ listOffset\| id]` | `list_broadcasts` | everyone | List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
-`!listcbs[ listOffset\| id]` | `list_commands` | everyone | List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
+`!addcb id:=('TEXT'/TEXT) cronString:=('TEXT'/TEXT) message:=('TEXT'/TEXT)` | `add_broadcast` | mod | Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
+`!addcc id:=('TEXT'/TEXT) regex:=('TEXT'/TEXT) message:=('TEXT'/TEXT)[ -ul=userLevel:=(mod/vip/none/broadcaster)][ -cd=cooldownInS:=NUMBERS]` | `add_command` | mod | Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
+`!(cc[s]/cb[s]/cc[scb][s]) commands` | `commands` | everyone | List all enabled commands
+`!delcb id:=('TEXT'/TEXT)` | `delete_broadcast` | mod | Delete a broadcast
+`!delcc id:=('TEXT'/TEXT)` | `delete_command` | mod | Delete a command
+`!editcb id:=('TEXT'/TEXT) option:=TEXT optionValue:=('TEXT'/TEXT)` | `edit_broadcast` | mod | A single property (cronString, description, id, message) can be edited of an existing broadcast
+`!editcc id:=('TEXT'/TEXT) option:=TEXT optionValue:=('TEXT'/TEXT)` | `edit_command` | mod | A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
+`!listcc[s][( listOffset:=NUMBERS/ id:=('TEXT'/TEXT))]` | `list_broadcasts` | everyone | List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
+`!listcb[s][( listOffset:=NUMBERS/ id:=('TEXT'/TEXT))]` | `list_commands` | everyone | List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
 
 [//]: # (END)
 
@@ -515,15 +515,15 @@ Supported features:
   - `!moonpie about` (everyone): Get version information of the bot
   - `!moonpie commands` (everyone): List all enabled commands
 - CUSTOM_CS_BS: Support custom commands/broadcasts stored in database and commands to change them
-  - `!addcb id cronString message` (mod): Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
-  - `!addcc id regex message[ -ul=userLevel][ -cd=cooldownInS]` (mod): Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
-  - `!(ccs|cbs|ccscbs) commands` (everyone): List all enabled commands
-  - `!delcb id` (mod): Delete a broadcast
-  - `!delcc id` (mod): Delete a command
-  - `!editcb id option optionValue` (mod): A single property (cronString, description, id, message) can be edited of an existing broadcast
-  - `!editcc id option optionValue` (mod): A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
-  - `!listccs[ listOffset| id]` (everyone): List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
-  - `!listcbs[ listOffset| id]` (everyone): List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
+  - `!addcb id:=('TEXT'/TEXT) cronString:=('TEXT'/TEXT) message:=('TEXT'/TEXT)` (mod): Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
+  - `!addcc id:=('TEXT'/TEXT) regex:=('TEXT'/TEXT) message:=('TEXT'/TEXT)[ -ul=userLevel:=(mod/vip/none/broadcaster)][ -cd=cooldownInS:=NUMBERS]` (mod): Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
+  - `!(cc[s]/cb[s]/cc[scb][s]) commands` (everyone): List all enabled commands
+  - `!delcb id:=('TEXT'/TEXT)` (mod): Delete a broadcast
+  - `!delcc id:=('TEXT'/TEXT)` (mod): Delete a command
+  - `!editcb id:=('TEXT'/TEXT) option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): A single property (cronString, description, id, message) can be edited of an existing broadcast
+  - `!editcc id:=('TEXT'/TEXT) option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
+  - `!listcc[s][( listOffset:=NUMBERS/ id:=('TEXT'/TEXT))]` (everyone): List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
+  - `!listcb[s][( listOffset:=NUMBERS/ id:=('TEXT'/TEXT))]` (everyone): List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
 
 [//]: # (END)
 
@@ -628,36 +628,36 @@ Supported features:
   - `!moonpie about` (everyone): Get version information of the bot
   - `!moonpie commands` (everyone): List all enabled commands
 - CUSTOM_CS_BS: Support custom commands/broadcasts stored in database and commands to change them
-  - `!addcb id cronString message` (mod): Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
-  - `!addcc id regex message[ -ul=userLevel][ -cd=cooldownInS]` (mod): Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
-  - `!(ccs|cbs|ccscbs) commands` (everyone): List all enabled commands
-  - `!delcb id` (mod): Delete a broadcast
-  - `!delcc id` (mod): Delete a command
-  - `!editcb id option optionValue` (mod): A single property (cronString, description, id, message) can be edited of an existing broadcast
-  - `!editcc id option optionValue` (mod): A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
-  - `!listccs[ listOffset| id]` (everyone): List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
-  - `!listcbs[ listOffset| id]` (everyone): List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
+  - `!addcb id:=('TEXT'/TEXT) cronString:=('TEXT'/TEXT) message:=('TEXT'/TEXT)` (mod): Add a broadcast with an ID, a cron expression to determine when the broadcast should be sent ([crontab.cronhub.io](https://crontab.cronhub.io/)) and a message
+  - `!addcc id:=('TEXT'/TEXT) regex:=('TEXT'/TEXT) message:=('TEXT'/TEXT)[ -ul=userLevel:=(mod/vip/none/broadcaster)][ -cd=cooldownInS:=NUMBERS]` (mod): Add a command with an ID, a RegEx expression to detect it and capture contents of the match ([regex101.com](https://regex101.com/)) and a message - Optionally a cooldown (in s) and user level (broadcaster, mod, vip, none) are also supported
+  - `!(cc[s]/cb[s]/cc[scb][s]) commands` (everyone): List all enabled commands
+  - `!delcb id:=('TEXT'/TEXT)` (mod): Delete a broadcast
+  - `!delcc id:=('TEXT'/TEXT)` (mod): Delete a command
+  - `!editcb id:=('TEXT'/TEXT) option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): A single property (cronString, description, id, message) can be edited of an existing broadcast
+  - `!editcc id:=('TEXT'/TEXT) option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): A single property (cooldownInS, count, description, id, message, regex, userLevel) can be edited of an existing command
+  - `!listcc[s][( listOffset:=NUMBERS/ id:=('TEXT'/TEXT))]` (everyone): List all callbacks (an offset number can be provided if multiple were added or an ID can be provided to only list one specific broadcast)
+  - `!listcb[s][( listOffset:=NUMBERS/ id:=('TEXT'/TEXT))]` (everyone): List all commands (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)
 - MOONPIE: Support moonpie database and commands to manage them
-  - `!moonpie add userName countAdd` (broadcaster): Add moonpies to a user
+  - `!moonpie add userName:=('TEXT'/TEXT) countAdd:=NUMBERS` (broadcaster): Add moonpies to a user
   - `!moonpie` (everyone): (If not already claimed) Claim a moonpie once every set hours and return the current count and the leaderboard position
   - `!moonpie commands` (everyone): List all enabled commands
-  - `!moonpie delete userName` (broadcaster): Delete moonpies of a user
-  - `!moonpie get userName` (everyone): Get moonpies of a user
-  - `!moonpie leaderboard[ startingRank]` (everyone): List the top moonpie holders
-  - `!moonpie remove userName countRemove` (broadcaster): Remove moonpies from a user
-  - `!moonpie set userName countSet` (broadcaster): Set moonpies of a user
+  - `!moonpie delete userName:=('TEXT'/TEXT)` (broadcaster): Delete moonpies of a user
+  - `!moonpie get userName:=('TEXT'/TEXT)` (everyone): Get moonpies of a user
+  - `!moonpie leaderboard[ startingRank:=NUMBERS]` (everyone): List the top moonpie holders
+  - `!moonpie remove userName:=('TEXT'/TEXT) countRemove:=NUMBERS` (broadcaster): Remove moonpies from a user
+  - `!moonpie set userName:=('TEXT'/TEXT) countSet:=NUMBERS` (broadcaster): Set moonpies of a user
 - OSU_API: Support osu! API calls in custom commands/broadcasts or in the enabled commands
   - `!osu commands` (everyone): List all enabled commands
   - `!np` (everyone): Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
-  - `!pp[ (osuUserId|osuUserName)]` (everyone): Get general account information (pp, rank, country, ...) of the account or of the given osu! player
-  - `!rp[ (osuUserId|osuUserName)]` (everyone): Get the most recent play of the account or of the given osu! player
-  - `!score osuUserName` (everyone): Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+  - `!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` (everyone): Get general account information (pp, rank, country, ...) of the account or of the given osu! player
+  - `!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` (everyone): Get the most recent play of the account or of the given osu! player
+  - `!score osuUserName:=('TEXT'/TEXT)` (everyone): Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 - OSU_API_BEATMAP_REQUESTS: Support osu! beatmap requests in Twitch chat using the osu! API and commands to manage them
   - `!osu commands` (everyone): List all enabled commands
   - `osuBeatmapUrl[ comment]` (everyone): Request a beatmap requests using an osu! URL and optional comment
-  - `!osuRequests[( on| off)[ message ]]` (get=everyone on/off=mod): Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
-  - `!osuRequests set option optionValue` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
-  - `!osuRequests unset option` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+  - `!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` (get=everyone on/off=mod): Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+  - `!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
+  - `!osuRequests unset option:=TEXT` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
 - OSU_IRC_BEATMAP_REQUESTS: Support sending beatmap requests via IRC messages to the osu! client
 - OSU_STREAM_COMPANION_FILE: Support getting current map/client information from osu! via StreamCompanion using the file interface and will be used in the enabled commands instead of the osu! API
   - `!osu commands` (everyone): List all enabled commands
@@ -772,15 +772,15 @@ Supported features:
 - CUSTOM_CS_BS: Support custom commands/broadcasts stored in database and commands to change them
 - OSU_API: Support osu! API calls in custom commands/broadcasts or in the enabled commands
   - `!osu commands` (everyone): List all enabled commands
-  - `!pp[ (osuUserId|osuUserName)]` (everyone): Get general account information (pp, rank, country, ...) of the account or of the given osu! player
-  - `!rp[ (osuUserId|osuUserName)]` (everyone): Get the most recent play of the account or of the given osu! player
-  - `!score osuUserName` (everyone): Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+  - `!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` (everyone): Get general account information (pp, rank, country, ...) of the account or of the given osu! player
+  - `!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` (everyone): Get the most recent play of the account or of the given osu! player
+  - `!score osuUserName:=('TEXT'/TEXT)` (everyone): Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 - OSU_API_BEATMAP_REQUESTS: Support osu! beatmap requests in Twitch chat using the osu! API and commands to manage them
   - `!osu commands` (everyone): List all enabled commands
   - `osuBeatmapUrl[ comment]` (everyone): Request a beatmap requests using an osu! URL and optional comment
-  - `!osuRequests[( on| off)[ message ]]` (get=everyone on/off=mod): Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
-  - `!osuRequests set option optionValue` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
-  - `!osuRequests unset option` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+  - `!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` (get=everyone on/off=mod): Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+  - `!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
+  - `!osuRequests unset option:=TEXT` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
 - OSU_IRC_BEATMAP_REQUESTS: Support sending beatmap requests via IRC messages to the osu! client
 
 [//]: # (END)
