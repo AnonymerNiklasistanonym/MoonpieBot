@@ -53,15 +53,15 @@ function Rename-Artifact {
     Rename-Item -Path $BinaryFileMoved -NewName $NewArtifactFileName
 }
 
-Rename-Artifact -ArtifactFileDir "$ApplicationName-installer-windows-node-18.x" `
+Rename-Artifact -ArtifactFileDir "$ApplicationName-installer-windows-node-19.x" `
                 -ArtifactFileName "${ApplicationName}_setup.exe" `
                 -NewArtifactFileName "$ApplicationName-installer-v$CurrentVersion-win64-node-18.exe" `
                 -BinaryOutputDir $BinaryDir
-Rename-Artifact -ArtifactFileDir "$ApplicationName-windows-node-18.x" `
+Rename-Artifact -ArtifactFileDir "$ApplicationName-windows-node-19.x" `
                 -ArtifactFileName "$ApplicationName.exe" `
                 -NewArtifactFileName "$ApplicationName-v$CurrentVersion-win64-node-18.exe" `
                 -BinaryOutputDir $BinaryDir
-Rename-Artifact -ArtifactFileDir "$ApplicationName-linux-node-18.x" `
+Rename-Artifact -ArtifactFileDir "$ApplicationName-linux-node-19.x" `
                 -ArtifactFileName "$ApplicationName" `
                 -NewArtifactFileName "$ApplicationName-v$CurrentVersion-linux64-node-18" `
                 -BinaryOutputDir $BinaryDir

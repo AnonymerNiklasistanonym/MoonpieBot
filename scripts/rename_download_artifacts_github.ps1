@@ -75,17 +75,17 @@ function Extract-Artifact {
     Rename-Item -Path $BinaryFile -NewName $BinaryOutputFileName
 }
 
-Extract-Artifact -ArtifactFileName "$ApplicationName-installer-windows-node-18.x.zip" `
+Extract-Artifact -ArtifactFileName "$ApplicationName-installer-windows-node-19.x.zip" `
                  -ExtractedArtifactFileName "${ApplicationName}_setup.exe" `
                  -BinaryOutputDir $BinaryDir  `
                  -BinaryOutputFileName "$ApplicationName-installer-v$CurrentVersion-win64-node-18.exe" `
                  $DownloadDir
-Extract-Artifact -ArtifactFileName "$ApplicationName-windows-node-18.x.zip" `
+Extract-Artifact -ArtifactFileName "$ApplicationName-windows-node-19.x.zip" `
                  -ExtractedArtifactFileName "$ApplicationName.exe" `
                  -BinaryOutputDir $BinaryDir `
                  -BinaryOutputFileName "$ApplicationName-v$CurrentVersion-win64-node-18.exe" `
                  $DownloadDir
-Extract-Artifact -ArtifactFileName "$ApplicationName-linux-node-18.x.zip" `
+Extract-Artifact -ArtifactFileName "$ApplicationName-linux-node-19.x.zip" `
                  -ExtractedArtifactFileName "$ApplicationName" `
                  -BinaryOutputDir $BinaryDir `
                  -BinaryOutputFileName "$ApplicationName-v$CurrentVersion-linux64-node-18" `
