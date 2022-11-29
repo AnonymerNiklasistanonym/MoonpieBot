@@ -20,6 +20,7 @@ import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { OsuRequestsConfig } from "../../info/databases/osuRequestsDb";
 import osuRequestsDb from "../../database/osuRequestsDb";
+import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
 import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
 import type {
@@ -192,19 +193,17 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
     if (!matchGroups) {
       throw Error("RegexOsuChatHandlerCommandRequests groups undefined");
     }
-    if (matchGroups.on !== undefined) {
+    if (matchGroups.on !== undefined || matchGroups.off !== undefined) {
       return {
         data: {
-          beatmapRequestsOnOffMessage: matchGroups.message,
-          beatmapRequestsType: BeatmapRequestsType.TURN_ON,
-        },
-      };
-    }
-    if (matchGroups.off !== undefined) {
-      return {
-        data: {
-          beatmapRequestsOnOffMessage: matchGroups.message,
-          beatmapRequestsType: BeatmapRequestsType.TURN_OFF,
+          beatmapRequestsOnOffMessage:
+            matchGroups.message !== undefined
+              ? removeWhitespaceEscapeChatCommand(matchGroups.message)
+              : undefined,
+          beatmapRequestsType:
+            matchGroups.on !== undefined
+              ? BeatmapRequestsType.TURN_ON
+              : BeatmapRequestsType.TURN_OFF,
         },
       };
     }

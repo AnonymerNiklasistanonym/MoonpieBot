@@ -404,8 +404,12 @@ describe("regex", () => {
             input: "!osuRequests off custom",
           },
           {
-            expected: { message: "custom message", off: "off" },
-            input: "!osuRequests off custom message  ",
+            expected: { message: "'custom message'", off: "off" },
+            input: "!osuRequests off 'custom message'",
+          },
+          {
+            expected: { message: "'custom message'", on: "on" },
+            input: "!osuRequests on 'custom message'",
           },
         ];
       checkRegexTestElements<RegexOsuChatHandlerCommandRequests>(

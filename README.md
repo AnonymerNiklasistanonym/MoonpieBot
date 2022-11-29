@@ -191,15 +191,15 @@ Chat | Command | Permissions | Description
 --- | --- | --- | ---
 `!osu commands` | `commands` | everyone | List all enabled commands
 `!osuLastRequest[ lastRequestCount:=NUMBERS]` | `last_request` | mod | Resend the last request (or requests if a custom count is provided) in case of a osu! client restart
-`!np` | `np` | everyone | Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
-`!osuPermitRequest` | `permit_request` | mod | Permit the last blocked map request
+`!np` | `np` | everyone | Get a link to the currently selected map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
+`!osuPermitRequest` | `permit_request` | mod | Permit last blocked request
 `!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` | `pp` | everyone | Get general account information (pp, rank, country, ...) of the account or of the given osu! player
 `osuBeatmapUrl[ comment]` | `requests` | everyone | Request a beatmap requests using an osu! URL and optional comment
-`!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` | `requests` | get=everyone on/off=mod | Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+`!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` | `requests` | get=everyone on/off=mod | Get if beatmap requests are currently enabled and with which demands if there are any, Turn beatmap requests on or off with an optional message
 `!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` | `requests` | mod | Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
 `!osuRequests unset option:=TEXT` | `requests` | mod | Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
 `!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` | `rp` | everyone | Get the most recent play of the account or of the given osu! player
-`!score osuUserName:=('TEXT'/TEXT)` | `score` | everyone | Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+`!score osuUserName:=('TEXT'/TEXT)` | `score` | everyone | Get the top score of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 
 [//]: # (END)
 
@@ -648,20 +648,20 @@ Supported features:
   - `!moonpie set userName:=('TEXT'/TEXT) countSet:=NUMBERS` (broadcaster): Set moonpies of a user
 - OSU_API: Support osu! API calls in custom commands/broadcasts or in the enabled commands
   - `!osu commands` (everyone): List all enabled commands
-  - `!np` (everyone): Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
+  - `!np` (everyone): Get a link to the currently selected map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
   - `!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` (everyone): Get general account information (pp, rank, country, ...) of the account or of the given osu! player
   - `!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` (everyone): Get the most recent play of the account or of the given osu! player
-  - `!score osuUserName:=('TEXT'/TEXT)` (everyone): Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+  - `!score osuUserName:=('TEXT'/TEXT)` (everyone): Get the top score of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 - OSU_API_BEATMAP_REQUESTS: Support osu! beatmap requests in Twitch chat using the osu! API and commands to manage them
   - `!osu commands` (everyone): List all enabled commands
   - `osuBeatmapUrl[ comment]` (everyone): Request a beatmap requests using an osu! URL and optional comment
-  - `!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` (get=everyone on/off=mod): Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+  - `!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` (get=everyone on/off=mod): Get if beatmap requests are currently enabled and with which demands if there are any, Turn beatmap requests on or off with an optional message
   - `!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
   - `!osuRequests unset option:=TEXT` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
 - OSU_IRC_BEATMAP_REQUESTS: Support sending beatmap requests via IRC messages to the osu! client
 - OSU_STREAM_COMPANION_FILE: Support getting current map/client information from osu! via StreamCompanion using the file interface and will be used in the enabled commands instead of the osu! API
   - `!osu commands` (everyone): List all enabled commands
-  - `!np` (everyone): Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
+  - `!np` (everyone): Get a link to the currently selected map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
 
 [//]: # (END)
 
@@ -774,11 +774,11 @@ Supported features:
   - `!osu commands` (everyone): List all enabled commands
   - `!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` (everyone): Get general account information (pp, rank, country, ...) of the account or of the given osu! player
   - `!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` (everyone): Get the most recent play of the account or of the given osu! player
-  - `!score osuUserName:=('TEXT'/TEXT)` (everyone): Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+  - `!score osuUserName:=('TEXT'/TEXT)` (everyone): Get the top score of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 - OSU_API_BEATMAP_REQUESTS: Support osu! beatmap requests in Twitch chat using the osu! API and commands to manage them
   - `!osu commands` (everyone): List all enabled commands
   - `osuBeatmapUrl[ comment]` (everyone): Request a beatmap requests using an osu! URL and optional comment
-  - `!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` (get=everyone on/off=mod): Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+  - `!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` (get=everyone on/off=mod): Get if beatmap requests are currently enabled and with which demands if there are any, Turn beatmap requests on or off with an optional message
   - `!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
   - `!osuRequests unset option:=TEXT` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
 - OSU_IRC_BEATMAP_REQUESTS: Support sending beatmap requests via IRC messages to the osu! client

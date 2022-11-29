@@ -15,6 +15,7 @@ import {
   pluginCustomDataListSumId,
 } from "./customData";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
+import { escapeRegExp } from "../../other/regexToString";
 // Type imports
 import type { Logger } from "winston";
 import type { MessageParserPluginGenerator } from "../../messageParser";
@@ -25,9 +26,12 @@ enum CustomDataLogicOperator {
   GET_OR_SET = "<>",
   GET_OR_SET_NUMBER = "<#>",
   REMOVE_NUMBER = "-#=",
-  SET = "=",
   SET_NUMBER = "#=",
+  // Put SET last because otherwise maybe the wrong operator is selected
+  // eslint-disable-next-line typescript-sort-keys/string-enum
+  SET = "=",
 }
+
 const customDataLogic = async (
   content: undefined | string,
   customCommandsBroadcastsDbPath: string,
@@ -37,31 +41,44 @@ const customDataLogic = async (
   if (content === undefined || content.trim().length === 0) {
     throw Error("Plugin argument was empty");
   }
-  const operators = /.+?(?:\+=|\+#=|<>|<#>|-#=|=|#=).+?/;
-  const operatorMatch = content.match(operators);
-  if (operatorMatch === null) {
+  let operator: CustomDataLogicOperator | undefined;
+  for (const a of Object.values(CustomDataLogicOperator)) {
+    const match = content.match(
+      // eslint-disable-next-line security/detect-non-literal-regexp
+      new RegExp(`.+?${escapeRegExp(a)}.+?`)
+    );
+    if (match !== null) {
+      operator = a;
+      break;
+    }
+  }
+
+  if (operator === undefined) {
     throw Error(
-      `Plugin argument format incorrect (it should be 'nameOPERATORvalue' [OPERATOR:=${Object.values(
+      `Plugin argument format incorrect (it should be 'nameOPERATORvalue' [OPERATOR:=${Object.entries(
         CustomDataLogicOperator
-      ).join(",")}] and no supported operator was found in '${content.trim()}')`
+      )
+        .map((keyValue) => `${keyValue[0]}=${keyValue[1]}`)
+        .join(
+          ","
+        )}] and no supported operator was found in '${content.trim()}')`
     );
   }
-  const operator = operatorMatch[1] as CustomDataLogicOperator;
   const args = content
     .trim()
     .split(operator)
     .map((a) => a.trim());
   if (args.length !== 2) {
     throw Error(
-      `Plugin argument format incorrect (it should be 'nameOPERATORvalue' [OPERATOR:=${Object.values(
-        CustomDataLogicOperator
-      ).join(
-        ","
-      )}] and more/less than 2 elements were found '${content.trim()}'/${JSON.stringify(
+      `Plugin argument format incorrect (it should be 'nameOPERATORvalue' and more/less than 2 elements were found '${content.trim()}'/${JSON.stringify(
         args
       )})`
     );
   }
+
+  const id = args[0];
+  const value = args[1];
+  const numberValue = parseFloat(value);
 
   // Validate if the plugin value is correct
   switch (operator) {
@@ -73,7 +90,7 @@ const customDataLogic = async (
     case CustomDataLogicOperator.GET_OR_SET_NUMBER:
     case CustomDataLogicOperator.REMOVE_NUMBER:
     case CustomDataLogicOperator.SET_NUMBER:
-      if (isNaN(parseFloat(args[1]))) {
+      if (isNaN(numberValue)) {
         throw Error(
           `Plugin value incorrect (a number was expected instead of '${content.trim()}')`
         );
@@ -84,11 +101,11 @@ const customDataLogic = async (
   const exists =
     await customCommandsBroadcastsDb.requests.customData.existsEntry(
       customCommandsBroadcastsDbPath,
-      { id: args[0] },
+      { id },
       logger
     );
 
-  // Remove existing value if found
+  // Remove existing value if operator overwrites it
   if (
     operator === CustomDataLogicOperator.SET ||
     operator === CustomDataLogicOperator.SET_NUMBER
@@ -96,13 +113,13 @@ const customDataLogic = async (
     if (exists) {
       await customCommandsBroadcastsDb.requests.customData.removeEntry(
         customCommandsBroadcastsDbPath,
-        { id: args[0] },
+        { id },
         logger
       );
     }
   }
 
-  // Get entry
+  // Get existing entry if operator needs it
   let entry;
   switch (operator) {
     case CustomDataLogicOperator.ADD:
@@ -113,7 +130,7 @@ const customDataLogic = async (
       if (exists) {
         entry = await customCommandsBroadcastsDb.requests.customData.getEntry(
           customCommandsBroadcastsDbPath,
-          { id: args[0] },
+          { id },
           logger
         );
       }
@@ -124,14 +141,13 @@ const customDataLogic = async (
   }
 
   switch (operator) {
-    // All the operators that need information about existing values
     case CustomDataLogicOperator.ADD:
       if (entry === undefined) {
         await customCommandsBroadcastsDb.requests.customData.createEntry(
           customCommandsBroadcastsDbPath,
           {
-            id: args[0],
-            value: args[1],
+            id,
+            value,
             valueType: CustomDataValueType.STRING,
           },
           logger
@@ -147,13 +163,13 @@ const customDataLogic = async (
         await customCommandsBroadcastsDb.requests.customData.updateEntry(
           customCommandsBroadcastsDbPath,
           {
-            id: args[0],
-            value: entry.value + args[1],
+            id,
+            value: entry.value + value,
             valueType: CustomDataValueType.STRING,
           },
           logger
         );
-        return entry.value + args[1];
+        return entry.value + value;
       }
     case CustomDataLogicOperator.ADD_NUMBER:
     case CustomDataLogicOperator.REMOVE_NUMBER:
@@ -161,15 +177,16 @@ const customDataLogic = async (
         await customCommandsBroadcastsDb.requests.customData.createEntry(
           customCommandsBroadcastsDbPath,
           {
-            id: args[0],
-            value: CustomDataLogicOperator.ADD_NUMBER
-              ? parseFloat(args[1])
-              : -parseFloat(args[1]),
+            id,
+            value:
+              operator === CustomDataLogicOperator.ADD_NUMBER
+                ? numberValue
+                : -numberValue,
             valueType: CustomDataValueType.NUMBER,
           },
           logger
         );
-        return args[1];
+        return value;
       } else if (typeof entry.value !== "number") {
         throw Error(
           `Plugin entry value was not a number ('${content.trim()}'/'${JSON.stringify(
@@ -179,15 +196,15 @@ const customDataLogic = async (
       } else {
         const newValue =
           entry.value +
-          (CustomDataLogicOperator.ADD_NUMBER
-            ? parseFloat(args[1])
-            : -parseFloat(args[1]));
+          (operator === CustomDataLogicOperator.ADD_NUMBER
+            ? numberValue
+            : -numberValue);
         await customCommandsBroadcastsDb.requests.customData.updateEntry(
           customCommandsBroadcastsDbPath,
           {
-            id: args[0],
+            id,
             value: newValue,
-            valueType: CustomDataValueType.STRING,
+            valueType: CustomDataValueType.NUMBER,
           },
           logger
         );
@@ -199,19 +216,19 @@ const customDataLogic = async (
         await customCommandsBroadcastsDb.requests.customData.createEntry(
           customCommandsBroadcastsDbPath,
           {
-            id: args[0],
+            id,
             value:
               operator === CustomDataLogicOperator.GET_OR_SET
-                ? args[1]
-                : parseFloat(args[1]),
+                ? value
+                : numberValue,
             valueType:
-              operator === CustomDataLogicOperator.GET_OR_SET_NUMBER
+              operator === CustomDataLogicOperator.GET_OR_SET
                 ? CustomDataValueType.STRING
                 : CustomDataValueType.NUMBER,
           },
           logger
         );
-        return args[1];
+        return value;
       } else if (entry === undefined) {
         throw Error(`Plugin entry was undefined ('${content.trim()}')`);
       }
@@ -221,11 +238,8 @@ const customDataLogic = async (
       await customCommandsBroadcastsDb.requests.customData.createEntry(
         customCommandsBroadcastsDbPath,
         {
-          id: args[0],
-          value:
-            operator === CustomDataLogicOperator.SET
-              ? args[1]
-              : parseFloat(args[1]),
+          id,
+          value: operator === CustomDataLogicOperator.SET ? value : numberValue,
           valueType:
             operator === CustomDataLogicOperator.SET
               ? CustomDataValueType.STRING
@@ -233,7 +247,7 @@ const customDataLogic = async (
         },
         logger
       );
-      return args[1];
+      return value;
   }
 };
 

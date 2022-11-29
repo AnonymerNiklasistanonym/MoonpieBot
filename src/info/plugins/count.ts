@@ -10,12 +10,7 @@ export interface PluginCountData {
 export const pluginCountGenerator: MessageParserPluginGenerator<PluginCountData> =
   {
     description: "Get the amount of times the custom command was called",
-    generate: (data) => (_, regexGroupIndex) => {
-      if (regexGroupIndex === undefined || regexGroupIndex.length === 0) {
-        throw Error("Regex group index was undefined or empty");
-      }
-      return `${data.count}`;
-    },
+    generate: (data) => () => `${data.count + 1}`,
     id: pluginCountId,
     signature: {
       type: "signature",

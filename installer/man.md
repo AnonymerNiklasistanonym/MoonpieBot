@@ -124,15 +124,15 @@ Supported list values: "*commands*", "*last_request*", "*np*", "*permit_request*
 
 - "*commands*": "*!osu commands*" (everyone) - List all enabled commands
 - "*last_request*": "*!osuLastRequest[ lastRequestCount:=NUMBERS]*" (mod) - Resend the last request (or requests if a custom count is provided) in case of a osu! client restart
-- "*np*": "*!np*" (everyone) - Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
-- "*permit_request*": "*!osuPermitRequest*" (mod) - Permit the last blocked map request
+- "*np*": "*!np*" (everyone) - Get a link to the currently selected map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])
+- "*permit_request*": "*!osuPermitRequest*" (mod) - Permit last blocked request
 - "*pp*": "*!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]*" (everyone) - Get general account information (pp, rank, country, ...) of the account or of the given osu! player
 - "*requests*": "*osuBeatmapUrl[ comment]*" (everyone) - Request a beatmap requests using an osu! URL and optional comment
-- "*requests*": "*!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]*" (get=everyone on/off=mod) - Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message
+- "*requests*": "*!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]*" (get=everyone on/off=mod) - Get if beatmap requests are currently enabled and with which demands if there are any, Turn beatmap requests on or off with an optional message
 - "*requests*": "*!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)*" (mod) - Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
 - "*requests*": "*!osuRequests unset option:=TEXT*" (mod) - Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
 - "*rp*": "*!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]*" (everyone) - Get the most recent play of the account or of the given osu! player
-- "*score*": "*!score osuUserName:=('TEXT'/TEXT)*" (everyone) - Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
+- "*score*": "*!score osuUserName:=('TEXT'/TEXT)*" (everyone) - Get the top score of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 
 **MOONPIE_CONFIG_OSU_API_CLIENT_ID**
 : The osu! client ID (and client secret) to use the osu! API v2. To get it go to your account settings, Click 'New OAuth application' and add a custom name and URL (https://osu.ppy.sh/home/account/edit#oauth). After doing that you can copy the client ID (and client secret).

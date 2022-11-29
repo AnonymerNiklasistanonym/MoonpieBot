@@ -78,7 +78,7 @@ export const getChatCommandsOsu: GetChatCommand<OsuCommands> = (id) => {
         command: regexOsuChatHandlerCommandLastRequest,
         description:
           "Resend the last request (or requests if a custom count is provided) in case of a osu! client restart",
-        descriptionShort: "Resend the last request",
+        descriptionShort: "Resend last request",
         id,
         permission: ChatCommandPermission.MOD,
       });
@@ -87,8 +87,8 @@ export const getChatCommandsOsu: GetChatCommand<OsuCommands> = (id) => {
       chatCommands.push({
         command: regexOsuChatHandlerCommandNp,
         description:
-          "Get a link to the currently being played map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])",
-        descriptionShort: "Get the beatmap that is now playing",
+          "Get a link to the currently selected map (if an optional StreamCompanion URL/directory path is provided this information will be used to get the current map information, otherwise the osu! window text will be used and searched for using the given osu! credentials [very slow and only works if the map is being played plus no detailed runtime information like mods and not all map information will be correct especially if it's not a ranked map])",
+        descriptionShort: "Get current beatmap",
         id,
         permission: ChatCommandPermission.EVERYONE,
       });
@@ -96,7 +96,7 @@ export const getChatCommandsOsu: GetChatCommand<OsuCommands> = (id) => {
     case OsuCommands.PERMIT_REQUEST:
       chatCommands.push({
         command: regexOsuChatHandlerCommandPermitRequest,
-        description: "Permit the last blocked map request",
+        description: "Permit last blocked request",
         id,
         permission: ChatCommandPermission.MOD,
       });
@@ -124,8 +124,8 @@ export const getChatCommandsOsu: GetChatCommand<OsuCommands> = (id) => {
     case OsuCommands.SCORE:
       chatCommands.push({
         command: regexOsuChatHandlerCommandScore,
-        description: `Get the top sore of the given osu! player on the most recently mentioned map in chat (from a beatmap request, ${OsuCommands.RP}, ${OsuCommands.NP})`,
-        descriptionShort: "Get the top sore on the most recently mentioned map",
+        description: `Get the top score of the given osu! player on the most recently mentioned map in chat (from a beatmap request, ${OsuCommands.RP}, ${OsuCommands.NP})`,
+        descriptionShort: "Get top score of last mentioned beatmap",
         id,
         permission: ChatCommandPermission.EVERYONE,
       });
@@ -143,7 +143,7 @@ export const getChatCommandsOsu: GetChatCommand<OsuCommands> = (id) => {
         {
           command: regexOsuChatHandlerCommandRequests,
           description:
-            "Get if map requests are currently enabled and with which demands if there are any, Turn map requests on or off with an optional message",
+            "Get if beatmap requests are currently enabled and with which demands if there are any, Turn beatmap requests on or off with an optional message",
           descriptionShort: "Get/Toggle beatmap requests",
           id,
           permission: `get=${ChatCommandPermission.EVERYONE} on/off=${ChatCommandPermission.MOD}`,
@@ -162,7 +162,7 @@ export const getChatCommandsOsu: GetChatCommand<OsuCommands> = (id) => {
           description: `Reset beatmap request demands/options (${Object.values(
             OsuRequestsConfig
           ).join(", ")}) back to their default value`,
-          descriptionShort: "Reset beatmap request demands",
+          descriptionShort: "Reset beatmap demands",
           id,
           permission: ChatCommandPermission.MOD,
         }

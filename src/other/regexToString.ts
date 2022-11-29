@@ -240,25 +240,6 @@ export const convertRegexToHumanStringDetailed = (
   regex: DeepReadonly<RegExp>
 ): string => {
   const result = convertRegexToHumanReadableStringHelper(regex.source, false);
-  // eslint-disable-next-line no-console
-  console.log(
-    "Default:",
-    result.elements.map((a) => convertToStringNew(a)).join("")
-  );
-  // eslint-disable-next-line no-console
-  console.log(
-    "Human:",
-    result.elements
-      .map((a) => convertToStringNew(a, regexConvertOptionsHuman))
-      .join("")
-  );
-  // eslint-disable-next-line no-console
-  console.log(
-    "Human (Detailed):",
-    result.elements
-      .map((a) => convertToStringNew(a, regexConvertOptionsHumanDetailed))
-      .join("")
-  );
   return result.elements
     .map((a) => convertToStringNew(a, regexConvertOptionsHumanDetailed))
     .join("")
@@ -415,3 +396,12 @@ export const convertToStringNew = (
       return finalContent;
   }
 };
+
+/**
+ * Escape string for a RegEx expression.
+ *
+ * @param str String that should be escaped.
+ * @returns Escaped string.
+ */
+export const escapeRegExp = (str: string): string =>
+  str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
