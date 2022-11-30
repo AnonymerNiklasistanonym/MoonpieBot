@@ -1,11 +1,5 @@
 # MoonpieBot
 
-## TODO
-
-- Fix !osu requests command to set an acutal boolean if map requests are enabled or not instead of checking empty messages which is weird
-- Check each feature if it works
-- Double check regex expressions that can take a string with whitespaces
-
 [![github release](https://img.shields.io/github/release/AnonymerNiklasistanonym/MoonpieBot.svg?label=current+release)](https://github.com/AnonymerNiklasistanonym/MoonpieBot/releases)
 [![CI](https://github.com/AnonymerNiklasistanonym/MoonpieBot/actions/workflows/nodejs.yml/badge.svg)](https://github.com/AnonymerNiklasistanonym/MoonpieBot/actions/workflows/nodejs.yml)
 ![](./coverage.svg)
@@ -34,6 +28,7 @@ A custom Twitch chat bot.
   - [Example > Geo (Only osu! beatmap requests and !rp/!pp/!score)](#example--geo-only-osu-beatmap-requests-and-rpppscore)
 - [Inspect Database](#inspect-database)
 - [Development](#development)
+  - [Debugging](#debugging)
   - [Tests](#tests)
   - [Configuration files](#configuration-files)
   - [How to handle versions](#how-to-handle-versions)
@@ -791,14 +786,25 @@ To inspect the SQLite database manually and edit it or run custom queries (for e
 
 ## Development
 
-- The entry point of the app is `src/index.ts`
-- A `.env` file should be created which is used for environment variables in the local dev environment
-- `npm run dev` - start the app in development mode (it reads the local .env file)
-- `npm run test:dev` - run tests locally (reads local .env)
-- `npm run lint` - run eslint
-- `npm run format` - run prettier
-- `npm run build:dev` - build typescript with source maps and comments in code are kept
-- `npm run mocha` - a helper npm script for running customised mocha command e.g. test a single file `npm run mocha -- file-name-or-pattern`
+- The entry point is `src/index.ts`
+- The main method is `src/index.ts`
+
+- `npm run build:dev`: will do the same as `npm run build` but with for example source maps
+- `npm run dev`: will do the same as `npm run build:dev; npm run start` and will redo these steps any time a source code change is detected
+- `npm run test`: run tests
+- `npm run mocha -- path/to/file.test.ts-or-pattern`: run only a custom test suite instead of all of them
+- `npm run lint-fix`: lint source code files for errors and style errors (fixes some of them automatically)
+- `npm run format-fix`: format source code files for style errors (fixes some of them automatically)
+
+### Debugging
+
+The bot can be debugged using [Visual Studio Code](https://code.visualstudio.com/) (**there are open source versions with no Microsoft telemetry!**):
+
+- Go to the `Debug` screen (`Ctrl` + `Shift` + `D`)
+- Select *Debug Moonpiebot*
+- Click run (`F5`)
+
+You can now catch uncaught exceptions or break on any line by setting breakpoints in the TypeScript source files (or the compiled JavaScript files).
 
 ### Tests
 

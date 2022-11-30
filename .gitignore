@@ -184,7 +184,9 @@ docs
 test.json
 
 # IDE files
-.vscode
+.vscode/*.json
+!.vscode/launch.json
+!.vscode/tasks.json
 
 # Binary builds
 bin
