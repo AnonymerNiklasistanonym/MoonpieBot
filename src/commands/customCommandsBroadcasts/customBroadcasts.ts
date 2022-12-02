@@ -35,7 +35,7 @@ import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
 import { macroCustomBroadcastInfo } from "../../info/macros/customBroadcast";
 import { macroCustomCommandBroadcastInfoEdit } from "../../info/macros/customCommands";
-import { parseRegexStringArgument } from "../helper";
+import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -143,11 +143,13 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        customBroadcastCronString: parseRegexStringArgument(
+        customBroadcastCronString: removeWhitespaceEscapeChatCommand(
           matchGroups.cronString
         ),
-        customBroadcastId: parseRegexStringArgument(matchGroups.id),
-        customBroadcastMessage: parseRegexStringArgument(matchGroups.message),
+        customBroadcastId: removeWhitespaceEscapeChatCommand(matchGroups.id),
+        customBroadcastMessage: removeWhitespaceEscapeChatCommand(
+          matchGroups.message
+        ),
       },
     };
   },
@@ -226,7 +228,7 @@ export const commandDelCB: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        customBroadcastId: parseRegexStringArgument(matchGroups.id),
+        customBroadcastId: removeWhitespaceEscapeChatCommand(matchGroups.id),
       },
     };
   },
@@ -368,7 +370,7 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
     if ("id" in matchGroups && matchGroups.id !== undefined) {
       return {
         data: {
-          customBroadcastId: parseRegexStringArgument(matchGroups.id),
+          customBroadcastId: removeWhitespaceEscapeChatCommand(matchGroups.id),
         },
       };
     }
@@ -491,9 +493,9 @@ export const commandEditCB: ChatMessageHandlerReplyCreator<
       }
       return {
         data: {
-          customBroadcastId: parseRegexStringArgument(matchGroups.id),
+          customBroadcastId: removeWhitespaceEscapeChatCommand(matchGroups.id),
           customBroadcastOption: matchGroups.option,
-          customBroadcastOptionValue: parseRegexStringArgument(
+          customBroadcastOptionValue: removeWhitespaceEscapeChatCommand(
             matchGroups.optionValue
           ),
         },

@@ -4,55 +4,56 @@
 import path from "path";
 // Local imports
 import {
-  createPkgbuildFile,
-  mergeUndefSingleArrayToArray,
+  createPkgbuild,
   PkgbuildCmdsSection,
   referencePCV,
   referencePV,
-} from "./pkgbuild";
+} from "./lib/pkgbuild";
 import { description, name, sourceCodeUrl } from "../src/info/general";
+import { convertUndefValueToArray } from "../src/other/arrayOperations";
+import { createJob } from "../src/createJob";
 import { getVersionString } from "../src/version";
 import { version } from "../src/info/version";
 // Type imports
-import type { PkgbuildCustomVariable, PkgbuildInfo } from "./pkgbuild";
+import type { PkgbuildCustomVariable, PkgbuildInfo } from "./lib/pkgbuild";
 
-export const defaultPCVApplicationName: PkgbuildCustomVariable = {
+const defaultPCVApplicationName: PkgbuildCustomVariable = {
   name: "applicationname",
   note: "The name of the application that is built by this package",
   value: name.toLowerCase(),
 };
-export const defaultPCVGitName: PkgbuildCustomVariable = {
+const defaultPCVGitName: PkgbuildCustomVariable = {
   name: "gitname",
   note: "The name of the cloned git directory of the application",
   value: `${referencePCV(defaultPCVApplicationName)}.git`,
 };
-export const defaultPCVInstallDir: PkgbuildCustomVariable = {
+const defaultPCVInstallDir: PkgbuildCustomVariable = {
   name: "installdir",
   note: "The install directory of the application",
   value: `/opt/${referencePCV(defaultPCVApplicationName)}`,
 };
-export const defaultPCVInstallDirBin: PkgbuildCustomVariable = {
+const defaultPCVInstallDirBin: PkgbuildCustomVariable = {
   name: "installdirbin",
   note: "The install directory for the global binaries",
   value: "/usr/bin",
 };
-export const defaultPCVInstallDirDesktop: PkgbuildCustomVariable = {
+const defaultPCVInstallDirDesktop: PkgbuildCustomVariable = {
   name: "installdirdesktop",
   note: "The install directory for the .desktop files",
   value: "/usr/share/applications",
 };
-export const defaultPCVInstallDirMan: PkgbuildCustomVariable = {
+const defaultPCVInstallDirMan: PkgbuildCustomVariable = {
   name: "installdirman",
   note: "The install directory for the man pages",
   value: "/usr/share/man/man1",
 };
-export const defaultPCVConfigDir: PkgbuildCustomVariable = {
+const defaultPCVConfigDir: PkgbuildCustomVariable = {
   name: "defaultconfigdir",
   note: "The install directory for the man pages",
   value: `$HOME/.local/share/${referencePCV(defaultPCVApplicationName)}`,
 };
 
-export const packageCmdsGenerator = (
+const packageCmdsGenerator = (
   packageType: "source" | "bin" = "source"
 ): PkgbuildCmdsSection[] => {
   const packageCmds: PkgbuildCmdsSection[] = [];
@@ -175,7 +176,7 @@ export const packageCmdsGenerator = (
   return packageCmds;
 };
 
-export const pkgbuildInfo: PkgbuildInfo = {
+const pkgbuildInfo: PkgbuildInfo = {
   arch: "x86_64",
   buildCmds: [
     {
@@ -262,15 +263,15 @@ export const pkgbuildInfo: PkgbuildInfo = {
   url: sourceCodeUrl,
 };
 
-export const pkgbuildBinInfoDownloadUrl = `${referencePV(
+const pkgbuildBinInfoDownloadUrl = `${referencePV(
   "url"
 )}/releases/download/v${referencePV("pkgver")}/`;
 
-export const pkgbuildBinInfo: PkgbuildInfo = {
+const pkgbuildBinInfo: PkgbuildInfo = {
   ...pkgbuildInfo,
   buildCmds: undefined,
   buildCmdsNote: undefined,
-  customVariables: mergeUndefSingleArrayToArray(
+  customVariables: convertUndefValueToArray(
     pkgbuildInfo.customVariables
   ).filter((a) => a.name !== defaultPCVGitName.name),
   depends: undefined,
@@ -307,7 +308,7 @@ export const pkgbuildBinInfo: PkgbuildInfo = {
   ],
 };
 
-export const pkgbuildGitInfo: PkgbuildInfo = {
+const pkgbuildGitInfo: PkgbuildInfo = {
   ...pkgbuildInfo,
   pkgname: `${referencePCV(defaultPCVApplicationName)}-git`,
   pkgverCmds: [
@@ -337,7 +338,6 @@ export const pkgbuildGitInfo: PkgbuildInfo = {
 const INSTALLER_DIR = path.join(__dirname, "..", "installer");
 const fileNamePkgbuild = "PKGBUILD";
 
-/** The output file path of the PKGBUILD to create. */
 const filePathOutputPkgbuild = path.join(INSTALLER_DIR, fileNamePkgbuild);
 /** The output file path of the PKGBUILD for the binary files to create. */
 const filePathOutputPkgbuildBin = path.join(
@@ -352,12 +352,16 @@ const filePathOutputPkgbuildGit = path.join(
 
 // -----------------------------------------------------------------------------
 
-console.log(`Create PKGBUILD file '${filePathOutputPkgbuild}'...`);
-console.log(`Create PKGBUILD file '${filePathOutputPkgbuildBin}'...`);
-console.log(`Create PKGBUILD file '${filePathOutputPkgbuildGit}'...`);
-
 Promise.all([
-  createPkgbuildFile(filePathOutputPkgbuild, pkgbuildInfo),
-  createPkgbuildFile(filePathOutputPkgbuildBin, pkgbuildBinInfo),
-  createPkgbuildFile(filePathOutputPkgbuildGit, pkgbuildGitInfo),
+  createJob("PKGBUILD", filePathOutputPkgbuild, createPkgbuild(pkgbuildInfo)),
+  createJob(
+    "PKGBUILD_BIN",
+    filePathOutputPkgbuildBin,
+    createPkgbuild(pkgbuildBinInfo)
+  ),
+  createJob(
+    "PKGBUILD_GIT",
+    filePathOutputPkgbuildGit,
+    createPkgbuild(pkgbuildGitInfo)
+  ),
 ]).catch(console.error);

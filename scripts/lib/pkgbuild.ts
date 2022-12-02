@@ -1,5 +1,10 @@
-// Package imports
-import { promises as fs } from "fs";
+// Local imports
+import {
+  convertUndefValueToArray,
+  convertValueToArray,
+} from "../../src/other/arrayOperations";
+// Type imports
+import type { OrArray } from "../../src/other/types";
 
 export interface PkgbuildMaintainer {
   email: string;
@@ -51,52 +56,32 @@ export interface PkgbuildInfo {
   url: string;
 }
 
-export const mergeSingleArrayToArray = <TYPE extends object | string>(
-  value: TYPE | TYPE[]
-): TYPE[] => {
-  if (Array.isArray(value)) {
-    return value;
-  }
-  return [value];
-};
-
-export const mergeUndefSingleArrayToArray = <TYPE extends object | string>(
-  value?: TYPE | TYPE[]
-): TYPE[] => {
-  if (value === undefined) {
-    return [];
-  }
-  return mergeSingleArrayToArray(value);
-};
-
-export const createPkgbuildArray = (
-  value?: string | string[],
+const createPkgbuildArray = (
+  value?: OrArray<string>,
   split = " ",
   literalValues = false
 ): string => {
-  return `(${mergeUndefSingleArrayToArray(value)
+  return `(${convertUndefValueToArray(value)
     .map((a) => createPkgValue(a, literalValues))
     .join(split)})`;
 };
 
-export const createPkgbuildComment = (value?: string | string[]): string => {
-  return `${mergeUndefSingleArrayToArray(value)
+const createPkgbuildComment = (value?: OrArray<string>): string => {
+  return `${convertUndefValueToArray(value)
     .map((a) => `# ${a}\n`)
     .join("")}`;
 };
 
-export const createPkgbuildCmdsSection = (
-  value: PkgbuildCmdsSection
-): string => {
+const createPkgbuildCmdsSection = (value: PkgbuildCmdsSection): string => {
   let outputString = "";
-  for (const note of mergeUndefSingleArrayToArray(value.note)) {
+  for (const note of convertUndefValueToArray(value.note)) {
     outputString += `  # ${note}\n`;
   }
   outputString += value.cmds.map((a) => `  ${a}\n`).join("");
   return outputString;
 };
 
-export const createPkgValue = (
+const createPkgValue = (
   value: string | number,
   literalValue = false
 ): string => {
@@ -110,7 +95,7 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
   let outputString = "";
   // Maintainer
   if (info.maintainer !== undefined) {
-    const maintainers = mergeSingleArrayToArray(info.maintainer);
+    const maintainers = convertValueToArray(info.maintainer);
     if (maintainers.length > 0) {
       outputString += createPkgbuildComment(
         `Maintainer: ${maintainers
@@ -120,7 +105,7 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
     }
   }
   // Custom variables
-  const customVariables = mergeUndefSingleArrayToArray(info.customVariables);
+  const customVariables = convertUndefValueToArray(info.customVariables);
   if (customVariables.length > 0) {
     outputString += outputString.length > 0 ? "\n" : "";
     outputString += createPkgbuildComment("Custom variables:");
@@ -148,7 +133,7 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
   // Sources and their sha1sums
   const sources: string[] = [];
   const sourcesSha1sums: string[] = [];
-  for (const source of mergeSingleArrayToArray(info.source)) {
+  for (const source of convertValueToArray(info.source)) {
     sources.push(source.name);
     sourcesSha1sums.push(
       source.sha1sum !== undefined ? source.sha1sum : "SKIP"
@@ -171,7 +156,7 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
     outputString += "\n";
     outputString += createPkgbuildComment(info.pkgverCmdsNote);
     outputString += "pkgver() {\n";
-    outputString += mergeSingleArrayToArray(info.pkgverCmds)
+    outputString += convertValueToArray(info.pkgverCmds)
       .map(createPkgbuildCmdsSection)
       .join("\n");
     outputString += "}\n";
@@ -180,7 +165,7 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
     outputString += "\n";
     outputString += createPkgbuildComment(info.buildCmdsNote);
     outputString += "build() {\n";
-    outputString += mergeSingleArrayToArray(info.buildCmds)
+    outputString += convertValueToArray(info.buildCmds)
       .map(createPkgbuildCmdsSection)
       .join("\n");
     outputString += "}\n";
@@ -189,7 +174,7 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
     outputString += "\n";
     outputString += createPkgbuildComment(info.packageCmdsNote);
     outputString += "package() {\n";
-    outputString += mergeSingleArrayToArray(info.packageCmds)
+    outputString += convertValueToArray(info.packageCmds)
       .map(createPkgbuildCmdsSection)
       .join("\n");
     outputString += "}\n";
@@ -201,12 +186,3 @@ export const referencePV = (variable: string): string => `$${variable}`;
 
 export const referencePCV = (customVariable: PkgbuildCustomVariable): string =>
   referencePV(`_${customVariable.name}`);
-
-export const createPkgbuildFile = async (
-  outputPath: string,
-  info: PkgbuildInfo
-): Promise<void> => {
-  const outputString = createPkgbuild(info);
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(outputPath, outputString);
-};

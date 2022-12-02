@@ -196,11 +196,8 @@ export const getEntries = async (
   if (runResult) {
     return runResult.map((a) => ({
       ...a,
-      description: a.description !== null ? a.description : undefined,
-      timestampLastExecution:
-        a.timestampLastExecution !== null
-          ? a.timestampLastExecution
-          : undefined,
+      description: a.description || undefined,
+      timestampLastExecution: a.timestampLastExecution || undefined,
       userLevel: convertTwitchBadgeStringToLevel(a.userLevel),
     }));
   }
@@ -271,12 +268,8 @@ export const getEntry = async (
   if (runResult) {
     return {
       ...runResult,
-      description:
-        runResult.description !== null ? runResult.description : undefined,
-      timestampLastExecution:
-        runResult.timestampLastExecution !== null
-          ? runResult.timestampLastExecution
-          : undefined,
+      description: runResult.description || undefined,
+      timestampLastExecution: runResult.timestampLastExecution || undefined,
       userLevel: convertTwitchBadgeStringToLevel(runResult.userLevel),
     };
   }

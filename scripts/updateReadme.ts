@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 
 // Package imports
-import { promises as fs } from "fs";
 import path from "path";
 // Local imports
 import { binaryName, defaultConfigDir } from "../src/info/general";
@@ -20,38 +19,21 @@ import {
 import { CliOption } from "../src/info/cli";
 import { convertRegexToHumanStringDetailed } from "../src/other/regexToString";
 import { createConsoleLogger } from "../src/logging";
+import { createJobUpdate } from "../src/createJob";
 import { fileNameEnv } from "../src/info/files";
 import { getFeatures } from "../src/info/features";
+import { getMdComment } from "./lib/markdown";
 import { getMoonpieConfigFromEnv } from "../src/info/config/moonpieConfig";
 import { OsuCommands } from "../src/info/chatCommands";
 // Type imports
-import { DeepReadonly } from "../src/other/types";
-import { Features } from "../src/info/features";
-
-/** Describes how a Markdown comment looks like. */
-const mdCommentInfo = Object.freeze({
-  begin: "[//]: # (",
-  end: ")",
-});
+import type { DeepReadonly } from "../src/other/types";
+import type { Features } from "../src/info/features";
 
 /** Describes how a Markdown comment text that should be recognized looks like. */
 const mdCommentText = Object.freeze({
   begin: "BEGIN:",
   end: "END",
 });
-
-/**
- * @param line The current markdown input string.
- * @returns The markdown comment string if a comment was found, otherwise undefined.
- */
-const getMdComment = (line: string): undefined | string =>
-  line.startsWith(mdCommentInfo.begin) &&
-  line.trimEnd().endsWith(mdCommentInfo.end)
-    ? line.substring(
-        mdCommentInfo.begin.length,
-        line.trimEnd().length - mdCommentInfo.end.length
-      )
-    : undefined;
 
 /** A list of all supported comment instructions. */
 enum CommentInstructionType {
@@ -174,15 +156,12 @@ const createCommentContent = async (
   return output;
 };
 
-const updateReadmeFile = async (mdFilePath: string) => {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const readmeFileLines = await fs.readFile(mdFilePath);
-
+const updateReadmeFile = async (mdFile: Buffer): Promise<string> => {
   let output = "";
   let lookForEnd = false;
   let mdComment: string | undefined;
   let lastMdComment: string | undefined;
-  for (const line of readmeFileLines.toString().split("\n")) {
+  for (const line of mdFile.toString().split("\n")) {
     // If not looking for end add the line
     if (lookForEnd === false) {
       output += `${line}\n`;
@@ -205,19 +184,18 @@ const updateReadmeFile = async (mdFilePath: string) => {
       continue;
     }
     // If looking for end and the comment starts with a end add it and end search
-    if (lookForEnd === true && mdComment === mdCommentText.end) {
+    if (lookForEnd && mdComment === mdCommentText.end) {
       output += `${line}\n`;
       lookForEnd = false;
     }
   }
 
   // Sanity check in case there is no end before updating the document
-  if (lookForEnd === true && lastMdComment !== undefined) {
+  if (lookForEnd && lastMdComment !== undefined) {
     throw Error(`Found no end of '${lastMdComment}'`);
   }
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(mdFilePath, `${output.trimEnd()}\n`);
+  return `${output.trimEnd()}\n`;
 };
 
 // -----------------------------------------------------------------------------
@@ -370,12 +348,9 @@ const createListEnvEntry = (envVarName: string): string => {
   if (info === undefined) {
     throw Error(`Unable to find env entry '${envVarName}'`);
   }
-  const supportedValues =
-    info.supportedValues !== undefined
-      ? info.supportedValues.values.map((a) =>
-          typeof a === "string" ? a : a.id
-        )
-      : undefined;
+  const supportedValues = info.supportedValues?.values.map((a) =>
+    typeof a === "string" ? a : a.id
+  );
   return `- [${info.required === true ? "x" : " "}] ${
     info.description
   }\n\n    ${
@@ -389,9 +364,7 @@ const createListEnvEntry = (envVarName: string): string => {
       ? typeof info.default === "string"
         ? info.default
         : info.default(path.join(__dirname, ".."))
-      : info.example !== undefined
-      ? info.example
-      : "TODO"
+      : info.example || "TODO"
   }\`${
     supportedValues !== undefined
       ? `\n\n    Supported values: ${supportedValues
@@ -457,5 +430,13 @@ const createTableEnableCommands = (envVarName: string): string => {
 
 const filePathReadme = path.join(__dirname, "..", "README.md");
 
-console.log(`Update README file '${filePathReadme}'...`);
-updateReadmeFile(filePathReadme).catch(console.error);
+// -----------------------------------------------------------------------------
+
+Promise.all([
+  createJobUpdate(
+    "README",
+    ["comment content"],
+    filePathReadme,
+    updateReadmeFile
+  ),
+]).catch(console.error);

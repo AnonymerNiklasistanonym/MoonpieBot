@@ -2,11 +2,12 @@
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
 import type { ExportedMacroInformation, MacroMap, RequestHelp } from "./macros";
+import type { OrArray, OrPromise } from "../other/types";
 import type { Logger } from "winston";
 import type { ParseTreeNodeErrorCode } from "./errors";
 
 export interface PluginSignature {
-  argument?: string | string[];
+  argument?: OrArray<string>;
   exportedMacros?: ExportedMacroInformation[];
   scope?: string;
   type: "signature";
@@ -33,13 +34,7 @@ export type PluginFunc = (
    * Return the plugin signature if available.
    */
   signature?: boolean
-) =>
-  | Promise<MacroMap | string | boolean | RequestHelp | PluginSignature>
-  | MacroMap
-  | string
-  | boolean
-  | RequestHelp
-  | PluginSignature;
+) => OrPromise<MacroMap | string | boolean | RequestHelp | PluginSignature>;
 export type PluginMap = Map<string, PluginFunc>;
 
 export interface MessageParserPluginExample {

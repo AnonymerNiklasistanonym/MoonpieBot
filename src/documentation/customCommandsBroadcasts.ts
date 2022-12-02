@@ -1,5 +1,3 @@
-// Package imports
-import { promises as fs } from "fs";
 // Local imports
 import { convertTwitchBadgeLevelToString, TwitchBadgeLevel } from "../twitch";
 import {
@@ -51,9 +49,7 @@ const addCustomBroadcastStringBuilder = (
     surroundCharacter: "'",
   })}`;
 
-export const createCustomCommandsBroadcastsDocumentation = async (
-  path: string
-): Promise<void> => {
+export const createCustomCommandsBroadcastsDocumentation = (): string => {
   const data: FileDocumentationParts[] = [];
   data.push({
     text:
@@ -193,6 +189,5 @@ export const createCustomCommandsBroadcastsDocumentation = async (
     });
   }
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(path, fileDocumentationGenerator(data));
+  return fileDocumentationGenerator(data);
 };

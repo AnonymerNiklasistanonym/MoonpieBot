@@ -1,5 +1,7 @@
 // Local imports
 import { splitTextAtLength } from "../other/splitTextAtLength";
+// Type imports
+import type { OrArray } from "../other/types";
 
 export enum FileDocumentationPartType {
   /** Add a headline with a description. */
@@ -25,7 +27,7 @@ export interface FileDocumentationPartText
   /** Optional prefix for the text. */
   prefix?: string;
   /** The text content. If an array is provided the text will not be split. */
-  text: string | string[];
+  text: OrArray<string>;
 }
 /** Add a headline with a description. */
 export interface FileDocumentationPartHeading
@@ -44,7 +46,7 @@ export interface FileDocumentationPartValue
    */
   isComment?: boolean;
   /** Optional value title. */
-  title?: string | string[];
+  title?: OrArray<string>;
   /** Optional value to document. */
   value?: string;
 }
@@ -59,7 +61,7 @@ export interface FileDocumentationPartValueDescription {
   /** Optional additional information. */
   infos?: string[];
   /** Optional additional information lists. */
-  lists?: [string, (string | string[])[]][];
+  lists?: [string, OrArray<string>[]][];
   /** The prefix for the description. */
   prefix: string;
   /** The value description. */

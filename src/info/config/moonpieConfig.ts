@@ -117,7 +117,7 @@ export interface MoonpieConfigCustomData {
   resetDatabaseFilePaths?: boolean;
 }
 
-export const getDatabasePath = (
+const getDatabasePath = (
   envVariable: EnvVariable,
   configDir: string,
   customData?: MoonpieConfigCustomData

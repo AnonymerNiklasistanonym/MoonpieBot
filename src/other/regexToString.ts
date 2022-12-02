@@ -232,7 +232,7 @@ export const convertRegexToHumanString = (
 ): string => {
   const result = convertRegexToHumanReadableStringHelper(regex.source, false);
   return result.elements
-    .map((a) => convertToStringNew(a, regexConvertOptionsHuman))
+    .map((a) => convertToString(a, regexConvertOptionsHuman))
     .join("")
     .trim();
 };
@@ -241,7 +241,7 @@ export const convertRegexToHumanStringDetailed = (
 ): string => {
   const result = convertRegexToHumanReadableStringHelper(regex.source, false);
   return result.elements
-    .map((a) => convertToStringNew(a, regexConvertOptionsHumanDetailed))
+    .map((a) => convertToString(a, regexConvertOptionsHumanDetailed))
     .join("")
     .trim();
 };
@@ -274,7 +274,7 @@ const regexConvertOptionsHuman: Readonly<RegexConvertToStringOptions> = {
   renderOnlyGroupName: true,
 };
 
-export const convertToStringNew = (
+const convertToString = (
   element: SimpleRegexElements,
   options: RegexConvertToStringOptions = {}
 ): string => {
@@ -353,11 +353,9 @@ export const convertToStringNew = (
       if (options.renderEmptyGroupCases !== false) {
         return `(${element.notCaptured ? "?:" : ""}${
           element.name ? `?<${element.name}>` : ""
-        }${element.content
-          .map((a) => convertToStringNew(a, options))
-          .join("")}${element.modifier ? element.modifier : ""}${
-          element.optional ? "?" : ""
-        })`;
+        }${element.content.map((a) => convertToString(a, options)).join("")}${
+          element.modifier ? element.modifier : ""
+        }${element.optional ? "?" : ""})`;
       }
       // eslint-disable-next-line no-case-declarations
       const groupElements = splitArrayAtElement(
@@ -366,7 +364,7 @@ export const convertToStringNew = (
       );
       // eslint-disable-next-line no-case-declarations
       const groupElementsFiltered = groupElements
-        .map((a) => a.map((b) => convertToStringNew(b, options)).join(""))
+        .map((a) => a.map((b) => convertToString(b, options)).join(""))
         .filter((c) => c.trim().length > 0);
       if (groupElementsFiltered.length !== groupElements.length) {
         element.optional = true;

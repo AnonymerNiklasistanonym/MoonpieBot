@@ -43,7 +43,7 @@ import {
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
-import { parseRegexStringArgument } from "../helper";
+import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -156,9 +156,13 @@ export const commandAddCC: ChatMessageHandlerReplyCreator<
           matchGroups.cooldownInS !== undefined
             ? parseInt(matchGroups.cooldownInS)
             : undefined,
-        customCommandId: parseRegexStringArgument(matchGroups.id),
-        customCommandMessage: parseRegexStringArgument(matchGroups.message),
-        customCommandRegex: parseRegexStringArgument(matchGroups.regex),
+        customCommandId: removeWhitespaceEscapeChatCommand(matchGroups.id),
+        customCommandMessage: removeWhitespaceEscapeChatCommand(
+          matchGroups.message
+        ),
+        customCommandRegex: removeWhitespaceEscapeChatCommand(
+          matchGroups.regex
+        ),
         customCommandUserLevel:
           matchGroups.userLevel !== undefined
             ? convertTwitchBadgeStringToLevel(matchGroups.userLevel)
@@ -241,7 +245,7 @@ export const commandDelCC: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        customCommandId: parseRegexStringArgument(matchGroups.id),
+        customCommandId: removeWhitespaceEscapeChatCommand(matchGroups.id),
       },
     };
   },
@@ -383,7 +387,7 @@ export const commandListCCs: ChatMessageHandlerReplyCreator<
     if ("id" in matchGroups && matchGroups.id !== undefined) {
       return {
         data: {
-          customCommandId: parseRegexStringArgument(matchGroups.id),
+          customCommandId: removeWhitespaceEscapeChatCommand(matchGroups.id),
         },
       };
     }
@@ -518,9 +522,9 @@ export const commandEditCC: ChatMessageHandlerReplyCreator<
       }
       return {
         data: {
-          customCommandId: parseRegexStringArgument(matchGroups.id),
+          customCommandId: removeWhitespaceEscapeChatCommand(matchGroups.id),
           customCommandOption: matchGroups.option,
-          customCommandOptionValue: parseRegexStringArgument(
+          customCommandOptionValue: removeWhitespaceEscapeChatCommand(
             matchGroups.optionValue
           ),
         },

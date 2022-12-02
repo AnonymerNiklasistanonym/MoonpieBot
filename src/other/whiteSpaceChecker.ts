@@ -1,12 +1,12 @@
-export const hasWhiteSpace = (str: string): boolean => /\s/g.test(str);
+const hasWhiteSpace = (str: string): boolean => /\s/g.test(str);
 
 export interface EscapeStringIfWhiteSpaceOptions {
-  escapeCharacters?: [string | RegExp, string][];
+  escapeCharacters?: Readonly<[string | Readonly<RegExp>, string][]>;
   surroundCharacter: string;
 }
 export const escapeStringIfWhiteSpace = (
-  str: string,
-  options: EscapeStringIfWhiteSpaceOptions = {
+  str: Readonly<string>,
+  options: Readonly<EscapeStringIfWhiteSpaceOptions> = {
     escapeCharacters: [
       ["\\", "\\\\"],
       // eslint-disable-next-line @typescript-eslint/quotes

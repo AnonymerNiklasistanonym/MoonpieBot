@@ -6,23 +6,22 @@ import {
   defaultConfigDir,
   name,
   sourceCodeUrl,
-} from "../src/info/general";
+} from "../../src/info/general";
 import {
   fileNameCustomCommandsBroadcastsExample,
   fileNameEnvExample,
   fileNameEnvStringsExample,
-} from "../src/info/files";
-import { CliOption } from "../src/info/cli";
-import { getVersionString } from "../src/version";
-import { version } from "../src/info/version";
+} from "../../src/info/files";
+import { CliOption } from "../../src/info/cli";
+import { getVersionString } from "../../src/version";
+import { version } from "../../src/info/version";
 
-export const createWindowsInstallerConfigFile = async (
-  outputPath: string,
+export const createWindowsInstallerConfigFileContent = (
   fileNameScriptMain: string,
   fileNameScriptMainCustomDir: string,
   fileNameScriptBackup: string,
   fileNameScriptImport: string
-): Promise<void> => {
+): string => {
   let outputString = "";
   outputString += ";Define name and lowercase name of the product\n";
   outputString += `!define PRODUCT "${name}"\n`;
@@ -43,8 +42,7 @@ export const createWindowsInstallerConfigFile = async (
   outputString += `!define FILE_NAME_ENV_STRINGS_EXAMPLE "${fileNameEnvStringsExample}"\n`;
   outputString += `!define FILE_NAME_CUSTOM_COMMANDS_BROADCASTS_EXAMPLE "${fileNameCustomCommandsBroadcastsExample}"\n`;
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(outputPath, outputString);
+  return outputString;
 };
 
 const batchExitProgram = "exit 0";
@@ -75,10 +73,9 @@ const batchSelectFolderDialog = async (
   return outputString;
 };
 
-export const createWindowsInstallerScriptFileMain = async (
-  outputPath: string,
+export const createWindowsInstallerScriptFileContentMain = async (
   powershellSelectDirectoryScriptPath?: string
-): Promise<void> => {
+): Promise<string> => {
   let outputString = "";
   const selectedCustomDirVarName = "SelectedCustomDir";
   if (powershellSelectDirectoryScriptPath !== undefined) {
@@ -98,15 +95,12 @@ export const createWindowsInstallerScriptFileMain = async (
   }" %*\n`;
   outputString += `${batchHideCommands}\n`;
   outputString += `${batchWaitForKeypress}\n`;
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(outputPath, outputString);
+  return outputString;
 };
 
-export const createWindowsInstallerScriptFileBackup = async (
-  outputPath: string,
+export const createWindowsInstallerScriptFileContentBackup = async (
   powershellSelectDirectoryScriptPath: string
-): Promise<void> => {
+): Promise<string> => {
   let outputString = "";
   outputString += `${batchHideCommands}\n`;
   const selectedBackupDirVarName = "SelectedBackupDir";
@@ -124,15 +118,12 @@ export const createWindowsInstallerScriptFileBackup = async (
   } "%${selectedBackupDirVarName}%" %*\n`;
   outputString += `${batchHideCommands}\n`;
   outputString += `${batchWaitForKeypress}\n`;
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(outputPath, outputString);
+  return outputString;
 };
 
-export const createWindowsInstallerScriptFileImport = async (
-  outputPath: string,
+export const createWindowsInstallerScriptFileContentImport = async (
   powershellSelectDirectoryScriptPath: string
-): Promise<void> => {
+): Promise<string> => {
   let outputString = "";
   outputString += `${batchHideCommands}\n`;
   const selectedBackupDirVarName = "SelectedBackupDir";
@@ -150,7 +141,5 @@ export const createWindowsInstallerScriptFileImport = async (
   } "%${selectedBackupDirVarName}%" %*\n`;
   outputString += `${batchHideCommands}\n`;
   outputString += `${batchWaitForKeypress}\n`;
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(outputPath, outputString);
+  return outputString;
 };

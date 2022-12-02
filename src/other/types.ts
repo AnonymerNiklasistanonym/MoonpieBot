@@ -32,3 +32,13 @@ export type EMPTY_OBJECT = Record<never, never>;
  * (Source: https://github.com/microsoft/TypeScript/issues/10725#issuecomment-699193070).
  */
 export type DeepReadonly<T> = { readonly [K in keyof T]: DeepReadonly<T[K]> };
+
+/**
+ * Type that represents the input type or the input type in a promise.
+ */
+export type OrPromise<TYPE> = TYPE | Promise<TYPE>;
+
+/**
+ * Type that represents the input type or the input type as an array.
+ */
+export type OrArray<TYPE> = TYPE | TYPE[];

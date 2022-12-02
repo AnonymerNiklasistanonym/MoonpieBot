@@ -23,6 +23,7 @@ import type {
   PluginMap,
 } from "../messageParser";
 import type { Logger } from "winston";
+import type { OrArray } from "../other/types";
 import type { StringMap } from "../messageParser";
 
 const documentPlugin = async (
@@ -32,7 +33,7 @@ const documentPlugin = async (
   macros: MacroMap,
   logger: Logger
 ): Promise<FileDocumentationPartValue> => {
-  const pluginExampleList: [string, (string | string[])[]][] = [];
+  const pluginExampleList: [string, OrArray<string>[]][] = [];
   if (plugin.examples !== undefined) {
     const pluginListExamples: string[][] = [];
     for (const pluginExample of plugin.examples) {
@@ -87,7 +88,7 @@ const documentPlugin = async (
     description: {
       lists: pluginExampleList,
       prefix: ">",
-      text: plugin.description !== undefined ? plugin.description : "TODO",
+      text: plugin.description || "TODO",
     },
     title: [
       await createPluginSignature(
@@ -108,7 +109,7 @@ const documentMacro = async (
   macros: MacroMap,
   logger: Logger
 ): Promise<FileDocumentationPartValue> => {
-  const macroAdditionalLists: [string, (string | string[])[]][] = [];
+  const macroAdditionalLists: [string, OrArray<string>[]][] = [];
   let macroListKeysTitle = "Keys";
   const macroListKeys: string[][] = [];
   if ("values" in macro) {

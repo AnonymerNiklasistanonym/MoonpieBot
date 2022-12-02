@@ -27,6 +27,7 @@ export const setup = async (
     databasePath,
     [customCommandsTable, customDataTable, customBroadcastsTable],
     [],
+    [],
     versionCurrent,
     {
       migrateVersion: (oldVersion, currentVersion) => {

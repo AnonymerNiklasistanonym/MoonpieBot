@@ -152,7 +152,7 @@ export const getEntries = async (
   if (runResult) {
     return runResult.map((a) => ({
       ...a,
-      description: a.description !== null ? a.description : undefined,
+      description: a.description || undefined,
     }));
   }
   throw Error(CustomCommandsBroadcastsDbError.NOT_FOUND);

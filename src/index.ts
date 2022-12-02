@@ -9,7 +9,6 @@
 
 // Package imports
 import dotenv from "dotenv";
-import { promises as fs } from "fs";
 import path from "path";
 // Local imports
 import { binaryName, name, usages } from "./info/general";
@@ -20,6 +19,7 @@ import {
   createEnvVariableDocumentation,
   printEnvVariablesToConsole,
 } from "./env";
+import { createJob, createJobDirectory } from "./createJob";
 import { defaultMacros, defaultMacrosOptional } from "./info/macros";
 import { defaultPlugins, defaultPluginsOptional } from "./info/plugins";
 import { ENV_PREFIX, envVariableInformation } from "./info/env";
@@ -90,22 +90,17 @@ const entryPoint = async () => {
       process.exit(0);
     }
     if ("createExampleFiles" in cliOptions && cliOptions.createExampleFiles) {
-      const exampleFilesDir = cliOptions.exampleFilesDir
-        ? cliOptions.exampleFilesDir
-        : configDir;
-      console.log(`Create example files in '${exampleFilesDir}'...`);
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.mkdir(exampleFilesDir, { recursive: true });
+      const exampleFilesDir = cliOptions.exampleFilesDir || configDir;
       await Promise.all([
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        await fs.writeFile(
+        createJob(
+          ".env example",
           path.join(exampleFilesDir, fileNameEnvExample),
           createEnvVariableDocumentation(configDir)
         ),
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        await fs.writeFile(
+        createJob(
+          ".env.strings example",
           path.join(exampleFilesDir, fileNameEnvStringsExample),
-          await createStringsVariableDocumentation(
+          createStringsVariableDocumentation(
             defaultStringMap,
             defaultPlugins,
             defaultMacros,
@@ -114,8 +109,10 @@ const entryPoint = async () => {
             createConsoleLogger(name, "off")
           )
         ),
-        createCustomCommandsBroadcastsDocumentation(
-          path.join(exampleFilesDir, fileNameCustomCommandsBroadcastsExample)
+        createJob(
+          "Custom Commands/Broadcasts example",
+          path.join(exampleFilesDir, fileNameCustomCommandsBroadcastsExample),
+          createCustomCommandsBroadcastsDocumentation()
         ),
       ]);
       process.exit(0);
@@ -140,8 +137,7 @@ const entryPoint = async () => {
     if ("customConfigDir" in cliOptions && cliOptions.customConfigDir) {
       configDir = cliOptions.customConfigDir;
       // Create config directory if it doesn't exist
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.mkdir(configDir, { recursive: true });
+      await createJobDirectory("config dir", configDir, { silent: true });
     }
     dotenv.config({
       path: path.join(configDir, fileNameEnv),
@@ -185,7 +181,7 @@ const entryPoint = async () => {
     if ("exportData" in cliOptions && cliOptions.exportData !== undefined) {
       for (const exportData of cliOptions.exportData) {
         let data;
-        switch (exportData.type.toUpperCase()) {
+        switch (exportData.type.toLowerCase()) {
           case ExportDataTypes.CUSTOM_COMMANDS_BROADCASTS:
             data = await exportDataCustomCommandsBroadcasts(
               configDir,
@@ -205,20 +201,20 @@ const entryPoint = async () => {
             data = await exportDataOsuRequests(configDir, exportData.json);
             break;
           default:
-            throw Error(`Unknown export data type '${exportData.type}'`);
+            throw Error(
+              `Unknown export data type '${
+                exportData.type
+              }' (supported: ${Object.values(ExportDataTypes).join(", ")})`
+            );
         }
         if (exportData.outputFile) {
-          console.log(
-            `Export data '${exportData.type}'${
-              exportData.json ? " in JSON format" : ""
-            } to '${exportData.outputFile}'...`
+          await createJob(
+            `export data '${exportData.type}'${
+              exportData.json ? " (JSON)" : ""
+            }`,
+            exportData.outputFile,
+            data
           );
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          await fs.mkdir(path.dirname(exportData.outputFile), {
-            recursive: true,
-          });
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          await fs.writeFile(exportData.outputFile, data);
         } else {
           console.log(data);
         }

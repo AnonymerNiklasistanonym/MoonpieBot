@@ -163,8 +163,7 @@ export const getEntry = async (
     const valueType = convertCustomDataValueTypeStringToValueType(
       runResult.valueType
     );
-    const description =
-      runResult.description !== null ? runResult.description : undefined;
+    const description = runResult.description || undefined;
     switch (valueType) {
       case CustomDataValueType.NUMBER:
         return {

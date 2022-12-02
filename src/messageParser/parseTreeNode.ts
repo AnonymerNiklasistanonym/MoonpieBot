@@ -116,22 +116,27 @@ export const parseTreeNode = async (
       const pluginValue = treeNode.pluginValue;
       // eslint-disable-next-line no-case-declarations
       let pluginValueString;
-      try {
-        pluginValueString = pluginValue
-          ? await parseTreeNode(pluginValue, plugins, macros, logger)
-          : undefined;
-      } catch (err) {
-        // For debugging log all parse tree node levels
-        logMessageParser.error(
-          Error(
-            `Parse tree node '${
-              treeNode.type
-            }' could not produce plugin value string ('${
-              treeNode.originalString
-            }',${(err as Error).message}`
-          )
-        );
-        throw err;
+      if (pluginValue) {
+        try {
+          pluginValueString = await parseTreeNode(
+            pluginValue,
+            plugins,
+            macros,
+            logger
+          );
+        } catch (err) {
+          // For debugging log all parse tree node levels
+          logMessageParser.error(
+            Error(
+              `Parse tree node '${
+                treeNode.type
+              }' could not produce plugin value string ('${
+                treeNode.originalString
+              }',${(err as Error).message}`
+            )
+          );
+          throw err;
+        }
       }
       // eslint-disable-next-line no-case-declarations
       let pluginOutput;

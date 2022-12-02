@@ -5,7 +5,7 @@ import { PluginTwitchChat } from "../plugins/twitchChat";
 // Type imports
 import type { StringEntry } from "../../messageParser";
 
-export const GENERAL_STRING_ID = "GENERAL";
+const GENERAL_STRING_ID = "GENERAL";
 
 export const generalUserPermissionError: StringEntry = {
   default: createMessageParserMessage([

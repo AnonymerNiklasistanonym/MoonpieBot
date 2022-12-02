@@ -13,5 +13,5 @@ export const genericStringSorter = (
 export const genericFilterNonUniqueStrings = (
   value: string,
   index: number,
-  self: string[]
+  self: Readonly<string[]>
 ): boolean => index === self.indexOf(value);

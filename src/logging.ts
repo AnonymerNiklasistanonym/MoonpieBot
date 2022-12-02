@@ -136,22 +136,3 @@ export const createLogFunc = (
     warn: baseLogFunc(LoggerLevel.WARN),
   };
 };
-
-/**
- * Helper method for consistent and helpful type guard check warnings.
- *
- * @param expectedMessage The type guard message about what is weird.
- * @param value The value that is currently being checked.
- * @param property The name of the property that is being checked.
- * @param index The index of the property that is being checked in an array.
- * @returns String that contains information about the property and what is bad plus its actual value and how it looks like.
- */
-export const typeGuardLog = <T>(
-  expectedMessage: string,
-  value: T,
-  property?: string,
-  index?: number
-): string =>
-  `${
-    property ? `'${property}'${index !== undefined ? `[${index}]` : ""}: ` : ""
-  }expected ${expectedMessage} ('${typeof value}'/'${JSON.stringify(value)}')`;

@@ -2,24 +2,30 @@
 import db, { SqliteTable, SqliteView } from "sqlite3-promise-query-api";
 // Local imports
 import * as versionRequests from "./version/requests";
+import { compareVersions, getVersionString } from "../../version";
 import { createLogFunc } from "../../logging";
 import { createLogMethod } from "../logging";
-import { getVersionString } from "../../version";
 import { versionTable } from "../../info/databases/genericVersionDb";
 // Type imports
-import { DbVersionInfo } from "../../info/databases/genericVersionDb";
+import type { DbVersionInfo } from "../../info/databases/genericVersionDb";
 import type { Logger } from "winston";
+import type { OrPromise } from "../../other/types";
+import type { SqliteIndex } from "sqlite3-promise-query-api/lib/helper";
 
-// TODO Make the setup step a generic method
+export interface MigrateDatabaseInformation {
+  name: string;
+  relatedVersion: DbVersionInfo;
+  type: "added" | "updated" | "fixed" | "removed";
+}
 
 export interface SetupDatabaseOptions {
   /** Handle database version migrations. */
   migrateVersion?: (
-    oldVersion: DbVersionInfo | undefined,
+    oldVersion: DbVersionInfo,
     currentVersion: DbVersionInfo
-  ) => void | Promise<void>;
+  ) => OrPromise<MigrateDatabaseInformation[]>;
   /** Setup initial data when the database is created. */
-  setupInitialData?: () => void | Promise<void>;
+  setupInitialData?: () => OrPromise<string[]>;
 }
 
 /**
@@ -29,6 +35,7 @@ export interface SetupDatabaseOptions {
  * @param databasePath Path to database.
  * @param tables Tables to set up.
  * @param views Views to set up.
+ * @param indices Indices to set up.
  * @param currentVersion The current version of the database.
  * @param options Other (optional) setup options.
  * @param logger Logger (for global logs).
@@ -37,6 +44,7 @@ export const genericSetupDatabase = async (
   databasePath: string,
   tables: SqliteTable[],
   views: SqliteView[],
+  indices: SqliteIndex[],
   currentVersion: DbVersionInfo,
   options: SetupDatabaseOptions | undefined,
   logger: Logger
@@ -84,37 +92,48 @@ export const genericSetupDatabase = async (
       );
     }
 
+    // Setup database indices
+    for (const index of indices) {
+      // > Create view if not existing
+      await db.requests.post(
+        databasePath,
+        db.queries.createIndex(
+          index.name,
+          index.tableName,
+          index.columns,
+          true,
+          index.where
+        ),
+        undefined,
+        logMethod
+      );
+    }
+
     // Insert initial data
     await versionRequests.createEntry(databasePath, currentVersion, logger);
     if (options?.setupInitialData !== undefined) {
-      await options.setupInitialData();
+      const initialDataInfo = await options.setupInitialData();
+      loggerDatabase.info(
+        `Added initial data to database '${databasePath}' (${initialDataInfo.join(
+          ", "
+        )})`
+      );
     }
   }
 
   // Check for migrations
   const versions = await versionRequests.getEntries(databasePath, logger);
   if (versions.length === 0) {
-    loggerDatabase.info(
-      `Database '${databasePath}' had no version (current: '${getVersionString(
-        currentVersion
-      )}')`
+    throw Error(
+      `Database '${databasePath}' had no version, please check the database!`
     );
-    if (options?.migrateVersion !== undefined) {
-      await options.migrateVersion(undefined, currentVersion);
-    }
-    // Add current version if no version is found
-    await versionRequests.createEntry(databasePath, currentVersion, logger);
   } else if (versions.length > 1) {
     throw Error(
       `Database '${databasePath}' had multiple versions, please check the database! (${versions
         .map((a) => getVersionString(a, ""))
         .join(",")})`
     );
-  } else if (
-    versions[0].major !== currentVersion.major ||
-    versions[0].minor !== currentVersion.minor ||
-    versions[0].patch !== currentVersion.patch
-  ) {
+  } else if (compareVersions(versions[0], currentVersion) !== 0) {
     loggerDatabase.info(
       `Database '${databasePath}' version is different from the current version: ${getVersionString(
         versions[0],
@@ -122,7 +141,18 @@ export const genericSetupDatabase = async (
       )} (current='${getVersionString(currentVersion, "")}')`
     );
     if (options?.migrateVersion !== undefined) {
-      await options?.migrateVersion(versions[0], currentVersion);
+      const migrateInfo = await options?.migrateVersion(
+        versions[0],
+        currentVersion
+      );
+      for (const migrateInfoPart of migrateInfo) {
+        loggerDatabase.info(
+          `Migrated database '${databasePath}' to ${getVersionString(
+            migrateInfoPart.relatedVersion,
+            ""
+          )}: ${migrateInfoPart.type} ${migrateInfoPart.name}`
+        );
+      }
     }
     // Then replace the old version with the current version
     await versionRequests.removeEntry(databasePath, versions[0], logger);

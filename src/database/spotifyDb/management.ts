@@ -22,6 +22,7 @@ export const setup = async (
     databasePath,
     [spotifyConfigTable],
     [],
+    [],
     versionCurrent,
     {
       migrateVersion: (oldVersion, currentVersion) => {

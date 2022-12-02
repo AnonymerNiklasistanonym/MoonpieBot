@@ -1,12 +1,12 @@
 // Type imports
-import type { DeepReadonly, EMPTY_OBJECT } from "./other/types";
+import type { DeepReadonly, EMPTY_OBJECT, OrPromise } from "./other/types";
 import type { ChatCommand } from "./chatCommand";
 import type { Logger } from "winston";
 
 export type GetFeatures<T, CONFIG extends EMPTY_OBJECT = EMPTY_OBJECT> = (
   config: CONFIG,
   logger: Logger
-) => DeepReadonly<T> | Promise<DeepReadonly<T>>;
+) => OrPromise<DeepReadonly<T>>;
 
 export interface FeatureInfo<
   FEATURE_ENUM = string,

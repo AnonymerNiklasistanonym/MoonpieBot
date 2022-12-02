@@ -4,12 +4,13 @@
 import path from "path";
 // Local imports
 import {
-  createWindowsInstallerConfigFile,
-  createWindowsInstallerScriptFileBackup,
-  createWindowsInstallerScriptFileImport,
-  createWindowsInstallerScriptFileMain,
-} from "./windowsInstaller";
-import { name } from "../src/info/general";
+  createWindowsInstallerConfigFileContent,
+  createWindowsInstallerScriptFileContentBackup,
+  createWindowsInstallerScriptFileContentImport,
+  createWindowsInstallerScriptFileContentMain,
+} from "./lib/windowsInstaller";
+import { binaryName } from "../src/info/general";
+import { createJob } from "../src/createJob";
 
 const WINDOWS_INSTALLER_DIR = path.join(
   __dirname,
@@ -19,68 +20,71 @@ const WINDOWS_INSTALLER_DIR = path.join(
 );
 
 /** The output file path of the windows installer config to create. */
-export const filePathOutputWindowsInstallerConfig = path.join(
+const filePathOutputWindowsInstallerConfig = path.join(
   WINDOWS_INSTALLER_DIR,
   "windows_installer_config.nsi"
 );
-export const filePathWindowsScriptGlobalMain = path.join(
+const filePathWindowsScriptGlobalMain = path.join(
   WINDOWS_INSTALLER_DIR,
-  `${name.toLowerCase()}.bat`
+  `${binaryName}.bat`
 );
-export const filePathWindowsScriptGlobalMainCustomDir = path.join(
+const filePathWindowsScriptGlobalMainCustomDir = path.join(
   WINDOWS_INSTALLER_DIR,
-  `${name.toLowerCase()}_custom_dir.bat`
+  `${binaryName}_custom_dir.bat`
 );
-export const filePathWindowsScriptGlobalBackup = path.join(
+const filePathWindowsScriptGlobalBackup = path.join(
   WINDOWS_INSTALLER_DIR,
-  `${name.toLowerCase()}_backup.bat`
+  `${binaryName}_backup.bat`
 );
-export const filePathWindowsScriptGlobalImport = path.join(
+const filePathWindowsScriptGlobalImport = path.join(
   WINDOWS_INSTALLER_DIR,
-  `${name.toLowerCase()}_import.bat`
+  `${binaryName}_import.bat`
 );
-export const filePathPowershellScriptSelectDirectory = path.join(
+const filePathPowershellScriptSelectDirectory = path.join(
   WINDOWS_INSTALLER_DIR,
   "select_directory.ps1"
 );
 
 // -----------------------------------------------------------------------------
 
-console.log(
-  `Create Windows installer config file '${filePathOutputWindowsInstallerConfig}'...`
-);
-console.log(
-  `Create Windows script file main '${filePathWindowsScriptGlobalMain}'...`
-);
-console.log(
-  `Create Windows script file backup '${filePathWindowsScriptGlobalBackup}'...`
-);
-console.log(
-  `Create Windows script file import '${filePathWindowsScriptGlobalImport}'...`
-);
-
 Promise.all([
-  createWindowsInstallerConfigFile(
+  createJob(
+    "Windows installer config",
     filePathOutputWindowsInstallerConfig,
-    path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalMain),
-    path.relative(
-      WINDOWS_INSTALLER_DIR,
-      filePathWindowsScriptGlobalMainCustomDir
-    ),
-    path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalBackup),
-    path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalImport)
+    createWindowsInstallerConfigFileContent(
+      path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalMain),
+      path.relative(
+        WINDOWS_INSTALLER_DIR,
+        filePathWindowsScriptGlobalMainCustomDir
+      ),
+      path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalBackup),
+      path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalImport)
+    )
   ),
-  createWindowsInstallerScriptFileMain(filePathWindowsScriptGlobalMain),
-  createWindowsInstallerScriptFileMain(
+  createJob(
+    "Windows batch script",
+    filePathWindowsScriptGlobalMain,
+    createWindowsInstallerScriptFileContentMain()
+  ),
+  createJob(
+    "Windows batch script with custom directory",
     filePathWindowsScriptGlobalMainCustomDir,
-    filePathPowershellScriptSelectDirectory
+    createWindowsInstallerScriptFileContentMain(
+      filePathPowershellScriptSelectDirectory
+    )
   ),
-  createWindowsInstallerScriptFileBackup(
+  createJob(
+    "Windows batch script backup",
     filePathWindowsScriptGlobalBackup,
-    filePathPowershellScriptSelectDirectory
+    createWindowsInstallerScriptFileContentBackup(
+      filePathPowershellScriptSelectDirectory
+    )
   ),
-  createWindowsInstallerScriptFileImport(
+  createJob(
+    "Windows batch script import",
     filePathWindowsScriptGlobalImport,
-    filePathPowershellScriptSelectDirectory
+    createWindowsInstallerScriptFileContentImport(
+      filePathPowershellScriptSelectDirectory
+    )
   ),
 ]).catch(console.error);

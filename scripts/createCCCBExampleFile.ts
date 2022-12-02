@@ -4,6 +4,7 @@
 import path from "path";
 // Local imports
 import { createCustomCommandsBroadcastsDocumentation } from "../src/documentation/customCommandsBroadcasts";
+import { createJob } from "../src/createJob";
 import { fileNameCustomCommandsBroadcastsExample } from "../src/info/files";
 
 // The "config dir" is the root of the repository
@@ -21,5 +22,9 @@ console.log(
 );
 
 Promise.all([
-  createCustomCommandsBroadcastsDocumentation(ccCbExampleFile),
+  createJob(
+    "Custom Commands/Broadcasts example",
+    ccCbExampleFile,
+    createCustomCommandsBroadcastsDocumentation()
+  ),
 ]).catch(console.error);

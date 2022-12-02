@@ -1,6 +1,6 @@
 % MoonpieBot(1) moonpiebot 1.0.31b
 % AnonymerNiklasistanonym
-% November 2022
+% December 2022
 
 # NAME
 
@@ -84,7 +84,7 @@ Example: "*twitch_channel_name1,twitch_channel_name2*"
 Example: "*twitch_account_name*"
 
 **MOONPIE_CONFIG_TWITCH_OAUTH_TOKEN**
-: A Twitch OAuth token (get it from: https://twitchapps.com/tmi/) of the Twitch account specified in MOONPIE_CONFIG_TWITCH_NAME.
+: A Twitch OAuth token (get it from: https://twitchapps.com/tmi/) of the Twitch account specified in **MOONPIE_CONFIG_TWITCH_NAME**.
 Example: "*oauth:abcdefghijklmnop*"
 
 **MOONPIE_CONFIG_TWITCH_DEBUG**="*OFF*"
@@ -139,7 +139,7 @@ Supported list values: "*commands*", "*last_request*", "*np*", "*permit_request*
 Example: "*1234*"
 
 **MOONPIE_CONFIG_OSU_API_CLIENT_SECRET**
-: Check the description of MOONPIE_CONFIG_OSU_API_CLIENT_ID.
+: Check the description of **MOONPIE_CONFIG_OSU_API_CLIENT_ID**.
 Example: "*dadasfsafsafdsadffasfsafasfa*"
 
 **MOONPIE_CONFIG_OSU_API_DEFAULT_ID**
@@ -150,12 +150,12 @@ Example: "*1185432*"
 : The database file path that contains the persistent osu! (beatmap) requests configuration.
 
 **MOONPIE_CONFIG_OSU_API_REQUESTS_DETAILED**
-: If beatmap requests are enabled (MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=requests) additionally output more detailed information about the map in the chat. This can also be set at runtime (!osuRequests set option optionValue) and stored persistently in a database (MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH) but if provided will override the current value in the database on start of the bot.
+: If beatmap requests are enabled (**MOONPIE_CONFIG_OSU_ENABLE_COMMANDS**=requests) additionally output more detailed information about the map in the chat. This can also be set at runtime (!osuRequests set option optionValue) and stored persistently in a database (**MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH**) but if provided will override the current value in the database on start of the bot.
 Example: "*ON*"
 Supported values: "*OFF*", "*ON*"
 
 **MOONPIE_CONFIG_OSU_API_REQUESTS_REDEEM_ID**
-: If beatmap requests are enabled (MOONPIE_CONFIG_OSU_ENABLE_COMMANDS=requests) make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime (!osuRequests set option optionValue) and stored persistently in a database (MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH) but if provided will override the current value in the database on start of the bot.
+: If beatmap requests are enabled (**MOONPIE_CONFIG_OSU_ENABLE_COMMANDS**=requests) make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime (!osuRequests set option optionValue) and stored persistently in a database (**MOONPIE_CONFIG_OSU_API_REQUESTS_CONFIG_DATABASE_PATH**) but if provided will override the current value in the database on start of the bot.
 Example: "*651f5474-07c2-4406-9e59-37d66fd34069*"
 
 **MOONPIE_CONFIG_OSU_IRC_PASSWORD**
@@ -163,7 +163,7 @@ Example: "*651f5474-07c2-4406-9e59-37d66fd34069*"
 Example: "*senderServerPassword*"
 
 **MOONPIE_CONFIG_OSU_IRC_USERNAME**
-: Check the description of MOONPIE_CONFIG_OSU_IRC_PASSWORD.
+: Check the description of **MOONPIE_CONFIG_OSU_IRC_PASSWORD**.
 Example: "*senderUserName*"
 
 **MOONPIE_CONFIG_OSU_IRC_REQUEST_TARGET**
@@ -171,11 +171,11 @@ Example: "*senderUserName*"
 Example: "*receiverUserName*"
 
 **MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL**
-: osu! StreamCompanion URL (websocket interface) to use a running StreamCompanion instance to get the currently being played beatmap, used mods and more (Providing a value will ignore MOONPIE_CONFIG_OSU_STREAM_COMPANION_DIR_PATH). Many users have problem with the websocket interface but the file interface worked for everyone so far.
+: osu! StreamCompanion URL (websocket interface) to use a running StreamCompanion instance to get the currently being played beatmap, used mods and more (Providing a value will ignore **MOONPIE_CONFIG_OSU_STREAM_COMPANION_DIR_PATH**). Many users have problem with the websocket interface but the file interface worked for everyone so far.
 Example: "*localhost:20727*"
 
 **MOONPIE_CONFIG_OSU_STREAM_COMPANION_DIR_PATH**
-: osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance to always get the currently being played beatmap, used mods and more (This is ignored if MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL is also provided). To configure the StreamCompanion output and for example update certain values like the download link even when not playing a map you need to open StreamCompanion. Go to the section 'Output Patterns' and then edit the used rows (like 'np_all') to change the format. You can also change the 'Save event' of a row like for the current mods or download link so both will be live updated even if no song is played.
+: osu! StreamCompanion directory (file interface) path to use a running StreamCompanion instance to always get the currently being played beatmap, used mods and more (This is ignored if **MOONPIE_CONFIG_OSU_STREAM_COMPANION_URL** is also provided). To configure the StreamCompanion output and for example update certain values like the download link even when not playing a map you need to open StreamCompanion. Go to the section 'Output Patterns' and then edit the used rows (like 'np_all') to change the format. You can also change the 'Save event' of a row like for the current mods or download link so both will be live updated even if no song is played.
 Example: "*C:\Program Files (x86)\StreamCompanion\Files*"
 
 **MOONPIE_CONFIG_SPOTIFY_ENABLE_COMMANDS**="*commands,song*"
@@ -193,11 +193,11 @@ Supported list values: "*commands*", "*song*" (empty list value: "*none*")
 Example: "*abcdefghijklmnop*"
 
 **MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET**
-: Check the description of MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID.
+: Check the description of **MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID**.
 Example: "*abcdefghijklmnop*"
 
 **MOONPIE_CONFIG_SPOTIFY_API_REFRESH_TOKEN**
-: Providing this token is not necessary but optional. You can get this token by authenticating once successfully using the MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID and MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET. This will be done automatically by this program if both values are provided (the browser window will open after starting). After a successful authentication via this website the refresh token can be copied from there but since it will be automatically stored in a database this variable does not need to be provided. If a value is found it is automatically written into the database and does not need to be provided after that.
+: Providing this token is not necessary but optional. You can get this token by authenticating once successfully using the **MOONPIE_CONFIG_SPOTIFY_API_CLIENT_ID** and **MOONPIE_CONFIG_SPOTIFY_API_CLIENT_SECRET**. This will be done automatically by this program if both values are provided (the browser window will open after starting). After a successful authentication via this website the refresh token can be copied from there but since it will be automatically stored in a database this variable does not need to be provided. If a value is found it is automatically written into the database and does not need to be provided after that.
 Example: "*abcdefghijklmnop*"
 
 **MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN**
@@ -205,7 +205,7 @@ Example: "*abcdefghijklmnop*"
 Example: "*abcdefghijklmnop*"
 
 **MOONPIE_CONFIG_TWITCH_API_CLIENT_ID**
-: Check the description of MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN.
+: Check the description of **MOONPIE_CONFIG_TWITCH_API_ACCESS_TOKEN**.
 Example: "*abcdefghijklmnop*"
 
 # BUGS

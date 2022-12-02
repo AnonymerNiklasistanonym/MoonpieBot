@@ -19,6 +19,7 @@ import { fileNameEnv, fileNameEnvExample } from "./files";
 import { convertRegexToHumanString } from "../other/regexToString";
 import { LoggerLevel } from "../logging";
 import { OsuCommands } from "./chatCommands";
+import { REDIRECT_URI } from "../spotify";
 import { regexOsuChatHandlerCommandRequestsSet } from "./regex";
 import { SpotifyCommands } from "./chatCommands";
 // Type imports
@@ -405,8 +406,7 @@ export const envVariableInformation: CliEnvVariableInformation<
   {
     block: EnvVariableBlock.SPOTIFY_API,
     censor: true,
-    description:
-      "Provide client id/secret to enable Spotify API calls or Spotify commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application - give the application the name 'MoonpieBot' and add the redirect URI 'http://localhost:9727' by clicking the button 'edit settings' after clicking on the application entry in the dashboard). At the first start a browser window will open where you need to successfully authenticate once.",
+    description: `Provide client id/secret to enable Spotify API calls or Spotify commands (get them by using https://developer.spotify.com/dashboard/applications and creating an application - give the application the name 'MoonpieBot' and add the redirect URI '${REDIRECT_URI}' by clicking the button 'edit settings' after clicking on the application entry in the dashboard). At the first start a browser window will open where you need to successfully authenticate once.`,
     example: "abcdefghijklmnop",
     name: EnvVariable.SPOTIFY_API_CLIENT_ID,
   },

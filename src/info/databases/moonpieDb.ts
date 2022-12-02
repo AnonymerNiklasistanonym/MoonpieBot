@@ -1,7 +1,11 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Type imports
-import type { SqliteTable, SqliteView } from "sqlite3-promise-query-api";
+import type {
+  SqliteIndex,
+  SqliteTable,
+  SqliteView,
+} from "sqlite3-promise-query-api";
 
 /**
  * The SQLite table for moonpies.
@@ -94,10 +98,16 @@ export const moonpieLeaderboardView: SqliteView<
   tableName: moonpieTable.name,
 };
 
+export const moonpieCountIndex: SqliteIndex = {
+  columns: [moonpieTable.columns.moonpieCount.name],
+  name: "index_moonpie_count",
+  tableName: moonpieTable.name,
+};
+
 export const versionCurrent = {
   major: 0,
   minor: 0,
-  patch: 1,
+  patch: 2,
 };
 
 /** Errors that can happen during requests. */

@@ -1,7 +1,7 @@
 export enum ExportDataTypes {
-  CUSTOM_COMMANDS_BROADCASTS = "CUSTOM_COMMANDS_BROADCASTS",
-  ENV = "ENV",
-  ENV_STRINGS = "ENV_STRINGS",
-  MOONPIE = "MOONPIE",
-  OSU_REQUESTS_CONFIG = "OSU_REQUESTS_CONFIG",
+  CUSTOM_COMMANDS_BROADCASTS = "custom_commands_broadcasts",
+  ENV = "env",
+  ENV_STRINGS = "env_strings",
+  MOONPIE = "moonpie",
+  OSU_REQUESTS_CONFIG = "osu_requests_config",
 }

@@ -6,6 +6,7 @@ import { promises as fs } from "fs";
 import path from "path";
 // Local imports
 import { author, description, license, name } from "../src/info/general";
+import { createJobUpdate } from "../src/createJob";
 import { version } from "../src/info/version";
 
 const filePathRootDir = path.join(__dirname, "..");
@@ -15,10 +16,9 @@ const filePathExeIcon = path.join(
   "icons",
   "moonpiebot.ico"
 );
-const filePathExe = path.join(filePathRootDir, "bin", "moonpiebot.exe");
 
-const updateWindowsExeMetadata = async (windowsExePath: string) => {
-  const exe = ResEdit.NtExecutable.from(await fs.readFile(windowsExePath));
+const updateWindowsExeMetadata = async (windowsExeFile: Buffer) => {
+  const exe = ResEdit.NtExecutable.from(windowsExeFile);
   const res = ResEdit.NtExecutableResource.from(exe);
   const iconFile = ResEdit.Data.IconFile.from(
     await fs.readFile(filePathExeIcon)
@@ -58,8 +58,20 @@ const updateWindowsExeMetadata = async (windowsExePath: string) => {
   );
   vi.outputToResourceEntries(res.entries);
   res.outputResource(exe);
-  await fs.writeFile(windowsExePath, Buffer.from(exe.generate()));
+  return Buffer.from(exe.generate());
 };
 
-console.log(`Update Windows .exe binary file '${filePathExe}'...`);
-updateWindowsExeMetadata(filePathExe).catch(console.error);
+// -----------------------------------------------------------------------------
+
+const filePathExe = path.join(filePathRootDir, "bin", "moonpiebot.exe");
+
+// -----------------------------------------------------------------------------
+
+Promise.all([
+  createJobUpdate(
+    "Windows binary",
+    ["metadata", "icon"],
+    filePathExe,
+    updateWindowsExeMetadata
+  ),
+]).catch(console.error);

@@ -21,7 +21,7 @@ interface CopyFile {
   old: string;
 }
 
-export const copyFiles = async (
+const copyFiles = async (
   files: CopyFile[],
   backupDir: string,
   logger: Logger
@@ -48,7 +48,7 @@ export const copyFiles = async (
  * @param backupConfig The updated config for the backup.
  * @returns List of files to backup if they exist.
  */
-export const getBackupFiles = (
+const getBackupFiles = (
   backupDir: string,
   configDir: string,
   config: DeepReadonly<MoonpieConfig>,

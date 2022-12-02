@@ -1,3 +1,6 @@
+// Type imports
+import type { OrArray } from "./types";
+
 const SPLIT_CHARACTER = " ";
 
 /**
@@ -11,7 +14,7 @@ const SPLIT_CHARACTER = " ";
  * @returns Array of text strings that never exceed the split length.
  */
 export const splitTextAtLength = (
-  textInput: string | string[],
+  textInput: OrArray<string>,
   splitLength: number
 ): string[] =>
   (typeof textInput === "string"

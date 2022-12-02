@@ -220,21 +220,23 @@ export const macroSpotifySong: MessageParserMacroGenerator<
           }
           break;
         case SpotifySongMacro.PREVIOUS_ARTISTS:
-          macroValue = hasPrevious
-            ? prevData.track.artists.map((a) => a.name).join(", ")
-            : undefined;
+          if (hasPrevious) {
+            macroValue = prevData.track.artists.map((a) => a.name).join(", ");
+          }
           break;
         case SpotifySongMacro.PREVIOUS_IS_SINGLE:
           macroValue =
             hasPrevious && prevData.track.album.album_type === "single";
           break;
         case SpotifySongMacro.PREVIOUS_TITLE:
-          macroValue = hasPrevious ? prevData.track.name : undefined;
+          if (hasPrevious) {
+            macroValue = prevData.track.name;
+          }
           break;
         case SpotifySongMacro.PREVIOUS_URL:
-          macroValue = hasPrevious
-            ? prevData.track.external_urls.spotify
-            : undefined;
+          if (hasPrevious) {
+            macroValue = prevData.track.external_urls.spotify;
+          }
           break;
       }
       if (typeof macroValue === "boolean") {
