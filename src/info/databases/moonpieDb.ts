@@ -6,6 +6,7 @@ import type {
   SqliteTable,
   SqliteView,
 } from "sqlite3-promise-query-api";
+import type { DbVersionInfo } from "./genericVersionDb";
 
 /**
  * The SQLite table for moonpies.
@@ -13,8 +14,8 @@ import type {
  * and a unique Twitch ID as the primary key as well as the current name
  * of the Twitch account.
  */
-export const moonpieTable: SqliteTable<
-  "date" | "moonpieCount" | "twitchId" | "twitchName"
+export const moonpieTable: Readonly<
+  SqliteTable<"date" | "moonpieCount" | "twitchId" | "twitchName">
 > = {
   columns: {
     /** The timestamp at the last time of the claim (for time based claims). */
@@ -52,8 +53,8 @@ export const moonpieTable: SqliteTable<
  * but is read only and improves performance by a lot since sorting the
  * table is not necessary any more.
  */
-export const moonpieLeaderboardView: SqliteView<
-  "moonpieCount" | "rank" | "twitchId" | "twitchName"
+export const moonpieLeaderboardView: Readonly<
+  SqliteView<"moonpieCount" | "rank" | "twitchId" | "twitchName">
 > = {
   columns: {
     /** The current number of moonpies. */
@@ -98,13 +99,13 @@ export const moonpieLeaderboardView: SqliteView<
   tableName: moonpieTable.name,
 };
 
-export const moonpieCountIndex: SqliteIndex = {
+export const moonpieCountIndex: Readonly<SqliteIndex> = {
   columns: [moonpieTable.columns.moonpieCount.name],
   name: "index_moonpie_count",
   tableName: moonpieTable.name,
 };
 
-export const versionCurrent = {
+export const versionCurrent: Readonly<DbVersionInfo> = {
   major: 0,
   minor: 0,
   patch: 2,

@@ -3,12 +3,12 @@
  */
 
 // Package imports
-import { constants, promises as fs } from "fs";
 import path from "path";
 import ReconnectingWebSocket from "reconnecting-websocket";
 import WebSocket from "ws";
 // Local imports
 import { createLogFunc } from "./logging";
+import { getFileContentIfExists } from "./other/fileOperations";
 // Type imports
 import type { Logger } from "winston";
 
@@ -107,31 +107,16 @@ const fileNameNpPlayingDl = "np_playing_DL.txt";
 const fileNameCurrentMods = "current_mods.txt";
 const fileNameCustom = "custom.txt";
 
-const getFileContentIfExists = async (filePath: string) => {
-  try {
-    await fs.access(filePath, constants.F_OK);
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    return await fs.readFile(filePath);
-  } catch (err) {
-    return `[Error: File not found (${filePath})]`;
-  }
-};
-
 /**
  * This method will setup an infinite loop that will continuously try to connect
  * to StreamCompanion.
  *
  * @param streamCompanionDirPath The directory of the StreamCompanion files.
- * @param _logger Global logger.
  * @returns A function that will use the file system interface to get the
  * StreamCompanion data.
  */
 export const createStreamCompanionFileConnection =
-  (
-    streamCompanionDirPath: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: Logger
-  ): StreamCompanionConnection =>
+  (streamCompanionDirPath: string): StreamCompanionConnection =>
   async (): Promise<StreamCompanionFileData> => {
     const npAll = getFileContentIfExists(
       path.join(streamCompanionDirPath, fileNameNpAll)
@@ -173,6 +158,7 @@ const generateStreamCompanionWebsocketUrl = (streamCompanionUrl: string) =>
   `ws://${streamCompanionUrl}/tokens`;
 const WEBSOCKET_RECONNECT_TIMEOUT_IN_S = 10;
 
+/** Interface which helps to get the hidden websocket URL since the default one is always empty. */
 /**
  * This method will setup an infinite loop that will continuously try to connect
  * to StreamCompanion.
@@ -184,7 +170,7 @@ const WEBSOCKET_RECONNECT_TIMEOUT_IN_S = 10;
  */
 export const createStreamCompanionWebSocketConnection = (
   streamCompanionUrl: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): StreamCompanionConnection => {
   const logStreamCompanion = createLogFunc(logger, LOG_ID);
 
@@ -212,13 +198,21 @@ export const createStreamCompanionWebSocketConnection = (
   };
   const cache: StreamCompanionWebSocketData = { type: "websocket" };
   ws.onmessage = (wsEvent) => {
-    Object.assign(
-      cache,
-      JSON.parse(wsEvent.data as string) as StreamCompanionWebSocketData
-    );
-    logStreamCompanion.debug(
-      `New StreamCompanion data: '${wsEvent.data as string}'`
-    );
+    if (typeof wsEvent.data === "string") {
+      Object.assign(
+        cache,
+        JSON.parse(wsEvent.data) as StreamCompanionWebSocketData
+      );
+      logStreamCompanion.debug(`New StreamCompanion data: '${wsEvent.data}'`);
+    } else {
+      logStreamCompanion.error(
+        Error(
+          `New StreamCompanion data was not a string: '${JSON.stringify(
+            wsEvent.data
+          )}'`
+        )
+      );
+    }
   };
   ws.onclose = () => {
     if (connectedToStreamCompanion) {

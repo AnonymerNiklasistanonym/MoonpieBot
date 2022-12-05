@@ -17,7 +17,7 @@ import {
   FileDocumentationPartType,
 } from "./documentation/fileDocumentationGenerator";
 import { convertRegexToHumanStringDetailed } from "./other/regexToString";
-import { escapeEnvVariableValue } from "./other/whiteSpaceChecker";
+import { escapeWhitespaceEnvVariableValue } from "./other/whiteSpaceChecker";
 import { genericFilterNonUniqueStrings } from "./other/genericStringSorter";
 import { getCustomEnvValueFromLoggerConfig } from "./info/config/loggerConfig";
 import { getCustomEnvValueFromMoonpieConfig } from "./info/config/moonpieConfig";
@@ -266,7 +266,7 @@ export const getEnvVariableValueOrError = (
 
 const getEnvVariableValueInformation = (
   envVariable: EnvVariable | string
-): CliEnvVariableInformation<EnvVariable> => {
+): DeepReadonly<CliEnvVariableInformation<EnvVariable>> => {
   const info = envVariableInformation.find((a) => a.name === envVariable);
   if (info) {
     return info;
@@ -333,7 +333,7 @@ export const createEnvVariableDocumentation = (
   configDir: string,
   loggerConfig?: DeepReadonly<LoggerConfig>,
   moonpieConfig?: DeepReadonly<MoonpieConfig>,
-  options: CreateEnvVariableDocumentationOptions = {}
+  options: Readonly<CreateEnvVariableDocumentationOptions> = {}
 ): string => {
   const data: FileDocumentationParts[] = [];
   const documentWithCustomConfigValues =
@@ -460,21 +460,23 @@ export const createEnvVariableDocumentation = (
           ) {
             if (defaultConfigValue !== undefined) {
               envInfos.push(
-                `(Default value: ${escapeEnvVariableValue(defaultConfigValue)})`
+                `(Default value: ${escapeWhitespaceEnvVariableValue(
+                  defaultConfigValue
+                )})`
               );
             }
-            value = `${ENV_PREFIX}${envVariable}=${escapeEnvVariableValue(
+            value = `${ENV_PREFIX}${envVariable}=${escapeWhitespaceEnvVariableValue(
               defaultConfigValueValue !== undefined
                 ? path.relative(configDir, customConfigValue)
                 : customConfigValue
             )}`;
           } else if (defaultConfigValue !== undefined) {
-            value = `${ENV_PREFIX}${envVariable}=${escapeEnvVariableValue(
+            value = `${ENV_PREFIX}${envVariable}=${escapeWhitespaceEnvVariableValue(
               defaultConfigValue
             )}`;
           } else if (envVariableInfo.example) {
             envInfos.push("(The following line is only an example!)");
-            value = `${ENV_PREFIX}${envVariable}=${escapeEnvVariableValue(
+            value = `${ENV_PREFIX}${envVariable}=${escapeWhitespaceEnvVariableValue(
               envVariableInfo.example
             )}`;
           }

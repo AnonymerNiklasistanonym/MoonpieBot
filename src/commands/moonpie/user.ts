@@ -25,7 +25,7 @@ import {
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import moonpieDb from "../../database/moonpieDb";
-import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
+import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker";
 import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
 import type {
@@ -109,7 +109,7 @@ export const commandGet: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        userNameMoonpieDb: removeWhitespaceEscapeChatCommand(
+        userNameMoonpieDb: removeWhitespaceEscapeChatCommandGroup(
           matchGroups.userName
         ),
       },
@@ -279,7 +279,7 @@ export const commandSet: ChatMessageHandlerReplyCreator<
         data: {
           operation: "-",
           setCount: parseInt(matchGroups.countRemove),
-          userNameMoonpieDb: removeWhitespaceEscapeChatCommand(
+          userNameMoonpieDb: removeWhitespaceEscapeChatCommandGroup(
             matchGroups.userName
           ),
         },
@@ -323,7 +323,7 @@ export const commandDelete: ChatMessageHandlerReplyCreator<
     ) {
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
-          name: removeWhitespaceEscapeChatCommand(data.userNameMoonpieDb),
+          name: removeWhitespaceEscapeChatCommandGroup(data.userNameMoonpieDb),
         }),
         isError: true,
         messageId: moonpieUserNeverClaimedError.id,
@@ -359,7 +359,7 @@ export const commandDelete: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        userNameMoonpieDb: removeWhitespaceEscapeChatCommand(
+        userNameMoonpieDb: removeWhitespaceEscapeChatCommandGroup(
           matchGroups.userName
         ),
       },

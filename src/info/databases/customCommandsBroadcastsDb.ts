@@ -1,20 +1,23 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Type imports
+import type { DbVersionInfo } from "./genericVersionDb";
 import type { SqliteTable } from "sqlite3-promise-query-api";
 
 /**
  * The SQLite table for custom commands.
  */
-export const customCommandsTable: SqliteTable<
-  | "cooldownInS"
-  | "count"
-  | "description"
-  | "id"
-  | "message"
-  | "regex"
-  | "timestampLastExecution"
-  | "userLevel"
+export const customCommandsTable: Readonly<
+  SqliteTable<
+    | "cooldownInS"
+    | "count"
+    | "description"
+    | "id"
+    | "message"
+    | "regex"
+    | "timestampLastExecution"
+    | "userLevel"
+  >
 > = {
   columns: {
     /** The time between the command can be used. */
@@ -70,8 +73,8 @@ export const customCommandsTable: SqliteTable<
 /**
  * The SQLite table for custom data for custom commands and broadcasts.
  */
-export const customDataTable: SqliteTable<
-  "id" | "description" | "value" | "valueType"
+export const customDataTable: Readonly<
+  SqliteTable<"id" | "description" | "value" | "valueType">
 > = {
   columns: {
     /** An optional description. */
@@ -104,8 +107,8 @@ export const customDataTable: SqliteTable<
 /**
  * The SQLite table for custom broadcasts.
  */
-export const customBroadcastsTable: SqliteTable<
-  "cronString" | "description" | "id" | "message"
+export const customBroadcastsTable: Readonly<
+  SqliteTable<"cronString" | "description" | "id" | "message">
 > = {
   columns: {
     /** The cron string that is used to determine when the broadcast should be sent. */
@@ -135,7 +138,7 @@ export const customBroadcastsTable: SqliteTable<
   name: "custom_broadcasts",
 };
 
-export const versionCurrent = {
+export const versionCurrent: Readonly<DbVersionInfo> = {
   major: 0,
   minor: 0,
   patch: 1,

@@ -14,7 +14,12 @@ import path from "path";
 import { binaryName, name, usages } from "./info/general";
 import { cliOptionsInformation, parseCliArgs } from "./info/cli";
 import { createBackup, importBackup } from "./backup";
-import { createConsoleLogger, createLogFunc, createLogger } from "./logging";
+import {
+  createConsoleLogger,
+  createLogFunc,
+  createLogger,
+  LoggerLevel,
+} from "./logging";
 import {
   createEnvVariableDocumentation,
   printEnvVariablesToConsole,
@@ -106,7 +111,7 @@ const entryPoint = async () => {
             defaultMacros,
             defaultPluginsOptional,
             defaultMacrosOptional,
-            createConsoleLogger(name, "off")
+            createConsoleLogger(name, LoggerLevel.OFF)
           )
         ),
         createJob(
@@ -126,7 +131,7 @@ const entryPoint = async () => {
       await importBackup(
         cliOptions.customConfigDir || configDir,
         cliOptions.backupDir,
-        createConsoleLogger(name, "info")
+        createConsoleLogger(name, LoggerLevel.INFO)
       );
       process.exit(0);
     }
@@ -154,7 +159,7 @@ const entryPoint = async () => {
       await createBackup(
         cliOptions.customConfigDir || configDir,
         cliOptions.backupDir,
-        createConsoleLogger(name, "info")
+        createConsoleLogger(name, LoggerLevel.INFO)
       );
       process.exit(0);
     }
@@ -237,8 +242,7 @@ const entryPoint = async () => {
       logIndex.info(`${name} ${versionString} was started (logs: '${logDir}')`);
       logIndex.debug(`Config directory: '${configDir}'`);
       logIndex.debug(`Node versions: '${JSON.stringify(process.versions)}'`);
-      const moonpieConfig = await getMoonpieConfigFromEnv(configDir);
-      await main(logger, moonpieConfig);
+      await main(logger, await getMoonpieConfigFromEnv(configDir));
       logIndex.debug("Main method finished without errors");
     } catch (err) {
       logIndex.error(err as Error);

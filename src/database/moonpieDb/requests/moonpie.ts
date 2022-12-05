@@ -24,7 +24,7 @@ import type { Logger } from "winston";
 export const existsEntry = async (
   databasePath: string,
   twitchId: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_exists");
   try {
@@ -58,7 +58,7 @@ export const existsEntry = async (
 export const existsEntryName = async (
   databasePath: string,
   twitchName: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_exists_name");
   //logger.debug("database: exists");
@@ -105,7 +105,7 @@ export interface CreateInput {
 export const createEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_create");
   // Special validations for DB entry creation
@@ -143,7 +143,7 @@ export const createEntry = async (
 export const removeEntry = async (
   databasePath: string,
   twitchId: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_remove");
   if ((await existsEntry(databasePath, twitchId, logger)) === false) {
@@ -173,7 +173,7 @@ export const removeEntry = async (
 export const removeEntryName = async (
   databasePath: string,
   twitchName: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_remove_name");
   if ((await existsEntryName(databasePath, twitchName, logger)) === false) {
@@ -216,7 +216,7 @@ export interface GetMoonpieOut extends GetMoonpieDbOut {}
 export const getEntry = async (
   databasePath: string,
   twitchId: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<GetMoonpieOut> => {
   const logMethod = createLogMethod(logger, "database_get_moonpie");
   // Special validations for DB entry request
@@ -272,7 +272,7 @@ export const getEntry = async (
 export const getEntryName = async (
   databasePath: string,
   twitchName: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<GetMoonpieOut> => {
   const logMethod = createLogMethod(logger, "database_get_moonpie_name");
   // Special validations for DB entry request
@@ -340,7 +340,7 @@ export interface UpdateInput {
 export const updateEntry = async (
   databasePath: string,
   input: UpdateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_update");
   // Special validations for DB entry request

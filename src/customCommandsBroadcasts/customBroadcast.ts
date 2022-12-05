@@ -39,7 +39,7 @@ export const createBroadcastScheduledTask = (
   globalStrings: StringMap,
   globalPlugins: PluginMap,
   globalMacros: MacroMap,
-  logger: Logger
+  logger: Readonly<Logger>
 ): cron.ScheduledTask => {
   const logCustomTimer = createLogFunc(logger, LOG_ID, "create_broadcast");
 
@@ -71,7 +71,7 @@ export const createBroadcastScheduledTask = (
 export const stopBroadcastScheduledTask = (
   cronTask: ScheduledTask,
   customBroadcastId: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): void => {
   const logCustomTimer = createLogFunc(logger, LOG_ID, "stop_broadcast");
 

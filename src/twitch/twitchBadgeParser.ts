@@ -1,5 +1,6 @@
 // Type imports
 import type { ChatUserstate } from "tmi.js";
+import type { DeepReadonly } from "../other/types";
 
 /**
  * Twitch badge levels.
@@ -20,7 +21,7 @@ export enum TwitchBadgeLevel {
  * @returns Highest twitch badge level.
  */
 export const parseTwitchBadgeLevel = (
-  tags: ChatUserstate
+  tags: DeepReadonly<ChatUserstate>
 ): TwitchBadgeLevel => {
   if (tags?.badges?.broadcaster === "1") {
     return TwitchBadgeLevel.BROADCASTER;

@@ -20,20 +20,21 @@ import {
 } from "./plugins/general";
 import { convertRegexToString } from "../other/regexToString";
 import { createMessageParserMessage } from "../messageParser";
+import { pluginCountGenerator } from "./plugins/count";
 import { pluginRegexGroupId } from "./plugins/regexGroup";
 import { PluginTwitchApi } from "./plugins/twitchApi";
 import { PluginTwitchChat } from "./plugins/twitchChat";
 import { TwitchBadgeLevel } from "../twitch";
 // Type imports
 import type { CustomCommand } from "../customCommandsBroadcasts/customCommand";
-import { pluginCountGenerator } from "./plugins/count";
+import type { DeepReadonlyArray } from "../other/types";
 
-const defaultExampleCommandValues = {
+const defaultExampleCommandValues = Object.freeze({
   count: 0,
   userLevel: TwitchBadgeLevel.NONE,
-};
+});
 
-export const customCommandsInformation: CustomCommand[] = [
+export const customCommandsInformation: DeepReadonlyArray<CustomCommand> = [
   {
     ...defaultExampleCommandValues,
     description: `Reply > ${PluginTwitchChat.USER}`,

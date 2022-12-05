@@ -7,6 +7,7 @@
   "recursive": true,
   "check-leaks": true,
   "exit": true,
+  "parallel": true,
   "full-trace": true,
   "bail": true,
   "no-timeout": true,

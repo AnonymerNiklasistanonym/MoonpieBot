@@ -25,7 +25,7 @@ export const fileNameCustomCommandsBroadcastsExample =
  * @returns The file name.
  */
 export const generateOutputDirNameOldConfig = (
-  date: Date = new Date()
+  date: Readonly<Date> = new Date()
 ): string =>
   `old_config_${date
     .toISOString()

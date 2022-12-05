@@ -13,8 +13,8 @@ import {
 } from "./chatCommands";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
+import type { DeepReadonly, DeepReadonlyArray } from "../other/types";
 import type { FeatureInfo, GetFeatures } from "../features";
-import type { DeepReadonly } from "../other/types";
 import type { MoonpieConfig } from "./config/moonpieConfig";
 
 export enum Feature {
@@ -32,12 +32,12 @@ export enum Feature {
 }
 
 export interface FeatureDataAbout {
-  enableCommands: DeepReadonly<MoonpieCommands[]>;
+  enableCommands: DeepReadonlyArray<MoonpieCommands>;
 }
 export interface FeatureDataMoonpie {
   claimCooldownHours: number;
   databasePath: string;
-  enableCommands: DeepReadonly<MoonpieCommands[]>;
+  enableCommands: DeepReadonlyArray<MoonpieCommands>;
 }
 export interface FeatureDataTwitchApi {
   accessToken: string;
@@ -48,7 +48,7 @@ export interface FeatureDataOsuApi {
   clientSecret: string;
   databasePath: string;
   defaultId: number;
-  enableCommands: DeepReadonly<OsuCommands[]>;
+  enableCommands: DeepReadonlyArray<OsuCommands>;
 }
 export interface FeatureDataOsuApiBeatmapRequests extends FeatureDataOsuApi {
   beatmapRequestsDetailed?: boolean;
@@ -60,7 +60,7 @@ export interface FeatureDataOsuIrc {
   username: string;
 }
 export interface FeatureDataOsuStreamCompanion {
-  enableCommands: DeepReadonly<OsuCommands[]>;
+  enableCommands: DeepReadonlyArray<OsuCommands>;
 }
 export interface FeatureDataOsuStreamCompanionFile
   extends FeatureDataOsuStreamCompanion {
@@ -74,15 +74,15 @@ export interface FeatureDataSpotifyApi {
   clientId: string;
   clientSecret: string;
   databasePath: string;
-  enableCommands: DeepReadonly<SpotifyCommands[]>;
+  enableCommands: DeepReadonlyArray<SpotifyCommands>;
   refreshToken?: string;
 }
 export interface FeatureDataCustomCommandsBroadcasts {
   databasePath: string;
-  enableCommands: DeepReadonly<CustomCommandsBroadcastsCommands[]>;
+  enableCommands: DeepReadonlyArray<CustomCommandsBroadcastsCommands>;
 }
 export interface FeatureDataLurk {
-  enableCommands: DeepReadonly<LurkCommands[]>;
+  enableCommands: DeepReadonlyArray<LurkCommands>;
 }
 
 export type Features =

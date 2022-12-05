@@ -35,7 +35,7 @@ enum CustomDataLogicOperator {
 const customDataLogic = async (
   content: undefined | string,
   customCommandsBroadcastsDbPath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<string> => {
   // Check if the content string has two elements, otherwise throw error
   if (content === undefined || content.trim().length === 0) {
@@ -262,7 +262,7 @@ const customDataListOperationsLogic = async (
   content: undefined | string,
   operation: CustomDataListOptions,
   customCommandsBroadcastsDbPath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<string> => {
   // Check if the content string has two elements, otherwise throw error
   if (content === undefined || content.trim().length === 0) {
@@ -311,7 +311,7 @@ const customDataListClearLogic = async (
   content: undefined | string,
   clear: "NUMBER" | "STRING",
   customCommandsBroadcastsDbPath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<string> => {
   // Check if the content string has two elements, otherwise throw error
   if (content === undefined || content.trim().length === 0) {
@@ -356,7 +356,7 @@ enum CustomListLogicOperator {
 const customDataListLogic = async (
   content: undefined | string,
   customCommandsBroadcastsDbPath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<string> => {
   // Check if the content string has two elements, otherwise throw error
   if (content === undefined || content.trim().length === 0) {

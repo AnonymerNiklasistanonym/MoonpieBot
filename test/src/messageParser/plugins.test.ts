@@ -12,6 +12,11 @@ import { ParseTreeNodeError } from "../../../src/messageParser";
 import { pluginRandomNumber } from "../../../src/info/plugins/general";
 // Type imports
 import type {
+  DeepReadonly,
+  DeepReadonlyArray,
+  OrUndef,
+} from "../../../src/other/types";
+import type {
   MessageParserPlugin,
   MessageParserPluginExample,
 } from "../../../src/messageParser";
@@ -19,9 +24,9 @@ import type { Logger } from "winston";
 import type { Suite } from "mocha";
 
 const testPlugin = async (
-  plugin: MessageParserPlugin,
-  logger: Logger,
-  additionalTests: MessageParserPluginExample[] = []
+  plugin: DeepReadonly<MessageParserPlugin>,
+  logger: Readonly<Logger>,
+  additionalTests: DeepReadonlyArray<MessageParserPluginExample> = []
 ) => {
   if (plugin.examples === undefined) {
     return;
@@ -64,12 +69,12 @@ const testPlugin = async (
       }
     } catch (err) {
       if (example.expectedError !== undefined) {
-        expect((err as ParseTreeNodeError)?.pluginError).to.be.equal(
+        expect((err as OrUndef<ParseTreeNodeError>)?.pluginError).to.be.equal(
           example.expectedError,
           JSON.stringify({ err, example, message, plugin: plugin.id })
         );
       } else if (example.expectedErrorCode !== undefined) {
-        expect((err as ParseTreeNodeError).code).to.be.equal(
+        expect((err as OrUndef<ParseTreeNodeError>)?.code).to.be.equal(
           example.expectedErrorCode,
           JSON.stringify({ err, example, message, plugin: plugin.id })
         );

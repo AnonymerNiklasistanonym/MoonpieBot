@@ -8,13 +8,14 @@ import {
   genericStringSorter,
 } from "./other/genericStringSorter";
 import { cliOutputGenerator } from "./documentation/cliOutputGenerator";
+import { convertRegexToHumanString } from "./other/regexToString";
 // Type imports
 import type {
   CliOutputElements,
   CliOutputOptions,
 } from "./documentation/cliOutputGenerator";
-import { ChatCommand } from "./chatCommand";
-import { convertRegexToHumanString } from "./other/regexToString";
+import type { DeepReadonly, DeepReadonlyArray } from "./other/types";
+import type { ChatCommand } from "./chatCommand";
 
 /**
  * Generic information about the usage of the program.
@@ -37,7 +38,7 @@ export interface CliOptionSignaturePart {
   type: CliOptionSignaturePartType;
 }
 export interface CliOptionSignaturePartEnum extends CliOptionSignaturePart {
-  enumValues: string[];
+  enumValues: ReadonlyArray<string>;
   type: CliOptionSignaturePartType.ENUM;
 }
 export interface CliOptionSignaturePartOther extends CliOptionSignaturePart {
@@ -52,7 +53,7 @@ export type CliOptionSignatureParts =
   | CliOptionSignaturePartEnum;
 
 export const cliOptionSignatureToString = (
-  parts: CliOptionSignatureParts[]
+  parts: DeepReadonlyArray<CliOptionSignatureParts>
 ): string =>
   parts
     .map((a) => {
@@ -108,7 +109,7 @@ export interface CliOptionInformation<NAME = string> {
 export interface CliEnvVariableInformationSupportedValues {
   canBeJoinedAsList?: boolean;
   emptyListValue?: string;
-  values: string[] | Readonly<ChatCommand[]>;
+  values: DeepReadonlyArray<ChatCommand> | ReadonlyArray<string>;
 }
 
 /**
@@ -150,11 +151,11 @@ export interface CliEnvVariableInformation<NAME = string, BLOCK = string> {
  */
 export const cliHelpGenerator = (
   programName: string,
-  cliUsagesInformation: CliUsageInformation[],
-  cliOptionsInformation: CliOptionInformation[] = [],
-  cliEnvVariableInformation: CliEnvVariableInformation[] = [],
+  cliUsagesInformation: DeepReadonlyArray<CliUsageInformation>,
+  cliOptionsInformation: DeepReadonlyArray<CliOptionInformation> = [],
+  cliEnvVariableInformation: DeepReadonlyArray<CliEnvVariableInformation> = [],
   configDir: string,
-  outputOptions: CliOutputOptions = {}
+  outputOptions: DeepReadonly<CliOutputOptions> = {}
 ): string => {
   const helpOutput: CliOutputElements[] = [];
 

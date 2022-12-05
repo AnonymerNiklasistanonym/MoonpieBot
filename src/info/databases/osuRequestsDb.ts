@@ -1,12 +1,15 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Type imports
+import type { DbVersionInfo } from "./genericVersionDb";
 import type { SqliteTable } from "sqlite3-promise-query-api";
 
 /**
  * The SQLite table for osu requests configuration information.
  */
-export const osuRequestsConfigTable: SqliteTable<"option" | "optionValue"> = {
+export const osuRequestsConfigTable: Readonly<
+  SqliteTable<"option" | "optionValue">
+> = {
   columns: {
     option: {
       name: "option",
@@ -21,9 +24,8 @@ export const osuRequestsConfigTable: SqliteTable<"option" | "optionValue"> = {
   },
   name: "osu_requests_config",
 };
-
-export const osuRequestsConfigTableV001: SqliteTable<
-  "option" | "optionValue" | "twitchChannel"
+export const osuRequestsConfigTableV001: Readonly<
+  SqliteTable<"option" | "optionValue" | "twitchChannel">
 > = {
   columns: {
     option: {
@@ -45,10 +47,10 @@ export const osuRequestsConfigTableV001: SqliteTable<
   name: "osu_requests_config",
 };
 
-export const versionCurrent = {
+export const versionCurrent: Readonly<DbVersionInfo> = {
   major: 0,
   minor: 0,
-  patch: 2,
+  patch: 3,
 };
 
 /** Errors that can happen during requests. */
@@ -62,6 +64,21 @@ export enum OsuRequestsDbError {
  * changes are being made so that a migration can be done).
  */
 export enum OsuRequestsConfig {
+  AR_MAX = "arMax",
+  AR_MIN = "arMin",
+  CS_MAX = "csMax",
+  CS_MIN = "csMin",
+  DETAILED = "detailed",
+  DETAILED_IRC = "detailedIrc",
+  ENABLED = "enabled",
+  LENGTH_IN_MIN_MAX = "lengthInMinMax",
+  LENGTH_IN_MIN_MIN = "lengthInMinMin",
+  MESSAGE = "message",
+  REDEEM_ID = "redeemId",
+  STAR_MAX = "starMax",
+  STAR_MIN = "starMin",
+}
+export enum OsuRequestsConfigV002 {
   AR_MAX = "arMax",
   AR_MIN = "arMin",
   CS_MAX = "csMax",

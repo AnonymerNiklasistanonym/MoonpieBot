@@ -88,7 +88,7 @@ export interface CommandLurkDetectorOutput {
 /**
  * Lurk command: Go lurking and get a welcome back message when coming back.
  */
-export const commandLurk: ChatMessageHandlerReplyCreator<
+const commandLurk: ChatMessageHandlerReplyCreator<
   CommandLurkGenericDataExtraLurkInfo,
   CommandLurkGenericDataExtraLurkInfo &
     ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,

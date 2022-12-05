@@ -4,10 +4,7 @@
 import path from "path";
 // Local imports
 import { binaryName, defaultConfigDir } from "../src/info/general";
-import {
-  createEnvVariableDocumentation,
-  EnvVariableStructureVariablesBlock,
-} from "../src/env";
+import { createConsoleLogger, LoggerLevel } from "../src/logging";
 import {
   ENV_LIST_SPLIT_CHARACTER,
   ENV_PREFIX,
@@ -18,7 +15,7 @@ import {
 } from "../src/info/env";
 import { CliOption } from "../src/info/cli";
 import { convertRegexToHumanStringDetailed } from "../src/other/regexToString";
-import { createConsoleLogger } from "../src/logging";
+import { createEnvVariableDocumentation } from "../src/env";
 import { createJobUpdate } from "../src/createJob";
 import { fileNameEnv } from "../src/info/files";
 import { getFeatures } from "../src/info/features";
@@ -110,7 +107,7 @@ const parseCommentInstruction = (comment: string): CommentInstruction => {
  * @returns Text content.
  */
 const createCommentContent = async (
-  commentInstruction: CommentInstruction
+  commentInstruction: DeepReadonly<CommentInstruction>
 ): Promise<string> => {
   let output = "";
   switch (commentInstruction.instruction) {
@@ -156,7 +153,9 @@ const createCommentContent = async (
   return output;
 };
 
-const updateReadmeFile = async (mdFile: Buffer): Promise<string> => {
+const updateReadmeFile = async (
+  mdFile: DeepReadonly<Buffer>
+): Promise<string> => {
   let output = "";
   let lookForEnd = false;
   let mdComment: string | undefined;
@@ -200,7 +199,9 @@ const updateReadmeFile = async (mdFile: Buffer): Promise<string> => {
 
 // -----------------------------------------------------------------------------
 
-const createEnvVarValueString = (envVariable: EnvExampleInfo): string => {
+const createEnvVarValueString = (
+  envVariable: DeepReadonly<EnvExampleInfo>
+): string => {
   const configDir = path.join(__dirname, "..");
   const info = envVariableInformation.find((a) => a.name === envVariable.id);
   if (info === undefined) {
@@ -332,7 +333,7 @@ const createEnvExample = async (
     .map((a) => indent + a)
     .join("\n")
     .trim()}\n${indent}\`\`\`\n\nSupported features:\n\n${(
-    await getFeatures(moonpieConfig, createConsoleLogger("", "off"))
+    await getFeatures(moonpieConfig, createConsoleLogger("", LoggerLevel.OFF))
   )
     .map(
       (b) =>
@@ -376,7 +377,7 @@ const createListEnvEntry = (envVarName: string): string => {
 
 const createListEnvBlockEntries = (envBlockName: string): string => {
   const infosBlock = envVariableStructure.find(
-    (a) => (a as EnvVariableStructureVariablesBlock)?.block === envBlockName
+    (a) => "block" in a && a.block === envBlockName
   );
   let blockInformation = "";
   if (infosBlock !== undefined) {

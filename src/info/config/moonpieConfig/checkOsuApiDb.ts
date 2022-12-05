@@ -1,5 +1,5 @@
 // Local imports
-import { createConsoleLogger } from "../../../logging";
+import { createConsoleLogger, LoggerLevel } from "../../../logging";
 import { fileExists } from "../../../other/fileOperations";
 import { OsuRequestsConfig } from "../../databases/osuRequestsDb";
 import osuRequestsDb from "../../../database/osuRequestsDb";
@@ -16,7 +16,7 @@ export const removeOsuApiDetailedRequestsIfFoundInDb = async (
   }
   const consoleLogger = createConsoleLogger(
     "removeOsuApiDetailedRequestsIfFoundInDb",
-    "error"
+    LoggerLevel.ERROR
   );
   await osuRequestsDb.setup(osuApiDatabasePath, consoleLogger);
   const entries = await osuRequestsDb.requests.osuRequestsConfig.getEntries(
@@ -54,7 +54,7 @@ export const removeOsuApiRequestsRedeemIdIfFoundInDb = async (
   }
   const consoleLogger = createConsoleLogger(
     "removeOsuApiRequestsRedeemIdIfFoundInDb",
-    "error"
+    LoggerLevel.ERROR
   );
   await osuRequestsDb.setup(osuApiDatabasePath, consoleLogger);
   const entries = await osuRequestsDb.requests.osuRequestsConfig.getEntries(

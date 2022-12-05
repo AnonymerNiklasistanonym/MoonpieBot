@@ -1,5 +1,7 @@
 // Local imports
 import { splitTextAtLength } from "../other/splitTextAtLength";
+// Tpe imports
+import type { DeepReadonly, DeepReadonlyArray } from "../other/types";
 
 /**
  * Generic information about a CLI output element.
@@ -57,9 +59,9 @@ export interface CliOutputOptions {
 /**
  * Default CLI output generation options.
  */
-const defaultCliOutputOptions = {
+const defaultCliOutputOptions = Object.freeze({
   maxLineLength: 100,
-};
+}) satisfies Readonly<CliOutputOptions>;
 
 /**
  * Generic method to generate CLI output.
@@ -69,8 +71,8 @@ const defaultCliOutputOptions = {
  * @returns CLI output string.
  */
 export const cliOutputGenerator = (
-  cliOutputLines: CliOutputElements[],
-  outputOptions: CliOutputOptions = {}
+  cliOutputLines: DeepReadonlyArray<CliOutputElements>,
+  outputOptions: DeepReadonly<CliOutputOptions> = {}
 ): string => {
   const options = {
     ...defaultCliOutputOptions,

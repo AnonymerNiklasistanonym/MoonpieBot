@@ -16,7 +16,7 @@ import type { Logger } from "winston";
  */
 export const setup = async (
   databasePath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<void> =>
   genericSetupDatabase(
     databasePath,

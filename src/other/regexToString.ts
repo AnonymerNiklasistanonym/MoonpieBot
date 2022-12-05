@@ -1,5 +1,7 @@
+// Package imports
+import { deepCopy } from "deep-copy-ts";
 // Type imports
-import { DeepReadonly } from "./types";
+import type { DeepReadonly, DeepReadonlyArray } from "./types";
 
 interface SimpleRegexElement {
   modifier?: "+" | "*";
@@ -42,12 +44,11 @@ interface SimpleRegexElementsResult {
   i: number;
 }
 
-const filterEmptyElements = (elements: SimpleRegexElements[]) =>
+const filterEmptyElements = (
+  elements: ReadonlyArray<SimpleRegexElements>
+): SimpleRegexElements[] =>
   elements.filter((a) => {
-    if (a.type === "text" && a.content.length === 0) {
-      return false;
-    }
-    if (a.type === "group" && a.content.length === 0) {
+    if ((a.type === "text" || a.type === "group") && a.content.length === 0) {
       return false;
     }
     return true;
@@ -195,8 +196,8 @@ const convertRegexToHumanReadableStringHelper = (
 };
 
 const splitArrayAtElement = <TYPE>(
-  elements: TYPE[],
-  splitAt: (element: TYPE) => boolean
+  elements: DeepReadonlyArray<TYPE>,
+  splitAt: (element: DeepReadonly<TYPE>) => boolean
 ): TYPE[][] => {
   const arrays: TYPE[][] = [];
   let currentArray: TYPE[] = [];
@@ -207,7 +208,7 @@ const splitArrayAtElement = <TYPE>(
         currentArray = [];
       }
     } else {
-      currentArray.push(a);
+      currentArray.push(deepCopy(a) as TYPE);
     }
   }
   if (currentArray.length > 0) {
@@ -275,8 +276,8 @@ const regexConvertOptionsHuman: Readonly<RegexConvertToStringOptions> = {
 };
 
 const convertToString = (
-  element: SimpleRegexElements,
-  options: RegexConvertToStringOptions = {}
+  element: DeepReadonly<SimpleRegexElements>,
+  options: DeepReadonly<RegexConvertToStringOptions> = {}
 ): string => {
   switch (element.type) {
     case "end":
@@ -366,8 +367,10 @@ const convertToString = (
       const groupElementsFiltered = groupElements
         .map((a) => a.map((b) => convertToString(b, options)).join(""))
         .filter((c) => c.trim().length > 0);
+      // eslint-disable-next-line no-case-declarations
+      let customOptional = false;
       if (groupElementsFiltered.length !== groupElements.length) {
-        element.optional = true;
+        customOptional = true;
       }
       if (groupElementsFiltered.length === 0) {
         return "";
@@ -388,7 +391,7 @@ const convertToString = (
       if (options.renderOnlyGroupName === true && element.name) {
         finalContent = element.name;
       }
-      if (element.optional) {
+      if (element.optional || customOptional) {
         finalContent = `[${finalContent}]`;
       }
       return finalContent;

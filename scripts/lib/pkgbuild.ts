@@ -4,7 +4,12 @@ import {
   convertValueToArray,
 } from "../../src/other/arrayOperations";
 // Type imports
-import type { OrArray } from "../../src/other/types";
+import type {
+  DeepReadonly,
+  OrArray,
+  OrReadonlyArray,
+  OrUndef,
+} from "../../src/other/types";
 
 export interface PkgbuildMaintainer {
   email: string;
@@ -22,42 +27,40 @@ export interface PkgbuildSource {
   sha1sum?: string;
 }
 
-export type SingleOrArray<TYPE> = TYPE | TYPE[];
-
 export interface PkgbuildCmdsSection {
   cmds: string[];
-  note?: SingleOrArray<string>;
+  note?: OrArray<string>;
 }
 
 export interface PkgbuildInfo {
-  arch: SingleOrArray<string>;
-  buildCmds?: SingleOrArray<PkgbuildCmdsSection>;
-  buildCmdsNote?: SingleOrArray<string>;
-  conflicts?: SingleOrArray<string>;
-  customVariables?: SingleOrArray<PkgbuildCustomVariable>;
-  depends?: SingleOrArray<string>;
-  dependsNote?: SingleOrArray<string>;
-  license: SingleOrArray<string>;
-  maintainer?: PkgbuildMaintainer | PkgbuildMaintainer[];
-  makedepends?: SingleOrArray<string>;
-  makedependsNote?: SingleOrArray<string>;
-  options?: SingleOrArray<string>;
-  optionsNote?: SingleOrArray<string>;
-  packageCmds?: SingleOrArray<PkgbuildCmdsSection>;
-  packageCmdsNote?: SingleOrArray<string>;
+  arch: OrArray<string>;
+  buildCmds?: OrArray<PkgbuildCmdsSection>;
+  buildCmdsNote?: OrArray<string>;
+  conflicts?: OrArray<string>;
+  customVariables?: OrArray<PkgbuildCustomVariable>;
+  depends?: OrArray<string>;
+  dependsNote?: OrArray<string>;
+  license: OrArray<string>;
+  maintainer?: OrArray<PkgbuildMaintainer>;
+  makedepends?: OrArray<string>;
+  makedependsNote?: OrArray<string>;
+  options?: OrArray<string>;
+  optionsNote?: OrArray<string>;
+  packageCmds?: OrArray<PkgbuildCmdsSection>;
+  packageCmdsNote?: OrArray<string>;
   pkgdesc: string;
   pkgname: string;
   pkgrel?: number;
   pkgver: string;
-  pkgverCmds?: SingleOrArray<PkgbuildCmdsSection>;
-  pkgverCmdsNote?: SingleOrArray<string>;
-  provides: SingleOrArray<string>;
-  source: SingleOrArray<PkgbuildSource>;
+  pkgverCmds?: OrArray<PkgbuildCmdsSection>;
+  pkgverCmdsNote?: OrArray<string>;
+  provides: OrArray<string>;
+  source: OrArray<PkgbuildSource>;
   url: string;
 }
 
 const createPkgbuildArray = (
-  value?: OrArray<string>,
+  value: OrUndef<OrReadonlyArray<string>>,
   split = " ",
   literalValues = false
 ): string => {
@@ -66,13 +69,15 @@ const createPkgbuildArray = (
     .join(split)})`;
 };
 
-const createPkgbuildComment = (value?: OrArray<string>): string => {
+const createPkgbuildComment = (value?: OrReadonlyArray<string>): string => {
   return `${convertUndefValueToArray(value)
     .map((a) => `# ${a}\n`)
     .join("")}`;
 };
 
-const createPkgbuildCmdsSection = (value: PkgbuildCmdsSection): string => {
+const createPkgbuildCmdsSection = (
+  value: DeepReadonly<PkgbuildCmdsSection>
+): string => {
   let outputString = "";
   for (const note of convertUndefValueToArray(value.note)) {
     outputString += `  # ${note}\n`;
@@ -91,7 +96,7 @@ const createPkgValue = (
   return `"${value}"`;
 };
 
-export const createPkgbuild = (info: PkgbuildInfo): string => {
+export const createPkgbuild = (info: DeepReadonly<PkgbuildInfo>): string => {
   let outputString = "";
   // Maintainer
   if (info.maintainer !== undefined) {
@@ -184,5 +189,6 @@ export const createPkgbuild = (info: PkgbuildInfo): string => {
 
 export const referencePV = (variable: string): string => `$${variable}`;
 
-export const referencePCV = (customVariable: PkgbuildCustomVariable): string =>
-  referencePV(`_${customVariable.name}`);
+export const referencePCV = (
+  customVariable: DeepReadonly<PkgbuildCustomVariable>
+): string => referencePV(`_${customVariable.name}`);

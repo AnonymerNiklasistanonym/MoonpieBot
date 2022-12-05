@@ -6,6 +6,7 @@
 import { createLogFunc } from "../logging";
 import { ENV_PREFIX_CUSTOM_STRINGS } from "../info/env";
 // Type imports
+import type { DeepReadonlyArray } from "../other/types";
 import type { Logger } from "winston";
 
 /**
@@ -59,10 +60,10 @@ export interface StringMapEntry extends Omit<StringEntry, "id"> {
  * @returns The resulting array can be inserted into a map for easy setup.
  */
 export const generateStringMap = (
-  ...stringEntries: StringEntry[]
+  ...stringEntries: DeepReadonlyArray<StringEntry>
 ): StringMap => {
   const mappedStringEntries = stringEntries.map<[string, StringMapEntry]>(
-    (a) => [a.id, a]
+    (a) => [a.id, Object.assign({}, a)]
   );
   // Check for duplicated IDs
   mappedStringEntries.forEach((value, index, array) => {
@@ -81,8 +82,8 @@ export const generateStringMap = (
  * @returns The updated strings map.
  */
 export const updateStringsMapWithCustomEnvStrings = (
-  strings: StringMap,
-  logger: Logger
+  strings: Readonly<StringMap>,
+  logger: Readonly<Logger>
 ): StringMap => {
   const logStrings = createLogFunc(
     logger,

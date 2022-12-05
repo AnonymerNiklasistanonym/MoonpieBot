@@ -3,17 +3,17 @@ import type { DeepReadonly, EMPTY_OBJECT, OrPromise } from "./other/types";
 import type { ChatCommand } from "./chatCommand";
 import type { Logger } from "winston";
 
-export type GetFeatures<T, CONFIG extends EMPTY_OBJECT = EMPTY_OBJECT> = (
-  config: CONFIG,
-  logger: Logger
-) => OrPromise<DeepReadonly<T>>;
+export type GetFeatures<FEATURE, CONFIG extends EMPTY_OBJECT = EMPTY_OBJECT> = (
+  config: DeepReadonly<CONFIG>,
+  logger: Readonly<Logger>
+) => OrPromise<DeepReadonly<FEATURE>>;
 
 export interface FeatureInfo<
   FEATURE_ENUM = string,
   FEATURE_DATA extends EMPTY_OBJECT = EMPTY_OBJECT
 > {
   /** The chat commands that this feature provides. */
-  chatCommands: Readonly<ChatCommand[]>;
+  chatCommands: ChatCommand[];
   /** The data that this feature can provide. */
   data: FEATURE_DATA;
   /** What does this feature enable. */

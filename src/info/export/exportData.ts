@@ -1,4 +1,5 @@
 // Local imports
+import { createConsoleLogger, LoggerLevel } from "../../logging";
 import { defaultMacros, defaultMacrosOptional } from "../macros";
 import { defaultPlugins, defaultPluginsOptional } from "../plugins";
 import {
@@ -9,14 +10,17 @@ import {
   getMoonpieConfigFromEnv,
   getMoonpieConfigMoonpieFromEnv,
 } from "../config/moonpieConfig";
-import { createConsoleLogger } from "../../logging";
+import { createCustomCommandsBroadcastsDocumentation } from "../../documentation/customCommandsBroadcasts";
 import { createEnvVariableDocumentation } from "../../env";
+import { createOsuRequestsConfigDocumentation } from "../../documentation/osuRequestsConfig";
 import { createStringsVariableDocumentation } from "../../documentation/strings";
+import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
 import { defaultStringMap } from "../../info/strings";
 import { genericStringSorter } from "../../other/genericStringSorter";
 import { getLoggerConfigFromEnv } from "../../info/config/loggerConfig";
 import moonpieDb from "../../database/moonpieDb";
 import { name } from "../general";
+import osuRequestsDb from "../../database/osuRequestsDb";
 import { updateStringsMapWithCustomEnvStrings } from "../../messageParser";
 // Type imports
 import type { ExportData } from "../../export";
@@ -43,7 +47,7 @@ export const exportDataEnv: ExportData<MoonpieConfigCustomData> = async (
 export const exportDataEnvStrings: ExportData = async (_configDir, json) => {
   const updatedStringsMap = updateStringsMapWithCustomEnvStrings(
     defaultStringMap,
-    createConsoleLogger(name, "off")
+    createConsoleLogger(name, LoggerLevel.OFF)
   );
   if (json) {
     const updatedStrings = Array.from(updatedStringsMap);
@@ -66,7 +70,7 @@ export const exportDataEnvStrings: ExportData = async (_configDir, json) => {
     defaultMacros,
     defaultPluginsOptional,
     defaultMacrosOptional,
-    createConsoleLogger(name, "off"),
+    createConsoleLogger(name, LoggerLevel.OFF),
     updatedStringsMap
   );
 };
@@ -76,10 +80,13 @@ const setMoonpieCommandBuilder = (user: string, count: number): string =>
 
 export const exportDataMoonpie: ExportData = async (configDir, json) => {
   const config = await getMoonpieConfigMoonpieFromEnv(configDir);
-  await moonpieDb.setup(config.databasePath, createConsoleLogger(name, "off"));
+  await moonpieDb.setup(
+    config.databasePath,
+    createConsoleLogger(name, LoggerLevel.OFF)
+  );
   const moonpieCounts = await moonpieDb.backup.exportMoonpieCountTableToJson(
     config.databasePath,
-    createConsoleLogger(name, "off")
+    createConsoleLogger(name, LoggerLevel.OFF)
   );
   if (json) {
     return JSON.stringify({
@@ -102,11 +109,67 @@ export const exportDataMoonpie: ExportData = async (configDir, json) => {
   ]);
 };
 
-export const exportDataCustomCommandsBroadcasts: ExportData = () => {
-  // TODO
-  throw Error("TODO");
+export const exportDataCustomCommandsBroadcasts: ExportData = async (
+  configDir,
+  json
+) => {
+  const config = await getMoonpieConfigFromEnv(configDir);
+  if (config.customCommandsBroadcasts?.databasePath === undefined) {
+    throw Error("custom commands broadcasts database path not found");
+  }
+  await customCommandsBroadcastsDb.setup(
+    config.customCommandsBroadcasts.databasePath,
+    createConsoleLogger(name, LoggerLevel.OFF)
+  );
+  const customCommands =
+    await customCommandsBroadcastsDb.requests.customCommand.getEntries(
+      config.customCommandsBroadcasts.databasePath,
+      undefined,
+      createConsoleLogger(name, LoggerLevel.OFF)
+    );
+  const customBroadcasts =
+    await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
+      config.customCommandsBroadcasts.databasePath,
+      undefined,
+      createConsoleLogger(name, LoggerLevel.OFF)
+    );
+  const customData =
+    await customCommandsBroadcastsDb.requests.customData.getEntries(
+      config.customCommandsBroadcasts.databasePath,
+      createConsoleLogger(name, LoggerLevel.OFF)
+    );
+  if (json) {
+    return JSON.stringify({
+      customBroadcasts,
+      customCommands,
+      customData,
+    });
+  }
+  return createCustomCommandsBroadcastsDocumentation(
+    customCommands,
+    customBroadcasts,
+    false
+  );
 };
-export const exportDataOsuRequests: ExportData = () => {
-  // TODO
-  throw Error("TODO");
+
+export const exportDataOsuRequests: ExportData = async (configDir, json) => {
+  const config = await getMoonpieConfigFromEnv(configDir);
+  if (config.osuApi?.databasePath === undefined) {
+    throw Error("osu! API database path not found");
+  }
+  await osuRequestsDb.setup(
+    config.osuApi.databasePath,
+    createConsoleLogger(name, LoggerLevel.OFF)
+  );
+  const osuRequestsConfig =
+    await osuRequestsDb.requests.osuRequestsConfig.getEntries(
+      config.osuApi.databasePath,
+      createConsoleLogger(name, LoggerLevel.OFF)
+    );
+  if (json) {
+    return JSON.stringify({
+      osuRequestsConfig,
+    });
+  }
+  return createOsuRequestsConfigDocumentation(osuRequestsConfig);
 };

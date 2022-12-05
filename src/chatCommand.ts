@@ -1,5 +1,7 @@
 // Local imports
 import { convertRegexToHumanString } from "./other/regexToString";
+// Type imports
+import type { DeepReadonlyArray } from "./other/types";
 
 export interface ChatCommand<COMMAND_ENUM extends string = string> {
   command: RegExp | string;
@@ -11,13 +13,15 @@ export interface ChatCommand<COMMAND_ENUM extends string = string> {
 
 export type GetChatCommand<COMMAND_ENUM extends string = string> = (
   id: COMMAND_ENUM
-) => Readonly<ChatCommand<COMMAND_ENUM>[]>;
+) => DeepReadonlyArray<ChatCommand<COMMAND_ENUM>>;
 
 export const createShortCommandDescription = <
   COMMAND_ENUM extends string = string
 >(
   id: COMMAND_ENUM,
-  getChatCommands: (id: COMMAND_ENUM) => readonly ChatCommand<COMMAND_ENUM>[]
+  getChatCommands: (
+    id: COMMAND_ENUM
+  ) => DeepReadonlyArray<ChatCommand<COMMAND_ENUM>>
 ): string => {
   const info = getChatCommands(id);
   if (info.length === 0) {
@@ -31,7 +35,7 @@ export const createShortCommandDescription = <
             ? a.command
             : convertRegexToHumanString(a.command)
         }'${a.permission !== "everyone" ? ` (${a.permission})` : ""} ${
-          a.descriptionShort ? a.descriptionShort : a.description
+          a.descriptionShort || a.description
         }`
     )
     .join(", ");

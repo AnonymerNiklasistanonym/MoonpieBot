@@ -43,7 +43,7 @@ import {
 } from "../../info/regex";
 import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
-import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
+import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -156,11 +156,11 @@ export const commandAddCC: ChatMessageHandlerReplyCreator<
           matchGroups.cooldownInS !== undefined
             ? parseInt(matchGroups.cooldownInS)
             : undefined,
-        customCommandId: removeWhitespaceEscapeChatCommand(matchGroups.id),
-        customCommandMessage: removeWhitespaceEscapeChatCommand(
+        customCommandId: removeWhitespaceEscapeChatCommandGroup(matchGroups.id),
+        customCommandMessage: removeWhitespaceEscapeChatCommandGroup(
           matchGroups.message
         ),
-        customCommandRegex: removeWhitespaceEscapeChatCommand(
+        customCommandRegex: removeWhitespaceEscapeChatCommandGroup(
           matchGroups.regex
         ),
         customCommandUserLevel:
@@ -245,7 +245,7 @@ export const commandDelCC: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        customCommandId: removeWhitespaceEscapeChatCommand(matchGroups.id),
+        customCommandId: removeWhitespaceEscapeChatCommandGroup(matchGroups.id),
       },
     };
   },
@@ -387,7 +387,9 @@ export const commandListCCs: ChatMessageHandlerReplyCreator<
     if ("id" in matchGroups && matchGroups.id !== undefined) {
       return {
         data: {
-          customCommandId: removeWhitespaceEscapeChatCommand(matchGroups.id),
+          customCommandId: removeWhitespaceEscapeChatCommandGroup(
+            matchGroups.id
+          ),
         },
       };
     }
@@ -522,9 +524,11 @@ export const commandEditCC: ChatMessageHandlerReplyCreator<
       }
       return {
         data: {
-          customCommandId: removeWhitespaceEscapeChatCommand(matchGroups.id),
+          customCommandId: removeWhitespaceEscapeChatCommandGroup(
+            matchGroups.id
+          ),
           customCommandOption: matchGroups.option,
-          customCommandOptionValue: removeWhitespaceEscapeChatCommand(
+          customCommandOptionValue: removeWhitespaceEscapeChatCommandGroup(
             matchGroups.optionValue
           ),
         },

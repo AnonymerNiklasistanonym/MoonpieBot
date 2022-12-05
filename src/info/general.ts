@@ -8,6 +8,7 @@ import { CliOption } from "./cli";
 import { EnvVariable } from "./env";
 // Type imports
 import type { CliUsageInformation } from "../cli";
+import type { DeepReadonlyArray } from "../other/types";
 
 /** Name of the program. */
 export const name = "MoonpieBot";
@@ -16,7 +17,7 @@ export const name = "MoonpieBot";
 export const binaryName = name.toLowerCase();
 
 /** The usages of the program. */
-export const usages: CliUsageInformation[] = [
+export const usages: DeepReadonlyArray<CliUsageInformation> = [
   {
     signature: "[OPTIONS]",
   },

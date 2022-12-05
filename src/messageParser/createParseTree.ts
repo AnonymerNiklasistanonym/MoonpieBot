@@ -3,6 +3,7 @@
  */
 
 // Type imports
+import { DeepReadonly } from "src/other/types";
 import type { Logger } from "winston";
 import type { StringMap } from "./strings";
 // Type exports
@@ -135,11 +136,11 @@ const MAX_STRING_DEPTH = 15;
  */
 export const createParseTree = (
   messageString: string,
-  strings: StringMap,
+  strings: DeepReadonly<StringMap>,
   pluginDepth = 0,
   earlyExitBecausePluginValue = false,
   stringDepth = 0,
-  logger: Logger
+  logger: Readonly<Logger>
 ): ParseTreeNode => {
   //console.log(`Generate parse tree of '${messageString}'`);
   //if (pluginDepth > 0) {

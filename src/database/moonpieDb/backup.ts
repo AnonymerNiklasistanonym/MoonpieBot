@@ -27,7 +27,7 @@ const LOG_ID = "database_backup";
  */
 export const exportMoonpieCountTableToJson = async (
   databasePath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<DatabaseStructure[]> => {
   const logDbBackup = createLogFunc(logger, LOG_ID);
   const logMethod = createLogMethod(logger, LOG_ID);

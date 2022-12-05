@@ -40,7 +40,7 @@ import { OsuRequestsConfig } from "./databases/osuRequestsDb";
 // Type imports
 import type { ChatCommand, GetChatCommand } from "../chatCommand";
 
-export enum ChatCommandPermission {
+enum ChatCommandPermission {
   BROADCASTER = "broadcaster",
   EVERYONE = "everyone",
   MOD = "mod",

@@ -21,7 +21,7 @@ export interface CreateInput {
 export const createEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_version_create");
   const postResult = await db.requests.post(
@@ -49,7 +49,7 @@ export interface RemoveInput {
 export const removeEntry = async (
   databasePath: string,
   input: RemoveInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_version_remove");
   const postResult = await db.requests.post(
@@ -85,7 +85,7 @@ export interface GetVersionOut extends GetVersionDbOut {}
 
 export const getEntries = async (
   databasePath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<GetVersionDbOut[]> => {
   const logMethod = createLogMethod(logger, "database_version_get");
 

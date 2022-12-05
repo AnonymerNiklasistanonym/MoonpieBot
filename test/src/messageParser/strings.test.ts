@@ -13,16 +13,17 @@ import {
 import { defaultStringMap } from "../../../src/info/strings";
 import { getTestLogger } from "../logger";
 // Type imports
+import type { DeepReadonly } from "../../../src/other/types";
 import type { StringMap } from "../../../src/messageParser";
 import type { Suite } from "mocha";
 
 use(sinonChai);
 
 const compareStringMaps = (
-  baseStringMap: StringMap,
-  updatedStringMap: StringMap,
-  changedKeys: string[],
-  newKeys: string[]
+  baseStringMap: DeepReadonly<StringMap>,
+  updatedStringMap: DeepReadonly<StringMap>,
+  changedKeys: ReadonlyArray<string>,
+  newKeys: ReadonlyArray<string>
 ) => {
   for (const [key, value] of updatedStringMap) {
     if (changedKeys.includes(key)) {

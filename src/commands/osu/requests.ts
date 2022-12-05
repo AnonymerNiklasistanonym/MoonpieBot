@@ -20,7 +20,7 @@ import { checkTwitchBadgeLevel } from "../twitchBadge";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser";
 import { OsuRequestsConfig } from "../../info/databases/osuRequestsDb";
 import osuRequestsDb from "../../database/osuRequestsDb";
-import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
+import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker";
 import { TwitchBadgeLevel } from "../../twitch";
 // Type imports
 import type {
@@ -78,7 +78,15 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           data.osuApiDbPath,
           {
-            option: OsuRequestsConfig.MESSAGE_OFF,
+            option: OsuRequestsConfig.ENABLED,
+            optionValue: "false",
+          },
+          logger
+        );
+        await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
+          data.osuApiDbPath,
+          {
+            option: OsuRequestsConfig.MESSAGE,
             optionValue:
               data.beatmapRequestsOnOffMessage !== undefined
                 ? data.beatmapRequestsOnOffMessage
@@ -99,17 +107,18 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
           messageId: osuBeatmapRequestTurnedOff.id,
         };
       case BeatmapRequestsType.TURN_ON:
-        await osuRequestsDb.requests.osuRequestsConfig.removeEntry(
+        await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           data.osuApiDbPath,
           {
-            option: OsuRequestsConfig.MESSAGE_OFF,
+            option: OsuRequestsConfig.ENABLED,
+            optionValue: "true",
           },
           logger
         );
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           data.osuApiDbPath,
           {
-            option: OsuRequestsConfig.MESSAGE_ON,
+            option: OsuRequestsConfig.MESSAGE,
             optionValue:
               data.beatmapRequestsOnOffMessage !== undefined
                 ? data.beatmapRequestsOnOffMessage
@@ -138,15 +147,15 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
           );
         if (
           osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
-          ) === undefined
+            (a) => a.option === OsuRequestsConfig.ENABLED
+          )?.optionValue !== "false"
         ) {
           return {
             additionalMacros: new Map([
               ...macros,
               ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
                 customMessage: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.MESSAGE_ON
+                  (a) => a.option === OsuRequestsConfig.MESSAGE
                 )?.optionValue,
               }),
               ...generateMacroMapFromMacroGenerator(
@@ -164,7 +173,7 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
               ...macros,
               ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
                 customMessage: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
+                  (a) => a.option === OsuRequestsConfig.MESSAGE
                 )?.optionValue,
               }),
             ]),
@@ -198,7 +207,7 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
         data: {
           beatmapRequestsOnOffMessage:
             matchGroups.message !== undefined
-              ? removeWhitespaceEscapeChatCommand(matchGroups.message)
+              ? removeWhitespaceEscapeChatCommandGroup(matchGroups.message)
               : undefined,
           beatmapRequestsType:
             matchGroups.on !== undefined
@@ -244,15 +253,13 @@ const validateSetValue = (
         throw Error("Number value was not finite!");
       }
       return optionValue;
-
-    case OsuRequestsConfig.MESSAGE_OFF:
-    case OsuRequestsConfig.MESSAGE_ON:
+    case OsuRequestsConfig.MESSAGE:
     case OsuRequestsConfig.REDEEM_ID:
       if (optionValue === undefined) {
         throw Error("String value was undefined!");
       }
-      return optionValue;
-
+      return removeWhitespaceEscapeChatCommandGroup(optionValue);
+    case OsuRequestsConfig.ENABLED:
     case OsuRequestsConfig.DETAILED:
     case OsuRequestsConfig.DETAILED_IRC:
       if (optionValue === undefined) {
@@ -345,7 +352,7 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
       additionalMacros: new Map([
         ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
           customMessage: osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.MESSAGE_ON
+            (a) => a.option === OsuRequestsConfig.MESSAGE
           )?.optionValue,
         }),
         ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequestDemands, {

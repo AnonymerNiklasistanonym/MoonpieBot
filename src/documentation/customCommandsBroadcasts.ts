@@ -8,25 +8,34 @@ import {
   fileDocumentationGenerator,
   FileDocumentationPartType,
 } from "./fileDocumentationGenerator";
+import {
+  regexCustomBroadcastAdd,
+  regexCustomBroadcastDelete,
+  regexCustomBroadcastEdit,
+  regexCustomCommandAdd,
+  regexCustomCommandDelete,
+  regexCustomCommandEdit,
+} from "../info/regex";
+import { convertRegexToHumanString } from "../other/regexToString";
 import { customBroadcastsInformation } from "../info/customBroadcasts";
 import { customCommandsInformation } from "../info/customCommands";
-import { escapeStringIfWhiteSpace } from "../other/whiteSpaceChecker";
+import { escapeWhitespaceChatCommandGroup } from "../other/whiteSpaceChecker";
 // Type imports
 import type { CustomBroadcast } from "../customCommandsBroadcasts/customBroadcast";
 import type { CustomCommand } from "../customCommandsBroadcasts/customCommand";
+import type { DeepReadonlyArray } from "../other/types";
 import type { FileDocumentationParts } from "./fileDocumentationGenerator";
 
 const addCustomCommandStringBuilder = (
-  customCommand: Pick<CustomCommand, "id" | "regex" | "message"> &
-    Partial<CustomCommand>
+  customCommand: Readonly<
+    Pick<CustomCommand, "id" | "regex" | "message"> & Partial<CustomCommand>
+  >
 ): string =>
-  `!addcc ${escapeStringIfWhiteSpace(customCommand.id, {
-    surroundCharacter: "'",
-  })} ${escapeStringIfWhiteSpace(customCommand.regex, {
-    surroundCharacter: "'",
-  })} ${escapeStringIfWhiteSpace(customCommand.message, {
-    surroundCharacter: "'",
-  })}${
+  `!addcc ${escapeWhitespaceChatCommandGroup(
+    customCommand.id
+  )} ${escapeWhitespaceChatCommandGroup(
+    customCommand.regex
+  )} ${escapeWhitespaceChatCommandGroup(customCommand.message)}${
     customCommand.userLevel !== undefined &&
     customCommand.userLevel !== TwitchBadgeLevel.NONE
       ? ` -ul=${convertTwitchBadgeLevelToString(customCommand.userLevel)}`
@@ -38,18 +47,22 @@ const addCustomCommandStringBuilder = (
   }`;
 
 const addCustomBroadcastStringBuilder = (
-  customBroadcast: Pick<CustomBroadcast, "id" | "cronString" | "message"> &
-    Partial<CustomBroadcast>
+  customBroadcast: Readonly<
+    Pick<CustomBroadcast, "id" | "cronString" | "message"> &
+      Partial<CustomBroadcast>
+  >
 ): string =>
-  `!addcb ${escapeStringIfWhiteSpace(customBroadcast.id, {
-    surroundCharacter: "'",
-  })} ${escapeStringIfWhiteSpace(customBroadcast.cronString, {
-    surroundCharacter: "'",
-  })} ${escapeStringIfWhiteSpace(customBroadcast.message, {
-    surroundCharacter: "'",
-  })}`;
+  `!addcb ${escapeWhitespaceChatCommandGroup(
+    customBroadcast.id
+  )} ${escapeWhitespaceChatCommandGroup(
+    customBroadcast.cronString
+  )} ${escapeWhitespaceChatCommandGroup(customBroadcast.message)}`;
 
-export const createCustomCommandsBroadcastsDocumentation = (): string => {
+export const createCustomCommandsBroadcastsDocumentation = (
+  customCommands: DeepReadonlyArray<CustomCommand> = customCommandsInformation,
+  customBroadcasts: DeepReadonlyArray<CustomBroadcast> = customBroadcastsInformation,
+  example = true
+): string => {
   const data: FileDocumentationParts[] = [];
   data.push({
     text:
@@ -61,37 +74,20 @@ export const createCustomCommandsBroadcastsDocumentation = (): string => {
   data.push({
     description: {
       prefix: ">",
-      text: "Add a custom command with an ID, a RegEx expression to detect it and capture contents of the match (https://regex101.com/) and a message",
-    },
-    isComment: false,
-    type: FileDocumentationPartType.VALUE,
-    value: addCustomCommandStringBuilder({
-      id: "ID",
-      message: "MESSAGE",
-      regex: "REGEX",
-    }),
-  });
-  data.push({
-    description: {
-      prefix: ">",
-      text: `Optionally a cooldown (in s) and user level (${Object.values(
-        TwitchBadgeLevel
-      )
-        .filter((a) => typeof a === "number")
-        .map<string>((a) =>
-          convertTwitchBadgeLevelToString(a as TwitchBadgeLevel)
+      text:
+        "Add a custom command with an ID, a RegEx expression to detect it and capture contents of the match (https://regex101.com/) and a message. " +
+        `Optionally a cooldown (in s) and user level (${Object.values(
+          TwitchBadgeLevel
         )
-        .join(", ")}) are also supported`,
+          .filter((a) => typeof a === "number")
+          .map<string>((a) =>
+            convertTwitchBadgeLevelToString(a as TwitchBadgeLevel)
+          )
+          .join(", ")}) are also supported`,
     },
     isComment: false,
     type: FileDocumentationPartType.VALUE,
-    value: addCustomCommandStringBuilder({
-      cooldownInS: 10,
-      id: "ID",
-      message: "MESSAGE",
-      regex: "REGEX",
-      userLevel: TwitchBadgeLevel.MODERATOR,
-    }),
+    value: convertRegexToHumanString(regexCustomCommandAdd),
   });
   data.push({
     description: {
@@ -102,7 +98,7 @@ export const createCustomCommandsBroadcastsDocumentation = (): string => {
     },
     isComment: false,
     type: FileDocumentationPartType.VALUE,
-    value: "!editcc PROPERTY NEW_VALUE",
+    value: convertRegexToHumanString(regexCustomCommandEdit),
   });
   data.push({
     description: {
@@ -111,7 +107,7 @@ export const createCustomCommandsBroadcastsDocumentation = (): string => {
     },
     isComment: false,
     type: FileDocumentationPartType.VALUE,
-    value: "!delcc ID",
+    value: convertRegexToHumanString(regexCustomCommandDelete),
   });
 
   data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
@@ -122,11 +118,7 @@ export const createCustomCommandsBroadcastsDocumentation = (): string => {
     },
     isComment: false,
     type: FileDocumentationPartType.VALUE,
-    value: addCustomBroadcastStringBuilder({
-      cronString: "CRON_STRING",
-      id: "ID",
-      message: "MESSAGE",
-    }),
+    value: convertRegexToHumanString(regexCustomBroadcastAdd),
   });
   data.push({
     description: {
@@ -137,7 +129,7 @@ export const createCustomCommandsBroadcastsDocumentation = (): string => {
     },
     isComment: false,
     type: FileDocumentationPartType.VALUE,
-    value: "!editcb PROPERTY NEW_VALUE",
+    value: convertRegexToHumanString(regexCustomBroadcastEdit),
   });
   data.push({
     description: {
@@ -146,47 +138,51 @@ export const createCustomCommandsBroadcastsDocumentation = (): string => {
     },
     isComment: false,
     type: FileDocumentationPartType.VALUE,
-    value: "!delcb ID",
+    value: convertRegexToHumanString(regexCustomBroadcastDelete),
   });
 
-  data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
-  data.push({
-    text: "Custom command examples:",
-    type: FileDocumentationPartType.TEXT,
-  });
-  for (const customCommand of customCommandsInformation) {
+  if (customCommands.length > 0) {
+    data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
     data.push({
-      description:
-        customCommand.description !== undefined
-          ? {
-              prefix: ">",
-              text: customCommand.description,
-            }
-          : undefined,
-      isComment: false,
-      type: FileDocumentationPartType.VALUE,
-      value: addCustomCommandStringBuilder(customCommand),
+      text: `Custom command${example ? " examples" : "s"}:`,
+      type: FileDocumentationPartType.TEXT,
     });
+    for (const customCommand of customCommands) {
+      data.push({
+        description:
+          customCommand.description !== undefined
+            ? {
+                prefix: ">",
+                text: customCommand.description,
+              }
+            : undefined,
+        isComment: false,
+        type: FileDocumentationPartType.VALUE,
+        value: addCustomCommandStringBuilder(customCommand),
+      });
+    }
   }
 
-  data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
-  data.push({
-    text: "Custom broadcast examples:",
-    type: FileDocumentationPartType.TEXT,
-  });
-  for (const customBroadcast of customBroadcastsInformation) {
+  if (customBroadcasts.length > 0) {
+    data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
     data.push({
-      description:
-        customBroadcast.description !== undefined
-          ? {
-              prefix: ">",
-              text: customBroadcast.description,
-            }
-          : undefined,
-      isComment: false,
-      type: FileDocumentationPartType.VALUE,
-      value: addCustomBroadcastStringBuilder(customBroadcast),
+      text: `Custom broadcast${example ? " examples" : "s"}:`,
+      type: FileDocumentationPartType.TEXT,
     });
+    for (const customBroadcast of customBroadcasts) {
+      data.push({
+        description:
+          customBroadcast.description !== undefined
+            ? {
+                prefix: ">",
+                text: customBroadcast.description,
+              }
+            : undefined,
+        isComment: false,
+        type: FileDocumentationPartType.VALUE,
+        value: addCustomBroadcastStringBuilder(customBroadcast),
+      });
+    }
   }
 
   return fileDocumentationGenerator(data);

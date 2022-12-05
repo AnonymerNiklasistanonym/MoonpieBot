@@ -191,8 +191,8 @@ Chat | Command | Permissions | Description
 `!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` | `pp` | everyone | Get general account information (pp, rank, country, ...) of the account or of the given osu! player
 `osuBeatmapUrl[ comment]` | `requests` | everyone | Request a beatmap requests using an osu! URL and optional comment
 `!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` | `requests` | get=everyone on/off=mod | Get if beatmap requests are currently enabled and with which demands if there are any, Turn beatmap requests on or off with an optional message
-`!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` | `requests` | mod | Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
-`!osuRequests unset option:=TEXT` | `requests` | mod | Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+`!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` | `requests` | mod | Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, enabled, lengthInMinMax, lengthInMinMin, message, redeemId, starMax, starMin)
+`!osuRequests unset option:=TEXT` | `requests` | mod | Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, enabled, lengthInMinMax, lengthInMinMin, message, redeemId, starMax, starMin) back to their default value
 `!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]` | `rp` | everyone | Get the most recent play of the account or of the given osu! player
 `!score osuUserName:=('TEXT'/TEXT)` | `score` | everyone | Get the top score of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 
@@ -651,8 +651,8 @@ Supported features:
   - `!osu commands` (everyone): List all enabled commands
   - `osuBeatmapUrl[ comment]` (everyone): Request a beatmap requests using an osu! URL and optional comment
   - `!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` (get=everyone on/off=mod): Get if beatmap requests are currently enabled and with which demands if there are any, Turn beatmap requests on or off with an optional message
-  - `!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
-  - `!osuRequests unset option:=TEXT` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+  - `!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, enabled, lengthInMinMax, lengthInMinMin, message, redeemId, starMax, starMin)
+  - `!osuRequests unset option:=TEXT` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, enabled, lengthInMinMax, lengthInMinMin, message, redeemId, starMax, starMin) back to their default value
 - OSU_IRC_BEATMAP_REQUESTS: Support sending beatmap requests via IRC messages to the osu! client
 - OSU_STREAM_COMPANION_FILE: Support getting current map/client information from osu! via StreamCompanion using the file interface and will be used in the enabled commands instead of the osu! API
   - `!osu commands` (everyone): List all enabled commands
@@ -774,8 +774,8 @@ Supported features:
   - `!osu commands` (everyone): List all enabled commands
   - `osuBeatmapUrl[ comment]` (everyone): Request a beatmap requests using an osu! URL and optional comment
   - `!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]` (get=everyone on/off=mod): Get if beatmap requests are currently enabled and with which demands if there are any, Turn beatmap requests on or off with an optional message
-  - `!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
-  - `!osuRequests unset option:=TEXT` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+  - `!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)` (mod): Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, enabled, lengthInMinMax, lengthInMinMin, message, redeemId, starMax, starMin)
+  - `!osuRequests unset option:=TEXT` (mod): Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, enabled, lengthInMinMax, lengthInMinMin, message, redeemId, starMax, starMin) back to their default value
 - OSU_IRC_BEATMAP_REQUESTS: Support sending beatmap requests via IRC messages to the osu! client
 
 [//]: # (END)

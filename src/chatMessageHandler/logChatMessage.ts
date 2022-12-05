@@ -16,8 +16,8 @@ import type { Logger } from "winston";
  * @param broadcastSourceId The ID of the broadcast source.
  */
 export const logBroadcastedMessage = (
-  logger: Logger,
-  sentMessage: string[],
+  logger: Readonly<Logger>,
+  sentMessage: ReadonlyArray<string>,
   broadcastSourceId: string
 ): void => {
   logger.log({
@@ -37,9 +37,9 @@ export const logBroadcastedMessage = (
  * @param detectedCommand The command that was detected.
  */
 export const logDetectedCommandInChatMessage = (
-  logger: Logger,
+  logger: Readonly<Logger>,
   messageId: string,
-  message: Readonly<string[]>,
+  message: ReadonlyArray<string>,
   detectedCommand: ChatMessageHandlerInfo
 ): void => {
   logger.log({
@@ -60,9 +60,9 @@ export const logDetectedCommandInChatMessage = (
  * @param replyToMessageId The ID of the message that is replied to.
  */
 export const logChatMessageReply = (
-  logger: Logger,
-  detectedCommand: ChatMessageHandlerInfo,
-  commandReplySentMessage: string[],
+  logger: Readonly<Logger>,
+  detectedCommand: Readonly<ChatMessageHandlerInfo>,
+  commandReplySentMessage: ReadonlyArray<string>,
   replyToMessageId: string
 ): void => {
   logger.log({

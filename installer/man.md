@@ -66,14 +66,14 @@ Supported list values: "*add_broadcast*", "*add_command*", "*commands*", "*delet
 
 **MOONPIE_CONFIG_LOGGING_CONSOLE_LOG_LEVEL**="*info*"
 : The log level of the log messages that are printed to the console.
-Supported values: "*debug*", "*error*", "*info*", "*warn*"
+Supported values: "*debug*", "*error*", "*info*", "*off*", "*warn*"
 
 **MOONPIE_CONFIG_LOGGING_DIRECTORY_PATH**="*logs*"
 : The directory file path of the log files
 
 **MOONPIE_CONFIG_LOGGING_FILE_LOG_LEVEL**="*debug*"
 : The log level of the log messages that are written to the log files.
-Supported values: "*debug*", "*error*", "*info*", "*warn*"
+Supported values: "*debug*", "*error*", "*info*", "*off*", "*warn*"
 
 **MOONPIE_CONFIG_TWITCH_CHANNELS**
 : A with a space separated list of all the channels the bot should be active.
@@ -129,8 +129,8 @@ Supported list values: "*commands*", "*last_request*", "*np*", "*permit_request*
 - "*pp*": "*!pp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]*" (everyone) - Get general account information (pp, rank, country, ...) of the account or of the given osu! player
 - "*requests*": "*osuBeatmapUrl[ comment]*" (everyone) - Request a beatmap requests using an osu! URL and optional comment
 - "*requests*": "*!osuRequests[( on/ off)[ message:=('TEXT'/TEXT)]]*" (get=everyone on/off=mod) - Get if beatmap requests are currently enabled and with which demands if there are any, Turn beatmap requests on or off with an optional message
-- "*requests*": "*!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)*" (mod) - Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin)
-- "*requests*": "*!osuRequests unset option:=TEXT*" (mod) - Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, lengthInMinMax, lengthInMinMin, messageOff, messageOn, redeemId, starMax, starMin) back to their default value
+- "*requests*": "*!osuRequests set option:=TEXT optionValue:=('TEXT'/TEXT)*" (mod) - Set beatmap demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, enabled, lengthInMinMax, lengthInMinMin, message, redeemId, starMax, starMin)
+- "*requests*": "*!osuRequests unset option:=TEXT*" (mod) - Reset beatmap request demands/options (arMax, arMin, csMax, csMin, detailed, detailedIrc, enabled, lengthInMinMax, lengthInMinMin, message, redeemId, starMax, starMin) back to their default value
 - "*rp*": "*!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]*" (everyone) - Get the most recent play of the account or of the given osu! player
 - "*score*": "*!score osuUserName:=('TEXT'/TEXT)*" (everyone) - Get the top score of the given osu! player on the most recently mentioned map in chat (from a beatmap request, rp, np)
 

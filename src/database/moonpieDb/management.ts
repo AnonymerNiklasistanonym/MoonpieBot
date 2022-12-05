@@ -21,7 +21,7 @@ import type { MigrateDatabaseInformation } from "../generic/setup";
  */
 export const setup = async (
   databasePath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<void> =>
   genericSetupDatabase(
     databasePath,

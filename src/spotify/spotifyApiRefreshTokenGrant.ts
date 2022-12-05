@@ -11,6 +11,7 @@ import { createLogFunc } from "../logging";
 import { SpotifyConfig } from "../database/spotifyDb/requests/spotifyConfig";
 import spotifyDb from "../database/spotifyDb";
 // Type imports
+import type { DeepReadonly } from "../other/types";
 import type { Logger } from "winston";
 import type { Server } from "http";
 
@@ -63,9 +64,9 @@ const generateHtmlCodeRefreshTokenGrantBad = (error: Readonly<Error>) =>
   "</body></html>";
 
 export const spotifyApiRefreshTokenGrantServer = (
-  spotifyApi: SpotifyWebApi,
+  spotifyApi: DeepReadonly<SpotifyWebApi>,
   spotifyDatabasePath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Server => {
   const logSpotify = createLogFunc(logger, LOG_ID, "refresh_token_grant");
   const server = http.createServer((req, res) => {

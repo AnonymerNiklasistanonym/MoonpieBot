@@ -24,9 +24,11 @@ import { convertRegexToHumanStringDetailed } from "../src/other/regexToString";
 import { createJob } from "../src/createJob";
 import { createManPageFileContent } from "./lib/man";
 import { getVersionString } from "../src/version";
+import { isStringArray } from "../src/other/types";
 import { version } from "../src/info/version";
 // Type imports
 import type { ChatCommand } from "../src/chatCommand";
+import type { DeepReadonlyArray } from "../src/other/types";
 import type { ManPageInfoEnvVariableCommand } from "./lib/man";
 
 const ROOT_DIR = path.join(__dirname, "..");
@@ -36,17 +38,17 @@ const filePathOutputManPage = path.join(INSTALLER_DIR, "man.md");
 // -----------------------------------------------------------------------------
 
 const getSupportedValues = (
-  info: string[] | readonly ChatCommand<string>[]
+  info: ReadonlyArray<string> | DeepReadonlyArray<ChatCommand<string>>
 ): string[] => {
-  if (info.length === 0 || typeof info[0] === "string") {
-    return info as string[];
+  if (isStringArray(info)) {
+    return info.slice();
   }
   return (info as readonly ChatCommand<string>[]).map((a) => a.id);
 };
 const getCommands = (
-  info: string[] | readonly ChatCommand<string>[]
+  info: ReadonlyArray<string> | DeepReadonlyArray<ChatCommand<string>>
 ): ManPageInfoEnvVariableCommand[] => {
-  if (info.length === 0 || typeof info[0] === "string") {
+  if (isStringArray(info)) {
     return [];
   }
   return (info as readonly ChatCommand<string>[]).map((a) => ({

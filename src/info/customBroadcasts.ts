@@ -3,8 +3,9 @@ import { createMessageParserMessage } from "../messageParser";
 import { pluginRandomNumber } from "./plugins/general";
 // Type imports
 import type { CustomBroadcast } from "../customCommandsBroadcasts/customBroadcast";
+import type { DeepReadonlyArray } from "../other/types";
 
-export const customBroadcastsInformation: CustomBroadcast[] = [
+export const customBroadcastsInformation: DeepReadonlyArray<CustomBroadcast> = [
   {
     cronString: "*/30 * * * * *",
     id: "Custom timer 1",

@@ -41,19 +41,18 @@ import type {
   MessageParserMacro,
   MessageParserMacroDocumentation,
 } from "../messageParser";
+import type { DeepReadonlyArray } from "../other/types";
 
 /**
  * The default values for all macros.
  */
-export const defaultMacros: MessageParserMacro[] = checkMacrosForDuplicates(
-  "default",
-  macroMoonpieBot
-);
+export const defaultMacros: DeepReadonlyArray<MessageParserMacro> =
+  checkMacrosForDuplicates("default", macroMoonpieBot);
 
 /**
  * The default values for all macros.
  */
-export const defaultMacrosOptional: MessageParserMacroDocumentation[] =
+export const defaultMacrosOptional: DeepReadonlyArray<MessageParserMacroDocumentation> =
   checkMacrosForDuplicates<MessageParserMacroDocumentation>(
     "default-optional",
     macroCustomBroadcastInfo,

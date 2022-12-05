@@ -179,7 +179,7 @@ export type ParsedCliOptions =
  * @returns Parsed CLI arguments.
  */
 export const parseCliArgs = (
-  cliArgs: Readonly<string[]>
+  cliArgs: ReadonlyArray<string>
 ): DeepReadonly<ParsedCliOptions> => {
   // Exit early if an argument was found that terminates the program
   if (cliArgs.includes(CliOption.HELP)) {

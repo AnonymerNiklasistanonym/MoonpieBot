@@ -12,8 +12,8 @@ import {
 } from "./customCommandsBroadcasts/customBroadcast";
 import { createOsuIrcConnection, tryToSendOsuIrcMessage } from "./osuIrc";
 import {
-  createStreamCompanionFileConnection as createStreamCompanionFile,
-  createStreamCompanionWebSocketConnection as createStreamCompanionWebSocket,
+  createStreamCompanionFileConnection,
+  createStreamCompanionWebSocketConnection,
 } from "./osuStreamCompanion";
 import { createTwitchClient, TwitchClientListener } from "./twitch";
 import { Feature, getFeature, getFeatures } from "./info/features";
@@ -89,7 +89,7 @@ const LOG_ID = "main";
  * @param logDir The directory in which all logs are contained.
  */
 export const main = async (
-  logger: Logger,
+  logger: Readonly<Logger>,
   config: DeepReadonly<MoonpieConfig>
 ): Promise<void> => {
   const loggerMain = createLogFunc(logger, LOG_ID);
@@ -171,14 +171,13 @@ export const main = async (
   // > osu! StreamCompanion current map data fetcher
   const osuStreamCompanionCurrentMapData =
     featureOsuStreamCompanionWeb?.id === Feature.OSU_STREAM_COMPANION_WEB
-      ? createStreamCompanionWebSocket(
+      ? createStreamCompanionWebSocketConnection(
           featureOsuStreamCompanionWeb.data.url,
           logger
         )
       : featureOsuStreamCompanionFile?.id === Feature.OSU_STREAM_COMPANION_FILE
-      ? createStreamCompanionFile(
-          featureOsuStreamCompanionFile.data.dirPath,
-          logger
+      ? createStreamCompanionFileConnection(
+          featureOsuStreamCompanionFile.data.dirPath
         )
       : undefined;
 
@@ -442,7 +441,7 @@ export const main = async (
    */
   const onNewMessage = async (
     channel: string,
-    tags: ChatUserstate,
+    tags: Readonly<ChatUserstate>,
     message: string,
     self: boolean
   ): Promise<void> => {

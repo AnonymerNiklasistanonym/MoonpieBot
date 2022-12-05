@@ -24,6 +24,7 @@ import { regexOsuChatHandlerCommandRequestsSet } from "./regex";
 import { SpotifyCommands } from "./chatCommands";
 // Type imports
 import type { CliEnvVariableInformation } from "../cli";
+import type { DeepReadonlyArray } from "../other/types";
 import type { EnvVariableStructureElement } from "../env";
 
 /**
@@ -118,10 +119,9 @@ const ENABLE_COMMANDS_DEFAULT_DESCRIPTION = `You can provide a list of commands 
 /**
  * ENV variable information.
  */
-export const envVariableInformation: CliEnvVariableInformation<
-  EnvVariable,
-  EnvVariableBlock
->[] = [
+export const envVariableInformation: DeepReadonlyArray<
+  CliEnvVariableInformation<EnvVariable, EnvVariableBlock>
+> = [
   {
     block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
     default: (configDir) =>
@@ -441,90 +441,91 @@ export const envVariableInformation: CliEnvVariableInformation<
   },
 ];
 
-export const envVariableStructure: EnvVariableStructureElement<EnvVariableBlock>[] =
-  [
-    {
-      content:
-        "This is an example config file for the MoonpieBot that contains all environment variables that the bot uses.",
-      exampleFile: true,
-      name: "File description",
-    },
-    {
-      content: `You can either set the variables yourself or copy this file, rename it from \`${fileNameEnvExample}\` to \`${fileNameEnv}\` and edit it with your own values since this is just an example to show how it should look.`,
-      exampleFile: true,
-      name: "File purpose",
-    },
-    {
-      content: `If a line that starts with '${ENV_PREFIX}' has the symbol '#' in front of it that means it will be ignored as a comment. This means you can add custom comments and easily enable/disable any '${ENV_PREFIX}' option by adding or removing that symbol.`,
-      name: "How to edit file",
-    },
-    {
-      block: EnvVariableBlock.LOGGING,
-      content: "Customize how much and where should be logged.",
-      name: "LOGGING",
-    },
-    {
-      block: EnvVariableBlock.TWITCH,
-      content:
-        "REQUIRED variables that need to be set for ANY configuration to connect to Twitch chat.",
-      name: "TWITCH",
-    },
-    {
-      block: EnvVariableBlock.MOONPIE,
-      content:
-        "Every day a user can claim a moonpie and the count is saved in a persistent database.",
-      name: "MOONPIE",
-    },
-    {
-      block: EnvVariableBlock.OSU,
-      content:
-        "Given a StreamCompanion connection osu! beatmap information (!np) can be provided or given an osu! OAuth client ID/secret and osu! ID plus an osu! IRC login the bot can enable beatmap requests or fetch other osu! related information.",
-      name: "OSU",
-    },
-    {
-      block: EnvVariableBlock.OSU_API,
-      content:
-        "A osu! API connection can be enabled to enable beatmap requests and other osu! commands.",
-      name: "OSU API",
-    },
-    {
-      block: EnvVariableBlock.OSU_STREAM_COMPANION,
-      content:
-        "A osu! StreamCompanion (https://github.com/Piotrekol/StreamCompanion) connection can be enabled for a much better !np command via either a websocket OR file interface.",
-      name: "OSU STREAM COMPANION",
-    },
-    {
-      block: EnvVariableBlock.OSU_IRC,
-      content:
-        "Optional osu! IRC connection that can be enabled to send beatmap requests to the osu! client.",
-      name: "OSU IRC",
-    },
-    {
-      block: EnvVariableBlock.SPOTIFY,
-      content: "Optional Spotify commands that can be enabled.",
-      name: "SPOTIFY",
-    },
-    {
-      block: EnvVariableBlock.SPOTIFY_API,
-      content:
-        "Given a Spotify client ID/secret the bot can fetch some Spotify related information like the currently played song.",
-      name: "SPOTIFY API",
-    },
-    {
-      block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
-      content:
-        "Custom commands and custom broadcasts can be added/edited/deleted via the Twitch chat which are persistently saved in a database. Custom commands will be checked for every new message. Custom broadcasts will be scheduled at start of the bot and rescheduled on any change.",
-      name: "CUSTOM COMMANDS & BROADCASTS",
-    },
-    {
-      block: EnvVariableBlock.TWITCH_API,
-      content:
-        "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
-      name: "TWITCH API",
-    },
-    {
-      block: EnvVariableBlock.LURK,
-      content: "Lurk command that welcomes chatters back.",
-      name: "LURK",
-    },
-  ];
+export const envVariableStructure: DeepReadonlyArray<
+  EnvVariableStructureElement<EnvVariableBlock>
+> = [
+  {
+    content:
+      "This is an example config file for the MoonpieBot that contains all environment variables that the bot uses.",
+    exampleFile: true,
+    name: "File description",
+  },
+  {
+    content: `You can either set the variables yourself or copy this file, rename it from \`${fileNameEnvExample}\` to \`${fileNameEnv}\` and edit it with your own values since this is just an example to show how it should look.`,
+    exampleFile: true,
+    name: "File purpose",
+  },
+  {
+    content: `If a line that starts with '${ENV_PREFIX}' has the symbol '#' in front of it that means it will be ignored as a comment. This means you can add custom comments and easily enable/disable any '${ENV_PREFIX}' option by adding or removing that symbol.`,
+    name: "How to edit file",
+  },
+  {
+    block: EnvVariableBlock.LOGGING,
+    content: "Customize how much and where should be logged.",
+    name: "LOGGING",
+  },
+  {
+    block: EnvVariableBlock.TWITCH,
+    content:
+      "REQUIRED variables that need to be set for ANY configuration to connect to Twitch chat.",
+    name: "TWITCH",
+  },
+  {
+    block: EnvVariableBlock.MOONPIE,
+    content:
+      "Every day a user can claim a moonpie and the count is saved in a persistent database.",
+    name: "MOONPIE",
+  },
+  {
+    block: EnvVariableBlock.OSU,
+    content:
+      "Given a StreamCompanion connection osu! beatmap information (!np) can be provided or given an osu! OAuth client ID/secret and osu! ID plus an osu! IRC login the bot can enable beatmap requests or fetch other osu! related information.",
+    name: "OSU",
+  },
+  {
+    block: EnvVariableBlock.OSU_API,
+    content:
+      "A osu! API connection can be enabled to enable beatmap requests and other osu! commands.",
+    name: "OSU API",
+  },
+  {
+    block: EnvVariableBlock.OSU_STREAM_COMPANION,
+    content:
+      "A osu! StreamCompanion (https://github.com/Piotrekol/StreamCompanion) connection can be enabled for a much better !np command via either a websocket OR file interface.",
+    name: "OSU STREAM COMPANION",
+  },
+  {
+    block: EnvVariableBlock.OSU_IRC,
+    content:
+      "Optional osu! IRC connection that can be enabled to send beatmap requests to the osu! client.",
+    name: "OSU IRC",
+  },
+  {
+    block: EnvVariableBlock.SPOTIFY,
+    content: "Optional Spotify commands that can be enabled.",
+    name: "SPOTIFY",
+  },
+  {
+    block: EnvVariableBlock.SPOTIFY_API,
+    content:
+      "Given a Spotify client ID/secret the bot can fetch some Spotify related information like the currently played song.",
+    name: "SPOTIFY API",
+  },
+  {
+    block: EnvVariableBlock.CUSTOM_COMMANDS_BROADCASTS,
+    content:
+      "Custom commands and custom broadcasts can be added/edited/deleted via the Twitch chat which are persistently saved in a database. Custom commands will be checked for every new message. Custom broadcasts will be scheduled at start of the bot and rescheduled on any change.",
+    name: "CUSTOM COMMANDS & BROADCASTS",
+  },
+  {
+    block: EnvVariableBlock.TWITCH_API,
+    content:
+      "Optional Twitch API connection that can be enabled for advanced custom commands that for example set/get the current game/title.",
+    name: "TWITCH API",
+  },
+  {
+    block: EnvVariableBlock.LURK,
+    content: "Lurk command that welcomes chatters back.",
+    name: "LURK",
+  },
+];

@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-unsafe-regex */
+
 // Type imports
 import type { EMPTY_OBJECT } from "../other/types";
 
@@ -9,7 +11,7 @@ import type { EMPTY_OBJECT } from "../other/types";
  * !moonpie about
  * ```
  */
-export const regexMoonpieChatHandlerCommandAbout =
+export const regexMoonpieChatHandlerCommandAbout: Readonly<RegExp> =
   /^\s*!moonpie\s+about(?:\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandRequests {
@@ -33,8 +35,7 @@ export interface RegexOsuChatHandlerCommandRequests {
  * !osuRequests on
  * ```
  */
-export const regexOsuChatHandlerCommandRequests =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexOsuChatHandlerCommandRequests: Readonly<RegExp> =
   /^\s*!osuRequests(?:(?:\s+(?<on>on)|\s+(?<off>off))(?:\s+(?<message>'[^']+'|\S+)\s*$|\s|$)?)?(?:\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandRequestsSet {
@@ -57,7 +58,7 @@ export interface RegexOsuChatHandlerCommandRequestsSet {
  * !osuRequests set maxStar 10
  * ```
  */
-export const regexOsuChatHandlerCommandRequestsSet =
+export const regexOsuChatHandlerCommandRequestsSet: Readonly<RegExp> =
   /^\s*!osuRequests\s+set\s+(?<option>\S+)\s+(?<optionValue>'[^']+'|\S+)(?:\s*$)/i;
 
 export interface RegexOsuChatHandlerCommandRequestsUnset {
@@ -79,7 +80,7 @@ export interface RegexOsuChatHandlerCommandRequestsUnset {
  * !osuRequests unset maxStar
  * ```
  */
-export const regexOsuChatHandlerCommandRequestsUnset =
+export const regexOsuChatHandlerCommandRequestsUnset: Readonly<RegExp> =
   /^\s*!osuRequests\s+unset\s+(?<option>\S+)(?:\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandLastRequest {
@@ -97,7 +98,7 @@ export interface RegexOsuChatHandlerCommandLastRequest {
  * !osuLastRequests 5
  * ```
  */
-export const regexOsuChatHandlerCommandLastRequest =
+export const regexOsuChatHandlerCommandLastRequest: Readonly<RegExp> =
   /^\s*!osuLastRequest(?:\s+(?<lastRequestCount>[0-9]+)(?:\s|$)|\s|$)/i;
 
 /**
@@ -108,7 +109,7 @@ export const regexOsuChatHandlerCommandLastRequest =
  * !osuPermitRequest
  * ```
  */
-export const regexOsuChatHandlerCommandPermitRequest =
+export const regexOsuChatHandlerCommandPermitRequest: Readonly<RegExp> =
   /^\s*!osuPermitRequest(?:\s|$)/i;
 
 /**
@@ -123,7 +124,8 @@ export const regexOsuChatHandlerCommandPermitRequest =
  * !moonpie Give me moonpie pls
  * ```
  */
-export const regexMoonpieChatHandlerCommandClaim = /^\s*!moonpie(?:\s|$)/i;
+export const regexMoonpieChatHandlerCommandClaim: Readonly<RegExp> =
+  /^\s*!moonpie(?:\s|$)/i;
 
 /**
  * Regex to recognize the `!moonpie commands` command.
@@ -133,7 +135,7 @@ export const regexMoonpieChatHandlerCommandClaim = /^\s*!moonpie(?:\s|$)/i;
  * !moonpie commands
  * ```
  */
-export const regexMoonpieChatHandlerCommandCommands =
+export const regexMoonpieChatHandlerCommandCommands: Readonly<RegExp> =
   /^\s*!moonpie\s+commands(?:\s|$)/i;
 
 /**
@@ -144,7 +146,7 @@ export const regexMoonpieChatHandlerCommandCommands =
  * !spotify commands
  * ```
  */
-export const regexSpotifyChatHandlerCommandCommands =
+export const regexSpotifyChatHandlerCommandCommands: Readonly<RegExp> =
   /^\s*!spotify\s+commands(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandLeaderboard {
@@ -164,8 +166,7 @@ export interface RegexMoonpieChatHandlerCommandLeaderboard {
  * !moonpie leaderboard 20
  * ```
  */
-export const regexMoonpieChatHandlerCommandLeaderboard =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexMoonpieChatHandlerCommandLeaderboard: Readonly<RegExp> =
   /^\s*!moonpie\s+leaderboard(?:\s+(?<startingRank>[0-9]+))?(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserGet {
@@ -181,7 +182,7 @@ export interface RegexMoonpieChatHandlerCommandUserGet {
  * !moonpie get alexa123
  * ```
  */
-export const regexMoonpieChatHandlerCommandUserGet =
+export const regexMoonpieChatHandlerCommandUserGet: Readonly<RegExp> =
   /^\s*!moonpie\s+get\s+(?<userName>(?:'[^']+'|\S+))(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserSet {
@@ -199,7 +200,7 @@ export interface RegexMoonpieChatHandlerCommandUserSet {
  * !moonpie set alexa123 727
  * ```
  */
-export const regexMoonpieChatHandlerCommandUserSet =
+export const regexMoonpieChatHandlerCommandUserSet: Readonly<RegExp> =
   /^\s*!moonpie\s+set\s+(?<userName>(?:'[^']+'|\S+))\s+(?<countSet>[0-9]+)(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserAdd {
@@ -217,7 +218,7 @@ export interface RegexMoonpieChatHandlerCommandUserAdd {
  * !moonpie add alexa123 3
  * ```
  */
-export const regexMoonpieChatHandlerCommandUserAdd =
+export const regexMoonpieChatHandlerCommandUserAdd: Readonly<RegExp> =
   /^\s*!moonpie\s+add\s+(?<userName>(?:'[^']+'|\S+))\s+(?<countAdd>[0-9]+)(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserRemove {
@@ -235,7 +236,7 @@ export interface RegexMoonpieChatHandlerCommandUserRemove {
  * !moonpie remove alexa123 4
  * ```
  */
-export const regexMoonpieChatHandlerCommandUserRemove =
+export const regexMoonpieChatHandlerCommandUserRemove: Readonly<RegExp> =
   /^\s*!moonpie\s+remove\s+(?<userName>(?:'[^']+'|\S+))\s+(?<countRemove>[0-9]+)(?:\s|$)/i;
 
 export interface RegexMoonpieChatHandlerCommandUserDelete {
@@ -251,7 +252,7 @@ export interface RegexMoonpieChatHandlerCommandUserDelete {
  * !moonpie delete alexa123
  * ```
  */
-export const regexMoonpieChatHandlerCommandUserDelete =
+export const regexMoonpieChatHandlerCommandUserDelete: Readonly<RegExp> =
   /^\s*!moonpie\s+delete\s+(?<userName>(?:'[^']+'|\S+))(?:\s|$)/i;
 
 /**
@@ -262,7 +263,7 @@ export const regexMoonpieChatHandlerCommandUserDelete =
  * !osu commands
  * ```
  */
-export const regexOsuChatHandlerCommandCommands =
+export const regexOsuChatHandlerCommandCommands: Readonly<RegExp> =
   /^\s*!osu\s+commands(?:\s|$)/i;
 
 /**
@@ -273,7 +274,8 @@ export const regexOsuChatHandlerCommandCommands =
  * !np $OPTIONAL_TEXT
  * ```
  */
-export const regexOsuChatHandlerCommandNp = /^\s*!np(?:\s|$)/i;
+export const regexOsuChatHandlerCommandNp: Readonly<RegExp> =
+  /^\s*!np(?:\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandPpUserId {
   osuUserId: string;
@@ -304,7 +306,7 @@ export type RegexOsuChatHandlerCommandPp =
  * !pp $CUSTOM_USER_NAME $OPTIONAL_TEXT
  * ```
  */
-export const regexOsuChatHandlerCommandPp =
+export const regexOsuChatHandlerCommandPp: Readonly<RegExp> =
   /^\s*!pp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^']+'|\S+)))(?:\s|$)|\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandRpUserId {
@@ -336,7 +338,7 @@ export type RegexOsuChatHandlerCommandRp =
  * !rp $CUSTOM_USER_NAME $OPTIONAL_TEXT
  * ```
  */
-export const regexOsuChatHandlerCommandRp =
+export const regexOsuChatHandlerCommandRp: Readonly<RegExp> =
   /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^']+'|\S+)))(?:\s|$)|\s|$)/i;
 
 export interface RegexOsuChatHandlerCommandScore {
@@ -352,7 +354,7 @@ export interface RegexOsuChatHandlerCommandScore {
  * !score osuName $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
-export const regexOsuChatHandlerCommandScore =
+export const regexOsuChatHandlerCommandScore: Readonly<RegExp> =
   /^\s*!score\s+(?<osuUserName>(?:'[^']+'|\S+))(?:\s|$)/i;
 
 export interface RegexOsuBeatmapIdFromUrlBase {
@@ -402,8 +404,7 @@ export type RegexOsuBeatmapIdFromUrl =
  * https://osu.ppy.sh/beatmaps/2587891 $COMMENT
  * ```
  */
-export const regexOsuBeatmapIdFromUrl =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexOsuBeatmapIdFromUrl: Readonly<RegExp> =
   /https:\/\/osu\.ppy\.sh\/(?:b\/(?<beatmapIdB>\d+)|beatmaps\/(?<beatmapIdBeatmaps>\d+)|beatmapsets\/\d+\/?#\S+\/(?<beatmapIdBeatmapsets>\d+)|beatmapsets\/(?<beatmapIdBeatmapsetsDownload>\d+)(?:\/download)?)\/?(?:\s+(?<comment>\S.*?)\s*$)?/i;
 
 export const regexOsuBeatmapUrlSplitter = (message: string): string[] =>
@@ -430,7 +431,7 @@ export interface RegexOsuWindowTitleNowPlaying {
  * osu! - Artist - Title [TV Size] [Version]
  * ```
  */
-export const regexOsuWindowTitleNowPlaying =
+export const regexOsuWindowTitleNowPlaying: Readonly<RegExp> =
   /^\S+\s+-\s+(?<artist>.+?)\s+-\s+(?<title>.+?)\s+\[\s*(?<version>[^[\]]+?)\s*\]$/;
 
 /**
@@ -441,7 +442,8 @@ export const regexOsuWindowTitleNowPlaying =
  * !song $OPTIONAL_TEXT_WITH_SPACES
  * ```
  */
-export const regexSpotifyChatHandlerCommandSong = /^\s*!song(?:\s|$)/i;
+export const regexSpotifyChatHandlerCommandSong: Readonly<RegExp> =
+  /^\s*!song(?:\s|$)/i;
 
 /**
  * Regex to recognize the !cc/!cb commands command.
@@ -455,7 +457,7 @@ export const regexSpotifyChatHandlerCommandSong = /^\s*!song(?:\s|$)/i;
  * !cb commands
  * ```
  */
-export const regexCustomCommandsBroadcastsCommands =
+export const regexCustomCommandsBroadcastsCommands: Readonly<RegExp> =
   /^\s*!(?:ccs?|cbs?|ccs?cbs?)\s+commands(?:\s*$)/i;
 
 export interface RegexCustomCommandAdd {
@@ -473,8 +475,7 @@ export interface RegexCustomCommandAdd {
  * !addcc ID REGEX MESSAGE -ul=mod -cd=12
  * ```
  */
-export const regexCustomCommandAdd =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexCustomCommandAdd: Readonly<RegExp> =
   /^\s*!addcc\s+(?<id>'[^']+'|\S+)\s+(?<regex>'[^']+'|\S+)\s+(?<message>'[^']+'|\S+)(?:\s+-ul=(?<userLevel>mod|vip|none|broadcaster))?(?:\s+-cd=(?<cooldownInS>[0-9]+))?(?:\s|$)/i;
 export interface RegexCustomCommandDelete {
   id: string;
@@ -487,8 +488,7 @@ export interface RegexCustomCommandDelete {
  * !delcc ID
  * ```
  */
-export const regexCustomCommandDelete =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexCustomCommandDelete: Readonly<RegExp> =
   /^\s*!delcc\s+(?<id>'[^']+'|\S+)(?:\s|$)/i;
 export interface RegexCustomCommandList {
   id?: string;
@@ -508,8 +508,7 @@ export interface RegexCustomCommandListOffset {
  * !listccs 2
  * ```
  */
-export const regexCustomCommandList =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexCustomCommandList: Readonly<RegExp> =
   /^\s*!listccs?(?:\s+(?<listOffset>[0-9]+?)|\s+(?<id>'[^']+'|\S+))?(?:\s|$)/i;
 export interface RegexCustomCommandEdit {
   id: string;
@@ -524,8 +523,7 @@ export interface RegexCustomCommandEdit {
  * !editcc ID OPTION OPTION_VALUE
  * ```
  */
-export const regexCustomCommandEdit =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexCustomCommandEdit: Readonly<RegExp> =
   /^\s*!editcc\s+(?<id>'[^']+'|\S+)\s+(?<option>\S+)\s+(?<optionValue>'[^']+'|\S+)(?:\s|$)/i;
 
 export interface RegexCustomBroadcastAdd {
@@ -541,8 +539,7 @@ export interface RegexCustomBroadcastAdd {
  * !addcb ID CRON_STRING MESSAGE
  * ```
  */
-export const regexCustomBroadcastAdd =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexCustomBroadcastAdd: Readonly<RegExp> =
   /^\s*!addcb\s+(?<id>'[^']+'|\S+)\s+(?<cronString>'[^']+'|\S+)\s+(?<message>'[^']+'|\S+)(?:\s|$)/i;
 export interface RegexCustomBroadcastDelete {
   id: string;
@@ -555,8 +552,7 @@ export interface RegexCustomBroadcastDelete {
  * !delcb ID
  * ```
  */
-export const regexCustomBroadcastDelete =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexCustomBroadcastDelete: Readonly<RegExp> =
   /^\s*!delcb\s+(?<id>'[^']+'|\S+)(?:\s|$)/i;
 
 export interface RegexCustomBroadcastList {
@@ -577,8 +573,7 @@ export interface RegexCustomBroadcastListOffset {
  * !listcbs 2
  * ```
  */
-export const regexCustomBroadcastList =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexCustomBroadcastList: Readonly<RegExp> =
   /^\s*!listcbs?(?:\s+(?<listOffset>[0-9]+?)|\s+(?<id>'[^']+'|\S+))?(?:\s|$)/i;
 export interface RegexCustomBroadcastEdit {
   id: string;
@@ -593,8 +588,8 @@ export interface RegexCustomBroadcastEdit {
  * !editcb ID OPTION OPTION_VALUE
  * ```
  */
-export const regexCustomBroadcastEdit =
-  // eslint-disable-next-line security/detect-unsafe-regex
+export const regexCustomBroadcastEdit: Readonly<RegExp> =
   /^\s*!editcb\s+(?<id>'[^']+'|\S+)\s+(?<option>\S+)\s+(?<optionValue>'[^']+'|\S+)(?:\s|$)/i;
 
-export const regexLurkChatHandlerCommandLurk = /^\s*!lurk(?:\s|$)/i;
+export const regexLurkChatHandlerCommandLurk: Readonly<RegExp> =
+  /^\s*!lurk(?:\s|$)/i;

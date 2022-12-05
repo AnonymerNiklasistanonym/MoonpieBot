@@ -8,17 +8,17 @@ import { createLogFunc } from "../logging";
 import { createPluginSignature } from "../messageParser/plugins";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
+import type { DeepReadonly } from "../other/types";
 import type { Logger } from "winston";
 import type { MacroMap } from "../messageParser/macros";
 import type { ParseTreeNode } from "../messageParser/createParseTree";
 import type { PluginMap } from "../messageParser/plugins";
-
 /**
  * The logging ID of this module.
  */
 const LOG_ID = "parse_tree_node";
 
-const replaceMacros = (text: string, macros: MacroMap) => {
+const replaceMacros = (text: string, macros: DeepReadonly<MacroMap>) => {
   return text.replace(
     /%([^:\s]+?):([^:\s]+?)%/g,
     (_fullMatch, macroName, macroValue) => {
@@ -60,10 +60,10 @@ const replaceMacros = (text: string, macros: MacroMap) => {
  * @returns The parsed string.
  */
 export const parseTreeNode = async (
-  treeNode: ParseTreeNode,
-  plugins: PluginMap,
-  macros: MacroMap,
-  logger: Logger
+  treeNode: DeepReadonly<ParseTreeNode>,
+  plugins: DeepReadonly<PluginMap>,
+  macros: DeepReadonly<MacroMap>,
+  logger: Readonly<Logger>
 ): Promise<string> => {
   const logMessageParser = createLogFunc(logger, LOG_ID, "parse_tree_node");
 
@@ -155,13 +155,10 @@ export const parseTreeNode = async (
         );
       }
       if (pluginOutput instanceof Map) {
+        const newMacros = new Map(macros) as MacroMap;
         for (const [macroId, macroValues] of pluginOutput) {
-          if (!macros.has(macroId)) {
-            macros.set(macroId, new Map());
-          }
-          for (const [macroName, macroValue] of macroValues) {
-            macros.get(macroId)?.set(macroName, macroValue);
-          }
+          // Overwrite/Set macros
+          newMacros.set(macroId, new Map(macroValues));
         }
         const pluginContentNode = treeNode.pluginContent;
         if (pluginContentNode === undefined) {
@@ -170,8 +167,7 @@ export const parseTreeNode = async (
             ParseTreeNodeErrorCode.NO_PLUGIN_CONTENT
           );
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return parseTreeNode(pluginContentNode, plugins, macros, logger);
+        return parseTreeNode(pluginContentNode, plugins, newMacros, logger);
       } else if (typeof pluginOutput === "string") {
         return pluginOutput;
       } else if (typeof pluginOutput === "boolean") {
@@ -212,13 +208,9 @@ export const parseTreeNode = async (
         }
         if (pluginOutput.plugins && plugins) {
           const stringsPlugins: string[] = [];
-          for (const pluginForSignature of plugins.entries()) {
+          for (const [pluginId, pluginFunc] of plugins) {
             stringsPlugins.push(
-              await createPluginSignature(
-                logger,
-                pluginForSignature[0],
-                pluginForSignature[1]
-              )
+              await createPluginSignature(logger, pluginId, pluginFunc)
             );
           }
           if (helpOutput.length > 0) {

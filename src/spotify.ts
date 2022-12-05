@@ -19,6 +19,7 @@ import type {
   SpotifyApiError,
   SpotifyApiResponse,
 } from "./spotify/spotifyApiTypes";
+import type { DeepReadonly } from "./other/types";
 import type { Logger } from "winston";
 
 /**
@@ -46,7 +47,7 @@ export const setupAndGetSpotifyApiClient = async (
   spotifyClientId: string,
   spotifyClientSecret: string,
   spotifyDatabasePath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<SpotifyWebApi> => {
   const logSpotify = createLogFunc(logger, LOG_ID, "authentication");
 
@@ -133,8 +134,8 @@ export interface SpotifyGetCurrentAndRecentSongs {
  * @returns Currently playing and recently played songs data.
  */
 export const spotifyGetCurrentAndRecentSongs = async (
-  spotifyApi: SpotifyWebApi,
-  logger: Logger
+  spotifyApi: DeepReadonly<SpotifyWebApi>,
+  logger: Readonly<Logger>
 ): Promise<SpotifyGetCurrentAndRecentSongs> => {
   const logSpotify = createLogFunc(
     logger,

@@ -1,5 +1,9 @@
 // Type imports
-import type { EMPTY_OBJECT } from "../other/types";
+import type {
+  DeepReadonly,
+  DeepReadonlyArray,
+  EMPTY_OBJECT,
+} from "../other/types";
 
 // A macro is a simple text replace dictionary
 export type MacroDictionaryEntry<MACRO_ENUM extends string = string> = [
@@ -46,13 +50,17 @@ export interface MessageParserMacroGenerator<
   /** Example data. */
   exampleData?: GENERATE_DATA;
   /** Method to generate the macro entries. */
-  generate: (data: GENERATE_DATA) => MacroDictionaryEntry<MACRO_ENUM>[];
+  generate: (
+    data: DeepReadonly<GENERATE_DATA>
+  ) => MacroDictionaryEntry<MACRO_ENUM>[];
 }
 
-export const generateMacroMap = (macros: MessageParserMacro[]): MacroMap => {
+export const generateMacroMap = (
+  macros: DeepReadonlyArray<MessageParserMacro>
+): MacroMap => {
   const macrosMap: MacroMap = new Map();
   for (const macro of macros) {
-    macrosMap.set(macro.id, macro.values);
+    macrosMap.set(macro.id, new Map(macro.values));
   }
   return macrosMap;
 };

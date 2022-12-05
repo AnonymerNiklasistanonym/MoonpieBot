@@ -1,5 +1,5 @@
 // Local imports
-import { createConsoleLogger } from "../../../logging";
+import { createConsoleLogger, LoggerLevel } from "../../../logging";
 import { fileExists } from "../../../other/fileOperations";
 import { SpotifyConfig } from "../../../database/spotifyDb/requests/spotifyConfig";
 import spotifyDb from "../../../database/spotifyDb";
@@ -16,7 +16,7 @@ export const removeSpotifyApiRefreshTokenIfFoundInDb = async (
   }
   const consoleLogger = createConsoleLogger(
     "removeSpotifyApiRefreshTokenIfFoundInDb",
-    "error"
+    LoggerLevel.ERROR
   );
   await spotifyDb.setup(spotifyDatabasePath, consoleLogger);
   const entries = await spotifyDb.requests.spotifyConfig.getEntries(

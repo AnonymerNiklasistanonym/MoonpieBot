@@ -24,12 +24,8 @@ export enum PluginOsuApi {
   USER = "OSU_API_USER",
 }
 
-export interface PluginOsuBeatmapGeneratorData {
-  osuApiV2Credentials: OsuApiV2Credentials;
-}
-
 export interface PluginsOsuGeneratorData {
-  osuApiV2Credentials: OsuApiV2Credentials;
+  osuApiV2Credentials: Readonly<OsuApiV2Credentials>;
 }
 
 export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGeneratorData>[] =

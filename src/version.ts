@@ -6,6 +6,7 @@
 import { convertUndefinedToCustomValue } from "./other/types";
 // Type imports
 import type { ComparatorValues } from "./other/genericStringSorter";
+import type { DeepReadonly } from "./other/types";
 
 /**
  * The Version structure.
@@ -23,7 +24,7 @@ export interface Version {
  * @returns Version string.
  */
 export const getVersionString = (
-  version: Readonly<Version>,
+  version: DeepReadonly<Version>,
   prefix = "v"
 ): string =>
   `${prefix}${version.major}.${version.minor}.${version.patch}${
@@ -37,8 +38,8 @@ export const getVersionString = (
  * B newer.
  */
 export const compareVersions = (
-  versionA: Readonly<Version>,
-  versionB: Readonly<Version>
+  versionA: DeepReadonly<Version>,
+  versionB: DeepReadonly<Version>
 ): ComparatorValues => {
   const aOlder =
     versionA.major < versionB.major ||

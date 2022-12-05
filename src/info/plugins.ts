@@ -37,11 +37,12 @@ import type {
   MessageParserPlugin,
   MessageParserPluginInfo,
 } from "../messageParser";
+import type { DeepReadonlyArray } from "../other/types";
 
 /**
  * The default values for all plugins.
  */
-export const defaultPlugins: MessageParserPlugin[] = [
+export const defaultPlugins: DeepReadonlyArray<MessageParserPlugin> = [
   pluginConvertToShortNumber,
   pluginHelp,
   pluginIfEmpty,
@@ -67,12 +68,13 @@ export const defaultPlugins: MessageParserPlugin[] = [
   pluginUppercase,
 ];
 
-export const defaultPluginsOptional: MessageParserPluginInfo[] = [
-  ...pluginsTwitchChatGenerator.map(generatePluginInfo),
-  ...pluginsOsuGenerator.map(generatePluginInfo),
-  ...pluginsOsuStreamCompanionGenerator.map(generatePluginInfo),
-  generatePluginInfo(pluginSpotifyGenerator),
-  generatePluginInfo(pluginCountGenerator),
-  ...pluginsCustomCommandDataGenerator.map(generatePluginInfo),
-  ...pluginsTwitchApiGenerator.map(generatePluginInfo),
-];
+export const defaultPluginsOptional: DeepReadonlyArray<MessageParserPluginInfo> =
+  [
+    ...pluginsTwitchChatGenerator.map(generatePluginInfo),
+    ...pluginsOsuGenerator.map(generatePluginInfo),
+    ...pluginsOsuStreamCompanionGenerator.map(generatePluginInfo),
+    generatePluginInfo(pluginSpotifyGenerator),
+    generatePluginInfo(pluginCountGenerator),
+    ...pluginsCustomCommandDataGenerator.map(generatePluginInfo),
+    ...pluginsTwitchApiGenerator.map(generatePluginInfo),
+  ];

@@ -3,13 +3,13 @@
 // Package imports
 import path from "path";
 // Local imports
+import { createConsoleLogger, LoggerLevel } from "../src/logging";
 import { defaultMacros, defaultMacrosOptional } from "../src/info/macros";
 import { defaultPlugins, defaultPluginsOptional } from "../src/info/plugins";
 import {
   fileNameEnvExample,
   fileNameEnvStringsExample,
 } from "../src/info/files";
-import { createConsoleLogger } from "../src/logging";
 import { createEnvVariableDocumentation } from "../src/env";
 import { createJob } from "../src/createJob";
 import { createStringsVariableDocumentation } from "../src/documentation/strings";
@@ -36,7 +36,7 @@ Promise.all([
       defaultMacros,
       defaultPluginsOptional,
       defaultMacrosOptional,
-      createConsoleLogger("create_example_files_env_strings", "off")
+      createConsoleLogger("create_example_files_env_strings", LoggerLevel.OFF)
     )
   ),
 ]).catch(console.error);

@@ -1,5 +1,5 @@
 // Type imports
-import type { OrArray } from "./types";
+import type { OrReadonlyArray } from "./types";
 
 const SPLIT_CHARACTER = " ";
 
@@ -14,7 +14,7 @@ const SPLIT_CHARACTER = " ";
  * @returns Array of text strings that never exceed the split length.
  */
 export const splitTextAtLength = (
-  textInput: OrArray<string>,
+  textInput: OrReadonlyArray<string>,
   splitLength: number
 ): string[] =>
   (typeof textInput === "string"

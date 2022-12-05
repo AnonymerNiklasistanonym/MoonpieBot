@@ -12,7 +12,7 @@ import { macroOsuScore } from "../../info/macros/osuApi";
 import { macroOsuScoreRequest } from "../../info/macros/osuScoreRequest";
 import { NOT_FOUND_STATUS_CODE } from "../../other/web";
 import { regexOsuChatHandlerCommandScore } from "../../info/regex";
-import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
+import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -139,7 +139,7 @@ export const commandScore: ChatMessageHandlerReplyCreator<
     if (!matchGroups) {
       throw Error("RegexOsuChatHandlerCommandScore groups undefined");
     }
-    const osuUserName = removeWhitespaceEscapeChatCommand(
+    const osuUserName = removeWhitespaceEscapeChatCommandGroup(
       matchGroups.osuUserName
     );
     return { data: { osuUserName } };

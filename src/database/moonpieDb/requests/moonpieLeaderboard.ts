@@ -36,7 +36,7 @@ export const getEntries = async (
   databasePath: string,
   limit: number | undefined,
   offset: number | undefined,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<GetMoonpieLeaderboardOut[]> => {
   const logMethod = createLogMethod(logger, "database_get_moonpie_leaderboard");
   const runResult = await db.requests.getAll<GetMoonpieLeaderboardDbOut>(
@@ -87,7 +87,7 @@ export const getEntries = async (
 export const getEntry = async (
   databasePath: string,
   twitchId: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<GetMoonpieLeaderboardOut> => {
   const logMethod = createLogMethod(
     logger,

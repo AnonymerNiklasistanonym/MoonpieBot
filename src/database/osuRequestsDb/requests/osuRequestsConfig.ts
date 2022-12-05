@@ -30,7 +30,7 @@ export interface ExistsInput {
 export const existsEntry = async (
   databasePath: string,
   input: ExistsInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_osu_requests_exists");
   try {
@@ -73,7 +73,7 @@ export interface CreateInput {
 export const createEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_osu_requests_create");
   const postResult = await db.requests.post(
@@ -91,7 +91,7 @@ export const createEntry = async (
 export const createOrUpdateEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const exists = await existsEntry(
     databasePath,
@@ -126,7 +126,7 @@ export interface RemoveInput {
 export const removeEntry = async (
   databasePath: string,
   input: RemoveInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_osu_requests_remove");
   const postResult = await db.requests.post(
@@ -155,7 +155,7 @@ export interface GetOsuRequestsConfigOut {
 
 export const getEntries = async (
   databasePath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<GetOsuRequestsConfigOut[]> => {
   const logMethod = createLogMethod(
     logger,
@@ -194,7 +194,7 @@ export interface UpdateInput {
 export const updateEntry = async (
   databasePath: string,
   input: UpdateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_update");
   // Special validations for DB entry request

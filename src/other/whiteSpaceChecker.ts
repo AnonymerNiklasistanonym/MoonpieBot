@@ -5,7 +5,7 @@ export interface EscapeStringIfWhiteSpaceOptions {
   surroundCharacter: string;
 }
 export const escapeStringIfWhiteSpace = (
-  str: Readonly<string>,
+  str: string,
   options: Readonly<EscapeStringIfWhiteSpaceOptions> = {
     escapeCharacters: [
       ["\\", "\\\\"],
@@ -17,7 +17,7 @@ export const escapeStringIfWhiteSpace = (
     surroundCharacter: '"',
   }
 ): string => {
-  if (!hasWhiteSpace(str)) {
+  if (!hasWhiteSpace(str) && str.length > 0) {
     return str;
   }
   if (options.escapeCharacters === undefined) {
@@ -29,13 +29,20 @@ export const escapeStringIfWhiteSpace = (
   }
   return `${options.surroundCharacter}${escapedString}${options.surroundCharacter}`;
 };
-export const escapeEnvVariableValue = (str: string): string =>
+
+export const escapeWhitespaceEnvVariableValue = (str: string): string =>
   escapeStringIfWhiteSpace(str, {
     escapeCharacters: [["'", "\\'"]],
     surroundCharacter: "'",
   });
 
-export const removeWhitespaceEscapeChatCommand = (str: string): string =>
+export const escapeWhitespaceChatCommandGroup = (str: string): string =>
+  escapeStringIfWhiteSpace(str, {
+    escapeCharacters: [["'", "\\'"]],
+    surroundCharacter: "'",
+  });
+
+export const removeWhitespaceEscapeChatCommandGroup = (str: string): string =>
   str.startsWith("'") && str.endsWith("'")
     ? str.substring(1, str.length - 1)
     : str;

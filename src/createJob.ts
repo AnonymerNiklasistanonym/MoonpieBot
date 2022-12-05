@@ -14,7 +14,7 @@ export const createJob = async (
   fileType: string,
   filePath: string,
   fileContent: OrPromise<string>,
-  options?: JobOptions
+  options?: Readonly<JobOptions>
 ): Promise<void> => {
   if (options?.silent !== true) {
     console.log(`Create ${fileType} file '${filePath}'...`);
@@ -26,7 +26,7 @@ export const createJob = async (
 export const createJobDirectory = async (
   directoryType: string,
   dirPath: string,
-  options?: JobOptions
+  options?: Readonly<JobOptions>
 ): Promise<void> => {
   if (options?.silent !== true) {
     console.log(`Create ${directoryType} directory '${dirPath}'...`);
@@ -36,10 +36,12 @@ export const createJobDirectory = async (
 
 export const createJobUpdate = async (
   fileType: string,
-  fileUpdateInfo: string[],
+  fileUpdateInfo: ReadonlyArray<string>,
   filePath: string,
-  updateFileContent: (fileContent: Buffer) => OrPromise<string | Buffer>,
-  options?: JobOptions
+  updateFileContent: (
+    fileContent: Readonly<Buffer>
+  ) => OrPromise<string | Buffer>,
+  options?: Readonly<JobOptions>
 ): Promise<void> => {
   if (options?.silent !== true) {
     console.log(

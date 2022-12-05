@@ -22,7 +22,7 @@ import type { StringMap } from "../messageParser";
 /**
  * The default values for all strings.
  */
-export const defaultStringMap: StringMap = generateStringMap(
+export const defaultStringMap: Readonly<StringMap> = generateStringMap(
   ...customCommandsBroadcastsCommands,
   ...customCommandsBroadcastsCommandReply,
   ...general,

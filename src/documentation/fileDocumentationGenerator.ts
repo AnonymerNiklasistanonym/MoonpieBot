@@ -88,7 +88,7 @@ const HEADING_DIVIDER_CHARACTER = "-";
  * @returns The documentation multiline string that can be written to a file.
  */
 export const fileDocumentationGenerator = (
-  inputParts: FileDocumentationParts[],
+  inputParts: Readonly<FileDocumentationParts[]>,
   splitLength = DEFAULT_MAX_LINE_LENGTH
 ): string =>
   inputParts.reduce((out, inputPart) => {

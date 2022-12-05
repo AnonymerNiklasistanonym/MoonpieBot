@@ -6,7 +6,7 @@ import { errorMessageDefaultOsuIdUndefined } from "../../error";
 import { macroOsuPpRpRequest } from "../../info/macros/osuPpRpRequest";
 import { osuCommandReplyPp } from "../../info/strings/osu/commandReply";
 import { regexOsuChatHandlerCommandPp } from "../../info/regex";
-import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
+import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -114,7 +114,7 @@ export const commandPp: ChatMessageHandlerReplyCreator<
     if ("osuUserName" in matchGroups && matchGroups.osuUserName !== undefined) {
       return {
         data: {
-          customOsuName: removeWhitespaceEscapeChatCommand(
+          customOsuName: removeWhitespaceEscapeChatCommandGroup(
             matchGroups.osuUserName
           ),
         },

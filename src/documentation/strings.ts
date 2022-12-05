@@ -9,6 +9,7 @@ import { escapeStringIfWhiteSpace } from "../other/whiteSpaceChecker";
 import { generatePluginAndMacroDocumentation } from "../documentation/messageParser";
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
+import type { DeepReadonly, DeepReadonlyArray } from "../other/types";
 import type {
   FileDocumentationParts,
   FileDocumentationPartText,
@@ -24,13 +25,13 @@ import type { Logger } from "winston";
 import type { StringMap } from "../messageParser";
 
 export const createStringsVariableDocumentation = async (
-  strings: StringMap,
-  plugins?: MessageParserPlugin[],
-  macros?: MessageParserMacro[],
-  optionalPlugins?: MessageParserPluginInfo[],
-  optionalMacros?: MessageParserMacroDocumentation[],
-  logger?: Logger,
-  updatedStringsMap?: StringMap
+  strings: DeepReadonly<StringMap>,
+  plugins?: DeepReadonlyArray<MessageParserPlugin>,
+  macros?: DeepReadonlyArray<MessageParserMacro>,
+  optionalPlugins?: DeepReadonlyArray<MessageParserPluginInfo>,
+  optionalMacros?: DeepReadonlyArray<MessageParserMacroDocumentation>,
+  logger?: Readonly<Logger>,
+  updatedStringsMap?: DeepReadonly<StringMap>
 ): Promise<string> => {
   const data: FileDocumentationParts[] = [];
   data.push({
@@ -81,7 +82,9 @@ export const createStringsVariableDocumentation = async (
     | FileDocumentationPartValue
     | FileDocumentationPartText
   )[] = [];
-  const sortedDefaultStrings = new Map([...defaultStringMap.entries()].sort());
+  const sortedDefaultStrings = new Map(
+    [...new Map(defaultStringMap).entries()].sort()
+  );
   for (const [key, stringEntry] of sortedDefaultStrings) {
     if (stringEntry.description !== undefined) {
       dataDefaultStrings.push({

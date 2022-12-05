@@ -1,4 +1,4 @@
-export const monthNames = [
+export const monthNames = Object.freeze([
   "January",
   "February",
   "March",
@@ -11,4 +11,4 @@ export const monthNames = [
   "October",
   "November",
   "December",
-];
+]);

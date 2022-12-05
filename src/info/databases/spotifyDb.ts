@@ -1,12 +1,15 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Type imports
+import type { DbVersionInfo } from "./genericVersionDb";
 import type { SqliteTable } from "sqlite3-promise-query-api";
 
 /**
  * The SQLite table for spotify configuration information.
  */
-export const spotifyConfigTable: SqliteTable<"option" | "optionValue"> = {
+export const spotifyConfigTable: Readonly<
+  SqliteTable<"option" | "optionValue">
+> = {
   columns: {
     option: {
       name: "option",
@@ -22,7 +25,7 @@ export const spotifyConfigTable: SqliteTable<"option" | "optionValue"> = {
   name: "spotify_config",
 };
 
-export const versionCurrent = {
+export const versionCurrent: Readonly<DbVersionInfo> = {
   major: 0,
   minor: 0,
   patch: 1,

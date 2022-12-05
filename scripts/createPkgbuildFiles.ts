@@ -16,38 +16,39 @@ import { getVersionString } from "../src/version";
 import { version } from "../src/info/version";
 // Type imports
 import type { PkgbuildCustomVariable, PkgbuildInfo } from "./lib/pkgbuild";
+import type { DeepReadonly } from "../src/other/types";
 
-const defaultPCVApplicationName: PkgbuildCustomVariable = {
+const defaultPCVApplicationName: DeepReadonly<PkgbuildCustomVariable> = {
   name: "applicationname",
   note: "The name of the application that is built by this package",
   value: name.toLowerCase(),
 };
-const defaultPCVGitName: PkgbuildCustomVariable = {
+const defaultPCVGitName: DeepReadonly<PkgbuildCustomVariable> = {
   name: "gitname",
   note: "The name of the cloned git directory of the application",
   value: `${referencePCV(defaultPCVApplicationName)}.git`,
 };
-const defaultPCVInstallDir: PkgbuildCustomVariable = {
+const defaultPCVInstallDir: DeepReadonly<PkgbuildCustomVariable> = {
   name: "installdir",
   note: "The install directory of the application",
   value: `/opt/${referencePCV(defaultPCVApplicationName)}`,
 };
-const defaultPCVInstallDirBin: PkgbuildCustomVariable = {
+const defaultPCVInstallDirBin: DeepReadonly<PkgbuildCustomVariable> = {
   name: "installdirbin",
   note: "The install directory for the global binaries",
   value: "/usr/bin",
 };
-const defaultPCVInstallDirDesktop: PkgbuildCustomVariable = {
+const defaultPCVInstallDirDesktop: DeepReadonly<PkgbuildCustomVariable> = {
   name: "installdirdesktop",
   note: "The install directory for the .desktop files",
   value: "/usr/share/applications",
 };
-const defaultPCVInstallDirMan: PkgbuildCustomVariable = {
+const defaultPCVInstallDirMan: DeepReadonly<PkgbuildCustomVariable> = {
   name: "installdirman",
   note: "The install directory for the man pages",
   value: "/usr/share/man/man1",
 };
-const defaultPCVConfigDir: PkgbuildCustomVariable = {
+const defaultPCVConfigDir: DeepReadonly<PkgbuildCustomVariable> = {
   name: "defaultconfigdir",
   note: "The install directory for the man pages",
   value: `$HOME/.local/share/${referencePCV(defaultPCVApplicationName)}`,
@@ -176,7 +177,7 @@ const packageCmdsGenerator = (
   return packageCmds;
 };
 
-const pkgbuildInfo: PkgbuildInfo = {
+const pkgbuildInfo: DeepReadonly<PkgbuildInfo> = {
   arch: "x86_64",
   buildCmds: [
     {
@@ -267,7 +268,7 @@ const pkgbuildBinInfoDownloadUrl = `${referencePV(
   "url"
 )}/releases/download/v${referencePV("pkgver")}/`;
 
-const pkgbuildBinInfo: PkgbuildInfo = {
+const pkgbuildBinInfo: DeepReadonly<PkgbuildInfo> = {
   ...pkgbuildInfo,
   buildCmds: undefined,
   buildCmdsNote: undefined,
@@ -308,7 +309,7 @@ const pkgbuildBinInfo: PkgbuildInfo = {
   ],
 };
 
-const pkgbuildGitInfo: PkgbuildInfo = {
+const pkgbuildGitInfo: DeepReadonly<PkgbuildInfo> = {
   ...pkgbuildInfo,
   pkgname: `${referencePCV(defaultPCVApplicationName)}-git`,
   pkgverCmds: [

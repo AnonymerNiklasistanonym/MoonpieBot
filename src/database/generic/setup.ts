@@ -42,12 +42,12 @@ export interface SetupDatabaseOptions {
  */
 export const genericSetupDatabase = async (
   databasePath: string,
-  tables: SqliteTable[],
-  views: SqliteView[],
-  indices: SqliteIndex[],
-  currentVersion: DbVersionInfo,
-  options: SetupDatabaseOptions | undefined,
-  logger: Logger
+  tables: Readonly<SqliteTable>[],
+  views: Readonly<SqliteView>[],
+  indices: Readonly<SqliteIndex>[],
+  currentVersion: Readonly<DbVersionInfo>,
+  options: Readonly<SetupDatabaseOptions> | undefined,
+  logger: Readonly<Logger>
 ): Promise<void> => {
   const loggerDatabase = createLogFunc(logger, "database", "setup");
   const logMethod = createLogMethod(logger, "database_setup");

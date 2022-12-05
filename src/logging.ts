@@ -6,6 +6,7 @@ import {
 } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 // Type imports
+import type { DeepReadonly } from "./other/types";
 import type { Logger } from "winston";
 
 /**
@@ -15,6 +16,7 @@ export enum LoggerLevel {
   DEBUG = "debug",
   ERROR = "error",
   INFO = "info",
+  OFF = "off",
   WARN = "warn",
 }
 
@@ -36,7 +38,7 @@ export interface LoggerInformation {
  * @param logInfo The information the logger provides.
  * @returns Parsed string.
  */
-const logFormat = (logInfo: LoggerInformation): string => {
+const logFormat = (logInfo: DeepReadonly<LoggerInformation>): string => {
   if (logInfo.timestamp && logInfo.service) {
     if (logInfo.section) {
       if (logInfo.subsection) {
@@ -61,8 +63,8 @@ const logFormat = (logInfo: LoggerInformation): string => {
 export const createLogger = (
   name: string,
   logDir: string,
-  logLevelConsole: LoggerLevel | string = "info",
-  logLevelFile: LoggerLevel | string = "debug"
+  logLevelConsole = LoggerLevel.INFO,
+  logLevelFile = LoggerLevel.DEBUG
 ): Logger =>
   createWinstonLogger({
     defaultMeta: { service: name },
@@ -91,7 +93,7 @@ export const createLogger = (
  */
 export const createConsoleLogger = (
   name: string,
-  logLevelConsole: LoggerLevel | string = "info"
+  logLevelConsole = LoggerLevel.INFO
 ): Logger =>
   createWinstonLogger({
     defaultMeta: { service: name },
@@ -120,7 +122,7 @@ export interface LogFunc {
  * @returns Log function with hardcoded section.
  */
 export const createLogFunc = (
-  logger: Logger,
+  logger: Readonly<Logger>,
   section: string,
   subsection?: string
 ): LogFunc => {

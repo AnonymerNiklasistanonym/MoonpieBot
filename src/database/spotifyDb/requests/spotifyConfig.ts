@@ -33,7 +33,7 @@ export interface ExistsInput {
 export const existsEntry = async (
   databasePath: string,
   input: ExistsInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_spotify_exists");
   try {
@@ -76,7 +76,7 @@ export interface CreateInput {
 export const createEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_spotify_create");
   const postResult = await db.requests.post(
@@ -94,7 +94,7 @@ export const createEntry = async (
 export const createOrUpdateEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const exists = await existsEntry(
     databasePath,
@@ -129,7 +129,7 @@ export interface RemoveInput {
 export const removeEntry = async (
   databasePath: string,
   input: RemoveInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_remove");
   const postResult = await db.requests.post(
@@ -153,7 +153,7 @@ export interface GetOsuRequestsConfigDbOut {
 
 export const getEntries = async (
   databasePath: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<GetOsuRequestsConfigDbOut[]> => {
   const logMethod = createLogMethod(logger, "database_spotify_get_entries");
 
@@ -189,7 +189,7 @@ export interface UpdateInput {
 export const updateEntry = async (
   databasePath: string,
   input: UpdateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_update");
   // Special validations for DB entry request

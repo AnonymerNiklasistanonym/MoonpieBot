@@ -35,7 +35,7 @@ import { checkTwitchBadgeLevel } from "../twitchBadge";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb";
 import { macroCustomBroadcastInfo } from "../../info/macros/customBroadcast";
 import { macroCustomCommandBroadcastInfoEdit } from "../../info/macros/customCommands";
-import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
+import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -143,11 +143,13 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        customBroadcastCronString: removeWhitespaceEscapeChatCommand(
+        customBroadcastCronString: removeWhitespaceEscapeChatCommandGroup(
           matchGroups.cronString
         ),
-        customBroadcastId: removeWhitespaceEscapeChatCommand(matchGroups.id),
-        customBroadcastMessage: removeWhitespaceEscapeChatCommand(
+        customBroadcastId: removeWhitespaceEscapeChatCommandGroup(
+          matchGroups.id
+        ),
+        customBroadcastMessage: removeWhitespaceEscapeChatCommandGroup(
           matchGroups.message
         ),
       },
@@ -228,7 +230,9 @@ export const commandDelCB: ChatMessageHandlerReplyCreator<
     }
     return {
       data: {
-        customBroadcastId: removeWhitespaceEscapeChatCommand(matchGroups.id),
+        customBroadcastId: removeWhitespaceEscapeChatCommandGroup(
+          matchGroups.id
+        ),
       },
     };
   },
@@ -370,7 +374,9 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
     if ("id" in matchGroups && matchGroups.id !== undefined) {
       return {
         data: {
-          customBroadcastId: removeWhitespaceEscapeChatCommand(matchGroups.id),
+          customBroadcastId: removeWhitespaceEscapeChatCommandGroup(
+            matchGroups.id
+          ),
         },
       };
     }
@@ -493,9 +499,11 @@ export const commandEditCB: ChatMessageHandlerReplyCreator<
       }
       return {
         data: {
-          customBroadcastId: removeWhitespaceEscapeChatCommand(matchGroups.id),
+          customBroadcastId: removeWhitespaceEscapeChatCommandGroup(
+            matchGroups.id
+          ),
           customBroadcastOption: matchGroups.option,
-          customBroadcastOptionValue: removeWhitespaceEscapeChatCommand(
+          customBroadcastOptionValue: removeWhitespaceEscapeChatCommandGroup(
             matchGroups.optionValue
           ),
         },

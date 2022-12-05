@@ -9,6 +9,7 @@ import { createLogFunc } from "../logging";
 // Type imports
 import type { Client } from "tmi.js";
 import type { Logger } from "winston";
+import type { OrUndef } from "../other/types";
 
 /**
  * The logging ID of this module.
@@ -90,11 +91,11 @@ export enum TwitchClientListener {
  * @returns Twitch client.
  */
 export const createTwitchClient = (
-  twitchName: string | undefined,
-  twitchOAuthToken: string | undefined,
-  twitchChannels: Readonly<string[]> | undefined,
+  twitchName: OrUndef<string>,
+  twitchOAuthToken: OrUndef<string>,
+  twitchChannels: OrUndef<ReadonlyArray<string>>,
   debug = false,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Client => {
   const logTwitchClient = createLogFunc(logger, LOG_ID, "client");
 

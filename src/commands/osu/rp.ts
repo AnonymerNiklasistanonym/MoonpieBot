@@ -9,7 +9,7 @@ import {
 import { errorMessageDefaultOsuIdUndefined } from "../../error";
 import { macroOsuPpRpRequest } from "../../info/macros/osuPpRpRequest";
 import { regexOsuChatHandlerCommandRp } from "../../info/regex";
-import { removeWhitespaceEscapeChatCommand } from "../../other/whiteSpaceChecker";
+import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -124,7 +124,7 @@ export const commandRp: ChatMessageHandlerReplyCreator<
     ) {
       return {
         data: {
-          customOsuName: removeWhitespaceEscapeChatCommand(
+          customOsuName: removeWhitespaceEscapeChatCommandGroup(
             matchGroups.osuUserName
           ),
         },

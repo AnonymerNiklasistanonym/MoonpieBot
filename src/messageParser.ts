@@ -3,6 +3,7 @@ import { createLogFunc } from "./logging";
 import { createParseTree } from "./messageParser/createParseTree";
 import { parseTreeNode } from "./messageParser/parseTreeNode";
 // Type imports
+import type { DeepReadonly, OrUndef } from "./other/types";
 import type { Logger } from "winston";
 import type { MacroMap } from "./messageParser/macros";
 import type { PluginMap } from "./messageParser/plugins";
@@ -64,11 +65,11 @@ export type {
 const LOG_ID = "message_parser";
 
 export const messageParser = async (
-  messageString: undefined | string,
-  strings: Readonly<StringMap> = new Map(),
-  plugins: Readonly<PluginMap> = new Map(),
-  macros: Readonly<MacroMap> = new Map(),
-  logger: Logger
+  messageString: OrUndef<string>,
+  strings: DeepReadonly<StringMap> = new Map(),
+  plugins: DeepReadonly<PluginMap> = new Map(),
+  macros: DeepReadonly<MacroMap> = new Map(),
+  logger: Readonly<Logger>
 ): Promise<string> => {
   const logMessageParser = createLogFunc(logger, LOG_ID);
 
@@ -85,11 +86,9 @@ export const messageParser = async (
       undefined,
       logger
     );
-    //console.log(JSON.stringify(parseTreeNodeRoot));
     // 2. Parse parse tree from top down
     return await parseTreeNode(parseTreeNodeRoot, plugins, macros, logger);
   } catch (err) {
-    logMessageParser.error(err as Error);
     logMessageParser.error(
       Error(
         `There was an error parsing the message string '${messageString}': ${
@@ -103,10 +102,10 @@ export const messageParser = async (
 
 export const messageParserById = async (
   stringId: string,
-  strings: Readonly<StringMap>,
-  plugins: Readonly<PluginMap> = new Map(),
-  macros: Readonly<MacroMap> = new Map(),
-  logger: Logger
+  strings: DeepReadonly<StringMap>,
+  plugins: DeepReadonly<PluginMap> = new Map(),
+  macros: DeepReadonly<MacroMap> = new Map(),
+  logger: Readonly<Logger>
 ): Promise<string> => {
   const stringEntryFromId = strings.get(stringId);
   if (stringEntryFromId === undefined) {

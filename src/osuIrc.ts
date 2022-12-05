@@ -5,6 +5,7 @@ import { createLogFunc } from "./logging";
 // Type imports
 import type { Client as IrcClient } from "irc";
 import type { Logger } from "winston";
+import type { OrUndef } from "./other/types";
 
 /**
  * The logging ID of this module.
@@ -70,14 +71,12 @@ export const createOsuIrcConnection = (
   osuIrcUsername: string,
   osuIrcPassword: string,
   id: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): IrcClient => {
   const logOsuIrc = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU_IRC, id);
-
-  // TODO Handle authentication errors
   const creationDate = new Date().toISOString();
   logOsuIrc.info(
-    `Trying to connect to ${OSU_IRC_URL}:${OSU_IRC_PORT} as ${osuIrcUsername} (creationDate=${creationDate})`
+    `Trying to connect to ${OSU_IRC_URL}:${OSU_IRC_PORT} as "${osuIrcUsername}" (creationDate=${creationDate})`
   );
   const osuIrcBotInstance = new irc.Client(OSU_IRC_URL, osuIrcUsername, {
     autoConnect: false,
@@ -152,6 +151,7 @@ export const createOsuIrcConnection = (
 };
 
 const NUMBER_OF_RETRIES_TO_CONNECT_TO_OSU_IRC_SERVER = 2;
+const OSU_IRC_COMMAND_WRONG_PASSWORD = "err_passwdmismatch";
 
 export const tryToSendOsuIrcMessage = async (
   osuIrcBot: (id: string) => irc.Client,
@@ -161,15 +161,14 @@ export const tryToSendOsuIrcMessage = async (
   logger: Readonly<Logger>
 ): Promise<void> => {
   const logOsuIrc = createLogFunc(logger, LOG_ID_CHAT_HANDLER_OSU_IRC, id);
-
-  let osuIrcBotInstance: undefined | irc.Client = osuIrcBot(id);
+  let osuIrcBotInstance: OrUndef<irc.Client> = osuIrcBot(id);
   await new Promise<void>((resolve, reject) => {
-    logOsuIrc.debug("Try to connect to osu! IRC channel");
+    logOsuIrc.debug("send msg try to connect to osu! IRC channel");
     osuIrcBotInstance?.connect(
       NUMBER_OF_RETRIES_TO_CONNECT_TO_OSU_IRC_SERVER,
       (reply) => {
         logOsuIrc.debug(
-          `osu! IRC connection was established: ${reply.args.join(", ")}`
+          `send msg connection was established: ${reply.args.join(", ")}`
         );
         message
           .split(OSU_IRC_NEWLINE)
@@ -177,27 +176,30 @@ export const tryToSendOsuIrcMessage = async (
         osuIrcBotInstance?.disconnect("", () => {
           osuIrcBotInstance?.conn.end();
           osuIrcBotInstance = undefined;
-          logOsuIrc.debug("osu! IRC connection was closed");
+          logOsuIrc.debug("send msg: connection was closed");
           resolve();
         });
       }
     );
     osuIrcBotInstance?.on("error", (ircMessage: IrcMessage) => {
-      logOsuIrc.info(`osu! IRC error: ${JSON.stringify(ircMessage)}`);
-      if (ircMessage.command === "err_passwdmismatch") {
-        reject(Error(`osu! IRC password wrong: ${ircMessage.args.join(",")}`));
+      const error = Error(
+        `send msg password wrong: ${ircMessage.args.join(",")}`
+      );
+      logOsuIrc.error(error);
+      if (ircMessage.command === OSU_IRC_COMMAND_WRONG_PASSWORD) {
+        reject(error);
       }
     });
   }).catch(async (err) => {
     await new Promise<void>((resolve) => {
       if (osuIrcBotInstance === undefined) {
-        logOsuIrc.info("osu! IRC connection was already closed");
+        logOsuIrc.info("send msg error cleanup: connection was already closed");
         return resolve();
       }
       osuIrcBotInstance?.disconnect("", () => {
         osuIrcBotInstance?.conn.end();
         osuIrcBotInstance = undefined;
-        logOsuIrc.info("osu! IRC connection was closed");
+        logOsuIrc.info("send msg error cleanup: connection was closed");
         resolve();
       });
     });

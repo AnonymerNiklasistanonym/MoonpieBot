@@ -92,10 +92,10 @@ const checkIfBeatmapMatchesDemands = (
           return false;
         }
         break;
+      case OsuRequestsConfig.ENABLED:
       case OsuRequestsConfig.DETAILED:
       case OsuRequestsConfig.DETAILED_IRC:
-      case OsuRequestsConfig.MESSAGE_OFF:
-      case OsuRequestsConfig.MESSAGE_ON:
+      case OsuRequestsConfig.MESSAGE:
       case OsuRequestsConfig.REDEEM_ID:
         break;
       case OsuRequestsConfig.STAR_MAX:
@@ -228,16 +228,15 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
 
     if (
       osuRequestsConfigEntries.find(
-        (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
-      ) !== undefined
+        (a) => a.option === OsuRequestsConfig.ENABLED
+      )?.optionValue === "false"
     ) {
-      // TODO Allow beatmap to be sent via the !osupermitrequest command
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(
           macroOsuBeatmapRequests,
           {
             customMessage: osuRequestsConfigEntries.find(
-              (a) => a.option === OsuRequestsConfig.MESSAGE_OFF
+              (a) => a.option === OsuRequestsConfig.MESSAGE
             )?.optionValue,
           }
         ),
@@ -288,7 +287,7 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
                 ...osuBeatmapRequestMacros,
                 ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
                   customMessage: osuRequestsConfigEntries.find(
-                    (a) => a.option === OsuRequestsConfig.MESSAGE_ON
+                    (a) => a.option === OsuRequestsConfig.MESSAGE
                   )?.optionValue,
                 }),
                 ...generateMacroMapFromMacroGenerator(

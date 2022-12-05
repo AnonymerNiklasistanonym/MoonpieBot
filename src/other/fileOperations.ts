@@ -54,3 +54,16 @@ export const copyFileWithBackup = async (
   await fs.copyFile(srcFilePath, destFilePath);
   return;
 };
+
+export const getFileContentIfExists = async (
+  filePath: string,
+  errorContent?: string
+): Promise<Buffer | string> => {
+  try {
+    await fs.access(filePath, fs.constants.F_OK);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    return await fs.readFile(filePath);
+  } catch (err) {
+    return errorContent || `Error: File '${filePath}' was not found!`;
+  }
+};

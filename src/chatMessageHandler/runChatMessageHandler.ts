@@ -38,7 +38,7 @@ export interface ChatMessageHandlerReplyCreatorChatUserState
  */
 export type ChatMessageHandlerCreateReply<DATA = EMPTY_OBJECT> = (
   /** The Twitch channel where the current message was written. */
-  channel: Readonly<string>,
+  channel: string,
   /**
    * The Twitch (user) chat state (the user name/id/badges of the user that
    * wrote the current message).
@@ -86,7 +86,7 @@ export interface ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledComman
   /**
    * The enabled commands for the current Twitch chat handler.
    */
-  enabledCommands: Readonly<string[]>;
+  enabledCommands: ReadonlyArray<string>;
 }
 
 /**
@@ -104,7 +104,7 @@ export type ChatMessageHandlerDetect<
   OUTPUT_DATA extends object = EMPTY_OBJECT
 > = (
   tags: Readonly<TwitchChatUserState>,
-  message: Readonly<string>,
+  message: string,
   data: Readonly<INPUT_DATA>
 ) => false | ChatMessageHandlerReplyCreatorDetectorDataOutput<OUTPUT_DATA>;
 
@@ -150,7 +150,7 @@ export interface ChatMessageHandlerReplyCreator<
   /** The method that detects if something should be handled. */
   detect: ChatMessageHandlerDetect<DETECTOR_INPUT_DATA, DETECTOR_OUTPUT_DATA>;
   /** Information about the chat message handler. */
-  info: ChatMessageHandlerInfo;
+  info: Readonly<ChatMessageHandlerInfo>;
 }
 
 /**
@@ -190,9 +190,9 @@ export const runChatMessageHandlerReplyCreator = async <
   DETECTOR_OUTPUT_DATA extends object = EMPTY_OBJECT
 >(
   client: Readonly<Client>,
-  channel: Readonly<string>,
+  channel: string,
   tags: Readonly<TwitchChatUserState>,
-  message: Readonly<string>,
+  message: string,
   data: DATA,
   globalStrings: Readonly<StringMap>,
   globalPlugins: Readonly<PluginMap>,

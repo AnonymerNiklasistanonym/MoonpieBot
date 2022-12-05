@@ -1,8 +1,13 @@
 // Local imports
 import { genericStringSorter } from "../other/genericStringSorter";
 // Type imports
+import type {
+  DeepReadonly,
+  DeepReadonlyArray,
+  OrArray,
+  OrPromise,
+} from "../other/types";
 import type { ExportedMacroInformation, MacroMap, RequestHelp } from "./macros";
-import type { OrArray, OrPromise } from "../other/types";
 import type { Logger } from "winston";
 import type { ParseTreeNodeErrorCode } from "./errors";
 
@@ -25,7 +30,7 @@ export interface PluginSignature {
  * - a signature information object.
  */
 export type PluginFunc = (
-  logger: Logger,
+  logger: Readonly<Logger>,
   /**
    * The plugin value string if exists.
    */
@@ -68,13 +73,13 @@ export interface MessageParserPlugin extends MessageParserPluginBase {
 
 export interface MessageParserPluginGenerator<DATA>
   extends MessageParserPluginBase {
-  generate: (data: DATA) => PluginFunc;
+  generate: (data: DeepReadonly<DATA>) => PluginFunc;
   signature?: PluginSignature;
 }
 
 export const generatePlugin = <DATA>(
   generator: MessageParserPluginGenerator<DATA>,
-  data: DATA
+  data: DeepReadonly<DATA>
 ): MessageParserPlugin => ({
   ...generator,
   func: async (logger, value, signature) => {
@@ -98,7 +103,7 @@ export interface MessageParserPluginInfo extends MessageParserPluginBase {
 }
 
 export const generatePluginMap = (
-  plugins: MessageParserPlugin[]
+  plugins: DeepReadonlyArray<MessageParserPlugin>
 ): PluginMap => {
   const pluginsMap: PluginMap = new Map();
   for (const plugin of plugins) {
@@ -108,10 +113,10 @@ export const generatePluginMap = (
 };
 
 export const createPluginSignature = async (
-  logger: Logger,
+  logger: Readonly<Logger>,
   pluginName: string,
   pluginFunc?: PluginFunc,
-  pluginSignatureObject?: PluginSignature
+  pluginSignatureObject?: DeepReadonly<PluginSignature>
 ): Promise<string> => {
   // Check for plugin signature
   const argumentSignatures: string[] = [];
@@ -122,7 +127,7 @@ export const createPluginSignature = async (
       pluginSignature = await pluginFunc(logger, undefined, true);
     }
     if (pluginSignatureObject !== undefined) {
-      pluginSignature = pluginSignatureObject;
+      pluginSignature = Object.assign({}, pluginSignatureObject);
     }
     if (
       typeof pluginSignature === "object" &&

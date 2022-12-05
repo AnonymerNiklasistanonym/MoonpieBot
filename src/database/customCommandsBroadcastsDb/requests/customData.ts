@@ -27,7 +27,7 @@ export interface ExistsInput {
 export const existsEntry = async (
   databasePath: string,
   input: ExistsInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_custom_data_exists");
   try {
@@ -60,7 +60,7 @@ export interface CreateInput {
 export const createEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_custom_data_create");
   const columns = [
@@ -93,7 +93,7 @@ export interface RemoveInput {
 export const removeEntry = async (
   databasePath: string,
   input: RemoveInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_custom_data_remove");
   const postResult = await db.requests.post(
@@ -121,10 +121,61 @@ export interface GetInput {
   id: string;
 }
 
+const mapGetCustomDataDbOutToResult = (
+  input: GetCustomDataDbOut
+): CustomDataTypes => {
+  const valueType = convertCustomDataValueTypeStringToValueType(
+    input.valueType
+  );
+  const description = input.description || undefined;
+  switch (valueType) {
+    case CustomDataValueType.NUMBER:
+      return {
+        ...input,
+        description,
+        value: convertCustomDataDbStringToValue(
+          input.value,
+          valueType
+        ) as number,
+        valueType,
+      };
+    case CustomDataValueType.NUMBER_LIST:
+      return {
+        ...input,
+        description,
+        value: convertCustomDataDbStringToValue(
+          input.value,
+          valueType
+        ) as number[],
+        valueType,
+      };
+    case CustomDataValueType.STRING:
+      return {
+        ...input,
+        description,
+        value: convertCustomDataDbStringToValue(
+          input.value,
+          valueType
+        ) as string,
+        valueType,
+      };
+    case CustomDataValueType.STRING_LIST:
+      return {
+        ...input,
+        description,
+        value: convertCustomDataDbStringToValue(
+          input.value,
+          valueType
+        ) as string[],
+        valueType,
+      };
+  }
+};
+
 export const getEntry = async (
   databasePath: string,
   input: GetInput,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<CustomDataTypes> => {
   const logMethod = createLogMethod(logger, "database_custom_data_get_entry");
 
@@ -160,52 +211,42 @@ export const getEntry = async (
     logMethod
   );
   if (runResult) {
-    const valueType = convertCustomDataValueTypeStringToValueType(
-      runResult.valueType
-    );
-    const description = runResult.description || undefined;
-    switch (valueType) {
-      case CustomDataValueType.NUMBER:
-        return {
-          ...runResult,
-          description,
-          value: convertCustomDataDbStringToValue(
-            runResult.value,
-            valueType
-          ) as number,
-          valueType,
-        };
-      case CustomDataValueType.NUMBER_LIST:
-        return {
-          ...runResult,
-          description,
-          value: convertCustomDataDbStringToValue(
-            runResult.value,
-            valueType
-          ) as number[],
-          valueType,
-        };
-      case CustomDataValueType.STRING:
-        return {
-          ...runResult,
-          description,
-          value: convertCustomDataDbStringToValue(
-            runResult.value,
-            valueType
-          ) as string,
-          valueType,
-        };
-      case CustomDataValueType.STRING_LIST:
-        return {
-          ...runResult,
-          description,
-          value: convertCustomDataDbStringToValue(
-            runResult.value,
-            valueType
-          ) as string[],
-          valueType,
-        };
-    }
+    return mapGetCustomDataDbOutToResult(runResult);
+  }
+  throw Error(CustomCommandsBroadcastsDbError.NOT_FOUND);
+};
+
+export const getEntries = async (
+  databasePath: string,
+  logger: Readonly<Logger>
+): Promise<CustomDataTypes[]> => {
+  const logMethod = createLogMethod(logger, "database_custom_data_get_entry");
+
+  const runResult = await db.requests.getAll<GetCustomDataDbOut>(
+    databasePath,
+    db.queries.select(customDataTable.name, [
+      {
+        alias: "description",
+        columnName: customDataTable.columns.description.name,
+      },
+      {
+        alias: "id",
+        columnName: customDataTable.columns.id.name,
+      },
+      {
+        alias: "value",
+        columnName: customDataTable.columns.value.name,
+      },
+      {
+        alias: "valueType",
+        columnName: customDataTable.columns.valueType.name,
+      },
+    ]),
+    undefined,
+    logMethod
+  );
+  if (runResult) {
+    return runResult.map((a) => mapGetCustomDataDbOutToResult(a));
   }
   throw Error(CustomCommandsBroadcastsDbError.NOT_FOUND);
 };
@@ -234,7 +275,7 @@ export const updateEntry = async (
     | UpdateInput
     | Omit<UpdateInputNumber, "valueIncrease">
     | Omit<UpdateInputNumber, "valueDecrease">,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_custom_data_update");
   // Special validations for DB entry request

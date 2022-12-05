@@ -5,10 +5,10 @@ name: Node.js CI
 
 on:
   # Run CI when a new branch or tag is created
-  # TODO Find way to not run when a new branch is pushed
-  #create:
-  #  tags:
-  #    - v*
+  create:
+    # only run if the tag is a supported version tag
+    tags:
+    - 'v[0-9]+.[0-9]+.[0-9]+'
   # Run CI when a new commit is pushed
   push:
     branches:

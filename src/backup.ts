@@ -12,7 +12,7 @@ import {
 } from "./info/files";
 import { getMoonpieConfigFromEnv } from "./info/config/moonpieConfig";
 // Type imports
-import type { DeepReadonly } from "./other/types";
+import type { DeepReadonly, DeepReadonlyArray } from "./other/types";
 import type { Logger } from "winston";
 import type { MoonpieConfig } from "./info/config/moonpieConfig";
 
@@ -22,9 +22,9 @@ interface CopyFile {
 }
 
 const copyFiles = async (
-  files: CopyFile[],
+  files: DeepReadonlyArray<CopyFile>,
   backupDir: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<void> => {
   for (const file of files) {
     logger.info(
@@ -99,7 +99,7 @@ const getBackupFiles = (
 export const importBackup = async (
   configDir: string,
   backupDir: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<void> => {
   logger.info(`Import backup from '${backupDir}' to '${configDir}'...`);
   // Create config directory if it doesn't exist
@@ -157,7 +157,7 @@ export const importBackup = async (
 export const createBackup = async (
   configDir: string,
   backupDir: string,
-  logger: Logger
+  logger: Readonly<Logger>
 ): Promise<void> => {
   logger.info(`Create backup in '${backupDir}' from '${configDir}'...`);
   // Create config/backup directory if it doesn't exist
