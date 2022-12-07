@@ -15,7 +15,7 @@ _installdirman="/usr/share/man/man1"
 _defaultconfigdir="$HOME/.local/share/$_applicationname"
 
 pkgname="$_applicationname-bin"
-pkgver="1.0.31b"
+pkgver="1.0.31"
 pkgrel="1"
 pkgdesc="A custom Twitch chat bot"
 arch=("x86_64")
