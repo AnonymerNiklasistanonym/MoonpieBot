@@ -8,7 +8,7 @@ on:
   push:
     # only run if the tag is a supported version tag
     tags:
-    - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   # This attribute allows to manually trigger the workflow from the
   # Actions tab from the GitHub website
   workflow_dispatch:

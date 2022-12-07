@@ -8,17 +8,17 @@ on:
   create:
     # only run if the tag is a supported version tag
     tags:
-    - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   # Run CI when a new commit is pushed
   push:
     branches:
-    - main
-    - dev
+      - main
+      - dev
   # Run CI when a new pull request is created
   pull_request:
     branches:
-    - main
-    - dev
+      - main
+      - dev
 
 env:
   # The name of the application
