@@ -2,7 +2,7 @@
 !define PRODUCT "MoonpieBot"
 !define PRODUCT_BINARY "moonpiebot"
 ;Define version of the product
-!define PRODUCT_VERSION "1.0.31"
+!define PRODUCT_VERSION "1.0.32"
 ;Define URL of the product
 !define PRODUCT_URL "https://github.com/AnonymerNiklasistanonym/MoonpieBot"
 ;Define local input file names

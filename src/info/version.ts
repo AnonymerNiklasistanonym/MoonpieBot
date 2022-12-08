@@ -12,5 +12,5 @@ export const version: Readonly<Version> = {
   beta: false,
   major: 1,
   minor: 0,
-  patch: 31,
+  patch: 32,
 };
