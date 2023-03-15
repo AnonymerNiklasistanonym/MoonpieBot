@@ -1,8 +1,8 @@
 /* eslint-disable no-console, no-magic-numbers, security/detect-non-literal-fs-filename */
 
 // Package imports
-import * as ResEdit from "resedit";
 import { promises as fs } from "fs";
+import { load as loadResEdit } from "resedit/cjs";
 import path from "path";
 // Local imports
 import { author, description, license, name } from "../src/info/general";
@@ -18,6 +18,8 @@ const filePathExeIcon = path.join(
 );
 
 const updateWindowsExeMetadata = async (windowsExeFile: Buffer) => {
+  const ResEdit = await loadResEdit();
+
   const exe = ResEdit.NtExecutable.from(windowsExeFile);
   const res = ResEdit.NtExecutableResource.from(exe);
   const iconFile = ResEdit.Data.IconFile.from(

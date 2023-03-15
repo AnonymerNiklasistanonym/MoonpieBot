@@ -43,7 +43,7 @@ export const convertUndefinedToCustomValue = <TValue, TCustomValue>(
 export type EMPTY_OBJECT = Record<never, never>;
 
 /** Primitive types that don't need to be readonly since they already are used by value. */
-type ImmutablePrimitive =
+export type ImmutablePrimitive =
   | undefined
   | null
   | boolean

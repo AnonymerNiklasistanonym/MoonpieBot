@@ -202,17 +202,20 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
     {
       description: "Get a random chatter in the current channel",
       generate: (data) => async () => {
+        if (data.twitchUserId === undefined) {
+          throw errorMessageUserIdUndefined();
+        }
         try {
-          const channelChatters =
-            await data.twitchApiClient.unsupported.getChatters(
-              data.channelName
-            );
-          if (channelChatters.allChatters === undefined) {
+          const channelChatters = await data.twitchApiClient.chat.getChatters(
+            data.channelName,
+            data.twitchUserId
+          );
+          if (channelChatters === undefined) {
             throw Error("Twitch API client request getChatters failed");
           }
-          return channelChatters.allChatters[
-            Math.floor(Math.random() * channelChatters.allChatters.length)
-          ];
+          return channelChatters.data[
+            Math.floor(Math.random() * channelChatters.data.length)
+          ].userName;
         } catch (err) {
           throw Error(
             `Chatters could not be fetched '${(err as Error).message}'`
