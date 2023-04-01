@@ -1,16 +1,22 @@
 {
+  "bail": true,
+  "check-leaks": true,
+  "colors": true,
+  "exit": true,
+  "full-trace": true,
+  "no-timeout": true,
+  "parallel": true,
+  "recursive": true,
+  "extension": ["ts"],
+  "node-option": ["experimental-specifier-resolution=node", "loader=ts-node/esm"],
   "require": [
     "ts-node/register",
-    "source-map-support/register",
-    "./test/setup.ts"
+    "./test/setup.mts"
   ],
-  "recursive": true,
-  "check-leaks": true,
-  "exit": true,
-  "parallel": true,
-  "full-trace": true,
-  "bail": true,
-  "no-timeout": true,
-  "colors": true,
-  "watch-files": ["package.json",".mocharc.json","src/**/*.ts", "tests/**/*.ts"]
+  "watch-files": [
+    "package.json",
+    ".mocharc.json",
+    "src/**/*.mts",
+    "tests/**/*.mts"
+  ]
 }

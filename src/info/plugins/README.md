@@ -8,7 +8,7 @@
 ## Standalone Plugin
 
 ```ts
-import type { MessageParserPlugin } from "../plugins";
+import type { MessageParserPlugin } from "../plugins.mjs";
 
 // Should always start with "plugin"
 export const pluginStandalone: MessageParserPlugin = {
@@ -37,7 +37,7 @@ pluginsMap.set(pluginStandalone.id, pluginStandalone.func);
 ## Plugin Generator
 
 ```ts
-import type { MessageParserPluginGenerator } from "../plugins";
+import type { MessageParserPluginGenerator } from "../plugins.mjs";
 
 // Enum that lists all exported plugins with string IDs
 // Should always be named "Plugin" Name

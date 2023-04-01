@@ -1,0 +1,218 @@
+// Package imports
+import db from "sqlite3-promise-query-api";
+// Relative imports
+import { compareVersions, getVersionString } from "../../version.mjs";
+import {
+  OsuRequestsConfig,
+  osuRequestsConfigTable,
+  osuRequestsConfigTableV001,
+  OsuRequestsConfigV002,
+  versionCurrent,
+} from "../../info/databases/osuRequestsDb.mjs";
+import { createLogMethod } from "../logging.mjs";
+import { createOrUpdateEntry } from "./requests/osuRequestsConfig.mjs";
+import { genericSetupDatabase } from "../generic/setup.mjs";
+// Type imports
+import type { Logger } from "winston";
+import type { MigrateDatabaseInformation } from "../generic/setup.mjs";
+
+/**
+ * Create tables if not existing and set them up with data.
+ *
+ * @param databasePath Path to database.
+ * @param logger Logger (for global logs).
+ */
+export const setup = async (
+  databasePath: string,
+  logger: Readonly<Logger>
+): Promise<void> =>
+  genericSetupDatabase(
+    databasePath,
+    [osuRequestsConfigTable],
+    [],
+    [],
+    versionCurrent,
+    {
+      migrateVersion: async (oldVersion, currentVersion) => {
+        const migrations: MigrateDatabaseInformation[] = [];
+        if (
+          compareVersions(oldVersion, { major: 0, minor: 0, patch: 2 }) === -1
+        ) {
+          // Alter table to drop channel column that was in version 0.0.1 but
+          // got removed in version 0.0.2
+          const logMethod = createLogMethod(
+            logger,
+            "database_osu_requests_migrate_00x_002"
+          );
+          // Since the column to drop is a primary key column the table needs
+          // to be renamed and the data needs to be copied.
+          const oldEntries = await db.default.requests.getAll<
+            Record<"option" | "optionValue" | "channel", string>
+          >(
+            databasePath,
+            db.default.queries.select(osuRequestsConfigTableV001.name, [
+              {
+                alias: "option",
+                columnName: osuRequestsConfigTableV001.columns.option.name,
+              },
+              {
+                alias: "optionValue",
+                columnName: osuRequestsConfigTableV001.columns.optionValue.name,
+              },
+              {
+                alias: "channel",
+                columnName:
+                  osuRequestsConfigTableV001.columns.twitchChannel.name,
+              },
+            ]),
+            undefined,
+            logMethod
+          );
+          // Validate if the entries are still valid
+          for (const oldEntry of oldEntries) {
+            if (
+              !Object.values(OsuRequestsConfigV002)
+                .map((a) => a.toString())
+                .includes(oldEntry.option)
+            ) {
+              throw Error(
+                "Could not successfully migrate database because the " +
+                  `option is unknown: '${oldEntry.option}' (${Object.values(
+                    OsuRequestsConfigV002
+                  ).join(",")})`
+              );
+            }
+          }
+          // Now rename the data but don't drop it in case of errors
+          await db.default.requests.post(
+            databasePath,
+            db.default.queries.alterTable(osuRequestsConfigTableV001.name, {
+              newTableName: `${osuRequestsConfigTableV001.name}_old_v001`,
+            }),
+            undefined,
+            logMethod
+          );
+          // Create the current table
+          await db.default.requests.post(
+            databasePath,
+            db.default.queries.createTable(
+              osuRequestsConfigTable.name,
+              Object.values(osuRequestsConfigTable.columns)
+            ),
+            undefined,
+            logMethod
+          );
+          // Copy the data from the old table to the new table
+          for (const oldEntry of oldEntries) {
+            await createOrUpdateEntry(
+              databasePath,
+              {
+                option: oldEntry.option as unknown as OsuRequestsConfig,
+                optionValue: oldEntry.optionValue,
+              },
+              logger
+            );
+          }
+          migrations.push({
+            name: "channel column",
+            relatedVersion: { major: 0, minor: 0, patch: 2 },
+            type: "removed",
+          });
+        }
+        if (
+          compareVersions(oldVersion, { major: 0, minor: 0, patch: 3 }) === -1
+        ) {
+          // Drop rows that got removed in version 0.0.3
+          const logMethod = createLogMethod(
+            logger,
+            "database_osu_requests_migrate_00x_003"
+          );
+          // Since the column to drop is a primary key column the table needs
+          // to be renamed and the data needs to be copied.
+          const oldEntries = await db.default.requests.getAll<
+            Record<"option" | "optionValue", string>
+          >(
+            databasePath,
+            db.default.queries.select(osuRequestsConfigTable.name, [
+              {
+                alias: "option",
+                columnName: osuRequestsConfigTable.columns.option.name,
+              },
+              {
+                alias: "optionValue",
+                columnName: osuRequestsConfigTable.columns.optionValue.name,
+              },
+            ]),
+            undefined,
+            logMethod
+          );
+          // Validate if the entries are still valid
+          for (const oldEntry of oldEntries) {
+            if (
+              !Object.values(OsuRequestsConfigV002)
+                .map((a) => a.toString())
+                .includes(oldEntry.option)
+            ) {
+              throw Error(
+                "Could not successfully migrate database because the " +
+                  `option is unknown: '${oldEntry.option}' (${Object.values(
+                    OsuRequestsConfigV002
+                  ).join(",")})`
+              );
+            }
+          }
+          // Now rename the data but don't drop it in case of errors
+          await db.default.requests.post(
+            databasePath,
+            db.default.queries.alterTable(osuRequestsConfigTable.name, {
+              newTableName: `${osuRequestsConfigTable.name}_old_v002`,
+            }),
+            undefined,
+            logMethod
+          );
+          // Create the current table
+          await db.default.requests.post(
+            databasePath,
+            db.default.queries.createTable(
+              osuRequestsConfigTable.name,
+              Object.values(osuRequestsConfigTable.columns)
+            ),
+            undefined,
+            logMethod
+          );
+          // Copy the data from the old table to the new table
+          for (const oldEntry of oldEntries) {
+            if (
+              !Object.values(OsuRequestsConfig).includes(
+                oldEntry.option as OsuRequestsConfig
+              )
+            ) {
+              continue;
+            }
+            await createOrUpdateEntry(
+              databasePath,
+              {
+                option: oldEntry.option as OsuRequestsConfig,
+                optionValue: oldEntry.optionValue,
+              },
+              logger
+            );
+          }
+          migrations.push({
+            name: "drop rows that were removed",
+            relatedVersion: { major: 0, minor: 0, patch: 3 },
+            type: "removed",
+          });
+        }
+        if (migrations.length > 0) {
+          return migrations;
+        }
+        throw Error(
+          `No database migration was found (old=${
+            oldVersion !== undefined ? getVersionString(oldVersion, "") : "none"
+          },current=${getVersionString(currentVersion, "")})!`
+        );
+      },
+    },
+    logger
+  );

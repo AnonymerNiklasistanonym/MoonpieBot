@@ -2,5 +2,5 @@
 * text=auto
 
 # These files are text and should be normalized (Convert crlf => lf)
-*.ts eol=lf
+*.mts eol=lf
 *.js eol=lf
