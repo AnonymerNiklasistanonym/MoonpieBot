@@ -15,12 +15,12 @@ import {
 
 export type GetConfig<T, CUSTOM_DATA extends EMPTY_OBJECT = EMPTY_OBJECT> = (
   configDir: string,
-  customData?: DeepReadonly<CUSTOM_DATA>
+  customData?: DeepReadonly<CUSTOM_DATA>,
 ) => OrPromise<DeepReadonly<T>>;
 
 export type GetCustomEnvValueFromConfig<T> = (
   envVariable: string,
-  config: DeepReadonly<T>
+  config: DeepReadonly<T>,
 ) => OrUndef<string>;
 
 /**
@@ -41,7 +41,7 @@ export const convertToBoolean = (variableValue?: string): boolean =>
  * @returns True if ON else false otherwise undefined.
  */
 export const convertToBooleanIfNotUndefined = (
-  variableValue?: string
+  variableValue?: string,
 ): OrUndef<boolean> =>
   variableValue === undefined ? undefined : convertToBoolean(variableValue);
 
@@ -54,7 +54,7 @@ export const convertToBooleanIfNotUndefined = (
  */
 export const convertToStringArray = <T extends string = string>(
   variableValue: string,
-  supportedValues?: DeepReadonlyArray<T>
+  supportedValues?: DeepReadonlyArray<T>,
 ): T[] => {
   const tempArray = variableValue
     .split(ENV_LIST_SPLIT_CHARACTER)
@@ -69,12 +69,12 @@ export const convertToStringArray = <T extends string = string>(
         throw Error(
           `Found unexpected '${tempValue}' while only supporting ${supportedValues
             .map((a) => `'${a}'`)
-            .join(",")}`
+            .join(",")}`,
         );
       }
     }
     return (supportedValues.slice() as T[]).filter((a) =>
-      tempArray.includes(a)
+      tempArray.includes(a),
     );
   }
   return tempArray as T[];
@@ -89,7 +89,7 @@ export const convertToStringArray = <T extends string = string>(
  */
 export const convertToInt = (
   variableValue: string,
-  errorMessage = "Could not parse environment variable value string to integer"
+  errorMessage = "Could not parse environment variable value string to integer",
 ): number => {
   const possibleInteger = parseInt(variableValue);
   if (Number.isInteger(possibleInteger)) {
@@ -107,14 +107,14 @@ export const convertToInt = (
  */
 export const convertToIntIfNotUndefined = (
   variableValue: OrUndef<string>,
-  errorMessage = "Could not parse environment variable value string to integer"
+  errorMessage = "Could not parse environment variable value string to integer",
 ): OrUndef<number> =>
   variableValue === undefined
     ? undefined
     : convertToInt(variableValue, errorMessage);
 
 export const convertFromStringArray = (
-  stringArray?: ReadonlyArray<string>
+  stringArray?: readonly string[],
 ): OrUndef<string> =>
   stringArray === undefined
     ? undefined

@@ -26,10 +26,10 @@ export const customCommandsBroadcastsCommandsAddCustomCommand: StringEntry = {
     [
       createShortCommandDescription(
         CustomCommandsBroadcastsCommands.ADD_CUSTOM_COMMAND,
-        getChatCommandsCustomCommandsBroadcasts
+        getChatCommandsCustomCommandsBroadcasts,
       ),
     ],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_ADD_CUSTOM_COMMAND`,
 };
@@ -38,10 +38,10 @@ export const customCommandsBroadcastsCommandsAddCustomBroadcast: StringEntry = {
     [
       createShortCommandDescription(
         CustomCommandsBroadcastsCommands.ADD_CUSTOM_BROADCAST,
-        getChatCommandsCustomCommandsBroadcasts
+        getChatCommandsCustomCommandsBroadcasts,
       ),
     ],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_ADD_CUSTOM_BROADCAST`,
 };
@@ -50,10 +50,10 @@ export const customCommandsBroadcastsCommandsEditCustomCommand: StringEntry = {
     [
       createShortCommandDescription(
         CustomCommandsBroadcastsCommands.EDIT_CUSTOM_COMMAND,
-        getChatCommandsCustomCommandsBroadcasts
+        getChatCommandsCustomCommandsBroadcasts,
       ),
     ],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_EDIT_CUSTOM_COMMAND`,
 };
@@ -63,10 +63,10 @@ export const customCommandsBroadcastsCommandsEditCustomBroadcast: StringEntry =
       [
         createShortCommandDescription(
           CustomCommandsBroadcastsCommands.EDIT_CUSTOM_BROADCAST,
-          getChatCommandsCustomCommandsBroadcasts
+          getChatCommandsCustomCommandsBroadcasts,
         ),
       ],
-      true
+      true,
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_EDIT_CUSTOM_BROADCAST`,
   };
@@ -75,10 +75,10 @@ export const customCommandsBroadcastsCommandsListCustomCommands: StringEntry = {
     [
       createShortCommandDescription(
         CustomCommandsBroadcastsCommands.LIST_CUSTOM_COMMANDS,
-        getChatCommandsCustomCommandsBroadcasts
+        getChatCommandsCustomCommandsBroadcasts,
       ),
     ],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_LIST_CUSTOM_COMMANDS`,
 };
@@ -88,10 +88,10 @@ export const customCommandsBroadcastsCommandsListCustomBroadcasts: StringEntry =
       [
         createShortCommandDescription(
           CustomCommandsBroadcastsCommands.LIST_CUSTOM_BROADCASTS,
-          getChatCommandsCustomCommandsBroadcasts
+          getChatCommandsCustomCommandsBroadcasts,
         ),
       ],
-      true
+      true,
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_LIST_CUSTOM_BROADCAST`,
   };
@@ -101,10 +101,10 @@ export const customCommandsBroadcastsCommandsDeleteCustomCommand: StringEntry =
       [
         createShortCommandDescription(
           CustomCommandsBroadcastsCommands.DELETE_CUSTOM_COMMAND,
-          getChatCommandsCustomCommandsBroadcasts
+          getChatCommandsCustomCommandsBroadcasts,
         ),
       ],
-      true
+      true,
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_DELETE_CUSTOM_COMMAND`,
   };
@@ -114,10 +114,10 @@ export const customCommandsBroadcastsCommandsDeleteCustomBroadcast: StringEntry 
       [
         createShortCommandDescription(
           CustomCommandsBroadcastsCommands.DELETE_CUSTOM_BROADCAST,
-          getChatCommandsCustomCommandsBroadcasts
+          getChatCommandsCustomCommandsBroadcasts,
         ),
       ],
-      true
+      true,
     ),
     id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_DELETE_CUSTOM_BROADCAST`,
   };
@@ -128,7 +128,7 @@ export const customCommandsBroadcastsCommandsPrefix: StringEntry = {
       { name: PluginTwitchChat.USER, type: "plugin" },
       " The following custom commands/broadcasts commands are supported: ",
     ],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMANDS_STRING_ID}_PREFIX`,
 };
@@ -165,11 +165,11 @@ export const customCommandsBroadcastsCommandsString: StringEntry = {
                   type: "reference",
                 },
                 type: "plugin",
-              })
+              }),
             )
             .reduce<(MessageForParserMessagePlugin | string)[]>(
               (prev, curr) => prev.concat([curr, ";"]),
-              []
+              [],
             ),
           name: pluginListFilterUndefined.id,
           scope: {

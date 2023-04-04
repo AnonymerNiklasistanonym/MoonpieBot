@@ -3,6 +3,6 @@ set "PScommand="POWERSHELL Add-Type -AssemblyName System.Windows.Forms;$FolderBr
 for /f "usebackq tokens=*" %%Q in (`%PScommand%`) do set SelectedBackupDir=%%Q
 if "%SelectedBackupDir%"=="" (exit 0)
 @echo on
-moonpiebot.exe --config-dir "%APPDATA%\MoonpieBot" --create-backup "%SelectedBackupDir%" %*
+moonpiebot.exe --config-dir "%APPDATA%\MoonpieBot" create-backup "%SelectedBackupDir%" %*
 @echo off
 pause press [enter]

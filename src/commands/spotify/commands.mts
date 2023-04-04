@@ -26,25 +26,28 @@ export const commandCommands: ChatMessageHandlerReplyCreator<
   CommandCommandsCreateReplyInput,
   CommandCommandsDetectorInput
 > = {
-  createReply: (_channel, _tags, data) => {
+  createReply: (_channel, _tags, data, logger) => {
     return {
       additionalMacros: new Map([
         [
           macroCommandEnabled.id,
           new Map(
-            macroCommandEnabled.generate({
-              convertEnumValueToInfo: (enumValue) => {
-                const enabled = data.enabledCommands.includes(enumValue);
-                switch (enumValue as SpotifyCommands) {
-                  case SpotifyCommands.COMMANDS:
-                    break;
-                  case SpotifyCommands.SONG:
-                    return [spotifyCommandsSong.id, enabled];
-                }
-                return ["undefined", false];
+            macroCommandEnabled.generate(
+              {
+                convertEnumValueToInfo: (enumValue) => {
+                  const enabled = data.enabledCommands.includes(enumValue);
+                  switch (enumValue as SpotifyCommands) {
+                    case SpotifyCommands.COMMANDS:
+                      break;
+                    case SpotifyCommands.SONG:
+                      return [spotifyCommandsSong.id, enabled];
+                  }
+                  return ["undefined", false];
+                },
+                enumValues: Object.values(SpotifyCommands),
               },
-              enumValues: Object.values(SpotifyCommands),
-            })
+              logger,
+            ),
           ),
         ],
       ]),

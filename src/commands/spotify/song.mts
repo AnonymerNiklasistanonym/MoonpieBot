@@ -31,13 +31,13 @@ export const commandSong: ChatMessageHandlerReplyCreator<
   createReply: async (_channel, _tags, data, logger) => {
     const spotifyData = await spotifyGetCurrentAndRecentSongs(
       data.spotifyWebApi,
-      logger
+      logger,
     );
 
     const macrosWithSpotifySong = new Map();
     macrosWithSpotifySong.set(
       macroSpotifySong.id,
-      new Map(macroSpotifySong.generate({ spotifyData }))
+      new Map(macroSpotifySong.generate({ spotifyData }, logger)),
     );
 
     return {

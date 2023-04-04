@@ -30,7 +30,7 @@ export const commandCommands: ChatMessageHandlerReplyCreator<
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
-  createReply: (_channel, _tags, data) => {
+  createReply: (_channel, _tags, data, logger) => {
     return {
       additionalMacros: generateMacroMapFromMacroGenerator(
         macroCommandEnabled,
@@ -60,7 +60,8 @@ export const commandCommands: ChatMessageHandlerReplyCreator<
             return ["undefined", false];
           },
           enumValues: Object.values(MoonpieCommands),
-        }
+        },
+        logger,
       ),
       messageId: moonpieCommandsString.id,
     };

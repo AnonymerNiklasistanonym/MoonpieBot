@@ -1,67 +1,32 @@
 /*
- * Version object and comparison.
+ * Version information and comparison.
  */
 
+// Package imports
+import semver from "semver";
 // Type imports
 import type { ComparatorValues } from "./other/genericStringSorter.mjs";
-import type { DeepReadonly } from "./other/types.mjs";
-// Relative imports
-import { convertUndefinedToCustomValue } from "./other/types.mjs";
-
-/**
- * The Version structure.
- */
-export interface Version {
-  beta?: boolean;
-  major: number;
-  minor: number;
-  patch: number;
-}
+import type { SemVer } from "semver";
 
 /**
  * @param version The version.
- * @param prefix The prefix for the string.
- * @returns Version string.
+ * @returns Version information.
+ * @throws If the version is not valid.
  */
-export const getVersionString = (
-  version: DeepReadonly<Version>,
-  prefix = "v"
-): string =>
-  `${prefix}${version.major}.${version.minor}.${version.patch}${
-    version.beta ? "b" : ""
-  }`;
+export const getVersionInfo = (version: string): SemVer => {
+  const parsedVersion = semver.parse(version);
+  if (parsedVersion == null) {
+    throw Error("Version was not valid!");
+  }
+  return parsedVersion;
+};
 
 /**
- * @param versionA Version A.
- * @param versionB Version B.
- * @returns Return 0 if the same version, 1 if version A is newer, -1 if version
- * B newer.
+ * @param v1 Current version.
+ * @param v2 New version.
+ * @returns 0 if v1 == v2, 1 if v1 is greater, -1 if v2 is greater.
  */
 export const compareVersions = (
-  versionA: DeepReadonly<Version>,
-  versionB: DeepReadonly<Version>
-): ComparatorValues => {
-  const aOlder =
-    versionA.major < versionB.major ||
-    (versionA.major === versionB.major && versionA.minor < versionB.minor) ||
-    (versionA.major === versionB.major &&
-      versionA.minor === versionB.minor &&
-      versionA.patch < versionB.patch) ||
-    (versionA.major === versionB.major &&
-      versionA.minor === versionB.minor &&
-      versionA.patch === versionB.patch &&
-      convertUndefinedToCustomValue(versionA.beta, false) >
-        convertUndefinedToCustomValue(versionB.beta, false));
-  const aNewer =
-    versionA.major > versionB.major ||
-    (versionA.major === versionB.major && versionA.minor > versionB.minor) ||
-    (versionA.major === versionB.major &&
-      versionA.minor === versionB.minor &&
-      versionA.patch > versionB.patch) ||
-    (versionA.major === versionB.major &&
-      versionA.minor === versionB.minor &&
-      versionA.patch === versionB.patch &&
-      convertUndefinedToCustomValue(versionA.beta, false) <
-        convertUndefinedToCustomValue(versionB.beta, false));
-  return aOlder ? -1 : aNewer ? 1 : 0;
-};
+  v1: Readonly<SemVer>,
+  v2: Readonly<SemVer>,
+): ComparatorValues => semver.compare(v1, v2);

@@ -32,12 +32,12 @@ import type { FileDocumentationParts } from "./fileDocumentationGenerator.mjs";
 const addCustomCommandStringBuilder = (
   customCommand: Readonly<
     Pick<CustomCommand, "id" | "regex" | "message"> & Partial<CustomCommand>
-  >
+  >,
 ): string =>
   `!addcc ${escapeWhitespaceChatCommandGroup(
-    customCommand.id
+    customCommand.id,
   )} ${escapeWhitespaceChatCommandGroup(
-    customCommand.regex
+    customCommand.regex,
   )} ${escapeWhitespaceChatCommandGroup(customCommand.message)}${
     customCommand.userLevel !== undefined &&
     customCommand.userLevel !== TwitchBadgeLevel.NONE
@@ -53,18 +53,18 @@ const addCustomBroadcastStringBuilder = (
   customBroadcast: Readonly<
     Pick<CustomBroadcast, "id" | "cronString" | "message"> &
       Partial<CustomBroadcast>
-  >
+  >,
 ): string =>
   `!addcb ${escapeWhitespaceChatCommandGroup(
-    customBroadcast.id
+    customBroadcast.id,
   )} ${escapeWhitespaceChatCommandGroup(
-    customBroadcast.cronString
+    customBroadcast.cronString,
   )} ${escapeWhitespaceChatCommandGroup(customBroadcast.message)}`;
 
 export const createCustomCommandsBroadcastsDocumentation = (
   customCommands: DeepReadonlyArray<CustomCommand> = customCommandsInformation,
   customBroadcasts: DeepReadonlyArray<CustomBroadcast> = customBroadcastsInformation,
-  example = true
+  example = true,
 ): string => {
   const data: FileDocumentationParts[] = [];
   data.push({
@@ -80,11 +80,11 @@ export const createCustomCommandsBroadcastsDocumentation = (
       text:
         "Add a custom command with an ID, a RegEx expression to detect it and capture contents of the match (https://regex101.com/) and a message. " +
         `Optionally a cooldown (in s) and user level (${Object.values(
-          TwitchBadgeLevel
+          TwitchBadgeLevel,
         )
           .filter((a) => typeof a === "number")
           .map<string>((a) =>
-            convertTwitchBadgeLevelToString(a as TwitchBadgeLevel)
+            convertTwitchBadgeLevelToString(a as TwitchBadgeLevel),
           )
           .join(", ")}) are also supported`,
     },
@@ -96,7 +96,7 @@ export const createCustomCommandsBroadcastsDocumentation = (
     description: {
       prefix: ">",
       text: `A single property (${Object.values(CustomCommandValueOptions).join(
-        ", "
+        ", ",
       )}) can be edited of an existing custom command`,
     },
     isComment: false,
@@ -127,7 +127,7 @@ export const createCustomCommandsBroadcastsDocumentation = (
     description: {
       prefix: ">",
       text: `A single property (${Object.values(
-        CustomBroadcastValueOptions
+        CustomBroadcastValueOptions,
       ).join(", ")}) can be edited of an existing custom broadcast`,
     },
     isComment: false,

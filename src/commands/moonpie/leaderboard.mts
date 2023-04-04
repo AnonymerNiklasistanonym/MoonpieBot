@@ -16,9 +16,9 @@ import {
   moonpieCommandReplyLeaderboardErrorNoEntriesFound,
   moonpieCommandReplyLeaderboardPrefix,
 } from "../../info/strings/moonpie/commandReply.mjs";
-import { MAX_LENGTH_OF_A_TWITCH_MESSAGE } from "../../twitch.mjs";
 import moonpieDb from "../../database/moonpieDb.mjs";
 import { regexMoonpieChatHandlerCommandLeaderboard } from "../../info/regex.mjs";
+import { TWITCH_MESSAGE_MAX_CHAR_LENGTH } from "../../twitch.mjs";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -46,14 +46,15 @@ export const commandLeaderboard: ChatMessageHandlerReplyCreator<
         data.moonpieDbPath,
         NUMBER_OF_LEADERBOARD_ENTRIES_TO_FETCH,
         data.startingRank,
-        logger
+        logger,
       );
 
     if (moonpieEntries.length === 0) {
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(
           macroMoonpieLeaderboard,
-          { startingRank: data.startingRank }
+          { startingRank: data.startingRank },
+          logger,
         ),
         isError: true,
         messageId: moonpieCommandReplyLeaderboardErrorNoEntriesFound.id,
@@ -66,20 +67,22 @@ export const commandLeaderboard: ChatMessageHandlerReplyCreator<
         globalStrings,
         globalPlugins,
         globalMacros,
-        logger2
+        logger2,
       ) => {
         const mergedMacros = new Map([
           ...globalMacros,
-          ...generateMacroMapFromMacroGenerator(macroMoonpieLeaderboard, {
-            startingRank: data.startingRank,
-          }),
+          ...generateMacroMapFromMacroGenerator(
+            macroMoonpieLeaderboard,
+            { startingRank: data.startingRank },
+            logger,
+          ),
         ]);
         let messageLeaderboard = await messageParserById(
           moonpieCommandReplyLeaderboardPrefix.id,
           globalStrings,
           globalPlugins,
           mergedMacros,
-          logger2
+          logger2,
         );
         const messageLeaderboardEntries = [];
         for (const moonpieEntry of moonpieEntries) {
@@ -96,21 +99,22 @@ export const commandLeaderboard: ChatMessageHandlerReplyCreator<
                     count: moonpieEntry.count,
                     name: moonpieEntry.name,
                     rank: moonpieEntry.rank,
-                  }
+                  },
+                  logger,
                 ),
               ]),
-              logger
-            )
+              logger,
+            ),
           );
         }
         messageLeaderboard += messageLeaderboardEntries.join(", ");
 
         // Slice the message if too long
         const message =
-          messageLeaderboard.length > MAX_LENGTH_OF_A_TWITCH_MESSAGE
+          messageLeaderboard.length > TWITCH_MESSAGE_MAX_CHAR_LENGTH
             ? messageLeaderboard.slice(
                 0,
-                MAX_LENGTH_OF_A_TWITCH_MESSAGE - "...".length
+                TWITCH_MESSAGE_MAX_CHAR_LENGTH - "...".length,
               ) + "..."
             : messageLeaderboard;
         return message;

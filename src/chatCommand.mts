@@ -12,16 +12,16 @@ export interface ChatCommand<COMMAND_ENUM extends string = string> {
 }
 
 export type GetChatCommand<COMMAND_ENUM extends string = string> = (
-  id: COMMAND_ENUM
+  id: COMMAND_ENUM,
 ) => DeepReadonlyArray<ChatCommand<COMMAND_ENUM>>;
 
 export const createShortCommandDescription = <
-  COMMAND_ENUM extends string = string
+  COMMAND_ENUM extends string = string,
 >(
   id: COMMAND_ENUM,
   getChatCommands: (
-    id: COMMAND_ENUM
-  ) => DeepReadonlyArray<ChatCommand<COMMAND_ENUM>>
+    id: COMMAND_ENUM,
+  ) => DeepReadonlyArray<ChatCommand<COMMAND_ENUM>>,
 ): string => {
   const info = getChatCommands(id);
   if (info.length === 0) {
@@ -35,8 +35,8 @@ export const createShortCommandDescription = <
             ? a.command
             : convertRegexToHumanString(a.command)
         }'${a.permission !== "everyone" ? ` (${a.permission})` : ""} ${
-          a.descriptionShort || a.description
-        }`
+          a.descriptionShort ?? a.description
+        }`,
     )
     .join(", ");
 };

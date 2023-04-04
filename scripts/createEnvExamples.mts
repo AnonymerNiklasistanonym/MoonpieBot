@@ -14,7 +14,7 @@ import {
   fileNameEnvExample,
   fileNameEnvStringsExample,
 } from "../src/info/files.mjs";
-import { createEnvVariableDocumentation } from "../src/env.mjs";
+import { createEnvVariableDocumentation } from "../src/documentation/envVariableDocumentation.mjs";
 import { createJob } from "../src/createJob.mjs";
 import { createStringsVariableDocumentation } from "../src/documentation/strings.mjs";
 import { defaultStringMap } from "../src/info/strings.mjs";
@@ -30,7 +30,7 @@ Promise.all([
   createJob(
     "ENV example",
     envExampleFile,
-    createEnvVariableDocumentation(configDir)
+    createEnvVariableDocumentation(configDir),
   ),
   createJob(
     "ENV strings example",
@@ -41,7 +41,7 @@ Promise.all([
       defaultMacros,
       defaultPluginsOptional,
       defaultMacrosOptional,
-      createConsoleLogger("create_example_files_env_strings", LoggerLevel.OFF)
-    )
+      createConsoleLogger("create_example_files_env_strings", LoggerLevel.OFF),
+    ),
   ),
 ]).catch(console.error);

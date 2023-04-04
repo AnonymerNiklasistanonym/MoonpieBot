@@ -117,7 +117,7 @@ export const getFeatures: GetFeatures<
     const moonpieFeatures: Features[] = [];
     if (config.moonpie.enableCommands.includes(MoonpieCommands.ABOUT)) {
       const enableCommands = config.moonpie.enableCommands.filter(
-        (a) => a === MoonpieCommands.COMMANDS || a === MoonpieCommands.ABOUT
+        (a) => a === MoonpieCommands.COMMANDS || a === MoonpieCommands.ABOUT,
       );
       moonpieFeatures.push({
         chatCommands: enableCommands
@@ -132,11 +132,11 @@ export const getFeatures: GetFeatures<
     }
     if (
       config.moonpie.enableCommands.filter(
-        (a) => a !== MoonpieCommands.COMMANDS && a !== MoonpieCommands.ABOUT
+        (a) => a !== MoonpieCommands.COMMANDS && a !== MoonpieCommands.ABOUT,
       ).length > 0
     ) {
       const enableCommands = config.moonpie.enableCommands.filter(
-        (a) => a !== MoonpieCommands.ABOUT
+        (a) => a !== MoonpieCommands.ABOUT,
       );
       moonpieFeatures.push({
         chatCommands: enableCommands
@@ -174,7 +174,7 @@ export const getFeatures: GetFeatures<
     });
   }
 
-  if (config.lurk && config.lurk.enableCommands.includes(LurkCommands.LURK)) {
+  if (config.lurk?.enableCommands.includes(LurkCommands.LURK)) {
     features.push({
       chatCommands: config.lurk.enableCommands
         .map((id) => getChatCommandsLurk(id))
@@ -189,8 +189,8 @@ export const getFeatures: GetFeatures<
 
   if (
     config.osuApi?.clientId !== undefined &&
-    config.osuApi?.clientSecret !== undefined &&
-    config.osuApi?.defaultId !== undefined
+    config.osuApi.clientSecret !== undefined &&
+    config.osuApi.defaultId !== undefined
   ) {
     const enableCommands =
       config.osu !== undefined
@@ -198,7 +198,7 @@ export const getFeatures: GetFeatures<
             (a) =>
               a !== OsuCommands.LAST_REQUEST &&
               a !== OsuCommands.PERMIT_REQUEST &&
-              a !== OsuCommands.REQUESTS
+              a !== OsuCommands.REQUESTS,
           )
         : [];
     const osuApiData: FeatureDataOsuApi = {
@@ -220,7 +220,7 @@ export const getFeatures: GetFeatures<
 
     if (config.osu?.enableCommands.includes(OsuCommands.REQUESTS)) {
       const enableCommandsRequests = config.osu.enableCommands.filter(
-        (a) => a === OsuCommands.COMMANDS || a === OsuCommands.REQUESTS
+        (a) => a === OsuCommands.COMMANDS || a === OsuCommands.REQUESTS,
       );
       features.push({
         chatCommands: enableCommandsRequests
@@ -239,8 +239,8 @@ export const getFeatures: GetFeatures<
 
       if (
         config.osuIrc?.password !== undefined &&
-        config.osuIrc?.username !== undefined &&
-        config.osuIrc?.requestTarget !== undefined
+        config.osuIrc.username !== undefined &&
+        config.osuIrc.requestTarget !== undefined
       ) {
         features.push({
           chatCommands: [],
@@ -260,7 +260,7 @@ export const getFeatures: GetFeatures<
   if (config.osuStreamCompanion?.url !== undefined) {
     const enableCommands = config.osu
       ? config.osu.enableCommands.filter(
-          (a) => a === OsuCommands.COMMANDS || a === OsuCommands.NP
+          (a) => a === OsuCommands.COMMANDS || a === OsuCommands.NP,
         )
       : [];
     features.push({
@@ -278,7 +278,7 @@ export const getFeatures: GetFeatures<
   } else if (config.osuStreamCompanion?.dirPath !== undefined) {
     const enableCommands = config.osu
       ? config.osu.enableCommands.filter(
-          (a) => a === OsuCommands.COMMANDS || a === OsuCommands.NP
+          (a) => a === OsuCommands.COMMANDS || a === OsuCommands.NP,
         )
       : [];
     features.push({
@@ -298,7 +298,7 @@ export const getFeatures: GetFeatures<
   if (
     config.spotify?.databasePath !== undefined &&
     config.spotifyApi?.clientId !== undefined &&
-    config.spotifyApi?.clientSecret !== undefined
+    config.spotifyApi.clientSecret !== undefined
   ) {
     features.push({
       chatCommands: config.spotify.enableCommands
@@ -320,7 +320,7 @@ export const getFeatures: GetFeatures<
   if (
     customCommandsFeatureEnabled &&
     config.twitchApi?.clientId !== undefined &&
-    config.twitchApi?.accessToken !== undefined
+    config.twitchApi.accessToken !== undefined
   ) {
     features.push({
       chatCommands: [],
@@ -339,5 +339,5 @@ export const getFeatures: GetFeatures<
 
 export const getFeature = (
   features: DeepReadonly<Features[]>,
-  feature: Feature
+  feature: Feature,
 ): undefined | DeepReadonly<Features> => features.find((a) => a.id === feature);

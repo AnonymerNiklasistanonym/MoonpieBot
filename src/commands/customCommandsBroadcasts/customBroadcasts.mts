@@ -24,20 +24,21 @@ import {
   messageParserById,
 } from "../../messageParser.mjs";
 import {
-  MAX_LENGTH_OF_A_TWITCH_MESSAGE,
-  TwitchBadgeLevel,
-} from "../../twitch.mjs";
-import {
   regexCustomBroadcastAdd,
   regexCustomBroadcastDelete,
   regexCustomBroadcastEdit,
   RegexCustomBroadcastEdit,
   regexCustomBroadcastList,
 } from "../../info/regex.mjs";
+import {
+  TWITCH_MESSAGE_MAX_CHAR_LENGTH,
+  TwitchBadgeLevel,
+} from "../../twitch.mjs";
 import { checkTwitchBadgeLevel } from "../twitchBadge.mjs";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb.mjs";
 import { macroCustomBroadcastInfo } from "../../info/macros/customBroadcast.mjs";
 import { macroCustomCommandBroadcastInfoEdit } from "../../info/macros/customCommands.mjs";
+import { normalizeMacroMap } from "../../messageParser/macrosHelper.mjs";
 import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker.mjs";
 // Type imports
 import type {
@@ -51,8 +52,6 @@ import type {
 import type {
   RegexCustomBroadcastAdd,
   RegexCustomBroadcastDelete,
-} from "../../info/regex.mjs";
-import type {
   RegexCustomBroadcastList,
   RegexCustomBroadcastListOffset,
 } from "../../info/regex.mjs";
@@ -74,7 +73,8 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
-      TwitchBadgeLevel.MODERATOR
+      TwitchBadgeLevel.MODERATOR,
+      logger,
     );
     if (twitchBadgeLevelCheck !== undefined) {
       return twitchBadgeLevelCheck;
@@ -90,13 +90,14 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
     try {
       validateCustomBroadcastValue(
         CustomBroadcastValueOptions.CRON_STRING,
-        customBroadcastInfo.cronString
+        customBroadcastInfo.cronString,
       );
     } catch (err) {
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(
           macroCustomBroadcastInfo,
-          customBroadcastInfo
+          customBroadcastInfo,
+          logger,
         ),
         messageId: customCommandsBroadcastsCommandReplyInvalidCronString.id,
       };
@@ -106,14 +107,14 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
       await customCommandsBroadcastsDb.requests.customBroadcast.existsEntry(
         data.customCommandsBroadcastsDbPath,
         { id: data.customBroadcastId },
-        logger
+        logger,
       );
 
     if (!exists) {
       await customCommandsBroadcastsDb.requests.customBroadcast.createEntry(
         data.customCommandsBroadcastsDbPath,
         customBroadcastInfo,
-        logger
+        logger,
       );
       data.customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts = true;
     }
@@ -121,7 +122,8 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
     return {
       additionalMacros: generateMacroMapFromMacroGenerator(
         macroCustomBroadcastInfo,
-        customBroadcastInfo
+        customBroadcastInfo,
+        logger,
       ),
       messageId: exists
         ? customCommandsBroadcastsCommandReplyAddCBAlreadyExists.id
@@ -131,7 +133,7 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
   detect: (_tags, message, data) => {
     if (
       !data.enabledCommands.includes(
-        CustomCommandsBroadcastsCommands.ADD_CUSTOM_BROADCAST
+        CustomCommandsBroadcastsCommands.ADD_CUSTOM_BROADCAST,
       )
     ) {
       return false;
@@ -147,13 +149,13 @@ export const commandAddCB: ChatMessageHandlerReplyCreator<
     return {
       data: {
         customBroadcastCronString: removeWhitespaceEscapeChatCommandGroup(
-          matchGroups.cronString
+          matchGroups.cronString,
         ),
         customBroadcastId: removeWhitespaceEscapeChatCommandGroup(
-          matchGroups.id
+          matchGroups.id,
         ),
         customBroadcastMessage: removeWhitespaceEscapeChatCommandGroup(
-          matchGroups.message
+          matchGroups.message,
         ),
       },
     };
@@ -179,7 +181,8 @@ export const commandDelCB: ChatMessageHandlerReplyCreator<
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
-      TwitchBadgeLevel.MODERATOR
+      TwitchBadgeLevel.MODERATOR,
+      logger,
     );
     if (twitchBadgeLevelCheck !== undefined) {
       return twitchBadgeLevelCheck;
@@ -193,14 +196,14 @@ export const commandDelCB: ChatMessageHandlerReplyCreator<
       await customCommandsBroadcastsDb.requests.customBroadcast.existsEntry(
         data.customCommandsBroadcastsDbPath,
         { id: data.customBroadcastId },
-        logger
+        logger,
       );
 
     if (exists) {
       await customCommandsBroadcastsDb.requests.customBroadcast.removeEntry(
         data.customCommandsBroadcastsDbPath,
         customBroadcastInfo,
-        logger
+        logger,
       );
       data.customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts = true;
     }
@@ -208,7 +211,8 @@ export const commandDelCB: ChatMessageHandlerReplyCreator<
     return {
       additionalMacros: generateMacroMapFromMacroGenerator(
         macroCustomBroadcastInfo,
-        customBroadcastInfo
+        customBroadcastInfo,
+        logger,
       ),
       messageId: exists
         ? customCommandsBroadcastsCommandReplyDelCB.id
@@ -218,7 +222,7 @@ export const commandDelCB: ChatMessageHandlerReplyCreator<
   detect: (_tags, message, data) => {
     if (
       !data.enabledCommands.includes(
-        CustomCommandsBroadcastsCommands.DELETE_CUSTOM_BROADCAST
+        CustomCommandsBroadcastsCommands.DELETE_CUSTOM_BROADCAST,
       )
     ) {
       return false;
@@ -234,7 +238,7 @@ export const commandDelCB: ChatMessageHandlerReplyCreator<
     return {
       data: {
         customBroadcastId: removeWhitespaceEscapeChatCommandGroup(
-          matchGroups.id
+          matchGroups.id,
         ),
       },
     };
@@ -264,7 +268,7 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
         await customCommandsBroadcastsDb.requests.customBroadcast.existsEntry(
           data.customCommandsBroadcastsDbPath,
           { id: data.customBroadcastId },
-          logger
+          logger,
         );
 
       if (exists) {
@@ -272,12 +276,13 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
           await customCommandsBroadcastsDb.requests.customBroadcast.getEntry(
             data.customCommandsBroadcastsDbPath,
             { id: data.customBroadcastId },
-            logger
+            logger,
           );
         return {
           additionalMacros: generateMacroMapFromMacroGenerator(
             macroCustomBroadcastInfo,
-            customBroadcastInfo
+            customBroadcastInfo,
+            logger,
           ),
           messageId: customCommandsBroadcastsCommandReplyListCB.id,
         };
@@ -285,7 +290,8 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(
           macroCustomBroadcastInfo,
-          { id: data.customBroadcastId }
+          { id: data.customBroadcastId },
+          logger,
         ),
         messageId: customCommandsBroadcastsCommandReplyCBNotFound.id,
       };
@@ -297,7 +303,7 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
         data.customBroadcastOffset
           ? Math.max(data.customBroadcastOffset - 1, 0)
           : 0,
-        logger
+        logger,
       );
 
     if (customBroadcastInfos.length === 0) {
@@ -310,14 +316,14 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
         globalStrings,
         globalPlugins,
         globalMacros,
-        logger2
+        logger2,
       ) => {
         let messageList = await messageParserById(
           customCommandsBroadcastsCommandReplyListCBsPrefix.id,
           globalStrings,
           globalPlugins,
           globalMacros,
-          logger2
+          logger2,
         );
         const messageListEntries = [];
         for (const customBroadcastInfo of customBroadcastInfos) {
@@ -328,20 +334,21 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
               globalPlugins,
               generateMacroMapFromMacroGenerator(
                 macroCustomBroadcastInfo,
-                customBroadcastInfo
+                customBroadcastInfo,
+                logger,
               ),
-              logger
-            )
+              logger,
+            ),
           );
         }
         messageList += messageListEntries.join(", ");
 
         // Slice the message if too long
         const message =
-          messageList.length > MAX_LENGTH_OF_A_TWITCH_MESSAGE
+          messageList.length > TWITCH_MESSAGE_MAX_CHAR_LENGTH
             ? messageList.slice(
                 0,
-                MAX_LENGTH_OF_A_TWITCH_MESSAGE - "...".length
+                TWITCH_MESSAGE_MAX_CHAR_LENGTH - "...".length,
               ) + "..."
             : messageList;
         return message;
@@ -351,7 +358,7 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
   detect: (_tags, message, data) => {
     if (
       !data.enabledCommands.includes(
-        CustomCommandsBroadcastsCommands.LIST_CUSTOM_BROADCASTS
+        CustomCommandsBroadcastsCommands.LIST_CUSTOM_BROADCASTS,
       )
     ) {
       return false;
@@ -378,7 +385,7 @@ export const commandListCBs: ChatMessageHandlerReplyCreator<
       return {
         data: {
           customBroadcastId: removeWhitespaceEscapeChatCommandGroup(
-            matchGroups.id
+            matchGroups.id,
           ),
         },
       };
@@ -405,7 +412,8 @@ export const commandEditCB: ChatMessageHandlerReplyCreator<
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
-      TwitchBadgeLevel.MODERATOR
+      TwitchBadgeLevel.MODERATOR,
+      logger,
     );
     if (twitchBadgeLevelCheck !== undefined) {
       return twitchBadgeLevelCheck;
@@ -415,13 +423,14 @@ export const commandEditCB: ChatMessageHandlerReplyCreator<
       await customCommandsBroadcastsDb.requests.customBroadcast.existsEntry(
         data.customCommandsBroadcastsDbPath,
         { id: data.customBroadcastId },
-        logger
+        logger,
       );
     if (!exists) {
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(
           macroCustomBroadcastInfo,
-          { id: data.customBroadcastId }
+          { id: data.customBroadcastId },
+          logger,
         ),
         messageId: customCommandsBroadcastsCommandReplyCBNotFound.id,
       };
@@ -438,7 +447,9 @@ export const commandEditCB: ChatMessageHandlerReplyCreator<
       throw Error(
         `Unknown set option '${
           data.customBroadcastOption
-        }' (supported: ${Object.values(CustomBroadcastValueOptions).join(",")})`
+        }' (supported: ${Object.values(CustomBroadcastValueOptions).join(
+          ",",
+        )})`,
       );
     }
 
@@ -466,21 +477,30 @@ export const commandEditCB: ChatMessageHandlerReplyCreator<
             ? data.customBroadcastOptionValue
             : undefined,
       },
-      logger
+      logger,
     );
     data.customCommandsBroadcastsRefreshHelper.refreshCustomBroadcasts = true;
 
     return {
       additionalMacros: new Map([
-        ...generateMacroMapFromMacroGenerator(macroCustomBroadcastInfo, {
-          id: data.customBroadcastId,
-        }),
-        ...generateMacroMapFromMacroGenerator(
-          macroCustomCommandBroadcastInfoEdit,
-          {
-            option,
-            optionValue: data.customBroadcastOptionValue,
-          }
+        ...normalizeMacroMap(
+          generateMacroMapFromMacroGenerator(
+            macroCustomBroadcastInfo,
+            {
+              id: data.customBroadcastId,
+            },
+            logger,
+          ),
+        ),
+        ...normalizeMacroMap(
+          generateMacroMapFromMacroGenerator(
+            macroCustomCommandBroadcastInfoEdit,
+            {
+              option,
+              optionValue: data.customBroadcastOptionValue,
+            },
+            logger,
+          ),
         ),
       ]),
       messageId: customCommandsBroadcastsCommandReplyEditCB.id,
@@ -489,7 +509,7 @@ export const commandEditCB: ChatMessageHandlerReplyCreator<
   detect: (_tags, message, data) => {
     if (
       !data.enabledCommands.includes(
-        CustomCommandsBroadcastsCommands.EDIT_CUSTOM_BROADCAST
+        CustomCommandsBroadcastsCommands.EDIT_CUSTOM_BROADCAST,
       )
     ) {
       return false;
@@ -503,11 +523,11 @@ export const commandEditCB: ChatMessageHandlerReplyCreator<
       return {
         data: {
           customBroadcastId: removeWhitespaceEscapeChatCommandGroup(
-            matchGroups.id
+            matchGroups.id,
           ),
           customBroadcastOption: matchGroups.option,
           customBroadcastOptionValue: removeWhitespaceEscapeChatCommandGroup(
-            matchGroups.optionValue
+            matchGroups.optionValue,
           ),
         },
       };

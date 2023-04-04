@@ -48,14 +48,14 @@ export const moonpieCommandReplyClaim: StringEntry = {
     " You just claimed a moonpie! You now have ",
     generateMessageParserMessageMacro(
       macroMoonpieLeaderboardEntry,
-      MacroMoonpieLeaderboardEntry.COUNT
+      MacroMoonpieLeaderboardEntry.COUNT,
     ),
     " moonpie",
     {
       args: [
         generateMessageParserMessageMacro(
           macroMoonpieLeaderboardEntry,
-          MacroMoonpieLeaderboardEntry.COUNT
+          MacroMoonpieLeaderboardEntry.COUNT,
         ),
         "!==1",
       ],
@@ -66,7 +66,7 @@ export const moonpieCommandReplyClaim: StringEntry = {
     " and are rank ",
     generateMessageParserMessageMacro(
       macroMoonpieLeaderboardEntry,
-      MacroMoonpieLeaderboardEntry.RANK
+      MacroMoonpieLeaderboardEntry.RANK,
     ),
     " on the leaderboard!",
   ]),
@@ -82,7 +82,7 @@ const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
       {
         args: generateMessageParserMessageMacro(
           macroMoonpieClaim,
-          MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S
+          MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S,
         ),
         name: pluginTimeInSToHumanReadableStringShort.id,
         type: "plugin",
@@ -91,7 +91,7 @@ const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
       {
         args: generateMessageParserMessageMacro(
           macroMoonpieClaim,
-          MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S
+          MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S,
         ),
         name: pluginTimeInSToHumanReadableStringShort.id,
         type: "plugin",
@@ -99,11 +99,11 @@ const moonpieCommandReplyAlreadyClaimedRefNormal: StringEntry = {
       ") and are rank ",
       generateMessageParserMessageMacro(
         macroMoonpieLeaderboardEntry,
-        MacroMoonpieLeaderboardEntry.RANK
+        MacroMoonpieLeaderboardEntry.RANK,
       ),
       " on the leaderboard!",
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_REF_NORMAL`,
 };
@@ -113,7 +113,7 @@ const moonpieCommandReplyAlreadyClaimedRefStar: StringEntry = {
     [
       "You are the cutest! You have 6969 moonpies and are rank 1 in my heart! <3",
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_ALREADY_CLAIMED_REF_STAR`,
 };
@@ -132,7 +132,7 @@ export const moonpieCommandReplyAlreadyClaimed: StringEntry = {
       ],
       name: pluginIfEqual.id,
       scope: generateMessageParserMessageReference(
-        moonpieCommandReplyAlreadyClaimedRefStar
+        moonpieCommandReplyAlreadyClaimedRefStar,
       ),
       type: "plugin",
     },
@@ -143,7 +143,7 @@ export const moonpieCommandReplyAlreadyClaimed: StringEntry = {
       ],
       name: pluginIfNotEqual.id,
       scope: generateMessageParserMessageReference(
-        moonpieCommandReplyAlreadyClaimedRefNormal
+        moonpieCommandReplyAlreadyClaimedRefNormal,
       ),
       type: "plugin",
     },
@@ -154,7 +154,7 @@ export const moonpieCommandReplyAlreadyClaimed: StringEntry = {
 export const moonpieCommandReplyLeaderboardPrefix: StringEntry = {
   default: createMessageParserMessage(
     ["@", { name: PluginTwitchChat.USER, type: "plugin" }, " "],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_PREFIX`,
 };
@@ -164,21 +164,21 @@ export const moonpieCommandReplyLeaderboardEntry: StringEntry = {
     [
       generateMessageParserMessageMacro(
         macroMoonpieLeaderboardEntry,
-        MacroMoonpieLeaderboardEntry.RANK
+        MacroMoonpieLeaderboardEntry.RANK,
       ),
       ". ",
       generateMessageParserMessageMacro(
         macroMoonpieLeaderboardEntry,
-        MacroMoonpieLeaderboardEntry.NAME
+        MacroMoonpieLeaderboardEntry.NAME,
       ),
       " (",
       generateMessageParserMessageMacro(
         macroMoonpieLeaderboardEntry,
-        MacroMoonpieLeaderboardEntry.COUNT
+        MacroMoonpieLeaderboardEntry.COUNT,
       ),
       ")",
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMAND_REPLY_STRING_ID}_LEADERBOARD_ENTRY`,
 };
@@ -189,14 +189,14 @@ export const moonpieCommandReplyLeaderboardErrorNoEntriesFound: StringEntry = {
     {
       args: generateMessageParserMessageMacro(
         macroMoonpieLeaderboard,
-        MacroMoonpieLeaderboard.STARTING_RANK
+        MacroMoonpieLeaderboard.STARTING_RANK,
       ),
       name: pluginIfNotUndefined.id,
       scope: [
         " (starting from rank ",
         generateMessageParserMessageMacro(
           macroMoonpieLeaderboard,
-          MacroMoonpieLeaderboard.STARTING_RANK
+          MacroMoonpieLeaderboard.STARTING_RANK,
         ),
         ")",
       ],

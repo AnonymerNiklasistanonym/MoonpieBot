@@ -89,7 +89,7 @@ const HEADING_DIVIDER_CHARACTER = "-";
  */
 export const fileDocumentationGenerator = (
   inputParts: Readonly<FileDocumentationParts[]>,
-  splitLength = DEFAULT_MAX_LINE_LENGTH
+  splitLength = DEFAULT_MAX_LINE_LENGTH,
 ): string =>
   inputParts.reduce((out, inputPart) => {
     switch (inputPart.type) {
@@ -104,7 +104,7 @@ export const fileDocumentationGenerator = (
             (inputPart.isComment ? 0 : SPACING_CHARACTER.length) -
             (inputPart.prefix !== undefined
               ? inputPart.prefix.length + SPACING_CHARACTER.length
-              : 0)
+              : 0),
         )
           .map(
             (a, index) =>
@@ -116,7 +116,7 @@ export const fileDocumentationGenerator = (
                     ? `${inputPart.prefix}${SPACING_CHARACTER}`
                     : SPACING_CHARACTER.repeat(inputPart.prefix.length + 1)
                   : ""
-              }${a}\n`
+              }${a}\n`,
           )
           .join("");
         break;
@@ -125,20 +125,20 @@ export const fileDocumentationGenerator = (
         out += [
           ...splitTextAtLength(
             inputPart.title,
-            splitLength - COMMENT_CHARACTER.length - SPACING_CHARACTER.length
+            splitLength - COMMENT_CHARACTER.length - SPACING_CHARACTER.length,
           ),
           ...(inputPart.description !== undefined
             ? [
                 HEADING_DIVIDER_CHARACTER.repeat(
                   splitLength -
                     COMMENT_CHARACTER.length -
-                    SPACING_CHARACTER.length
+                    SPACING_CHARACTER.length,
                 ),
                 ...splitTextAtLength(
                   inputPart.description,
                   splitLength -
                     COMMENT_CHARACTER.length -
-                    SPACING_CHARACTER.length
+                    SPACING_CHARACTER.length,
                 ),
               ]
             : []),
@@ -152,7 +152,7 @@ export const fileDocumentationGenerator = (
         if (inputPart.title !== undefined) {
           out += fileDocumentationGenerator(
             [{ text: inputPart.title, type: FileDocumentationPartType.TEXT }],
-            splitLength
+            splitLength,
           );
         }
         // Value description
@@ -166,7 +166,7 @@ export const fileDocumentationGenerator = (
                 type: FileDocumentationPartType.TEXT,
               },
             ],
-            splitLength
+            splitLength,
           );
           if (inputPart.description.infos !== undefined) {
             for (const info of inputPart.description.infos) {
@@ -174,13 +174,13 @@ export const fileDocumentationGenerator = (
                 [
                   {
                     prefix: SPACING_CHARACTER.repeat(
-                      inputPart.description.prefix.length
+                      inputPart.description.prefix.length,
                     ),
                     text: info,
                     type: FileDocumentationPartType.TEXT,
                   },
                 ],
-                splitLength
+                splitLength,
               );
             }
           }
@@ -190,26 +190,26 @@ export const fileDocumentationGenerator = (
                 [
                   {
                     prefix: SPACING_CHARACTER.repeat(
-                      inputPart.description.prefix.length
+                      inputPart.description.prefix.length,
                     ),
                     text: `${name}:`,
                     type: FileDocumentationPartType.TEXT,
                   },
                 ],
-                splitLength
+                splitLength,
               );
               for (const listEntry of entries) {
                 out += fileDocumentationGenerator(
                   [
                     {
                       prefix: `${SPACING_CHARACTER.repeat(
-                        inputPart.description.prefix.length + 1
+                        inputPart.description.prefix.length + 1,
                       )}-`,
                       text: listEntry,
                       type: FileDocumentationPartType.TEXT,
                     },
                   ],
-                  splitLength
+                  splitLength,
                 );
               }
             }

@@ -4,8 +4,9 @@ import {
   generateMessageParserMessageMacro,
   generateMessageParserMessageReference,
 } from "../../../messageParser.mjs";
-import { MacroOsuApi, macroOsuApi } from "../../macros/osuApi.mjs";
 import {
+  MacroOsuApi,
+  macroOsuApi,
   MacroOsuBeatmap,
   macroOsuBeatmap,
   MacroOsuScore,
@@ -45,7 +46,7 @@ const osuBeatmapRequestRefTopScoreShort: StringEntry = {
       {
         args: generateMessageParserMessageMacro(
           macroOsuScore,
-          MacroOsuScore.MODS
+          MacroOsuScore.MODS,
         ),
         name: pluginIfNotEmpty.id,
         scope: [
@@ -55,7 +56,7 @@ const osuBeatmapRequestRefTopScoreShort: StringEntry = {
         type: "plugin",
       },
     ],
-    true
+    true,
   ),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE_SHORT`,
 };
@@ -67,7 +68,7 @@ export const osuBeatmapRequestRefTopScore: StringEntry = {
       {
         args: generateMessageParserMessageMacro(
           macroOsuScore,
-          MacroOsuScore.PP
+          MacroOsuScore.PP,
         ),
         name: pluginIfNotUndefined.id,
         scope: [
@@ -86,7 +87,7 @@ export const osuBeatmapRequestRefTopScore: StringEntry = {
       "/",
       generateMessageParserMessageMacro(
         macroOsuScore,
-        MacroOsuScore.COUNT_MISS
+        MacroOsuScore.COUNT_MISS,
       ),
       ") [mc=",
       generateMessageParserMessageMacro(macroOsuScore, MacroOsuScore.MAX_COMBO),
@@ -95,7 +96,7 @@ export const osuBeatmapRequestRefTopScore: StringEntry = {
       "%] from ",
       generateMessageParserMessageMacro(
         macroOsuScore,
-        MacroOsuScore.DATE_MONTH
+        MacroOsuScore.DATE_MONTH,
       ),
       " ",
       generateMessageParserMessageMacro(macroOsuScore, MacroOsuScore.DATE_YEAR),
@@ -103,7 +104,7 @@ export const osuBeatmapRequestRefTopScore: StringEntry = {
       {
         args: generateMessageParserMessageMacro(
           macroOsuScore,
-          MacroOsuScore.HAS_REPLAY
+          MacroOsuScore.HAS_REPLAY,
         ),
         name: pluginIfTrue.id,
         scope: [
@@ -114,7 +115,7 @@ export const osuBeatmapRequestRefTopScore: StringEntry = {
         type: "plugin",
       },
     ],
-    true
+    true,
   ),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_TOP_SCORE`,
 };
@@ -125,7 +126,7 @@ export const osuBeatmapRequest: StringEntry = {
   >([
     generateMessageParserMessageMacro(
       macroOsuBeatmapRequest,
-      MacroOsuBeatmapRequest.REQUESTER
+      MacroOsuBeatmapRequest.REQUESTER,
     ),
     " requested ",
     generateMessageParserMessageMacro(macroOsuBeatmap, MacroOsuBeatmap.TITLE),
@@ -136,13 +137,13 @@ export const osuBeatmapRequest: StringEntry = {
     "' [",
     generateMessageParserMessageMacro(
       macroOsuBeatmap,
-      MacroOsuBeatmap.DIFFICULTY_RATING
+      MacroOsuBeatmap.DIFFICULTY_RATING,
     ),
     "* ",
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmap,
-        MacroOsuBeatmap.LENGTH_IN_S
+        MacroOsuBeatmap.LENGTH_IN_S,
       ),
       name: pluginTimeInSToStopwatchString.id,
       type: "plugin",
@@ -150,38 +151,38 @@ export const osuBeatmapRequest: StringEntry = {
     " ",
     generateMessageParserMessageMacro(
       macroOsuBeatmap,
-      MacroOsuBeatmap.RANKED_STATUS
+      MacroOsuBeatmap.RANKED_STATUS,
     ),
     "]",
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmap,
-        MacroOsuBeatmap.HAS_LEADERBOARD
+        MacroOsuBeatmap.HAS_LEADERBOARD,
       ),
       name: pluginIfTrue.id,
       scope: {
         args: [
           generateMessageParserMessageMacro(
             macroOsuBeatmapRequest,
-            MacroOsuBeatmapRequest.ID
+            MacroOsuBeatmapRequest.ID,
           ),
           " ",
           generateMessageParserMessageMacro(
             macroOsuApi,
-            MacroOsuApi.DEFAULT_USER_ID
+            MacroOsuApi.DEFAULT_USER_ID,
           ),
         ],
         name: PluginOsuApi.SCORE,
         scope: {
           args: generateMessageParserMessageMacro(
             macroOsuScore,
-            MacroOsuScore.EXISTS
+            MacroOsuScore.EXISTS,
           ),
           name: pluginIfTrue.id,
           scope: [
             " - Best score: ",
             generateMessageParserMessageReference(
-              osuBeatmapRequestRefTopScoreShort
+              osuBeatmapRequestRefTopScoreShort,
             ),
           ],
           type: "plugin",
@@ -202,7 +203,7 @@ const osuBeatmapRequestRefDetailedStats: StringEntry = {
       "FC=",
       generateMessageParserMessageMacro(
         macroOsuBeatmap,
-        MacroOsuBeatmap.MAX_COMBO
+        MacroOsuBeatmap.MAX_COMBO,
       ),
       ", CS=",
       generateMessageParserMessageMacro(macroOsuBeatmap, MacroOsuBeatmap.CS),
@@ -224,13 +225,13 @@ const osuBeatmapRequestRefDetailedStats: StringEntry = {
       {
         args: generateMessageParserMessageMacro(
           macroOsuBeatmap,
-          MacroOsuBeatmap.PLAY_COUNT
+          MacroOsuBeatmap.PLAY_COUNT,
         ),
         name: pluginConvertToShortNumber.id,
         type: "plugin",
       },
     ],
-    true
+    true,
   ),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_REF_DETAILED_STATS`,
 };
@@ -241,7 +242,7 @@ export const osuBeatmapRequestDetailed: StringEntry = {
   >([
     generateMessageParserMessageMacro(
       macroOsuBeatmapRequest,
-      MacroOsuBeatmapRequest.REQUESTER
+      MacroOsuBeatmapRequest.REQUESTER,
     ),
     " requested ",
     generateMessageParserMessageMacro(macroOsuBeatmap, MacroOsuBeatmap.TITLE),
@@ -252,13 +253,13 @@ export const osuBeatmapRequestDetailed: StringEntry = {
     "' [",
     generateMessageParserMessageMacro(
       macroOsuBeatmap,
-      MacroOsuBeatmap.DIFFICULTY_RATING
+      MacroOsuBeatmap.DIFFICULTY_RATING,
     ),
     "* ",
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmap,
-        MacroOsuBeatmap.LENGTH_IN_S
+        MacroOsuBeatmap.LENGTH_IN_S,
       ),
       name: pluginTimeInSToStopwatchString.id,
       type: "plugin",
@@ -266,17 +267,17 @@ export const osuBeatmapRequestDetailed: StringEntry = {
     " ",
     generateMessageParserMessageMacro(
       macroOsuBeatmap,
-      MacroOsuBeatmap.RANKED_STATUS
+      MacroOsuBeatmap.RANKED_STATUS,
     ),
     "] from ",
     generateMessageParserMessageMacro(
       macroOsuBeatmap,
-      MacroOsuBeatmap.LAST_UPDATED_MONTH
+      MacroOsuBeatmap.LAST_UPDATED_MONTH,
     ),
     " ",
     generateMessageParserMessageMacro(
       macroOsuBeatmap,
-      MacroOsuBeatmap.LAST_UPDATED_YEAR
+      MacroOsuBeatmap.LAST_UPDATED_YEAR,
     ),
     " {",
     generateMessageParserMessageReference(osuBeatmapRequestRefDetailedStats),
@@ -284,19 +285,19 @@ export const osuBeatmapRequestDetailed: StringEntry = {
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmap,
-        MacroOsuBeatmap.HAS_LEADERBOARD
+        MacroOsuBeatmap.HAS_LEADERBOARD,
       ),
       name: pluginIfTrue.id,
       scope: {
         args: [
           generateMessageParserMessageMacro(
             macroOsuBeatmapRequest,
-            MacroOsuBeatmapRequest.ID
+            MacroOsuBeatmapRequest.ID,
           ),
           " ",
           generateMessageParserMessageMacro(
             macroOsuApi,
-            MacroOsuApi.DEFAULT_USER_ID
+            MacroOsuApi.DEFAULT_USER_ID,
           ),
         ],
         name: PluginOsuApi.SCORE,
@@ -304,13 +305,13 @@ export const osuBeatmapRequestDetailed: StringEntry = {
           {
             args: generateMessageParserMessageMacro(
               macroOsuScore,
-              MacroOsuScore.EXISTS
+              MacroOsuScore.EXISTS,
             ),
             name: pluginIfTrue.id,
             scope: [
               " - Current top score is a ",
               generateMessageParserMessageReference(
-                osuBeatmapRequestRefTopScore
+                osuBeatmapRequestRefTopScore,
               ),
             ],
             type: "plugin",
@@ -318,7 +319,7 @@ export const osuBeatmapRequestDetailed: StringEntry = {
           {
             args: generateMessageParserMessageMacro(
               macroOsuScore,
-              MacroOsuScore.EXISTS
+              MacroOsuScore.EXISTS,
             ),
             name: pluginIfFalse.id,
             scope: " - No score found",
@@ -338,7 +339,7 @@ export const osuBeatmapRequestNotFound: StringEntry = {
     "osu! beatmap was not found :( (ID='",
     generateMessageParserMessageMacro(
       macroOsuBeatmapRequest,
-      MacroOsuBeatmapRequest.ID
+      MacroOsuBeatmapRequest.ID,
     ),
     "')",
   ]),
@@ -352,7 +353,7 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmapRequests,
-        MacroOsuBeatmapRequests.CUSTOM_MESSAGE
+        MacroOsuBeatmapRequests.CUSTOM_MESSAGE_OR_EMPTY,
       ),
       name: pluginIfNotEmpty.id,
       type: "plugin",
@@ -360,7 +361,7 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmapRequestDemands,
-        MacroOsuBeatmapRequestDemands.HAS_DEMANDS
+        MacroOsuBeatmapRequestDemands.HAS_DEMANDS,
       ),
       name: pluginIfTrue.id,
       scope: [
@@ -370,14 +371,14 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
             {
               args: generateMessageParserMessageMacro(
                 macroOsuBeatmapRequestDemands,
-                MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN
+                MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN,
               ),
               name: pluginIfNotUndefined.id,
               scope: [
                 ">",
                 generateMessageParserMessageMacro(
                   macroOsuBeatmapRequestDemands,
-                  MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN
+                  MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN,
                 ),
                 "*;",
               ],
@@ -386,14 +387,14 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
             {
               args: generateMessageParserMessageMacro(
                 macroOsuBeatmapRequestDemands,
-                MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX
+                MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX,
               ),
               name: pluginIfNotUndefined.id,
               scope: [
                 "<",
                 generateMessageParserMessageMacro(
                   macroOsuBeatmapRequestDemands,
-                  MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX
+                  MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX,
                 ),
                 "*;",
               ],
@@ -402,14 +403,14 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
             {
               args: generateMessageParserMessageMacro(
                 macroOsuBeatmapRequestDemands,
-                MacroOsuBeatmapRequestDemands.AR_RANGE_MIN
+                MacroOsuBeatmapRequestDemands.AR_RANGE_MIN,
               ),
               name: pluginIfNotUndefined.id,
               scope: [
                 "AR>",
                 generateMessageParserMessageMacro(
                   macroOsuBeatmapRequestDemands,
-                  MacroOsuBeatmapRequestDemands.AR_RANGE_MIN
+                  MacroOsuBeatmapRequestDemands.AR_RANGE_MIN,
                 ),
                 ";",
               ],
@@ -418,14 +419,14 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
             {
               args: generateMessageParserMessageMacro(
                 macroOsuBeatmapRequestDemands,
-                MacroOsuBeatmapRequestDemands.AR_RANGE_MAX
+                MacroOsuBeatmapRequestDemands.AR_RANGE_MAX,
               ),
               name: pluginIfNotUndefined.id,
               scope: [
                 "AR<",
                 generateMessageParserMessageMacro(
                   macroOsuBeatmapRequestDemands,
-                  MacroOsuBeatmapRequestDemands.AR_RANGE_MAX
+                  MacroOsuBeatmapRequestDemands.AR_RANGE_MAX,
                 ),
                 ";",
               ],
@@ -434,14 +435,14 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
             {
               args: generateMessageParserMessageMacro(
                 macroOsuBeatmapRequestDemands,
-                MacroOsuBeatmapRequestDemands.CS_RANGE_MIN
+                MacroOsuBeatmapRequestDemands.CS_RANGE_MIN,
               ),
               name: pluginIfNotUndefined.id,
               scope: [
                 "CS>",
                 generateMessageParserMessageMacro(
                   macroOsuBeatmapRequestDemands,
-                  MacroOsuBeatmapRequestDemands.CS_RANGE_MIN
+                  MacroOsuBeatmapRequestDemands.CS_RANGE_MIN,
                 ),
                 ";",
               ],
@@ -450,14 +451,14 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
             {
               args: generateMessageParserMessageMacro(
                 macroOsuBeatmapRequestDemands,
-                MacroOsuBeatmapRequestDemands.CS_RANGE_MAX
+                MacroOsuBeatmapRequestDemands.CS_RANGE_MAX,
               ),
               name: pluginIfNotUndefined.id,
               scope: [
                 "CS<",
                 generateMessageParserMessageMacro(
                   macroOsuBeatmapRequestDemands,
-                  MacroOsuBeatmapRequestDemands.CS_RANGE_MAX
+                  MacroOsuBeatmapRequestDemands.CS_RANGE_MAX,
                 ),
                 ";",
               ],
@@ -466,14 +467,14 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
             {
               args: generateMessageParserMessageMacro(
                 macroOsuBeatmapRequestDemands,
-                MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN
+                MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN,
               ),
               name: pluginIfNotUndefined.id,
               scope: [
                 ">",
                 generateMessageParserMessageMacro(
                   macroOsuBeatmapRequestDemands,
-                  MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN
+                  MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN,
                 ),
                 "min;",
               ],
@@ -482,14 +483,14 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
             {
               args: generateMessageParserMessageMacro(
                 macroOsuBeatmapRequestDemands,
-                MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX
+                MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX,
               ),
               name: pluginIfNotUndefined.id,
               scope: [
                 "<",
                 generateMessageParserMessageMacro(
                   macroOsuBeatmapRequestDemands,
-                  MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX
+                  MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX,
                 ),
                 "min;",
               ],
@@ -498,7 +499,7 @@ export const osuBeatmapRequestDemandsRef: StringEntry = {
             {
               args: generateMessageParserMessageMacro(
                 macroOsuBeatmapRequestDemands,
-                MacroOsuBeatmapRequestDemands.REDEEM_ID
+                MacroOsuBeatmapRequestDemands.REDEEM_ID,
               ),
               name: pluginIfNotUndefined.id,
               scope: "only via channel points redeem;",
@@ -529,13 +530,13 @@ const osuBeatmapRequestRefIrcRequestString: StringEntry = {
     [
       generateMessageParserMessageMacro(
         macroOsuBeatmapRequest,
-        MacroOsuBeatmapRequest.REQUESTER
+        MacroOsuBeatmapRequest.REQUESTER,
       ),
       " requested ",
       "[https://osu.ppy.sh/beatmapsets/",
       generateMessageParserMessageMacro(
         macroOsuBeatmap,
-        MacroOsuBeatmap.SET_ID
+        MacroOsuBeatmap.SET_ID,
       ),
       "#osu/",
       generateMessageParserMessageMacro(macroOsuBeatmap, MacroOsuBeatmap.ID),
@@ -544,16 +545,16 @@ const osuBeatmapRequestRefIrcRequestString: StringEntry = {
       " '",
       generateMessageParserMessageMacro(
         macroOsuBeatmap,
-        MacroOsuBeatmap.VERSION
+        MacroOsuBeatmap.VERSION,
       ),
       "' by '",
       generateMessageParserMessageMacro(
         macroOsuBeatmap,
-        MacroOsuBeatmap.ARTIST
+        MacroOsuBeatmap.ARTIST,
       ),
       "']",
     ],
-    true
+    true,
   ),
   id: `${OSU_BEATMAP_REQUEST_STRING_ID}_IRC_REF_REQUEST_STRING`,
 };
@@ -565,12 +566,12 @@ export const osuBeatmapRequestIrc: StringEntry = {
       args: [
         generateMessageParserMessageMacro(
           macroOsuBeatmapRequest,
-          MacroOsuBeatmapRequest.ID
+          MacroOsuBeatmapRequest.ID,
         ),
         " ",
         generateMessageParserMessageMacro(
           macroOsuApi,
-          MacroOsuApi.DEFAULT_USER_ID
+          MacroOsuApi.DEFAULT_USER_ID,
         ),
       ],
       name: PluginOsuApi.SCORE,
@@ -579,7 +580,7 @@ export const osuBeatmapRequestIrc: StringEntry = {
           args: [
             generateMessageParserMessageMacro(
               macroOsuScore,
-              MacroOsuScore.EXISTS
+              MacroOsuScore.EXISTS,
             ),
             "===true",
           ],
@@ -587,7 +588,7 @@ export const osuBeatmapRequestIrc: StringEntry = {
           scope: [
             `${OSU_IRC_NEWLINE} > Top score: `,
             generateMessageParserMessageReference(
-              osuBeatmapRequestRefTopScoreShort
+              osuBeatmapRequestRefTopScoreShort,
             ),
           ],
           type: "plugin",
@@ -595,14 +596,14 @@ export const osuBeatmapRequestIrc: StringEntry = {
         {
           args: generateMessageParserMessageMacro(
             macroOsuBeatmapRequest,
-            MacroOsuBeatmapRequest.COMMENT
+            MacroOsuBeatmapRequest.COMMENT,
           ),
           name: pluginIfNotEmpty.id,
           scope: [
             `${OSU_IRC_NEWLINE} > Comment: `,
             generateMessageParserMessageMacro(
               macroOsuBeatmapRequest,
-              MacroOsuBeatmapRequest.COMMENT
+              MacroOsuBeatmapRequest.COMMENT,
             ),
           ],
           type: "plugin",
@@ -622,12 +623,12 @@ export const osuBeatmapRequestIrcDetailed: StringEntry = {
     `${OSU_IRC_NEWLINE}from `,
     generateMessageParserMessageMacro(
       macroOsuBeatmap,
-      MacroOsuBeatmap.LAST_UPDATED_MONTH
+      MacroOsuBeatmap.LAST_UPDATED_MONTH,
     ),
     " ",
     generateMessageParserMessageMacro(
       macroOsuBeatmap,
-      MacroOsuBeatmap.LAST_UPDATED_YEAR
+      MacroOsuBeatmap.LAST_UPDATED_YEAR,
     ),
     " {",
     { name: osuBeatmapRequestRefDetailedStats.id, type: "reference" },
@@ -636,19 +637,19 @@ export const osuBeatmapRequestIrcDetailed: StringEntry = {
       args: [
         generateMessageParserMessageMacro(
           macroOsuBeatmapRequest,
-          MacroOsuBeatmapRequest.ID
+          MacroOsuBeatmapRequest.ID,
         ),
         " ",
         generateMessageParserMessageMacro(
           macroOsuApi,
-          MacroOsuApi.DEFAULT_USER_ID
+          MacroOsuApi.DEFAULT_USER_ID,
         ),
       ],
       name: PluginOsuApi.SCORE,
       scope: {
         args: generateMessageParserMessageMacro(
           macroOsuScore,
-          MacroOsuScore.EXISTS
+          MacroOsuScore.EXISTS,
         ),
         name: pluginIfTrue.id,
         scope: [
@@ -662,14 +663,14 @@ export const osuBeatmapRequestIrcDetailed: StringEntry = {
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmapRequest,
-        MacroOsuBeatmapRequest.COMMENT
+        MacroOsuBeatmapRequest.COMMENT,
       ),
       name: pluginIfNotEmpty.id,
       scope: [
         `${OSU_IRC_NEWLINE} > Comment: `,
         generateMessageParserMessageMacro(
           macroOsuBeatmapRequest,
-          MacroOsuBeatmapRequest.COMMENT
+          MacroOsuBeatmapRequest.COMMENT,
         ),
       ],
       type: "plugin",
@@ -700,14 +701,14 @@ export const osuBeatmapRequestTurnedOff: StringEntry = {
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmapRequests,
-        MacroOsuBeatmapRequests.CUSTOM_MESSAGE
+        MacroOsuBeatmapRequests.CUSTOM_MESSAGE_OR_EMPTY,
       ),
       name: pluginIfNotEmpty.id,
       scope: [
         " (",
         generateMessageParserMessageMacro(
           macroOsuBeatmapRequests,
-          MacroOsuBeatmapRequests.CUSTOM_MESSAGE
+          MacroOsuBeatmapRequests.CUSTOM_MESSAGE_OR_EMPTY,
         ),
         ")",
       ],
@@ -732,14 +733,14 @@ export const osuBeatmapRequestCurrentlyOff: StringEntry = {
     {
       args: generateMessageParserMessageMacro(
         macroOsuBeatmapRequests,
-        MacroOsuBeatmapRequests.CUSTOM_MESSAGE
+        MacroOsuBeatmapRequests.CUSTOM_MESSAGE_OR_EMPTY,
       ),
       name: pluginIfNotEmpty.id,
       scope: [
         " (",
         generateMessageParserMessageMacro(
           macroOsuBeatmapRequests,
-          MacroOsuBeatmapRequests.CUSTOM_MESSAGE
+          MacroOsuBeatmapRequests.CUSTOM_MESSAGE_OR_EMPTY,
         ),
         ")",
       ],

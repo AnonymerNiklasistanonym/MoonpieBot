@@ -27,30 +27,30 @@ import type {
   MessageParserPlugin,
   MessageParserPluginInfo,
   PluginMap,
+  StringMap,
 } from "../messageParser.mjs";
 import type { Logger } from "winston";
-import type { StringMap } from "../messageParser.mjs";
 
 const documentPlugin = async (
   plugin: DeepReadonly<MessageParserPlugin | MessageParserPluginInfo>,
   strings: DeepReadonly<StringMap>,
   plugins: DeepReadonly<PluginMap>,
   macros: DeepReadonly<MacroMap>,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<FileDocumentationPartValue> => {
   const pluginExampleList: [string, OrArray<string>[]][] = [];
   if (plugin.examples !== undefined) {
     const pluginListExamples: string[][] = [];
     for (const pluginExample of plugin.examples) {
       const exampleString = createMessageParserMessage([
-        pluginExample.before || "",
+        pluginExample.before ?? "",
         {
           args: pluginExample.argument,
           name: plugin.id,
           scope: pluginExample.scope,
           type: "plugin",
         },
-        pluginExample.after || "",
+        pluginExample.after ?? "",
       ]);
       // Don't render random number or help -output because there is no seed
       if (pluginExample.hideOutput) {
@@ -62,7 +62,7 @@ const documentPlugin = async (
             strings,
             plugins,
             macros,
-            logger
+            logger,
           );
           pluginListExamples.push([
             `"${exampleString}"`,
@@ -93,14 +93,14 @@ const documentPlugin = async (
     description: {
       lists: pluginExampleList,
       prefix: ">",
-      text: plugin.description || "TODO",
+      text: plugin.description ?? "TODO",
     },
     title: [
       await createPluginSignature(
         logger,
         plugin.id,
         "func" in plugin ? plugin.func : undefined,
-        "func" in plugin ? undefined : plugin.signature
+        "func" in plugin ? undefined : plugin.signature,
       ),
     ],
     type: FileDocumentationPartType.VALUE,
@@ -108,13 +108,11 @@ const documentPlugin = async (
 };
 
 const documentMacro = async (
-  macro: DeepReadonly<
-    MessageParserMacro<string> | MessageParserMacroDocumentation<string>
-  >,
+  macro: DeepReadonly<MessageParserMacro | MessageParserMacroDocumentation>,
   strings: DeepReadonly<StringMap>,
   plugins: DeepReadonly<PluginMap>,
   macros: DeepReadonly<MacroMap>,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<FileDocumentationPartValue> => {
   const macroAdditionalLists: [string, OrArray<string>[]][] = [];
   let macroListKeysTitle = "Keys";
@@ -127,7 +125,7 @@ const documentMacro = async (
         strings,
         plugins,
         macros,
-        logger
+        logger,
       );
       macroListKeys.push([`"${macroString}"`, `=> "${macroStringOutput}"`]);
     }
@@ -139,7 +137,10 @@ const documentMacro = async (
       "generate" in macroGenerator &&
       macroGenerator.exampleData !== undefined
     ) {
-      const macroValues = macroGenerator.generate(macroGenerator.exampleData);
+      const macroValues = macroGenerator.generate(
+        macroGenerator.exampleData,
+        logger,
+      );
       macroAdditionalLists.push([
         "Example data",
         [
@@ -159,9 +160,10 @@ const documentMacro = async (
           ],
         ],
       ]);
-      for (const key of macroValues
+      const sortedMacroValues = [...macroValues.entries()]
         .map((a) => a[0])
-        .sort(genericStringSorter)) {
+        .sort(genericStringSorter);
+      for (const key of sortedMacroValues) {
         const macroString = `%${macro.id}:${key}%`;
         const extendedMacroMap = new Map([
           ...macros,
@@ -172,7 +174,7 @@ const documentMacro = async (
           strings,
           plugins,
           extendedMacroMap,
-          logger
+          logger,
         );
         macroListKeys.push([`"${macroString}"`, `=> "${macroStringOutput}"`]);
       }
@@ -203,7 +205,7 @@ export const generatePluginAndMacroDocumentation = async (
   macros: DeepReadonlyArray<MessageParserMacro>,
   optionalPlugins: OrUndef<DeepReadonlyArray<MessageParserPluginInfo>>,
   optionalMacros: OrUndef<DeepReadonlyArray<MessageParserMacroDocumentation>>,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<FileDocumentationParts[]> => {
   const pluginMap = generatePluginMap(plugins);
   const macroMap = generateMacroMap(macros);
@@ -224,7 +226,7 @@ export const generatePluginAndMacroDocumentation = async (
     .sort((a, b) => genericStringSorter(a.id, b.id));
   for (const plugin of pluginsSorted) {
     pluginEntries.push(
-      await documentPlugin(plugin, strings, pluginMap, macroMap, logger)
+      await documentPlugin(plugin, strings, pluginMap, macroMap, logger),
     );
   }
   output.push(...pluginEntries);
@@ -245,7 +247,7 @@ export const generatePluginAndMacroDocumentation = async (
     .sort((a, b) => genericStringSorter(a.id, b.id));
   for (const macro of macrosSorted) {
     macroEntries.push(
-      await documentMacro(macro, strings, pluginMap, macroMap, logger)
+      await documentMacro(macro, strings, pluginMap, macroMap, logger),
     );
   }
   output.push(...macroEntries);
@@ -262,7 +264,7 @@ export const generatePluginAndMacroDocumentation = async (
       .sort((a, b) => genericStringSorter(a.id, b.id));
     for (const plugin of optionalPluginsSorted) {
       optionalPluginEntries.push(
-        await documentPlugin(plugin, strings, pluginMap, macroMap, logger)
+        await documentPlugin(plugin, strings, pluginMap, macroMap, logger),
       );
     }
     output.push(...optionalPluginEntries);
@@ -280,7 +282,7 @@ export const generatePluginAndMacroDocumentation = async (
       .sort((a, b) => genericStringSorter(a.id, b.id));
     for (const macro of optionalMacrosSorted) {
       optionalMacroEntries.push(
-        await documentMacro(macro, strings, pluginMap, macroMap, logger)
+        await documentMacro(macro, strings, pluginMap, macroMap, logger),
       );
     }
     output.push(...optionalMacroEntries);

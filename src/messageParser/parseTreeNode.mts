@@ -13,9 +13,7 @@ import type { Logger } from "winston";
 import type { MacroMap } from "../messageParser/macros.mjs";
 import type { ParseTreeNode } from "../messageParser/createParseTree.mjs";
 import type { PluginMap } from "../messageParser/plugins.mjs";
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "parse_tree_node";
 
 const replaceMacros = (text: string, macros: DeepReadonly<MacroMap>) => {
@@ -29,7 +27,7 @@ const replaceMacros = (text: string, macros: DeepReadonly<MacroMap>) => {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           `Macro (${macroName}) was not found [${Array.from(macros.entries())
             .map((a) => a[0])
-            .join(",")}]`
+            .join(",")}]`,
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -38,14 +36,14 @@ const replaceMacros = (text: string, macros: DeepReadonly<MacroMap>) => {
         throw Error(
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           `Macro (${macroName}:${macroValue}) was not found [${Array.from(
-            macro.entries()
+            macro.entries(),
           )
             .map((a) => a[0])
-            .join(",")}]`
+            .join(",")}]`,
         );
       }
       return macroOutput;
-    }
+    },
   );
 };
 
@@ -63,7 +61,7 @@ export const parseTreeNode = async (
   treeNode: DeepReadonly<ParseTreeNode>,
   plugins: DeepReadonly<PluginMap>,
   macros: DeepReadonly<MacroMap>,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<string> => {
   const logMessageParser = createLogFunc(logger, LOG_ID, "parse_tree_node");
 
@@ -72,7 +70,7 @@ export const parseTreeNode = async (
       if (treeNode.content === undefined) {
         throw new ParseTreeNodeError(
           `Parse tree node '${treeNode.type}' had no content (${treeNode.originalString})`,
-          ParseTreeNodeErrorCode.NO_CONTENT
+          ParseTreeNodeErrorCode.NO_CONTENT,
         );
       }
       try {
@@ -84,7 +82,7 @@ export const parseTreeNode = async (
           }',${(err as Error).message})`,
           ParseTreeNodeErrorCode.MACRO_ERROR,
           undefined,
-          (err as Error).message
+          (err as Error).message,
         );
       }
     case "plugin":
@@ -94,7 +92,7 @@ export const parseTreeNode = async (
       if (pluginName === undefined) {
         throw new ParseTreeNodeError(
           `Parse tree node '${treeNode.type}' had no plugin name (${treeNode.originalString})`,
-          ParseTreeNodeErrorCode.NO_PLUGIN_NAME
+          ParseTreeNodeErrorCode.NO_PLUGIN_NAME,
         );
       }
       // eslint-disable-next-line no-case-declarations
@@ -109,7 +107,7 @@ export const parseTreeNode = async (
             .map((a) => a[0])
             .sort(genericStringSorter)
             .join(",")}])`,
-          ParseTreeNodeErrorCode.PLUGIN_NOT_FOUND
+          ParseTreeNodeErrorCode.PLUGIN_NOT_FOUND,
         );
       }
       // eslint-disable-next-line no-case-declarations
@@ -122,7 +120,7 @@ export const parseTreeNode = async (
             pluginValue,
             plugins,
             macros,
-            logger
+            logger,
           );
         } catch (err) {
           // For debugging log all parse tree node levels
@@ -132,8 +130,8 @@ export const parseTreeNode = async (
                 treeNode.type
               }' could not produce plugin value string ('${
                 treeNode.originalString
-              }',${(err as Error).message}`
-            )
+              }',${(err as Error).message}`,
+            ),
           );
           throw err;
         }
@@ -151,7 +149,7 @@ export const parseTreeNode = async (
             (err as Error).message
           })`,
           ParseTreeNodeErrorCode.PLUGIN_ERROR,
-          (err as Error).message
+          (err as Error).message,
         );
       }
       if (pluginOutput instanceof Map) {
@@ -164,14 +162,14 @@ export const parseTreeNode = async (
         if (pluginContentNode === undefined) {
           throw new ParseTreeNodeError(
             `Parse tree node '${treeNode.type}' had no plugin content (${treeNode.originalString})`,
-            ParseTreeNodeErrorCode.NO_PLUGIN_CONTENT
+            ParseTreeNodeErrorCode.NO_PLUGIN_CONTENT,
           );
         }
         return parseTreeNode(pluginContentNode, plugins, newMacros, logger);
       } else if (typeof pluginOutput === "string") {
         return pluginOutput;
       } else if (typeof pluginOutput === "boolean") {
-        if (pluginOutput === false) {
+        if (!pluginOutput) {
           return "";
         }
         const pluginContentNode = treeNode.pluginContent;
@@ -181,7 +179,7 @@ export const parseTreeNode = async (
           }
           throw new ParseTreeNodeError(
             `Parse tree node '${treeNode.type}' had no plugin content and no plugin value (${treeNode.originalString})`,
-            ParseTreeNodeErrorCode.NO_PLUGIN_CONTENT_AND_VALUE
+            ParseTreeNodeErrorCode.NO_PLUGIN_CONTENT_AND_VALUE,
           );
         }
         return parseTreeNode(pluginContentNode, plugins, macros, logger);
@@ -192,7 +190,7 @@ export const parseTreeNode = async (
           for (const macro of macros.entries()) {
             for (const macroValue of macro[1]) {
               stringsMacros.push(
-                `%${macro[0]}:${macroValue[0]}%='${macroValue[1]}'`
+                `%${macro[0]}:${macroValue[0]}%='${macroValue[1]}'`,
               );
             }
           }
@@ -210,7 +208,7 @@ export const parseTreeNode = async (
           const stringsPlugins: string[] = [];
           for (const [pluginId, pluginFunc] of plugins) {
             stringsPlugins.push(
-              await createPluginSignature(logger, pluginId, pluginFunc)
+              await createPluginSignature(logger, pluginId, pluginFunc),
             );
           }
           if (helpOutput.length > 0) {
@@ -232,7 +230,7 @@ export const parseTreeNode = async (
       if (treeNode.children === undefined) {
         throw new ParseTreeNodeError(
           `Parse tree node '${treeNode.type}' had no children (${treeNode.originalString})`,
-          ParseTreeNodeErrorCode.NO_CHILDREN
+          ParseTreeNodeErrorCode.NO_CHILDREN,
         );
       }
       // eslint-disable-next-line no-case-declarations

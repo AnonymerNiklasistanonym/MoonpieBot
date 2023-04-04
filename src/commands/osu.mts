@@ -17,10 +17,12 @@ import type {
   ChatMessageHandler,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
 } from "../chatMessageHandler.mjs";
+import type {
+  CommandBeatmapCreateReplyInput,
+  OsuIrcBotSendMessageFunc,
+} from "./osu/beatmap.mjs";
 import type { Beatmap } from "osu-api-v2";
-import type { CommandBeatmapCreateReplyInput } from "./osu/beatmap.mjs";
 import type { CommandPpRpCreateReplyInput } from "./osu/pp.mjs";
-import type { OsuIrcBotSendMessageFunc } from "./osu/beatmap.mjs";
 import type { StreamCompanionConnection } from "../osuStreamCompanion.mjs";
 
 export interface CommandOsuGenericDataOsuApiDbPath {
@@ -125,7 +127,7 @@ export const osuChatHandler: ChatMessageHandler<
   globalStrings,
   globalPlugins,
   globalMacros,
-  logger
+  logger,
 ) => {
   // Handle commands
   await Promise.all(
@@ -140,9 +142,9 @@ export const osuChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandCommands].map((command) =>
@@ -156,9 +158,9 @@ export const osuChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   if ("osuApiDbPath" in data) {
     await Promise.all(
@@ -173,9 +175,9 @@ export const osuChatHandler: ChatMessageHandler<
           globalPlugins,
           globalMacros,
           logger,
-          command
-        )
-      )
+          command,
+        ),
+      ),
     );
     await Promise.all(
       [commandScore].map((command) =>
@@ -189,9 +191,9 @@ export const osuChatHandler: ChatMessageHandler<
           globalPlugins,
           globalMacros,
           logger,
-          command
-        )
-      )
+          command,
+        ),
+      ),
     );
     await Promise.all(
       [commandBeatmapRequests].map((command) =>
@@ -205,9 +207,9 @@ export const osuChatHandler: ChatMessageHandler<
           globalPlugins,
           globalMacros,
           logger,
-          command
-        )
-      )
+          command,
+        ),
+      ),
     );
     await Promise.all(
       [commandBeatmapRequestsSetUnset].map((command) =>
@@ -221,9 +223,9 @@ export const osuChatHandler: ChatMessageHandler<
           globalPlugins,
           globalMacros,
           logger,
-          command
-        )
-      )
+          command,
+        ),
+      ),
     );
     await Promise.all(
       [commandBeatmapLastRequest].map((command) =>
@@ -237,9 +239,9 @@ export const osuChatHandler: ChatMessageHandler<
           globalPlugins,
           globalMacros,
           logger,
-          command
-        )
-      )
+          command,
+        ),
+      ),
     );
     await Promise.all(
       [commandBeatmapPermitRequest].map((command) =>
@@ -253,9 +255,9 @@ export const osuChatHandler: ChatMessageHandler<
           globalPlugins,
           globalMacros,
           logger,
-          command
-        )
-      )
+          command,
+        ),
+      ),
     );
     await Promise.all(
       [commandBeatmap].map((command) =>
@@ -269,9 +271,9 @@ export const osuChatHandler: ChatMessageHandler<
           globalPlugins,
           globalMacros,
           logger,
-          command
-        )
-      )
+          command,
+        ),
+      ),
     );
   }
 };

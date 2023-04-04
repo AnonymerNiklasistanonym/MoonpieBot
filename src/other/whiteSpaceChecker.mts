@@ -15,7 +15,7 @@ export const escapeStringIfWhiteSpace = (
     ],
     // eslint-disable-next-line @typescript-eslint/quotes
     surroundCharacter: '"',
-  }
+  },
 ): string => {
   if (!hasWhiteSpace(str) && str.length > 0) {
     return str;

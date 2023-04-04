@@ -30,7 +30,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
 
         try {
           const gameNameApi = await data.twitchApiClient.games.getGameByName(
-            gameName
+            gameName,
           );
           if (gameNameApi?.id === undefined) {
             throw Error("Twitch API client request getGameByName failed");
@@ -44,7 +44,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
             channelUserInfo.id,
             {
               gameId: gameNameApi.id,
-            }
+            },
           );
           return gameNameApi.name;
         } catch (err) {
@@ -71,7 +71,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
           }
           const channelInfo =
             await data.twitchApiClient.channels.getChannelInfoById(
-              channelUserInfo.id
+              channelUserInfo.id,
             );
           if (channelInfo?.gameName === undefined) {
             throw Error("Twitch API client request getChannelInfoById failed");
@@ -101,7 +101,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
           }
           const channelInfo =
             await data.twitchApiClient.channels.getChannelInfoById(
-              channelUserInfo.id
+              channelUserInfo.id,
             );
           if (channelInfo?.title === undefined) {
             throw Error("Twitch API client request getChannelInfoById failed");
@@ -134,7 +134,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
             channelUserInfo.id,
             {
               title,
-            }
+            },
           );
           return title;
         } catch (err) {
@@ -179,7 +179,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
           const follow =
             await data.twitchApiClient.users.getFollowFromUserToBroadcaster(
               channelUserInfo.id,
-              userId
+              userId,
             );
           if (follow?.followDate === undefined) {
             throw Error("User is not following the channel");
@@ -189,7 +189,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
           return `${(currentTimestamp - followStartTimestamp) / 1000}`;
         } catch (err) {
           throw Error(
-            `Follow age could not be fetched '${(err as Error).message}'`
+            `Follow age could not be fetched '${(err as Error).message}'`,
           );
         }
       },
@@ -210,7 +210,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
           }
           const channelChatters = await data.twitchApiClient.chat.getChatters(
             `#${data.channelName}`,
-            tokenInfo.userId
+            tokenInfo.userId,
           );
           if (channelChatters === undefined) {
             throw Error("Twitch API client request getChatters failed");
@@ -220,7 +220,7 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
           ].userName;
         } catch (err) {
           throw Error(
-            `Chatters could not be fetched '${(err as Error).message}'`
+            `Chatters could not be fetched '${(err as Error).message}'`,
           );
         }
       },

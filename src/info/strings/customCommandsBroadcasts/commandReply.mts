@@ -29,12 +29,12 @@ export const customCommandsBroadcastsCommandReplyAddCC: StringEntry = {
     " You added a command (ID=",
     generateMessageParserMessageMacro(
       macroCustomCommandInfo,
-      MacroCustomCommandInfo.ID
+      MacroCustomCommandInfo.ID,
     ),
     ",REGEX=",
     generateMessageParserMessageMacro(
       macroCustomCommandInfo,
-      MacroCustomCommandInfo.REGEX
+      MacroCustomCommandInfo.REGEX_OR_UNDEF,
     ),
     ")",
   ]),
@@ -48,7 +48,7 @@ export const customCommandsBroadcastsCommandReplyAddCCAlreadyExists: StringEntry
       " A command with the ID '",
       generateMessageParserMessageMacro(
         macroCustomCommandInfo,
-        MacroCustomCommandInfo.ID
+        MacroCustomCommandInfo.ID,
       ),
       "' already exists!",
     ]),
@@ -61,7 +61,7 @@ export const customCommandsBroadcastsCommandReplyInvalidRegex: StringEntry = {
     " The regex '",
     generateMessageParserMessageMacro(
       macroCustomCommandInfo,
-      MacroCustomCommandInfo.REGEX
+      MacroCustomCommandInfo.REGEX_OR_UNDEF,
     ),
     "' is not valid!",
   ]),
@@ -74,7 +74,7 @@ export const customCommandsBroadcastsCommandReplyDelCC: StringEntry = {
     " You deleted a command (",
     generateMessageParserMessageMacro(
       macroCustomCommandInfo,
-      MacroCustomCommandInfo.ID
+      MacroCustomCommandInfo.ID,
     ),
     ")",
   ]),
@@ -89,17 +89,17 @@ export const customCommandsBroadcastsCommandReplyEditCC: StringEntry = {
     " You edited a command (",
     generateMessageParserMessageMacro(
       macroCustomCommandInfo,
-      MacroCustomCommandInfo.ID
+      MacroCustomCommandInfo.ID,
     ),
     "): ",
     generateMessageParserMessageMacro(
       macroCustomCommandBroadcastInfoEdit,
-      MacroCustomCommandBroadcastInfoEdit.OPTION
+      MacroCustomCommandBroadcastInfoEdit.OPTION,
     ),
     "='",
     generateMessageParserMessageMacro(
       macroCustomCommandBroadcastInfoEdit,
-      MacroCustomCommandBroadcastInfoEdit.OPTION_VALUE
+      MacroCustomCommandBroadcastInfoEdit.OPTION_VALUE,
     ),
     "'",
   ]),
@@ -112,7 +112,7 @@ export const customCommandsBroadcastsCommandReplyCCNotFound: StringEntry = {
     " No command with the ID '",
     generateMessageParserMessageMacro(
       macroCustomCommandInfo,
-      MacroCustomCommandInfo.ID
+      MacroCustomCommandInfo.ID,
     ),
     "' was found!",
   ]),
@@ -133,12 +133,12 @@ export const customCommandsBroadcastsCommandReplyAddCB: StringEntry = {
     " You added a broadcast (ID=",
     generateMessageParserMessageMacro(
       macroCustomBroadcastInfo,
-      MacroCustomBroadcastInfo.ID
+      MacroCustomBroadcastInfo.ID,
     ),
     ",CRON_STRING=",
     generateMessageParserMessageMacro(
       macroCustomBroadcastInfo,
-      MacroCustomBroadcastInfo.CRON_STRING
+      MacroCustomBroadcastInfo.CRON_STRING_OR_UNDEF,
     ),
     ")",
   ]),
@@ -152,7 +152,7 @@ export const customCommandsBroadcastsCommandReplyAddCBAlreadyExists: StringEntry
       " A broadcast with the ID '",
       generateMessageParserMessageMacro(
         macroCustomBroadcastInfo,
-        MacroCustomBroadcastInfo.ID
+        MacroCustomBroadcastInfo.ID,
       ),
       "' already exists!",
     ]),
@@ -165,7 +165,7 @@ export const customCommandsBroadcastsCommandReplyDelCB: StringEntry = {
     " You deleted a broadcast (",
     generateMessageParserMessageMacro(
       macroCustomBroadcastInfo,
-      MacroCustomBroadcastInfo.ID
+      MacroCustomBroadcastInfo.ID,
     ),
     ")",
   ]),
@@ -178,7 +178,7 @@ export const customCommandsBroadcastsCommandReplyCBNotFound: StringEntry = {
     " No broadcast with the ID '",
     generateMessageParserMessageMacro(
       macroCustomBroadcastInfo,
-      MacroCustomBroadcastInfo.ID
+      MacroCustomBroadcastInfo.ID,
     ),
     "' was found!",
   ]),
@@ -200,7 +200,7 @@ export const customCommandsBroadcastsCommandReplyInvalidCronString: StringEntry 
       " The cron string '",
       generateMessageParserMessageMacro(
         macroCustomBroadcastInfo,
-        MacroCustomBroadcastInfo.CRON_STRING
+        MacroCustomBroadcastInfo.CRON_STRING_OR_UNDEF,
       ),
       "' is not valid!",
     ]),
@@ -210,7 +210,7 @@ export const customCommandsBroadcastsCommandReplyInvalidCronString: StringEntry 
 export const customCommandsBroadcastsCommandReplyListCCsPrefix: StringEntry = {
   default: createMessageParserMessage(
     ["@", { name: PluginTwitchChat.USER, type: "plugin" }, " "],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CCS_LIST_PREFIX`,
 };
@@ -221,32 +221,32 @@ export const customCommandsBroadcastsCommandReplyListCCsEntry: StringEntry = {
       "'",
       generateMessageParserMessageMacro(
         macroCustomCommandInfo,
-        MacroCustomCommandInfo.ID
+        MacroCustomCommandInfo.ID,
       ),
       "' /",
       generateMessageParserMessageMacro(
         macroCustomCommandInfo,
-        MacroCustomCommandInfo.REGEX
+        MacroCustomCommandInfo.REGEX_OR_UNDEF,
       ),
       "/i",
       {
         args: generateMessageParserMessageMacro(
           macroCustomCommandInfo,
-          MacroCustomCommandInfo.DESCRIPTION
+          MacroCustomCommandInfo.DESCRIPTION_OR_EMPTY,
         ),
         name: pluginIfNotEmpty.id,
         scope: [
           " (",
           generateMessageParserMessageMacro(
             macroCustomCommandInfo,
-            MacroCustomCommandInfo.DESCRIPTION
+            MacroCustomCommandInfo.DESCRIPTION_OR_EMPTY,
           ),
           ")",
         ],
         type: "plugin",
       },
     ],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CCS_LIST_ENTRY`,
 };
@@ -255,13 +255,13 @@ export const customCommandsBroadcastsCommandReplyListCC: StringEntry = {
   default: createMessageParserMessage(
     [
       generateMessageParserMessageReference(
-        customCommandsBroadcastsCommandReplyListCCsPrefix
+        customCommandsBroadcastsCommandReplyListCCsPrefix,
       ),
       generateMessageParserMessageReference(
-        customCommandsBroadcastsCommandReplyListCCsEntry
+        customCommandsBroadcastsCommandReplyListCCsEntry,
       ),
     ],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CC_LIST`,
 };
@@ -275,17 +275,17 @@ export const customCommandsBroadcastsCommandReplyEditCB: StringEntry = {
     " You edited a broadcast (",
     generateMessageParserMessageMacro(
       macroCustomBroadcastInfo,
-      MacroCustomBroadcastInfo.ID
+      MacroCustomBroadcastInfo.ID,
     ),
     "): ",
     generateMessageParserMessageMacro(
       macroCustomCommandBroadcastInfoEdit,
-      MacroCustomCommandBroadcastInfoEdit.OPTION
+      MacroCustomCommandBroadcastInfoEdit.OPTION,
     ),
     "='",
     generateMessageParserMessageMacro(
       macroCustomCommandBroadcastInfoEdit,
-      MacroCustomCommandBroadcastInfoEdit.OPTION_VALUE
+      MacroCustomCommandBroadcastInfoEdit.OPTION_VALUE,
     ),
     "'",
   ]),
@@ -295,7 +295,7 @@ export const customCommandsBroadcastsCommandReplyEditCB: StringEntry = {
 export const customCommandsBroadcastsCommandReplyListCBsPrefix: StringEntry = {
   default: createMessageParserMessage(
     ["@", { name: PluginTwitchChat.USER, type: "plugin" }, " "],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CBS_LIST_PREFIX`,
 };
@@ -306,32 +306,32 @@ export const customCommandsBroadcastsCommandReplyListCBsEntry: StringEntry = {
       "'",
       generateMessageParserMessageMacro(
         macroCustomBroadcastInfo,
-        MacroCustomBroadcastInfo.ID
+        MacroCustomBroadcastInfo.ID,
       ),
       "' [",
       generateMessageParserMessageMacro(
         macroCustomBroadcastInfo,
-        MacroCustomBroadcastInfo.CRON_STRING
+        MacroCustomBroadcastInfo.CRON_STRING_OR_UNDEF,
       ),
       "]",
       {
         args: generateMessageParserMessageMacro(
           macroCustomBroadcastInfo,
-          MacroCustomBroadcastInfo.DESCRIPTION
+          MacroCustomBroadcastInfo.DESCRIPTION_OR_EMPTY,
         ),
         name: pluginIfNotEmpty.id,
         scope: [
           " (",
           generateMessageParserMessageMacro(
             macroCustomBroadcastInfo,
-            MacroCustomBroadcastInfo.DESCRIPTION
+            MacroCustomBroadcastInfo.DESCRIPTION_OR_EMPTY,
           ),
           ")",
         ],
         type: "plugin",
       },
     ],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CBS_LIST_ENTRY`,
 };
@@ -340,13 +340,13 @@ export const customCommandsBroadcastsCommandReplyListCB: StringEntry = {
   default: createMessageParserMessage(
     [
       generateMessageParserMessageReference(
-        customCommandsBroadcastsCommandReplyListCBsPrefix
+        customCommandsBroadcastsCommandReplyListCBsPrefix,
       ),
       generateMessageParserMessageReference(
-        customCommandsBroadcastsCommandReplyListCBsEntry
+        customCommandsBroadcastsCommandReplyListCBsEntry,
       ),
     ],
-    true
+    true,
   ),
   id: `${CUSTOM_COMMANDS_BROADCASTS_COMMAND_REPLY_STRING_ID}_CB_LIST`,
 };

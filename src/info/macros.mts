@@ -79,5 +79,5 @@ export const defaultMacrosOptional: DeepReadonlyArray<MessageParserMacroDocument
     macroOsuWindowTitle,
     macroPermissionError,
     macroSpotifySong,
-    macroWelcomeBack
+    macroWelcomeBack,
   );

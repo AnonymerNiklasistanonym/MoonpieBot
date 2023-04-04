@@ -26,10 +26,10 @@ export const osuCommandsLastRequest: StringEntry = {
     [
       createShortCommandDescription(
         OsuCommands.LAST_REQUEST,
-        getChatCommandsOsu
+        getChatCommandsOsu,
       ),
     ],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_LAST_REQUEST`,
 };
@@ -38,17 +38,17 @@ export const osuCommandsPermitRequest: StringEntry = {
     [
       createShortCommandDescription(
         OsuCommands.PERMIT_REQUEST,
-        getChatCommandsOsu
+        getChatCommandsOsu,
       ),
     ],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_PERMIT_REQUEST`,
 };
 export const osuCommandsNp: StringEntry = {
   default: createMessageParserMessage(
     [createShortCommandDescription(OsuCommands.NP, getChatCommandsOsu)],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_NP`,
 };
@@ -58,7 +58,7 @@ export const osuCommandsNpStreamCompanionWebsocket: StringEntry = {
       createShortCommandDescription(OsuCommands.NP, getChatCommandsOsu) +
         " using StreamCompanion (websockets)",
     ],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_NP_STREAM_COMPANION_WEBSOCKET`,
 };
@@ -68,35 +68,35 @@ export const osuCommandsNpStreamCompanionFile: StringEntry = {
       createShortCommandDescription(OsuCommands.NP, getChatCommandsOsu) +
         " using StreamCompanion (files)",
     ],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_NP_STREAM_COMPANION_FILES`,
 };
 export const osuCommandsPp: StringEntry = {
   default: createMessageParserMessage(
     [createShortCommandDescription(OsuCommands.PP, getChatCommandsOsu)],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_PP`,
 };
 export const osuCommandsRequests: StringEntry = {
   default: createMessageParserMessage(
     [createShortCommandDescription(OsuCommands.REQUESTS, getChatCommandsOsu)],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_REQUESTS`,
 };
 export const osuCommandsRp: StringEntry = {
   default: createMessageParserMessage(
     [createShortCommandDescription(OsuCommands.RP, getChatCommandsOsu)],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_RP`,
 };
 export const osuCommandsScore: StringEntry = {
   default: createMessageParserMessage(
     [createShortCommandDescription(OsuCommands.SCORE, getChatCommandsOsu)],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_SCORE`,
 };
@@ -107,7 +107,7 @@ export const osuCommandsPrefix: StringEntry = {
       { name: PluginTwitchChat.USER, type: "plugin" },
       " The following osu! commands are supported: ",
     ],
-    true
+    true,
   ),
   id: `${OSU_COMMANDS_STRING_ID}_PREFIX`,
 };
@@ -145,11 +145,11 @@ export const osuCommandsString: StringEntry = {
                   type: "reference",
                 },
                 type: "plugin",
-              })
+              }),
             )
             .reduce<(MessageForParserMessagePlugin | string)[]>(
               (prev, curr) => prev.concat([curr, ";"]),
-              []
+              [],
             ),
           name: pluginListFilterUndefined.id,
           scope: {

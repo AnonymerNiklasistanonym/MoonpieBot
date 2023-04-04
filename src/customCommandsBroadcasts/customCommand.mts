@@ -8,9 +8,7 @@ import type { ChatMessageHandlerReplyCreator } from "../chatMessageHandler.mjs";
 import type { EMPTY_OBJECT } from "../other/types.mjs";
 import type { PluginMap } from "../messageParser.mjs";
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "custom_command";
 
 /**
@@ -44,7 +42,7 @@ export interface CommandHandleCustomCommandDetectorDataOut {
 
 export const customCommandChatHandler = (
   customCommandIdRegex: Omit<CustomCommand, "message" | "description">,
-  pathDatabase: string
+  pathDatabase: string,
 ): ChatMessageHandlerReplyCreator<
   EMPTY_OBJECT,
   EMPTY_OBJECT,
@@ -55,7 +53,7 @@ export const customCommandChatHandler = (
       const pluginsCommand: PluginMap = new Map();
       pluginsCommand.set(
         pluginsRegexGroupGenerator.id,
-        pluginsRegexGroupGenerator.generate(data)
+        pluginsRegexGroupGenerator.generate(data),
       );
 
       return {
@@ -63,7 +61,7 @@ export const customCommandChatHandler = (
           globalStrings,
           globalPlugins,
           globalMacros,
-          loggerMessage
+          loggerMessage,
         ) => {
           const customCommand =
             await customCommandsBroadcastsDb.requests.customCommand.getEntry(
@@ -71,14 +69,14 @@ export const customCommandChatHandler = (
               {
                 id: customCommandIdRegex.id,
               },
-              loggerMessage
+              loggerMessage,
             );
           const message = await messageParser(
             customCommand.message,
             globalStrings,
             new Map([...globalPlugins, ...pluginsCommand]),
             globalMacros,
-            loggerMessage
+            loggerMessage,
           );
           customCommandIdRegex = customCommand;
           return message;

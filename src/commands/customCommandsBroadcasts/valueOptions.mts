@@ -9,7 +9,7 @@ export enum CustomBroadcastValueOptions {
 }
 export const validateCustomBroadcastValue = (
   option: CustomBroadcastValueOptions,
-  optionValue?: string
+  optionValue?: string,
 ): string => {
   switch (option) {
     case CustomBroadcastValueOptions.DESCRIPTION:
@@ -47,7 +47,7 @@ export enum CustomCommandValueOptions {
 }
 export const validateCustomCommandValue = (
   option: CustomCommandValueOptions,
-  optionValue?: string
+  optionValue?: string,
 ): string => {
   switch (option) {
     case CustomCommandValueOptions.COOLDOWN_IN_S:

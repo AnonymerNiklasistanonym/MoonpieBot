@@ -15,16 +15,14 @@ import type { DeepReadonly } from "../other/types.mjs";
 import type { Logger } from "winston";
 import type { Server } from "http";
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "spotify_refresh_token_grant";
 
 const SPOTIFY_API_URL = "https://accounts.spotify.com";
 
 export const generateSpotifyApiUrlRefreshTokenGrant = (
   spotifyClientId: string,
-  spotifyRedirectUri: string
+  spotifyRedirectUri: string,
 ): string =>
   SPOTIFY_API_URL +
   "/authorize" +
@@ -66,7 +64,7 @@ const generateHtmlCodeRefreshTokenGrantBad = (error: Readonly<Error>) =>
 export const spotifyApiRefreshTokenGrantServer = (
   spotifyApi: DeepReadonly<SpotifyWebApi>,
   spotifyDatabasePath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Server => {
   const logSpotify = createLogFunc(logger, LOG_ID, "refresh_token_grant");
   const server = http.createServer((req, res) => {
@@ -77,7 +75,7 @@ export const spotifyApiRefreshTokenGrantServer = (
         method: req.method,
         referer: req.headers.referer,
         url: req.url,
-      })}`
+      })}`,
     );
     if (req.url && req.headers.host) {
       if (req.url.endsWith("/")) {
@@ -92,18 +90,18 @@ export const spotifyApiRefreshTokenGrantServer = (
             .authorizationCodeGrant(codeToken)
             .then((codeGrantAuthorization) => {
               spotifyApi.setAccessToken(
-                codeGrantAuthorization.body["access_token"]
+                codeGrantAuthorization.body.access_token,
               );
               spotifyApi.setRefreshToken(
-                codeGrantAuthorization.body["refresh_token"]
+                codeGrantAuthorization.body.refresh_token,
               );
               return spotifyDb.requests.spotifyConfig.createOrUpdateEntry(
                 spotifyDatabasePath,
                 {
                   option: SpotifyConfig.REFRESH_TOKEN,
-                  optionValue: codeGrantAuthorization.body["refresh_token"],
+                  optionValue: codeGrantAuthorization.body.refresh_token,
                 },
-                logger
+                logger,
               );
             })
             .then(() => {
@@ -112,7 +110,7 @@ export const spotifyApiRefreshTokenGrantServer = (
               if (refreshToken === undefined) {
                 throw Error(
                   "Unexpected undefined refresh token after successful " +
-                    "authentication"
+                    "authentication",
                 );
               }
               res.writeHead(OK_STATUS_CODE);
@@ -137,7 +135,7 @@ export const spotifyApiRefreshTokenGrantServer = (
     } else {
       // Unsupported path
       const error = Error(
-        "Spotify authentication server encountered request with no url and host"
+        "Spotify authentication server encountered request with no url and host",
       );
       logSpotify.error(error);
       res.writeHead(FORBIDDEN_STATUS_CODE);

@@ -31,24 +31,24 @@ export const copyFileWithBackup = async (
   srcFilePath: string,
   destFilePath: string,
   destFilePathBackup: string,
-  options: Readonly<CopyFileWithBackupOptions>
+  options: Readonly<CopyFileWithBackupOptions>,
 ): Promise<void> => {
   const srcFileNotFound = !(await fileExists(srcFilePath));
-  if (srcFileNotFound && options.ignoreSrcFileNotFound !== true) {
+  if (srcFileNotFound && !options.ignoreSrcFileNotFound) {
     throw Error(`Source file was not found '${srcFilePath}'`);
   }
   const srcDestSameFile = pathsAreEqual(srcFilePath, destFilePath);
-  if (srcDestSameFile && options.ignoreSrcDestSameFile !== true) {
+  if (srcDestSameFile && !options.ignoreSrcDestSameFile) {
     throw Error(`Source and dest file are the same '${srcFilePath}'`);
   }
   if (await fileExists(destFilePath)) {
     await fs.mkdir(path.dirname(destFilePathBackup), { recursive: true });
     await fs.rename(destFilePath, destFilePathBackup);
   }
-  if (srcFileNotFound && options.ignoreSrcFileNotFound === true) {
+  if (srcFileNotFound && options.ignoreSrcFileNotFound) {
     return;
   }
-  if (srcDestSameFile && options.ignoreSrcDestSameFile === true) {
+  if (srcDestSameFile && options.ignoreSrcDestSameFile) {
     return;
   }
   await fs.copyFile(srcFilePath, destFilePath);
@@ -57,13 +57,13 @@ export const copyFileWithBackup = async (
 
 export const getFileContentIfExists = async (
   filePath: string,
-  errorContent?: string
+  errorContent?: string,
 ): Promise<Buffer | string> => {
   try {
     await fs.access(filePath, fs.constants.F_OK);
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     return await fs.readFile(filePath);
   } catch (err) {
-    return errorContent || `Error: File '${filePath}' was not found!`;
+    return errorContent ?? `Error: File '${filePath}' was not found!`;
   }
 };

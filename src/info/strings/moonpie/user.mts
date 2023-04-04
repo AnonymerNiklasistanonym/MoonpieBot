@@ -26,19 +26,19 @@ export const moonpieUserGet: StringEntry = {
     " The user ",
     generateMessageParserMessageMacro(
       macroMoonpieLeaderboardEntry,
-      MacroMoonpieLeaderboardEntry.NAME
+      MacroMoonpieLeaderboardEntry.NAME,
     ),
     " has ",
     generateMessageParserMessageMacro(
       macroMoonpieLeaderboardEntry,
-      MacroMoonpieLeaderboardEntry.COUNT
+      MacroMoonpieLeaderboardEntry.COUNT,
     ),
     " moonpie",
     {
       args: [
         generateMessageParserMessageMacro(
           macroMoonpieLeaderboardEntry,
-          MacroMoonpieLeaderboardEntry.COUNT
+          MacroMoonpieLeaderboardEntry.COUNT,
         ),
         "!==1",
       ],
@@ -49,7 +49,7 @@ export const moonpieUserGet: StringEntry = {
     " and is rank ",
     generateMessageParserMessageMacro(
       macroMoonpieLeaderboardEntry,
-      MacroMoonpieLeaderboardEntry.RANK
+      MacroMoonpieLeaderboardEntry.RANK,
     ),
     " on the leaderboard!",
   ]),
@@ -68,12 +68,12 @@ export const moonpieUserSetNaNError: StringEntry = {
     "The given moonpie count (",
     generateMessageParserMessageMacro(
       macroMoonpieUserSet,
-      MacroMoonpieUserSet.SET_OPERATION
+      MacroMoonpieUserSet.SET_OPERATION,
     ),
     ") '",
     generateMessageParserMessageMacro(
       macroMoonpieUserSet,
-      MacroMoonpieUserSet.SET_COUNT
+      MacroMoonpieUserSet.SET_COUNT,
     ),
     "' is not a valid number!",
   ]),
@@ -91,14 +91,14 @@ export const moonpieUserSet: StringEntry = {
     " to ",
     generateMessageParserMessageMacro(
       macroMoonpieLeaderboardEntry,
-      MacroMoonpieLeaderboardEntry.COUNT
+      MacroMoonpieLeaderboardEntry.COUNT,
     ),
     " moonpie",
     {
       args: [
         generateMessageParserMessageMacro(
           macroMoonpieLeaderboardEntry,
-          MacroMoonpieLeaderboardEntry.COUNT
+          MacroMoonpieLeaderboardEntry.COUNT,
         ),
         "!==1",
       ],
@@ -109,16 +109,16 @@ export const moonpieUserSet: StringEntry = {
     " (",
     generateMessageParserMessageMacro(
       macroMoonpieUserSet,
-      MacroMoonpieUserSet.SET_OPERATION
+      MacroMoonpieUserSet.SET_OPERATION,
     ),
     generateMessageParserMessageMacro(
       macroMoonpieUserSet,
-      MacroMoonpieUserSet.SET_COUNT
+      MacroMoonpieUserSet.SET_COUNT,
     ),
     ") and they are now rank ",
     generateMessageParserMessageMacro(
       macroMoonpieLeaderboardEntry,
-      MacroMoonpieLeaderboardEntry.RANK
+      MacroMoonpieLeaderboardEntry.RANK,
     ),
     " on the leaderboard!",
   ]),

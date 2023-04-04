@@ -49,7 +49,7 @@ enum ChatCommandPermission {
 export const LOG_ID_CHAT_HANDLER_OSU = "osu_chat_handler";
 
 const ENABLE_COMMANDS_DEFAULT_DESCRIPTION_COMMAND_COMMANDS =
-  "List all enabled Commands.mjs";
+  "List all enabled commands";
 
 export enum OsuCommands {
   COMMANDS = "commands",
@@ -151,7 +151,7 @@ export const getChatCommandsOsu: GetChatCommand<OsuCommands> = (id) => {
         {
           command: regexOsuChatHandlerCommandRequestsSet,
           description: `Set beatmap demands/options (${Object.values(
-            OsuRequestsConfig
+            OsuRequestsConfig,
           ).join(", ")})`,
           descriptionShort: "Set beatmap demands",
           id,
@@ -160,12 +160,12 @@ export const getChatCommandsOsu: GetChatCommand<OsuCommands> = (id) => {
         {
           command: regexOsuChatHandlerCommandRequestsUnset,
           description: `Reset beatmap request demands/options (${Object.values(
-            OsuRequestsConfig
+            OsuRequestsConfig,
           ).join(", ")}) back to their default value`,
           descriptionShort: "Reset beatmap demands",
           id,
           permission: ChatCommandPermission.MOD,
-        }
+        },
       );
       break;
   }
@@ -349,14 +349,14 @@ export const getChatCommandsCustomCommandsBroadcasts: GetChatCommand<
       command = regexCustomBroadcastEdit;
       descriptionShort = "Edit a broadcast";
       description = `A single property (${Object.values(
-        CustomBroadcastValueOptions
+        CustomBroadcastValueOptions,
       ).join(", ")}) can be edited of an existing broadcast`;
       break;
     case CustomCommandsBroadcastsCommands.EDIT_CUSTOM_COMMAND:
       command = regexCustomCommandEdit;
       descriptionShort = "Edit a command";
       description = `A single property (${Object.values(
-        CustomCommandValueOptions
+        CustomCommandValueOptions,
       ).join(", ")}) can be edited of an existing command`;
       break;
     case CustomCommandsBroadcastsCommands.LIST_CUSTOM_BROADCASTS:
@@ -369,7 +369,7 @@ export const getChatCommandsCustomCommandsBroadcasts: GetChatCommand<
       break;
     case CustomCommandsBroadcastsCommands.LIST_CUSTOM_COMMANDS:
       command = regexCustomBroadcastList;
-      descriptionShort = "List all Commands.mjs";
+      descriptionShort = "List all commands";
       description =
         descriptionShort +
         " (an offset number can be provided if multiple were added or an ID can be provided to only list one specific command)";

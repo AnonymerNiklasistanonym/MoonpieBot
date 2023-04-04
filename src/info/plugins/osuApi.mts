@@ -33,7 +33,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
     {
       generate:
         (data) =>
-        async (_, beatmapId): Promise<MacroMap> => {
+        async (logger, beatmapId): Promise<MacroMap> => {
           if (beatmapId === undefined || beatmapId.trim().length === 0) {
             throw Error("osu! beatmap ID was empty");
           }
@@ -41,15 +41,19 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
           const oauthAccessToken =
             await osuApiV2.default.oauth.clientCredentialsGrant(
               data.osuApiV2Credentials.clientId,
-              data.osuApiV2Credentials.clientSecret
+              data.osuApiV2Credentials.clientSecret,
             );
           const beatmap = await osuApiV2.default.beatmaps.get(
             oauthAccessToken,
-            beatmapIdNumber
+            beatmapIdNumber,
           );
-          return generateMacroMapFromMacroGenerator(macroOsuBeatmap, {
-            beatmap,
-          });
+          return generateMacroMapFromMacroGenerator(
+            macroOsuBeatmap,
+            {
+              beatmap,
+            },
+            logger,
+          );
         },
       id: PluginOsuApi.BEATMAP,
       signature: {
@@ -61,7 +65,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
     {
       generate:
         (data) =>
-        async (_, beatmapIdAndUserId): Promise<MacroMap> => {
+        async (logger, beatmapIdAndUserId): Promise<MacroMap> => {
           if (
             beatmapIdAndUserId === undefined ||
             beatmapIdAndUserId.trim().length === 0
@@ -77,23 +81,31 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
           const oauthAccessToken =
             await osuApiV2.default.oauth.clientCredentialsGrant(
               data.osuApiV2Credentials.clientId,
-              data.osuApiV2Credentials.clientSecret
+              data.osuApiV2Credentials.clientSecret,
             );
           try {
             const beatmapScore = await osuApiV2.default.beatmaps.scores.users(
               oauthAccessToken,
               beatmapIdAndUserIdNumber[0],
-              beatmapIdAndUserIdNumber[1]
+              beatmapIdAndUserIdNumber[1],
             );
-            return generateMacroMapFromMacroGenerator(macroOsuScore, {
-              beatmapScore,
-            });
+            return generateMacroMapFromMacroGenerator(
+              macroOsuScore,
+              {
+                beatmapScore,
+              },
+              logger,
+            );
           } catch (err) {
             if (
               (err as OsuApiV2WebRequestError).statusCode ===
               NOT_FOUND_STATUS_CODE
             ) {
-              return generateMacroMapFromMacroGenerator(macroOsuScore, {});
+              return generateMacroMapFromMacroGenerator(
+                macroOsuScore,
+                {},
+                logger,
+              );
             } else {
               throw err;
             }
@@ -109,7 +121,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
     {
       generate:
         (data) =>
-        async (_, userId): Promise<MacroMap> => {
+        async (logger, userId): Promise<MacroMap> => {
           if (userId === undefined || userId.trim().length === 0) {
             throw Error("osu! user ID was empty");
           }
@@ -117,7 +129,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
           const oauthAccessToken =
             await osuApiV2.default.oauth.clientCredentialsGrant(
               data.osuApiV2Credentials.clientId,
-              data.osuApiV2Credentials.clientSecret
+              data.osuApiV2Credentials.clientSecret,
             );
           const lastPlays = await osuApiV2.default.users.scores(
             oauthAccessToken,
@@ -126,14 +138,22 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
             GameMode.OSU_STANDARD,
             1,
             0,
-            true
+            true,
           );
           if (lastPlays.length > 0) {
-            return generateMacroMapFromMacroGenerator(macroOsuMostRecentPlay, {
-              score: lastPlays[0],
-            });
+            return generateMacroMapFromMacroGenerator(
+              macroOsuMostRecentPlay,
+              {
+                score: lastPlays[0],
+              },
+              logger,
+            );
           }
-          return generateMacroMapFromMacroGenerator(macroOsuMostRecentPlay, {});
+          return generateMacroMapFromMacroGenerator(
+            macroOsuMostRecentPlay,
+            {},
+            logger,
+          );
         },
       id: PluginOsuApi.MOST_RECENT_PLAY,
       signature: {
@@ -145,7 +165,7 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
     {
       generate:
         (data) =>
-        async (_, userId): Promise<MacroMap> => {
+        async (logger, userId): Promise<MacroMap> => {
           if (userId === undefined || userId.trim().length === 0) {
             throw Error("osu! user ID was empty");
           }
@@ -153,14 +173,18 @@ export const pluginsOsuGenerator: MessageParserPluginGenerator<PluginsOsuGenerat
           const oauthAccessToken =
             await osuApiV2.default.oauth.clientCredentialsGrant(
               data.osuApiV2Credentials.clientId,
-              data.osuApiV2Credentials.clientSecret
+              data.osuApiV2Credentials.clientSecret,
             );
           const user = await osuApiV2.default.users.get(
             oauthAccessToken,
             userIdNumber,
-            GameMode.OSU_STANDARD
+            GameMode.OSU_STANDARD,
           );
-          return generateMacroMapFromMacroGenerator(macroOsuUser, { user });
+          return generateMacroMapFromMacroGenerator(
+            macroOsuUser,
+            { user },
+            logger,
+          );
         },
       id: PluginOsuApi.USER,
       signature: {

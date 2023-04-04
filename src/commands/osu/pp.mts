@@ -47,7 +47,7 @@ export const commandPp: ChatMessageHandlerReplyCreator<
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandPpRpDetectorOutput
 > = {
-  createReply: async (_channel, _tags, data) => {
+  createReply: async (_channel, _tags, data, logger) => {
     if (data.defaultOsuId === undefined) {
       throw errorMessageDefaultOsuIdUndefined();
     }
@@ -55,13 +55,13 @@ export const commandPp: ChatMessageHandlerReplyCreator<
     const oauthAccessToken =
       await osuApiV2.default.oauth.clientCredentialsGrant(
         data.osuApiV2Credentials.clientId,
-        data.osuApiV2Credentials.clientSecret
+        data.osuApiV2Credentials.clientSecret,
       );
 
     if (data.customOsuId === undefined && data.customOsuName !== undefined) {
       const userSearchResult = await osuApiV2.default.search.user(
         oauthAccessToken,
-        data.customOsuName
+        data.customOsuName,
       );
       if (
         userSearchResult.data !== undefined &&
@@ -75,20 +75,23 @@ export const commandPp: ChatMessageHandlerReplyCreator<
     await osuApiV2.default.users.get(
       oauthAccessToken,
       data.customOsuId !== undefined ? data.customOsuId : data.defaultOsuId,
-      GameMode.OSU_STANDARD
+      GameMode.OSU_STANDARD,
     );
 
     const osuPpRequestMacros = new Map();
     osuPpRequestMacros.set(
       macroOsuPpRpRequest.id,
       new Map(
-        macroOsuPpRpRequest.generate({
-          id:
-            data.customOsuId !== undefined
-              ? data.customOsuId
-              : data.defaultOsuId,
-        })
-      )
+        macroOsuPpRpRequest.generate(
+          {
+            id:
+              data.customOsuId !== undefined
+                ? data.customOsuId
+                : data.defaultOsuId,
+          },
+          logger,
+        ),
+      ),
     );
 
     return {
@@ -119,7 +122,7 @@ export const commandPp: ChatMessageHandlerReplyCreator<
       return {
         data: {
           customOsuName: removeWhitespaceEscapeChatCommandGroup(
-            matchGroups.osuUserName
+            matchGroups.osuUserName,
           ),
         },
       };

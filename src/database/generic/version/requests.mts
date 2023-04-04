@@ -21,7 +21,7 @@ export interface CreateInput {
 export const createEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_version_create");
   const postResult = await db.default.requests.post(
@@ -32,7 +32,7 @@ export const createEntry = async (
       versionTable.columns.patch.name,
     ]),
     [input.major, input.minor, input.patch],
-    logMethod
+    logMethod,
   );
   return postResult.lastID;
 };
@@ -49,7 +49,7 @@ export interface RemoveInput {
 export const removeEntry = async (
   databasePath: string,
   input: RemoveInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_version_remove");
   const postResult = await db.default.requests.post(
@@ -66,7 +66,7 @@ export const removeEntry = async (
       columnName: versionTable.columns.major.name,
     }),
     [input.major, input.minor, input.patch],
-    logMethod
+    logMethod,
   );
   return postResult.changes > 0;
 };
@@ -80,12 +80,16 @@ export interface GetVersionDbOut {
   patch: number;
 }
 
+export const getVersionDbString = (
+  version: Readonly<GetVersionDbOut>,
+): string => `${version.major}.${version.minor}.${version.patch}`;
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface GetVersionOut extends GetVersionDbOut {}
 
 export const getEntries = async (
   databasePath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<GetVersionDbOut[]> => {
   const logMethod = createLogMethod(logger, "database_version_get");
 
@@ -97,7 +101,7 @@ export const getEntries = async (
       versionTable.columns.patch.name,
     ]),
     undefined,
-    logMethod
+    logMethod,
   );
   if (runResult) {
     return runResult;

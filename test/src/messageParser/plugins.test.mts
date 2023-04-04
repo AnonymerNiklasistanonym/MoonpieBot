@@ -4,11 +4,13 @@
 import { describe } from "mocha";
 import { expect } from "chai";
 // Relative imports
+import {
+  messageParser,
+  ParseTreeNodeError,
+} from "../../../src/messageParser.mjs";
 import { createMessageParserMessage } from "../../../src/messageParser/createMessageParserMessage.mjs";
 import { defaultPlugins } from "../../../src/info/plugins.mjs";
 import { getTestLogger } from "../logger.mjs";
-import { messageParser } from "../../../src/messageParser.mjs";
-import { ParseTreeNodeError } from "../../../src/messageParser.mjs";
 import { pluginRandomNumber } from "../../../src/info/plugins/general.mjs";
 // Type imports
 import type {
@@ -26,7 +28,7 @@ import type { Suite } from "mocha";
 const testPlugin = async (
   plugin: DeepReadonly<MessageParserPlugin>,
   logger: Readonly<Logger>,
-  additionalTests: DeepReadonlyArray<MessageParserPluginExample> = []
+  additionalTests: DeepReadonlyArray<MessageParserPluginExample> = [],
 ) => {
   if (plugin.examples === undefined) {
     return;
@@ -48,7 +50,7 @@ const testPlugin = async (
         undefined,
         new Map([[plugin.id, plugin.func]]),
         undefined,
-        logger
+        logger,
       );
       if (example.hideOutput) {
         expect(output).to.be.a("string");
@@ -59,24 +61,24 @@ const testPlugin = async (
             message,
             output,
             plugin: plugin.id,
-          })}`
+          })}`,
         );
       } else {
         expect(output).to.be.equal(
           example.expectedOutput,
-          JSON.stringify({ example, message, output, plugin: plugin.id })
+          JSON.stringify({ example, message, output, plugin: plugin.id }),
         );
       }
     } catch (err) {
       if (example.expectedError !== undefined) {
         expect((err as OrUndef<ParseTreeNodeError>)?.pluginError).to.be.equal(
           example.expectedError,
-          JSON.stringify({ err, example, message, plugin: plugin.id })
+          JSON.stringify({ err, example, message, plugin: plugin.id }),
         );
       } else if (example.expectedErrorCode !== undefined) {
         expect((err as OrUndef<ParseTreeNodeError>)?.code).to.be.equal(
           example.expectedErrorCode,
-          JSON.stringify({ err, example, message, plugin: plugin.id })
+          JSON.stringify({ err, example, message, plugin: plugin.id }),
         );
       } else {
         throw err;

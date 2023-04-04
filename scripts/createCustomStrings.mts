@@ -30,6 +30,6 @@ for (const stringEntryToPrint of stringEntriesToPrint) {
     }=${escapeStringIfWhiteSpace(stringEntryToPrint.default, {
       escapeCharacters: [["'", "\\'"]],
       surroundCharacter: "'",
-    })}`
+    })}`,
   );
 }

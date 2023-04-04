@@ -40,7 +40,8 @@ export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
-      TwitchBadgeLevel.MODERATOR
+      TwitchBadgeLevel.MODERATOR,
+      logger,
     );
     if (twitchBadgeLevelCheck !== undefined) {
       return twitchBadgeLevelCheck;
@@ -66,7 +67,7 @@ export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
     const osuRequestsConfigEntries =
       await osuRequestsDb.requests.osuRequestsConfig.getEntries(
         data.osuApiDbPath,
-        logger
+        logger,
       );
 
     for (const previousBeatmapRequest of previousBeatmapRequests) {
@@ -76,19 +77,20 @@ export const commandBeatmapLastRequest: ChatMessageHandlerReplyCreator<
       commandReplies.push(
         ...sendBeatmapRequest(
           osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.DETAILED
+            (a) => a.option === OsuRequestsConfig.DETAILED,
           )?.optionValue === "true",
           osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.DETAILED_IRC
+            (a) => a.option === OsuRequestsConfig.DETAILED_IRC,
           )?.optionValue === "true",
           undefined,
           previousBeatmapRequest.data.id,
           previousBeatmapRequest.userName,
+          logger,
           previousBeatmapRequest.comment,
           previousBeatmapRequest.data,
           data.osuIrcRequestTarget,
-          data.osuIrcBot
-        )
+          data.osuIrcBot,
+        ),
       );
     }
     return commandReplies;

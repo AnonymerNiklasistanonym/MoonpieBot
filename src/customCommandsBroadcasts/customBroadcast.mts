@@ -10,9 +10,7 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { StringMap } from "../messageParser.mjs";
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "custom_broadcast";
 
 /**
@@ -39,7 +37,7 @@ export const createBroadcastScheduledTask = (
   globalStrings: StringMap,
   globalPlugins: PluginMap,
   globalMacros: MacroMap,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): cron.ScheduledTask => {
   const logCustomTimer = createLogFunc(logger, LOG_ID, "create_broadcast");
 
@@ -49,7 +47,7 @@ export const createBroadcastScheduledTask = (
   logCustomTimer.debug(`Create broadcast '${customBroadcast.id}'`);
   return cron.schedule(customBroadcast.cronString, () => {
     logCustomTimer.debug(
-      `Broadcast '${customBroadcast.id}' was triggered (${customBroadcast.cronString})`
+      `Broadcast '${customBroadcast.id}' was triggered (${customBroadcast.cronString})`,
     );
     for (const channel of channels) {
       messageParser(
@@ -57,7 +55,7 @@ export const createBroadcastScheduledTask = (
         globalStrings,
         globalPlugins,
         globalMacros,
-        logger
+        logger,
       )
         .then((parsedMessage) => client.say(channel, parsedMessage))
         .then((sentMessage) => {
@@ -71,7 +69,7 @@ export const createBroadcastScheduledTask = (
 export const stopBroadcastScheduledTask = (
   cronTask: ScheduledTask,
   customBroadcastId: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): void => {
   const logCustomTimer = createLogFunc(logger, LOG_ID, "stop_broadcast");
 

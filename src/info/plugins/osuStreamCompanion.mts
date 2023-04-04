@@ -24,19 +24,20 @@ export const pluginsOsuStreamCompanionGenerator: MessageParserPluginGenerator<Pl
     {
       description:
         "Get the current osu! map data via StreamCompanion (websocket interface).",
-      generate: (data) => async () => {
+      generate: (data) => async (logger) => {
         const currentMap = await data.streamCompanionDataFunc();
         if (currentMap === undefined) {
           return new Map();
         }
         if (currentMap.type !== "websocket") {
           throw Error(
-            `No web socket connection was found (type='${currentMap.type}')`
+            `No web socket connection was found (type='${currentMap.type}')`,
           );
         }
         return generateMacroMapFromMacroGenerator(
           macroOsuStreamCompanionCurrentMapWebSocket,
-          { currentMap }
+          { currentMap },
+          logger,
         );
       },
       id: PluginOsuStreamCompanion.CURRENT_MAP_WEBSOCKET,
@@ -48,19 +49,20 @@ export const pluginsOsuStreamCompanionGenerator: MessageParserPluginGenerator<Pl
     {
       description:
         "Get the current osu! map data via StreamCompanion (file interface).",
-      generate: (data) => async () => {
+      generate: (data) => async (logger) => {
         const currentMap = await data.streamCompanionDataFunc();
         if (currentMap === undefined) {
           return new Map();
         }
         if (currentMap.type !== "file") {
           throw Error(
-            `No file connection was found (type='${currentMap.type}')`
+            `No file connection was found (type='${currentMap.type}')`,
           );
         }
         return generateMacroMapFromMacroGenerator(
           macroOsuStreamCompanionCurrentMapFile,
-          { currentMap }
+          { currentMap },
+          logger,
         );
       },
       id: PluginOsuStreamCompanion.CURRENT_MAP_FILE,

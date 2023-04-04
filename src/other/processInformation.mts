@@ -31,7 +31,7 @@ export interface ProcessInformationWindows extends ProcessInformationBase {
  * @returns The information of that process.
  */
 export const getProcessInformationByName = async (
-  processName: string
+  processName: string,
 ): Promise<ProcessInformationWindows> => {
   let cmd = "";
   switch (process.platform) {
@@ -47,11 +47,12 @@ export const getProcessInformationByName = async (
     default:
       // Throw errors on other platforms
       throw Error(
-        `Unsupported platform to check if process "${processName}" is running: "${process.platform}"`
+        `Unsupported platform to check if process "${processName}" is running: "${process.platform}"`,
       );
   }
 
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line security/detect-child-process
     exec(cmd, (err, processInformationStdout /*, _stderr*/) => {
       if (err) {
         reject(err);
@@ -66,14 +67,13 @@ export const getProcessInformationByName = async (
           s.push(null);
           s.pipe(csv())
             .on("data", (data: WindowsTasklistVOutputElement) =>
-              resultsWin32.push(data)
+              resultsWin32.push(data),
             )
             .on("end", () => {
-              const processInformation = resultsWin32.find(
-                (a) =>
-                  a["Image Name"]
-                    .toLowerCase()
-                    .indexOf(processName.toLowerCase()) > -1
+              const processInformation = resultsWin32.find((a) =>
+                a["Image Name"]
+                  .toLowerCase()
+                  .includes(processName.toLowerCase()),
               );
               resolve({
                 platform: "win32",
@@ -87,7 +87,7 @@ export const getProcessInformationByName = async (
         default:
           // Throw errors on other platforms
           throw Error(
-            `Unsupported platform to check if process "${processName}" is running: "${process.platform}"`
+            `Unsupported platform to check if process "${processName}" is running: "${process.platform}"`,
           );
       }
     });

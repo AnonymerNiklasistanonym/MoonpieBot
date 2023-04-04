@@ -1,8 +1,8 @@
-// Type imports
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
+// Relative imports
+import { createMessageParserMacroGeneratorDynamicKeys } from "../../messageParser/macros.mjs";
 
 export interface MacroCommandsEnabledData<ENUM_TYPE> {
-  convertEnumValueToInfo: (enumValue: ENUM_TYPE) => [string, boolean];
+  convertEnumValueToInfo: (enumValue: ENUM_TYPE) => [ENUM_TYPE, boolean];
   enumValues: ENUM_TYPE[];
 }
 enum MacroCommandEnabledExample {
@@ -10,16 +10,30 @@ enum MacroCommandEnabledExample {
   COMMANDS = "COMMAND_COMMANDS",
   HELP = "COMMAND_HELP",
 }
-export const macroCommandEnabled: MessageParserMacroGenerator<
-  MacroCommandsEnabledData<string>,
-  string
-> = {
-  description:
-    "Available in !commands commands to see what commands are enabled",
-  exampleData: {
+export const macroCommandEnabled = createMessageParserMacroGeneratorDynamicKeys<
+  string,
+  MacroCommandsEnabledData<string>
+>(
+  {
+    description:
+      "Available in !commands commands to see what commands are enabled",
+    id: "COMMAND_ENABLED",
+  },
+  (data) =>
+    data.enumValues.map(
+      (enumValue) => data.convertEnumValueToInfo(enumValue)[0],
+    ),
+  (macroId, data) =>
+    data.enumValues
+      .map((enumValue) => data.convertEnumValueToInfo(enumValue))
+      .find((a) => a[0] === macroId)
+      ?.at(1)
+      ? "true"
+      : "false",
+  {
     convertEnumValueToInfo: (enumValue) => {
       const enabled = [MacroCommandEnabledExample.HELP].includes(
-        enumValue as MacroCommandEnabledExample
+        enumValue as MacroCommandEnabledExample,
       );
       switch (enumValue as MacroCommandEnabledExample) {
         case MacroCommandEnabledExample.ABOUT:
@@ -33,12 +47,4 @@ export const macroCommandEnabled: MessageParserMacroGenerator<
     },
     enumValues: Object.values(MacroCommandEnabledExample),
   },
-  generate: (data) =>
-    data.enumValues
-      .map<[string, boolean]>((enumValue) =>
-        data.convertEnumValueToInfo(enumValue)
-      )
-      .map<[string, string]>((a) => [a[0], a[1] ? "true" : "false"]),
-  id: "COMMAND_ENABLED",
-  keys: [],
-};
+);

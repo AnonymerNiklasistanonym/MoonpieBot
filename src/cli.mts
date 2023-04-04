@@ -38,7 +38,7 @@ export interface CliOptionSignaturePart {
   type: CliOptionSignaturePartType;
 }
 export interface CliOptionSignaturePartEnum extends CliOptionSignaturePart {
-  enumValues: ReadonlyArray<string>;
+  enumValues: readonly string[];
   type: CliOptionSignaturePartType.ENUM;
 }
 export interface CliOptionSignaturePartOther extends CliOptionSignaturePart {
@@ -53,7 +53,7 @@ export type CliOptionSignatureParts =
   | CliOptionSignaturePartEnum;
 
 export const cliOptionSignatureToString = (
-  parts: DeepReadonlyArray<CliOptionSignatureParts>
+  parts: DeepReadonlyArray<CliOptionSignatureParts>,
 ): string =>
   parts
     .map((a) => {
@@ -109,7 +109,7 @@ export interface CliOptionInformation<NAME = string> {
 export interface CliEnvVariableInformationSupportedValues {
   canBeJoinedAsList?: boolean;
   emptyListValue?: string;
-  values: DeepReadonlyArray<ChatCommand> | ReadonlyArray<string>;
+  values: DeepReadonlyArray<ChatCommand> | readonly string[];
 }
 
 /**
@@ -155,7 +155,7 @@ export const cliHelpGenerator = (
   cliOptionsInformation: DeepReadonlyArray<CliOptionInformation> = [],
   cliEnvVariableInformation: DeepReadonlyArray<CliEnvVariableInformation> = [],
   configDir: string,
-  outputOptions: DeepReadonly<CliOutputOptions> = {}
+  outputOptions: DeepReadonly<CliOutputOptions> = {},
 ): string => {
   const helpOutput: CliOutputElements[] = [];
 

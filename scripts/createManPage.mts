@@ -6,27 +6,27 @@ import path from "path";
 // Relative imports
 import {
   author,
-  binaryName,
   bugTrackerUrl,
   description,
+  displayName,
   license,
   licenseUrl,
-  longDescription,
   name,
-  packageDescription,
   sourceCodeUrl,
-  usages,
+  version,
   websiteUrl,
 } from "../src/info/general.mjs";
 import { ENV_PREFIX, envVariableInformation } from "../src/info/env.mjs";
-import { cliOptionSignatureToString } from "../src/cli.mjs";
-import { cliOptionsInformation } from "../src/info/cli.mjs";
+import {
+  longDescription,
+  packageDescription,
+} from "../src/info/descriptions.mjs";
+// import { cliOptionSignatureToString } from "../src/cli.mjs";
+// import { createProgram } from "../src/info/cli.mjs";
 import { convertRegexToHumanStringDetailed } from "../src/other/regexToString.mjs";
 import { createJob } from "../src/createJob.mjs";
 import { createManPageFileContent } from "./lib/man.mjs";
-import { getVersionString } from "../src/version.mjs";
 import { isStringArray } from "../src/other/types.mjs";
-import { version } from "../src/info/version.mjs";
 // Type imports
 import type { ChatCommand } from "../src/chatCommand.mjs";
 import type { DeepReadonlyArray } from "../src/other/types.mjs";
@@ -40,20 +40,20 @@ const filePathOutputManPage = path.join(INSTALLER_DIR, "man.md");
 // -----------------------------------------------------------------------------
 
 const getSupportedValues = (
-  info: ReadonlyArray<string> | DeepReadonlyArray<ChatCommand<string>>
+  info: readonly string[] | DeepReadonlyArray<ChatCommand>,
 ): string[] => {
   if (isStringArray(info)) {
     return info.slice();
   }
-  return (info as readonly ChatCommand<string>[]).map((a) => a.id);
+  return (info as readonly ChatCommand[]).map((a) => a.id);
 };
 const getCommands = (
-  info: ReadonlyArray<string> | DeepReadonlyArray<ChatCommand<string>>
+  info: readonly string[] | DeepReadonlyArray<ChatCommand>,
 ): ManPageInfoEnvVariableCommand[] => {
   if (isStringArray(info)) {
     return [];
   }
-  return (info as readonly ChatCommand<string>[]).map((a) => ({
+  return (info as readonly ChatCommand[]).map((a) => ({
     description: a.description,
     id: a.id,
     permission: a.permission,
@@ -64,6 +64,8 @@ const getCommands = (
   }));
 };
 
+// TODO Create new data structure that supports options and commands
+
 try {
   await Promise.all([
     createJob(
@@ -71,15 +73,8 @@ try {
       filePathOutputManPage,
       createManPageFileContent({
         author,
-        binaryName,
-        cliOptions: cliOptionsInformation.map((a) => ({
-          description: a.description,
-          name: a.name,
-          signature:
-            a.signature !== undefined
-              ? cliOptionSignatureToString(a.signature)
-              : undefined,
-        })),
+        binaryName: name,
+        cliOptions: [],
         customSections: [
           {
             content: `Bugs are tracked in GitHub Issues: ${bugTrackerUrl}`,
@@ -87,7 +82,7 @@ try {
           },
           {
             content:
-              `${name} is available under the ${license} license.\n` +
+              `${displayName} is available under the ${license} license.\n` +
               `See ${licenseUrl} for the full license text.`,
             title: "COPYRIGHT",
           },
@@ -98,7 +93,7 @@ try {
             title: "SEE ALSO",
           },
         ],
-        description: `${longDescription}\n\n${packageDescription(false)}`,
+        description: `${longDescription}\n\n${packageDescription("linux")}`,
         descriptionShort: description,
         envVariables: envVariableInformation.map((a) => ({
           commands:
@@ -126,11 +121,12 @@ try {
               ? getSupportedValues(a.supportedValues.values)
               : undefined,
         })),
-        name,
+        name: displayName,
         releaseDate: new Date(),
-        usageSignatures: usages.map((a) => a.signature),
-        version: getVersionString(version, ""),
-      })
+        // TODO Convert commander usage to MAN usage
+        usageSignatures: [], //usages.map((a) => a.signature),
+        version,
+      }),
     ),
   ]);
 } catch (err) {

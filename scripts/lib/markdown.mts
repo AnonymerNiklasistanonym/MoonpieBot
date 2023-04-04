@@ -13,6 +13,6 @@ export const getMdComment = (line: string): undefined | string =>
   line.trimEnd().endsWith(mdCommentInfo.end)
     ? line.substring(
         mdCommentInfo.begin.length,
-        line.trimEnd().length - mdCommentInfo.end.length
+        line.trimEnd().length - mdCommentInfo.end.length,
       )
     : undefined;

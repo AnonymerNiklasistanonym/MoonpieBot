@@ -120,13 +120,13 @@ export interface MoonpieConfigCustomData {
 const getDatabasePath = (
   envVariable: EnvVariable,
   configDir: string,
-  customData?: MoonpieConfigCustomData
+  customData?: MoonpieConfigCustomData,
 ): string =>
   path.resolve(
     configDir,
     customData?.resetDatabaseFilePaths === true
       ? getEnvVariableValueDefault(envVariable, configDir)
-      : getEnvVariableValueOrDefault(envVariable, configDir)
+      : getEnvVariableValueOrDefault(envVariable, configDir),
   );
 
 export const getMoonpieConfigFromEnv: GetConfig<
@@ -137,10 +137,10 @@ export const getMoonpieConfigFromEnv: GetConfig<
     // Twitch connection
     twitch: {
       channels: convertToStringArray(
-        getEnvVariableValueOrError(EnvVariable.TWITCH_CHANNELS)
+        getEnvVariableValueOrError(EnvVariable.TWITCH_CHANNELS),
       ),
       debug: convertToBoolean(
-        getEnvVariableValueOrUndefined(EnvVariable.TWITCH_DEBUG)
+        getEnvVariableValueOrUndefined(EnvVariable.TWITCH_DEBUG),
       ),
       name: getEnvVariableValueOrError(EnvVariable.TWITCH_NAME),
       oAuthToken: getEnvVariableValueOrError(EnvVariable.TWITCH_OAUTH_TOKEN),
@@ -149,10 +149,10 @@ export const getMoonpieConfigFromEnv: GetConfig<
     twitchApi: {
       // eslint-disable-next-line sort-keys
       accessToken: getEnvVariableValueOrUndefined(
-        EnvVariable.TWITCH_API_ACCESS_TOKEN
+        EnvVariable.TWITCH_API_ACCESS_TOKEN,
       ),
       clientId: getEnvVariableValueOrUndefined(
-        EnvVariable.TWITCH_API_CLIENT_ID
+        EnvVariable.TWITCH_API_CLIENT_ID,
       ),
     },
     // > Moonpie
@@ -163,23 +163,23 @@ export const getMoonpieConfigFromEnv: GetConfig<
       databasePath: getDatabasePath(
         EnvVariable.SPOTIFY_DATABASE_PATH,
         configDir,
-        customData
+        customData,
       ),
       enableCommands: convertToStringArray(
         getEnvVariableValueOrDefault(
           EnvVariable.SPOTIFY_ENABLE_COMMANDS,
-          configDir
+          configDir,
         ),
-        Object.values(SpotifyCommands)
+        Object.values(SpotifyCommands),
       ),
     },
     // > Spotify API
     spotifyApi: {
       clientId: getEnvVariableValueOrUndefined(
-        EnvVariable.SPOTIFY_API_CLIENT_ID
+        EnvVariable.SPOTIFY_API_CLIENT_ID,
       ),
       clientSecret: getEnvVariableValueOrUndefined(
-        EnvVariable.SPOTIFY_API_CLIENT_SECRET
+        EnvVariable.SPOTIFY_API_CLIENT_SECRET,
       ),
       // Remove the refresh token value if it is found in database
       refreshToken:
@@ -188,14 +188,14 @@ export const getMoonpieConfigFromEnv: GetConfig<
               getDatabasePath(
                 EnvVariable.SPOTIFY_DATABASE_PATH,
                 configDir,
-                customData
+                customData,
               ),
               getEnvVariableValueOrUndefined(
-                EnvVariable.SPOTIFY_API_REFRESH_TOKEN
-              )
+                EnvVariable.SPOTIFY_API_REFRESH_TOKEN,
+              ),
             )
           : getEnvVariableValueOrUndefined(
-              EnvVariable.SPOTIFY_API_REFRESH_TOKEN
+              EnvVariable.SPOTIFY_API_REFRESH_TOKEN,
             ),
     },
     // > osu!
@@ -204,9 +204,9 @@ export const getMoonpieConfigFromEnv: GetConfig<
       enableCommands: convertToStringArray(
         getEnvVariableValueOrDefault(
           EnvVariable.OSU_ENABLE_COMMANDS,
-          configDir
+          configDir,
         ),
-        Object.values(OsuCommands)
+        Object.values(OsuCommands),
       ),
     },
     // > osu! API
@@ -217,18 +217,18 @@ export const getMoonpieConfigFromEnv: GetConfig<
               getDatabasePath(
                 EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
                 configDir,
-                customData
+                customData,
               ),
               convertToBooleanIfNotUndefined(
                 getEnvVariableValueOrUndefined(
-                  EnvVariable.OSU_API_REQUESTS_DETAILED
-                )
-              )
+                  EnvVariable.OSU_API_REQUESTS_DETAILED,
+                ),
+              ),
             )
           : convertToBooleanIfNotUndefined(
               getEnvVariableValueOrUndefined(
-                EnvVariable.OSU_API_REQUESTS_DETAILED
-              )
+                EnvVariable.OSU_API_REQUESTS_DETAILED,
+              ),
             ),
       beatmapRequestsRedeemId:
         customData?.removeAttributesStoredInDatabases === true
@@ -236,43 +236,43 @@ export const getMoonpieConfigFromEnv: GetConfig<
               getDatabasePath(
                 EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
                 configDir,
-                customData
+                customData,
               ),
               getEnvVariableValueOrUndefined(
-                EnvVariable.OSU_API_REQUESTS_REDEEM_ID
-              )
+                EnvVariable.OSU_API_REQUESTS_REDEEM_ID,
+              ),
             )
           : getEnvVariableValueOrUndefined(
-              EnvVariable.OSU_API_REQUESTS_REDEEM_ID
+              EnvVariable.OSU_API_REQUESTS_REDEEM_ID,
             ),
       clientId: convertToIntIfNotUndefined(
         getEnvVariableValueOrUndefined(EnvVariable.OSU_API_CLIENT_ID),
-        "The osu! api client ID string could not be parsed to an integer"
+        "The osu! api client ID string could not be parsed to an integer",
       ),
       clientSecret: getEnvVariableValueOrUndefined(
-        EnvVariable.OSU_API_CLIENT_SECRET
+        EnvVariable.OSU_API_CLIENT_SECRET,
       ),
       databasePath: getDatabasePath(
         EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH,
         configDir,
-        customData
+        customData,
       ),
       defaultId: convertToIntIfNotUndefined(
-        getEnvVariableValueOrUndefined(EnvVariable.OSU_API_DEFAULT_ID)
+        getEnvVariableValueOrUndefined(EnvVariable.OSU_API_DEFAULT_ID),
       ),
     },
     // > osu! IRC
     osuIrc: {
       password: getEnvVariableValueOrUndefined(EnvVariable.OSU_IRC_PASSWORD),
       requestTarget: getEnvVariableValueOrUndefined(
-        EnvVariable.OSU_IRC_REQUEST_TARGET
+        EnvVariable.OSU_IRC_REQUEST_TARGET,
       ),
       username: getEnvVariableValueOrUndefined(EnvVariable.OSU_IRC_USERNAME),
     },
     // > osu! StreamCompanion
     osuStreamCompanion: {
       dirPath: getEnvVariableValueOrUndefined(
-        EnvVariable.OSU_STREAM_COMPANION_DIR_PATH
+        EnvVariable.OSU_STREAM_COMPANION_DIR_PATH,
       ),
       url: getEnvVariableValueOrUndefined(EnvVariable.OSU_STREAM_COMPANION_URL),
     },
@@ -282,14 +282,14 @@ export const getMoonpieConfigFromEnv: GetConfig<
       databasePath: getDatabasePath(
         EnvVariable.CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH,
         configDir,
-        customData
+        customData,
       ),
       enableCommands: convertToStringArray(
         getEnvVariableValueOrDefault(
           EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLE_COMMANDS,
-          configDir
+          configDir,
         ),
-        Object.values(CustomCommandsBroadcastsCommands)
+        Object.values(CustomCommandsBroadcastsCommands),
       ),
     },
     // Lurk
@@ -297,9 +297,9 @@ export const getMoonpieConfigFromEnv: GetConfig<
       enableCommands: convertToStringArray(
         getEnvVariableValueOrDefault(
           EnvVariable.LURK_ENABLE_COMMANDS,
-          configDir
+          configDir,
         ),
-        Object.values(LurkCommands)
+        Object.values(LurkCommands),
       ),
     },
   };
@@ -313,21 +313,21 @@ export const getMoonpieConfigMoonpieFromEnv: GetConfig<
     claimCooldownHours: convertToInt(
       getEnvVariableValueOrDefault(
         EnvVariable.MOONPIE_CLAIM_COOLDOWN_HOURS,
-        configDir
+        configDir,
       ),
-      "The moonpie claim cooldown hours number string could not be parsed to an integer"
+      "The moonpie claim cooldown hours number string could not be parsed to an integer",
     ),
     databasePath: getDatabasePath(
       EnvVariable.MOONPIE_DATABASE_PATH,
       configDir,
-      customData
+      customData,
     ),
     enableCommands: convertToStringArray(
       getEnvVariableValueOrDefault(
         EnvVariable.MOONPIE_ENABLE_COMMANDS,
-        configDir
+        configDir,
       ),
-      Object.values(MoonpieCommands)
+      Object.values(MoonpieCommands),
     ),
   };
 };
@@ -340,7 +340,7 @@ export const getCustomEnvValueFromMoonpieConfig: GetCustomEnvValueFromConfig<
     return convertFromStringArray(config.twitch.channels);
   }
   if (envVariable === EnvVariable.TWITCH_DEBUG) {
-    return convertFromBoolean(config.twitch?.debug);
+    return convertFromBoolean(config.twitch.debug);
   }
   if (envVariable === EnvVariable.TWITCH_NAME) {
     return config.twitch.name;
@@ -428,7 +428,7 @@ export const getCustomEnvValueFromMoonpieConfig: GetCustomEnvValueFromConfig<
   }
   if (envVariable === EnvVariable.CUSTOM_COMMANDS_BROADCASTS_ENABLE_COMMANDS) {
     return convertFromStringArray(
-      config.customCommandsBroadcasts?.enableCommands
+      config.customCommandsBroadcasts?.enableCommands,
     );
   }
   // > Lurk

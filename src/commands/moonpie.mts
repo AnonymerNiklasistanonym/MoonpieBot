@@ -35,7 +35,7 @@ export const moonpieChatHandler: ChatMessageHandler<
   globalStrings,
   globalPlugins,
   globalMacros,
-  logger
+  logger,
 ): Promise<void> => {
   // Handle commands
   await Promise.all(
@@ -50,9 +50,9 @@ export const moonpieChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandSet].map((command) =>
@@ -66,9 +66,9 @@ export const moonpieChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandGet, commandDelete].map((command) =>
@@ -82,9 +82,9 @@ export const moonpieChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandCommands].map((command) =>
@@ -98,8 +98,8 @@ export const moonpieChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
 };

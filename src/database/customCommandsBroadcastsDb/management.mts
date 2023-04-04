@@ -9,7 +9,6 @@ import {
 //import customCommandsBroadcastsDb from "../customCommandsBroadcastsDb.mjs";
 //import { customCommandsInformation } from "../../info/customCommands.mjs";
 import { genericSetupDatabase } from "../generic/setup.mjs";
-import { getVersionString } from "../../version.mjs";
 // Type imports
 import type { Logger } from "winston";
 
@@ -21,7 +20,7 @@ import type { Logger } from "winston";
  */
 export const setup = async (
   databasePath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<void> =>
   genericSetupDatabase(
     databasePath,
@@ -32,9 +31,7 @@ export const setup = async (
     {
       migrateVersion: (oldVersion, currentVersion) => {
         throw Error(
-          `No database migration was found (old=${
-            oldVersion !== undefined ? getVersionString(oldVersion, "") : "none"
-          },current=${getVersionString(currentVersion, "")})!`
+          `No database migration was found (old=${oldVersion.version},current=${currentVersion.version})!`,
         );
       },
       /*
@@ -69,5 +66,5 @@ export const setup = async (
       },
       */
     },
-    logger
+    logger,
   );

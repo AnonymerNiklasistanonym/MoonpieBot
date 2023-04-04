@@ -18,11 +18,13 @@ export const pluginSpotifyGenerator: MessageParserPluginGenerator<PluginSpotifyD
       async (logger): Promise<MacroMap> => {
         const spotifyData = await spotifyGetCurrentAndRecentSongs(
           data.spotifyWebApi,
-          logger
+          logger,
         );
-        return generateMacroMapFromMacroGenerator(macroSpotifySong, {
-          spotifyData,
-        });
+        return generateMacroMapFromMacroGenerator(
+          macroSpotifySong,
+          { spotifyData },
+          logger,
+        );
       },
     id: "SPOTIFY_SONG",
     signature: {

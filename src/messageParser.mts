@@ -37,7 +37,6 @@ export {
 export type {
   MacroMap,
   MacroDictionary,
-  MacroDictionaryEntry,
   MessageParserMacro,
   MessageParserMacroDocumentation,
   MessageParserMacroGenerator,
@@ -59,9 +58,7 @@ export type {
   MessageForParserMessagePlugin,
 } from "./messageParser/createMessageParserMessage.mjs";
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "message_parser";
 
 export const messageParser = async (
@@ -69,7 +66,7 @@ export const messageParser = async (
   strings: DeepReadonly<StringMap> = new Map(),
   plugins: DeepReadonly<PluginMap> = new Map(),
   macros: DeepReadonly<MacroMap> = new Map(),
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<string> => {
   const logMessageParser = createLogFunc(logger, LOG_ID);
 
@@ -84,7 +81,7 @@ export const messageParser = async (
       undefined,
       undefined,
       undefined,
-      logger
+      logger,
     );
     // 2. Parse parse tree from top down
     return await parseTreeNode(parseTreeNodeRoot, plugins, macros, logger);
@@ -93,8 +90,8 @@ export const messageParser = async (
       Error(
         `There was an error parsing the message string '${messageString}': ${
           (err as Error).message
-        }`
-      )
+        }`,
+      ),
     );
     throw err;
   }
@@ -105,7 +102,7 @@ export const messageParserById = async (
   strings: DeepReadonly<StringMap>,
   plugins: DeepReadonly<PluginMap> = new Map(),
   macros: DeepReadonly<MacroMap> = new Map(),
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<string> => {
   const stringEntryFromId = strings.get(stringId);
   if (stringEntryFromId === undefined) {
@@ -116,6 +113,6 @@ export const messageParserById = async (
     strings,
     plugins,
     macros,
-    logger
+    logger,
   );
 };

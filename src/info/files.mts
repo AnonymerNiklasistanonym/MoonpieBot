@@ -18,6 +18,15 @@ export const fileNameCustomCommandsBroadcastsExample =
   "customCommandsBroadcasts.example.txt";
 
 /**
+ * @param platform The operating platform.
+ * @returns The default config directory when installed as a package.
+ */
+export const defaultConfigDir = (platform: "win32" | "linux"): string =>
+  platform === "win32"
+    ? "%APPDATA%\\MoonpieBot"
+    : "$HOME/.local/share/moonpiebot";
+
+/**
  * A function to create the directory name of an old MoonpieBot configuration depending
  * on the current date.
  *
@@ -25,7 +34,7 @@ export const fileNameCustomCommandsBroadcastsExample =
  * @returns The file name.
  */
 export const generateOutputDirNameOldConfig = (
-  date: Readonly<Date> = new Date()
+  date: Readonly<Date> = new Date(),
 ): string =>
   `old_config_${date
     .toISOString()

@@ -27,7 +27,7 @@ export interface ExistsInput {
 export const existsEntry = async (
   databasePath: string,
   input: ExistsInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_custom_data_exists");
   try {
@@ -39,7 +39,7 @@ export const existsEntry = async (
         columnName: customDataTable.columns.id.name,
       }),
       [input.id],
-      logMethod
+      logMethod,
     );
     if (runResultExists) {
       return runResultExists.exists_value === 1;
@@ -60,7 +60,7 @@ export interface CreateInput {
 export const createEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_custom_data_create");
   const columns = [
@@ -81,7 +81,7 @@ export const createEntry = async (
     databasePath,
     db.default.queries.insert(customDataTable.name, columns),
     values,
-    logMethod
+    logMethod,
   );
   return postResult.lastID;
 };
@@ -93,7 +93,7 @@ export interface RemoveInput {
 export const removeEntry = async (
   databasePath: string,
   input: RemoveInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_custom_data_remove");
   const postResult = await db.default.requests.post(
@@ -102,7 +102,7 @@ export const removeEntry = async (
       columnName: customDataTable.columns.id.name,
     }),
     [input.id],
-    logMethod
+    logMethod,
   );
   return postResult.changes > 0;
 };
@@ -122,12 +122,12 @@ export interface GetInput {
 }
 
 const mapGetCustomDataDbOutToResult = (
-  input: GetCustomDataDbOut
+  input: GetCustomDataDbOut,
 ): CustomDataTypes => {
   const valueType = convertCustomDataValueTypeStringToValueType(
-    input.valueType
+    input.valueType,
   );
-  const description = input.description || undefined;
+  const description = input.description ?? undefined;
   switch (valueType) {
     case CustomDataValueType.NUMBER:
       return {
@@ -135,7 +135,7 @@ const mapGetCustomDataDbOutToResult = (
         description,
         value: convertCustomDataDbStringToValue(
           input.value,
-          valueType
+          valueType,
         ) as number,
         valueType,
       };
@@ -145,7 +145,7 @@ const mapGetCustomDataDbOutToResult = (
         description,
         value: convertCustomDataDbStringToValue(
           input.value,
-          valueType
+          valueType,
         ) as number[],
         valueType,
       };
@@ -155,7 +155,7 @@ const mapGetCustomDataDbOutToResult = (
         description,
         value: convertCustomDataDbStringToValue(
           input.value,
-          valueType
+          valueType,
         ) as string,
         valueType,
       };
@@ -165,7 +165,7 @@ const mapGetCustomDataDbOutToResult = (
         description,
         value: convertCustomDataDbStringToValue(
           input.value,
-          valueType
+          valueType,
         ) as string[],
         valueType,
       };
@@ -175,7 +175,7 @@ const mapGetCustomDataDbOutToResult = (
 export const getEntry = async (
   databasePath: string,
   input: GetInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<CustomDataTypes> => {
   const logMethod = createLogMethod(logger, "database_custom_data_get_entry");
 
@@ -205,10 +205,10 @@ export const getEntry = async (
         whereColumns: {
           columnName: customDataTable.columns.id.name,
         },
-      }
+      },
     ),
     [input.id],
-    logMethod
+    logMethod,
   );
   if (runResult) {
     return mapGetCustomDataDbOutToResult(runResult);
@@ -218,7 +218,7 @@ export const getEntry = async (
 
 export const getEntries = async (
   databasePath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<CustomDataTypes[]> => {
   const logMethod = createLogMethod(logger, "database_custom_data_get_entry");
 
@@ -243,12 +243,9 @@ export const getEntries = async (
       },
     ]),
     undefined,
-    logMethod
+    logMethod,
   );
-  if (runResult) {
-    return runResult.map((a) => mapGetCustomDataDbOutToResult(a));
-  }
-  throw Error(CustomCommandsBroadcastsDbError.NOT_FOUND);
+  return runResult.map(mapGetCustomDataDbOutToResult);
 };
 
 // Update entries
@@ -275,12 +272,12 @@ export const updateEntry = async (
     | UpdateInput
     | Omit<UpdateInputNumber, "valueIncrease">
     | Omit<UpdateInputNumber, "valueDecrease">,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_custom_data_update");
   // Special validations for DB entry request
   // > Check if entry already exists
-  if ((await existsEntry(databasePath, input, logger)) === false) {
+  if (!(await existsEntry(databasePath, input, logger))) {
     throw Error(CustomCommandsBroadcastsDbError.NOT_EXISTING);
   }
 
@@ -314,7 +311,7 @@ export const updateEntry = async (
       columnName: customDataTable.columns.id.name,
     }),
     [...values, input.id],
-    logMethod
+    logMethod,
   );
   return postResult.changes;
 };

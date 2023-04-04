@@ -72,7 +72,7 @@ const defaultCliOutputOptions = Object.freeze({
  */
 export const cliOutputGenerator = (
   cliOutputLines: DeepReadonlyArray<CliOutputElements>,
-  outputOptions: DeepReadonly<CliOutputOptions> = {}
+  outputOptions: DeepReadonly<CliOutputOptions> = {},
 ): string => {
   const options = {
     ...defaultCliOutputOptions,
@@ -83,16 +83,19 @@ export const cliOutputGenerator = (
     switch (cliOutputLine.type) {
       case "text":
         cliOutput.push(
-          ...splitTextAtLength(cliOutputLine.content, options.maxLineLength)
+          ...splitTextAtLength(cliOutputLine.content, options.maxLineLength),
         );
         break;
       case "list":
         cliOutput.push(
-          ...splitTextAtLength(`${cliOutputLine.title}:`, options.maxLineLength)
+          ...splitTextAtLength(
+            `${cliOutputLine.title}:`,
+            options.maxLineLength,
+          ),
         );
         // eslint-disable-next-line no-case-declarations
         const maximumListElementLength = Math.max(
-          ...cliOutputLine.elements.map((a) => a.content.length + 2)
+          ...cliOutputLine.elements.map((a) => a.content.length + 2),
         );
         //if (maximumListElementLength >= options.maxLineLength) {
         //  throw Error(
@@ -121,8 +124,8 @@ export const cliOutputGenerator = (
                   .map((b) =>
                     splitTextAtLength(
                       b,
-                      options.maxLineLength - "    ".length
-                    ).map((c) => `    ${c}`)
+                      options.maxLineLength - "    ".length,
+                    ).map((c) => `    ${c}`),
                   )
                   .flat(),
               ].join("\n");
@@ -133,8 +136,10 @@ export const cliOutputGenerator = (
               .map((b) =>
                 splitTextAtLength(
                   b,
-                  options.maxLineLength - maximumListElementLength - "  ".length
-                )
+                  options.maxLineLength -
+                    maximumListElementLength -
+                    "  ".length,
+                ),
               )
               .flat();
 
@@ -143,16 +148,16 @@ export const cliOutputGenerator = (
               if (first) {
                 first = false;
                 currentLine += `  ${" ".repeat(
-                  Math.max(maximumListElementLength - currentLine.length, 0)
+                  Math.max(maximumListElementLength - currentLine.length, 0),
                 )}${descriptionTextPart}`;
               } else {
                 currentLine += `\n  ${" ".repeat(
-                  maximumListElementLength
+                  maximumListElementLength,
                 )}${descriptionTextPart}`;
               }
             }
             return currentLine;
-          })
+          }),
         );
         break;
     }

@@ -50,7 +50,7 @@ interface RegexTestElement<TEST_TYPE extends object = object> {
 }
 const checkRegexTestElements = <TEST_TYPE extends object = object>(
   testSet: RegexTestElement<TEST_TYPE>[],
-  regex: RegExp
+  regex: RegExp,
 ) => {
   for (const a of testSet) {
     const match = a.input.match(regex);
@@ -67,16 +67,16 @@ const checkRegexTestElements = <TEST_TYPE extends object = object>(
             if (match.groups === undefined) {
               return;
             }
-            // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-unsafe-member-access
-            if (match.groups[key] === undefined) {
-              // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line security/detect-object-injection
+            if (match.groups[key]) {
+              // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-dynamic-delete
               delete match.groups[key];
             }
           });
         }
         expect(match.groups).to.be.deep.equal(
           a.expected,
-          `Expected named capture groups to be equal ${baseErrorMessage}`
+          `Expected named capture groups to be equal ${baseErrorMessage}`,
         );
       }
     }
@@ -100,7 +100,7 @@ describe("regex", () => {
       ];
       checkRegexTestElements(
         testSetMoonpieClaim,
-        regexMoonpieChatHandlerCommandClaim
+        regexMoonpieChatHandlerCommandClaim,
       );
     });
     it("!moonpie about/commands/leaderboard", () => {
@@ -120,7 +120,7 @@ describe("regex", () => {
       ];
       checkRegexTestElements(
         testSetMoonpieAbout,
-        regexMoonpieChatHandlerCommandAbout
+        regexMoonpieChatHandlerCommandAbout,
       );
       checkRegexTestElements<RegexMoonpieChatHandlerCommandLeaderboard>(
         testSetMoonpieAbout.map((a) => ({
@@ -128,14 +128,14 @@ describe("regex", () => {
           expected: a.expected === undefined ? {} : a.expected,
           input: a.input.replace(/about/g, "leaderboard"),
         })),
-        regexMoonpieChatHandlerCommandLeaderboard
+        regexMoonpieChatHandlerCommandLeaderboard,
       );
       checkRegexTestElements(
         testSetMoonpieAbout.map((a) => ({
           ...a,
           input: a.input.replace(/about/g, "commands"),
         })),
-        regexMoonpieChatHandlerCommandCommands
+        regexMoonpieChatHandlerCommandCommands,
       );
     });
     it("!moonpie leaderboard $STARTING_RANK", () => {
@@ -162,7 +162,7 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexMoonpieChatHandlerCommandLeaderboard>(
         testSetMoonpieLeaderboard,
-        regexMoonpieChatHandlerCommandLeaderboard
+        regexMoonpieChatHandlerCommandLeaderboard,
       );
     });
 
@@ -203,14 +203,14 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserDelete>(
         testSetMoonpieUserDelete,
-        regexMoonpieChatHandlerCommandUserDelete
+        regexMoonpieChatHandlerCommandUserDelete,
       );
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserGet>(
         testSetMoonpieUserDelete.map((a) => ({
           ...a,
           input: a.input.replace(/delete/g, "get"),
         })),
-        regexMoonpieChatHandlerCommandUserGet
+        regexMoonpieChatHandlerCommandUserGet,
       );
     });
 
@@ -259,7 +259,7 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserSet>(
         testSetMoonpieUserSet,
-        regexMoonpieChatHandlerCommandUserSet
+        regexMoonpieChatHandlerCommandUserSet,
       );
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserAdd>(
         testSetMoonpieUserSet.map((a) => ({
@@ -273,7 +273,7 @@ describe("regex", () => {
                 },
           input: a.input.replace(/set/g, "add"),
         })),
-        regexMoonpieChatHandlerCommandUserAdd
+        regexMoonpieChatHandlerCommandUserAdd,
       );
       checkRegexTestElements<RegexMoonpieChatHandlerCommandUserRemove>(
         testSetMoonpieUserSet.map((a) => ({
@@ -287,7 +287,7 @@ describe("regex", () => {
                 },
           input: a.input.replace(/set/g, "remove"),
         })),
-        regexMoonpieChatHandlerCommandUserRemove
+        regexMoonpieChatHandlerCommandUserRemove,
       );
     });
   });
@@ -345,7 +345,7 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexOsuWindowTitleNowPlaying>(
         testSetOsuWindowTitle,
-        regexOsuWindowTitleNowPlaying
+        regexOsuWindowTitleNowPlaying,
       );
     });
   });
@@ -369,7 +369,7 @@ describe("regex", () => {
           ...a,
           input: a.input.replace(/np/g, "osu commands"),
         })),
-        regexOsuChatHandlerCommandCommands
+        regexOsuChatHandlerCommandCommands,
       );
       checkRegexTestElements(
         testSetOsuNp.map((a) => ({
@@ -377,7 +377,7 @@ describe("regex", () => {
           expected: a.expected === undefined ? {} : a.expected,
           input: a.input.replace(/np/g, "osuRequests"),
         })),
-        regexOsuChatHandlerCommandRequests
+        regexOsuChatHandlerCommandRequests,
       );
       checkRegexTestElements(
         testSetOsuNp.map((a) => ({
@@ -385,7 +385,7 @@ describe("regex", () => {
           expected: a.expected === undefined ? {} : a.expected,
           input: a.input.replace(/np/g, "osuLastRequest"),
         })),
-        regexOsuChatHandlerCommandLastRequest
+        regexOsuChatHandlerCommandLastRequest,
       );
     });
 
@@ -414,7 +414,7 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexOsuChatHandlerCommandRequests>(
         testSetOsuRequests,
-        regexOsuChatHandlerCommandRequests
+        regexOsuChatHandlerCommandRequests,
       );
     });
 
@@ -436,7 +436,7 @@ describe("regex", () => {
         ];
       checkRegexTestElements<RegexOsuChatHandlerCommandLastRequest>(
         testSetOsuLastRequest,
-        regexOsuChatHandlerCommandLastRequest
+        regexOsuChatHandlerCommandLastRequest,
       );
     });
 
@@ -470,14 +470,14 @@ describe("regex", () => {
       ];
       checkRegexTestElements<RegexOsuChatHandlerCommandPp>(
         testSetOsuPp,
-        regexOsuChatHandlerCommandPp
+        regexOsuChatHandlerCommandPp,
       );
       checkRegexTestElements<RegexOsuChatHandlerCommandRp>(
         testSetOsuPp.map((a) => ({
           ...a,
           input: a.input.replace(/pp/g, "rp"),
         })),
-        regexOsuChatHandlerCommandRp
+        regexOsuChatHandlerCommandRp,
       );
     });
 
@@ -593,21 +593,21 @@ describe("regex", () => {
 
       expect(
         regexOsuBeatmapUrlSplitter(
-          "https://osu.ppy.sh/beatmaps/2587891 abc def"
-        )
+          "https://osu.ppy.sh/beatmaps/2587891 abc def",
+        ),
       ).to.be.deep.equal(["https://osu.ppy.sh/beatmaps/2587891 abc def"]);
       expect(
-        regexOsuBeatmapUrlSplitter("https://osu.ppy.sh/beatmaps/2587891")
+        regexOsuBeatmapUrlSplitter("https://osu.ppy.sh/beatmaps/2587891"),
       ).to.be.deep.equal(["https://osu.ppy.sh/beatmaps/2587891"]);
       expect(
         regexOsuBeatmapUrlSplitter(
-          "abc https://osu.ppy.sh/beatmaps/2587891 abc"
-        )
+          "abc https://osu.ppy.sh/beatmaps/2587891 abc",
+        ),
       ).to.be.deep.equal(["abc ", "https://osu.ppy.sh/beatmaps/2587891 abc"]);
       expect(
         regexOsuBeatmapUrlSplitter(
-          "https://osu.ppy.sh/beatmaps/2587891 https://osu.ppy.sh/b/2587891 $COMMENT https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587892 https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES"
-        )
+          "https://osu.ppy.sh/beatmaps/2587891 https://osu.ppy.sh/b/2587891 $COMMENT https://osu.ppy.sh/beatmapsets/1228734#osu/2554945 $OPTIONAL_TEXT_WITH_SPACES https://osu.ppy.sh/beatmaps/2587892 https://osu.ppy.sh/beatmaps/2587893 $OPTIONAL TEXT WITH SPACES",
+        ),
       ).to.be.deep.equal([
         "https://osu.ppy.sh/beatmaps/2587891 ",
         "https://osu.ppy.sh/b/2587891 $COMMENT ",
@@ -632,14 +632,14 @@ describe("regex", () => {
       ];
       checkRegexTestElements(
         testSetSpotifySong,
-        regexSpotifyChatHandlerCommandSong
+        regexSpotifyChatHandlerCommandSong,
       );
       checkRegexTestElements(
         testSetSpotifySong.map((a) => ({
           ...a,
           input: a.input.replace(/song/g, "spotify commands"),
         })),
-        regexSpotifyChatHandlerCommandCommands
+        regexSpotifyChatHandlerCommandCommands,
       );
     });
   });

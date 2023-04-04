@@ -22,14 +22,15 @@ import type {
 import type { DeepReadonly } from "./other/types.mjs";
 import type { Logger } from "winston";
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "spotify";
 
-const REDIRECT_URL = "http://localhost.mjs";
+/** The URL to redirect Spotify OAuth requests. */
+const REDIRECT_URL = "http://localhost";
+/** The PORT to redirect Spotify OAuth requests. */
 const REDIRECT_PORT = 9727;
 
+/** The URI to redirect Spotify OAuth requests. */
 export const REDIRECT_URI = `${REDIRECT_URL}:${REDIRECT_PORT}`;
 
 /**
@@ -47,17 +48,18 @@ export const setupAndGetSpotifyApiClient = async (
   spotifyClientId: string,
   spotifyClientSecret: string,
   spotifyDatabasePath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<SpotifyWebApi> => {
-  const logSpotify = createLogFunc(logger, LOG_ID, "authentication");
+  const loggerModule = createLogFunc(logger, LOG_ID, "authentication");
 
   const spotifyConfigDbEntries =
     await spotifyDb.requests.spotifyConfig.getEntries(
       spotifyDatabasePath,
-      logger
+      logger,
     );
   const spotifyRefreshToken = spotifyConfigDbEntries.find(
-    (a) => a.option === SpotifyConfig.REFRESH_TOKEN
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    (a) => a.option === SpotifyConfig.REFRESH_TOKEN,
   )?.optionValue;
 
   const spotifyApi = new SpotifyWebApi({
@@ -68,20 +70,22 @@ export const setupAndGetSpotifyApiClient = async (
   });
 
   // Refresh the access token if refresh token was found
-  if (spotifyApi.getRefreshToken() !== undefined) {
+  if (spotifyApi.getRefreshToken()) {
     try {
       const response = await spotifyApi.refreshAccessToken();
       spotifyApi.setAccessToken(response.body.access_token);
+      loggerModule.debug("Access token was refreshed");
       return spotifyApi;
     } catch (error) {
-      logSpotify.error(
+      const spotifyError = error as SpotifyApiError;
+      loggerModule.error(
         Error(
-          "Using the found refresh token gave an error: " +
-            (error as Error).message +
-            ` (${JSON.stringify((error as SpotifyApiError)?.body)})`
-        )
+          `Using the found refresh token to refresh access token threw an error: ${
+            spotifyError.message
+          } (${JSON.stringify(spotifyError.body)})`,
+        ),
       );
-      logSpotify.info("Try to grant refresh token again");
+      loggerModule.info("Try to grant refresh token");
     }
   }
 
@@ -89,22 +93,22 @@ export const setupAndGetSpotifyApiClient = async (
   const server = spotifyApiRefreshTokenGrantServer(
     spotifyApi,
     spotifyDatabasePath,
-    logger
+    logger,
   );
   // > Start server to catch authentication URL
   await new Promise<void>((resolve) => {
     server.listen(REDIRECT_PORT, undefined, () => {
-      logSpotify.info(`Server started on port ${REDIRECT_PORT}`);
+      loggerModule.debug(`Server started on port ${REDIRECT_PORT}`);
       resolve();
     });
   });
   // > Open authentication URL
   const response = await fetch(
-    generateSpotifyApiUrlRefreshTokenGrant(spotifyClientId, REDIRECT_URI)
+    generateSpotifyApiUrlRefreshTokenGrant(spotifyClientId, REDIRECT_URI),
   );
   if (response.ok) {
-    logSpotify.info(
-      `Grant the Spotify refresh token using the following URL: ${response.url}`
+    loggerModule.info(
+      `Grant the Spotify refresh token using the following URL: ${response.url}`,
     );
     await open(response.url);
   }
@@ -112,7 +116,7 @@ export const setupAndGetSpotifyApiClient = async (
   // > Wait until server is closed
   await new Promise<void>((resolve) => {
     server.on("close", () => {
-      logSpotify.info("Server closed");
+      loggerModule.debug("Server closed");
       resolve();
     });
   });
@@ -135,12 +139,12 @@ export interface SpotifyGetCurrentAndRecentSongs {
  */
 export const spotifyGetCurrentAndRecentSongs = async (
   spotifyApi: DeepReadonly<SpotifyWebApi>,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<SpotifyGetCurrentAndRecentSongs> => {
   const logSpotify = createLogFunc(
     logger,
     LOG_ID,
-    "get_current_and_recent_songs"
+    "get_current_and_recent_songs",
   );
 
   try {
@@ -164,18 +168,18 @@ export const spotifyGetCurrentAndRecentSongs = async (
 
     // Remove the currently playing song from the recently played tracks
     if (
-      recentlyPlayedTracks.body?.items?.length > 0 &&
-      currentlyPlaying.body?.item?.id !== undefined
+      recentlyPlayedTracks.body.items.length > 0 &&
+      currentlyPlaying.body.item?.id !== undefined
     ) {
       recentlyPlayedTracks.body.items = recentlyPlayedTracks.body.items.filter(
-        (a) => a.track.id !== currentlyPlaying.body.item?.id
+        (a) => a.track.id !== currentlyPlaying.body.item?.id,
       );
     }
 
     return { currentlyPlaying, recentlyPlayedTracks };
   } catch (err) {
     logSpotify.error(
-      Error(`Connection not successful: ${JSON.stringify(err)}`)
+      Error(`Connection not successful: ${JSON.stringify(err)}`),
     );
     throw err;
   }

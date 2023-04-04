@@ -76,36 +76,42 @@ jobs:
       continue-on-error: true
     - name: Build
       run: npm run build
+    - name: Lint circular dependencies
+      run: npm run lint:circular
+      continue-on-error: true
     - name: Create documentation
       run: npm run docs
       continue-on-error: true
     - name: Run other scripts that create project related files
       run: npm run create
-    - name: Create binary release
-      run: npm run package:${{ matrix.os-name }}
-    - name: Binary release postfix (EXE metadata - Windows)
-      if: matrix.os == 'windows-latest'
-      run: npm run package:${{ matrix.os-name }}:postfix
-    - name: Save binary release
-      if: contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v')
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.APPLICATION_NAME }}-${{ matrix.os-name }}-node-${{ matrix.node-version }}
-        path: bin/${{ env.APPLICATION_NAME }}${{ matrix.binary-postfix }}
-        retention-days: 7
-        if-no-files-found: error
-    - name: Create binary installer (Windows)
-      if: matrix.os == 'windows-latest'
-      run: makensis .\windows_installer.nsi
-      working-directory: .\installer\windows_installer
-    - name: Save binary installer (Windows)
-      if: matrix.os == 'windows-latest' && (contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v'))
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.APPLICATION_NAME }}-installer-${{ matrix.os-name }}-node-${{ matrix.node-version }}
-        path: bin/${{ env.APPLICATION_NAME }}${{ matrix.binary-postfix-installer }}
-        retention-days: 7
-        if-no-files-found: error
+    # -------------------------------------------
+    # Skip binary releases until pkg supports ES6
+    # -------------------------------------------
+    #- name: Create binary release
+    #  run: npm run package:${{ matrix.os-name }}
+    #- name: Binary release postfix (EXE metadata - Windows)
+    #  if: matrix.os == 'windows-latest'
+    #  run: npm run package:${{ matrix.os-name }}:postfix
+    #- name: Save binary release
+    #  if: contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v')
+    #  uses: actions/upload-artifact@v3
+    #  with:
+    #    name: ${{ env.APPLICATION_NAME }}-${{ matrix.os-name }}-node-${{ matrix.node-version }}
+    #    path: bin/${{ env.APPLICATION_NAME }}${{ matrix.binary-postfix }}
+    #    retention-days: 7
+    #    if-no-files-found: error
+    #- name: Create binary installer (Windows)
+    #  if: matrix.os == 'windows-latest'
+    #  run: makensis .\windows_installer.nsi
+    #  working-directory: .\installer\windows_installer
+    #- name: Save binary installer (Windows)
+    #  if: matrix.os == 'windows-latest' && (contains(github.head_ref, 'main') || startsWith(github.ref, 'refs/tags/v'))
+    #  uses: actions/upload-artifact@v3
+    #  with:
+    #    name: ${{ env.APPLICATION_NAME }}-installer-${{ matrix.os-name }}-node-${{ matrix.node-version }}
+    #    path: bin/${{ env.APPLICATION_NAME }}${{ matrix.binary-postfix-installer }}
+    #    retention-days: 7
+    #    if-no-files-found: error
     - name: Create man page (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: pandoc "man.md" -s -t man -o "${{ env.APPLICATION_NAME }}${{ matrix.binary-postfix-man }}"

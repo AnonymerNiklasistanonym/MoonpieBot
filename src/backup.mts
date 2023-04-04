@@ -27,17 +27,17 @@ interface CopyFile {
 const copyFiles = async (
   files: DeepReadonlyArray<CopyFile>,
   backupDir: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<void> => {
   for (const file of files) {
     logger.info(
-      `Copy '${file.old}' to '${file.new}' (backup: '${backupDir}')...`
+      `Copy '${file.old}' to '${file.new}' (backup: '${backupDir}')...`,
     );
     await copyFileWithBackup(
       file.old,
       file.new,
       path.join(backupDir, path.basename(file.new)),
-      { ignoreSrcDestSameFile: true, ignoreSrcFileNotFound: true }
+      { ignoreSrcDestSameFile: true, ignoreSrcFileNotFound: true },
     );
   }
 };
@@ -55,7 +55,7 @@ const getBackupFiles = (
   backupDir: string,
   configDir: string,
   config: DeepReadonly<MoonpieConfig>,
-  backupConfig: DeepReadonly<MoonpieConfig>
+  backupConfig: DeepReadonly<MoonpieConfig>,
 ): CopyFile[] => {
   const filesToCopy: CopyFile[] = [
     {
@@ -102,7 +102,7 @@ const getBackupFiles = (
 export const importBackup = async (
   configDir: string,
   backupDir: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<void> => {
   logger.info(`Import backup from '${backupDir}' to '${configDir}'...`);
   // Create config directory if it doesn't exist
@@ -131,12 +131,12 @@ export const importBackup = async (
   // the same name save the old files in a new directory
   const backupDirCurrentConfig = path.join(
     configDir,
-    generateOutputDirNameOldConfig()
+    generateOutputDirNameOldConfig(),
   );
   await copyFiles(
     getBackupFiles(configDir, backupDir, configToImport, configUpdated),
     backupDirCurrentConfig,
-    logger
+    logger,
   );
   // Overwrite the backed up configs with the parsed and updated config
   // (Updated to fix for example paths or deprecated variables)
@@ -147,20 +147,20 @@ export const importBackup = async (
     await exportDataEnv(configDir, false, {
       removeAttributesStoredInDatabases: true,
       resetDatabaseFilePaths: true,
-    })
+    }),
   );
   logger.info(`Create updated '${fileNameEnvStrings}' in '${configDir}'...`);
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
     path.join(configDir, fileNameEnvStrings),
-    await exportDataEnvStrings(configDir, false)
+    await exportDataEnvStrings(configDir, false),
   );
 };
 
 export const createBackup = async (
   configDir: string,
   backupDir: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<void> => {
   logger.info(`Create backup in '${backupDir}' from '${configDir}'...`);
   // Create config/backup directory if it doesn't exist
@@ -178,12 +178,12 @@ export const createBackup = async (
   // the same name save the old files in a new directory
   const backupDirCurrentConfig = path.join(
     backupDir,
-    generateOutputDirNameOldConfig()
+    generateOutputDirNameOldConfig(),
   );
   await copyFiles(
     getBackupFiles(backupDir, configDir, config, backupConfig),
     backupDirCurrentConfig,
-    logger
+    logger,
   );
   // Overwrite the backed up configs with the parsed and updated config
   // (Updated to fix for example paths or deprecated variables)
@@ -194,12 +194,12 @@ export const createBackup = async (
     await exportDataEnv(backupDir, false, {
       removeAttributesStoredInDatabases: true,
       resetDatabaseFilePaths: true,
-    })
+    }),
   );
   logger.info(`Create updated '${fileNameEnvStrings}' in '${backupDir}'...`);
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
     path.join(backupDir, fileNameEnvStrings),
-    await exportDataEnvStrings(backupDir, false)
+    await exportDataEnvStrings(backupDir, false),
   );
 };

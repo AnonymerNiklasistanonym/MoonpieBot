@@ -1,5 +1,5 @@
-// Type imports
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
+// Relative imports
+import { createMessageParserMacroGenerator } from "../../messageParser/macros.mjs";
 
 export interface MacroOsuWindowTitleData {
   artist: string;
@@ -13,41 +13,30 @@ export enum MacroOsuWindowTitle {
   TITLE = "TITLE",
   VERSION = "VERSION",
 }
-export const macroOsuWindowTitle: MessageParserMacroGenerator<
-  MacroOsuWindowTitleData,
-  MacroOsuWindowTitle
-> = {
-  exampleData: {
+export const macroOsuWindowTitle = createMessageParserMacroGenerator<
+  MacroOsuWindowTitle,
+  MacroOsuWindowTitleData
+>(
+  {
+    id: "OSU_WINDOW_TITLE",
+  },
+  Object.values(MacroOsuWindowTitle),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroOsuWindowTitle.ARTIST:
+        return data.artist;
+      case MacroOsuWindowTitle.MAP_ID_VIA_API:
+        return data.mapId;
+      case MacroOsuWindowTitle.TITLE:
+        return data.title;
+      case MacroOsuWindowTitle.VERSION:
+        return data.version;
+    }
+  },
+  {
     artist: "RIOT",
     mapId: 2355511,
     title: "Disorder (Rebirth)",
     version: "bryant kumat",
   },
-  generate: (data) =>
-    Object.values(MacroOsuWindowTitle).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroOsuWindowTitle.ARTIST:
-          macroValue = data.artist;
-          break;
-        case MacroOsuWindowTitle.MAP_ID_VIA_API:
-          macroValue = data.mapId;
-          break;
-        case MacroOsuWindowTitle.TITLE:
-          macroValue = data.title;
-          break;
-        case MacroOsuWindowTitle.VERSION:
-          macroValue = data.version;
-          break;
-      }
-      if (typeof macroValue === "undefined") {
-        macroValue = "undefined";
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${macroValue}`;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "OSU_WINDOW_TITLE",
-  keys: Object.values(MacroOsuWindowTitle),
-};
+);

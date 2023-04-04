@@ -55,7 +55,7 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
   globalStrings,
   globalPlugins,
   globalMacros,
-  logger
+  logger,
 ): Promise<void> => {
   // Handle commands
   await Promise.all(
@@ -70,9 +70,9 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandAddCC].map((command) =>
@@ -86,9 +86,9 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandDelCC].map((command) =>
@@ -102,9 +102,9 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandEditCC].map((command) =>
@@ -118,9 +118,9 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandListCCs].map((command) =>
@@ -134,9 +134,9 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandAddCB].map((command) =>
@@ -150,9 +150,9 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandDelCB].map((command) =>
@@ -166,9 +166,9 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandListCBs].map((command) =>
@@ -182,9 +182,9 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandEditCB].map((command) =>
@@ -198,8 +198,8 @@ export const customCommandsBroadcastsChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
 };

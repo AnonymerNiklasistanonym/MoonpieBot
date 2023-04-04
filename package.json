@@ -1,14 +1,19 @@
 {
     "name": "moonpiebot",
-    "version": "1.0.33",
-    "description": "A custom twitch bot",
+    "version": "1.0.33-beta.0",
+    "description": "A custom Twitch chat bot",
     "type": "module",
     "exports": "./dist/index.mjs",
-    "bin": "./dist/index.mjs",
+    "imports": {
+        "#package.json": "./package.json"
+    },
+    "bin": {
+        "moonpiebot": "./dist/index.mjs"
+    },
     "main": "./dist/index.mjs",
     "pkg": {
         "scripts": [
-            "dist/**/*.js",
+            "dist/**/*.mjs",
             "node_modules/es-get-iterator/node.js",
             "node_modules/sqlite3/lib/binding/**/*.node"
         ],
@@ -34,9 +39,10 @@
         "create:windowsInstallerConfig": "ts-node --project tsconfig.eslint.json --esm scripts/createWindowsInstallerConfigFiles.mts",
         "dev": "cross-env NODE_PATH=./dist nodemon --verbose",
         "docs": "typedoc --tsconfig tsconfig.json",
-        "findUnusedExports": "ts-unused-exports tsconfig.eslint.json --ignoreTestFiles --showLineNumber --allowUnusedTypes --excludePathsFromReport=test",
+        "lint:unusedExports": "ts-unused-exports tsconfig.eslint.json --ignoreTestFiles --showLineNumber --allowUnusedTypes --excludePathsFromReport=test",
         "lint:fix": "eslint --fix .",
         "lint": "eslint .",
+        "lint:circular": "madge --circular dist/index.mjs",
         "mocha": "cross-env NODE_PATH=. mocha -r dotenv/config",
         "package:linux": "pkg --target node18-linux-x64 .",
         "package:windows": "pkg --target node18-win-x64 --options require=esm .",
@@ -55,12 +61,12 @@
         "url": "git+https://github.com/AnonymerNiklasistanonym/MoonpieBot.git"
     },
     "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "author": "AnonymerNiklasistanonym",
+    "license": "MIT",
     "bugs": {
         "url": "https://github.com/AnonymerNiklasistanonym/MoonpieBot/issues"
     },
-    "homepage": "https://github.com/AnonymerNiklasistanonym/MoonpieBot#readme",
+    "homepage": "https://github.com/AnonymerNiklasistanonym/MoonpieBot",
     "devDependencies": {
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@types/chai": "^4.3.4",
@@ -73,8 +79,8 @@
         "@types/sqlite3": "^3.1.8",
         "@types/tmi.js": "^1.8.3",
         "@types/ws": "^8.5.4",
-        "@typescript-eslint/eslint-plugin": "^5.57.0",
-        "@typescript-eslint/parser": "^5.57.0",
+        "@typescript-eslint/eslint-plugin": "^5.57.1",
+        "@typescript-eslint/parser": "^5.57.1",
         "chai": "^4.3.7",
         "concurrently": "^8.0.1",
         "cross-env": "^7.0.3",
@@ -84,6 +90,8 @@
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-security": "^1.7.1",
         "eslint-plugin-typescript-sort-keys": "^2.3.0",
+        "find-unused-exports": "^5.0.0",
+        "madge": "^6.0.0",
         "mocha": "^10.2.0",
         "nodemon": "^2.0.22",
         "nyc": "^15.1.0",
@@ -102,8 +110,9 @@
         "typescript": "^5.0.3"
     },
     "dependencies": {
-        "@twurple/api": "^6.0.9",
-        "@twurple/auth": "^6.0.9",
+        "@twurple/api": "^6.1.0",
+        "@twurple/auth": "^6.1.0",
+        "commander": "^10.0.0",
         "csv-parser": "^3.0.0",
         "deep-copy-ts": "^0.5.4",
         "dotenv": "^16.0.3",
@@ -113,6 +122,7 @@
         "open": "^9.1.0",
         "osu-api-v2": "^0.0.33",
         "reconnecting-websocket": "^4.4.0",
+        "semver": "^7.3.8",
         "spotify-web-api-node": "^5.0.2",
         "sqlite3-promise-query-api": "^0.0.10",
         "tmi.js": "^1.8.5",

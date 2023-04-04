@@ -16,6 +16,7 @@ import {
   createStreamCompanionWebSocketConnection,
 } from "./osuStreamCompanion.mjs";
 import { createTwitchClient, TwitchClientListener } from "./twitch.mjs";
+import { displayName, version } from "./info/general.mjs";
 import { Feature, getFeature, getFeatures } from "./info/features.mjs";
 import {
   generateMacroMap,
@@ -32,12 +33,10 @@ import customCommandsBroadcastsDb from "./database/customCommandsBroadcastsDb.mj
 import { defaultMacros } from "./info/macros.mjs";
 import { defaultPlugins } from "./info/plugins.mjs";
 import { defaultStringMap } from "./info/strings.mjs";
-import { getVersionString } from "./version.mjs";
 import { lurkChatHandler } from "./commands/lurk.mjs";
 import { macroOsuApi } from "./info/macros/osuApi.mjs";
 import { moonpieChatHandler } from "./commands/moonpie.mjs";
 import moonpieDb from "./database/moonpieDb.mjs";
-import { name } from "./info/general.mjs";
 import { osuChatHandler } from "./commands/osu.mjs";
 import { OsuRequestsConfig } from "./info/databases/osuRequestsDb.mjs";
 import osuRequestsDb from "./database/osuRequestsDb.mjs";
@@ -53,7 +52,6 @@ import { setupAndGetSpotifyApiClient } from "./spotify.mjs";
 import { spotifyChatHandler } from "./commands/spotify.mjs";
 import { SpotifyConfig } from "./database/spotifyDb/requests/spotifyConfig.mjs";
 import spotifyDb from "./database/spotifyDb.mjs";
-import { version } from "./info/version.mjs";
 // Type imports
 import type { ChatUserstate } from "tmi.js";
 import type { CustomBroadcast } from "./customCommandsBroadcasts/customBroadcast.mjs";
@@ -67,9 +65,7 @@ import type { PluginTwitchApiData } from "./info/plugins/twitchApi.mjs";
 import type { PluginTwitchChatData } from "./info/plugins/twitchChat.mjs";
 import type { ScheduledTask } from "node-cron";
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "main";
 
 /**.
@@ -90,17 +86,17 @@ const LOG_ID = "main";
  */
 export const main = async (
   logger: Readonly<Logger>,
-  config: DeepReadonly<MoonpieConfig>
+  config: DeepReadonly<MoonpieConfig>,
 ): Promise<void> => {
-  const loggerMain = createLogFunc(logger, LOG_ID);
+  const loggerModule = createLogFunc(logger, LOG_ID);
 
   // Get all supported features
   const features = await getFeatures(config, logger);
-  loggerMain.info(`Enabled features: (${features.length})`);
+  loggerModule.info(`Enabled features: (${features.length})`);
   for (const feature of features) {
-    loggerMain.info(`- ${feature.id}: ${feature.description}`);
+    loggerModule.info(`- ${feature.id}: ${feature.description}`);
     if (feature.chatCommands.length > 0) {
-      loggerMain.info(
+      loggerModule.info(
         `  (${feature.chatCommands
           .map(
             (a) =>
@@ -108,9 +104,9 @@ export const main = async (
                 typeof a.command === "string"
                   ? a.command
                   : convertRegexToHumanString(a.command)
-              }' [${a.permission}]`
+              }' [${a.permission}]`,
           )
-          .join(", ")})`
+          .join(", ")})`,
       );
     }
   }
@@ -121,16 +117,16 @@ export const main = async (
   const featureOsuApi = getFeature(features, Feature.OSU_API);
   const featureOsuMapRequests = getFeature(
     features,
-    Feature.OSU_API_BEATMAP_REQUESTS
+    Feature.OSU_API_BEATMAP_REQUESTS,
   );
   const featureOsuIrc = getFeature(features, Feature.OSU_IRC_BEATMAP_REQUESTS);
   const featureOsuStreamCompanionFile = getFeature(
     features,
-    Feature.OSU_STREAM_COMPANION_FILE
+    Feature.OSU_STREAM_COMPANION_FILE,
   );
   const featureOsuStreamCompanionWeb = getFeature(
     features,
-    Feature.OSU_STREAM_COMPANION_WEB
+    Feature.OSU_STREAM_COMPANION_WEB,
   );
   const featureSpotifyApi = getFeature(features, Feature.SPOTIFY_API);
   const featureTwitchApi = getFeature(features, Feature.TWITCH_API);
@@ -142,14 +138,14 @@ export const main = async (
     config.twitch.oAuthToken,
     config.twitch.channels,
     config.twitch.debug,
-    logger
+    logger,
   );
   // > Twitch API client
   let twitchApiClient: undefined | ApiClient;
   if (featureTwitchApi?.id === Feature.TWITCH_API) {
     const authProviderScopes = new StaticAuthProvider(
       featureTwitchApi.data.clientId,
-      featureTwitchApi.data.accessToken
+      featureTwitchApi.data.accessToken,
     );
     twitchApiClient = new ApiClient({
       authProvider: authProviderScopes,
@@ -165,7 +161,7 @@ export const main = async (
         featureOsuIrc.data.username,
         featureOsuIrc.data.password,
         id,
-        logger
+        logger,
       );
   }
   // > osu! StreamCompanion current map data fetcher
@@ -173,11 +169,11 @@ export const main = async (
     featureOsuStreamCompanionWeb?.id === Feature.OSU_STREAM_COMPANION_WEB
       ? createStreamCompanionWebSocketConnection(
           featureOsuStreamCompanionWeb.data.url,
-          logger
+          logger,
         )
       : featureOsuStreamCompanionFile?.id === Feature.OSU_STREAM_COMPANION_FILE
       ? createStreamCompanionFileConnection(
-          featureOsuStreamCompanionFile.data.dirPath
+          featureOsuStreamCompanionFile.data.dirPath,
         )
       : undefined;
 
@@ -193,7 +189,7 @@ export const main = async (
     if (featureOsuMapRequests?.id === Feature.OSU_API_BEATMAP_REQUESTS) {
       await osuRequestsDb.setup(
         featureOsuMapRequests.data.databasePath,
-        logger
+        logger,
       );
       if (featureOsuMapRequests.data.beatmapRequestsDetailed !== undefined) {
         const detailed = featureOsuMapRequests.data.beatmapRequestsDetailed
@@ -205,7 +201,7 @@ export const main = async (
             option: OsuRequestsConfig.DETAILED,
             optionValue: detailed,
           },
-          logger
+          logger,
         );
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           featureOsuMapRequests.data.databasePath,
@@ -213,7 +209,7 @@ export const main = async (
             option: OsuRequestsConfig.DETAILED_IRC,
             optionValue: detailed,
           },
-          logger
+          logger,
         );
       }
       if (featureOsuMapRequests.data.beatmapRequestsRedeemId !== undefined) {
@@ -223,7 +219,7 @@ export const main = async (
             option: OsuRequestsConfig.REDEEM_ID,
             optionValue: featureOsuMapRequests.data.beatmapRequestsRedeemId,
           },
-          logger
+          logger,
         );
       }
     }
@@ -235,7 +231,7 @@ export const main = async (
       // Setup database tables (or do nothing if they already exist)
       await customCommandsBroadcastsDb.setup(
         config.customCommandsBroadcasts.databasePath,
-        logger
+        logger,
       );
     }
   };
@@ -251,7 +247,7 @@ export const main = async (
             option: SpotifyConfig.REFRESH_TOKEN,
             optionValue: featureSpotifyApi.data.refreshToken,
           },
-          logger
+          logger,
         );
       }
     }
@@ -272,7 +268,7 @@ export const main = async (
           featureSpotifyApi.data.clientId,
           featureSpotifyApi.data.clientSecret,
           featureSpotifyApi.data.databasePath,
-          logger
+          logger,
         )
       : undefined;
 
@@ -280,7 +276,7 @@ export const main = async (
   // > Strings
   const stringMap = updateStringsMapWithCustomEnvStrings(
     defaultStringMap,
-    logger
+    logger,
   );
   // > Macros
   const macroMap = generateMacroMap(defaultMacros);
@@ -291,8 +287,11 @@ export const main = async (
     macroMap.set(
       macroOsuApi.id,
       new Map(
-        macroOsuApi.generate({ osuApiDefaultId: featureOsuApi.data.defaultId })
-      )
+        macroOsuApi.generate(
+          { osuApiDefaultId: featureOsuApi.data.defaultId },
+          logger,
+        ),
+      ),
     );
     pluginsOsuGenerator.map((plugin) => {
       const pluginReady = generatePlugin(plugin, {
@@ -340,7 +339,7 @@ export const main = async (
         await customCommandsBroadcastsDb.requests.customCommand.getEntries(
           config.customCommandsBroadcasts.databasePath,
           undefined,
-          logger
+          logger,
         );
     }
     if (
@@ -353,7 +352,7 @@ export const main = async (
         await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
           config.customCommandsBroadcasts.databasePath,
           undefined,
-          logger
+          logger,
         );
       // Stop all old running custom broadcasts
       for (const [
@@ -372,11 +371,11 @@ export const main = async (
           stringMap,
           pluginMap,
           macroMap,
-          logger
+          logger,
         );
         customCommandsBroadcastsRefreshHelper.enabledCustomBroadcasts.set(
           customBroadcast.id,
-          customBroadcastScheduledTask
+          customBroadcastScheduledTask,
         );
       }
     }
@@ -388,18 +387,18 @@ export const main = async (
     channel: string,
     tags: ChatUserstate,
     err: ErrorWithCode,
-    chatHandlerId: string
+    chatHandlerId: string,
   ) => {
-    loggerMain.error(err);
+    loggerModule.error(err);
     try {
       await twitchClient.say(
         channel,
         `${tags.username ? `@${tags.username} ` : ""}${chatHandlerId} Error: ${
           err.message
-        }${err.code ? ` (${err.code})` : ""}`
+        }${err.code ? ` (${err.code})` : ""}`,
       );
     } catch (errFunc) {
-      loggerMain.error(errFunc as Error);
+      loggerModule.error(errFunc as Error);
     }
   };
 
@@ -420,12 +419,12 @@ export const main = async (
   }
   if (featureOsuStreamCompanionWeb?.id === Feature.OSU_STREAM_COMPANION_WEB) {
     enabledOsuCommands.push(
-      ...featureOsuStreamCompanionWeb.data.enableCommands
+      ...featureOsuStreamCompanionWeb.data.enableCommands,
     );
   }
   if (featureOsuStreamCompanionFile?.id === Feature.OSU_STREAM_COMPANION_FILE) {
     enabledOsuCommands.push(
-      ...featureOsuStreamCompanionFile.data.enableCommands
+      ...featureOsuStreamCompanionFile.data.enableCommands,
     );
   }
 
@@ -443,7 +442,7 @@ export const main = async (
     channel: string,
     tags: Readonly<ChatUserstate>,
     message: string,
-    self: boolean
+    self: boolean,
   ): Promise<void> => {
     // Ignore messages written by the Twitch client
     if (self) {
@@ -489,7 +488,7 @@ export const main = async (
             stringMap,
             pluginMapChannel,
             macroMapChannel,
-            logger
+            logger,
           );
         } else if (featureAbout?.id === Feature.ABOUT) {
           await moonpieChatHandler(
@@ -505,7 +504,7 @@ export const main = async (
             stringMap,
             pluginMapChannel,
             macroMapChannel,
-            logger
+            logger,
           );
         }
       } catch (err) {
@@ -513,7 +512,7 @@ export const main = async (
           channel,
           tags,
           err as ErrorWithCode,
-          "Moonpie"
+          "Moonpie",
         );
       }
     }
@@ -546,7 +545,7 @@ export const main = async (
             stringMap,
             pluginMapChannel,
             macroMapChannel,
-            logger
+            logger,
           );
         } else if (osuStreamCompanionCurrentMapData !== undefined) {
           await osuChatHandler(
@@ -561,7 +560,7 @@ export const main = async (
             stringMap,
             pluginMapChannel,
             macroMapChannel,
-            logger
+            logger,
           );
         }
       } catch (err) {
@@ -569,7 +568,7 @@ export const main = async (
           channel,
           tags,
           err as ErrorWithCode,
-          "osu!"
+          "osu!",
         );
       }
     }
@@ -588,14 +587,14 @@ export const main = async (
           stringMap,
           pluginMapChannel,
           macroMapChannel,
-          logger
+          logger,
         );
       } catch (err) {
         await chatHandlerErrorMessage(
           channel,
           tags,
           err as ErrorWithCode,
-          "Spotify"
+          "Spotify",
         );
       }
     }
@@ -613,14 +612,14 @@ export const main = async (
           stringMap,
           pluginMapChannel,
           macroMapChannel,
-          logger
+          logger,
         );
       } catch (err) {
         await chatHandlerErrorMessage(
           channel,
           tags,
           err as ErrorWithCode,
-          "Lurk"
+          "Lurk",
         );
       }
     }
@@ -640,14 +639,14 @@ export const main = async (
           stringMap,
           pluginMapChannel,
           macroMapChannel,
-          logger
+          logger,
         );
       } catch (err) {
         await chatHandlerErrorMessage(
           channel,
           tags,
           err as ErrorWithCode,
-          "Custom Commands/Broadcasts"
+          "Custom Commands/Broadcasts",
         );
       }
 
@@ -672,7 +671,7 @@ export const main = async (
             pluginCountGenerator.id,
             pluginCountGenerator.generate({
               count: customCommand.count,
-            })
+            }),
           );
 
           try {
@@ -688,8 +687,8 @@ export const main = async (
               logger,
               customCommandChatHandler(
                 customCommand,
-                featureCcCb.data.databasePath
-              )
+                featureCcCb.data.databasePath,
+              ),
             );
             if (!executed) {
               continue;
@@ -701,7 +700,7 @@ export const main = async (
                 id: customCommand.id,
                 timestampLastExecution: Date.now(),
               },
-              logger
+              logger,
             );
             customCommandsBroadcastsRefreshHelper.refreshCustomCommands = true;
           } catch (err) {
@@ -709,7 +708,7 @@ export const main = async (
               channel,
               tags,
               err as ErrorWithCode,
-              `Custom Command ${customCommand.id}`
+              `Custom Command ${customCommand.id}`,
             );
           }
         }
@@ -718,7 +717,7 @@ export const main = async (
           channel,
           tags,
           err as ErrorWithCode,
-          "Custom Command"
+          "Custom Command",
         );
       }
     }
@@ -729,43 +728,43 @@ export const main = async (
     TwitchClientListener.NEW_REDEEM,
     (channel, username, rewardType) => {
       // Log when a new redeem was made
-      loggerMain.debug(
+      loggerModule.debug(
         `User "${username}" redeemed "${rewardType}" in the channel ` +
-          `"${channel}"`
+          `"${channel}"`,
       );
-    }
+    },
   );
   twitchClient.on(
     TwitchClientListener.CLIENT_CONNECTING_TO_TWITCH,
     (address, port) => {
       // Log when the client is trying to connect to Twitch
-      loggerMain.info(`Connecting to Twitch: ${address}:${port}`);
-    }
+      loggerModule.info(`Connecting to Twitch: ${address}:${port}`);
+    },
   );
   twitchClient.on(
     TwitchClientListener.CLIENT_CONNECTED_TO_TWITCH,
     (address, port) => {
       // Log when the client successfully connected to Twitch
-      loggerMain.info(`Connected to Twitch: ${address}:${port}`);
-    }
+      loggerModule.info(`Connected to Twitch: ${address}:${port}`);
+    },
   );
   twitchClient.on(
     TwitchClientListener.CLIENT_DISCONNECTED_FROM_TWITCH,
     (reason) => {
       // Log when the client disconnects from Twitch
-      loggerMain.info(`Disconnected from Twitch: ${reason}`);
-    }
+      loggerModule.info(`Disconnected from Twitch: ${reason}`);
+    },
   );
   twitchClient.on(
     TwitchClientListener.USER_JOINED_CHANNEL,
     (channel, username, self) => {
       // Log when the Twitch client itself joins a Twitch channel
       if (self) {
-        loggerMain.info(
-          `Joined the Twitch channel "${channel}" as "${username}"`
+        loggerModule.info(
+          `Joined the Twitch channel "${channel}" as "${username}"`,
         );
       }
-    }
+    },
   );
   let averageCommandHandleTime = 0;
   let averageCommandHandleCount = 0;
@@ -775,7 +774,7 @@ export const main = async (
       const startTime = performance.now();
       onNewMessage(channel, tags, message, self)
         .catch((err) => {
-          loggerMain.error(err as Error);
+          loggerModule.error(err as Error);
         })
         .finally(() => {
           const endTime = performance.now();
@@ -784,19 +783,19 @@ export const main = async (
             averageCommandHandleTime / averageCommandHandleCount;
           averageCommandHandleTime +=
             (endTime - startTime) / averageCommandHandleCount;
-          loggerMain.debug(
+          loggerModule.debug(
             `Command was handled in ${
               endTime - startTime
             }ms (average time: ${averageCommandHandleTime}ms ` +
-              `N=${averageCommandHandleCount})`
+              `N=${averageCommandHandleCount})`,
           );
         });
-    }
+    },
   );
 
   process.on("SIGINT", () => {
     // When the process is being force closed catch that and close "safely"
-    loggerMain.info("SIGINT was detected");
+    loggerModule.info("SIGINT was detected");
     process.exit();
   });
 
@@ -810,11 +809,11 @@ export const main = async (
         osuIrcMsgSender,
         "main",
         osuIrcRequestTarget,
-        `UwU (${name} ${getVersionString(version)})`,
-        logger
+        `UwU (${displayName} ${version})`,
+        logger,
       );
     } catch (err) {
-      loggerMain.error(err as Error);
+      loggerModule.error(err as Error);
     }
   }
 };

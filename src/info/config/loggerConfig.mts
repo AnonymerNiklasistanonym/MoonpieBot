@@ -15,15 +15,15 @@ export interface LoggerConfig {
 
 const getLoggerLevelFromString = (loggerLevel: string): LoggerLevel => {
   const parsedLoggerLevel = Object.values(LoggerLevel).find(
-    (a) => a === loggerLevel.toLowerCase()
+    (a) => a === loggerLevel.toLowerCase(),
   );
   if (parsedLoggerLevel) {
     return parsedLoggerLevel;
   }
   throw Error(
     `Logger level '${loggerLevel}' is not supported! (${Object.values(
-      LoggerLevel
-    ).join(", ")})`
+      LoggerLevel,
+    ).join(", ")})`,
   );
 };
 
@@ -31,16 +31,16 @@ export const getLoggerConfigFromEnv: GetConfig<LoggerConfig> = (configDir) => ({
   // Twitch connection
   logDir: path.resolve(
     configDir,
-    getEnvVariableValueOrDefault(EnvVariable.LOGGING_DIRECTORY_PATH, configDir)
+    getEnvVariableValueOrDefault(EnvVariable.LOGGING_DIRECTORY_PATH, configDir),
   ),
   logLevelConsole: getLoggerLevelFromString(
     getEnvVariableValueOrDefault(
       EnvVariable.LOGGING_CONSOLE_LOG_LEVEL,
-      configDir
-    )
+      configDir,
+    ),
   ),
   logLevelFile: getLoggerLevelFromString(
-    getEnvVariableValueOrDefault(EnvVariable.LOGGING_FILE_LOG_LEVEL, configDir)
+    getEnvVariableValueOrDefault(EnvVariable.LOGGING_FILE_LOG_LEVEL, configDir),
   ),
 });
 

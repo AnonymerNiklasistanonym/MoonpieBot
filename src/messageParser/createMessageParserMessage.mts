@@ -9,7 +9,7 @@ interface MessageForParserMessageElement {
   type: string;
 }
 export type MessageForParserMessageElements<
-  MACRO_ENUM extends string = string
+  MACRO_ENUM extends string = string,
 > =
   | string
   | MessageForParserMessageMacro<MACRO_ENUM>
@@ -17,7 +17,7 @@ export type MessageForParserMessageElements<
   | MessageForParserMessageReference;
 
 export interface MessageForParserMessagePlugin<
-  MACRO_ENUM extends string = string
+  MACRO_ENUM extends string = string,
 > extends MessageForParserMessageElement {
   args?:
     | MessageForParserMessageElements<MACRO_ENUM>[]
@@ -30,7 +30,7 @@ export interface MessageForParserMessagePlugin<
 }
 
 export interface MessageForParserMessageMacro<
-  MACRO_ENUM extends string = string
+  MACRO_ENUM extends string = string,
 > extends MessageForParserMessageElement {
   key: MACRO_ENUM;
   name: string;
@@ -47,7 +47,7 @@ export const generateMessageParserMessageMacro = <MACRO_ENUM extends string>(
   macro:
     | MessageParserMacro<MACRO_ENUM>
     | MessageParserMacroDocumentation<MACRO_ENUM>,
-  key: MACRO_ENUM
+  key: MACRO_ENUM,
 ): MessageForParserMessageMacro<MACRO_ENUM> => ({
   key,
   name: macro.id,
@@ -55,7 +55,7 @@ export const generateMessageParserMessageMacro = <MACRO_ENUM extends string>(
 });
 
 export const generateMessageParserMessageReference = (
-  stringEntry: StringEntry
+  stringEntry: StringEntry,
 ): MessageForParserMessageReference => ({
   name: stringEntry.id,
   type: "reference",
@@ -71,7 +71,7 @@ export const generateMessageParserMessageReference = (
  */
 export const createMessageParserMessage = <MACRO_ENUM extends string = string>(
   message: MessageForParserMessageElements<MACRO_ENUM>[],
-  insidePlugin = false
+  insidePlugin = false,
 ): string =>
   message
     .map((a) => {
@@ -85,21 +85,27 @@ export const createMessageParserMessage = <MACRO_ENUM extends string = string>(
         case "macro":
           if (a.name === undefined || a.key === undefined) {
             throw Error(
-              `Macro name/key was undefined (${JSON.stringify({ a, message })})`
+              `Macro name/key was undefined (${JSON.stringify({
+                a,
+                message,
+              })})`,
             );
           }
           return `%${a.name}:${a.key}%`;
         case "reference":
           if (a.name === undefined) {
             throw Error(
-              `Reference name was undefined (${JSON.stringify({ a, message })})`
+              `Reference name was undefined (${JSON.stringify({
+                a,
+                message,
+              })})`,
             );
           }
           return `$[${a.name}]`;
         case "plugin":
           if (a.name === undefined) {
             throw Error(
-              `Plugin name was undefined (${JSON.stringify({ a, message })})`
+              `Plugin name was undefined (${JSON.stringify({ a, message })})`,
             );
           }
           // eslint-disable-next-line no-case-declarations
@@ -107,13 +113,13 @@ export const createMessageParserMessage = <MACRO_ENUM extends string = string>(
           if (a.args !== undefined) {
             pluginText += `=${createMessageParserMessage(
               Array.isArray(a.args) ? a.args : [a.args],
-              true
+              true,
             )}`;
           }
           if (a.scope !== undefined) {
             pluginText += `|${createMessageParserMessage(
               Array.isArray(a.scope) ? a.scope : [a.scope],
-              true
+              true,
             )}`;
           }
           pluginText += ")";

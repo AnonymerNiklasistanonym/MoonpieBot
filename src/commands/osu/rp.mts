@@ -38,7 +38,7 @@ export const commandRp: ChatMessageHandlerReplyCreator<
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandPpRpDetectorOutput
 > = {
-  createReply: async (_channel, _tags, data) => {
+  createReply: async (_channel, _tags, data, logger) => {
     if (data.defaultOsuId === undefined) {
       throw errorMessageDefaultOsuIdUndefined();
     }
@@ -46,13 +46,13 @@ export const commandRp: ChatMessageHandlerReplyCreator<
     const oauthAccessToken =
       await osuApiV2.default.oauth.clientCredentialsGrant(
         data.osuApiV2Credentials.clientId,
-        data.osuApiV2Credentials.clientSecret
+        data.osuApiV2Credentials.clientSecret,
       );
 
     if (data.customOsuId === undefined && data.customOsuName) {
       const userSearchResult = await osuApiV2.default.search.user(
         oauthAccessToken,
-        data.customOsuName
+        data.customOsuName,
       );
       if (
         Array.isArray(userSearchResult.data) &&
@@ -69,26 +69,29 @@ export const commandRp: ChatMessageHandlerReplyCreator<
       GameMode.OSU_STANDARD,
       1,
       0,
-      true
+      true,
     );
 
     const osuRpRequestMacros = new Map();
     osuRpRequestMacros.set(
       macroOsuPpRpRequest.id,
       new Map(
-        macroOsuPpRpRequest.generate({
-          id:
-            data.customOsuId !== undefined
-              ? data.customOsuId
-              : data.defaultOsuId,
-        })
-      )
+        macroOsuPpRpRequest.generate(
+          {
+            id:
+              data.customOsuId !== undefined
+                ? data.customOsuId
+                : data.defaultOsuId,
+          },
+          logger,
+        ),
+      ),
     );
 
     if (lastPlay.length > 0) {
       if (lastPlay[0].beatmap?.id) {
         data.beatmapRequestsInfo.lastMentionedBeatmapId =
-          lastPlay[0].beatmap?.id;
+          lastPlay[0].beatmap.id;
       }
       return {
         additionalMacros: osuRpRequestMacros,
@@ -129,7 +132,7 @@ export const commandRp: ChatMessageHandlerReplyCreator<
       return {
         data: {
           customOsuName: removeWhitespaceEscapeChatCommandGroup(
-            matchGroups.osuUserName
+            matchGroups.osuUserName,
           ),
         },
       };

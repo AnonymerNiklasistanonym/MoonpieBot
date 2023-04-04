@@ -1,15 +1,14 @@
+// Relative imports
 import {
   author,
   bugTrackerUrl,
   description,
+  displayName,
   license,
-  name,
-  sourceCodeUrl,
+  version,
+  websiteUrl,
 } from "../general.mjs";
-import { getVersionString } from "../../version.mjs";
-import { version } from "../version.mjs";
-// Type imports
-import type { MessageParserMacro } from "../../messageParser.mjs";
+import { createMessageParserMacro } from "../../messageParser/macros.mjs";
 
 export enum MacroMoonpieBot {
   AUTHOR = "AUTHOR",
@@ -20,35 +19,29 @@ export enum MacroMoonpieBot {
   URL = "URL",
   VERSION = "VERSION",
 }
-export const macroMoonpieBot: MessageParserMacro<MacroMoonpieBot> = {
-  id: "MOONPIEBOT",
-  values: new Map(
-    Object.values(MacroMoonpieBot).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroMoonpieBot.NAME:
-          macroValue = name;
-          break;
-        case MacroMoonpieBot.VERSION:
-          macroValue = getVersionString(version);
-          break;
-        case MacroMoonpieBot.AUTHOR:
-          macroValue = author;
-          break;
-        case MacroMoonpieBot.DESCRIPTION:
-          macroValue = description;
-          break;
-        case MacroMoonpieBot.URL:
-          macroValue = sourceCodeUrl;
-          break;
-        case MacroMoonpieBot.LICENSE:
-          macroValue = license;
-          break;
-        case MacroMoonpieBot.BUG_TRACKER:
-          macroValue = bugTrackerUrl;
-          break;
-      }
-      return [macroId, macroValue];
-    })
-  ),
-};
+
+export const macroMoonpieBot = createMessageParserMacro(
+  {
+    description: "MoonpieBot information",
+    id: "MOONPIEBOT",
+  },
+  Object.values(MacroMoonpieBot),
+  (macroId) => {
+    switch (macroId) {
+      case MacroMoonpieBot.NAME:
+        return displayName;
+      case MacroMoonpieBot.VERSION:
+        return version;
+      case MacroMoonpieBot.AUTHOR:
+        return author;
+      case MacroMoonpieBot.DESCRIPTION:
+        return description;
+      case MacroMoonpieBot.URL:
+        return websiteUrl;
+      case MacroMoonpieBot.LICENSE:
+        return license;
+      case MacroMoonpieBot.BUG_TRACKER:
+        return bugTrackerUrl;
+    }
+  },
+);

@@ -11,9 +11,7 @@ import type { Client } from "tmi.js";
 import type { Logger } from "winston";
 import type { OrUndef } from "../other/types.mjs";
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "twitch";
 
 /**
@@ -59,7 +57,7 @@ export enum TwitchClientListener {
    */
   NEW_MESSAGE = "message",
   /**
-   * Triggers when a Twitch user joins a Twitch channel that is being listened to.
+   * Triggers when a Twitch redeem was redeemed.
    */
   NEW_REDEEM = "redeem",
   /**
@@ -93,9 +91,9 @@ export enum TwitchClientListener {
 export const createTwitchClient = (
   twitchName: OrUndef<string>,
   twitchOAuthToken: OrUndef<string>,
-  twitchChannels: OrUndef<ReadonlyArray<string>>,
+  twitchChannels: OrUndef<readonly string[]>,
   debug = false,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Client => {
   const logTwitchClient = createLogFunc(logger, LOG_ID, "client");
 
@@ -103,32 +101,32 @@ export const createTwitchClient = (
   if (twitchName === undefined) {
     throw new CreateTwitchClientError(
       "Could not create Twitch client: twitchName was undefined",
-      CreateTwitchClientErrorCode.TWITCH_NAME_UNDEFINED
+      CreateTwitchClientErrorCode.TWITCH_NAME_UNDEFINED,
     );
   }
   if (twitchOAuthToken === undefined) {
     throw new CreateTwitchClientError(
       "Could not create Twitch client: twitchOAuthToken was undefined",
-      CreateTwitchClientErrorCode.TWITCH_OAUTH_TOKEN_UNDEFINED
+      CreateTwitchClientErrorCode.TWITCH_OAUTH_TOKEN_UNDEFINED,
     );
   }
   if (twitchChannels === undefined) {
     throw new CreateTwitchClientError(
       "Could not create Twitch client: twitchChannels was undefined",
-      CreateTwitchClientErrorCode.TWITCH_CHANNELS_UNDEFINED
+      CreateTwitchClientErrorCode.TWITCH_CHANNELS_UNDEFINED,
     );
   }
   if (twitchChannels.length === 0) {
     throw new CreateTwitchClientError(
       "Could not create Twitch client: twitchChannels list was empty",
-      CreateTwitchClientErrorCode.TWITCH_CHANNELS_EMPTY
+      CreateTwitchClientErrorCode.TWITCH_CHANNELS_EMPTY,
     );
   }
 
   logTwitchClient.info(
     `Create Twitch client for the account "${twitchName}" in the channels: ${twitchChannels
       .map((a) => `"${a}"`)
-      .join(", ")}`
+      .join(", ")}`,
   );
 
   // Create Twitch client that can listen to all specified channels

@@ -1,7 +1,7 @@
 // Relative imports
 import { convertTwitchBadgeLevelToString } from "../../twitch.mjs";
-// Type import
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
+import { createMessageParserMacroGenerator } from "../../messageParser/macros.mjs";
+// Type imports
 import type { TwitchBadgeLevel } from "../../twitch.mjs";
 
 export interface MacroPermissionErrorData {
@@ -13,23 +13,20 @@ export enum MacroPermissionError {
   FOUND = "FOUND",
 }
 
-export const macroPermissionError: MessageParserMacroGenerator<
-  MacroPermissionErrorData,
-  MacroPermissionError
-> = {
-  generate: (data) =>
-    Object.values(MacroPermissionError).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroPermissionError.EXPECTED:
-          macroValue = convertTwitchBadgeLevelToString(data.expected);
-          break;
-        case MacroPermissionError.FOUND:
-          macroValue = convertTwitchBadgeLevelToString(data.found);
-          break;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "PERMISSION_ERROR",
-  keys: Object.values(MacroPermissionError),
-};
+export const macroPermissionError = createMessageParserMacroGenerator<
+  MacroPermissionError,
+  MacroPermissionErrorData
+>(
+  {
+    id: "PERMISSION_ERROR",
+  },
+  Object.values(MacroPermissionError),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroPermissionError.EXPECTED:
+        return convertTwitchBadgeLevelToString(data.expected);
+      case MacroPermissionError.FOUND:
+        return convertTwitchBadgeLevelToString(data.found);
+    }
+  },
+);

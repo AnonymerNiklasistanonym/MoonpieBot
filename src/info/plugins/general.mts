@@ -17,7 +17,7 @@ export const pluginIfEmpty: MessageParserPlugin = {
     { expectedErrorCode: ParseTreeNodeErrorCode.NO_PLUGIN_CONTENT_AND_VALUE },
   ],
   func: (_, content, signature) => {
-    if (signature === true) {
+    if (signature) {
       return { argument: "value", scope: "showIfEmpty", type: "signature" };
     }
     return pluginIfEmptyLogic(content);
@@ -48,7 +48,7 @@ export const pluginIfNotEmpty: MessageParserPlugin = {
 
 const pluginIfNotUndefinedAndMatchesStringLogic = (
   shouldMatch: string,
-  content?: string
+  content?: string,
 ): boolean =>
   content !== undefined && content.trim().toLowerCase() === shouldMatch;
 
@@ -145,7 +145,7 @@ export const pluginIfNotUndefined: MessageParserPlugin = {
 
 const pluginIfEqualLogic = (
   splitAt: string,
-  aStringEqualsBString?: string
+  aStringEqualsBString?: string,
 ): boolean => {
   if (
     aStringEqualsBString === undefined ||
@@ -159,8 +159,8 @@ const pluginIfEqualLogic = (
   }
   throw Error(
     `More or less than 2 strings were given! (${aStringEqualsBString}=>${JSON.stringify(
-      givenStrings
-    )})`
+      givenStrings,
+    )})`,
   );
 };
 
@@ -211,7 +211,7 @@ export const pluginIfNotEqual: MessageParserPlugin = {
 const pluginIfCompareNumbersLogic = (
   splitAt: string,
   operation: (num1: number, num2: number) => boolean,
-  aNumOperationBNum?: string
+  aNumOperationBNum?: string,
 ): boolean => {
   if (
     aNumOperationBNum === undefined ||
@@ -228,8 +228,8 @@ const pluginIfCompareNumbersLogic = (
   }
   throw Error(
     `More or less than 2 numbers were given ${aNumOperationBNum}=[${givenNumbers.join(
-      ","
-    )}]!`
+      ",",
+    )}]!`,
   );
 };
 
@@ -253,7 +253,7 @@ export const pluginIfGreater: MessageParserPlugin = {
     return pluginIfCompareNumbersLogic(
       separator,
       (a, b) => a > b,
-      aNumGreaterBNum
+      aNumGreaterBNum,
     )
       ? new Map()
       : "";
@@ -280,7 +280,7 @@ export const pluginIfNotGreater: MessageParserPlugin = {
     return pluginIfCompareNumbersLogic(
       separator,
       (a, b) => a <= b,
-      aNumGreaterBNum
+      aNumGreaterBNum,
     )
       ? new Map()
       : "";
@@ -308,7 +308,7 @@ export const pluginIfSmaller: MessageParserPlugin = {
     return pluginIfCompareNumbersLogic(
       separator,
       (a, b) => a < b,
-      aNumSmallerBNum
+      aNumSmallerBNum,
     )
       ? new Map()
       : "";
@@ -335,7 +335,7 @@ export const pluginIfNotSmaller: MessageParserPlugin = {
     return pluginIfCompareNumbersLogic(
       separator,
       (a, b) => a >= b,
-      aNumNotSmallerBNum
+      aNumNotSmallerBNum,
     )
       ? new Map()
       : "";
@@ -446,7 +446,7 @@ export const pluginRandomNumber: MessageParserPlugin = {
       if (interval.includes("[-]")) {
         return `${randomIntFromInterval(
           givenNumbers[0] + 1,
-          givenNumbers[1] - 1
+          givenNumbers[1] - 1,
         )}`;
       }
       if (interval.includes("<-]")) {
@@ -477,15 +477,15 @@ const secondsToObject = (seconds: number) => {
   const yearsNumber = Math.floor(seconds / yearInSeconds);
   const daysNumber = Math.floor((seconds % yearInSeconds) / dayInSeconds);
   const hoursNumber = Math.floor(
-    ((seconds % yearInSeconds) % dayInSeconds) / hourInSeconds
+    ((seconds % yearInSeconds) % dayInSeconds) / hourInSeconds,
   );
   const minutesNumber = Math.floor(
     (((seconds % yearInSeconds) % dayInSeconds) % hourInSeconds) /
-      minuteInSeconds
+      minuteInSeconds,
   );
   const secondsNumber = Math.floor(
     (((seconds % yearInSeconds) % dayInSeconds) % hourInSeconds) %
-      minuteInSeconds
+      minuteInSeconds,
   );
 
   return {
@@ -526,7 +526,7 @@ export const pluginTimeInSToStopwatchString: MessageParserPlugin = {
       timeList.unshift(
         secondsObject.years,
         secondsObject.days,
-        secondsObject.hours
+        secondsObject.hours,
       );
       timeUnit = "y";
     } else if (secondsObject.days > 0) {
@@ -575,31 +575,31 @@ export const pluginTimeInSToHumanReadableString: MessageParserPlugin = {
     const finalStringList = [];
     if (secondsObject.years > 0) {
       finalStringList.push(
-        `${secondsObject.years} year${secondsObject.years === 1 ? "" : "s"}`
+        `${secondsObject.years} year${secondsObject.years === 1 ? "" : "s"}`,
       );
     }
     if (secondsObject.days > 0) {
       finalStringList.push(
-        `${secondsObject.days} day${secondsObject.days === 1 ? "" : "s"}`
+        `${secondsObject.days} day${secondsObject.days === 1 ? "" : "s"}`,
       );
     }
     if (secondsObject.hours > 0) {
       finalStringList.push(
-        `${secondsObject.hours} hour${secondsObject.hours === 1 ? "" : "s"}`
+        `${secondsObject.hours} hour${secondsObject.hours === 1 ? "" : "s"}`,
       );
     }
     if (secondsObject.minutes > 0) {
       finalStringList.push(
         `${secondsObject.minutes} minute${
           secondsObject.minutes === 1 ? "" : "s"
-        }`
+        }`,
       );
     }
     if (secondsObject.seconds > 0 || finalStringList.length === 0) {
       finalStringList.push(
         `${secondsObject.seconds} second${
           secondsObject.seconds === 1 ? "" : "s"
-        }`
+        }`,
       );
     }
     const finalString = finalStringList.reduce((prev, curr, currentIndex) => {
@@ -655,20 +655,20 @@ export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
     if (secondsObject.years > 0) {
       yearsFound = true;
       finalStringList.push(
-        `${secondsObject.years} year${secondsObject.years === 1 ? "" : "s"}`
+        `${secondsObject.years} year${secondsObject.years === 1 ? "" : "s"}`,
       );
     }
     if (secondsObject.days > 0) {
       daysFound = true;
       finalStringList.push(
-        `${secondsObject.days} day${secondsObject.days === 1 ? "" : "s"}`
+        `${secondsObject.days} day${secondsObject.days === 1 ? "" : "s"}`,
       );
     }
     if (!(yearsFound || secondsObject.days > D_COUNT_UNTIL_H_HIDDEN)) {
       if (secondsObject.hours > 0) {
         hoursFound = true;
         finalStringList.push(
-          `${secondsObject.hours} hour${secondsObject.hours === 1 ? "" : "s"}`
+          `${secondsObject.hours} hour${secondsObject.hours === 1 ? "" : "s"}`,
         );
       }
       if (!(daysFound || secondsObject.hours > H_COUNT_UNTIL_MIN_HIDDEN)) {
@@ -676,7 +676,7 @@ export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
           finalStringList.push(
             `${secondsObject.minutes} minute${
               secondsObject.minutes === 1 ? "" : "s"
-            }`
+            }`,
           );
         }
         if (!(hoursFound || secondsObject.minutes > MIN_COUNT_UNTIL_S_HIDDEN)) {
@@ -684,7 +684,7 @@ export const pluginTimeInSToHumanReadableStringShort: MessageParserPlugin = {
             finalStringList.push(
               `${secondsObject.seconds} second${
                 secondsObject.seconds === 1 ? "" : "s"
-              }`
+              }`,
             );
           }
         }
@@ -727,6 +727,33 @@ export const pluginConvertToShortNumber: MessageParserPlugin = {
     return Intl.NumberFormat("en", { notation: "compact" }).format(number);
   },
   id: "CONVERT_TO_SHORT_NUMBER",
+};
+
+export const pluginRoundNumber: MessageParserPlugin = {
+  description: "Round a number to a certain amount of decimal places",
+  examples: [
+    { argument: "42.23555 2", expectedOutput: "42.24" },
+    { argument: "42.23555 0", expectedOutput: "42" },
+  ],
+  func: (_logger, argString, signature) => {
+    if (signature === true) {
+      return {
+        argument: ["number", "number"],
+        type: "signature",
+      };
+    }
+    if (argString === undefined) {
+      throw Error("Argument string was undefined");
+    }
+    const args = argString.trim().split(" ");
+    if (args.length !== 2) {
+      throw Error("Only 2 arguments are supported");
+    }
+    const numberA = parseFloat(args[0]);
+    const numberB = parseInt(args[1]);
+    return numberA.toFixed(numberB);
+  },
+  id: "ROUND_NUMBER",
 };
 
 export const pluginHelp: MessageParserPlugin = {
@@ -850,4 +877,44 @@ export const pluginListSort: MessageParserPlugin = {
       .join(";");
   },
   id: "LIST_SORT",
+};
+
+export const pluginMath: MessageParserPlugin = {
+  description: "Do math operation between 2 numbers",
+  examples: [
+    {
+      argument: "8 + 6",
+      expectedOutput: "14",
+    },
+    { argument: "100 - 20", expectedOutput: "80" },
+  ],
+  func: (_logger, argString, signature) => {
+    if (signature === true) {
+      return {
+        argument: ["number", "operation", "number"],
+        type: "signature",
+      };
+    }
+    if (argString === undefined) {
+      throw Error("Argument string was undefined");
+    }
+    const args = argString.trim().split(" ");
+    if (args.length !== 3) {
+      throw Error("Only 3 arguments are supported");
+    }
+    const numberA = parseFloat(args[0]);
+    const numberB = parseFloat(args[2]);
+    const supportedOperations: [string, (a: number, b: number) => number][] = [
+      ["+", (a, b) => a + b],
+      ["-", (a, b) => a - b],
+      ["*", (a, b) => a * b],
+      ["/", (a, b) => a / b],
+    ];
+    const operation = supportedOperations.find((a) => a[0] === args[1]);
+    if (operation === undefined) {
+      throw Error(`Operation '${args[1]}' is not supported`);
+    }
+    return `${operation[1](numberA, numberB)}`;
+  },
+  id: "MATH",
 };

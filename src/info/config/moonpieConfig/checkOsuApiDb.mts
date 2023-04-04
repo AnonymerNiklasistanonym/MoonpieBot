@@ -6,7 +6,7 @@ import osuRequestsDb from "../../../database/osuRequestsDb.mjs";
 
 export const removeOsuApiDetailedRequestsIfFoundInDb = async (
   osuApiDatabasePath: string,
-  osuApiDetailedRequests: undefined | boolean
+  osuApiDetailedRequests: undefined | boolean,
 ): Promise<undefined | boolean> => {
   if (osuApiDetailedRequests === undefined) {
     return undefined;
@@ -16,18 +16,18 @@ export const removeOsuApiDetailedRequestsIfFoundInDb = async (
   }
   const consoleLogger = createConsoleLogger(
     "removeOsuApiDetailedRequestsIfFoundInDb",
-    LoggerLevel.ERROR
+    LoggerLevel.ERROR,
   );
   await osuRequestsDb.setup(osuApiDatabasePath, consoleLogger);
   const entries = await osuRequestsDb.requests.osuRequestsConfig.getEntries(
     osuApiDatabasePath,
-    consoleLogger
+    consoleLogger,
   );
   const detailedRequestsDb = entries.find(
-    (a) => a.option === OsuRequestsConfig.DETAILED
+    (a) => a.option === OsuRequestsConfig.DETAILED,
   );
   const detailedRequestsIrcDb = entries.find(
-    (a) => a.option === OsuRequestsConfig.DETAILED_IRC
+    (a) => a.option === OsuRequestsConfig.DETAILED_IRC,
   );
   if (
     detailedRequestsDb !== undefined &&
@@ -44,7 +44,7 @@ export const removeOsuApiDetailedRequestsIfFoundInDb = async (
 
 export const removeOsuApiRequestsRedeemIdIfFoundInDb = async (
   osuApiDatabasePath: string,
-  osuApiRequestsRedeemId: undefined | string
+  osuApiRequestsRedeemId: undefined | string,
 ): Promise<undefined | string> => {
   if (osuApiRequestsRedeemId === undefined) {
     return undefined;
@@ -54,15 +54,15 @@ export const removeOsuApiRequestsRedeemIdIfFoundInDb = async (
   }
   const consoleLogger = createConsoleLogger(
     "removeOsuApiRequestsRedeemIdIfFoundInDb",
-    LoggerLevel.ERROR
+    LoggerLevel.ERROR,
   );
   await osuRequestsDb.setup(osuApiDatabasePath, consoleLogger);
   const entries = await osuRequestsDb.requests.osuRequestsConfig.getEntries(
     osuApiDatabasePath,
-    consoleLogger
+    consoleLogger,
   );
   const osuApiRequestsRedeemIdDb = entries.find(
-    (a) => a.option === OsuRequestsConfig.REDEEM_ID
+    (a) => a.option === OsuRequestsConfig.REDEEM_ID,
   );
   if (
     osuApiRequestsRedeemIdDb !== undefined &&

@@ -2,37 +2,39 @@
 import { promises as fs } from "fs";
 // Relative imports
 import {
-  binaryName,
-  defaultConfigDir,
+  commandCreateBackup,
+  commandImportBackup,
+  getCommandFlag,
+  getOptionFlag,
+  optionCustomConfigDir,
+} from "../../src/info/cli.mjs";
+import {
+  displayName,
   name,
-  sourceCodeUrl,
+  version,
+  websiteUrl,
 } from "../../src/info/general.mjs";
 import {
   fileNameCustomCommandsBroadcastsExample,
   fileNameEnvExample,
   fileNameEnvStringsExample,
 } from "../../src/info/files.mjs";
-import { CliOption } from "../../src/info/cli.mjs";
-import { getVersionString } from "../../src/version.mjs";
-import { version } from "../../src/info/version.mjs";
+import { defaultConfigDir } from "../../src/info/files.mjs";
 
 export const createWindowsInstallerConfigFileContent = (
   fileNameScriptMain: string,
   fileNameScriptMainCustomDir: string,
   fileNameScriptBackup: string,
-  fileNameScriptImport: string
+  fileNameScriptImport: string,
 ): string => {
   let outputString = "";
   outputString += ";Define name and lowercase name of the product\n";
-  outputString += `!define PRODUCT "${name}"\n`;
-  outputString += `!define PRODUCT_BINARY "${binaryName}"\n`;
+  outputString += `!define PRODUCT "${displayName}"\n`;
+  outputString += `!define PRODUCT_BINARY "${name}"\n`;
   outputString += ";Define version of the product\n";
-  outputString += `!define PRODUCT_VERSION "${getVersionString(
-    version,
-    ""
-  )}"\n`;
+  outputString += `!define PRODUCT_VERSION "${version}"\n`;
   outputString += ";Define URL of the product\n";
-  outputString += `!define PRODUCT_URL "${sourceCodeUrl}"\n`;
+  outputString += `!define PRODUCT_URL "${websiteUrl}"\n`;
   outputString += ";Define local input file names\n";
   outputString += `!define FILE_NAME_SCRIPT_MAIN "${fileNameScriptMain}"\n`;
   outputString += `!define FILE_NAME_SCRIPT_MAIN_CUSTOM_CONFIG_DIR "${fileNameScriptMainCustomDir}"\n`;
@@ -53,11 +55,11 @@ const batchSelectFolderDialog = async (
   powershellSelectDirectoryScriptPath: string,
   dialogTitle: string,
   variableName: string,
-  onEmptyAction?: string
+  onEmptyAction?: string,
 ) => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const powershellSelectDirectoryScript = await fs.readFile(
-    powershellSelectDirectoryScriptPath
+    powershellSelectDirectoryScriptPath,
   );
   const pscommand = "PScommand";
   let outputString = `set "${pscommand}="POWERSHELL ${powershellSelectDirectoryScript
@@ -74,7 +76,7 @@ const batchSelectFolderDialog = async (
 };
 
 export const createWindowsInstallerScriptFileContentMain = async (
-  powershellSelectDirectoryScriptPath?: string
+  powershellSelectDirectoryScriptPath?: string,
 ): Promise<string> => {
   let outputString = "";
   const selectedCustomDirVarName = "SelectedCustomDir";
@@ -84,14 +86,14 @@ export const createWindowsInstallerScriptFileContentMain = async (
       powershellSelectDirectoryScriptPath,
       "Select custom configuration directory",
       selectedCustomDirVarName,
-      batchExitProgram
+      batchExitProgram,
     )}\n`;
     outputString += `${batchShowCommands}\n`;
   }
-  outputString += `${binaryName}.exe ${CliOption.CONFIG_DIRECTORY} "${
+  outputString += `${name}.exe ${getOptionFlag(optionCustomConfigDir)} "${
     powershellSelectDirectoryScriptPath !== undefined
       ? `%${selectedCustomDirVarName}%`
-      : defaultConfigDir(true)
+      : defaultConfigDir("win32")
   }" %*\n`;
   outputString += `${batchHideCommands}\n`;
   outputString += `${batchWaitForKeypress}\n`;
@@ -99,7 +101,7 @@ export const createWindowsInstallerScriptFileContentMain = async (
 };
 
 export const createWindowsInstallerScriptFileContentBackup = async (
-  powershellSelectDirectoryScriptPath: string
+  powershellSelectDirectoryScriptPath: string,
 ): Promise<string> => {
   let outputString = "";
   outputString += `${batchHideCommands}\n`;
@@ -108,21 +110,21 @@ export const createWindowsInstallerScriptFileContentBackup = async (
     powershellSelectDirectoryScriptPath,
     "Select backup directory",
     selectedBackupDirVarName,
-    batchExitProgram
+    batchExitProgram,
   )}\n`;
   outputString += `${batchShowCommands}\n`;
-  outputString += `${binaryName}.exe ${
-    CliOption.CONFIG_DIRECTORY
-  } "${defaultConfigDir(true)}" ${
-    CliOption.CREATE_BACKUP
-  } "%${selectedBackupDirVarName}%" %*\n`;
+  outputString += `${name}.exe ${getOptionFlag(
+    optionCustomConfigDir,
+  )} "${defaultConfigDir("win32")}" ${getCommandFlag(
+    commandCreateBackup,
+  )} "%${selectedBackupDirVarName}%" %*\n`;
   outputString += `${batchHideCommands}\n`;
   outputString += `${batchWaitForKeypress}\n`;
   return outputString;
 };
 
 export const createWindowsInstallerScriptFileContentImport = async (
-  powershellSelectDirectoryScriptPath: string
+  powershellSelectDirectoryScriptPath: string,
 ): Promise<string> => {
   let outputString = "";
   outputString += `${batchHideCommands}\n`;
@@ -131,14 +133,14 @@ export const createWindowsInstallerScriptFileContentImport = async (
     powershellSelectDirectoryScriptPath,
     "Select backup directory to import",
     selectedBackupDirVarName,
-    batchExitProgram
+    batchExitProgram,
   )}\n`;
   outputString += `${batchShowCommands}\n`;
-  outputString += `${binaryName}.exe ${
-    CliOption.CONFIG_DIRECTORY
-  } "${defaultConfigDir(true)}" ${
-    CliOption.IMPORT_BACKUP
-  } "%${selectedBackupDirVarName}%" %*\n`;
+  outputString += `${name}.exe ${getOptionFlag(
+    optionCustomConfigDir,
+  )} "${defaultConfigDir("win32")}" ${getCommandFlag(
+    commandImportBackup,
+  )} "%${selectedBackupDirVarName}%" %*\n`;
   outputString += `${batchHideCommands}\n`;
   outputString += `${batchWaitForKeypress}\n`;
   return outputString;

@@ -25,7 +25,7 @@ export class ParseTreeNodeError extends Error {
     message: string,
     code: ParseTreeNodeErrorCode,
     pluginError?: string,
-    macroError?: string
+    macroError?: string,
   ) {
     super(message);
     this.code = code;

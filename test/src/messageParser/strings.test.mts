@@ -22,8 +22,8 @@ use(sinonChai);
 const compareStringMaps = (
   baseStringMap: DeepReadonly<StringMap>,
   updatedStringMap: DeepReadonly<StringMap>,
-  changedKeys: ReadonlyArray<string>,
-  newKeys: ReadonlyArray<string>
+  changedKeys: readonly string[],
+  newKeys: readonly string[],
 ) => {
   for (const [key, value] of updatedStringMap) {
     if (changedKeys.includes(key)) {
@@ -75,7 +75,7 @@ export default (): Suite => {
         updateStringsMapWithCustomEnvStrings(defaultStringMap, logger);
       }).to.not.throw();
       expect(
-        updateStringsMapWithCustomEnvStrings(defaultStringMap, logger)
+        updateStringsMapWithCustomEnvStrings(defaultStringMap, logger),
       ).to.deep.equal(defaultStringMap);
       sandbox.restore();
 
@@ -86,16 +86,16 @@ export default (): Suite => {
       });
       const updateDefaultStringInMap = updateStringsMapWithCustomEnvStrings(
         defaultStringMap,
-        logger
+        logger,
       );
       compareStringMaps(
         defaultStringMap,
         updateDefaultStringInMap,
         ["MOONPIE_COMMAND_REPLY_ABOUT"],
-        []
+        [],
       );
       expect(
-        updateDefaultStringInMap.get("MOONPIE_COMMAND_REPLY_ABOUT")
+        updateDefaultStringInMap.get("MOONPIE_COMMAND_REPLY_ABOUT"),
       ).to.deep.equal({
         default: "@$(USER) %MOONPIEBOT:NAME% %MOONPIEBOT:VERSION% Custom",
         updated: true,
@@ -109,19 +109,19 @@ export default (): Suite => {
       });
       const updateDefaultStringsInMap = updateStringsMapWithCustomEnvStrings(
         defaultStringMap,
-        logger
+        logger,
       );
       compareStringMaps(
         defaultStringMap,
         updateDefaultStringsInMap,
         ["MOONPIE_COMMANDS_ABOUT", "MOONPIE_COMMAND_REPLY_ABOUT"],
-        []
+        [],
       );
       expect(
-        updateDefaultStringsInMap.get("MOONPIE_COMMANDS_ABOUT")
+        updateDefaultStringsInMap.get("MOONPIE_COMMANDS_ABOUT"),
       ).to.deep.equal({ default: "!moonpie about Custom", updated: true });
       expect(
-        updateDefaultStringsInMap.get("MOONPIE_COMMAND_REPLY_ABOUT")
+        updateDefaultStringsInMap.get("MOONPIE_COMMAND_REPLY_ABOUT"),
       ).to.deep.equal({
         default: "@$(USER) %MOONPIEBOT:NAME% %MOONPIEBOT:VERSION% Custom",
         updated: true,
@@ -133,7 +133,7 @@ export default (): Suite => {
       });
       const customStringInMap = updateStringsMapWithCustomEnvStrings(
         defaultStringMap,
-        logger
+        logger,
       );
       compareStringMaps(defaultStringMap, customStringInMap, [], ["ABC"]);
       expect(customStringInMap.get("ABC")).to.deep.equal({
@@ -149,13 +149,13 @@ export default (): Suite => {
       });
       const customStringsInMap = updateStringsMapWithCustomEnvStrings(
         defaultStringMap,
-        logger
+        logger,
       );
       compareStringMaps(
         defaultStringMap,
         customStringInMap,
         [],
-        ["ABC", "DEF"]
+        ["ABC", "DEF"],
       );
       expect(customStringsInMap.get("ABC")).to.deep.equal({
         custom: true,

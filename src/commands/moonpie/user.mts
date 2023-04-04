@@ -25,6 +25,7 @@ import {
 import { checkTwitchBadgeLevel } from "../twitchBadge.mjs";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser.mjs";
 import moonpieDb from "../../database/moonpieDb.mjs";
+import { normalizeMacroMap } from "../../messageParser/macrosHelper.mjs";
 import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker.mjs";
 import { TwitchBadgeLevel } from "../../twitch.mjs";
 // Type imports
@@ -54,40 +55,54 @@ export const commandGet: ChatMessageHandlerReplyCreator<
       await moonpieDb.requests.moonpie.existsEntryName(
         data.moonpieDbPath,
         data.userNameMoonpieDb,
-        logger
+        logger,
       )
     ) {
       const moonpieEntry = await moonpieDb.requests.moonpie.getEntryName(
         data.moonpieDbPath,
         data.userNameMoonpieDb,
-        logger
+        logger,
       );
 
       const currentMoonpieLeaderboardEntry =
         await moonpieDb.requests.moonpieLeaderboard.getEntry(
           data.moonpieDbPath,
           moonpieEntry.id,
-          logger
+          logger,
         );
 
       return {
         additionalMacros: new Map([
-          ...generateMacroMapFromMacroGenerator(macroMoonpieUser, {
-            name: data.userNameMoonpieDb,
-          }),
-          ...generateMacroMapFromMacroGenerator(macroMoonpieLeaderboardEntry, {
-            count: currentMoonpieLeaderboardEntry.count,
-            name: data.userNameMoonpieDb,
-            rank: currentMoonpieLeaderboardEntry.rank,
-          }),
+          ...normalizeMacroMap(
+            generateMacroMapFromMacroGenerator(
+              macroMoonpieUser,
+              {
+                name: data.userNameMoonpieDb,
+              },
+              logger,
+            ),
+          ),
+          ...normalizeMacroMap(
+            generateMacroMapFromMacroGenerator(
+              macroMoonpieLeaderboardEntry,
+              {
+                count: currentMoonpieLeaderboardEntry.count,
+                name: data.userNameMoonpieDb,
+                rank: currentMoonpieLeaderboardEntry.rank,
+              },
+              logger,
+            ),
+          ),
         ]),
         messageId: moonpieUserGet.id,
       };
     } else {
       return {
-        additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
-          name: data.userNameMoonpieDb,
-        }),
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroMoonpieUser,
+          { name: data.userNameMoonpieDb },
+          logger,
+        ),
         isError: true,
         messageId: moonpieUserNeverClaimedError.id,
       };
@@ -110,7 +125,7 @@ export const commandGet: ChatMessageHandlerReplyCreator<
     return {
       data: {
         userNameMoonpieDb: removeWhitespaceEscapeChatCommandGroup(
-          matchGroups.userName
+          matchGroups.userName,
         ),
       },
     };
@@ -137,7 +152,8 @@ export const commandSet: ChatMessageHandlerReplyCreator<
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
-      TwitchBadgeLevel.BROADCASTER
+      TwitchBadgeLevel.BROADCASTER,
+      logger,
     );
     if (twitchBadgeLevelCheck !== undefined) {
       return twitchBadgeLevelCheck;
@@ -146,13 +162,25 @@ export const commandSet: ChatMessageHandlerReplyCreator<
     if (!Number.isInteger(data.setCount)) {
       return {
         additionalMacros: new Map([
-          ...generateMacroMapFromMacroGenerator(macroMoonpieUser, {
-            name: data.userNameMoonpieDb,
-          }),
-          ...generateMacroMapFromMacroGenerator(macroMoonpieUserSet, {
-            setCount: data.setCount,
-            setOperation: data.operation,
-          }),
+          ...normalizeMacroMap(
+            generateMacroMapFromMacroGenerator(
+              macroMoonpieUser,
+              {
+                name: data.userNameMoonpieDb,
+              },
+              logger,
+            ),
+          ),
+          ...normalizeMacroMap(
+            generateMacroMapFromMacroGenerator(
+              macroMoonpieUserSet,
+              {
+                setCount: data.setCount,
+                setOperation: data.operation,
+              },
+              logger,
+            ),
+          ),
         ]),
         isError: true,
         messageId: moonpieUserSetNaNError.id,
@@ -164,13 +192,15 @@ export const commandSet: ChatMessageHandlerReplyCreator<
       !(await moonpieDb.requests.moonpie.existsEntryName(
         data.moonpieDbPath,
         data.userNameMoonpieDb,
-        logger
+        logger,
       ))
     ) {
       return {
-        additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
-          name: data.userNameMoonpieDb,
-        }),
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroMoonpieUser,
+          { name: data.userNameMoonpieDb },
+          logger,
+        ),
         isError: true,
         messageId: moonpieUserNeverClaimedError.id,
       };
@@ -179,7 +209,7 @@ export const commandSet: ChatMessageHandlerReplyCreator<
     const moonpieEntry = await moonpieDb.requests.moonpie.getEntryName(
       data.moonpieDbPath,
       data.userNameMoonpieDb,
-      logger
+      logger,
     );
     let newCount = moonpieEntry.count;
     switch (data.operation) {
@@ -204,30 +234,48 @@ export const commandSet: ChatMessageHandlerReplyCreator<
         name: moonpieEntry.name,
         timestamp: moonpieEntry.timestamp,
       },
-      logger
+      logger,
     );
 
     const currentMoonpieLeaderboardEntry =
       await moonpieDb.requests.moonpieLeaderboard.getEntry(
         data.moonpieDbPath,
         moonpieEntry.id,
-        logger
+        logger,
       );
 
     return {
       additionalMacros: new Map([
-        ...generateMacroMapFromMacroGenerator(macroMoonpieUser, {
-          name: data.userNameMoonpieDb,
-        }),
-        ...generateMacroMapFromMacroGenerator(macroMoonpieUserSet, {
-          setCount: data.setCount,
-          setOperation: data.operation,
-        }),
-        ...generateMacroMapFromMacroGenerator(macroMoonpieLeaderboardEntry, {
-          count: newCount,
-          name: data.userNameMoonpieDb,
-          rank: currentMoonpieLeaderboardEntry.rank,
-        }),
+        ...normalizeMacroMap(
+          generateMacroMapFromMacroGenerator(
+            macroMoonpieUser,
+            {
+              name: data.userNameMoonpieDb,
+            },
+            logger,
+          ),
+        ),
+        ...normalizeMacroMap(
+          generateMacroMapFromMacroGenerator(
+            macroMoonpieUserSet,
+            {
+              setCount: data.setCount,
+              setOperation: data.operation,
+            },
+            logger,
+          ),
+        ),
+        ...normalizeMacroMap(
+          generateMacroMapFromMacroGenerator(
+            macroMoonpieLeaderboardEntry,
+            {
+              count: newCount,
+              name: data.userNameMoonpieDb,
+              rank: currentMoonpieLeaderboardEntry.rank,
+            },
+            logger,
+          ),
+        ),
       ]),
       messageId: moonpieUserSet.id,
     };
@@ -272,7 +320,7 @@ export const commandSet: ChatMessageHandlerReplyCreator<
         | RegexMoonpieChatHandlerCommandUserRemove;
       if (!matchGroups) {
         throw Error(
-          "RegexMoonpieChatHandlerCommandUserRemove groups undefined"
+          "RegexMoonpieChatHandlerCommandUserRemove groups undefined",
         );
       }
       return {
@@ -280,7 +328,7 @@ export const commandSet: ChatMessageHandlerReplyCreator<
           operation: "-",
           setCount: parseInt(matchGroups.countRemove),
           userNameMoonpieDb: removeWhitespaceEscapeChatCommandGroup(
-            matchGroups.userName
+            matchGroups.userName,
           ),
         },
       };
@@ -307,7 +355,8 @@ export const commandDelete: ChatMessageHandlerReplyCreator<
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
-      TwitchBadgeLevel.BROADCASTER
+      TwitchBadgeLevel.BROADCASTER,
+      logger,
     );
     if (twitchBadgeLevelCheck !== undefined) {
       return twitchBadgeLevelCheck;
@@ -318,13 +367,19 @@ export const commandDelete: ChatMessageHandlerReplyCreator<
       !(await moonpieDb.requests.moonpie.existsEntryName(
         data.moonpieDbPath,
         data.userNameMoonpieDb,
-        logger
+        logger,
       ))
     ) {
       return {
-        additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
-          name: removeWhitespaceEscapeChatCommandGroup(data.userNameMoonpieDb),
-        }),
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroMoonpieUser,
+          {
+            name: removeWhitespaceEscapeChatCommandGroup(
+              data.userNameMoonpieDb,
+            ),
+          },
+          logger,
+        ),
         isError: true,
         messageId: moonpieUserNeverClaimedError.id,
       };
@@ -333,13 +388,17 @@ export const commandDelete: ChatMessageHandlerReplyCreator<
     await moonpieDb.requests.moonpie.removeEntryName(
       data.moonpieDbPath,
       data.userNameMoonpieDb,
-      logger
+      logger,
     );
 
     return {
-      additionalMacros: generateMacroMapFromMacroGenerator(macroMoonpieUser, {
-        name: data.userNameMoonpieDb,
-      }),
+      additionalMacros: generateMacroMapFromMacroGenerator(
+        macroMoonpieUser,
+        {
+          name: data.userNameMoonpieDb,
+        },
+        logger,
+      ),
       messageId: moonpieUserDelete.id,
     };
   },
@@ -360,7 +419,7 @@ export const commandDelete: ChatMessageHandlerReplyCreator<
     return {
       data: {
         userNameMoonpieDb: removeWhitespaceEscapeChatCommandGroup(
-          matchGroups.userName
+          matchGroups.userName,
         ),
       },
     };

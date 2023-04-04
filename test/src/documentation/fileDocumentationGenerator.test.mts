@@ -22,8 +22,8 @@ export default (): Suite => {
               type: FileDocumentationPartType.TEXT,
             },
           ],
-          20
-        )
+          20,
+        ),
       ).to.be.equal("# Single line\n");
       expect(
         fileDocumentationGenerator(
@@ -33,8 +33,8 @@ export default (): Suite => {
               type: FileDocumentationPartType.TEXT,
             },
           ],
-          20
-        )
+          20,
+        ),
       ).to.be.equal("# Multiple lines of\n# text\n");
       expect(
         fileDocumentationGenerator(
@@ -45,8 +45,8 @@ export default (): Suite => {
               type: FileDocumentationPartType.TEXT,
             },
           ],
-          20
-        )
+          20,
+        ),
       ).to.be.equal("# > Single line\n");
       expect(
         fileDocumentationGenerator(
@@ -57,8 +57,8 @@ export default (): Suite => {
               type: FileDocumentationPartType.TEXT,
             },
           ],
-          20
-        )
+          20,
+        ),
       ).to.be.equal("# > Multiple lines of text but don't split\n");
       expect(
         fileDocumentationGenerator(
@@ -69,10 +69,10 @@ export default (): Suite => {
               type: FileDocumentationPartType.TEXT,
             },
           ],
-          20
-        )
+          20,
+        ),
       ).to.be.equal(
-        "# > Multiple lines of text but don't split\n#   split this\n"
+        "# > Multiple lines of text but don't split\n#   split this\n",
       );
     });
     it("value", () => {
@@ -84,8 +84,8 @@ export default (): Suite => {
               value: "a",
             },
           ],
-          20
-        )
+          20,
+        ),
       ).to.be.equal("a\n");
       expect(
         fileDocumentationGenerator(
@@ -96,8 +96,8 @@ export default (): Suite => {
               value: "a",
             },
           ],
-          20
-        )
+          20,
+        ),
       ).to.be.equal("#a\n");
     });
     expect(
@@ -110,8 +110,8 @@ export default (): Suite => {
             value: "a",
           },
         ],
-        20
-      )
+        20,
+      ),
     ).to.be.equal("# Title\n#a\n");
     expect(
       fileDocumentationGenerator(
@@ -122,8 +122,8 @@ export default (): Suite => {
             value: "a",
           },
         ],
-        20
-      )
+        20,
+      ),
     ).to.be.equal("# Title with\n# multiple lines\na\n");
     expect(
       fileDocumentationGenerator(
@@ -138,8 +138,8 @@ export default (): Suite => {
             value: "a",
           },
         ],
-        20
-      )
+        20,
+      ),
     ).to.be.equal("# Title\n# > Description with\n#   multiple lines\na\n");
     expect(
       fileDocumentationGenerator(
@@ -155,10 +155,10 @@ export default (): Suite => {
             value: "a",
           },
         ],
-        20
-      )
+        20,
+      ),
     ).to.be.equal(
-      "# T\n# > D\n#   Info\n#   Info with\n#   multiple lines\na\n"
+      "# T\n# > D\n#   Info\n#   Info with\n#   multiple lines\na\n",
     );
     expect(
       fileDocumentationGenerator(
@@ -174,10 +174,10 @@ export default (): Suite => {
             value: "a",
           },
         ],
-        20
-      )
+        20,
+      ),
     ).to.be.equal(
-      "# T\n# > D\n#   List:\n#   - a\n#   - b\n#   - multiple lines\n#     list entry\na\n"
+      "# T\n# > D\n#   List:\n#   - a\n#   - b\n#   - multiple lines\n#     list entry\na\n",
     );
   });
 };

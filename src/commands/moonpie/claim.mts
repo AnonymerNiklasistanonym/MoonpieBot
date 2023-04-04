@@ -24,6 +24,7 @@ import {
 } from "../../info/regex.mjs";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser.mjs";
 import moonpieDb from "../../database/moonpieDb.mjs";
+import { normalizeMacroMap } from "../../messageParser/macrosHelper.mjs";
 // Type imports
 import type {
   ChatMessageHandlerReplyCreator,
@@ -60,13 +61,13 @@ export const commandClaim: ChatMessageHandlerReplyCreator<
       await moonpieDb.requests.moonpie.existsEntry(
         data.moonpieDbPath,
         tags["user-id"],
-        logger
+        logger,
       )
     ) {
       const moonpieEntry = await moonpieDb.requests.moonpie.getEntry(
         data.moonpieDbPath,
         tags["user-id"],
-        logger
+        logger,
       );
 
       // If a moonpie entry already exists check if a moonpie was redeemed in the last 24 hours
@@ -74,7 +75,7 @@ export const commandClaim: ChatMessageHandlerReplyCreator<
       msSinceLastClaim = Math.max(currentTimestamp - moonpieEntry.timestamp, 0);
       msTillNextClaim = Math.max(
         claimCooldownMs + moonpieEntry.timestamp - currentTimestamp,
-        0
+        0,
       );
 
       if (msSinceLastClaim > claimCooldownMs) {
@@ -88,7 +89,7 @@ export const commandClaim: ChatMessageHandlerReplyCreator<
       await moonpieDb.requests.moonpie.createEntry(
         data.moonpieDbPath,
         { id: tags["user-id"], name: tags.username },
-        logger
+        logger,
       );
     }
     await moonpieDb.requests.moonpie.updateEntry(
@@ -99,28 +100,40 @@ export const commandClaim: ChatMessageHandlerReplyCreator<
         name: tags.username,
         timestamp: newTimestamp,
       },
-      logger
+      logger,
     );
 
     const currentMoonpieLeaderboardEntry =
       await moonpieDb.requests.moonpieLeaderboard.getEntry(
         data.moonpieDbPath,
         tags["user-id"],
-        logger
+        logger,
       );
 
     return {
       additionalMacros: new Map([
-        ...generateMacroMapFromMacroGenerator(macroMoonpieClaim, {
-          cooldownHours: data.moonpieClaimCooldownHours,
-          timeSinceLastClaimInS: msSinceLastClaim / 1000,
-          timeTillNextClaimInS: msTillNextClaim / 1000,
-        }),
-        ...generateMacroMapFromMacroGenerator(macroMoonpieLeaderboardEntry, {
-          count: newMoonpieCount,
-          name: tags.username,
-          rank: currentMoonpieLeaderboardEntry.rank,
-        }),
+        ...normalizeMacroMap(
+          generateMacroMapFromMacroGenerator(
+            macroMoonpieClaim,
+            {
+              cooldownHours: data.moonpieClaimCooldownHours,
+              timeSinceLastClaimInS: msSinceLastClaim / 1000,
+              timeTillNextClaimInS: msTillNextClaim / 1000,
+            },
+            logger,
+          ),
+        ),
+        ...normalizeMacroMap(
+          generateMacroMapFromMacroGenerator(
+            macroMoonpieLeaderboardEntry,
+            {
+              count: newMoonpieCount,
+              name: tags.username,
+              rank: currentMoonpieLeaderboardEntry.rank,
+            },
+            logger,
+          ),
+        ),
       ]),
       messageId: alreadyClaimedAMoonpie
         ? moonpieCommandReplyAlreadyClaimed.id

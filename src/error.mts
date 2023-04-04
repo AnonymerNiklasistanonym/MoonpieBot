@@ -17,7 +17,7 @@ export enum ErrorWithCodeCode {
  */
 export const errorMessageIdUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
-    "Unable to reply to message! (messageId is undefined)"
+    "Unable to reply to message! (messageId is undefined)",
   );
   error.code = ErrorWithCodeCode.MESSAGE_ID_UNDEFINED;
   return error;
@@ -28,7 +28,7 @@ export const errorMessageIdUndefined = (): ErrorWithCode => {
  */
 export const errorMessageUserNameUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
-    "Unable to reply to message! (userName is undefined)"
+    "Unable to reply to message! (userName is undefined)",
   );
   error.code = ErrorWithCodeCode.USER_NAME_UNDEFINED;
   return error;
@@ -39,7 +39,7 @@ export const errorMessageUserNameUndefined = (): ErrorWithCode => {
  */
 export const errorMessageUserIdUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
-    "Unable to reply to message! (userId is undefined)"
+    "Unable to reply to message! (userId is undefined)",
   );
   error.code = ErrorWithCodeCode.USER_ID_UNDEFINED;
   return error;
@@ -50,7 +50,7 @@ export const errorMessageUserIdUndefined = (): ErrorWithCode => {
  */
 export const errorMessageDefaultOsuIdUndefined = (): ErrorWithCode => {
   const error: ErrorWithCode = Error(
-    "Unable to reply to message! (defaultOsuId is undefined)"
+    "Unable to reply to message! (defaultOsuId is undefined)",
   );
   error.code = ErrorWithCodeCode.OSU_API_V2_DEFAULT_OSU_ID_UNDEFINED;
   return error;

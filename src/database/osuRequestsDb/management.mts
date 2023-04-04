@@ -1,7 +1,7 @@
 // Package imports
 import db from "sqlite3-promise-query-api";
 // Relative imports
-import { compareVersions, getVersionString } from "../../version.mjs";
+import { compareVersions, getVersionInfo } from "../../version.mjs";
 import {
   OsuRequestsConfig,
   osuRequestsConfigTable,
@@ -24,7 +24,7 @@ import type { MigrateDatabaseInformation } from "../generic/setup.mjs";
  */
 export const setup = async (
   databasePath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<void> =>
   genericSetupDatabase(
     databasePath,
@@ -35,14 +35,12 @@ export const setup = async (
     {
       migrateVersion: async (oldVersion, currentVersion) => {
         const migrations: MigrateDatabaseInformation[] = [];
-        if (
-          compareVersions(oldVersion, { major: 0, minor: 0, patch: 2 }) === -1
-        ) {
+        if (compareVersions(oldVersion, getVersionInfo("0.0.2")) === -1) {
           // Alter table to drop channel column that was in version 0.0.1 but
           // got removed in version 0.0.2
           const logMethod = createLogMethod(
             logger,
-            "database_osu_requests_migrate_00x_002"
+            "database_osu_requests_migrate_00x_002",
           );
           // Since the column to drop is a primary key column the table needs
           // to be renamed and the data needs to be copied.
@@ -66,7 +64,7 @@ export const setup = async (
               },
             ]),
             undefined,
-            logMethod
+            logMethod,
           );
           // Validate if the entries are still valid
           for (const oldEntry of oldEntries) {
@@ -78,8 +76,8 @@ export const setup = async (
               throw Error(
                 "Could not successfully migrate database because the " +
                   `option is unknown: '${oldEntry.option}' (${Object.values(
-                    OsuRequestsConfigV002
-                  ).join(",")})`
+                    OsuRequestsConfigV002,
+                  ).join(",")})`,
               );
             }
           }
@@ -90,17 +88,17 @@ export const setup = async (
               newTableName: `${osuRequestsConfigTableV001.name}_old_v001`,
             }),
             undefined,
-            logMethod
+            logMethod,
           );
           // Create the current table
           await db.default.requests.post(
             databasePath,
             db.default.queries.createTable(
               osuRequestsConfigTable.name,
-              Object.values(osuRequestsConfigTable.columns)
+              Object.values(osuRequestsConfigTable.columns),
             ),
             undefined,
-            logMethod
+            logMethod,
           );
           // Copy the data from the old table to the new table
           for (const oldEntry of oldEntries) {
@@ -110,22 +108,20 @@ export const setup = async (
                 option: oldEntry.option as unknown as OsuRequestsConfig,
                 optionValue: oldEntry.optionValue,
               },
-              logger
+              logger,
             );
           }
           migrations.push({
             name: "channel column",
-            relatedVersion: { major: 0, minor: 0, patch: 2 },
+            relatedVersion: getVersionInfo("0.0.2"),
             type: "removed",
           });
         }
-        if (
-          compareVersions(oldVersion, { major: 0, minor: 0, patch: 3 }) === -1
-        ) {
+        if (compareVersions(oldVersion, getVersionInfo("0.0.3")) === -1) {
           // Drop rows that got removed in version 0.0.3
           const logMethod = createLogMethod(
             logger,
-            "database_osu_requests_migrate_00x_003"
+            "database_osu_requests_migrate_00x_003",
           );
           // Since the column to drop is a primary key column the table needs
           // to be renamed and the data needs to be copied.
@@ -144,7 +140,7 @@ export const setup = async (
               },
             ]),
             undefined,
-            logMethod
+            logMethod,
           );
           // Validate if the entries are still valid
           for (const oldEntry of oldEntries) {
@@ -156,8 +152,8 @@ export const setup = async (
               throw Error(
                 "Could not successfully migrate database because the " +
                   `option is unknown: '${oldEntry.option}' (${Object.values(
-                    OsuRequestsConfigV002
-                  ).join(",")})`
+                    OsuRequestsConfigV002,
+                  ).join(",")})`,
               );
             }
           }
@@ -168,23 +164,23 @@ export const setup = async (
               newTableName: `${osuRequestsConfigTable.name}_old_v002`,
             }),
             undefined,
-            logMethod
+            logMethod,
           );
           // Create the current table
           await db.default.requests.post(
             databasePath,
             db.default.queries.createTable(
               osuRequestsConfigTable.name,
-              Object.values(osuRequestsConfigTable.columns)
+              Object.values(osuRequestsConfigTable.columns),
             ),
             undefined,
-            logMethod
+            logMethod,
           );
           // Copy the data from the old table to the new table
           for (const oldEntry of oldEntries) {
             if (
               !Object.values(OsuRequestsConfig).includes(
-                oldEntry.option as OsuRequestsConfig
+                oldEntry.option as OsuRequestsConfig,
               )
             ) {
               continue;
@@ -195,12 +191,12 @@ export const setup = async (
                 option: oldEntry.option as OsuRequestsConfig,
                 optionValue: oldEntry.optionValue,
               },
-              logger
+              logger,
             );
           }
           migrations.push({
             name: "drop rows that were removed",
-            relatedVersion: { major: 0, minor: 0, patch: 3 },
+            relatedVersion: getVersionInfo("0.0.3"),
             type: "removed",
           });
         }
@@ -208,11 +204,9 @@ export const setup = async (
           return migrations;
         }
         throw Error(
-          `No database migration was found (old=${
-            oldVersion !== undefined ? getVersionString(oldVersion, "") : "none"
-          },current=${getVersionString(currentVersion, "")})!`
+          `No database migration was found (old=${oldVersion.version},current=${currentVersion.version})!`,
         );
       },
     },
-    logger
+    logger,
   );

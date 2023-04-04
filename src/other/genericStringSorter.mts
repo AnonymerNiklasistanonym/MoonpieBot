@@ -2,7 +2,7 @@ export type ComparatorValues = -1 | 0 | 1;
 
 export const genericStringSorter = (
   stringA?: string,
-  stringB?: string
+  stringB?: string,
 ): ComparatorValues => {
   if (stringA === undefined || stringB === undefined) {
     return 0;
@@ -13,5 +13,5 @@ export const genericStringSorter = (
 export const genericFilterNonUniqueStrings = (
   value: string,
   index: number,
-  self: ReadonlyArray<string>
+  self: readonly string[],
 ): boolean => index === self.indexOf(value);

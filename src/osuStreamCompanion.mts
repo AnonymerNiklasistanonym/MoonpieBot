@@ -12,9 +12,7 @@ import { getFileContentIfExists } from "./other/fileOperations.mjs";
 // Type imports
 import type { Logger } from "winston";
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "osu_streamcompanion";
 
 /**
@@ -119,19 +117,19 @@ export const createStreamCompanionFileConnection =
   (streamCompanionDirPath: string): StreamCompanionConnection =>
   async (): Promise<StreamCompanionFileData> => {
     const npAll = getFileContentIfExists(
-      path.join(streamCompanionDirPath, fileNameNpAll)
+      path.join(streamCompanionDirPath, fileNameNpAll),
     );
     const npPlayingDetails = getFileContentIfExists(
-      path.join(streamCompanionDirPath, fileNameNpPlayingDetails)
+      path.join(streamCompanionDirPath, fileNameNpPlayingDetails),
     );
     const npPlayingDl = getFileContentIfExists(
-      path.join(streamCompanionDirPath, fileNameNpPlayingDl)
+      path.join(streamCompanionDirPath, fileNameNpPlayingDl),
     );
     const currentMods = getFileContentIfExists(
-      path.join(streamCompanionDirPath, fileNameCurrentMods)
+      path.join(streamCompanionDirPath, fileNameCurrentMods),
     );
     const custom = getFileContentIfExists(
-      path.join(streamCompanionDirPath, fileNameCustom)
+      path.join(streamCompanionDirPath, fileNameCustom),
     );
 
     // Wait for all promises concurrently for better performance
@@ -170,7 +168,7 @@ const WEBSOCKET_RECONNECT_TIMEOUT_IN_S = 10;
  */
 export const createStreamCompanionWebSocketConnection = (
   streamCompanionUrl: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): StreamCompanionConnection => {
   const logStreamCompanion = createLogFunc(logger, LOG_ID);
 
@@ -186,7 +184,7 @@ export const createStreamCompanionWebSocketConnection = (
     `Try to connect to StreamCompanion via '${
       // eslint-disable-next-line no-underscore-dangle
       (ws as unknown as ReconnectingWebSocketHelper)._url
-    }' (url=${websocketUrl}, timeout=${WEBSOCKET_RECONNECT_TIMEOUT_IN_S}s)`
+    }' (url=${websocketUrl}, timeout=${WEBSOCKET_RECONNECT_TIMEOUT_IN_S}s)`,
   );
   ws.onopen = () => {
     connectedToStreamCompanion = true;
@@ -201,16 +199,16 @@ export const createStreamCompanionWebSocketConnection = (
     if (typeof wsEvent.data === "string") {
       Object.assign(
         cache,
-        JSON.parse(wsEvent.data) as StreamCompanionWebSocketData
+        JSON.parse(wsEvent.data) as StreamCompanionWebSocketData,
       );
       logStreamCompanion.debug(`New StreamCompanion data: '${wsEvent.data}'`);
     } else {
       logStreamCompanion.error(
         Error(
           `New StreamCompanion data was not a string: '${JSON.stringify(
-            wsEvent.data
-          )}'`
-        )
+            wsEvent.data,
+          )}'`,
+        ),
       );
     }
   };
@@ -223,7 +221,7 @@ export const createStreamCompanionWebSocketConnection = (
   ws.onerror = (err) => {
     connectedToStreamCompanion = false;
     logStreamCompanion.error(
-      Error(`StreamCompanion socket error: ${err.message}`)
+      Error(`StreamCompanion socket error: ${err.message}`),
     );
   };
   return () => (connectedToStreamCompanion ? cache : undefined);

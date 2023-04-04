@@ -17,9 +17,7 @@ export interface DatabaseStructure {
   timestamp: number;
 }
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "database_backup";
 
 /**
@@ -30,7 +28,7 @@ const LOG_ID = "database_backup";
  */
 export const exportMoonpieCountTableToJson = async (
   databasePath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<DatabaseStructure[]> => {
   const logDbBackup = createLogFunc(logger, LOG_ID);
   const logMethod = createLogMethod(logger, LOG_ID);
@@ -61,10 +59,10 @@ export const exportMoonpieCountTableToJson = async (
         { columnName: moonpieTable.columns.moonpieCount.name },
         { columnName: moonpieTable.columns.date.name },
       ],
-      {}
+      {},
     ),
     undefined,
-    logMethod
+    logMethod,
   );
   return moonpieData;
 };

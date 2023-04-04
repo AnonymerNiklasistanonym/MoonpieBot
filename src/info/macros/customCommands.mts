@@ -1,7 +1,7 @@
-// Type imports
+// Relative imports
 import { convertTwitchBadgeLevelToString } from "../../twitch.mjs";
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
-// Type import
+import { createMessageParserMacroGenerator } from "../../messageParser/macros.mjs";
+// Type imports
 import type { TwitchBadgeLevel } from "../../twitch.mjs";
 
 export interface MacroCustomCommandInfoData {
@@ -13,64 +13,46 @@ export interface MacroCustomCommandInfoData {
   userLevel?: TwitchBadgeLevel;
 }
 export enum MacroCustomCommandInfo {
-  COOLDOWN_IN_S = "COOLDOWN_IN_S",
-  /** Is empty string even if undefined. */
-  DESCRIPTION = "DESCRIPTION",
+  COOLDOWN_IN_S_OR_UNDEF = "COOLDOWN_IN_S_OR_UNDEF",
+  DESCRIPTION_OR_EMPTY = "DESCRIPTION_OR_EMPTY",
   ID = "ID",
-  MESSAGE = "MESSAGE",
-  REGEX = "REGEX",
-  USER_LEVEL = "USER_LEVEL",
+  MESSAGE_OR_UNDEF = "MESSAGE_OR_UNDEF",
+  REGEX_OR_UNDEF = "REGEX_OR_UNDEF",
+  USER_LEVEL_OR_UNDEF = "USER_LEVEL_OR_UNDEF",
 }
 
-export const macroCustomCommandInfo: MessageParserMacroGenerator<
-  MacroCustomCommandInfoData,
-  MacroCustomCommandInfo
-> = {
-  exampleData: {
+export const macroCustomCommandInfo = createMessageParserMacroGenerator<
+  MacroCustomCommandInfo,
+  MacroCustomCommandInfoData
+>(
+  {
+    id: "CUSTOM_COMMAND_INFO",
+  },
+  Object.values(MacroCustomCommandInfo),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroCustomCommandInfo.COOLDOWN_IN_S_OR_UNDEF:
+        return data.cooldownInS;
+      case MacroCustomCommandInfo.ID:
+        return data.id;
+      case MacroCustomCommandInfo.DESCRIPTION_OR_EMPTY:
+        return data.description ?? "";
+      case MacroCustomCommandInfo.MESSAGE_OR_UNDEF:
+        return data.message;
+      case MacroCustomCommandInfo.REGEX_OR_UNDEF:
+        return data.regex;
+      case MacroCustomCommandInfo.USER_LEVEL_OR_UNDEF:
+        if (data.userLevel) {
+          return convertTwitchBadgeLevelToString(data.userLevel);
+        }
+    }
+  },
+  {
     id: "ID",
     message: "MESSAGE",
     regex: "REGEX",
   },
-  generate: (data) =>
-    Object.values(MacroCustomCommandInfo).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroCustomCommandInfo.COOLDOWN_IN_S:
-          macroValue = data.cooldownInS;
-          break;
-        case MacroCustomCommandInfo.ID:
-          macroValue = data.id;
-          break;
-        case MacroCustomCommandInfo.DESCRIPTION:
-          if (data.description !== undefined) {
-            macroValue = data.description;
-          } else {
-            macroValue = "";
-          }
-          break;
-        case MacroCustomCommandInfo.MESSAGE:
-          macroValue = data.message;
-          break;
-        case MacroCustomCommandInfo.REGEX:
-          macroValue = data.regex;
-          break;
-        case MacroCustomCommandInfo.USER_LEVEL:
-          if (data.userLevel) {
-            macroValue = convertTwitchBadgeLevelToString(data.userLevel);
-          }
-          break;
-      }
-      if (macroValue === undefined) {
-        macroValue = "undefined";
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${macroValue}`;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "CUSTOM_COMMAND_INFO",
-  keys: Object.values(MacroCustomCommandInfo),
-};
+);
 
 export interface MacroCustomCommandInfoEditData {
   option: string;
@@ -80,27 +62,25 @@ export enum MacroCustomCommandBroadcastInfoEdit {
   OPTION = "OPTION",
   OPTION_VALUE = "OPTION_VALUE",
 }
-export const macroCustomCommandBroadcastInfoEdit: MessageParserMacroGenerator<
-  MacroCustomCommandInfoEditData,
-  MacroCustomCommandBroadcastInfoEdit
-> = {
-  exampleData: {
-    option: "ID",
-    optionValue: "new ID",
-  },
-  generate: (data) =>
-    Object.values(MacroCustomCommandBroadcastInfoEdit).map((macroId) => {
-      let macroValue;
+export const macroCustomCommandBroadcastInfoEdit =
+  createMessageParserMacroGenerator<
+    MacroCustomCommandBroadcastInfoEdit,
+    MacroCustomCommandInfoEditData
+  >(
+    {
+      id: "CUSTOM_COMMAND_BROADCAST_INFO_EDIT",
+    },
+    Object.values(MacroCustomCommandBroadcastInfoEdit),
+    (macroId, data) => {
       switch (macroId) {
         case MacroCustomCommandBroadcastInfoEdit.OPTION:
-          macroValue = data.option;
-          break;
+          return data.option;
         case MacroCustomCommandBroadcastInfoEdit.OPTION_VALUE:
-          macroValue = data.optionValue;
-          break;
+          return data.optionValue;
       }
-      return [macroId, macroValue];
-    }),
-  id: "CUSTOM_COMMAND_BROADCAST_INFO_EDIT",
-  keys: Object.values(MacroCustomCommandBroadcastInfoEdit),
-};
+    },
+    {
+      option: "ID",
+      optionValue: "new ID",
+    },
+  );

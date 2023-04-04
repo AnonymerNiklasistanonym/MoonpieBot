@@ -10,41 +10,41 @@ import {
   createWindowsInstallerScriptFileContentImport,
   createWindowsInstallerScriptFileContentMain,
 } from "./lib/windowsInstaller.mjs";
-import { binaryName } from "../src/info/general.mjs";
 import { createJob } from "../src/createJob.mjs";
+import { name } from "../src/info/general.mjs";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const WINDOWS_INSTALLER_DIR = path.join(
   dirname,
   "..",
   "installer",
-  "windows_installer"
+  "windows_installer",
 );
 
 /** The output file path of the windows installer config to create. */
 const filePathOutputWindowsInstallerConfig = path.join(
   WINDOWS_INSTALLER_DIR,
-  "windows_installer_config.nsi"
+  "windows_installer_config.nsi",
 );
 const filePathWindowsScriptGlobalMain = path.join(
   WINDOWS_INSTALLER_DIR,
-  `${binaryName}.bat`
+  `${name}.bat`,
 );
 const filePathWindowsScriptGlobalMainCustomDir = path.join(
   WINDOWS_INSTALLER_DIR,
-  `${binaryName}_custom_dir.bat`
+  `${name}_custom_dir.bat`,
 );
 const filePathWindowsScriptGlobalBackup = path.join(
   WINDOWS_INSTALLER_DIR,
-  `${binaryName}_backup.bat`
+  `${name}_backup.bat`,
 );
 const filePathWindowsScriptGlobalImport = path.join(
   WINDOWS_INSTALLER_DIR,
-  `${binaryName}_import.bat`
+  `${name}_import.bat`,
 );
 const filePathPowershellScriptSelectDirectory = path.join(
   WINDOWS_INSTALLER_DIR,
-  "select_directory.ps1"
+  "select_directory.ps1",
 );
 
 // -----------------------------------------------------------------------------
@@ -58,37 +58,37 @@ try {
         path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalMain),
         path.relative(
           WINDOWS_INSTALLER_DIR,
-          filePathWindowsScriptGlobalMainCustomDir
+          filePathWindowsScriptGlobalMainCustomDir,
         ),
         path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalBackup),
-        path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalImport)
-      )
+        path.relative(WINDOWS_INSTALLER_DIR, filePathWindowsScriptGlobalImport),
+      ),
     ),
     createJob(
       "Windows batch script",
       filePathWindowsScriptGlobalMain,
-      createWindowsInstallerScriptFileContentMain()
+      createWindowsInstallerScriptFileContentMain(),
     ),
     createJob(
       "Windows batch script with custom directory",
       filePathWindowsScriptGlobalMainCustomDir,
       createWindowsInstallerScriptFileContentMain(
-        filePathPowershellScriptSelectDirectory
-      )
+        filePathPowershellScriptSelectDirectory,
+      ),
     ),
     createJob(
       "Windows batch script backup",
       filePathWindowsScriptGlobalBackup,
       createWindowsInstallerScriptFileContentBackup(
-        filePathPowershellScriptSelectDirectory
-      )
+        filePathPowershellScriptSelectDirectory,
+      ),
     ),
     createJob(
       "Windows batch script import",
       filePathWindowsScriptGlobalImport,
       createWindowsInstallerScriptFileContentImport(
-        filePathPowershellScriptSelectDirectory
-      )
+        filePathPowershellScriptSelectDirectory,
+      ),
     ),
   ]);
 } catch (err) {

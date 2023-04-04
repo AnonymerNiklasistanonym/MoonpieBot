@@ -177,6 +177,7 @@ tmp/
 .env.strings.original
 *.db
 *.db-journal
+*.backup
 
 # Documentation
 docs

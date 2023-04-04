@@ -30,7 +30,7 @@ export interface ExistsInput {
 export const existsEntry = async (
   databasePath: string,
   input: ExistsInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_osu_requests_exists");
   try {
@@ -42,7 +42,7 @@ export const existsEntry = async (
         columnName: osuRequestsConfigTable.columns.option.name,
       }),
       [input.option],
-      logMethod
+      logMethod,
     );
     if (runResultExists) {
       return runResultExists.exists_value === 1;
@@ -73,7 +73,7 @@ export interface CreateInput {
 export const createEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_osu_requests_create");
   const postResult = await db.default.requests.post(
@@ -83,7 +83,7 @@ export const createEntry = async (
       osuRequestsConfigTable.columns.optionValue.name,
     ]),
     [input.option, input.optionValue],
-    logMethod
+    logMethod,
   );
   return postResult.lastID;
 };
@@ -91,14 +91,14 @@ export const createEntry = async (
 export const createOrUpdateEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<number> => {
   const exists = await existsEntry(
     databasePath,
     {
       option: input.option,
     },
-    logger
+    logger,
   );
   if (!exists) {
     return await createEntry(databasePath, input, logger);
@@ -126,7 +126,7 @@ export interface RemoveInput {
 export const removeEntry = async (
   databasePath: string,
   input: RemoveInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_osu_requests_remove");
   const postResult = await db.default.requests.post(
@@ -135,7 +135,7 @@ export const removeEntry = async (
       columnName: osuRequestsConfigTable.columns.option.name,
     }),
     [input.option],
-    logMethod
+    logMethod,
   );
   return postResult.changes > 0;
 };
@@ -155,11 +155,11 @@ export interface GetOsuRequestsConfigOut {
 
 export const getEntries = async (
   databasePath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<GetOsuRequestsConfigOut[]> => {
   const logMethod = createLogMethod(
     logger,
-    "database_osu_requests_get_entries"
+    "database_osu_requests_get_entries",
   );
 
   const runResult = await db.default.requests.getAll<GetOsuRequestsConfigDbOut>(
@@ -175,12 +175,9 @@ export const getEntries = async (
       },
     ]),
     undefined,
-    logMethod
+    logMethod,
   );
-  if (runResult) {
-    return runResult;
-  }
-  throw Error(OsuRequestsDbError.NOT_FOUND);
+  return runResult;
 };
 
 // Update
@@ -194,12 +191,12 @@ export interface UpdateInput {
 export const updateEntry = async (
   databasePath: string,
   input: UpdateInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_update");
   // Special validations for DB entry request
   // > Check if entry already exists
-  if ((await existsEntry(databasePath, input, logger)) === false) {
+  if (!(await existsEntry(databasePath, input, logger))) {
     throw Error(OsuRequestsDbError.NOT_EXISTING);
   }
 
@@ -211,7 +208,7 @@ export const updateEntry = async (
       columnName: osuRequestsConfigTable.columns.option.name,
     }),
     [...values, input.option],
-    logMethod
+    logMethod,
   );
   return postResult.changes;
 };

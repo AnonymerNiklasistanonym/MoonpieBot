@@ -6,7 +6,7 @@ import spotifyDb from "../../../database/spotifyDb.mjs";
 
 export const removeSpotifyApiRefreshTokenIfFoundInDb = async (
   spotifyDatabasePath: string,
-  spotifyApiRefreshToken: undefined | string
+  spotifyApiRefreshToken: undefined | string,
 ): Promise<undefined | string> => {
   if (spotifyApiRefreshToken === undefined) {
     return undefined;
@@ -16,15 +16,16 @@ export const removeSpotifyApiRefreshTokenIfFoundInDb = async (
   }
   const consoleLogger = createConsoleLogger(
     "removeSpotifyApiRefreshTokenIfFoundInDb",
-    LoggerLevel.ERROR
+    LoggerLevel.ERROR,
   );
   await spotifyDb.setup(spotifyDatabasePath, consoleLogger);
   const entries = await spotifyDb.requests.spotifyConfig.getEntries(
     spotifyDatabasePath,
-    consoleLogger
+    consoleLogger,
   );
   const spotifyApiRefreshTokenDb = entries.find(
-    (a) => a.option === SpotifyConfig.REFRESH_TOKEN
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    (a) => a.option === SpotifyConfig.REFRESH_TOKEN,
   );
   if (
     spotifyApiRefreshTokenDb !== undefined &&

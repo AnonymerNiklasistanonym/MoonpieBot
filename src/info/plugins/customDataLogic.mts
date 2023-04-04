@@ -35,7 +35,7 @@ enum CustomDataLogicOperator {
 const customDataLogic = async (
   content: undefined | string,
   customCommandsBroadcastsDbPath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<string> => {
   // Check if the content string has two elements, otherwise throw error
   if (content === undefined || content.trim().length === 0) {
@@ -45,7 +45,7 @@ const customDataLogic = async (
   for (const a of Object.values(CustomDataLogicOperator)) {
     const match = content.match(
       // eslint-disable-next-line security/detect-non-literal-regexp
-      new RegExp(`.+?${escapeRegExp(a)}.+?`)
+      new RegExp(`.+?${escapeRegExp(a)}.+?`),
     );
     if (match !== null) {
       operator = a;
@@ -56,12 +56,12 @@ const customDataLogic = async (
   if (operator === undefined) {
     throw Error(
       `Plugin argument format incorrect (it should be 'nameOPERATORvalue' [OPERATOR:=${Object.entries(
-        CustomDataLogicOperator
+        CustomDataLogicOperator,
       )
         .map((keyValue) => `${keyValue[0]}=${keyValue[1]}`)
         .join(
-          ","
-        )}] and no supported operator was found in '${content.trim()}')`
+          ",",
+        )}] and no supported operator was found in '${content.trim()}')`,
     );
   }
   const args = content
@@ -71,8 +71,8 @@ const customDataLogic = async (
   if (args.length !== 2) {
     throw Error(
       `Plugin argument format incorrect (it should be 'nameOPERATORvalue' and more/less than 2 elements were found '${content.trim()}'/${JSON.stringify(
-        args
-      )})`
+        args,
+      )})`,
     );
   }
 
@@ -92,7 +92,7 @@ const customDataLogic = async (
     case CustomDataLogicOperator.SET_NUMBER:
       if (isNaN(numberValue)) {
         throw Error(
-          `Plugin value incorrect (a number was expected instead of '${content.trim()}')`
+          `Plugin value incorrect (a number was expected instead of '${content.trim()}')`,
         );
       }
       break;
@@ -102,7 +102,7 @@ const customDataLogic = async (
     await customCommandsBroadcastsDb.requests.customData.existsEntry(
       customCommandsBroadcastsDbPath,
       { id },
-      logger
+      logger,
     );
 
   // Remove existing value if operator overwrites it
@@ -114,7 +114,7 @@ const customDataLogic = async (
       await customCommandsBroadcastsDb.requests.customData.removeEntry(
         customCommandsBroadcastsDbPath,
         { id },
-        logger
+        logger,
       );
     }
   }
@@ -131,7 +131,7 @@ const customDataLogic = async (
         entry = await customCommandsBroadcastsDb.requests.customData.getEntry(
           customCommandsBroadcastsDbPath,
           { id },
-          logger
+          logger,
         );
       }
       break;
@@ -150,14 +150,14 @@ const customDataLogic = async (
             value,
             valueType: CustomDataValueType.STRING,
           },
-          logger
+          logger,
         );
         return args[1];
       } else if (typeof entry.value !== "string") {
         throw Error(
           `Plugin entry value was not a string ('${content.trim()}'/'${JSON.stringify(
-            entry.value
-          )}'/${entry.valueType})`
+            entry.value,
+          )}'/${entry.valueType})`,
         );
       } else {
         await customCommandsBroadcastsDb.requests.customData.updateEntry(
@@ -167,7 +167,7 @@ const customDataLogic = async (
             value: entry.value + value,
             valueType: CustomDataValueType.STRING,
           },
-          logger
+          logger,
         );
         return entry.value + value;
       }
@@ -184,14 +184,14 @@ const customDataLogic = async (
                 : -numberValue,
             valueType: CustomDataValueType.NUMBER,
           },
-          logger
+          logger,
         );
         return value;
       } else if (typeof entry.value !== "number") {
         throw Error(
           `Plugin entry value was not a number ('${content.trim()}'/'${JSON.stringify(
-            entry.value
-          )}'/${entry.valueType})`
+            entry.value,
+          )}'/${entry.valueType})`,
         );
       } else {
         const newValue =
@@ -206,7 +206,7 @@ const customDataLogic = async (
             value: newValue,
             valueType: CustomDataValueType.NUMBER,
           },
-          logger
+          logger,
         );
         return `${newValue}`;
       }
@@ -226,7 +226,7 @@ const customDataLogic = async (
                 ? CustomDataValueType.STRING
                 : CustomDataValueType.NUMBER,
           },
-          logger
+          logger,
         );
         return value;
       } else if (entry === undefined) {
@@ -245,7 +245,7 @@ const customDataLogic = async (
               ? CustomDataValueType.STRING
               : CustomDataValueType.NUMBER,
         },
-        logger
+        logger,
       );
       return value;
   }
@@ -262,7 +262,7 @@ const customDataListOperationsLogic = async (
   content: undefined | string,
   operation: CustomDataListOptions,
   customCommandsBroadcastsDbPath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<string> => {
   // Check if the content string has two elements, otherwise throw error
   if (content === undefined || content.trim().length === 0) {
@@ -272,7 +272,7 @@ const customDataListOperationsLogic = async (
   const list = await customCommandsBroadcastsDb.requests.customData.getEntry(
     customCommandsBroadcastsDbPath,
     { id: content },
-    logger
+    logger,
   );
 
   switch (operation) {
@@ -311,7 +311,7 @@ const customDataListClearLogic = async (
   content: undefined | string,
   clear: "NUMBER" | "STRING",
   customCommandsBroadcastsDbPath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<string> => {
   // Check if the content string has two elements, otherwise throw error
   if (content === undefined || content.trim().length === 0) {
@@ -322,13 +322,13 @@ const customDataListClearLogic = async (
     await customCommandsBroadcastsDb.requests.customData.existsEntry(
       customCommandsBroadcastsDbPath,
       { id: content },
-      logger
+      logger,
     );
   if (exists) {
     await customCommandsBroadcastsDb.requests.customData.removeEntry(
       customCommandsBroadcastsDbPath,
       { id: content },
-      logger
+      logger,
     );
   }
 
@@ -342,7 +342,7 @@ const customDataListClearLogic = async (
           ? CustomDataValueType.NUMBER_LIST
           : CustomDataValueType.STRING_LIST,
     },
-    logger
+    logger,
   );
 
   return "";
@@ -356,7 +356,7 @@ enum CustomListLogicOperator {
 const customDataListLogic = async (
   content: undefined | string,
   customCommandsBroadcastsDbPath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<string> => {
   // Check if the content string has two elements, otherwise throw error
   if (content === undefined || content.trim().length === 0) {
@@ -371,7 +371,7 @@ const customDataListLogic = async (
       await customCommandsBroadcastsDb.requests.customData.existsEntry(
         customCommandsBroadcastsDbPath,
         { id: content },
-        logger
+        logger,
       );
     if (!exists) {
       throw Error(`Expected an custom data entry but found none '${content}'`);
@@ -379,7 +379,7 @@ const customDataListLogic = async (
     const entry = await customCommandsBroadcastsDb.requests.customData.getEntry(
       customCommandsBroadcastsDbPath,
       { id: content },
-      logger
+      logger,
     );
     return convertCustomDataValueToDbString(entry.value, entry.valueType);
   }
@@ -391,8 +391,8 @@ const customDataListLogic = async (
   if (args.length !== 2) {
     throw Error(
       `Plugin argument format incorrect (it should be 'nameOPERATORvalue' and more/less than 2 elements were found using '${operator}' in '${content.trim()}'/${JSON.stringify(
-        args
-      )})`
+        args,
+      )})`,
     );
   }
 
@@ -405,7 +405,7 @@ const customDataListLogic = async (
     case CustomListLogicOperator.REMOVE_INDEX:
       if (isNaN(parseFloat(args[1]))) {
         throw Error(
-          `Plugin value incorrect (a number was expected instead of '${content.trim()}')`
+          `Plugin value incorrect (a number was expected instead of '${content.trim()}')`,
         );
       }
       break;
@@ -415,7 +415,7 @@ const customDataListLogic = async (
     await customCommandsBroadcastsDb.requests.customData.existsEntry(
       customCommandsBroadcastsDbPath,
       { id: args[0] },
-      logger
+      logger,
     );
 
   // Get entry
@@ -424,7 +424,7 @@ const customDataListLogic = async (
     entry = await customCommandsBroadcastsDb.requests.customData.getEntry(
       customCommandsBroadcastsDbPath,
       { id: args[0] },
-      logger
+      logger,
     );
   }
 
@@ -432,7 +432,7 @@ const customDataListLogic = async (
     case CustomListLogicOperator.REMOVE_INDEX:
       if (entry === undefined) {
         throw Error(
-          `Can't remove list element from non existent list ('${content.trim()}')`
+          `Can't remove list element from non existent list ('${content.trim()}')`,
         );
       } else if (
         entry.valueType !== CustomDataValueType.NUMBER_LIST &&
@@ -441,29 +441,29 @@ const customDataListLogic = async (
         throw Error(
           `Can't remove list element from non custom data that is not a list ('${content.trim()}'/'${
             entry.value
-          }'/${entry.valueType})`
+          }'/${entry.valueType})`,
         );
       } else if (entry.value.length === 0) {
         throw Error(
-          `Can't remove list element from empty list ('${content.trim()}')`
+          `Can't remove list element from empty list ('${content.trim()}')`,
         );
       } else if (parseInt(args[1]) >= entry.value.length) {
         throw Error(
           `Can't remove list element with index bigger than list length ('${content.trim()}'/${
             entry.value.length
-          })`
+          })`,
         );
       } else {
         const removedElements = entry.value.splice(parseInt(args[1]), 1);
         if (removedElements[0] === undefined) {
           throw Error(
-            `No element was removed from custom data list ('${content.trim()}')`
+            `No element was removed from custom data list ('${content.trim()}')`,
           );
         }
         await customCommandsBroadcastsDb.requests.customData.updateEntry(
           customCommandsBroadcastsDbPath,
           { id: args[0], value: entry.value, valueType: entry.valueType },
-          logger
+          logger,
         );
         return `${removedElements[0]}`;
       }
@@ -483,7 +483,7 @@ const customDataListLogic = async (
                 ? CustomDataValueType.NUMBER_LIST
                 : CustomDataValueType.STRING_LIST,
           },
-          logger
+          logger,
         );
         return args[1];
       } else if (entry.valueType === CustomDataValueType.NUMBER_LIST) {
@@ -491,7 +491,7 @@ const customDataListLogic = async (
         await customCommandsBroadcastsDb.requests.customData.updateEntry(
           customCommandsBroadcastsDbPath,
           { id: args[0], value: entry.value, valueType: entry.valueType },
-          logger
+          logger,
         );
         return args[1];
       } else if (entry.valueType === CustomDataValueType.STRING_LIST) {
@@ -499,20 +499,20 @@ const customDataListLogic = async (
         await customCommandsBroadcastsDb.requests.customData.updateEntry(
           customCommandsBroadcastsDbPath,
           { id: args[0], value: entry.value, valueType: entry.valueType },
-          logger
+          logger,
         );
         return args[1];
       } else {
         throw Error(
           `Can't append list element to custom data that is not a list ('${content.trim()}'/'${
             entry.value
-          }'/${entry.valueType})`
+          }'/${entry.valueType})`,
         );
       }
     case CustomListLogicOperator.GET_INDEX:
       if (entry === undefined) {
         throw Error(
-          `Can't get list element from non existent list ('${content.trim()}')`
+          `Can't get list element from non existent list ('${content.trim()}')`,
         );
       } else if (
         entry.valueType !== CustomDataValueType.NUMBER_LIST &&
@@ -521,15 +521,15 @@ const customDataListLogic = async (
         throw Error(
           `Can't get list element from custom data that is not a list ('${content.trim()}'/'${
             entry.value
-          }'/${entry.valueType})`
+          }'/${entry.valueType})`,
         );
       } else {
         const element = entry.value.at(parseInt(args[1]));
         if (element === undefined) {
           throw Error(
             `Can't get list element from custom data using the provided index ('${content.trim()}'/'${entry.value.join(
-              ","
-            )}'/${entry.valueType})`
+              ",",
+            )}'/${entry.valueType})`,
           );
         }
         return `${element}`;
@@ -587,7 +587,7 @@ export const pluginsCustomCommandDataGenerator: MessageParserPluginGenerator<Plu
           content,
           CustomDataListOptions.SIZE,
           data.databasePath,
-          logger
+          logger,
         ),
       id: pluginCustomDataListSizeId,
       signature: { argument: "id", type: "signature" },
@@ -614,7 +614,7 @@ export const pluginsCustomCommandDataGenerator: MessageParserPluginGenerator<Plu
           content,
           CustomDataListOptions.MAX,
           data.databasePath,
-          logger
+          logger,
         ),
       id: pluginCustomDataListMaxId,
       signature: { argument: "id", type: "signature" },
@@ -627,7 +627,7 @@ export const pluginsCustomCommandDataGenerator: MessageParserPluginGenerator<Plu
           content,
           CustomDataListOptions.MIN,
           data.databasePath,
-          logger
+          logger,
         ),
       id: pluginCustomDataListMinId,
       signature: { argument: "id", type: "signature" },
@@ -640,7 +640,7 @@ export const pluginsCustomCommandDataGenerator: MessageParserPluginGenerator<Plu
           content,
           CustomDataListOptions.AVERAGE,
           data.databasePath,
-          logger
+          logger,
         ),
       id: pluginCustomDataListAverageId,
       signature: { argument: "id", type: "signature" },
@@ -653,7 +653,7 @@ export const pluginsCustomCommandDataGenerator: MessageParserPluginGenerator<Plu
           content,
           CustomDataListOptions.SUM,
           data.databasePath,
-          logger
+          logger,
         ),
       id: pluginCustomDataListSumId,
       signature: { argument: "id", type: "signature" },

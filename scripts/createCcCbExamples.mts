@@ -14,13 +14,13 @@ const configDir = path.join(dirname, "..");
 
 const ccCbExampleFile = path.join(
   configDir,
-  fileNameCustomCommandsBroadcastsExample
+  fileNameCustomCommandsBroadcastsExample,
 );
 
 // -----------------------------------------------------------------------------
 
 console.log(
-  `Create Custom Commands/Broadcasts example file '${ccCbExampleFile}'...`
+  `Create Custom Commands/Broadcasts example file '${ccCbExampleFile}'...`,
 );
 
 try {
@@ -28,7 +28,7 @@ try {
     createJob(
       "Custom Commands/Broadcasts example",
       ccCbExampleFile,
-      createCustomCommandsBroadcastsDocumentation()
+      createCustomCommandsBroadcastsDocumentation(),
     ),
   ]);
 } catch (err) {

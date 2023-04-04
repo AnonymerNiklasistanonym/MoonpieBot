@@ -58,13 +58,13 @@ export const commandScore: ChatMessageHandlerReplyCreator<
     const logCmdBeatmap = createLogFunc(
       logger,
       LOG_ID_CHAT_HANDLER_OSU,
-      OsuCommands.SCORE
+      OsuCommands.SCORE,
     );
 
     const oauthAccessToken =
       await osuApiV2.default.oauth.clientCredentialsGrant(
         data.osuApiV2Credentials.clientId,
-        data.osuApiV2Credentials.clientSecret
+        data.osuApiV2Credentials.clientSecret,
       );
 
     // Get beatmap and if found the current top score and convert them into a
@@ -72,40 +72,46 @@ export const commandScore: ChatMessageHandlerReplyCreator<
     try {
       const user = await osuApiV2.default.search.user(
         oauthAccessToken,
-        data.osuUserName
+        data.osuUserName,
       );
       const userId = user.data[0].id;
       const beatmapScore = await osuApiV2.default.beatmaps.scores.users(
         oauthAccessToken,
         data.beatmapRequestsInfo.lastMentionedBeatmapId,
-        userId
+        userId,
       );
       osuBeatmapRequestMacros.set(
         macroOsuScore.id,
-        new Map(macroOsuScore.generate({ beatmapScore }))
+        new Map(macroOsuScore.generate({ beatmapScore }, logger)),
       );
       // Check for user score
       osuBeatmapRequestMacros.set(
         macroOsuScoreRequest.id,
         new Map(
-          macroOsuScoreRequest.generate({
-            beatmapId: data.beatmapRequestsInfo.lastMentionedBeatmapId,
-            userName:
-              beatmapScore.score.user?.username !== undefined
-                ? beatmapScore.score.user?.username
-                : data.osuUserName,
-          })
-        )
+          macroOsuScoreRequest.generate(
+            {
+              beatmapId: data.beatmapRequestsInfo.lastMentionedBeatmapId,
+              userName:
+                beatmapScore.score.user?.username !== undefined
+                  ? beatmapScore.score.user.username
+                  : data.osuUserName,
+            },
+            logger,
+          ),
+        ),
       );
     } catch (err) {
       osuBeatmapRequestMacros.set(
         macroOsuScoreRequest.id,
         new Map(
-          macroOsuScoreRequest.generate({
-            beatmapId: data.beatmapRequestsInfo.lastMentionedBeatmapId,
-            userName: data.osuUserName,
-          })
-        )
+          macroOsuScoreRequest.generate(
+            {
+              beatmapId: data.beatmapRequestsInfo.lastMentionedBeatmapId,
+              userName: data.osuUserName,
+            },
+            logger,
+          ),
+        ),
       );
       if (
         (err as OsuApiV2WebRequestError).statusCode === NOT_FOUND_STATUS_CODE
@@ -144,7 +150,7 @@ export const commandScore: ChatMessageHandlerReplyCreator<
       throw Error("RegexOsuChatHandlerCommandScore groups undefined");
     }
     const osuUserName = removeWhitespaceEscapeChatCommandGroup(
-      matchGroups.osuUserName
+      matchGroups.osuUserName,
     );
     return { data: { osuUserName } };
   },

@@ -4,13 +4,12 @@
 
 // Type imports
 import type { DeepReadonly, EMPTY_OBJECT } from "../other/types.mjs";
-import type { MacroMap, PluginMap } from "../messageParser.mjs";
+import type { MacroMap, PluginMap, StringMap } from "../messageParser.mjs";
 import type {
   ChatUserstate as TwitchChatState,
   Client as TwitchClient,
 } from "tmi.js";
 import type { Logger } from "winston";
-import type { StringMap } from "../messageParser.mjs";
 
 /**
  * A type for all chat message handler functions.
@@ -38,5 +37,5 @@ export type ChatMessageHandler<DATA extends object = EMPTY_OBJECT> = (
   /** The global macro object to generate text from strings. */
   globalMacros: DeepReadonly<MacroMap>,
   /** The global logger. */
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ) => Promise<void>;

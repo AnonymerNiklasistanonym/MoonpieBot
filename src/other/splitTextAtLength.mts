@@ -15,7 +15,7 @@ const SPLIT_CHARACTER = " ";
  */
 export const splitTextAtLength = (
   textInput: OrReadonlyArray<string>,
-  splitLength: number
+  splitLength: number,
 ): string[] =>
   (typeof textInput === "string"
     ? textInput.split(SPLIT_CHARACTER)
@@ -39,5 +39,5 @@ export const splitTextAtLength = (
       }
       return out;
     },
-    [""]
+    [""],
   );

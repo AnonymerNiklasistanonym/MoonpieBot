@@ -42,7 +42,7 @@ export type PluginFunc = (
   /**
    * Return the plugin signature if available.
    */
-  signature?: boolean
+  signature?: boolean,
 ) => OrPromise<MacroMap | string | boolean | RequestHelp | PluginSignature>;
 export type PluginMap = Map<string, PluginFunc>;
 
@@ -83,7 +83,7 @@ export interface MessageParserPluginGenerator<DATA>
 
 export const generatePlugin = <DATA extends unknown>(
   generator: MessageParserPluginGenerator<DATA>,
-  data: DeepReadonly<DATA>
+  data: DeepReadonly<DATA>,
 ): MessageParserPlugin => ({
   ...generator,
   func: async (logger, value, signature) => {
@@ -97,7 +97,7 @@ export const generatePlugin = <DATA extends unknown>(
 });
 
 export const generatePluginInfo = <DATA extends unknown>(
-  generator: MessageParserPluginGenerator<DATA>
+  generator: MessageParserPluginGenerator<DATA>,
 ): MessageParserPluginInfo => ({
   ...generator,
 });
@@ -107,7 +107,7 @@ export interface MessageParserPluginInfo extends MessageParserPluginBase {
 }
 
 export const generatePluginMap = (
-  plugins: DeepReadonlyArray<MessageParserPlugin>
+  plugins: DeepReadonlyArray<MessageParserPlugin>,
 ): PluginMap => {
   const pluginsMap: PluginMap = new Map();
   for (const plugin of plugins) {
@@ -120,7 +120,7 @@ export const createPluginSignature = async (
   logger: Readonly<Logger>,
   pluginName: string,
   pluginFunc?: PluginFunc,
-  pluginSignatureObject?: DeepReadonly<PluginSignature>
+  pluginSignatureObject?: DeepReadonly<PluginSignature>,
 ): Promise<string> => {
   // Check for plugin signature
   const argumentSignatures: string[] = [];
@@ -136,7 +136,7 @@ export const createPluginSignature = async (
     if (
       typeof pluginSignature === "object" &&
       !(pluginSignature instanceof Map) &&
-      pluginSignature?.type === "signature"
+      pluginSignature.type === "signature"
     ) {
       if (pluginSignature.argument) {
         if (Array.isArray(pluginSignature.argument)) {
@@ -178,7 +178,7 @@ export const createPluginSignature = async (
           argumentSignature && argumentSignature.length > 0
             ? "=" + argumentSignature
             : ""
-        }${scopeSignature ? "|" + scopeSignature : ""})`
+        }${scopeSignature ? "|" + scopeSignature : ""})`,
     )
     .join(",");
 };

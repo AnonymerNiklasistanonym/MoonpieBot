@@ -1,5 +1,5 @@
 // Relative imports
-import { compareVersions, getVersionString } from "../../version.mjs";
+import { compareVersions, getVersionInfo } from "../../version.mjs";
 import {
   moonpieCountIndex,
   moonpieLeaderboardView,
@@ -21,7 +21,7 @@ import type { MigrateDatabaseInformation } from "../generic/setup.mjs";
  */
 export const setup = async (
   databasePath: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<void> =>
   genericSetupDatabase(
     databasePath,
@@ -32,13 +32,11 @@ export const setup = async (
     {
       migrateVersion: async (oldVersion, currentVersion) => {
         const migrations: MigrateDatabaseInformation[] = [];
-        if (
-          compareVersions(oldVersion, { major: 0, minor: 0, patch: 2 }) === -1
-        ) {
+        if (compareVersions(oldVersion, getVersionInfo("0.0.2")) === -1) {
           // Create index that was added in version 0.0.2
           const logMethod = createLogMethod(
             logger,
-            "database_moonpie_migrate_00x_002"
+            "database_moonpie_migrate_00x_002",
           );
           await db.default.requests.post(
             databasePath,
@@ -47,14 +45,14 @@ export const setup = async (
               moonpieCountIndex.tableName,
               moonpieCountIndex.columns,
               true,
-              moonpieCountIndex.where
+              moonpieCountIndex.where,
             ),
             undefined,
-            logMethod
+            logMethod,
           );
           migrations.push({
             name: "moonpie count index",
-            relatedVersion: { major: 0, minor: 0, patch: 2 },
+            relatedVersion: getVersionInfo("0.0.2"),
             type: "added",
           });
         }
@@ -62,12 +60,9 @@ export const setup = async (
           return migrations;
         }
         throw Error(
-          `No database migration was found (old=${getVersionString(
-            oldVersion,
-            ""
-          )},current=${getVersionString(currentVersion, "")})!`
+          `No database migration was found (old=${oldVersion.version},current=${currentVersion.version})!`,
         );
       },
     },
-    logger
+    logger,
   );

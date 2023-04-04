@@ -1,5 +1,5 @@
-// Type imports
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
+// Relative imports
+import { createMessageParserMacroGenerator } from "../../messageParser/macros.mjs";
 
 export interface MacroOsuPpRpRequestData {
   id: number;
@@ -7,23 +7,18 @@ export interface MacroOsuPpRpRequestData {
 export enum MacroOsuPpRpRequest {
   ID = "ID",
 }
-export const macroOsuPpRpRequest: MessageParserMacroGenerator<
-  MacroOsuPpRpRequestData,
-  MacroOsuPpRpRequest
-> = {
-  generate: (data) =>
-    Object.values(MacroOsuPpRpRequest).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroOsuPpRpRequest.ID:
-          macroValue = data.id;
-          break;
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${macroValue}`;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "OSU_PP_RP_REQUEST",
-  keys: Object.values(MacroOsuPpRpRequest),
-};
+export const macroOsuPpRpRequest = createMessageParserMacroGenerator<
+  MacroOsuPpRpRequest,
+  MacroOsuPpRpRequestData
+>(
+  {
+    id: "OSU_PP_RP_REQUEST",
+  },
+  Object.values(MacroOsuPpRpRequest),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroOsuPpRpRequest.ID:
+        return data.id;
+    }
+  },
+);

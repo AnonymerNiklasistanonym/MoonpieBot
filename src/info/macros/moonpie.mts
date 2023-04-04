@@ -1,5 +1,5 @@
-// Type imports
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
+// Relative imports
+import { createMessageParserMacroGenerator } from "../../messageParser/macros.mjs";
 
 export interface MacroMoonpieClaimData {
   cooldownHours: number;
@@ -11,33 +11,27 @@ export enum MacroMoonpieClaim {
   TIME_SINCE_CLAIM_IN_S = "TIME_SINCE_CLAIM_IN_S",
   TIME_TILL_NEXT_CLAIM_IN_S = "TIME_TILL_NEXT_CLAIM_IN_S",
 }
-export const macroMoonpieClaim: MessageParserMacroGenerator<
-  MacroMoonpieClaimData,
-  MacroMoonpieClaim
-> = {
-  description: "Available in strings from successful moonpie claims",
-  generate: (data) =>
-    Object.values(MacroMoonpieClaim).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroMoonpieClaim.COOLDOWN_HOURS:
-          macroValue = data.cooldownHours;
-          break;
-        case MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S:
-          macroValue = data.timeSinceLastClaimInS;
-          break;
-        case MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S:
-          macroValue = data.timeTillNextClaimInS;
-          break;
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${macroValue}`;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "MOONPIE_CLAIM",
-  keys: Object.values(MacroMoonpieClaim),
-};
+
+export const macroMoonpieClaim = createMessageParserMacroGenerator<
+  MacroMoonpieClaim,
+  MacroMoonpieClaimData
+>(
+  {
+    description: "Variables for moonpie claims",
+    id: "MOONPIE_CLAIM",
+  },
+  Object.values(MacroMoonpieClaim),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroMoonpieClaim.COOLDOWN_HOURS:
+        return data.cooldownHours;
+      case MacroMoonpieClaim.TIME_SINCE_CLAIM_IN_S:
+        return data.timeSinceLastClaimInS;
+      case MacroMoonpieClaim.TIME_TILL_NEXT_CLAIM_IN_S:
+        return data.timeTillNextClaimInS;
+    }
+  },
+);
 
 export interface MacroMoonpieLeaderboardEntryData {
   count: number;
@@ -49,34 +43,26 @@ export enum MacroMoonpieLeaderboardEntry {
   NAME = "NAME",
   RANK = "RANK",
 }
-export const macroMoonpieLeaderboardEntry: MessageParserMacroGenerator<
-  MacroMoonpieLeaderboardEntryData,
-  MacroMoonpieLeaderboardEntry
-> = {
-  description:
-    "Available in strings from successful moonpie claims or leaderboard entries",
-  generate: (data) =>
-    Object.values(MacroMoonpieLeaderboardEntry).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroMoonpieLeaderboardEntry.COUNT:
-          macroValue = data.count;
-          break;
-        case MacroMoonpieLeaderboardEntry.NAME:
-          macroValue = data.name;
-          break;
-        case MacroMoonpieLeaderboardEntry.RANK:
-          macroValue = data.rank;
-          break;
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${macroValue}`;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "MOONPIE_LEADERBOARD_ENTRY",
-  keys: Object.values(MacroMoonpieLeaderboardEntry),
-};
+export const macroMoonpieLeaderboardEntry = createMessageParserMacroGenerator<
+  MacroMoonpieLeaderboardEntry,
+  MacroMoonpieLeaderboardEntryData
+>(
+  {
+    description: "Variables for moonpie claims or leaderboard entries",
+    id: "MOONPIE_LEADERBOARD_ENTRY",
+  },
+  Object.values(MacroMoonpieLeaderboardEntry),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroMoonpieLeaderboardEntry.COUNT:
+        return data.count;
+      case MacroMoonpieLeaderboardEntry.NAME:
+        return data.name;
+      case MacroMoonpieLeaderboardEntry.RANK:
+        return data.rank;
+    }
+  },
+);
 
 export interface MacroMoonpieLeaderboardData {
   startingRank?: number;
@@ -84,31 +70,25 @@ export interface MacroMoonpieLeaderboardData {
 export enum MacroMoonpieLeaderboard {
   STARTING_RANK = "STARTING_RANK",
 }
-export const macroMoonpieLeaderboard: MessageParserMacroGenerator<
-  MacroMoonpieLeaderboardData,
-  MacroMoonpieLeaderboard
-> = {
-  description:
-    "Available in strings that are replies to the moonpie leaderboard command",
-  generate: (data) =>
-    Object.values(MacroMoonpieLeaderboard).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroMoonpieLeaderboard.STARTING_RANK:
-          macroValue = data.startingRank;
-          break;
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${macroValue}`;
-      }
-      if (typeof macroValue === "undefined") {
-        macroValue = "undefined";
-      }
-      return [macroId, macroValue];
-    }),
-  id: "MOONPIE_LEADERBOARD",
-  keys: Object.values(MacroMoonpieLeaderboard),
-};
+export const macroMoonpieLeaderboard = createMessageParserMacroGenerator<
+  MacroMoonpieLeaderboard,
+  MacroMoonpieLeaderboardData
+>(
+  {
+    description: "Variables for moonpie leaderboard lists are requested",
+    id: "MOONPIE_LEADERBOARD",
+  },
+  Object.values(MacroMoonpieLeaderboard),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroMoonpieLeaderboard.STARTING_RANK:
+        if (data.startingRank === undefined) {
+          throw Error("moonpie leaderboard starting rank is undefined");
+        }
+        return data.startingRank;
+    }
+  },
+);
 
 export interface MacroMoonpieUserSetData {
   setCount: number;
@@ -118,29 +98,24 @@ export enum MacroMoonpieUserSet {
   SET_COUNT = "SET_COUNT",
   SET_OPERATION = "SET_OPERATION",
 }
-export const macroMoonpieUserSet: MessageParserMacroGenerator<
-  MacroMoonpieUserSetData,
-  MacroMoonpieUserSet
-> = {
-  generate: (data) =>
-    Object.values(MacroMoonpieUserSet).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroMoonpieUserSet.SET_COUNT:
-          macroValue = data.setCount;
-          break;
-        case MacroMoonpieUserSet.SET_OPERATION:
-          macroValue = data.setOperation;
-          break;
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${macroValue}`;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "MOONPIE_USER_SET",
-  keys: Object.values(MacroMoonpieUserSet),
-};
+export const macroMoonpieUserSet = createMessageParserMacroGenerator<
+  MacroMoonpieUserSet,
+  MacroMoonpieUserSetData
+>(
+  {
+    description: "Variables for when moonpies of a user are set",
+    id: "MOONPIE_USER_SET",
+  },
+  Object.values(MacroMoonpieUserSet),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroMoonpieUserSet.SET_COUNT:
+        return data.setCount;
+      case MacroMoonpieUserSet.SET_OPERATION:
+        return data.setOperation;
+    }
+  },
+);
 
 export interface MacroMoonpieUserData {
   name: string;
@@ -148,20 +123,19 @@ export interface MacroMoonpieUserData {
 export enum MacroMoonpieUser {
   NAME = "NAME",
 }
-export const macroMoonpieUser: MessageParserMacroGenerator<
-  MacroMoonpieUserData,
-  MacroMoonpieUser
-> = {
-  generate: (data) =>
-    Object.values(MacroMoonpieUser).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroMoonpieUser.NAME:
-          macroValue = data.name;
-          break;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "MOONPIE_USER",
-  keys: Object.values(MacroMoonpieUser),
-};
+export const macroMoonpieUser = createMessageParserMacroGenerator<
+  MacroMoonpieUser,
+  MacroMoonpieUserData
+>(
+  {
+    description: "Variables for when moonpies of a user are requested",
+    id: "MOONPIE_USER",
+  },
+  Object.values(MacroMoonpieUser),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroMoonpieUser.NAME:
+        return data.name;
+    }
+  },
+);

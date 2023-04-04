@@ -24,7 +24,7 @@ import type { Logger } from "winston";
 export const existsEntry = async (
   databasePath: string,
   twitchId: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_exists");
   try {
@@ -36,7 +36,7 @@ export const existsEntry = async (
         columnName: moonpieTable.columns.twitchId.name,
       }),
       [twitchId],
-      logMethod
+      logMethod,
     );
     if (runResultExists) {
       return runResultExists.exists_value === 1;
@@ -58,7 +58,7 @@ export const existsEntry = async (
 export const existsEntryName = async (
   databasePath: string,
   twitchName: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_exists_name");
   //logger.debug("database: exists");
@@ -72,7 +72,7 @@ export const existsEntryName = async (
         lower: true,
       }),
       [twitchName.toLowerCase()],
-      logMethod
+      logMethod,
     );
     if (runResultExists) {
       return runResultExists.exists_value === 1;
@@ -105,7 +105,7 @@ export interface CreateInput {
 export const createEntry = async (
   databasePath: string,
   input: CreateInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<number> => {
   const logMethod = createLogMethod(logger, "database_create");
   // Special validations for DB entry creation
@@ -123,7 +123,7 @@ export const createEntry = async (
       moonpieTable.columns.date.name,
     ]),
     [input.id, input.name, 0, 0],
-    logMethod
+    logMethod,
   );
   return postResult.lastID;
 };
@@ -143,10 +143,10 @@ export const createEntry = async (
 export const removeEntry = async (
   databasePath: string,
   twitchId: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_remove");
-  if ((await existsEntry(databasePath, twitchId, logger)) === false) {
+  if (!(await existsEntry(databasePath, twitchId, logger))) {
     return true;
   }
 
@@ -156,7 +156,7 @@ export const removeEntry = async (
       columnName: moonpieTable.columns.twitchId.name,
     }),
     [twitchId],
-    logMethod
+    logMethod,
   );
   return postResult.changes > 0;
 };
@@ -173,10 +173,10 @@ export const removeEntry = async (
 export const removeEntryName = async (
   databasePath: string,
   twitchName: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_remove_name");
-  if ((await existsEntryName(databasePath, twitchName, logger)) === false) {
+  if (!(await existsEntryName(databasePath, twitchName, logger))) {
     return true;
   }
 
@@ -186,7 +186,7 @@ export const removeEntryName = async (
       columnName: moonpieTable.columns.twitchName.name,
     }),
     [twitchName],
-    logMethod
+    logMethod,
   );
   return postResult.changes > 0;
 };
@@ -216,12 +216,12 @@ export interface GetMoonpieOut extends GetMoonpieDbOut {}
 export const getEntry = async (
   databasePath: string,
   twitchId: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<GetMoonpieOut> => {
   const logMethod = createLogMethod(logger, "database_get_moonpie");
   // Special validations for DB entry request
   // > Check if entry already exists
-  if ((await existsEntry(databasePath, twitchId, logger)) === false) {
+  if (!(await existsEntry(databasePath, twitchId, logger))) {
     throw Error(MoonpieDbError.NOT_EXISTING);
   }
 
@@ -249,10 +249,10 @@ export const getEntry = async (
       ],
       {
         whereColumns: { columnName: moonpieTable.columns.twitchId.name },
-      }
+      },
     ),
     [twitchId],
-    logMethod
+    logMethod,
   );
   if (runResult) {
     return runResult;
@@ -272,12 +272,12 @@ export const getEntry = async (
 export const getEntryName = async (
   databasePath: string,
   twitchName: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<GetMoonpieOut> => {
   const logMethod = createLogMethod(logger, "database_get_moonpie_name");
   // Special validations for DB entry request
   // > Check if entry already exists
-  if ((await existsEntryName(databasePath, twitchName, logger)) === false) {
+  if (!(await existsEntryName(databasePath, twitchName, logger))) {
     throw Error(MoonpieDbError.NOT_EXISTING);
   }
 
@@ -308,10 +308,10 @@ export const getEntryName = async (
           columnName: moonpieTable.columns.twitchName.name,
           lower: true,
         },
-      }
+      },
     ),
     [twitchName.toLowerCase()],
-    logMethod
+    logMethod,
   );
   if (runResult) {
     return runResult;
@@ -340,12 +340,12 @@ export interface UpdateInput {
 export const updateEntry = async (
   databasePath: string,
   input: UpdateInput,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<boolean> => {
   const logMethod = createLogMethod(logger, "database_update");
   // Special validations for DB entry request
   // > Check if entry already exists
-  if ((await existsEntry(databasePath, input.id, logger)) === false) {
+  if (!(await existsEntry(databasePath, input.id, logger))) {
     throw Error(MoonpieDbError.NOT_EXISTING);
   }
 
@@ -366,7 +366,7 @@ export const updateEntry = async (
       columnName: moonpieTable.columns.twitchId.name,
     }),
     values,
-    logMethod
+    logMethod,
   );
   return postResult.changes > 0;
 };

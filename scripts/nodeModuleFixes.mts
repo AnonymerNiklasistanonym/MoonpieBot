@@ -14,7 +14,7 @@ const filePathTwitchApiCallOptionsDTs = path.join(
   "@twurple",
   "api-call",
   "lib",
-  "TwitchApiCallOptions.d.ts"
+  "TwitchApiCallOptions.d.ts",
 );
 
 const fixNonEsmDependencyTwurple = (fileContent: Readonly<Buffer>): string => {
@@ -22,7 +22,7 @@ const fixNonEsmDependencyTwurple = (fileContent: Readonly<Buffer>): string => {
   const newFileContent = oldFileContent
     .replace(
       "import type { RequestInit as NodeRequestInit } from 'node-fetch';\n",
-      ""
+      "",
     )
     .replace("RequestInit | NodeRequestInit", "RequestInit");
   return newFileContent;
@@ -34,7 +34,7 @@ try {
       "TwitchApiCallOptions.d.ts",
       ["fix non esm dependency"],
       filePathTwitchApiCallOptionsDTs,
-      fixNonEsmDependencyTwurple
+      fixNonEsmDependencyTwurple,
     ),
   ]);
 } catch (err) {

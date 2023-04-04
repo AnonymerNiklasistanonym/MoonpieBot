@@ -35,7 +35,7 @@ describe("messageParser", () => {
         undefined,
         undefined,
         undefined,
-        logger
+        logger,
       );
       expect(output0).to.be.equal("Hello");
     });
@@ -46,7 +46,7 @@ describe("messageParser", () => {
         undefined,
         undefined,
         undefined,
-        logger
+        logger,
       );
       expect(output0).to.be.equal("Hello $(notAPlugin)");
       const message1 = "Hello \\$\\(notAPlugin)";
@@ -55,7 +55,7 @@ describe("messageParser", () => {
         undefined,
         undefined,
         undefined,
-        logger
+        logger,
       );
       expect(output1).to.be.equal("Hello $(notAPlugin)");
       const message2 = "Hello \\$\\\\(notAPlugin)";
@@ -64,7 +64,7 @@ describe("messageParser", () => {
         undefined,
         undefined,
         undefined,
-        logger
+        logger,
       );
       expect(output2).to.be.equal("Hello $\\(notAPlugin)");
       const message3 = "Hello \\%NotAMacro\\%";
@@ -73,7 +73,7 @@ describe("messageParser", () => {
         undefined,
         undefined,
         undefined,
-        logger
+        logger,
       );
       expect(output3).to.be.equal("Hello %NotAMacro%");
     });
@@ -87,7 +87,7 @@ describe("messageParser", () => {
         strings,
         undefined,
         undefined,
-        logger
+        logger,
       );
       expect(output0).to.be.equal("def");
 
@@ -97,7 +97,7 @@ describe("messageParser", () => {
         strings,
         undefined,
         undefined,
-        logger
+        logger,
       );
       expect(output1).to.be.equal("Hey def!");
     });
@@ -134,7 +134,7 @@ describe("messageParser", () => {
         strings,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output0).to.be.equal("Hello WORLD UwU!");
       const message1 = ">$[reference]<";
@@ -143,7 +143,7 @@ describe("messageParser", () => {
         strings,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output1).to.be.equal(">Hello WORLD UwU!<");
     });
@@ -159,7 +159,7 @@ describe("messageParser", () => {
         undefined,
         undefined,
         macros,
-        logger
+        logger,
       );
       expect(output0).to.be.equal("Hello geo");
     });
@@ -172,7 +172,7 @@ describe("messageParser", () => {
         if (value === "geo") {
           return "osu!";
         } else {
-          throw Error;
+          throw Error();
         }
       });
       const message0 = "geo played on stream $(TWITCH_GAME=geo)";
@@ -181,7 +181,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output0).to.be.equal("geo played on stream osu!");
 
@@ -192,7 +192,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         macros,
-        logger
+        logger,
       );
       expect(output1).to.be.equal("geo played on stream osu!");
 
@@ -205,7 +205,7 @@ describe("messageParser", () => {
         undefined,
         plugins2,
         new Map(),
-        logger
+        logger,
       );
       expect(output2).to.be.equal("this command was called 10 times");
     });
@@ -216,7 +216,7 @@ describe("messageParser", () => {
         if (value === "geo") {
           return new Map([["TWITCH_GAME", new Map([["GEO", "osu!"]])]]);
         } else {
-          throw Error;
+          throw Error();
         }
       });
       const message0 =
@@ -226,7 +226,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output0).to.be.equal("geo played on stream osu!");
     });
@@ -239,7 +239,7 @@ describe("messageParser", () => {
         } else if (value === "lune") {
           return new Map([["TWITCH_GAME", new Map([["LUNE", "osu!"]])]]);
         } else {
-          throw Error;
+          throw Error();
         }
       });
       const message0 =
@@ -249,10 +249,10 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output0).to.be.equal(
-        "geo played on stream osu! and lune played osu!"
+        "geo played on stream osu! and lune played osu!",
       );
     });
     it("general plugins", async () => {
@@ -262,11 +262,11 @@ describe("messageParser", () => {
       plugins.set(pluginRandomNumber.id, pluginRandomNumber.func);
       plugins.set(
         pluginTimeInSToStopwatchString.id,
-        pluginTimeInSToStopwatchString.func
+        pluginTimeInSToStopwatchString.func,
       );
       plugins.set(
         pluginTimeInSToHumanReadableString.id,
-        pluginTimeInSToHumanReadableString.func
+        pluginTimeInSToHumanReadableString.func,
       );
       plugins.set(pluginIfEmpty.id, pluginIfEmpty.func);
       plugins.set(pluginIfNotEmpty.id, pluginIfNotEmpty.func);
@@ -277,7 +277,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output0).to.be.equal("HELLO WORLD");
 
@@ -287,7 +287,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output1).to.be.equal("hello world");
 
@@ -297,7 +297,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(parseInt(output2)).to.be.a("number").above(-1).below(101);
       const message3 = "$(RANDOM_NUMBER=10)";
@@ -306,7 +306,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(parseInt(output3)).to.be.a("number").above(-1).below(11);
       const message4 = "$(RANDOM_NUMBER=10<->20)";
@@ -315,7 +315,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(parseInt(output4)).to.be.a("number").above(9).below(21);
       const message5 = "$(RANDOM_NUMBER=-20<->-10)";
@@ -324,7 +324,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(parseInt(output5)).to.be.a("number").above(-21).below(-9);
       const message6 = "$(RANDOM_NUMBER=-20)";
@@ -333,7 +333,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(parseInt(output6)).to.be.a("number").above(-21).below(1);
 
@@ -343,7 +343,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output7).to.be.equal("02:01 min");
       const message8 = "$(TIME_IN_S_TO_STOPWATCH_STRING=6211)";
@@ -352,7 +352,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output8).to.be.equal("01:43:31 h");
 
@@ -362,7 +362,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output9).to.be.equal("");
       const message10 = "$(IF_EMPTY=|hi)";
@@ -371,7 +371,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output10).to.be.equal("hi");
       const message11 = "$(IF_NOT_EMPTY=not empty|hi)";
@@ -380,7 +380,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output11).to.be.equal("hi");
       const message12 = "$(IF_NOT_EMPTY=|hi)";
@@ -389,7 +389,7 @@ describe("messageParser", () => {
         undefined,
         plugins,
         undefined,
-        logger
+        logger,
       );
       expect(output12).to.be.equal("");
     });

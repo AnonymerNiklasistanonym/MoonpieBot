@@ -16,14 +16,14 @@ import type { FileDocumentationParts } from "./fileDocumentationGenerator.mjs";
 import type { GetOsuRequestsConfigOut } from "../database/osuRequestsDb/requests/osuRequestsConfig.mjs";
 
 const osuRequestsSetConfig = (
-  customCommand: Readonly<GetOsuRequestsConfigOut>
+  customCommand: Readonly<GetOsuRequestsConfigOut>,
 ): string =>
   `!osuRequests set ${customCommand.option} ${escapeWhitespaceChatCommandGroup(
-    customCommand.optionValue
+    customCommand.optionValue,
   )}`;
 
 export const createOsuRequestsConfigDocumentation = (
-  osuRequestsConfigList: Readonly<GetOsuRequestsConfigOut[]>
+  osuRequestsConfigList: Readonly<GetOsuRequestsConfigOut[]>,
 ): string => {
   const data: FileDocumentationParts[] = [];
   data.push({
@@ -44,7 +44,7 @@ export const createOsuRequestsConfigDocumentation = (
     description: {
       prefix: ">",
       text: `A single option (${Object.values(OsuRequestsConfig).join(
-        ", "
+        ", ",
       )}) can be set`,
     },
     isComment: false,
@@ -55,7 +55,7 @@ export const createOsuRequestsConfigDocumentation = (
     description: {
       prefix: ">",
       text: `A single option (${Object.values(OsuRequestsConfig).join(
-        ", "
+        ", ",
       )}) can be unset`,
     },
     isComment: false,

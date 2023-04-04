@@ -45,7 +45,7 @@ interface SimpleRegexElementsResult {
 }
 
 const filterEmptyElements = (
-  elements: ReadonlyArray<SimpleRegexElements>
+  elements: readonly SimpleRegexElements[],
 ): SimpleRegexElements[] =>
   elements.filter((a) => {
     if ((a.type === "text" || a.type === "group") && a.content.length === 0) {
@@ -57,7 +57,7 @@ const filterEmptyElements = (
 const convertRegexToHumanReadableStringHelper = (
   regexString: string,
   earlyExit = false,
-  depth = 0
+  depth = 0,
 ): SimpleRegexElementsResult => {
   let i = 0;
   let escapeSymbol = false;
@@ -85,11 +85,11 @@ const convertRegexToHumanReadableStringHelper = (
         // Optional character was found
         const optionalCharacter = currentElement.content.substring(
           currentElement.content.length - 1,
-          currentElement.content.length
+          currentElement.content.length,
         );
         currentElement.content = currentElement.content.slice(
           0,
-          currentElement.content.length - 1
+          currentElement.content.length - 1,
         );
         elements.push(currentElement);
         currentElement = {
@@ -121,7 +121,7 @@ const convertRegexToHumanReadableStringHelper = (
       const contentResult = convertRegexToHumanReadableStringHelper(
         regexString.substring(i),
         true,
-        depth + 1
+        depth + 1,
       );
       currentElement.content.push(...contentResult.elements);
       i += contentResult.i;
@@ -197,7 +197,7 @@ const convertRegexToHumanReadableStringHelper = (
 
 const splitArrayAtElement = <TYPE extends unknown>(
   elements: DeepReadonlyArray<TYPE>,
-  splitAt: (element: DeepReadonly<TYPE>) => boolean
+  splitAt: (element: DeepReadonly<TYPE>) => boolean,
 ): TYPE[][] => {
   const arrays: TYPE[][] = [];
   let currentArray: TYPE[] = [];
@@ -229,7 +229,7 @@ export const convertRegexToString = (regex: DeepReadonly<RegExp>): string =>
   regex.source;
 
 export const convertRegexToHumanString = (
-  regex: DeepReadonly<RegExp>
+  regex: DeepReadonly<RegExp>,
 ): string => {
   const result = convertRegexToHumanReadableStringHelper(regex.source, false);
   return result.elements
@@ -238,7 +238,7 @@ export const convertRegexToHumanString = (
     .trim();
 };
 export const convertRegexToHumanStringDetailed = (
-  regex: DeepReadonly<RegExp>
+  regex: DeepReadonly<RegExp>,
 ): string => {
   const result = convertRegexToHumanReadableStringHelper(regex.source, false);
   return result.elements
@@ -277,7 +277,7 @@ const regexConvertOptionsHuman: Readonly<RegexConvertToStringOptions> = {
 
 const convertToString = (
   element: DeepReadonly<SimpleRegexElements>,
-  options: DeepReadonly<RegexConvertToStringOptions> = {}
+  options: DeepReadonly<RegexConvertToStringOptions> = {},
 ): string => {
   switch (element.type) {
     case "end":
@@ -361,7 +361,7 @@ const convertToString = (
       // eslint-disable-next-line no-case-declarations
       const groupElements = splitArrayAtElement(
         element.content,
-        (a) => a.type === "group_separator"
+        (a) => a.type === "group_separator",
       );
       // eslint-disable-next-line no-case-declarations
       const groupElementsFiltered = groupElements

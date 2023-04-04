@@ -20,9 +20,9 @@ import type {
   MessageParserMacroDocumentation,
   MessageParserPlugin,
   MessageParserPluginInfo,
+  StringMap,
 } from "../messageParser.mjs";
 import type { Logger } from "winston";
-import type { StringMap } from "../messageParser.mjs";
 
 export const createStringsVariableDocumentation = async (
   strings: DeepReadonly<StringMap>,
@@ -31,7 +31,7 @@ export const createStringsVariableDocumentation = async (
   optionalPlugins?: DeepReadonlyArray<MessageParserPluginInfo>,
   optionalMacros?: DeepReadonlyArray<MessageParserMacroDocumentation>,
   logger?: Readonly<Logger>,
-  updatedStringsMap?: DeepReadonly<StringMap>
+  updatedStringsMap?: DeepReadonly<StringMap>,
 ): Promise<string> => {
   const data: FileDocumentationParts[] = [];
   data.push({
@@ -50,7 +50,7 @@ export const createStringsVariableDocumentation = async (
         macros,
         optionalPlugins,
         optionalMacros,
-        logger
+        logger,
       );
     data.push(...pluginsAndMacroDocumentation);
     data.push({ count: 1, type: FileDocumentationPartType.NEWLINE });
@@ -83,7 +83,7 @@ export const createStringsVariableDocumentation = async (
     | FileDocumentationPartText
   )[] = [];
   const sortedDefaultStrings = new Map(
-    [...new Map(defaultStringMap).entries()].sort()
+    [...new Map(defaultStringMap).entries()].sort(),
   );
   for (const [key, stringEntry] of sortedDefaultStrings) {
     if (stringEntry.description !== undefined) {
@@ -97,7 +97,7 @@ export const createStringsVariableDocumentation = async (
       type: FileDocumentationPartType.VALUE,
       value: `${ENV_PREFIX_CUSTOM_STRINGS}${key}=${escapeStringIfWhiteSpace(
         stringEntry.default,
-        { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
+        { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" },
       )}`,
     });
     if (
@@ -140,7 +140,7 @@ export const createStringsVariableDocumentation = async (
         type: FileDocumentationPartType.VALUE,
         value: `${ENV_PREFIX_CUSTOM_STRINGS}${updatedStringId}=${escapeStringIfWhiteSpace(
           updatedStringValue.default,
-          { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
+          { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" },
         )}`,
       });
     }
@@ -162,7 +162,7 @@ export const createStringsVariableDocumentation = async (
         type: FileDocumentationPartType.VALUE,
         value: `${ENV_PREFIX_CUSTOM_STRINGS}${customStringId}=${escapeStringIfWhiteSpace(
           customStringValue.default,
-          { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" }
+          { escapeCharacters: [["'", "\\'"]], surroundCharacter: "'" },
         )}`,
       });
     }

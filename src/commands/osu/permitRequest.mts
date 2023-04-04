@@ -35,7 +35,8 @@ export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
-      TwitchBadgeLevel.MODERATOR
+      TwitchBadgeLevel.MODERATOR,
+      logger,
     );
     if (twitchBadgeLevelCheck !== undefined) {
       return twitchBadgeLevelCheck;
@@ -54,7 +55,7 @@ export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
     data.beatmapRequestsInfo.lastMentionedBeatmapId =
       blockedBeatmapRequest.data.id;
     data.beatmapRequestsInfo.previousBeatmapRequests.unshift(
-      blockedBeatmapRequest
+      blockedBeatmapRequest,
     );
     data.beatmapRequestsInfo.blockedBeatmapRequest = undefined;
 
@@ -63,25 +64,26 @@ export const commandBeatmapPermitRequest: ChatMessageHandlerReplyCreator<
     const osuRequestsConfigEntries =
       await osuRequestsDb.requests.osuRequestsConfig.getEntries(
         data.osuApiDbPath,
-        logger
+        logger,
       );
 
     commandReplies.push(
       ...sendBeatmapRequest(
         osuRequestsConfigEntries.find(
-          (a) => a.option === OsuRequestsConfig.DETAILED
+          (a) => a.option === OsuRequestsConfig.DETAILED,
         )?.optionValue === "true",
         osuRequestsConfigEntries.find(
-          (a) => a.option === OsuRequestsConfig.DETAILED_IRC
+          (a) => a.option === OsuRequestsConfig.DETAILED_IRC,
         )?.optionValue === "true",
         undefined,
         blockedBeatmapRequest.data.id,
         blockedBeatmapRequest.userName,
+        logger,
         blockedBeatmapRequest.comment,
         blockedBeatmapRequest.data,
         data.osuIrcRequestTarget,
-        data.osuIrcBot
-      )
+        data.osuIrcBot,
+      ),
     );
 
     return commandReplies;

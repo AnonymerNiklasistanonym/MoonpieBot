@@ -36,7 +36,7 @@ export const getEntries = async (
   databasePath: string,
   limit: number | undefined,
   offset: number | undefined,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<GetMoonpieLeaderboardOut[]> => {
   const logMethod = createLogMethod(logger, "database_get_moonpie_leaderboard");
   const runResult =
@@ -65,15 +65,12 @@ export const getEntries = async (
           limit,
           limitOffset:
             offset !== undefined ? Math.max(offset - 1, 0) : undefined,
-        }
+        },
       ),
       [],
-      logMethod
+      logMethod,
     );
-  if (runResult) {
-    return runResult;
-  }
-  throw Error(MoonpieDbError.NOT_FOUND);
+  return runResult;
 };
 
 /**
@@ -89,15 +86,15 @@ export const getEntries = async (
 export const getEntry = async (
   databasePath: string,
   twitchId: string,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): Promise<GetMoonpieLeaderboardOut> => {
   const logMethod = createLogMethod(
     logger,
-    "database_get_moonpie_leaderboard_entry"
+    "database_get_moonpie_leaderboard_entry",
   );
   // Special validations for DB entry request
   // > Check if entry already exists
-  if ((await existsEntry(databasePath, twitchId, logger)) === false) {
+  if (!(await existsEntry(databasePath, twitchId, logger))) {
     throw Error(MoonpieDbError.NOT_EXISTING);
   }
 
@@ -127,10 +124,10 @@ export const getEntry = async (
           whereColumns: {
             columnName: moonpieLeaderboardView.columns.twitchId.columnName,
           },
-        }
+        },
       ),
       [twitchId],
-      logMethod
+      logMethod,
     );
   if (runResult) {
     return runResult;

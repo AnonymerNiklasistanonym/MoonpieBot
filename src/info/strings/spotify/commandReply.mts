@@ -1,14 +1,13 @@
 // Relative imports
+import { macroSpotifySong, SpotifySongMacro } from "../../macros/spotify.mjs";
 import {
   pluginIfFalse,
   pluginIfNotEmpty,
   pluginIfTrue,
 } from "../../plugins/general.mjs";
 import { createMessageParserMessage } from "../../../messageParser.mjs";
-import { macroSpotifySong } from "../../macros/spotify.mjs";
 import { PluginTwitchChat } from "../../plugins/twitchChat.mjs";
 import { SPOTIFY_STRING_ID } from "../spotify.mjs";
-import { SpotifySongMacro } from "../../macros/spotify.mjs";
 // Type imports
 import type { StringEntry } from "../../../messageParser.mjs";
 
@@ -75,7 +74,7 @@ const spotifyCommandReplyRefSongCurrent: StringEntry = {
         type: "plugin",
       },
     ],
-    true
+    true,
   ),
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_CURRENT`,
 };
@@ -136,7 +135,7 @@ const spotifyCommandReplyRefSongPrevious: StringEntry = {
         type: "plugin",
       },
     ],
-    true
+    true,
   ),
   id: `${SPOTIFY_COMMAND_REPLY_STRING_ID}_SONG_REF_PREVIOUS`,
 };

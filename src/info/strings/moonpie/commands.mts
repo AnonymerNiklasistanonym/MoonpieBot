@@ -30,10 +30,10 @@ export const moonpieCommandsClaim: StringEntry = {
     [
       createShortCommandDescription(
         MoonpieCommands.CLAIM,
-        getChatCommandsMoonpie
+        getChatCommandsMoonpie,
       ),
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_CLAIM`,
 };
@@ -42,10 +42,10 @@ export const moonpieCommandsLeaderboard: StringEntry = {
     [
       createShortCommandDescription(
         MoonpieCommands.LEADERBOARD,
-        getChatCommandsMoonpie
+        getChatCommandsMoonpie,
       ),
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_LEADERBOARD`,
 };
@@ -54,10 +54,10 @@ export const moonpieCommandsGet: StringEntry = {
     [
       createShortCommandDescription(
         MoonpieCommands.GET,
-        getChatCommandsMoonpie
+        getChatCommandsMoonpie,
       ),
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_GET`,
 };
@@ -66,10 +66,10 @@ export const moonpieCommandsSet: StringEntry = {
     [
       createShortCommandDescription(
         MoonpieCommands.SET,
-        getChatCommandsMoonpie
+        getChatCommandsMoonpie,
       ),
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_SET`,
 };
@@ -78,10 +78,10 @@ export const moonpieCommandsAdd: StringEntry = {
     [
       createShortCommandDescription(
         MoonpieCommands.ADD,
-        getChatCommandsMoonpie
+        getChatCommandsMoonpie,
       ),
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_ADD`,
 };
@@ -90,10 +90,10 @@ export const moonpieCommandsRemove: StringEntry = {
     [
       createShortCommandDescription(
         MoonpieCommands.REMOVE,
-        getChatCommandsMoonpie
+        getChatCommandsMoonpie,
       ),
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_REMOVE`,
 };
@@ -102,10 +102,10 @@ export const moonpieCommandsDelete: StringEntry = {
     [
       createShortCommandDescription(
         MoonpieCommands.DELETE,
-        getChatCommandsMoonpie
+        getChatCommandsMoonpie,
       ),
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_DELETE`,
 };
@@ -114,10 +114,10 @@ export const moonpieCommandsAbout: StringEntry = {
     [
       createShortCommandDescription(
         MoonpieCommands.ABOUT,
-        getChatCommandsMoonpie
+        getChatCommandsMoonpie,
       ),
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_ABOUT`,
 };
@@ -128,7 +128,7 @@ export const moonpieCommandsPrefix: StringEntry = {
       { name: PluginTwitchChat.USER, type: "plugin" },
       " The following Moonpie commands are supported: ",
     ],
-    true
+    true,
   ),
   id: `${MOONPIE_COMMANDS_STRING_ID}_PREFIX`,
 };
@@ -153,16 +153,16 @@ export const moonpieCommandsString: StringEntry = {
               (a): MessageForParserMessagePlugin => ({
                 args: generateMessageParserMessageMacro(
                   macroCommandEnabled,
-                  a.id
+                  a.id,
                 ),
                 name: pluginIfTrue.id,
                 scope: generateMessageParserMessageReference(a),
                 type: "plugin",
-              })
+              }),
             )
             .reduce<(MessageForParserMessagePlugin | string)[]>(
               (prev, curr) => prev.concat([curr, ";"]),
-              []
+              [],
             ),
           name: pluginListFilterUndefined.id,
           scope: generateMessageParserMessageReference(generalCommandsNone),

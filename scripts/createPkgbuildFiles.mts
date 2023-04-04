@@ -10,11 +10,15 @@ import {
   referencePCV,
   referencePV,
 } from "./lib/pkgbuild.mjs";
-import { description, name, sourceCodeUrl } from "../src/info/general.mjs";
+import {
+  description,
+  displayName,
+  license,
+  version,
+  websiteUrl,
+} from "../src/info/general.mjs";
 import { convertUndefValueToArray } from "../src/other/arrayOperations.mjs";
 import { createJob } from "../src/createJob.mjs";
-import { getVersionString } from "../src/version.mjs";
-import { version } from "../src/info/version.mjs";
 // Type imports
 import type { PkgbuildCustomVariable, PkgbuildInfo } from "./lib/pkgbuild.mjs";
 import type { DeepReadonly } from "../src/other/types.mjs";
@@ -22,7 +26,7 @@ import type { DeepReadonly } from "../src/other/types.mjs";
 const defaultPCVApplicationName: DeepReadonly<PkgbuildCustomVariable> = {
   name: "applicationname",
   note: "The name of the application that is built by this package",
-  value: name.toLowerCase(),
+  value: displayName.toLowerCase(),
 };
 const defaultPCVGitName: DeepReadonly<PkgbuildCustomVariable> = {
   name: "gitname",
@@ -56,7 +60,7 @@ const defaultPCVConfigDir: DeepReadonly<PkgbuildCustomVariable> = {
 };
 
 const packageCmdsGenerator = (
-  packageType: "source" | "bin" = "source"
+  packageType: "source" | "bin" = "source",
 ): PkgbuildCmdsSection[] => {
   const packageCmds: PkgbuildCmdsSection[] = [];
   packageCmds.push({
@@ -68,16 +72,16 @@ const packageCmdsGenerator = (
       packageCmds.push({
         cmds: [
           `install -Dd "${referencePV("pkgdir")}${referencePCV(
-            defaultPCVInstallDir
+            defaultPCVInstallDir,
           )}"`,
           `find node_modules -not -path "*/__pycache__/*" -exec install -D {} "${referencePV(
-            "pkgdir"
+            "pkgdir",
           )}${referencePCV(defaultPCVInstallDir)}/"{} \\;`,
           `find dist -exec install -D {} "${referencePV(
-            "pkgdir"
+            "pkgdir",
           )}${referencePCV(defaultPCVInstallDir)}/"{} \\;`,
           `install -D package.json "${referencePV("pkgdir")}${referencePCV(
-            defaultPCVInstallDir
+            defaultPCVInstallDir,
           )}"`,
         ],
         note: "Create a directory in /opt and copy the files necessary for the runtime there",
@@ -87,12 +91,12 @@ const packageCmdsGenerator = (
       packageCmds.push({
         cmds: [
           `install -Dd "${referencePV("pkgdir")}${referencePCV(
-            defaultPCVInstallDir
+            defaultPCVInstallDir,
           )}"`,
           `install -Dm 755 "${referencePCV(
-            defaultPCVApplicationName
+            defaultPCVApplicationName,
           )}.bin" "${referencePV("pkgdir")}${referencePCV(
-            defaultPCVInstallDir
+            defaultPCVInstallDir,
           )}"`,
         ],
         note: "Create a directory in /opt and copy the binary file there",
@@ -102,7 +106,7 @@ const packageCmdsGenerator = (
   packageCmds.push({
     cmds: [
       `install -Dm 644 "${referencePV("srcdir")}/${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}.svg" "${referencePV("pkgdir")}${referencePCV(defaultPCVInstallDir)}"`,
     ],
     note: "Install the application icon",
@@ -114,7 +118,7 @@ const packageCmdsGenerator = (
         (packageType === "source"
           ? `node "${referencePCV(defaultPCVInstallDir)}"`
           : `"${referencePCV(defaultPCVInstallDir)}/${referencePCV(
-              defaultPCVApplicationName
+              defaultPCVApplicationName,
             )}.bin"`) +
           ` --config-dir "${referencePCV(defaultPCVConfigDir)}" \\$@`,
       ]
@@ -123,10 +127,10 @@ const packageCmdsGenerator = (
         // eslint-disable-next-line @typescript-eslint/quotes
         .replace(/"/g, '\\"')}" > "${referencePCV(defaultPCVApplicationName)}"`,
       `install -Dd "${referencePV("pkgdir")}${referencePCV(
-        defaultPCVInstallDirBin
+        defaultPCVInstallDirBin,
       )}"`,
       `install -Dm 755 "${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}" "${referencePV("pkgdir")}${referencePCV(defaultPCVInstallDirBin)}"`,
     ],
     note: "Create and install a global script to start the application",
@@ -140,27 +144,27 @@ const packageCmdsGenerator = (
         "Type=Application",
         "Terminal=true",
         `Exec=${referencePCV(
-          defaultPCVApplicationName
+          defaultPCVApplicationName,
         )}; read -n1 -p "Press any key to exit."`,
         `Name=${referencePCV(defaultPCVApplicationName)}`,
         `Comment=${referencePV("pkgdesc")}`,
         `Icon=${referencePCV(defaultPCVInstallDir)}/${referencePCV(
-          defaultPCVApplicationName
+          defaultPCVApplicationName,
         )}.svg`,
       ]
         .map((a) => `\\\n${a}\\n`)
         .join("")
         // eslint-disable-next-line @typescript-eslint/quotes
         .replace(/"/g, '\\"')}" > "${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}.desktop"`,
       `install -Dd "${referencePV("pkgdir")}${referencePCV(
-        defaultPCVInstallDirDesktop
+        defaultPCVInstallDirDesktop,
       )}"`,
       `install -Dm 644 "${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}.desktop" "${referencePV("pkgdir")}${referencePCV(
-        defaultPCVInstallDirDesktop
+        defaultPCVInstallDirDesktop,
       )}"`,
     ],
     note: "Create and install .desktop entry",
@@ -168,9 +172,9 @@ const packageCmdsGenerator = (
   packageCmds.push({
     cmds: [
       `install -Dm 644 "${referencePV("srcdir")}/${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}.1" "${referencePV("pkgdir")}${referencePCV(
-        defaultPCVInstallDirMan
+        defaultPCVInstallDirMan,
       )}/${referencePCV(defaultPCVApplicationName)}.1"`,
     ],
     note: "Install manpage",
@@ -206,7 +210,7 @@ const pkgbuildInfo: DeepReadonly<PkgbuildInfo> = {
     {
       cmds: [
         `pandoc "installer/man.md" -s -t man -o "${referencePV(
-          "srcdir"
+          "srcdir",
         )}/${referencePCV(defaultPCVApplicationName)}.1"`,
       ],
       note: "Create manpage",
@@ -214,9 +218,9 @@ const pkgbuildInfo: DeepReadonly<PkgbuildInfo> = {
     {
       cmds: [
         `cp "res/icons/${referencePCV(
-          defaultPCVApplicationName
+          defaultPCVApplicationName,
         )}.svg" "${referencePV("srcdir")}/${referencePCV(
-          defaultPCVApplicationName
+          defaultPCVApplicationName,
         )}.svg"`,
       ],
       note: "Create application icon",
@@ -239,7 +243,7 @@ const pkgbuildInfo: DeepReadonly<PkgbuildInfo> = {
   ],
   depends: "nodejs",
   dependsNote: "Node.js runtime is required",
-  license: "MIT",
+  license,
   maintainer: {
     email: "niklas.mikeler@gmail.com",
     name: "AnonymerNiklasistanonym",
@@ -253,20 +257,20 @@ const pkgbuildInfo: DeepReadonly<PkgbuildInfo> = {
   packageCmdsNote: "Define where files should be installed",
   pkgdesc: description,
   pkgname: referencePCV(defaultPCVApplicationName),
-  pkgver: getVersionString(version, ""),
+  pkgver: version,
   provides: referencePV("pkgname"),
   source: [
     {
       name: `${referencePCV(defaultPCVGitName)}::git+${referencePV(
-        "url"
+        "url",
       )}#tag=v${referencePV("pkgver")}`,
     },
   ],
-  url: sourceCodeUrl,
+  url: websiteUrl,
 };
 
 const pkgbuildBinInfoDownloadUrl = `${referencePV(
-  "url"
+  "url",
 )}/releases/download/v${referencePV("pkgver")}/`;
 
 const pkgbuildBinInfo: DeepReadonly<PkgbuildInfo> = {
@@ -274,7 +278,7 @@ const pkgbuildBinInfo: DeepReadonly<PkgbuildInfo> = {
   buildCmds: undefined,
   buildCmdsNote: undefined,
   customVariables: convertUndefValueToArray(
-    pkgbuildInfo.customVariables
+    pkgbuildInfo.customVariables,
   ).filter((a) => a.name !== defaultPCVGitName.name),
   depends: undefined,
   dependsNote: undefined,
@@ -288,23 +292,23 @@ const pkgbuildBinInfo: DeepReadonly<PkgbuildInfo> = {
   source: [
     {
       name: `${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}.bin::${pkgbuildBinInfoDownloadUrl}${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}-v${referencePV("pkgver")}-linux64-node-18`,
     },
     {
       name: `${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}.1::${pkgbuildBinInfoDownloadUrl}${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}-v${referencePV("pkgver")}-man.1`,
     },
     {
       name: `${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}.svg::${pkgbuildBinInfoDownloadUrl}${referencePCV(
-        defaultPCVApplicationName
+        defaultPCVApplicationName,
       )}.svg`,
     },
   ],
@@ -331,7 +335,7 @@ const pkgbuildGitInfo: DeepReadonly<PkgbuildInfo> = {
   source: [
     {
       name: `${referencePCV(defaultPCVGitName)}::git+${referencePV(
-        "url"
+        "url",
       )}#branch=main`,
     },
   ],
@@ -345,12 +349,12 @@ const filePathOutputPkgbuild = path.join(INSTALLER_DIR, fileNamePkgbuild);
 /** The output file path of the PKGBUILD for the binary files to create. */
 const filePathOutputPkgbuildBin = path.join(
   INSTALLER_DIR,
-  `${fileNamePkgbuild}_BIN`
+  `${fileNamePkgbuild}_BIN`,
 );
 /** The output file path of the PKGBUILD for the latest git commit to create. */
 const filePathOutputPkgbuildGit = path.join(
   INSTALLER_DIR,
-  `${fileNamePkgbuild}_GIT`
+  `${fileNamePkgbuild}_GIT`,
 );
 
 // -----------------------------------------------------------------------------
@@ -361,12 +365,12 @@ try {
     createJob(
       "PKGBUILD_BIN",
       filePathOutputPkgbuildBin,
-      createPkgbuild(pkgbuildBinInfo)
+      createPkgbuild(pkgbuildBinInfo),
     ),
     createJob(
       "PKGBUILD_GIT",
       filePathOutputPkgbuildGit,
-      createPkgbuild(pkgbuildGitInfo)
+      createPkgbuild(pkgbuildGitInfo),
     ),
   ]);
 } catch (err) {

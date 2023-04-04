@@ -15,10 +15,9 @@ import {
 import { messageParserById } from "../messageParser.mjs";
 // Type imports
 import type { Client, ChatUserstate as TwitchChatUserState } from "tmi.js";
-import type { MacroMap, PluginMap } from "../messageParser.mjs";
+import type { MacroMap, PluginMap, StringMap } from "../messageParser.mjs";
 import type { EMPTY_OBJECT } from "../other/types.mjs";
 import type { Logger } from "winston";
-import type { StringMap } from "../messageParser.mjs";
 
 /**
  * Information about the current chat message and user.
@@ -47,7 +46,7 @@ export type ChatMessageHandlerCreateReply<DATA = EMPTY_OBJECT> = (
   /** The additional data necessary for execution. */
   data: DATA,
   /** The global logger. */
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ) =>
   | Promise<ChatMessageHandlerReply | ChatMessageHandlerReply[]>
   | ChatMessageHandlerReply
@@ -64,7 +63,7 @@ export interface ChatMessageHandlerReply {
   /** A custom send function. */
   customSendFunc?: (
     message: string,
-    logger: Readonly<Logger>
+    logger: Readonly<Logger>,
   ) => Promise<string[]> | string[];
   /** This message should throw an error. */
   isError?: boolean;
@@ -75,7 +74,7 @@ export interface ChatMessageHandlerReply {
         globalStrings: Readonly<StringMap>,
         globalPlugins: Readonly<PluginMap>,
         globalMacros: Readonly<MacroMap>,
-        logger: Readonly<Logger>
+        logger: Readonly<Logger>,
       ) => Promise<string>);
 }
 
@@ -86,7 +85,7 @@ export interface ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledComman
   /**
    * The enabled commands for the current Twitch chat handler.
    */
-  enabledCommands: ReadonlyArray<string>;
+  enabledCommands: readonly string[];
 }
 
 /**
@@ -101,11 +100,11 @@ export interface ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledComman
  */
 export type ChatMessageHandlerDetect<
   INPUT_DATA extends object = EMPTY_OBJECT,
-  OUTPUT_DATA extends object = EMPTY_OBJECT
+  OUTPUT_DATA extends object = EMPTY_OBJECT,
 > = (
   tags: Readonly<TwitchChatUserState>,
   message: string,
-  data: Readonly<INPUT_DATA>
+  data: Readonly<INPUT_DATA>,
 ) => false | ChatMessageHandlerReplyCreatorDetectorDataOutput<OUTPUT_DATA>;
 
 /**
@@ -115,7 +114,7 @@ export type ChatMessageHandlerDetect<
  * successfully detects a command (like regular expression group matches).
  */
 export interface ChatMessageHandlerReplyCreatorDetectorDataOutput<
-  DETECTED_DATA extends object = EMPTY_OBJECT
+  DETECTED_DATA extends object = EMPTY_OBJECT,
 > {
   /**
    * The information found by the detector that should be forwarded to the
@@ -138,7 +137,7 @@ export interface ChatMessageHandlerReplyCreatorDetectorDataOutput<
 export interface ChatMessageHandlerReplyCreator<
   CREATE_REPLY_INPUT_DATA extends object = EMPTY_OBJECT,
   DETECTOR_INPUT_DATA extends object = EMPTY_OBJECT,
-  DETECTOR_OUTPUT_DATA extends object = EMPTY_OBJECT
+  DETECTOR_OUTPUT_DATA extends object = EMPTY_OBJECT,
 > {
   /**
    * The method that handles the detected command with additional and forwarded
@@ -187,7 +186,7 @@ export const runChatMessageHandlerReplyCreator = async <
   DATA extends CREATE_REPLY_INPUT_DATA & DETECTOR_INPUT_DATA,
   CREATE_REPLY_INPUT_DATA extends object = EMPTY_OBJECT,
   DETECTOR_INPUT_DATA extends object = EMPTY_OBJECT,
-  DETECTOR_OUTPUT_DATA extends object = EMPTY_OBJECT
+  DETECTOR_OUTPUT_DATA extends object = EMPTY_OBJECT,
 >(
   client: Readonly<Client>,
   channel: string,
@@ -202,7 +201,7 @@ export const runChatMessageHandlerReplyCreator = async <
     CREATE_REPLY_INPUT_DATA,
     DETECTOR_INPUT_DATA,
     DETECTOR_OUTPUT_DATA
-  >
+  >,
 ): Promise<boolean> => {
   const detectedCommand = chatMessageHandler.detect(tags, message, data);
   if (detectedCommand !== false) {
@@ -219,13 +218,13 @@ export const runChatMessageHandlerReplyCreator = async <
       logger,
       tags.id,
       [tags.username, message],
-      chatMessageHandler.info
+      chatMessageHandler.info,
     );
     const replyOrReplies = await chatMessageHandler.createReply(
       channel,
       tags as ChatMessageHandlerReplyCreatorChatUserState,
       { ...data, ...detectedCommand.data },
-      logger
+      logger,
     );
     const replies = Array.isArray(replyOrReplies)
       ? replyOrReplies
@@ -244,13 +243,13 @@ export const runChatMessageHandlerReplyCreator = async <
               globalStrings,
               replyPlugins,
               replyMacros,
-              logger
+              logger,
             )
           : await reply.messageId(
               globalStrings,
               replyPlugins,
               replyMacros,
-              logger
+              logger,
             );
       if (reply.isError) {
         throw Error(messageToSend);
@@ -262,7 +261,7 @@ export const runChatMessageHandlerReplyCreator = async <
         logger,
         chatMessageHandler.info,
         sentMessage,
-        tags.id
+        tags.id,
       );
     }
     return true;

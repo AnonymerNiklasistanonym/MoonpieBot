@@ -1,11 +1,11 @@
 // Relative imports
+import { createMessageParserMacroGenerator } from "../../messageParser/macros.mjs";
 import { roundNumber } from "../../other/round.mjs";
 // Type imports
 import type {
   StreamCompanionFileData,
   StreamCompanionWebSocketData,
 } from "../../osuStreamCompanion.mjs";
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
 
 export interface MacroOsuStreamCompanionCurrentMapWebSocketData {
   currentMap: StreamCompanionWebSocketData;
@@ -35,123 +35,90 @@ export enum MacroOsuStreamCompanionCurrentMapWebSocket {
   TITLE_ROMAN = "TITLE_ROMAN",
   TITLE_UNICODE = "TITLE_UNICODE",
 }
-export const macroOsuStreamCompanionCurrentMapWebSocket: MessageParserMacroGenerator<
-  MacroOsuStreamCompanionCurrentMapWebSocketData,
-  MacroOsuStreamCompanionCurrentMapWebSocket
-> = {
-  exampleData: {
-    currentMap: {
-      artistRoman: "UNDEAD CORPORATION",
-      artistUnicode: "UNDEAD CORPORATION",
-      creator: "mom",
-      diffName: "Easy",
-      mAR: 4.5,
-      mBpm: "193-215 (200)",
-      mCS: 2.5,
-      mHP: 3,
-      mOD: 3,
-      mStars: 2.068,
-      mapid: 2151824,
-      mapsetid: 1019827,
-      maxCombo: 773,
-      mods: "None",
-      titleRoman: "Sad Dream",
-      titleUnicode: "UNDEAD CORPORATION",
-      type: "websocket",
+export const macroOsuStreamCompanionCurrentMapWebSocket =
+  createMessageParserMacroGenerator<
+    MacroOsuStreamCompanionCurrentMapWebSocket,
+    MacroOsuStreamCompanionCurrentMapWebSocketData
+  >(
+    {
+      id: "OSU_STREAMCOMPANION_CURRENT_MAP_WEB_SOCKET",
     },
-  },
-  generate: (data) =>
-    Object.values(MacroOsuStreamCompanionCurrentMapWebSocket).map((macroId) => {
-      //console.log(data);
-      let macroValue;
+    Object.values(MacroOsuStreamCompanionCurrentMapWebSocket),
+    (macroId, data) => {
       switch (macroId) {
         case MacroOsuStreamCompanionCurrentMapWebSocket.ARTIST_ROMAN:
-          macroValue = data.currentMap.artistRoman;
-          break;
+          return data.currentMap.artistRoman;
         case MacroOsuStreamCompanionCurrentMapWebSocket.ARTIST_UNICODE:
-          macroValue = data.currentMap.artistUnicode;
-          break;
+          return data.currentMap.artistUnicode;
         case MacroOsuStreamCompanionCurrentMapWebSocket.TITLE_ROMAN:
-          macroValue = data.currentMap.titleRoman;
-          break;
+          return data.currentMap.titleRoman;
         case MacroOsuStreamCompanionCurrentMapWebSocket.TITLE_UNICODE:
-          macroValue = data.currentMap.titleUnicode;
-          break;
+          return data.currentMap.titleUnicode;
         case MacroOsuStreamCompanionCurrentMapWebSocket.DIFF_NAME:
-          macroValue = data.currentMap.diffName;
-          break;
+          return data.currentMap.diffName;
         case MacroOsuStreamCompanionCurrentMapWebSocket.CREATOR:
-          macroValue = data.currentMap.creator;
-          break;
+          return data.currentMap.creator;
         case MacroOsuStreamCompanionCurrentMapWebSocket.ID:
-          macroValue = data.currentMap.mapid;
-          break;
+          return data.currentMap.mapid;
         case MacroOsuStreamCompanionCurrentMapWebSocket.SET_ID:
-          macroValue = data.currentMap.mapsetid;
-          break;
+          return data.currentMap.mapsetid;
         case MacroOsuStreamCompanionCurrentMapWebSocket.CS:
-          macroValue = data.currentMap.mCS;
-          break;
+          return data.currentMap.mCS;
         case MacroOsuStreamCompanionCurrentMapWebSocket.AR:
-          macroValue = data.currentMap.mAR;
-          break;
+          return data.currentMap.mAR;
         case MacroOsuStreamCompanionCurrentMapWebSocket.OD:
-          macroValue = data.currentMap.mOD;
-          break;
+          return data.currentMap.mOD;
         case MacroOsuStreamCompanionCurrentMapWebSocket.HP:
-          macroValue = data.currentMap.mHP;
-          break;
+          return data.currentMap.mHP;
         case MacroOsuStreamCompanionCurrentMapWebSocket.BPM:
-          macroValue = data.currentMap.mBpm;
-          break;
+          return data.currentMap.mBpm;
         case MacroOsuStreamCompanionCurrentMapWebSocket.DIFFICULTY_RATING:
-          macroValue = data.currentMap.mStars;
-          break;
+          return data.currentMap.mStars;
         case MacroOsuStreamCompanionCurrentMapWebSocket.MAX_COMBO:
-          macroValue = data.currentMap.maxCombo;
-          break;
+          return data.currentMap.maxCombo;
         case MacroOsuStreamCompanionCurrentMapWebSocket.MODS:
-          macroValue = data.currentMap.mods;
-          break;
+          return data.currentMap.mods;
         case MacroOsuStreamCompanionCurrentMapWebSocket.OSU_IS_RUNNING:
-          macroValue = data.currentMap.osuIsRunning;
-          break;
+          return data.currentMap.osuIsRunning;
         case MacroOsuStreamCompanionCurrentMapWebSocket.OSU_PP_95:
-          macroValue = data.currentMap.osu_m95PP;
-          break;
+          return data.currentMap.osu_m95PP ?? undefined;
         case MacroOsuStreamCompanionCurrentMapWebSocket.OSU_PP_96:
-          macroValue = data.currentMap.osu_m96PP;
-          break;
+          return data.currentMap.osu_m96PP ?? undefined;
         case MacroOsuStreamCompanionCurrentMapWebSocket.OSU_PP_97:
-          macroValue = data.currentMap.osu_m97PP;
-          break;
+          return data.currentMap.osu_m97PP ?? undefined;
         case MacroOsuStreamCompanionCurrentMapWebSocket.OSU_PP_98:
-          macroValue = data.currentMap.osu_m98PP;
-          break;
+          return data.currentMap.osu_m98PP ?? undefined;
         case MacroOsuStreamCompanionCurrentMapWebSocket.OSU_PP_99:
-          macroValue = data.currentMap.osu_m99PP;
-          break;
+          return data.currentMap.osu_m99PP ?? undefined;
         case MacroOsuStreamCompanionCurrentMapWebSocket.OSU_PP_SS:
-          macroValue = data.currentMap.osu_mSSPP;
-          break;
+          return data.currentMap.osu_mSSPP ?? undefined;
       }
-      if (macroValue === null) {
-        macroValue = "null";
-      }
-      if (macroValue === undefined) {
-        macroValue = "undefined";
-      }
-      if (typeof macroValue === "boolean") {
-        macroValue = macroValue ? "true" : "false";
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${roundNumber(macroValue, 2)}`;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "OSU_STREAMCOMPANION_CURRENT_MAP_WEB_SOCKET",
-  keys: Object.values(MacroOsuStreamCompanionCurrentMapWebSocket),
-};
+    },
+    {
+      currentMap: {
+        artistRoman: "UNDEAD CORPORATION",
+        artistUnicode: "UNDEAD CORPORATION",
+        creator: "mom",
+        diffName: "Easy",
+        mAR: 4.5,
+        mBpm: "193-215 (200)",
+        mCS: 2.5,
+        mHP: 3,
+        mOD: 3,
+        mStars: 2.068,
+        mapid: 2151824,
+        mapsetid: 1019827,
+        maxCombo: 773,
+        mods: "None",
+        titleRoman: "Sad Dream",
+        titleUnicode: "UNDEAD CORPORATION",
+        type: "websocket",
+      },
+    },
+    {
+      convertNumber: (num) => `${roundNumber(num, 2)}`,
+    },
+  );
 
 export interface MacroOsuStreamCompanionCurrentMapFileData {
   currentMap: StreamCompanionFileData;
@@ -163,46 +130,37 @@ export enum MacroOsuStreamCompanionCurrentMapFile {
   NP_PLAYING_DETAILS = "NP_PLAYING_DETAILS",
   NP_PLAYING_DL = "NP_PLAYING_DL",
 }
-export const macroOsuStreamCompanionCurrentMapFile: MessageParserMacroGenerator<
-  MacroOsuStreamCompanionCurrentMapFileData,
-  MacroOsuStreamCompanionCurrentMapFile
-> = {
-  exampleData: {
-    currentMap: {
-      currentMods: "None",
-      custom: "",
-      npAll: "UNDEAD CORPORATION - Sad Dream [Easy] CS:2,5 AR:4,5 OD:3 HP:3",
-      npPlayingDetails: "",
-      npPlayingDl: "http://osu.ppy.sh/b/2151824",
-      type: "file",
+export const macroOsuStreamCompanionCurrentMapFile =
+  createMessageParserMacroGenerator<
+    MacroOsuStreamCompanionCurrentMapFile,
+    MacroOsuStreamCompanionCurrentMapFileData
+  >(
+    {
+      id: "OSU_STREAMCOMPANION_CURRENT_MAP_FILE",
     },
-  },
-  generate: (data) =>
-    Object.values(MacroOsuStreamCompanionCurrentMapFile).map((macroId) => {
-      //console.log(data);
-      let macroValue;
+    Object.values(MacroOsuStreamCompanionCurrentMapFile),
+    (macroId, data) => {
       switch (macroId) {
         case MacroOsuStreamCompanionCurrentMapFile.NP_ALL:
-          macroValue = data.currentMap.npAll;
-          break;
+          return data.currentMap.npAll;
         case MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DETAILS:
-          macroValue = data.currentMap.npPlayingDetails;
-          break;
+          return data.currentMap.npPlayingDetails;
         case MacroOsuStreamCompanionCurrentMapFile.NP_PLAYING_DL:
-          macroValue = data.currentMap.npPlayingDl;
-          break;
+          return data.currentMap.npPlayingDl;
         case MacroOsuStreamCompanionCurrentMapFile.CURRENT_MODS:
-          macroValue = data.currentMap.currentMods;
-          break;
+          return data.currentMap.currentMods;
         case MacroOsuStreamCompanionCurrentMapFile.CUSTOM:
-          macroValue = data.currentMap.custom;
-          break;
+          return data.currentMap.custom;
       }
-      if (typeof macroValue === "undefined") {
-        macroValue = "undefined";
-      }
-      return [macroId, macroValue];
-    }),
-  id: "OSU_STREAMCOMPANION_CURRENT_MAP_FILE",
-  keys: Object.values(MacroOsuStreamCompanionCurrentMapFile),
-};
+    },
+    {
+      currentMap: {
+        currentMods: "None",
+        custom: "",
+        npAll: "UNDEAD CORPORATION - Sad Dream [Easy] CS:2,5 AR:4,5 OD:3 HP:3",
+        npPlayingDetails: "",
+        npPlayingDl: "http://osu.ppy.sh/b/2151824",
+        type: "file",
+      },
+    },
+  );

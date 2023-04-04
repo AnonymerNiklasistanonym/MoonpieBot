@@ -20,7 +20,7 @@ describe("logging", () => {
       "b",
       loggerDirPath2,
       LoggerLevel.WARN,
-      LoggerLevel.WARN
+      LoggerLevel.WARN,
     );
     expect(logger2).to.not.be.undefined;
     logger2.info("Info");
@@ -30,7 +30,7 @@ describe("logging", () => {
       "c",
       loggerDirPath3,
       LoggerLevel.WARN,
-      LoggerLevel.WARN
+      LoggerLevel.WARN,
     );
     expect(logger3).to.not.be.undefined;
     logger3.info("Info");
@@ -40,7 +40,7 @@ describe("logging", () => {
       "d",
       loggerDirPath4,
       LoggerLevel.WARN,
-      LoggerLevel.WARN
+      LoggerLevel.WARN,
     );
     expect(logger4).to.not.be.undefined;
     logger4.log({

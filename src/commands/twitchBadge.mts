@@ -8,11 +8,13 @@ import { generalUserPermissionError } from "../info/strings/general.mjs";
 import { macroPermissionError } from "../info/macros/general.mjs";
 // Type imports
 import type { ChatMessageHandlerReply } from "../chatMessageHandler.mjs";
+import type { Logger } from "winston";
 import type { ChatUserstate as TwitchChatUserState } from "tmi.js";
 
 export const checkTwitchBadgeLevel = (
   tags: Readonly<TwitchChatUserState>,
-  expectedBadgeLevel: TwitchBadgeLevel
+  expectedBadgeLevel: TwitchBadgeLevel,
+  logger: Readonly<Logger>,
 ): ChatMessageHandlerReply | undefined => {
   const twitchBadgeLevel = parseTwitchBadgeLevel(tags);
   if (twitchBadgeLevel < expectedBadgeLevel) {
@@ -21,10 +23,13 @@ export const checkTwitchBadgeLevel = (
         [
           macroPermissionError.id,
           new Map(
-            macroPermissionError.generate({
-              expected: expectedBadgeLevel,
-              found: twitchBadgeLevel,
-            })
+            macroPermissionError.generate(
+              {
+                expected: expectedBadgeLevel,
+                found: twitchBadgeLevel,
+              },
+              logger,
+            ),
           ),
         ],
       ]),

@@ -21,22 +21,22 @@ export enum TwitchBadgeLevel {
  * @returns Highest twitch badge level.
  */
 export const parseTwitchBadgeLevel = (
-  tags: DeepReadonly<ChatUserstate>
+  tags: DeepReadonly<ChatUserstate>,
 ): TwitchBadgeLevel => {
-  if (tags?.badges?.broadcaster === "1") {
+  if (tags.badges?.broadcaster === "1") {
     return TwitchBadgeLevel.BROADCASTER;
   }
-  if (tags?.badges?.moderator === "1") {
+  if (tags.badges?.moderator === "1") {
     return TwitchBadgeLevel.MODERATOR;
   }
-  if (tags?.badges?.vip === "1") {
+  if (tags.badges?.vip === "1") {
     return TwitchBadgeLevel.VIP;
   }
   return TwitchBadgeLevel.NONE;
 };
 
 export const convertTwitchBadgeLevelToString = (
-  badgeLevel: TwitchBadgeLevel
+  badgeLevel: TwitchBadgeLevel,
 ): string => {
   switch (badgeLevel) {
     case TwitchBadgeLevel.BROADCASTER:
@@ -51,7 +51,7 @@ export const convertTwitchBadgeLevelToString = (
 };
 
 export const convertTwitchBadgeStringToLevel = (
-  badgeLevelString: string
+  badgeLevelString: string,
 ): TwitchBadgeLevel => {
   switch (badgeLevelString) {
     case "broadcaster":
@@ -64,7 +64,7 @@ export const convertTwitchBadgeStringToLevel = (
       return TwitchBadgeLevel.VIP;
     default:
       throw Error(
-        `Unexpected Twitch badge level string: '${badgeLevelString}'`
+        `Unexpected Twitch badge level string: '${badgeLevelString}'`,
       );
   }
 };

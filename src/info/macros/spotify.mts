@@ -1,5 +1,6 @@
+// Relative imports
+import { createMessageParserMacroGenerator } from "../../messageParser/macros.mjs";
 // Type imports
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
 import type { SpotifyGetCurrentAndRecentSongs } from "../../spotify.mjs";
 
 export interface MacroSpotifySongData {
@@ -19,11 +20,113 @@ export enum SpotifySongMacro {
   PREVIOUS_TITLE = "PREVIOUS_TITLE",
   PREVIOUS_URL = "PREVIOUS_URL",
 }
-export const macroSpotifySong: MessageParserMacroGenerator<
-  MacroSpotifySongData,
-  SpotifySongMacro
-> = {
-  exampleData: {
+export const macroSpotifySong = createMessageParserMacroGenerator<
+  SpotifySongMacro,
+  MacroSpotifySongData
+>(
+  {
+    id: "SPOTIFY_SONG",
+  },
+  Object.values(SpotifySongMacro),
+  (macroId, data) => {
+    // Save output for example data:
+    //// eslint-disable-next-line no-console
+    //console.log(
+    //  JSON.stringify(data, (key, val) => {
+    //    if (
+    //      [
+    //        "actions",
+    //        "available_markets",
+    //        "context",
+    //        "currently_playing_type",
+    //        "cursors",
+    //        "disc_number",
+    //        "duration_ms",
+    //        "explicit",
+    //        "external_ids",
+    //        "headers",
+    //        "href",
+    //        "id",
+    //        "images",
+    //        "is_local",
+    //        "is_playing",
+    //        "limit",
+    //        "next",
+    //        "played_at",
+    //        "popularity",
+    //        "preview_url",
+    //        "progress_ms",
+    //        "release_date_precision",
+    //        "release_date",
+    //        "timestamp",
+    //        "total_tracks",
+    //        "track_number",
+    //        "uri",
+    //      ].includes(key)
+    //    ) {
+    //      return undefined;
+    //    }
+    //    if (key === "items" && Array.isArray(val)) {
+    //      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    //      return val.slice(0, 1);
+    //    }
+    //    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    //    return val;
+    //  })
+    //);
+    const currData = data.spotifyData.currentlyPlaying.body.item;
+    const hasCurrent = currData != null;
+
+    const recentData = data.spotifyData.recentlyPlayedTracks.body.items;
+    const hasPrevious = recentData.length > 0;
+    const prevData = recentData[0];
+
+    switch (macroId) {
+      case SpotifySongMacro.CURRENT_ALBUM:
+        if (
+          hasCurrent &&
+          currData.type === "track" &&
+          currData.album.album_type !== "single"
+        ) {
+          return currData.album.name;
+        }
+        return undefined;
+      case SpotifySongMacro.CURRENT_ARTISTS:
+        if (hasCurrent && currData.type === "track") {
+          return currData.artists.map((a) => a.name).join(", ");
+        }
+        return undefined;
+      case SpotifySongMacro.CURRENT_IS_SINGLE:
+        return (
+          hasCurrent &&
+          currData.type === "track" &&
+          currData.album.album_type === "single"
+        );
+      case SpotifySongMacro.CURRENT_TITLE:
+        return hasCurrent && currData.type === "track"
+          ? currData.name
+          : undefined;
+      case SpotifySongMacro.CURRENT_URL:
+        return hasCurrent ? currData.external_urls.spotify : undefined;
+      case SpotifySongMacro.HAS_CURRENT:
+        return hasCurrent;
+      case SpotifySongMacro.HAS_PREVIOUS:
+        return hasPrevious;
+      case SpotifySongMacro.PREVIOUS_ALBUM:
+        return hasPrevious ? prevData.track.album.name : undefined;
+      case SpotifySongMacro.PREVIOUS_ARTISTS:
+        return hasPrevious
+          ? prevData.track.artists.map((a) => a.name).join(", ")
+          : undefined;
+      case SpotifySongMacro.PREVIOUS_IS_SINGLE:
+        return hasPrevious && prevData.track.album.album_type === "single";
+      case SpotifySongMacro.PREVIOUS_TITLE:
+        return hasPrevious ? prevData.track.name : undefined;
+      case SpotifySongMacro.PREVIOUS_URL:
+        return hasPrevious ? prevData.track.external_urls.spotify : undefined;
+    }
+  },
+  {
     spotifyData: {
       currentlyPlaying: {
         body: {
@@ -122,132 +225,4 @@ export const macroSpotifySong: MessageParserMacroGenerator<
       },
     } as unknown as SpotifyGetCurrentAndRecentSongs,
   },
-  generate: (data) => {
-    // Save output for example data:
-    //// eslint-disable-next-line no-console
-    //console.log(
-    //  JSON.stringify(data, (key, val) => {
-    //    if (
-    //      [
-    //        "actions",
-    //        "available_markets",
-    //        "context",
-    //        "currently_playing_type",
-    //        "cursors",
-    //        "disc_number",
-    //        "duration_ms",
-    //        "explicit",
-    //        "external_ids",
-    //        "headers",
-    //        "href",
-    //        "id",
-    //        "images",
-    //        "is_local",
-    //        "is_playing",
-    //        "limit",
-    //        "next",
-    //        "played_at",
-    //        "popularity",
-    //        "preview_url",
-    //        "progress_ms",
-    //        "release_date_precision",
-    //        "release_date",
-    //        "timestamp",
-    //        "total_tracks",
-    //        "track_number",
-    //        "uri",
-    //      ].includes(key)
-    //    ) {
-    //      return undefined;
-    //    }
-    //    if (key === "items" && Array.isArray(val)) {
-    //      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    //      return val.slice(0, 1);
-    //    }
-    //    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    //    return val;
-    //  })
-    //);
-    const currData = data.spotifyData.currentlyPlaying.body.item;
-    const hasCurrent = currData != null;
-
-    const recentData = data.spotifyData.recentlyPlayedTracks.body.items;
-    const hasPrevious = recentData.length > 0;
-    const prevData = recentData[0];
-
-    return Object.values(SpotifySongMacro).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case SpotifySongMacro.CURRENT_ALBUM:
-          if (
-            hasCurrent &&
-            currData.type === "track" &&
-            currData.album.album_type !== "single"
-          ) {
-            macroValue = currData.album.name;
-          }
-          break;
-        case SpotifySongMacro.CURRENT_ARTISTS:
-          if (hasCurrent && currData.type === "track") {
-            macroValue = currData.artists.map((a) => a.name).join(", ");
-          }
-          break;
-        case SpotifySongMacro.CURRENT_IS_SINGLE:
-          macroValue =
-            hasCurrent &&
-            currData.type === "track" &&
-            currData.album.album_type === "single";
-          break;
-        case SpotifySongMacro.CURRENT_TITLE:
-          if (hasCurrent && currData.type === "track") {
-            macroValue = currData.name;
-          }
-          break;
-        case SpotifySongMacro.CURRENT_URL:
-          if (hasCurrent) {
-            macroValue = currData.external_urls.spotify;
-          }
-          break;
-        case SpotifySongMacro.HAS_CURRENT:
-          macroValue = hasCurrent;
-          break;
-        case SpotifySongMacro.HAS_PREVIOUS:
-          macroValue = hasPrevious;
-          break;
-        case SpotifySongMacro.PREVIOUS_ALBUM:
-          if (hasPrevious) {
-            macroValue = prevData.track.album.name;
-          }
-          break;
-        case SpotifySongMacro.PREVIOUS_ARTISTS:
-          if (hasPrevious) {
-            macroValue = prevData.track.artists.map((a) => a.name).join(", ");
-          }
-          break;
-        case SpotifySongMacro.PREVIOUS_IS_SINGLE:
-          macroValue =
-            hasPrevious && prevData.track.album.album_type === "single";
-          break;
-        case SpotifySongMacro.PREVIOUS_TITLE:
-          if (hasPrevious) {
-            macroValue = prevData.track.name;
-          }
-          break;
-        case SpotifySongMacro.PREVIOUS_URL:
-          if (hasPrevious) {
-            macroValue = prevData.track.external_urls.spotify;
-          }
-          break;
-      }
-      if (typeof macroValue === "boolean") {
-        macroValue = macroValue ? "true" : "false";
-      }
-      if (typeof macroValue === "undefined") {
-        macroValue = "undefined";
-      }
-      return [macroId, macroValue];
-    });
-  },
-  id: "SPOTIFY_SONG",
-  keys: Object.values(SpotifySongMacro),
-};
+);

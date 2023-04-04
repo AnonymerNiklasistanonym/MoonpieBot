@@ -30,7 +30,7 @@ export const spotifyChatHandler: ChatMessageHandler<
   globalStrings,
   globalPlugins,
   globalMacros,
-  logger
+  logger,
 ) => {
   // Handle commands
   await Promise.all(
@@ -45,9 +45,9 @@ export const spotifyChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
   await Promise.all(
     [commandCommands].map((command) =>
@@ -61,8 +61,8 @@ export const spotifyChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
 };

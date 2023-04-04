@@ -21,13 +21,13 @@ export default (databaseDirPath: string): Suite => {
     itAllowFail("backupTables", process.platform === "win32", async () => {
       const databasePath = path.join(
         databaseDirPath,
-        "moonpieDb_backupTables.db"
+        "moonpieDb_backupTables.db",
       );
       await moonpieDb.setup(databasePath, logger);
 
       const backup1 = await moonpieDb.backup.exportMoonpieCountTableToJson(
         databasePath,
-        logger
+        logger,
       );
       expect(backup1).to.be.an("array");
       expect(backup1.length).to.be.equal(0);
@@ -38,7 +38,7 @@ export default (databaseDirPath: string): Suite => {
           id: "1",
           name: "one",
         },
-        logger
+        logger,
       );
 
       await moonpieDb.requests.moonpie.createEntry(
@@ -47,7 +47,7 @@ export default (databaseDirPath: string): Suite => {
           id: "3",
           name: "four",
         },
-        logger
+        logger,
       );
 
       await moonpieDb.requests.moonpie.updateEntry(
@@ -58,12 +58,12 @@ export default (databaseDirPath: string): Suite => {
           name: "four",
           timestamp: 42,
         },
-        logger
+        logger,
       );
 
       const backup2 = await moonpieDb.backup.exportMoonpieCountTableToJson(
         databasePath,
-        logger
+        logger,
       );
       expect(backup2).to.be.an("array");
       expect(backup2.length).to.be.equal(2);
@@ -85,7 +85,7 @@ export default (databaseDirPath: string): Suite => {
       try {
         await moonpieDb.backup.exportMoonpieCountTableToJson(
           databasePath + "abc",
-          logger
+          logger,
         );
         expect(false);
       } catch (err) {

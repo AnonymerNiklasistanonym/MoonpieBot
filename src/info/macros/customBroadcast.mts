@@ -1,5 +1,5 @@
-// Type imports
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
+// Relative imports
+import { createMessageParserMacroGenerator } from "../../messageParser/macros.mjs";
 
 export interface MacroCustomBroadcastInfoData {
   cronString?: string;
@@ -8,44 +8,35 @@ export interface MacroCustomBroadcastInfoData {
   message?: string;
 }
 export enum MacroCustomBroadcastInfo {
-  CRON_STRING = "CRON_STRING",
-  /** Is an empty string if undefined. */
-  DESCRIPTION = "DESCRIPTION",
+  CRON_STRING_OR_UNDEF = "CRON_STRING_OR_UNDEF",
+  DESCRIPTION_OR_EMPTY = "DESCRIPTION_OR_EMPTY",
   ID = "ID",
-  MESSAGE = "MESSAGE",
+  MESSAGE_OR_UNDEF = "MESSAGE_OR_UNDEF",
 }
 
-export const macroCustomBroadcastInfo: MessageParserMacroGenerator<
-  MacroCustomBroadcastInfoData,
-  MacroCustomBroadcastInfo
-> = {
-  exampleData: {
+export const macroCustomBroadcastInfo = createMessageParserMacroGenerator<
+  MacroCustomBroadcastInfo,
+  MacroCustomBroadcastInfoData
+>(
+  {
+    id: "CUSTOM_BROADCAST_INFO",
+  },
+  Object.values(MacroCustomBroadcastInfo),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroCustomBroadcastInfo.CRON_STRING_OR_UNDEF:
+        return data.cronString;
+      case MacroCustomBroadcastInfo.DESCRIPTION_OR_EMPTY:
+        return data.description ?? "";
+      case MacroCustomBroadcastInfo.ID:
+        return data.id;
+      case MacroCustomBroadcastInfo.MESSAGE_OR_UNDEF:
+        return data.message;
+    }
+  },
+  {
     cronString: "*/15 * * * *",
     id: "ID",
     message: "MESSAGE",
   },
-  generate: (data) =>
-    Object.values(MacroCustomBroadcastInfo).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroCustomBroadcastInfo.CRON_STRING:
-          macroValue = data.cronString;
-          break;
-        case MacroCustomBroadcastInfo.DESCRIPTION:
-          macroValue = data.description !== undefined ? data.description : "";
-          break;
-        case MacroCustomBroadcastInfo.ID:
-          macroValue = data.id;
-          break;
-        case MacroCustomBroadcastInfo.MESSAGE:
-          macroValue = data.message;
-          break;
-      }
-      if (macroValue === undefined) {
-        macroValue = "undefined";
-      }
-      return [macroId, macroValue];
-    }),
-  id: "CUSTOM_BROADCAST_INFO",
-  keys: Object.values(MacroCustomBroadcastInfo),
-};
+);

@@ -1,6 +1,4 @@
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 //const LOG_ID = "custom_data";
 
 /**
@@ -55,13 +53,13 @@ export type CustomDataTypes =
 
 export const convertCustomDataValueToDbString = (
   value: string | number | string[] | number[],
-  valueType: CustomDataValueType
+  valueType: CustomDataValueType,
 ): string => {
   switch (valueType) {
     case CustomDataValueType.NUMBER:
       if (typeof value !== "number") {
         throw Error(
-          `Custom data value type (${valueType}) does not fit the value (${typeof value})`
+          `Custom data value type (${valueType}) does not fit the value (${typeof value})`,
         );
       }
       return `${value}`;
@@ -72,14 +70,14 @@ export const convertCustomDataValueToDbString = (
         value.some((a) => typeof a !== "number")
       ) {
         throw Error(
-          `Custom data value type (${valueType}) does not fit the value (${typeof value})`
+          `Custom data value type (${valueType}) does not fit the value (${typeof value})`,
         );
       }
       return JSON.stringify(value);
     case CustomDataValueType.STRING:
       if (typeof value !== "string") {
         throw Error(
-          `Custom data value type (${valueType}) does not fit the value (${typeof value})`
+          `Custom data value type (${valueType}) does not fit the value (${typeof value})`,
         );
       }
       return value;
@@ -90,7 +88,7 @@ export const convertCustomDataValueToDbString = (
         value.some((a) => typeof a !== "string")
       ) {
         throw Error(
-          `Custom data value type (${valueType}) does not fit the value (${typeof value})`
+          `Custom data value type (${valueType}) does not fit the value (${typeof value})`,
         );
       }
       return JSON.stringify(value);
@@ -99,7 +97,7 @@ export const convertCustomDataValueToDbString = (
 
 export const convertCustomDataDbStringToValue = (
   value: string,
-  valueType: CustomDataValueType
+  valueType: CustomDataValueType,
 ): string | number | string[] | number[] => {
   switch (valueType) {
     case CustomDataValueType.NUMBER:
@@ -115,7 +113,7 @@ export const convertCustomDataDbStringToValue = (
         }
         if (maybeStringArray.some((a) => typeof a !== "number")) {
           throw Error(
-            `Custom data value array entries not always a number (${value})`
+            `Custom data value array entries not always a number (${value})`,
           );
         }
         return maybeStringArray;
@@ -132,7 +130,7 @@ export const convertCustomDataDbStringToValue = (
         }
         if (maybeStringArray.some((a) => typeof a !== "string")) {
           throw Error(
-            `Custom data value array entries not always a string (${value})`
+            `Custom data value array entries not always a string (${value})`,
           );
         }
         return maybeStringArray;
@@ -143,7 +141,7 @@ export const convertCustomDataDbStringToValue = (
 };
 
 export const convertCustomDataValueTypeStringToValueType = (
-  valueType: string
+  valueType: string,
 ): CustomDataValueType => {
   switch (valueType) {
     case CustomDataValueType.NUMBER:

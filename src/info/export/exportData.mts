@@ -11,15 +11,15 @@ import {
   getMoonpieConfigMoonpieFromEnv,
 } from "../config/moonpieConfig.mjs";
 import { createCustomCommandsBroadcastsDocumentation } from "../../documentation/customCommandsBroadcasts.mjs";
-import { createEnvVariableDocumentation } from "../../env.mjs";
+import { createEnvVariableDocumentation } from "../../documentation/envVariableDocumentation.mjs";
 import { createOsuRequestsConfigDocumentation } from "../../documentation/osuRequestsConfig.mjs";
 import { createStringsVariableDocumentation } from "../../documentation/strings.mjs";
 import customCommandsBroadcastsDb from "../../database/customCommandsBroadcastsDb.mjs";
 import { defaultStringMap } from "../../info/strings.mjs";
+import { displayName } from "../general.mjs";
 import { genericStringSorter } from "../../other/genericStringSorter.mjs";
 import { getLoggerConfigFromEnv } from "../../info/config/loggerConfig.mjs";
 import moonpieDb from "../../database/moonpieDb.mjs";
-import { name } from "../general.mjs";
 import osuRequestsDb from "../../database/osuRequestsDb.mjs";
 import { updateStringsMapWithCustomEnvStrings } from "../../messageParser.mjs";
 // Type imports
@@ -30,7 +30,7 @@ import type { MoonpieConfigCustomData } from "../config/moonpieConfig.mjs";
 export const exportDataEnv: ExportData<MoonpieConfigCustomData> = async (
   configDir,
   json,
-  customData
+  customData,
 ): Promise<string> => {
   const loggerConfig = await getLoggerConfigFromEnv(configDir);
   const moonpieConfig = await getMoonpieConfigFromEnv(configDir, customData);
@@ -47,7 +47,7 @@ export const exportDataEnv: ExportData<MoonpieConfigCustomData> = async (
 export const exportDataEnvStrings: ExportData = async (_configDir, json) => {
   const updatedStringsMap = updateStringsMapWithCustomEnvStrings(
     defaultStringMap,
-    createConsoleLogger(name, LoggerLevel.OFF)
+    createConsoleLogger(displayName, LoggerLevel.OFF),
   );
   if (json) {
     const updatedStrings = Array.from(updatedStringsMap);
@@ -70,8 +70,8 @@ export const exportDataEnvStrings: ExportData = async (_configDir, json) => {
     defaultMacros,
     defaultPluginsOptional,
     defaultMacrosOptional,
-    createConsoleLogger(name, LoggerLevel.OFF),
-    updatedStringsMap
+    createConsoleLogger(displayName, LoggerLevel.OFF),
+    updatedStringsMap,
   );
 };
 
@@ -82,11 +82,11 @@ export const exportDataMoonpie: ExportData = async (configDir, json) => {
   const config = await getMoonpieConfigMoonpieFromEnv(configDir);
   await moonpieDb.setup(
     config.databasePath,
-    createConsoleLogger(name, LoggerLevel.OFF)
+    createConsoleLogger(displayName, LoggerLevel.OFF),
   );
   const moonpieCounts = await moonpieDb.backup.exportMoonpieCountTableToJson(
     config.databasePath,
-    createConsoleLogger(name, LoggerLevel.OFF)
+    createConsoleLogger(displayName, LoggerLevel.OFF),
   );
   if (json) {
     return JSON.stringify({
@@ -111,7 +111,7 @@ export const exportDataMoonpie: ExportData = async (configDir, json) => {
 
 export const exportDataCustomCommandsBroadcasts: ExportData = async (
   configDir,
-  json
+  json,
 ) => {
   const config = await getMoonpieConfigFromEnv(configDir);
   if (config.customCommandsBroadcasts?.databasePath === undefined) {
@@ -119,24 +119,24 @@ export const exportDataCustomCommandsBroadcasts: ExportData = async (
   }
   await customCommandsBroadcastsDb.setup(
     config.customCommandsBroadcasts.databasePath,
-    createConsoleLogger(name, LoggerLevel.OFF)
+    createConsoleLogger(displayName, LoggerLevel.OFF),
   );
   const customCommands =
     await customCommandsBroadcastsDb.requests.customCommand.getEntries(
       config.customCommandsBroadcasts.databasePath,
       undefined,
-      createConsoleLogger(name, LoggerLevel.OFF)
+      createConsoleLogger(displayName, LoggerLevel.OFF),
     );
   const customBroadcasts =
     await customCommandsBroadcastsDb.requests.customBroadcast.getEntries(
       config.customCommandsBroadcasts.databasePath,
       undefined,
-      createConsoleLogger(name, LoggerLevel.OFF)
+      createConsoleLogger(displayName, LoggerLevel.OFF),
     );
   const customData =
     await customCommandsBroadcastsDb.requests.customData.getEntries(
       config.customCommandsBroadcasts.databasePath,
-      createConsoleLogger(name, LoggerLevel.OFF)
+      createConsoleLogger(displayName, LoggerLevel.OFF),
     );
   if (json) {
     return JSON.stringify({
@@ -148,7 +148,7 @@ export const exportDataCustomCommandsBroadcasts: ExportData = async (
   return createCustomCommandsBroadcastsDocumentation(
     customCommands,
     customBroadcasts,
-    false
+    false,
   );
 };
 
@@ -159,12 +159,12 @@ export const exportDataOsuRequests: ExportData = async (configDir, json) => {
   }
   await osuRequestsDb.setup(
     config.osuApi.databasePath,
-    createConsoleLogger(name, LoggerLevel.OFF)
+    createConsoleLogger(displayName, LoggerLevel.OFF),
   );
   const osuRequestsConfig =
     await osuRequestsDb.requests.osuRequestsConfig.getEntries(
       config.osuApi.databasePath,
-      createConsoleLogger(name, LoggerLevel.OFF)
+      createConsoleLogger(displayName, LoggerLevel.OFF),
     );
   if (json) {
     return JSON.stringify({

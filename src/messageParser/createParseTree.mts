@@ -3,7 +3,7 @@
  */
 
 // Type imports
-import { DeepReadonly } from "src/other/types.mjs";
+import type { DeepReadonly } from "../other/types.mjs";
 import type { Logger } from "winston";
 import type { StringMap } from "./strings.mjs";
 // Type exports
@@ -140,7 +140,7 @@ export const createParseTree = (
   pluginDepth = 0,
   earlyExitBecausePluginValue = false,
   stringDepth = 0,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): ParseTreeNode => {
   //console.log(`Generate parse tree of '${messageString}'`);
   //if (pluginDepth > 0) {
@@ -288,8 +288,8 @@ export const createParseTree = (
         } else {
           throw Error(
             `Plugin value found that should not exist: '${character}' (${JSON.stringify(
-              currentChildNode.pluginValue
-            )})`
+              currentChildNode.pluginValue,
+            )})`,
           );
         }
         break;
@@ -300,8 +300,8 @@ export const createParseTree = (
         } else {
           throw Error(
             `Plugin content found that should not exist: '${character}' (${JSON.stringify(
-              currentChildNode.pluginContent
-            )})`
+              currentChildNode.pluginContent,
+            )})`,
           );
         }
         break;
@@ -343,7 +343,7 @@ export const createParseTree = (
             // Remove the begin of the plugin scope open from the string
             originalString: currentChildNode.originalString.slice(
               0,
-              -"$(".length
+              -"$(".length,
             ),
           });
         }
@@ -368,7 +368,7 @@ export const createParseTree = (
           pluginDepth,
           true,
           stringDepth,
-          logger
+          logger,
         );
         //console.log(
         //  `Determined pluginValue from '${messageString.slice(
@@ -393,7 +393,7 @@ export const createParseTree = (
           pluginDepth,
           undefined,
           stringDepth,
-          logger
+          logger,
         );
         //console.log(
         //  `Determined pluginContent from '${messageString.slice(
@@ -427,7 +427,7 @@ export const createParseTree = (
         // Prevent stack overflows when string references have loop
         if (stringDepth > MAX_STRING_DEPTH) {
           throw Error(
-            "The maximum string depth was reached, most likely there is a loop!"
+            "The maximum string depth was reached, most likely there is a loop!",
           );
         }
         // And increase the plugin depth by 1
@@ -447,7 +447,7 @@ export const createParseTree = (
             // Remove the begin of the reference scope open from the string
             originalString: currentChildNode.originalString.slice(
               0,
-              -"$[".length
+              -"$[".length,
             ),
           });
         }
@@ -460,7 +460,7 @@ export const createParseTree = (
         const referenceStringEntry = strings.get(referenceName);
         if (referenceStringEntry === undefined) {
           throw Error(
-            `The reference '${referenceName}' from '${messageString}' was not found`
+            `The reference '${referenceName}' from '${messageString}' was not found`,
           );
         }
         // eslint-disable-next-line no-case-declarations
@@ -470,7 +470,7 @@ export const createParseTree = (
           undefined,
           undefined,
           stringDepth,
-          logger
+          logger,
         );
         //console.log(
         //  `Reference parse tree: ${JSON.stringify(
@@ -508,8 +508,8 @@ export const createParseTree = (
   if (parseState !== ParseState.TEXT) {
     throw Error(
       `Message is invalid! Final parse state was "${parseState}" (${JSON.stringify(
-        { currentChildNode, rootNode }
-      )})`
+        { currentChildNode, rootNode },
+      )})`,
     );
   }
   // If there is content that was not yet added to the root node add it now

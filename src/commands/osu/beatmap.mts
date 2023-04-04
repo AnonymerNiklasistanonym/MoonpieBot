@@ -33,6 +33,7 @@ import { OsuRequestsConfig } from "../../info/databases/osuRequestsDb.mjs";
 import osuRequestsDb from "../../database/osuRequestsDb.mjs";
 import { tryToSendOsuIrcMessage } from "../../osuIrc.mjs";
 // Type imports
+import type { Beatmap, OsuApiV2WebRequestError } from "osu-api-v2";
 import type {
   ChatMessageHandlerReply,
   ChatMessageHandlerReplyCreator,
@@ -44,11 +45,10 @@ import type {
   CommandOsuGenericDataOsuApiV2Credentials,
   CommandOsuGenericDataOsuIrcData,
 } from "../osu.mjs";
-import type { Beatmap } from "osu-api-v2";
 import type { GetOsuRequestsConfigOut } from "../../database/osuRequestsDb/requests/osuRequestsConfig.mjs";
 import type { Client as IrcClient } from "irc";
+import type { Logger } from "winston";
 import type { MacroMap } from "../../messageParser.mjs";
-import type { OsuApiV2WebRequestError } from "osu-api-v2";
 import type { RegexOsuBeatmapIdFromUrl } from "../../info/regex.mjs";
 
 const MAX_LENGTH_PREVIOUS_REQUESTS = 15;
@@ -61,7 +61,7 @@ export interface BeatmapRequest {
 
 const checkIfBeatmapMatchesDemands = (
   beatmap: Beatmap,
-  demands: GetOsuRequestsConfigOut[]
+  demands: GetOsuRequestsConfigOut[],
 ) => {
   for (const demand of demands) {
     switch (demand.option) {
@@ -122,26 +122,30 @@ export const sendBeatmapRequest = (
   messageParserMacros: MacroMap = new Map(),
   beatmapRequestId: number,
   beatmapRequester: string,
+  logger: Readonly<Logger>,
   beatmapRequestComment?: string,
   beatmap?: Beatmap,
   osuIrcRequestTarget?: string,
-  osuIrcBot?: OsuIrcBotSendMessageFunc
+  osuIrcBot?: OsuIrcBotSendMessageFunc,
 ): ChatMessageHandlerReply[] => {
   const commandRepliesBeatmap: ChatMessageHandlerReply[] = [];
   messageParserMacros.set(
     macroOsuBeatmapRequest.id,
     new Map(
-      macroOsuBeatmapRequest.generate({
-        comment: beatmapRequestComment?.trim(),
-        id: beatmapRequestId,
-        requester: beatmapRequester,
-      })
-    )
+      macroOsuBeatmapRequest.generate(
+        {
+          comment: beatmapRequestComment?.trim(),
+          id: beatmapRequestId,
+          requester: beatmapRequester,
+        },
+        logger,
+      ),
+    ),
   );
   if (beatmap !== undefined) {
     messageParserMacros.set(
       macroOsuBeatmap.id,
-      new Map(macroOsuBeatmap.generate({ beatmap }))
+      new Map(macroOsuBeatmap.generate({ beatmap }, logger)),
     );
   }
   commandRepliesBeatmap.push({
@@ -159,7 +163,7 @@ export const sendBeatmapRequest = (
           "commandBeatmap",
           osuIrcRequestTarget,
           message,
-          loggerSendFunc
+          loggerSendFunc,
         );
         return [osuIrcRequestTarget, message];
       },
@@ -200,17 +204,17 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
     const logCmdBeatmap = createLogFunc(
       logger,
       LOG_ID_CHAT_HANDLER_OSU,
-      "beatmap"
+      "beatmap",
     );
 
     const osuRequestsConfigEntries =
       await osuRequestsDb.requests.osuRequestsConfig.getEntries(
         data.osuApiDbPath,
-        logger
+        logger,
       );
 
     const redeemId = osuRequestsConfigEntries.find(
-      (a) => a.option === OsuRequestsConfig.REDEEM_ID
+      (a) => a.option === OsuRequestsConfig.REDEEM_ID,
     )?.optionValue;
     if (
       redeemId !== undefined &&
@@ -222,7 +226,7 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
           tags["custom-reward-id"]
             ? `"${tags["custom-reward-id"] as string}"`
             : "no id"
-        }`
+        }`,
       );
       return {
         messageId: osuBeatmapRequestNoRedeem.id,
@@ -231,7 +235,7 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
 
     if (
       osuRequestsConfigEntries.find(
-        (a) => a.option === OsuRequestsConfig.ENABLED
+        (a) => a.option === OsuRequestsConfig.ENABLED,
       )?.optionValue === "false"
     ) {
       return {
@@ -239,9 +243,10 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
           macroOsuBeatmapRequests,
           {
             customMessage: osuRequestsConfigEntries.find(
-              (a) => a.option === OsuRequestsConfig.MESSAGE
+              (a) => a.option === OsuRequestsConfig.MESSAGE,
             )?.optionValue,
-          }
+          },
+          logger,
         ),
         messageId: osuBeatmapRequestCurrentlyOff.id,
       };
@@ -250,7 +255,7 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
     const oauthAccessToken =
       await osuApiV2.default.oauth.clientCredentialsGrant(
         data.osuApiV2Credentials.clientId,
-        data.osuApiV2Credentials.clientSecret
+        data.osuApiV2Credentials.clientSecret,
       );
 
     const commandReplies: ChatMessageHandlerReply[] = [];
@@ -260,12 +265,15 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
       osuBeatmapRequestMacros.set(
         macroOsuBeatmapRequest.id,
         new Map(
-          macroOsuBeatmapRequest.generate({
-            comment: beatmapRequest.comment?.trim(),
-            id: beatmapRequest.beatmapId,
-            requester: tags.username,
-          })
-        )
+          macroOsuBeatmapRequest.generate(
+            {
+              comment: beatmapRequest.comment?.trim(),
+              id: beatmapRequest.beatmapId,
+              requester: tags.username,
+            },
+            logger,
+          ),
+        ),
       );
 
       // Get beatmap and if found the current top score and convert them into a
@@ -274,52 +282,53 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
       try {
         beatmap = await osuApiV2.default.beatmaps.get(
           oauthAccessToken,
-          beatmapRequest.beatmapId
+          beatmapRequest.beatmapId,
         );
-        if (beatmap) {
-          if (
-            !checkIfBeatmapMatchesDemands(beatmap, osuRequestsConfigEntries)
-          ) {
-            data.beatmapRequestsInfo.blockedBeatmapRequest = {
-              comment: beatmapRequest.comment?.trim(),
-              data: beatmap,
-              userId: tags["user-id"],
-              userName: tags.username,
-            };
-            return {
-              additionalMacros: new Map([
-                ...osuBeatmapRequestMacros,
-                ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
-                  customMessage: osuRequestsConfigEntries.find(
-                    (a) => a.option === OsuRequestsConfig.MESSAGE
-                  )?.optionValue,
-                }),
-                ...generateMacroMapFromMacroGenerator(
-                  macroOsuBeatmapRequestDemands,
-                  {
-                    osuRequestsConfigEntries,
-                  }
-                ),
-              ]),
-              isError: true,
-              messageId: osuBeatmapRequestNotMeetingDemands.id,
-            };
-          }
-
-          data.beatmapRequestsInfo.lastMentionedBeatmapId = beatmap.id;
-          data.beatmapRequestsInfo.previousBeatmapRequests.unshift({
+        if (!checkIfBeatmapMatchesDemands(beatmap, osuRequestsConfigEntries)) {
+          data.beatmapRequestsInfo.blockedBeatmapRequest = {
             comment: beatmapRequest.comment?.trim(),
             data: beatmap,
             userId: tags["user-id"],
             userName: tags.username,
-          });
-          // Truncate array at a max length
-          data.beatmapRequestsInfo.previousBeatmapRequests =
-            data.beatmapRequestsInfo.previousBeatmapRequests.slice(
-              0,
-              MAX_LENGTH_PREVIOUS_REQUESTS
-            );
+          };
+          return {
+            additionalMacros: new Map([
+              ...osuBeatmapRequestMacros,
+              ...generateMacroMapFromMacroGenerator(
+                macroOsuBeatmapRequests,
+                {
+                  customMessage: osuRequestsConfigEntries.find(
+                    (a) => a.option === OsuRequestsConfig.MESSAGE,
+                  )?.optionValue,
+                },
+                logger,
+              ),
+              ...generateMacroMapFromMacroGenerator(
+                macroOsuBeatmapRequestDemands,
+                {
+                  osuRequestsConfigEntries,
+                },
+                logger,
+              ),
+            ]),
+            isError: true,
+            messageId: osuBeatmapRequestNotMeetingDemands.id,
+          };
         }
+
+        data.beatmapRequestsInfo.lastMentionedBeatmapId = beatmap.id;
+        data.beatmapRequestsInfo.previousBeatmapRequests.unshift({
+          comment: beatmapRequest.comment?.trim(),
+          data: beatmap,
+          userId: tags["user-id"],
+          userName: tags.username,
+        });
+        // Truncate array at a max length
+        data.beatmapRequestsInfo.previousBeatmapRequests =
+          data.beatmapRequestsInfo.previousBeatmapRequests.slice(
+            0,
+            MAX_LENGTH_PREVIOUS_REQUESTS,
+          );
         // Check for user score
       } catch (err) {
         if (
@@ -339,19 +348,20 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
       commandReplies.push(
         ...sendBeatmapRequest(
           osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.DETAILED
+            (a) => a.option === OsuRequestsConfig.DETAILED,
           )?.optionValue === "true",
           osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.DETAILED_IRC
+            (a) => a.option === OsuRequestsConfig.DETAILED_IRC,
           )?.optionValue === "true",
           osuBeatmapRequestMacros,
           beatmapRequest.beatmapId,
           tags.username,
+          logger,
           beatmapRequest.comment,
           beatmap,
           data.osuIrcRequestTarget,
-          data.osuIrcBot
-        )
+          data.osuIrcBot,
+        ),
       );
     }
     return commandReplies;
@@ -368,7 +378,7 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
       return false;
     }
     const beatmapRequests: BeatmapRequest[] = regexOsuBeatmapUrlSplitter(
-      message
+      message,
     )
       .map((a) => {
         const match = a.match(regexOsuBeatmapIdFromUrl);
@@ -381,6 +391,7 @@ export const commandBeatmap: ChatMessageHandlerReplyCreator<
         if (!matchGroups) {
           throw Error("RegexOsuBeatmapIdFromUrl groups undefined");
         }
+        // Create a safer type so the keys do not need to be checked with ifs
         let beatmapId;
         if (
           "beatmapIdB" in matchGroups &&

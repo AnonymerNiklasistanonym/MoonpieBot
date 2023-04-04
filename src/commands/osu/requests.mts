@@ -21,6 +21,7 @@ import {
 } from "../../info/regex.mjs";
 import { checkTwitchBadgeLevel } from "../twitchBadge.mjs";
 import { generateMacroMapFromMacroGenerator } from "../../messageParser.mjs";
+import { normalizeMacroMap } from "../../messageParser/macrosHelper.mjs";
 import { OsuRequestsConfig } from "../../info/databases/osuRequestsDb.mjs";
 import osuRequestsDb from "../../database/osuRequestsDb.mjs";
 import { removeWhitespaceEscapeChatCommandGroup } from "../../other/whiteSpaceChecker.mjs";
@@ -67,7 +68,8 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
     ) {
       const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
         tags,
-        TwitchBadgeLevel.MODERATOR
+        TwitchBadgeLevel.MODERATOR,
+        logger,
       );
       if (twitchBadgeLevelCheck !== undefined) {
         return twitchBadgeLevelCheck;
@@ -84,7 +86,7 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
             option: OsuRequestsConfig.ENABLED,
             optionValue: "false",
           },
-          logger
+          logger,
         );
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           data.osuApiDbPath,
@@ -95,15 +97,16 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
                 ? data.beatmapRequestsOnOffMessage
                 : "",
           },
-          logger
+          logger,
         );
         macros.set(
           macroOsuBeatmapRequests.id,
           new Map(
-            macroOsuBeatmapRequests.generate({
-              customMessage: data.beatmapRequestsOnOffMessage,
-            })
-          )
+            macroOsuBeatmapRequests.generate(
+              { customMessage: data.beatmapRequestsOnOffMessage },
+              logger,
+            ),
+          ),
         );
         return {
           additionalMacros: macros,
@@ -116,7 +119,7 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
             option: OsuRequestsConfig.ENABLED,
             optionValue: "true",
           },
-          logger
+          logger,
         );
         await osuRequestsDb.requests.osuRequestsConfig.createOrUpdateEntry(
           data.osuApiDbPath,
@@ -127,15 +130,16 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
                 ? data.beatmapRequestsOnOffMessage
                 : "",
           },
-          logger
+          logger,
         );
         macros.set(
           macroOsuBeatmapRequests.id,
           new Map(
-            macroOsuBeatmapRequests.generate({
-              customMessage: data.beatmapRequestsOnOffMessage,
-            })
-          )
+            macroOsuBeatmapRequests.generate(
+              { customMessage: data.beatmapRequestsOnOffMessage },
+              logger,
+            ),
+          ),
         );
         return {
           additionalMacros: macros,
@@ -146,26 +150,35 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
         const osuRequestsConfigEntries =
           await osuRequestsDb.requests.osuRequestsConfig.getEntries(
             data.osuApiDbPath,
-            logger
+            logger,
           );
         if (
           osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.ENABLED
+            (a) => a.option === OsuRequestsConfig.ENABLED,
           )?.optionValue !== "false"
         ) {
           return {
             additionalMacros: new Map([
               ...macros,
-              ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
-                customMessage: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.MESSAGE
-                )?.optionValue,
-              }),
-              ...generateMacroMapFromMacroGenerator(
-                macroOsuBeatmapRequestDemands,
-                {
-                  osuRequestsConfigEntries,
-                }
+              ...normalizeMacroMap(
+                generateMacroMapFromMacroGenerator(
+                  macroOsuBeatmapRequests,
+                  {
+                    customMessage: osuRequestsConfigEntries.find(
+                      (a) => a.option === OsuRequestsConfig.MESSAGE,
+                    )?.optionValue,
+                  },
+                  logger,
+                ),
+              ),
+              ...normalizeMacroMap(
+                generateMacroMapFromMacroGenerator(
+                  macroOsuBeatmapRequestDemands,
+                  {
+                    osuRequestsConfigEntries,
+                  },
+                  logger,
+                ),
               ),
             ]),
             messageId: osuBeatmapRequestCurrentlyOn.id,
@@ -174,11 +187,17 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
           return {
             additionalMacros: new Map([
               ...macros,
-              ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
-                customMessage: osuRequestsConfigEntries.find(
-                  (a) => a.option === OsuRequestsConfig.MESSAGE
-                )?.optionValue,
-              }),
+              ...normalizeMacroMap(
+                generateMacroMapFromMacroGenerator(
+                  macroOsuBeatmapRequests,
+                  {
+                    customMessage: osuRequestsConfigEntries.find(
+                      (a) => a.option === OsuRequestsConfig.MESSAGE,
+                    )?.optionValue,
+                  },
+                  logger,
+                ),
+              ),
             ]),
             messageId: osuBeatmapRequestCurrentlyOff.id,
           };
@@ -233,7 +252,7 @@ export const commandBeatmapRequests: ChatMessageHandlerReplyCreator<
 
 const validateSetValue = (
   option: OsuRequestsConfig,
-  optionValue?: string
+  optionValue?: string,
 ): string => {
   switch (option) {
     case OsuRequestsConfig.AR_MAX:
@@ -300,7 +319,8 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
   createReply: async (_channel, tags, data, logger) => {
     const twitchBadgeLevelCheck = checkTwitchBadgeLevel(
       tags,
-      TwitchBadgeLevel.MODERATOR
+      TwitchBadgeLevel.MODERATOR,
+      logger,
     );
     if (twitchBadgeLevelCheck !== undefined) {
       return twitchBadgeLevelCheck;
@@ -317,7 +337,7 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
       throw Error(
         `Unknown set/unset option '${
           data.beatmapRequestsSetOption
-        }' (supported: ${Object.values(OsuRequestsConfig).join(",")})`
+        }' (supported: ${Object.values(OsuRequestsConfig).join(",")})`,
       );
     }
 
@@ -329,10 +349,10 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
             option,
             optionValue: validateSetValue(
               option,
-              data.beatmapRequestsSetOptionValue
+              data.beatmapRequestsSetOptionValue,
             ),
           },
-          logger
+          logger,
         );
         break;
       case BeatmapRequestsSetUnsetType.UNSET:
@@ -341,26 +361,36 @@ export const commandBeatmapRequestsSetUnset: ChatMessageHandlerReplyCreator<
           {
             option,
           },
-          logger
+          logger,
         );
     }
 
     const osuRequestsConfigEntries =
       await osuRequestsDb.requests.osuRequestsConfig.getEntries(
         data.osuApiDbPath,
-        logger
+        logger,
       );
 
     return {
       additionalMacros: new Map([
-        ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequests, {
-          customMessage: osuRequestsConfigEntries.find(
-            (a) => a.option === OsuRequestsConfig.MESSAGE
-          )?.optionValue,
-        }),
-        ...generateMacroMapFromMacroGenerator(macroOsuBeatmapRequestDemands, {
-          osuRequestsConfigEntries,
-        }),
+        ...normalizeMacroMap(
+          generateMacroMapFromMacroGenerator(
+            macroOsuBeatmapRequests,
+            {
+              customMessage: osuRequestsConfigEntries.find(
+                (a) => a.option === OsuRequestsConfig.MESSAGE,
+              )?.optionValue,
+            },
+            logger,
+          ),
+        ),
+        ...normalizeMacroMap(
+          generateMacroMapFromMacroGenerator(
+            macroOsuBeatmapRequestDemands,
+            { osuRequestsConfigEntries },
+            logger,
+          ),
+        ),
       ]),
       messageId: osuBeatmapRequestDemandsUpdated.id,
     };

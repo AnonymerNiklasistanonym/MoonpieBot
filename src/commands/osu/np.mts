@@ -56,7 +56,7 @@ export const commandNp: ChatMessageHandlerReplyCreator<
     const logCmdNp = createLogFunc(
       logger,
       LOG_ID_CHAT_HANDLER_OSU,
-      OsuCommands.NP
+      OsuCommands.NP,
     );
 
     if (data.osuStreamCompanionCurrentMapData !== undefined) {
@@ -66,7 +66,7 @@ export const commandNp: ChatMessageHandlerReplyCreator<
         ((currMapData.type === "websocket" &&
           currMapData.mapid !== undefined &&
           currMapData.mapid !== 0) ||
-          (currMapData.type === "file" && currMapData?.npAll.length > 0))
+          (currMapData.type === "file" && currMapData.npAll.length > 0))
       ) {
         switch (currMapData.type) {
           case "websocket":
@@ -78,7 +78,7 @@ export const commandNp: ChatMessageHandlerReplyCreator<
           case "file":
             // eslint-disable-next-line no-case-declarations
             const beatmapIdMatch = currMapData.npPlayingDl.match(
-              regexOsuBeatmapIdFromUrl
+              regexOsuBeatmapIdFromUrl,
             );
             if (beatmapIdMatch) {
               const matchGroups = beatmapIdMatch.groups as
@@ -122,10 +122,7 @@ export const commandNp: ChatMessageHandlerReplyCreator<
               messageId: osuCommandReplyNpStreamCompanionFile.id,
             };
         }
-      } else if (
-        currMapData?.type === "websocket" &&
-        currMapData?.mapid === 0
-      ) {
+      } else if (currMapData?.type === "websocket" && currMapData.mapid === 0) {
         return {
           messageId: osuCommandReplyNpNoMapStreamCompanionWebsocket.id,
         };
@@ -159,13 +156,13 @@ export const commandNp: ChatMessageHandlerReplyCreator<
             const oauthAccessToken =
               await osuApiV2.default.oauth.clientCredentialsGrant(
                 data.osuApiV2Credentials.clientId,
-                data.osuApiV2Credentials.clientSecret
+                data.osuApiV2Credentials.clientSecret,
               );
 
             const searchResult = await osuApiV2.default.beatmapsets.search(
               oauthAccessToken,
               `title='${matchGroups.title}' artist='${matchGroups.artist}'`,
-              false
+              false,
             );
             if (
               searchResult.beatmapsets !== undefined &&
@@ -179,7 +176,7 @@ export const commandNp: ChatMessageHandlerReplyCreator<
                 const diffNameCanBeFound = a.beatmaps?.find(
                   (b) =>
                     b.version.trim().toLocaleLowerCase() ===
-                    matchGroups.version.trim().toLocaleLowerCase()
+                    matchGroups.version.trim().toLocaleLowerCase(),
                 );
                 return titleIsTheSame && diffNameCanBeFound;
               });
@@ -187,7 +184,7 @@ export const commandNp: ChatMessageHandlerReplyCreator<
                 const exactBeatmapDiff = exactMatch.beatmaps?.find(
                   (a) =>
                     a.version.trim().toLocaleLowerCase() ===
-                    matchGroups.version.trim().toLocaleLowerCase()
+                    matchGroups.version.trim().toLocaleLowerCase(),
                 );
                 if (exactBeatmapDiff) {
                   data.beatmapRequestsInfo.lastMentionedBeatmapId =
@@ -203,13 +200,16 @@ export const commandNp: ChatMessageHandlerReplyCreator<
           customMacros.set(
             macroOsuWindowTitle.id,
             new Map(
-              macroOsuWindowTitle.generate({
-                artist: matchGroups.artist,
-                mapId,
-                title: matchGroups.title,
-                version: matchGroups.version,
-              })
-            )
+              macroOsuWindowTitle.generate(
+                {
+                  artist: matchGroups.artist,
+                  mapId,
+                  title: matchGroups.title,
+                  version: matchGroups.version,
+                },
+                logger,
+              ),
+            ),
           );
           return {
             additionalMacros: customMacros,
@@ -220,7 +220,7 @@ export const commandNp: ChatMessageHandlerReplyCreator<
       return { messageId: osuCommandReplyNpNoMap.id };
     }
     throw Error(
-      "Neither an osu!api credentials nor a StreamCompanion connection was found"
+      "Neither an osu!api credentials nor a StreamCompanion connection was found",
     );
   },
   detect: (_tags, message, data) => {

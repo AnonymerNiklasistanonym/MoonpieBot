@@ -62,7 +62,7 @@ export const lurkChatHandler: ChatMessageHandler<
   globalStrings,
   globalPlugins,
   globalMacros,
-  logger
+  logger,
 ) => {
   // Handle commands
   await Promise.all(
@@ -77,9 +77,9 @@ export const lurkChatHandler: ChatMessageHandler<
         globalPlugins,
         globalMacros,
         logger,
-        command
-      )
-    )
+        command,
+      ),
+    ),
   );
 };
 
@@ -97,13 +97,15 @@ const commandLurk: ChatMessageHandlerReplyCreator<
     ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   CommandLurkDetectorOutput
 > = {
-  createReply: (_channel, tags, data) => {
+  createReply: (_channel, tags, data, logger) => {
     if (data.welcomeBack === true) {
       data.lurkInfo.lurkers.delete(tags["user-id"]);
       return {
-        additionalMacros: generateMacroMapFromMacroGenerator(macroWelcomeBack, {
-          dateLurkStart: data.dateLurkStart,
-        }),
+        additionalMacros: generateMacroMapFromMacroGenerator(
+          macroWelcomeBack,
+          { dateLurkStart: data.dateLurkStart },
+          logger,
+        ),
         messageId: lurkCommandReplyWelcomeBack.id,
       };
     }

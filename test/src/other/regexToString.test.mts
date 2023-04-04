@@ -16,30 +16,30 @@ export default (): Suite => {
       expect(convertRegexToString(/abc/i)).to.be.equal("abc");
       const moonpieRegex = /^\s*!moonpie(?:\s|$)/i;
       expect(convertRegexToString(moonpieRegex)).to.be.equal(
-        moonpieRegex.source
+        moonpieRegex.source,
       );
       expect(convertRegexToHumanString(moonpieRegex)).to.be.equal("!moonpie");
       expect(convertRegexToHumanStringDetailed(moonpieRegex)).to.be.equal(
-        "!moonpie"
+        "!moonpie",
       );
       const osuUserNameRegex =
         /^\s*!score\s+(?<osuUserName>(?:'[^']+'|\S+))(?:\s|$)/i;
       expect(convertRegexToString(osuUserNameRegex)).to.be.equal(
-        osuUserNameRegex.source
+        osuUserNameRegex.source,
       );
       expect(convertRegexToHumanString(osuUserNameRegex)).to.be.equal(
-        "!score osuUserName"
+        "!score osuUserName",
       );
       expect(convertRegexToHumanStringDetailed(osuUserNameRegex)).to.be.equal(
-        "!score osuUserName:=('TEXT'/TEXT)"
+        "!score osuUserName:=('TEXT'/TEXT)",
       );
       const osuRpRegex =
         /^\s*!rp(?:\s+(?:(?<osuUserId>[0-9]+)|(?<osuUserName>(?:'[^']+'|\S+)))(?:\s|$)|\s|$)/i;
       expect(convertRegexToHumanString(osuRpRegex)).to.be.equal(
-        "!rp[ (osuUserId/osuUserName)]"
+        "!rp[ (osuUserId/osuUserName)]",
       );
       expect(convertRegexToHumanStringDetailed(osuRpRegex)).to.be.equal(
-        "!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]"
+        "!rp[ (osuUserId:=NUMBERS/osuUserName:=('TEXT'/TEXT))]",
       );
     });
   });

@@ -60,7 +60,7 @@ export const createManPageFileContent = (info: ManPageInfo): string => {
   for (const usageSignature of info.usageSignatures) {
     outputString += `**${info.binaryName}** ${usageSignature.replace(
       /\[(\S+)\]/g,
-      (_fullMatch: string, optionName: string) => `[*${optionName}*]`
+      (_fullMatch: string, optionName: string) => `[*${optionName}*]`,
     )}\n`;
   }
   outputString += "\n";
@@ -133,7 +133,7 @@ export const createManPageFileContent = (info: ManPageInfo): string => {
       outputString = outputString.replace(
         // eslint-disable-next-line security/detect-non-literal-regexp
         new RegExp(cliOption.name, "g"),
-        `**${cliOption.name}**`
+        `**${cliOption.name}**`,
       );
     }
   }
@@ -142,7 +142,7 @@ export const createManPageFileContent = (info: ManPageInfo): string => {
       outputString = outputString.replace(
         // eslint-disable-next-line security/detect-non-literal-regexp
         new RegExp(envVariable.name, "g"),
-        `**${envVariable.name}**`
+        `**${envVariable.name}**`,
       );
     }
   }
@@ -153,7 +153,7 @@ export const createManPageFileContent = (info: ManPageInfo): string => {
     .replace(/customTimers\.json/g, "*customTimers.json*")
     .replace(
       /\$HOME\/\.local\/share\/moonpiebot/g,
-      "*$HOME/.local/share/moonpiebot*"
+      "*$HOME/.local/share/moonpiebot*",
     );
   // Fix options not being displayed correctly
   outputString = outputString.replace(/--/g, "----");

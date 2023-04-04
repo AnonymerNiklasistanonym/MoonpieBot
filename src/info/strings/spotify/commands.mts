@@ -26,10 +26,10 @@ export const spotifyCommandsSong: Readonly<StringEntry> = {
     [
       createShortCommandDescription(
         SpotifyCommands.SONG,
-        getChatCommandsSpotify
+        getChatCommandsSpotify,
       ),
     ],
-    true
+    true,
   ),
   id: `${SPOTIFY_COMMANDS_STRING_ID}_SONG`,
 };
@@ -40,7 +40,7 @@ export const spotifyCommandsPrefix: Readonly<StringEntry> = {
       { name: PluginTwitchChat.USER, type: "plugin" },
       " The following Spotify commands are supported: ",
     ],
-    true
+    true,
   ),
   id: `${SPOTIFY_COMMANDS_STRING_ID}_PREFIX`,
 };
@@ -68,11 +68,11 @@ export const spotifyCommandsString: Readonly<StringEntry> = {
                   type: "reference",
                 },
                 type: "plugin",
-              })
+              }),
             )
             .reduce<(MessageForParserMessagePlugin | string)[]>(
               (prev, curr) => prev.concat([curr, ";"]),
-              []
+              [],
             ),
           name: pluginListFilterUndefined.id,
           scope: {

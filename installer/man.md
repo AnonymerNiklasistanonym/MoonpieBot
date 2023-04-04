@@ -1,6 +1,6 @@
-% MoonpieBot(1) moonpiebot 1.0.32
+% MoonpieBot(1) moonpiebot 1.0.33-beta.0
 % AnonymerNiklasistanonym
-% March 2023
+% April 2023
 
 # NAME
 
@@ -8,42 +8,12 @@ moonpiebot - A custom Twitch chat bot.
 
 # SYNOPSIS
 
-**moonpiebot** [*OPTIONS*]
 
 # DESCRIPTION
 
-Running this program will start a Twitch connected bot using information provided by either environment variables, a '*.env*' file in the same directory or given a **----config-dir** argument a '*.env*' file in the specified directory. Additionally log files and the databases are written to this directory if not specified otherwise by 'LOGGING_DIRECTORY_PATH', 'MOONPIE_DATABASE_PATH', 'SPOTIFY_DATABASE_PATH', 'CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH'. Custom strings can also be written to '*.env*.strings' to keep the '*.env*' clean.
+Running this program will start a Twitch connected bot using information provided by either environment variables, a '*.env*' file in the same directory or given a configuration directory argument a '*.env*' file in the specified directory. Additionally log files and the databases are written to this directory if not specified otherwise by 'LOGGING_DIRECTORY_PATH', 'MOONPIE_DATABASE_PATH', 'SPOTIFY_DATABASE_PATH', 'CUSTOM_COMMANDS_BROADCASTS_DATABASE_PATH'. Custom strings can also be written to '*.env*.strings' to keep the '*.env*' clean.
 
-If this program is installed via a package it will use *$HOME/.local/share/moonpiebot* as the default **----config-dir**.
-
-# OPTIONS
-
-**----config-dir** *CONFIG_DIR*
-: Specify a custom directory that contains all configurations and databases
-
-**----disable-censoring**
-: Disabling the censoring stops the censoring of private tokens which is helpful to debug if the inputs are read correctly but should otherwise be avoided
-
-**----create-backup** *BACKUP_DIR*
-: Create a backup of all configurations and databases that can be found in the specified backup directory
-
-**----import-backup** *BACKUP_DIR*
-: Import a backup of all configurations and databases that can be found in the specified backup directory
-
-**----create-example-files** *[EXAMPLE_FILES_DIR]*
-: Creates example files (for custom commands and timers) in the specified example files directory if given or the current config directory
-
-**----export-data** *CUSTOM_COMMANDS_BROADCASTS|ENV|ENV_STRINGS|MOONPIE|OSU_REQUESTS_CONFIG* *[OUTPUT_FILE]*
-: Exports certain data for backups
-
-**----export-data**-json *CUSTOM_COMMANDS_BROADCASTS|ENV|ENV_STRINGS|MOONPIE|OSU_REQUESTS_CONFIG* *[OUTPUT_FILE]*
-: Exports certain data for 3rd party support
-
-**----help**
-: Get instructions on how to run and configure this program
-
-**----version**
-: Get the version of the program
+If this program is installed via a package it will use *$HOME/.local/share/moonpiebot* as the default configuration directory.
 
 # ENVIRONMENT VARIABLES
 
@@ -220,6 +190,6 @@ See https://github.com/AnonymerNiklasistanonym/MoonpieBot/blob/main/LICENSE for 
 
 # SEE ALSO
 
-Website and Documentation: https://anonymerniklasistanonym.github.io/MoonpieBot/
+Website and Documentation: https://github.com/AnonymerNiklasistanonym/MoonpieBot
 
-GitHub repository and issue tracker: https://github.com/AnonymerNiklasistanonym/MoonpieBot
+GitHub repository and issue tracker: git+https://github.com/AnonymerNiklasistanonym/MoonpieBot.git

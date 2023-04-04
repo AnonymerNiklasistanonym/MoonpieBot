@@ -1,8 +1,8 @@
 // Relative imports
+import { createMessageParserMacroGenerator } from "../../messageParser/macros.mjs";
 import { OsuRequestsConfig } from "../databases/osuRequestsDb.mjs";
 // Type imports
 import type { GetOsuRequestsConfigOut } from "../../database/osuRequestsDb/requests/osuRequestsConfig.mjs";
-import type { MessageParserMacroGenerator } from "../../messageParser.mjs";
 
 export interface MacroOsuBeatmapRequestData {
   comment?: string;
@@ -14,65 +14,47 @@ export enum MacroOsuBeatmapRequest {
   ID = "ID",
   REQUESTER = "REQUESTER",
 }
-export const macroOsuBeatmapRequest: MessageParserMacroGenerator<
-  MacroOsuBeatmapRequestData,
-  MacroOsuBeatmapRequest
-> = {
-  generate: (data) =>
-    Object.values(MacroOsuBeatmapRequest).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroOsuBeatmapRequest.COMMENT:
-          if (data.comment) {
-            macroValue = data.comment;
-          } else {
-            macroValue = "";
-          }
-          break;
-        case MacroOsuBeatmapRequest.ID:
-          macroValue = data.id;
-          break;
-        case MacroOsuBeatmapRequest.REQUESTER:
-          macroValue = data.requester;
-          break;
-      }
-      if (typeof macroValue === "number") {
-        macroValue = `${macroValue}`;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "OSU_BEATMAP_REQUEST",
-  keys: Object.values(MacroOsuBeatmapRequest),
-};
+export const macroOsuBeatmapRequest = createMessageParserMacroGenerator<
+  MacroOsuBeatmapRequest,
+  MacroOsuBeatmapRequestData
+>(
+  {
+    id: "OSU_BEATMAP_REQUEST",
+  },
+  Object.values(MacroOsuBeatmapRequest),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroOsuBeatmapRequest.COMMENT:
+        return data.comment ?? "";
+      case MacroOsuBeatmapRequest.ID:
+        return data.id;
+      case MacroOsuBeatmapRequest.REQUESTER:
+        return data.requester;
+    }
+  },
+);
 
 export interface MacroOsuBeatmapRequestsData {
   customMessage?: string;
 }
 export enum MacroOsuBeatmapRequests {
-  /** Empty string if there is no custom message. */
-  CUSTOM_MESSAGE = "CUSTOM_MESSAGE",
+  CUSTOM_MESSAGE_OR_EMPTY = "CUSTOM_MESSAGE_OR_EMPTY",
 }
-export const macroOsuBeatmapRequests: MessageParserMacroGenerator<
-  MacroOsuBeatmapRequestsData,
-  MacroOsuBeatmapRequests
-> = {
-  generate: (data) =>
-    Object.values(MacroOsuBeatmapRequests).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroOsuBeatmapRequests.CUSTOM_MESSAGE:
-          if (data.customMessage !== undefined) {
-            macroValue = data.customMessage;
-          } else {
-            macroValue = "";
-          }
-          break;
-      }
-      return [macroId, macroValue];
-    }),
-  id: "OSU_BEATMAP_REQUESTS",
-  keys: Object.values(MacroOsuBeatmapRequests),
-};
+export const macroOsuBeatmapRequests = createMessageParserMacroGenerator<
+  MacroOsuBeatmapRequests,
+  MacroOsuBeatmapRequestsData
+>(
+  {
+    id: "OSU_BEATMAP_REQUESTS",
+  },
+  Object.values(MacroOsuBeatmapRequests),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroOsuBeatmapRequests.CUSTOM_MESSAGE_OR_EMPTY:
+        return data.customMessage ?? "";
+    }
+  },
+);
 export interface MacroOsuBeatmapRequestDemandsData {
   osuRequestsConfigEntries: GetOsuRequestsConfigOut[];
 }
@@ -90,95 +72,78 @@ export enum MacroOsuBeatmapRequestDemands {
 }
 const getConfigEntry = (
   osuRequestsConfigEntries: GetOsuRequestsConfigOut[],
-  key: OsuRequestsConfig
+  key: OsuRequestsConfig,
 ) => osuRequestsConfigEntries.find((a) => a.option === key)?.optionValue;
 
-export const macroOsuBeatmapRequestDemands: MessageParserMacroGenerator<
-  MacroOsuBeatmapRequestDemandsData,
-  MacroOsuBeatmapRequestDemands
-> = {
-  generate: (data) =>
-    Object.values(MacroOsuBeatmapRequestDemands).map((macroId) => {
-      let macroValue;
-      switch (macroId) {
-        case MacroOsuBeatmapRequestDemands.AR_RANGE_MAX:
-          macroValue = getConfigEntry(
-            data.osuRequestsConfigEntries,
-            OsuRequestsConfig.AR_MAX
-          );
-          break;
-        case MacroOsuBeatmapRequestDemands.AR_RANGE_MIN:
-          macroValue = getConfigEntry(
-            data.osuRequestsConfigEntries,
-            OsuRequestsConfig.AR_MIN
-          );
-          break;
-        case MacroOsuBeatmapRequestDemands.CS_RANGE_MAX:
-          macroValue = getConfigEntry(
-            data.osuRequestsConfigEntries,
-            OsuRequestsConfig.CS_MAX
-          );
-          break;
-        case MacroOsuBeatmapRequestDemands.CS_RANGE_MIN:
-          macroValue = getConfigEntry(
-            data.osuRequestsConfigEntries,
-            OsuRequestsConfig.CS_MIN
-          );
-          break;
-        case MacroOsuBeatmapRequestDemands.HAS_DEMANDS:
-          macroValue = [
-            OsuRequestsConfig.AR_MAX,
-            OsuRequestsConfig.AR_MIN,
-            OsuRequestsConfig.CS_MAX,
-            OsuRequestsConfig.CS_MIN,
-            OsuRequestsConfig.LENGTH_IN_MIN_MAX,
-            OsuRequestsConfig.LENGTH_IN_MIN_MIN,
-            OsuRequestsConfig.REDEEM_ID,
-            OsuRequestsConfig.STAR_MAX,
-            OsuRequestsConfig.STAR_MIN,
-          ]
-            .map((a) => getConfigEntry(data.osuRequestsConfigEntries, a))
-            .some((b) => b !== undefined);
-          break;
-        case MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX:
-          macroValue = getConfigEntry(
-            data.osuRequestsConfigEntries,
-            OsuRequestsConfig.LENGTH_IN_MIN_MAX
-          );
-          break;
-        case MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN:
-          macroValue = getConfigEntry(
-            data.osuRequestsConfigEntries,
-            OsuRequestsConfig.LENGTH_IN_MIN_MIN
-          );
-          break;
-        case MacroOsuBeatmapRequestDemands.REDEEM_ID:
-          macroValue = getConfigEntry(
-            data.osuRequestsConfigEntries,
-            OsuRequestsConfig.REDEEM_ID
-          );
-          break;
-        case MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX:
-          macroValue = getConfigEntry(
-            data.osuRequestsConfigEntries,
-            OsuRequestsConfig.STAR_MAX
-          );
-          break;
-        case MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN:
-          macroValue = getConfigEntry(
-            data.osuRequestsConfigEntries,
-            OsuRequestsConfig.STAR_MIN
-          );
-          break;
-      }
-      if (macroValue === undefined) {
-        macroValue = "undefined";
-      }
-      if (typeof macroValue === "boolean") {
-        macroValue = macroValue ? "true" : "false";
-      }
-      return [macroId, macroValue];
-    }),
-  id: "OSU_BEATMAP_REQUEST_DEMANDS",
-  keys: Object.values(MacroOsuBeatmapRequestDemands),
-};
+export const macroOsuBeatmapRequestDemands = createMessageParserMacroGenerator<
+  MacroOsuBeatmapRequestDemands,
+  MacroOsuBeatmapRequestDemandsData
+>(
+  {
+    id: "OSU_BEATMAP_REQUEST_DEMANDS",
+  },
+  Object.values(MacroOsuBeatmapRequestDemands),
+  (macroId, data) => {
+    switch (macroId) {
+      case MacroOsuBeatmapRequestDemands.AR_RANGE_MAX:
+        return getConfigEntry(
+          data.osuRequestsConfigEntries,
+          OsuRequestsConfig.AR_MAX,
+        );
+      case MacroOsuBeatmapRequestDemands.AR_RANGE_MIN:
+        return getConfigEntry(
+          data.osuRequestsConfigEntries,
+          OsuRequestsConfig.AR_MIN,
+        );
+      case MacroOsuBeatmapRequestDemands.CS_RANGE_MAX:
+        return getConfigEntry(
+          data.osuRequestsConfigEntries,
+          OsuRequestsConfig.CS_MAX,
+        );
+      case MacroOsuBeatmapRequestDemands.CS_RANGE_MIN:
+        return getConfigEntry(
+          data.osuRequestsConfigEntries,
+          OsuRequestsConfig.CS_MIN,
+        );
+      case MacroOsuBeatmapRequestDemands.HAS_DEMANDS:
+        return [
+          OsuRequestsConfig.AR_MAX,
+          OsuRequestsConfig.AR_MIN,
+          OsuRequestsConfig.CS_MAX,
+          OsuRequestsConfig.CS_MIN,
+          OsuRequestsConfig.LENGTH_IN_MIN_MAX,
+          OsuRequestsConfig.LENGTH_IN_MIN_MIN,
+          OsuRequestsConfig.REDEEM_ID,
+          OsuRequestsConfig.STAR_MAX,
+          OsuRequestsConfig.STAR_MIN,
+        ]
+          .map((a) => getConfigEntry(data.osuRequestsConfigEntries, a))
+          .some((b) => b !== undefined);
+      case MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MAX:
+        return getConfigEntry(
+          data.osuRequestsConfigEntries,
+          OsuRequestsConfig.LENGTH_IN_MIN_MAX,
+        );
+      case MacroOsuBeatmapRequestDemands.LENGTH_IN_MIN_RANGE_MIN:
+        return getConfigEntry(
+          data.osuRequestsConfigEntries,
+          OsuRequestsConfig.LENGTH_IN_MIN_MIN,
+        );
+      case MacroOsuBeatmapRequestDemands.REDEEM_ID:
+        return getConfigEntry(
+          data.osuRequestsConfigEntries,
+          OsuRequestsConfig.REDEEM_ID,
+        );
+      case MacroOsuBeatmapRequestDemands.STAR_RANGE_MAX:
+        return getConfigEntry(
+          data.osuRequestsConfigEntries,
+          OsuRequestsConfig.STAR_MAX,
+        );
+      case MacroOsuBeatmapRequestDemands.STAR_RANGE_MIN:
+        return getConfigEntry(
+          data.osuRequestsConfigEntries,
+          OsuRequestsConfig.STAR_MIN,
+        );
+    }
+  },
+);

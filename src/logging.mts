@@ -64,7 +64,7 @@ export const createLogger = (
   name: string,
   logDir: string,
   logLevelConsole = LoggerLevel.INFO,
-  logLevelFile = LoggerLevel.DEBUG
+  logLevelFile = LoggerLevel.DEBUG,
 ): Logger =>
   createWinstonLogger({
     defaultMeta: { service: name },
@@ -93,7 +93,7 @@ export const createLogger = (
  */
 export const createConsoleLogger = (
   name: string,
-  logLevelConsole = LoggerLevel.INFO
+  logLevelConsole = LoggerLevel.INFO,
 ): Logger =>
   createWinstonLogger({
     defaultMeta: { service: name },
@@ -124,7 +124,7 @@ export interface LogFunc {
 export const createLogFunc = (
   logger: Readonly<Logger>,
   section: string,
-  subsection?: string
+  subsection?: string,
 ): LogFunc => {
   const baseLogFunc = (level: LoggerLevel) => (message: string) => {
     logger.log({ level, message, section, subsection });

@@ -127,7 +127,7 @@ export const envVariableInformation: DeepReadonlyArray<
     default: (configDir) =>
       path.relative(
         configDir,
-        path.join(configDir, "customCommandsBroadcasts.db")
+        path.join(configDir, "customCommandsBroadcasts.db"),
       ),
     defaultValue: (configDir) =>
       path.resolve(path.join(configDir, "customCommandsBroadcasts.db")),
@@ -181,7 +181,7 @@ export const envVariableInformation: DeepReadonlyArray<
     description:
       "A with a space separated list of all the channels the bot should be active.",
     example: ["twitch_channel_name1", "twitch_channel_name2"].join(
-      ENV_LIST_SPLIT_CHARACTER
+      ENV_LIST_SPLIT_CHARACTER,
     ),
     legacyNames: ["TWITCH_CHANNEL"],
     name: EnvVariable.TWITCH_CHANNELS,
@@ -318,7 +318,7 @@ export const envVariableInformation: DeepReadonlyArray<
     }=${
       OsuCommands.REQUESTS
     }) additionally output more detailed information about the map in the chat. This can also be set at runtime (${convertRegexToHumanString(
-      regexOsuChatHandlerCommandRequestsSet
+      regexOsuChatHandlerCommandRequestsSet,
     )}) and stored persistently in a database (${ENV_PREFIX}${
       EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH
     }) but if provided will override the current value in the database on start of the bot.`,
@@ -337,7 +337,7 @@ export const envVariableInformation: DeepReadonlyArray<
     }=${
       OsuCommands.REQUESTS
     }) make it that only messages that used a channel point redeem will be recognized. This can also be set at runtime (${convertRegexToHumanString(
-      regexOsuChatHandlerCommandRequestsSet
+      regexOsuChatHandlerCommandRequestsSet,
     )}) and stored persistently in a database (${ENV_PREFIX}${
       EnvVariable.OSU_API_REQUESTS_CONFIG_DATABASE_PATH
     }) but if provided will override the current value in the database on start of the bot.`,

@@ -33,10 +33,10 @@ export const commandCommands: ChatMessageHandlerReplyCreator<
     ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands,
   ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledCommands
 > = {
-  createReply: async (_channel, _tags, data) => {
+  createReply: async (_channel, _tags, data, logger) => {
     const streamCompanionInfo =
       data.osuStreamCompanionCurrentMapData !== undefined
-        ? await data?.osuStreamCompanionCurrentMapData()
+        ? await data.osuStreamCompanionCurrentMapData()
         : undefined;
 
     return {
@@ -100,7 +100,8 @@ export const commandCommands: ChatMessageHandlerReplyCreator<
             `${OsuCommands.NP}_STREAM_COMPANION_FILES`,
             `${OsuCommands.NP}_STREAM_COMPANION_WEBSOCKET`,
           ],
-        }
+        },
+        logger,
       ),
       messageId: osuCommandsString.id,
     };

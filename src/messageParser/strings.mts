@@ -15,9 +15,7 @@ import type { Logger } from "winston";
  */
 export type StringMap = Map<string, StringMapEntry>;
 
-/**
- * The logging ID of this module.
- */
+/** The logging ID of this module. */
 const LOG_ID = "strings";
 
 /**
@@ -63,7 +61,7 @@ export const generateStringMap = (
   ...stringEntries: DeepReadonlyArray<StringEntry>
 ): StringMap => {
   const mappedStringEntries = stringEntries.map<[string, StringMapEntry]>(
-    (a) => [a.id, Object.assign({}, a)]
+    (a) => [a.id, Object.assign({}, a)],
   );
   // Check for duplicated IDs
   mappedStringEntries.forEach((value, index, array) => {
@@ -83,12 +81,12 @@ export const generateStringMap = (
  */
 export const updateStringsMapWithCustomEnvStrings = (
   strings: Readonly<StringMap>,
-  logger: Readonly<Logger>
+  logger: Readonly<Logger>,
 ): StringMap => {
   const logStrings = createLogFunc(
     logger,
     LOG_ID,
-    "update_strings_with_custom_env_strings"
+    "update_strings_with_custom_env_strings",
   );
 
   const updatedStrings = new Map(strings);
@@ -129,14 +127,14 @@ export const updateStringsMapWithCustomEnvStrings = (
     logStrings.info(
       `Found ${foundCustomStringsCounter} default custom string${
         foundCustomStringsCounter > 1 ? "s" : ""
-      }`
+      }`,
     );
   }
   if (foundCustomNonDefaultStringsCounter > 0) {
     logStrings.info(
       `Found ${foundCustomNonDefaultStringsCounter} non-default custom string${
         foundCustomNonDefaultStringsCounter > 1 ? "s" : ""
-      }`
+      }`,
     );
   }
   return updatedStrings;

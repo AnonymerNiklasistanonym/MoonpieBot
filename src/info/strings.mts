@@ -34,5 +34,5 @@ export const defaultStringMap: Readonly<StringMap> = generateStringMap(
   ...osuCommandReply,
   ...osuCommands,
   ...spotifyCommandReply,
-  ...spotifyCommands
+  ...spotifyCommands,
 );

@@ -6,7 +6,7 @@
  * @returns True if not undefined.
  */
 export const notUndefined = <T extends unknown>(
-  value?: Readonly<T>
+  value?: Readonly<T>,
 ): value is T => value !== undefined;
 
 /**
@@ -16,15 +16,10 @@ export const notUndefined = <T extends unknown>(
  * @param value Possible string array.
  * @returns True if not undefined.
  */
-export const isStringArray = (
-  value: ReadonlyArray<unknown>
-): value is string[] => {
-  return (
-    Array.isArray(value) &&
-    value.length > 0 &&
-    value.every((item) => typeof item === "string")
-  );
-};
+export const isStringArray = (value: readonly unknown[]): value is string[] =>
+  Array.isArray(value) &&
+  value.length > 0 &&
+  value.every((item) => typeof item === "string");
 
 /**
  * Convert a value to a custom value if undefined.
@@ -35,7 +30,7 @@ export const isStringArray = (
  */
 export const convertUndefinedToCustomValue = <TValue, TCustomValue>(
   value: OrUndef<TValue>,
-  customValue: TCustomValue
+  customValue: TCustomValue,
 ): TValue | TCustomValue => (value === undefined ? customValue : value);
 
 /**
@@ -61,7 +56,7 @@ export type ImmutablePrimitive =
  */
 export type DeepReadonly<T> = T extends ImmutablePrimitive
   ? T
-  : T extends Array<infer U>
+  : T extends (infer U)[]
   ? DeepReadonlyArray<U>
   : T extends Map<infer K, infer V>
   ? DeepReadonlyMap<K, V>
@@ -69,7 +64,7 @@ export type DeepReadonly<T> = T extends ImmutablePrimitive
   ? DeepReadonlySet<M>
   : DeepReadonlyObject<T>;
 
-export type DeepReadonlyArray<T> = ReadonlyArray<DeepReadonly<T>>;
+export type DeepReadonlyArray<T> = readonly DeepReadonly<T>[];
 export type DeepReadonlyMap<K, V> = ReadonlyMap<
   DeepReadonly<K>,
   DeepReadonly<V>
@@ -92,7 +87,7 @@ export type OrArray<TYPE> = TYPE | TYPE[];
 /**
  * Type that represents the input type or the input type as an array.
  */
-export type OrReadonlyArray<TYPE> = TYPE | ReadonlyArray<TYPE>;
+export type OrReadonlyArray<TYPE> = TYPE | readonly TYPE[];
 
 /**
  * Type that represents the input type or undefined.

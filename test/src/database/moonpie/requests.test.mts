@@ -28,7 +28,7 @@ export default (databaseDirPath: string): Suite => {
           id: "1",
           name: "one",
         },
-        logger
+        logger,
       );
       expect(id1).to.be.a("number");
 
@@ -38,7 +38,7 @@ export default (databaseDirPath: string): Suite => {
           id: "3",
           name: "four",
         },
-        logger
+        logger,
       );
       expect(id2).to.be.a("number");
 
@@ -49,7 +49,7 @@ export default (databaseDirPath: string): Suite => {
             id: "3",
             name: "four",
           },
-          logger
+          logger,
         );
         expect(false);
       } catch (err) {
@@ -64,14 +64,14 @@ export default (databaseDirPath: string): Suite => {
       const notExists1 = await moonpieDb.requests.moonpie.existsEntry(
         databasePath,
         "1",
-        logger
+        logger,
       );
       expect(notExists1).to.be.equal(false);
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const notExists2 = await moonpieDb.requests.moonpie.existsEntry(
         databasePath,
         "3",
-        logger
+        logger,
       );
       expect(notExists2).to.be.equal(false);
 
@@ -81,21 +81,21 @@ export default (databaseDirPath: string): Suite => {
           id: "3",
           name: "four",
         },
-        logger
+        logger,
       );
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const exists1 = await moonpieDb.requests.moonpie.existsEntry(
         databasePath,
         "3",
-        logger
+        logger,
       );
       expect(exists1).to.be.equal(true);
     }).timeout(githubCiMaxTimeout);
     itAllowFail("existsName", process.platform === "win32", async () => {
       const databasePath = path.join(
         databaseDirPath,
-        "moonpieDb_existsName.db"
+        "moonpieDb_existsName.db",
       );
       await moonpieDb.setup(databasePath, logger);
 
@@ -103,14 +103,14 @@ export default (databaseDirPath: string): Suite => {
       const notExists1 = await moonpieDb.requests.moonpie.existsEntryName(
         databasePath,
         "one",
-        logger
+        logger,
       );
       expect(notExists1).to.be.equal(false);
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const notExists2 = await moonpieDb.requests.moonpie.existsEntryName(
         databasePath,
         "four",
-        logger
+        logger,
       );
       expect(notExists2).to.be.equal(false);
 
@@ -120,21 +120,21 @@ export default (databaseDirPath: string): Suite => {
           id: "3",
           name: "four",
         },
-        logger
+        logger,
       );
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const exists1 = await moonpieDb.requests.moonpie.existsEntryName(
         databasePath,
         "four",
-        logger
+        logger,
       );
       expect(exists1).to.be.equal(true);
     }).timeout(githubCiMaxTimeout);
     itAllowFail("getMoonpie", process.platform === "win32", async () => {
       const databasePath = path.join(
         databaseDirPath,
-        "moonpieDb_getMoonpie.db"
+        "moonpieDb_getMoonpie.db",
       );
       await moonpieDb.setup(databasePath, logger);
 
@@ -151,13 +151,13 @@ export default (databaseDirPath: string): Suite => {
           id: "3",
           name: "four",
         },
-        logger
+        logger,
       );
 
       const moonpieInfo1 = await moonpieDb.requests.moonpie.getEntry(
         databasePath,
         "3",
-        logger
+        logger,
       );
       expect(moonpieInfo1.id).to.be.equal("3");
       expect(moonpieInfo1.name).to.be.equal("four");
@@ -174,7 +174,7 @@ export default (databaseDirPath: string): Suite => {
     itAllowFail("getMoonpieName", process.platform === "win32", async () => {
       const databasePath = path.join(
         databaseDirPath,
-        "moonpieDb_getMoonpieName.db"
+        "moonpieDb_getMoonpieName.db",
       );
       await moonpieDb.setup(databasePath, logger);
 
@@ -182,7 +182,7 @@ export default (databaseDirPath: string): Suite => {
         await moonpieDb.requests.moonpie.getEntryName(
           databasePath,
           "four",
-          logger
+          logger,
         );
         expect(false);
       } catch (err) {
@@ -195,13 +195,13 @@ export default (databaseDirPath: string): Suite => {
           id: "3",
           name: "four",
         },
-        logger
+        logger,
       );
 
       const moonpieInfo1 = await moonpieDb.requests.moonpie.getEntryName(
         databasePath,
         "four",
-        logger
+        logger,
       );
       expect(moonpieInfo1.id).to.be.equal("3");
       expect(moonpieInfo1.name).to.be.equal("four");
@@ -212,7 +212,7 @@ export default (databaseDirPath: string): Suite => {
         await moonpieDb.requests.moonpie.getEntryName(
           databasePath,
           "seven",
-          logger
+          logger,
         );
         expect(false);
       } catch (err) {
@@ -231,7 +231,7 @@ export default (databaseDirPath: string): Suite => {
             id: "3",
             name: "four",
           },
-          logger
+          logger,
         );
         expect(false);
       } catch (err) {
@@ -244,7 +244,7 @@ export default (databaseDirPath: string): Suite => {
           id: "3",
           name: "four",
         },
-        logger
+        logger,
       );
       await moonpieDb.requests.moonpie.updateEntry(
         databasePath,
@@ -253,13 +253,13 @@ export default (databaseDirPath: string): Suite => {
           id: "3",
           name: "four",
         },
-        logger
+        logger,
       );
 
       const moonpieInfo1 = await moonpieDb.requests.moonpie.getEntry(
         databasePath,
         "3",
-        logger
+        logger,
       );
       expect(moonpieInfo1.id).to.be.equal("3");
       expect(moonpieInfo1.name).to.be.equal("four");
@@ -274,13 +274,13 @@ export default (databaseDirPath: string): Suite => {
           name: "five",
           timestamp: 111,
         },
-        logger
+        logger,
       );
 
       const moonpieInfo2 = await moonpieDb.requests.moonpie.getEntry(
         databasePath,
         "3",
-        logger
+        logger,
       );
       expect(moonpieInfo2.id).to.be.equal("3");
       expect(moonpieInfo2.name).to.be.equal("five");
@@ -293,7 +293,7 @@ export default (databaseDirPath: string): Suite => {
       async () => {
         const databasePath = path.join(
           databaseDirPath,
-          "moonpieDb_getMoonpieLeaderboard.db"
+          "moonpieDb_getMoonpieLeaderboard.db",
         );
         await moonpieDb.setup(databasePath, logger);
 
@@ -302,7 +302,7 @@ export default (databaseDirPath: string): Suite => {
             databasePath,
             10,
             0,
-            logger
+            logger,
           );
         expect(leaderboard1).to.be.an("array");
         expect(leaderboard1.length).to.be.equal(0);
@@ -313,7 +313,7 @@ export default (databaseDirPath: string): Suite => {
             id: "3",
             name: "four",
           },
-          logger
+          logger,
         );
 
         const leaderboard2 =
@@ -321,7 +321,7 @@ export default (databaseDirPath: string): Suite => {
             databasePath,
             10,
             0,
-            logger
+            logger,
           );
         expect(leaderboard2).to.be.an("array");
         expect(leaderboard2.length).to.be.equal(1);
@@ -335,7 +335,7 @@ export default (databaseDirPath: string): Suite => {
             id: "6",
             name: "six",
           },
-          logger
+          logger,
         );
 
         const leaderboard3 =
@@ -343,7 +343,7 @@ export default (databaseDirPath: string): Suite => {
             databasePath,
             10,
             0,
-            logger
+            logger,
           );
         expect(leaderboard3).to.be.an("array");
         expect(leaderboard3.length).to.be.equal(2);
@@ -360,7 +360,7 @@ export default (databaseDirPath: string): Suite => {
             id: "8",
             name: "eight",
           },
-          logger
+          logger,
         );
 
         await moonpieDb.requests.moonpie.updateEntry(
@@ -370,7 +370,7 @@ export default (databaseDirPath: string): Suite => {
             id: "8",
             name: "eight",
           },
-          logger
+          logger,
         );
         await moonpieDb.requests.moonpie.updateEntry(
           databasePath,
@@ -379,7 +379,7 @@ export default (databaseDirPath: string): Suite => {
             id: "6",
             name: "six_new_name",
           },
-          logger
+          logger,
         );
 
         const offset = 1;
@@ -388,7 +388,7 @@ export default (databaseDirPath: string): Suite => {
             databasePath,
             10,
             offset + 1,
-            logger
+            logger,
           );
         expect(leaderboard4).to.be.an("array");
         expect(leaderboard4.length).to.be.equal(3 - offset);
@@ -398,7 +398,7 @@ export default (databaseDirPath: string): Suite => {
         expect(leaderboard4[2 - offset].count).to.be.equal(0);
         expect(leaderboard4[2 - offset].name).to.be.equal("four");
         expect(leaderboard4[2 - offset].rank).to.be.equal(3);
-      }
+      },
     ).timeout(githubCiMaxTimeout);
     itAllowFail(
       "getMoonpieLeaderboardEntry",
@@ -406,7 +406,7 @@ export default (databaseDirPath: string): Suite => {
       async () => {
         const databasePath = path.join(
           databaseDirPath,
-          "moonpieDb_getMoonpieLeaderboardEntry.db"
+          "moonpieDb_getMoonpieLeaderboardEntry.db",
         );
         await moonpieDb.setup(databasePath, logger);
 
@@ -414,7 +414,7 @@ export default (databaseDirPath: string): Suite => {
           await moonpieDb.requests.moonpieLeaderboard.getEntry(
             databasePath,
             "1",
-            logger
+            logger,
           );
           expect(false);
         } catch (err) {
@@ -427,14 +427,14 @@ export default (databaseDirPath: string): Suite => {
             id: "1",
             name: "one",
           },
-          logger
+          logger,
         );
 
         const leaderboard1 =
           await moonpieDb.requests.moonpieLeaderboard.getEntry(
             databasePath,
             "1",
-            logger
+            logger,
           );
         expect(leaderboard1.count).to.be.equal(0);
         expect(leaderboard1.name).to.be.equal("one");
@@ -446,7 +446,7 @@ export default (databaseDirPath: string): Suite => {
             id: "4",
             name: "four",
           },
-          logger
+          logger,
         );
         await moonpieDb.requests.moonpie.updateEntry(
           databasePath,
@@ -455,14 +455,14 @@ export default (databaseDirPath: string): Suite => {
             id: "4",
             name: "four",
           },
-          logger
+          logger,
         );
 
         const leaderboard2 =
           await moonpieDb.requests.moonpieLeaderboard.getEntry(
             databasePath,
             "1",
-            logger
+            logger,
           );
         expect(leaderboard2.count).to.be.equal(0);
         expect(leaderboard2.name).to.be.equal("one");
@@ -475,19 +475,19 @@ export default (databaseDirPath: string): Suite => {
             id: "1",
             name: "one",
           },
-          logger
+          logger,
         );
 
         const leaderboard3 =
           await moonpieDb.requests.moonpieLeaderboard.getEntry(
             databasePath,
             "1",
-            logger
+            logger,
           );
         expect(leaderboard3.count).to.be.equal(10);
         expect(leaderboard3.name).to.be.equal("one");
         expect(leaderboard3.rank).to.be.equal(1);
-      }
+      },
     ).timeout(githubCiMaxTimeout);
     itAllowFail("remove", process.platform === "win32", async () => {
       const databasePath = path.join(databaseDirPath, "moonpieDb_remove.db");
@@ -506,21 +506,21 @@ export default (databaseDirPath: string): Suite => {
           id: "1",
           name: "one",
         },
-        logger
+        logger,
       );
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const exists1 = await moonpieDb.requests.moonpie.existsEntry(
         databasePath,
         "1",
-        logger
+        logger,
       );
       expect(exists1).to.be.equal(true);
 
       const remove1 = await moonpieDb.requests.moonpie.removeEntry(
         databasePath,
         "1",
-        logger
+        logger,
       );
       expect(remove1).to.be.equal(true);
 
@@ -528,14 +528,14 @@ export default (databaseDirPath: string): Suite => {
       const notExists1 = await moonpieDb.requests.moonpie.existsEntry(
         databasePath,
         "1",
-        logger
+        logger,
       );
       expect(notExists1).to.be.equal(false);
     }).timeout(githubCiMaxTimeout);
     itAllowFail("removeName", process.platform === "win32", async () => {
       const databasePath = path.join(
         databaseDirPath,
-        "moonpieDb_removeName.db"
+        "moonpieDb_removeName.db",
       );
       await moonpieDb.setup(databasePath, logger);
 
@@ -543,7 +543,7 @@ export default (databaseDirPath: string): Suite => {
         await moonpieDb.requests.moonpie.removeEntryName(
           databasePath,
           "one",
-          logger
+          logger,
         );
         expect(false);
       } catch (err) {
@@ -556,21 +556,21 @@ export default (databaseDirPath: string): Suite => {
           id: "1",
           name: "one",
         },
-        logger
+        logger,
       );
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const exists1 = await moonpieDb.requests.moonpie.existsEntryName(
         databasePath,
         "one",
-        logger
+        logger,
       );
       expect(exists1).to.be.equal(true);
 
       const remove1 = await moonpieDb.requests.moonpie.removeEntryName(
         databasePath,
         "one",
-        logger
+        logger,
       );
       expect(remove1).to.be.equal(true);
 
@@ -578,7 +578,7 @@ export default (databaseDirPath: string): Suite => {
       const notExists1 = await moonpieDb.requests.moonpie.existsEntryName(
         databasePath,
         "one",
-        logger
+        logger,
       );
       expect(notExists1).to.be.equal(false);
     }).timeout(githubCiMaxTimeout);

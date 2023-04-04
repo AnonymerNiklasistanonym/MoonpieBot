@@ -62,7 +62,7 @@ export interface PkgbuildInfo {
 const createPkgbuildArray = (
   value: OrUndef<OrReadonlyArray<string>>,
   split = " ",
-  literalValues = false
+  literalValues = false,
 ): string => {
   return `(${convertUndefValueToArray(value)
     .map((a) => createPkgValue(a, literalValues))
@@ -76,7 +76,7 @@ const createPkgbuildComment = (value?: OrReadonlyArray<string>): string => {
 };
 
 const createPkgbuildCmdsSection = (
-  value: DeepReadonly<PkgbuildCmdsSection>
+  value: DeepReadonly<PkgbuildCmdsSection>,
 ): string => {
   let outputString = "";
   for (const note of convertUndefValueToArray(value.note)) {
@@ -88,7 +88,7 @@ const createPkgbuildCmdsSection = (
 
 const createPkgValue = (
   value: string | number,
-  literalValue = false
+  literalValue = false,
 ): string => {
   if (literalValue) {
     return `${value}`;
@@ -105,7 +105,7 @@ export const createPkgbuild = (info: DeepReadonly<PkgbuildInfo>): string => {
       outputString += createPkgbuildComment(
         `Maintainer: ${maintainers
           .map((a) => `${a.name} <${a.email}>`)
-          .join(", ")}`
+          .join(", ")}`,
       );
     }
   }
@@ -123,7 +123,7 @@ export const createPkgbuild = (info: DeepReadonly<PkgbuildInfo>): string => {
   outputString += `pkgname=${createPkgValue(info.pkgname)}\n`;
   outputString += `pkgver=${createPkgValue(info.pkgver)}\n`;
   outputString += `pkgrel=${createPkgValue(
-    info.pkgrel !== undefined ? info.pkgrel : 1
+    info.pkgrel !== undefined ? info.pkgrel : 1,
   )}\n`;
   outputString += `pkgdesc=${createPkgValue(info.pkgdesc)}\n`;
   outputString += `arch=${createPkgbuildArray(info.arch)}\n`;
@@ -141,20 +141,20 @@ export const createPkgbuild = (info: DeepReadonly<PkgbuildInfo>): string => {
   for (const source of convertValueToArray(info.source)) {
     sources.push(source.name);
     sourcesSha1sums.push(
-      source.sha1sum !== undefined ? source.sha1sum : "SKIP"
+      source.sha1sum !== undefined ? source.sha1sum : "SKIP",
     );
   }
   outputString += `source=${createPkgbuildArray(sources, "\n        ")}\n`;
   outputString += `sha1sums=${createPkgbuildArray(
     sourcesSha1sums,
-    "\n          "
+    "\n          ",
   )}\n`;
   if (info.options) {
     outputString += createPkgbuildComment(info.optionsNote);
     outputString += `options=${createPkgbuildArray(
       info.options,
       undefined,
-      true
+      true,
     )}\n`;
   }
   if (info.pkgverCmds) {
@@ -190,5 +190,5 @@ export const createPkgbuild = (info: DeepReadonly<PkgbuildInfo>): string => {
 export const referencePV = (variable: string): string => `$${variable}`;
 
 export const referencePCV = (
-  customVariable: DeepReadonly<PkgbuildCustomVariable>
+  customVariable: DeepReadonly<PkgbuildCustomVariable>,
 ): string => referencePV(`_${customVariable.name}`);
