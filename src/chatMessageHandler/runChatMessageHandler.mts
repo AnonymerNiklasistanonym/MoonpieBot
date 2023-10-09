@@ -31,7 +31,6 @@ export interface ChatMessageHandlerReplyCreatorChatUserState
 
 /**
  * A global type for a method that creates a reply for a command.
- *
  * @typeParam DATAThe additional data the command needs for execution.
  * @returns One or more sent replies.
  */
@@ -91,7 +90,6 @@ export interface ChatMessageHandlerReplyCreatorGenericDetectorInputEnabledComman
 /**
  * A global type for a method that detects a command and return data about what
  * was detected or return false if nothing was detected.
- *
  * @typeParam INPUT_DATA The additional data the command detector needs for
  * execution.
  * @typeParam OUTPUT_DATA Data that the command detector should return when it
@@ -109,7 +107,6 @@ export type ChatMessageHandlerDetect<
 
 /**
  * The data that was parsed from a successful detected command by a message.
- *
  * @typeParam DETECTED_DATA Data that the command detector should return when it
  * successfully detects a command (like regular expression group matches).
  */
@@ -127,7 +124,6 @@ export interface ChatMessageHandlerReplyCreatorDetectorDataOutput<
  * The structure of a chat message handler that has a method
  * to check a message if it should create a reply and
  * a method to create a reply.
- *
  * @typeParam CREATE_REPLY_INPUT_DATA The data that is necessary to create a reply.
  * @typeParam DETECTOR_INPUT_DATA The data that is necessary to detect if a reply
  * should be created.
@@ -164,7 +160,6 @@ export interface ChatMessageHandlerInfo {
 
 /**
  * Generic method to handle a chat message.
- *
  * @param client Twitch client.
  * @param channel Twitch channel.
  * @param tags Twitch user state.

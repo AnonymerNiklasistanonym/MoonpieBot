@@ -195,7 +195,7 @@ const convertRegexToHumanReadableStringHelper = (
   return { elements: filterEmptyElements(elements), i };
 };
 
-const splitArrayAtElement = <TYPE extends unknown>(
+const splitArrayAtElement = <TYPE,>(
   elements: DeepReadonlyArray<TYPE>,
   splitAt: (element: DeepReadonly<TYPE>) => boolean,
 ): TYPE[][] => {
@@ -221,7 +221,6 @@ const splitArrayAtElement = <TYPE extends unknown>(
 /**
  * This method converts a regex to a string.
  * It will remove all modifiers/flags.
- *
  * @param regex The regex that should be converted to a string.
  * @returns Regex as a string.
  */
@@ -400,7 +399,6 @@ const convertToString = (
 
 /**
  * Escape string for a RegEx expression.
- *
  * @param str String that should be escaped.
  * @returns Escaped string.
  */

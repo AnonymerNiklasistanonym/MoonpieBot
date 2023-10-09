@@ -63,7 +63,6 @@ export const generateMessageParserMessageReference = (
 
 /**
  * Create a message string for the message parser.
- *
  * @param message The message represented by an array of elements to be parsed to a string.
  * @param insidePlugin Set this to true so it can be used inside a plugin (so characters get correctly escaped).
  * @template MACRO_ENUM Represents for type safety all supported macros.

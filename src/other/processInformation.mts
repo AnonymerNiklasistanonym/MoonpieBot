@@ -26,7 +26,6 @@ export interface ProcessInformationWindows extends ProcessInformationBase {
 
 /**
  * Get the information of a process.
- *
  * @param processName The name of the process.
  * @returns The information of that process.
  */

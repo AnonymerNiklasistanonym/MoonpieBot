@@ -60,7 +60,7 @@ export const createEnvVariableDocumentation = (
       // Now add for each variable of the block the documentation
       for (const envVariable in EnvVariable) {
         const envVariableInfo = getEnvVariableValueInformation(envVariable);
-        if (envVariableInfo.block === structurePart.block) {
+        if (envVariableInfo.block === `${structurePart.block}`) {
           const envInfos: string[] = [];
           if (
             envVariableInfo.supportedValues &&

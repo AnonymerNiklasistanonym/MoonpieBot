@@ -1,11 +1,8 @@
-// Relative imports
-import { errorMessageUserIdUndefined } from "../../error.mjs";
 // Type imports
 import type { ApiClient } from "@twurple/api";
 import type { MessageParserPluginGenerator } from "../../messageParser.mjs";
 
 export enum PluginTwitchApi {
-  GET_FOLLOW_AGE = "TWITCH_API_GET_FOLLOW_AGE",
   GET_GAME = "TWITCH_API_GET_GAME",
   GET_TITLE = "TWITCH_API_GET_TITLE",
   RANDOM_USER = "TWITCH_API_RANDOM_USER",
@@ -29,9 +26,8 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
         }
 
         try {
-          const gameNameApi = await data.twitchApiClient.games.getGameByName(
-            gameName,
-          );
+          const gameNameApi =
+            await data.twitchApiClient.games.getGameByName(gameName);
           if (gameNameApi?.id === undefined) {
             throw Error("Twitch API client request getGameByName failed");
           }
@@ -148,69 +144,16 @@ export const pluginsTwitchApiGenerator: MessageParserPluginGenerator<PluginTwitc
       },
     },
     {
-      description: "Get the follow age of a chatter in the current channel",
-      generate: (data) => async (_, userName) => {
-        try {
-          const channelUserInfo =
-            await data.twitchApiClient.users.getUserByName(data.channelName);
-          if (channelUserInfo?.id === undefined) {
-            throw Error("Twitch API client request getUserByName failed");
-          }
-          let userId;
-          if (userName !== undefined && userName.length > 0) {
-            const twitchUserInfo =
-              await data.twitchApiClient.users.getUserByName(userName);
-            if (twitchUserInfo?.id === undefined) {
-              throw Error("Twitch API client request getUserByName failed");
-            }
-            userId = twitchUserInfo.id;
-          } else {
-            if (data.twitchUserId === undefined) {
-              throw errorMessageUserIdUndefined();
-            }
-            userId = data.twitchUserId;
-          }
-          // Check if the user is the broadcaster
-          if (channelUserInfo.id === userId) {
-            const currentTimestamp = Date.now();
-            const followStartTimestamp = channelUserInfo.creationDate.getTime();
-            return `${(currentTimestamp - followStartTimestamp) / 1000}`;
-          }
-          const follow =
-            await data.twitchApiClient.users.getFollowFromUserToBroadcaster(
-              channelUserInfo.id,
-              userId,
-            );
-          if (follow?.followDate === undefined) {
-            throw Error("User is not following the channel");
-          }
-          const currentTimestamp = Date.now();
-          const followStartTimestamp = follow.followDate.getTime();
-          return `${(currentTimestamp - followStartTimestamp) / 1000}`;
-        } catch (err) {
-          throw Error(
-            `Follow age could not be fetched '${(err as Error).message}'`,
-          );
-        }
-      },
-      id: PluginTwitchApi.GET_FOLLOW_AGE,
-      signature: {
-        argument: "userName",
-        type: "signature",
-      },
-    },
-    {
       description: "Get a random chatter in the current channel",
       generate: (data) => async () => {
-        // TODO Currently broken
         try {
           const tokenInfo = await data.twitchApiClient.getTokenInfo();
           if (tokenInfo.userId === null) {
             throw Error("Twitch API client request getTokenInfo failed");
           }
+          // TODO Pagination makes problems in actually getting a random chatter
           const channelChatters = await data.twitchApiClient.chat.getChatters(
             `#${data.channelName}`,
-            tokenInfo.userId,
           );
           if (channelChatters === undefined) {
             throw Error("Twitch API client request getChatters failed");

@@ -25,18 +25,16 @@ export type GetCustomEnvValueFromConfig<T> = (
 
 /**
  * Convert variable value to a boolean value.
- *
  * @param variableValue Input string.
  * @returns True if ON else false.
  */
 export const convertToBoolean = (variableValue?: string): boolean =>
   variableValue === undefined
     ? false
-    : variableValue.toUpperCase() === EnvVariableOnOff.ON;
+    : variableValue.toUpperCase() === `${EnvVariableOnOff.ON}`;
 
 /**
  * Convert variable value to a boolean value if not undefined.
- *
  * @param variableValue Input string.
  * @returns True if ON else false otherwise undefined.
  */
@@ -47,7 +45,6 @@ export const convertToBooleanIfNotUndefined = (
 
 /**
  * Convert variable value to a string array.
- *
  * @param variableValue Input string.
  * @param supportedValues All supported values.
  * @returns StringArray.
@@ -82,7 +79,6 @@ export const convertToStringArray = <T extends string = string>(
 
 /**
  * Convert number string to integer or throw error if not possible.
- *
  * @param variableValue Input string.
  * @param errorMessage Custom error message.
  * @returns Number value if valid number.
@@ -100,7 +96,6 @@ export const convertToInt = (
 
 /**
  * Convert number string to integer or throw error if not possible if the input string not undefined.
- *
  * @param variableValue Input string.
  * @param errorMessage Custom error message.
  * @returns Number value if valid number.

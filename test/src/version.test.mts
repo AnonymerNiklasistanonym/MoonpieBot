@@ -12,7 +12,7 @@ describe("version", () => {
     expect(version).to.be.a("string");
   });
   it("getVersionInfo", () => {
-    expect(getVersionInfo("v1.0.1b")).to.not.throw;
+    expect(getVersionInfo("v1.0.1-beta.0")).to.not.throw;
   });
   it("compareVersions", () => {
     const sameVersionTest = (a: SemVer, b: SemVer, same = true) => {
@@ -41,7 +41,7 @@ describe("version", () => {
     };
 
     const versionA = getVersionInfo("1.0.1");
-    const versionABeta = getVersionInfo("1.0.1-beta");
+    const versionABeta = getVersionInfo("1.0.1-beta.0");
     const versionANewer = getVersionInfo("2.0.1");
 
     // Same version

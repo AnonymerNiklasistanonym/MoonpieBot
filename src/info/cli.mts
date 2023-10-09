@@ -115,7 +115,12 @@ export const createProgram = (cliActions: Readonly<CliActions>): Command =>
   commanderProgramBase
     .addCommand(
       commandExportDataJson.action(
-        (type: ExportDataTypes, output: OrUndef<string>, _, command: Command) =>
+        (
+          type: ExportDataTypes,
+          output: OrUndef<string>,
+          _,
+          command: Command,
+        ) =>
           cliActions.exportData
             ? cliActions.exportData(
                 type,
@@ -164,7 +169,6 @@ export const createProgram = (cliActions: Readonly<CliActions>): Command =>
 
 /**
  * Parse CLI arguments.
- *
  * @param cliArgs CLI arguments.
  * @param cliActions Callback actions.
  */

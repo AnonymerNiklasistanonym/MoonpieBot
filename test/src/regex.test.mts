@@ -51,6 +51,7 @@ interface RegexTestElement<TEST_TYPE extends object = object> {
 const checkRegexTestElements = <TEST_TYPE extends object = object>(
   testSet: RegexTestElement<TEST_TYPE>[],
   regex: RegExp,
+  testName?: string,
 ) => {
   for (const a of testSet) {
     const match = a.input.match(regex);
@@ -68,7 +69,7 @@ const checkRegexTestElements = <TEST_TYPE extends object = object>(
               return;
             }
             // eslint-disable-next-line security/detect-object-injection
-            if (match.groups[key]) {
+            if (match.groups[key] === undefined) {
               // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-dynamic-delete
               delete match.groups[key];
             }
@@ -76,7 +77,8 @@ const checkRegexTestElements = <TEST_TYPE extends object = object>(
         }
         expect(match.groups).to.be.deep.equal(
           a.expected,
-          `Expected named capture groups to be equal ${baseErrorMessage}`,
+          (testName !== undefined ? `[${testName}] ` : "") +
+            `Expected named capture groups to be equal ${baseErrorMessage}`,
         );
       }
     }
@@ -101,6 +103,7 @@ describe("regex", () => {
       checkRegexTestElements(
         testSetMoonpieClaim,
         regexMoonpieChatHandlerCommandClaim,
+        "moonpie claim",
       );
     });
     it("!moonpie about/commands/leaderboard", () => {
@@ -121,6 +124,7 @@ describe("regex", () => {
       checkRegexTestElements(
         testSetMoonpieAbout,
         regexMoonpieChatHandlerCommandAbout,
+        "moonpie about",
       );
       checkRegexTestElements<RegexMoonpieChatHandlerCommandLeaderboard>(
         testSetMoonpieAbout.map((a) => ({
@@ -129,6 +133,7 @@ describe("regex", () => {
           input: a.input.replace(/about/g, "leaderboard"),
         })),
         regexMoonpieChatHandlerCommandLeaderboard,
+        "moonpie leaderboard",
       );
       checkRegexTestElements(
         testSetMoonpieAbout.map((a) => ({
@@ -163,6 +168,7 @@ describe("regex", () => {
       checkRegexTestElements<RegexMoonpieChatHandlerCommandLeaderboard>(
         testSetMoonpieLeaderboard,
         regexMoonpieChatHandlerCommandLeaderboard,
+        "!moonpie leaderboard $STARTING_RANK",
       );
     });
 

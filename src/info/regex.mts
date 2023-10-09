@@ -5,7 +5,6 @@ import type { EMPTY_OBJECT } from "../other/types.mjs";
 
 /**
  * Regex to recognize the `!moonpie about` command.
- *
  * @example
  * ```text
  * !moonpie about
@@ -21,7 +20,6 @@ export interface RegexOsuChatHandlerCommandRequests {
 }
 /**
  * Regex to recognize the !osuRequests (on|off $OPTIONAL_MESSAGE) command.
- *
  * @example
  * ```text
  * !osuRequests
@@ -44,7 +42,6 @@ export interface RegexOsuChatHandlerCommandRequestsSet {
 }
 /**
  * Regex to recognize the !osuRequests set $OPTION $VALUE command.
- *
  * @example
  * ```text
  * !osuRequests set messageOn new message
@@ -66,7 +63,6 @@ export interface RegexOsuChatHandlerCommandRequestsUnset {
 }
 /**
  * Regex to recognize the !osuRequests set $OPTION $VALUE command.
- *
  * @example
  * ```text
  * !osuRequests unset messageOn
@@ -88,7 +84,6 @@ export interface RegexOsuChatHandlerCommandLastRequest {
 }
 /**
  * Regex to recognize the !osuLastRequests $OPTIONAL_COUNT command.
- *
  * @example
  * ```text
  * !osuLastRequests
@@ -103,7 +98,6 @@ export const regexOsuChatHandlerCommandLastRequest: Readonly<RegExp> =
 
 /**
  * Regex to recognize the !osuPermitRequest command.
- *
  * @example
  * ```text
  * !osuPermitRequest
@@ -114,7 +108,6 @@ export const regexOsuChatHandlerCommandPermitRequest: Readonly<RegExp> =
 
 /**
  * Regex to recognize the `!moonpie` command.
- *
  * @example
  * ```text
  * !moonpie
@@ -129,7 +122,6 @@ export const regexMoonpieChatHandlerCommandClaim: Readonly<RegExp> =
 
 /**
  * Regex to recognize the `!moonpie commands` command.
- *
  * @example
  * ```text
  * !moonpie commands
@@ -140,7 +132,6 @@ export const regexMoonpieChatHandlerCommandCommands: Readonly<RegExp> =
 
 /**
  * Regex to recognize the `!spotify commands` command.
- *
  * @example
  * ```text
  * !spotify commands
@@ -156,7 +147,6 @@ export interface RegexMoonpieChatHandlerCommandLeaderboard {
  * Regex to recognize the `!moonpie leaderboard` command.
  *
  * - The first group is the optional rank.
- *
  * @example
  * ```text
  * !moonpie leaderboard
@@ -176,7 +166,6 @@ export interface RegexMoonpieChatHandlerCommandUserGet {
  * Regex to recognize the `!moonpie get $USER` command.
  *
  * - The first group is the user name string.
- *
  * @example
  * ```text
  * !moonpie get alexa123
@@ -194,7 +183,6 @@ export interface RegexMoonpieChatHandlerCommandUserSet {
  *
  * - The first group is the user name string.
  * - The second group is the moonpie count that should be set.
- *
  * @example
  * ```text
  * !moonpie set alexa123 727
@@ -212,7 +200,6 @@ export interface RegexMoonpieChatHandlerCommandUserAdd {
  *
  * - The first group is the user name string.
  * - The second group is the moonpie count that should be added.
- *
  * @example
  * ```text
  * !moonpie add alexa123 3
@@ -230,7 +217,6 @@ export interface RegexMoonpieChatHandlerCommandUserRemove {
  *
  * - The first group is the user name string.
  * - The second group is the moonpie count that should be removed.
- *
  * @example
  * ```text
  * !moonpie remove alexa123 4
@@ -246,7 +232,6 @@ export interface RegexMoonpieChatHandlerCommandUserDelete {
  * Regex to recognize the `!moonpie delete $USER` command.
  *
  * - The first group is the user name string.
- *
  * @example
  * ```text
  * !moonpie delete alexa123
@@ -257,7 +242,6 @@ export const regexMoonpieChatHandlerCommandUserDelete: Readonly<RegExp> =
 
 /**
  * Regex to recognize the `!osu commands` command.
- *
  * @example
  * ```text
  * !osu commands
@@ -268,7 +252,6 @@ export const regexOsuChatHandlerCommandCommands: Readonly<RegExp> =
 
 /**
  * Regex to recognize the `!np` command.
- *
  * @example
  * ```text
  * !np $OPTIONAL_TEXT
@@ -292,7 +275,6 @@ export type RegexOsuChatHandlerCommandPp =
  *
  * - The first group is the custom osu ID number.
  * - The second group is the custom osu user name string.
- *
  * @example
  * ```text
  * !pp
@@ -324,7 +306,6 @@ export type RegexOsuChatHandlerCommandRp =
  *
  * - The first group is the custom osu ID number.
  * - The second group is the custom osu user name string.
- *
  * @example
  * ```text
  * !rp
@@ -348,7 +329,6 @@ export interface RegexOsuChatHandlerCommandScore {
  * Regex to recognize the `!score osuName $OPTIONAL_TEXT_WITH_SPACES` command.
  *
  * - The first group is the custom osu user name string.
- *
  * @example
  * ```text
  * !score osuName $OPTIONAL_TEXT_WITH_SPACES
@@ -386,7 +366,6 @@ export type RegexOsuBeatmapIdFromUrl =
  *
  * It returns different named groups for the following number of links using
  * the following type {@link RegexOsuBeatmapIdFromUrl} if there is a match.
- *
  * @example
  * ```text
  * https://osu.ppy.sh/b/2587891 $COMMENT
@@ -421,7 +400,6 @@ export interface RegexOsuWindowTitleNowPlaying {
  * - The first capture group is the artist.
  * - The second group is the title.
  * - The third group is the name of the version.
- *
  * @example
  * ```text
  * osu! - Artist - Title [Version]
@@ -436,7 +414,6 @@ export const regexOsuWindowTitleNowPlaying: Readonly<RegExp> =
 
 /**
  * Regex to recognize the `!song` command.
- *
  * @example
  * ```text
  * !song $OPTIONAL_TEXT_WITH_SPACES
@@ -447,7 +424,6 @@ export const regexSpotifyChatHandlerCommandSong: Readonly<RegExp> =
 
 /**
  * Regex to recognize the !cc/!cb commands command.
- *
  * @example
  * ```text
  * !cc commands
@@ -469,7 +445,6 @@ export interface RegexCustomCommandAdd {
 }
 /**
  * Regex to recognize the !addcc command.
- *
  * @example
  * ```text
  * !addcc ID REGEX MESSAGE -ul=mod -cd=12
@@ -482,7 +457,6 @@ export interface RegexCustomCommandDelete {
 }
 /**
  * Regex to recognize the !delcc command.
- *
  * @example
  * ```text
  * !delcc ID
@@ -498,7 +472,6 @@ export interface RegexCustomCommandListOffset {
 }
 /**
  * Regex to recognize the !listccs command.
- *
  * @example
  * ```text
  * !listccs ID
@@ -517,7 +490,6 @@ export interface RegexCustomCommandEdit {
 }
 /**
  * Regex to recognize the !editcc command.
- *
  * @example
  * ```text
  * !editcc ID OPTION OPTION_VALUE
@@ -533,7 +505,6 @@ export interface RegexCustomBroadcastAdd {
 }
 /**
  * Regex to recognize the !addcc command.
- *
  * @example
  * ```text
  * !addcb ID CRON_STRING MESSAGE
@@ -546,7 +517,6 @@ export interface RegexCustomBroadcastDelete {
 }
 /**
  * Regex to recognize the !delcb command.
- *
  * @example
  * ```text
  * !delcb ID
@@ -563,7 +533,6 @@ export interface RegexCustomBroadcastListOffset {
 }
 /**
  * Regex to recognize the !listcbs command.
- *
  * @example
  * ```text
  * !listcbs ID
@@ -582,7 +551,6 @@ export interface RegexCustomBroadcastEdit {
 }
 /**
  * Regex to recognize the !editcb command.
- *
  * @example
  * ```text
  * !editcb ID OPTION OPTION_VALUE

@@ -22,7 +22,6 @@ const LOG_ID = "database_backup";
 
 /**
  * Create tables if not existing.
- *
  * @param databasePath Path to db.default.sqlite3.
  * @param logger Logger (for global logs).
  */

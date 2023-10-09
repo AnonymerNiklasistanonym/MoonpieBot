@@ -44,7 +44,6 @@ const copyFiles = async (
 
 /**
  * Get a list of files that should be copied for a backup.
- *
  * @param backupDir The directory where the backup should be created.
  * @param configDir The current config directory.
  * @param config The current config.
@@ -94,7 +93,6 @@ const getBackupFiles = (
 
 /**
  * Import a backup of the bot to the current config directory.
- *
  * @param configDir The config directory where the backup should be imported.
  * @param backupDir The backup directory from which the backup should be imported.
  * @param logger The logger.

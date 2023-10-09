@@ -1,6 +1,5 @@
 /**
  * Round a number to a given amount of decimal places.
- *
  * @param num Number to round.
  * @param decimalPlaces The number of decimal places to round to.
  * @returns Rounded number.

@@ -45,7 +45,12 @@ export const commandCommands: ChatMessageHandlerReplyCreator<
         {
           convertEnumValueToInfo: (enumValue) => {
             const enabled = data.enabledCommands.includes(enumValue);
-            switch (enumValue as OsuCommands) {
+            switch (
+              enumValue as
+                | OsuCommands
+                | `${OsuCommands.NP}_STREAM_COMPANION_FILES`
+                | `${OsuCommands.NP}_STREAM_COMPANION_WEBSOCKET`
+            ) {
               case OsuCommands.COMMANDS:
                 break;
               case OsuCommands.LAST_REQUEST:

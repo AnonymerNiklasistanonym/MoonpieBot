@@ -14,7 +14,6 @@ export const longDescription =
 
 /**
  * Additional package description of the program.
- *
  * @param platform True if Windows paths should be used otherwise it will use Linux paths.
  * @returns String that has either the paths for the Windows installer or Linux package.
  */

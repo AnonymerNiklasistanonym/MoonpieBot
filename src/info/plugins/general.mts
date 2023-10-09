@@ -469,7 +469,6 @@ const yearInSeconds = dayInSeconds * 365;
 
 /**
  * Calculate from seconds the amount of minutes, hours, days, years.
- *
  * @param seconds The length of the time period in seconds.
  * @returns Object that contains the seconds-years of that second amount.
  */

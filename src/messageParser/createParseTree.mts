@@ -37,7 +37,6 @@ export interface ParseTreeNode {
 
 /**
  * There are multiple parse states while parsing a message.
- *
  * @example ```
  * this is text \$ with an escaped dollar
  * ```
@@ -125,7 +124,6 @@ const MAX_STRING_DEPTH = 15;
  * This method will call itself recursively if inside of a plugin content is
  * detected. The recursive call will early exit as soon as a plugin content
  * scope close is detected.
- *
  * @param messageString The input string.
  * @param strings The global string dictonary for references.
  * @param pluginDepth The depth of the plugin which is used for recursive calls.

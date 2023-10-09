@@ -36,7 +36,6 @@ export const REDIRECT_URI = `${REDIRECT_URL}:${REDIRECT_PORT}`;
 /**
  * Setup Spotify authentication so that API calls can be used and return a
  * working API client.
- *
  * @param spotifyClientId The Spotify API client ID.
  * @param spotifyClientSecret The Spotify API client secret.
  * @param spotifyDatabasePath The path to the Spotify database to save the
@@ -132,7 +131,6 @@ export interface SpotifyGetCurrentAndRecentSongs {
 
 /**
  * Get current song and recently played songs on Spotify.
- *
  * @param spotifyApi The Spotify api client.
  * @param logger Used for logging.
  * @returns Currently playing and recently played songs data.

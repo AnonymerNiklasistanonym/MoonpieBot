@@ -49,7 +49,6 @@ const replaceMacros = (text: string, macros: DeepReadonly<MacroMap>) => {
 
 /**
  * Parse a tree node to a string (recursively).
- *
  * @param treeNode The tree node to be parsed.
  * @param plugins The supported plugins.
  * @param macros The supported macros.

@@ -20,7 +20,6 @@ export interface ExistsInput {
 
 /**
  * Create osu!requests config option entry.
- *
  * @param databasePath Path to database.
  * @param input Create info.
  * @param logger Logger (used for logging).
@@ -63,7 +62,6 @@ export interface CreateInput {
 
 /**
  * Create osu!requests config option entry.
- *
  * @param databasePath Path to database.
  * @param input Create info.
  * @param logger Logger (used for logging).
@@ -116,7 +114,6 @@ export interface RemoveInput {
 
 /**
  * Remove osu!requests config option entry.
- *
  * @param databasePath Path to database.
  * @param input Remove input.
  * @param logger Logger (used for logging).

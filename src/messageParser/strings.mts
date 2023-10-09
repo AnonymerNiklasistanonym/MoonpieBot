@@ -53,7 +53,6 @@ export interface StringMapEntry extends Omit<StringEntry, "id"> {
 
 /**
  * Generate a string list for fast usage in a map.
- *
  * @param stringEntries The string entries (with more information).
  * @returns The resulting array can be inserted into a map for easy setup.
  */
@@ -74,7 +73,6 @@ export const generateStringMap = (
 
 /**
  * Update the strings map with environment variable strings.
- *
  * @param strings The current string map.
  * @param logger The global logger.
  * @returns The updated strings map.

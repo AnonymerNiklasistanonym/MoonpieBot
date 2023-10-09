@@ -13,7 +13,6 @@ import type { Logger } from "winston";
 
 /**
  * A type for all chat message handler functions.
- *
  * @typeParam DATA The additional data the chat message handler needs for run.
  */
 export type ChatMessageHandler<DATA extends object = EMPTY_OBJECT> = (

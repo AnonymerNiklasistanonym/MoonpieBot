@@ -108,7 +108,6 @@ const fileNameCustom = "custom.txt";
 /**
  * This method will setup an infinite loop that will continuously try to connect
  * to StreamCompanion.
- *
  * @param streamCompanionDirPath The directory of the StreamCompanion files.
  * @returns A function that will use the file system interface to get the
  * StreamCompanion data.
@@ -160,7 +159,6 @@ const WEBSOCKET_RECONNECT_TIMEOUT_IN_S = 10;
 /**
  * This method will setup an infinite loop that will continuously try to connect
  * to StreamCompanion.
- *
  * @param streamCompanionUrl The URL of the StreamCompanion websocket.
  * @param logger Global logger.
  * @returns A function that will if there is a connection and data available

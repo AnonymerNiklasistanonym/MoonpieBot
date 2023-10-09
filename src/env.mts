@@ -38,7 +38,6 @@ const CENSORED_CUSTOM_ENV_VALUE = "*******[secret]********";
 
 /**
  * Print all environment variables to the console plus if found a custom value.
- *
  * @param configDir The configuration directory.
  * @param censor Should the custom values be censored or not.
  */
@@ -122,7 +121,6 @@ export interface EnvVariableValue {
  * Get the value of an environment variable or throw an error if it's value is
  * provided multiple times (via legacy variables) or does not match the
  * supported values.
- *
  * @param envVariable The ENV variable (name).
  * @returns The value and which environment variable it's derived from or
  * undefined values if not found.
@@ -219,7 +217,7 @@ export const getEnvVariableValue = (
   return { envVariableName, legacy, value };
 };
 
-export const getEnvVariableValueOrCustomDefault = <T extends unknown>(
+export const getEnvVariableValueOrCustomDefault = <T,>(
   envVariable: EnvVariable,
   defaultValue: T,
 ): string | T => {
@@ -256,7 +254,7 @@ export const getEnvVariableValueOrError = (
 export const getEnvVariableValueInformation = (
   envVariable: EnvVariable | string,
 ): DeepReadonly<CliEnvVariableInformation<EnvVariable>> => {
-  const info = envVariableInformation.find((a) => a.name === envVariable);
+  const info = envVariableInformation.find((a) => `${a.name}` === envVariable);
   if (info) {
     return info;
   }
@@ -266,7 +264,6 @@ export const getEnvVariableValueInformation = (
 /**
  * Get the value of an environment variable or if not found a default value.
  * If the value is a (relative) path a configuration directory path needs to be supplied to get the correct value.
- *
  * @param envVariable The environment variable.
  * @param configDir The configuration directory for correct relative file paths.
  * @returns The value or default value of the environment variable.
@@ -304,7 +301,6 @@ export const getEnvVariableValueDefault = (
 
 /**
  * Get the actual name of the environment variable.
- *
  * @param envVariable The environment variable.
  * @returns The actual name of the environment variable.
  */

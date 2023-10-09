@@ -81,7 +81,7 @@ export interface MessageParserPluginGenerator<DATA>
   signature?: PluginSignature;
 }
 
-export const generatePlugin = <DATA extends unknown>(
+export const generatePlugin = <DATA,>(
   generator: MessageParserPluginGenerator<DATA>,
   data: DeepReadonly<DATA>,
 ): MessageParserPlugin => ({
@@ -96,7 +96,7 @@ export const generatePlugin = <DATA extends unknown>(
   },
 });
 
-export const generatePluginInfo = <DATA extends unknown>(
+export const generatePluginInfo = <DATA,>(
   generator: MessageParserPluginGenerator<DATA>,
 ): MessageParserPluginInfo => ({
   ...generator,

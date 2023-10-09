@@ -10,7 +10,6 @@ import type { Logger } from "winston";
 
 /**
  * Log a sent Twitch broadcast message.
- *
  * @param logger The global logger.
  * @param sentMessage The sent message information.
  * @param broadcastSourceId The ID of the broadcast source.
@@ -30,7 +29,6 @@ export const logBroadcastedMessage = (
 
 /**
  * Log a detected command from a Twitch message.
- *
  * @param logger The global logger.
  * @param messageId The ID of the message that is checked.
  * @param message The message that something was detected in.
@@ -53,7 +51,6 @@ export const logDetectedCommandInChatMessage = (
 
 /**
  * Log a reply to a Twitch message from a Twitch command.
- *
  * @param logger The global logger.
  * @param detectedCommand The detected command.
  * @param commandReplySentMessage The command reply.

@@ -56,7 +56,6 @@ interface CommentInstruction {
 
 /**
  * Parse a detected comment instruction.
- *
  * @param comment The comment text.
  * @returns Parsed comment instruction.
  */
@@ -81,7 +80,7 @@ const parseCommentInstruction = (comment: string): CommentInstruction => {
       instruction: CommentInstructionType.TABLE_ENABLE_COMMANDS,
     };
   }
-  if (comment === CommentInstructionType.DEFAULT_CONFIG_DIR_SECTION) {
+  if (comment === `${CommentInstructionType.DEFAULT_CONFIG_DIR_SECTION}`) {
     return {
       argument: "",
       instruction: CommentInstructionType.DEFAULT_CONFIG_DIR_SECTION,
@@ -106,7 +105,6 @@ const parseCommentInstruction = (comment: string): CommentInstruction => {
 
 /**
  * Create the from the comment instruction specified content.
- *
  * @param commentInstruction The comment instruction.
  * @returns Text content.
  */
@@ -352,7 +350,7 @@ const createEnvExample = async (
 };
 
 const createListEnvEntry = (envVarName: string): string => {
-  const info = envVariableInformation.find((a) => a.name === envVarName);
+  const info = envVariableInformation.find((a) => `${a.name}` === envVarName);
   if (info === undefined) {
     throw Error(`Unable to find env entry '${envVarName}'`);
   }
@@ -384,13 +382,15 @@ const createListEnvEntry = (envVarName: string): string => {
 
 const createListEnvBlockEntries = (envBlockName: string): string => {
   const infosBlock = envVariableStructure.find(
-    (a) => "block" in a && a.block === envBlockName,
+    (a) => "block" in a && `${a.block}` === envBlockName,
   );
   let blockInformation = "";
   if (infosBlock !== undefined) {
     blockInformation = infosBlock.content + "\n\n";
   }
-  const infos = envVariableInformation.filter((a) => a.block === envBlockName);
+  const infos = envVariableInformation.filter(
+    (a) => `${a.block}` === envBlockName,
+  );
   if (infos.length === 0) {
     throw Error(`Unable to find any env entry of the block '${envBlockName}'`);
   }
@@ -401,7 +401,7 @@ const createListEnvBlockEntries = (envBlockName: string): string => {
 
 const createTableEnableCommands = (envVarName: string): string => {
   const info = envVariableInformation.find(
-    (a) => a.name === `${envVarName}_ENABLE_COMMANDS`,
+    (a) => a.name.toString() === `${envVarName}_ENABLE_COMMANDS`,
   );
   if (info === undefined) {
     throw Error(`Unable to find env entry '${envVarName}_ENABLE_COMMANDS'`);

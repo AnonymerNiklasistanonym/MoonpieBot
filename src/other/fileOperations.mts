@@ -6,7 +6,6 @@ import path from "path";
 
 /**
  * Return if file/directory already exists.
- *
  * @param filePath Path of file/directory.
  * @returns True if exists, False if not.
  */

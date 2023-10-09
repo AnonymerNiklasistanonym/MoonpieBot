@@ -65,7 +65,6 @@ const defaultCliOutputOptions = Object.freeze({
 
 /**
  * Generic method to generate CLI output.
- *
  * @param cliOutputLines The lines that should be generated.
  * @param outputOptions CLI output options.
  * @returns CLI output string.

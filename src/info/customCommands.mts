@@ -16,7 +16,6 @@ import {
   pluginIfNotUndefined,
   pluginIfUndefined,
   pluginRandomNumber,
-  pluginTimeInSToHumanReadableStringShort,
 } from "./plugins/general.mjs";
 import { convertRegexToString } from "../other/regexToString.mjs";
 import { createMessageParserMessage } from "../messageParser.mjs";
@@ -130,52 +129,6 @@ export const customCommandsInformation: DeepReadonlyArray<CustomCommand> = [
     // TODO double check regex later
     regex: convertRegexToString(/^\s*!so\s+@?(\S+)\s*(?:.*)$/),
     userLevel: TwitchBadgeLevel.MODERATOR,
-  },
-  {
-    ...defaultExampleCommandValues,
-    description: `Use Twitch API to get the follow age > ${pluginRegexGroupId},${PluginTwitchApi.GET_FOLLOW_AGE},${pluginTimeInSToHumanReadableStringShort.id}`,
-    id: "followage",
-    message: createMessageParserMessage([
-      "@",
-      { name: PluginTwitchChat.USER, type: "plugin" },
-      {
-        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
-        name: pluginIfNotUndefined.id,
-        scope: [
-          " ",
-          { args: "1", name: pluginRegexGroupId, type: "plugin" },
-          " followed the channel since ",
-          {
-            args: {
-              args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
-              name: PluginTwitchApi.GET_FOLLOW_AGE,
-              type: "plugin",
-            },
-            name: pluginTimeInSToHumanReadableStringShort.id,
-            type: "plugin",
-          },
-        ],
-        type: "plugin",
-      },
-      {
-        args: { args: "1", name: pluginRegexGroupId, type: "plugin" },
-        name: pluginIfUndefined.id,
-        scope: [
-          " You followed the channel since ",
-          {
-            args: {
-              args: { name: PluginTwitchChat.USER, type: "plugin" },
-              name: PluginTwitchApi.GET_FOLLOW_AGE,
-              type: "plugin",
-            },
-            name: pluginTimeInSToHumanReadableStringShort.id,
-            type: "plugin",
-          },
-        ],
-        type: "plugin",
-      },
-    ]),
-    regex: convertRegexToString(/^\s*!followage(?:\s+(.*?)\s*$|\s|$)/),
   },
   {
     ...defaultExampleCommandValues,

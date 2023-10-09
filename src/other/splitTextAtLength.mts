@@ -8,7 +8,6 @@ const SPLIT_CHARACTER = " ";
  * while also not breaking words off.
  * If the text input is an array this means that the array elements should never
  * be split.
- *
  * @param textInput The text that should be split.
  * @param splitLength The length after which text should be split if possible.
  * @returns Array of text strings that never exceed the split length.

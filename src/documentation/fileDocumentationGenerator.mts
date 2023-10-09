@@ -82,7 +82,6 @@ const HEADING_DIVIDER_CHARACTER = "-";
 
 /**
  * Generate file documentation string.
- *
  * @param inputParts List of documentation parts.
  * @param splitLength The length after which text should be split if possible.
  * @returns The documentation multiline string that can be written to a file.

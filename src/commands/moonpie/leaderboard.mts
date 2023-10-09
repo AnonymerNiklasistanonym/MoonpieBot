@@ -48,12 +48,18 @@ export const commandLeaderboard: ChatMessageHandlerReplyCreator<
         data.startingRank,
         logger,
       );
-
+    if (data.startingRank !== undefined && Number.isNaN(data.startingRank)) {
+      throw Error(
+        `Starting rank (${data.startingRank}) is not undefined and not a number`,
+      );
+    }
     if (moonpieEntries.length === 0) {
       return {
         additionalMacros: generateMacroMapFromMacroGenerator(
           macroMoonpieLeaderboard,
-          { startingRank: data.startingRank },
+          data.startingRank !== undefined
+            ? { startingRank: data.startingRank }
+            : {},
           logger,
         ),
         isError: true,
@@ -73,7 +79,9 @@ export const commandLeaderboard: ChatMessageHandlerReplyCreator<
           ...globalMacros,
           ...generateMacroMapFromMacroGenerator(
             macroMoonpieLeaderboard,
-            { startingRank: data.startingRank },
+            data.startingRank !== undefined
+              ? { startingRank: data.startingRank }
+              : {},
             logger,
           ),
         ]);

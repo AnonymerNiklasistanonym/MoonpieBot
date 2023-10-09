@@ -15,7 +15,6 @@ import type { Logger } from "winston";
 
 /**
  * Check if moonpie entry exists given a Twitch ID.
- *
  * @param databasePath Path to database.
  * @param twitchId Twitch ID.
  * @param logger Logger (used for logging).
@@ -49,7 +48,6 @@ export const existsEntry = async (
 
 /**
  * Check if moonpie entry exists given a Twitch name.
- *
  * @param databasePath Path to database.
  * @param twitchName Twitch name.
  * @param logger Logger (used for logging).
@@ -95,7 +93,6 @@ export interface CreateInput {
 
 /**
  * Create moonpie entry.
- *
  * @param databasePath Path to database.
  * @param input Moonpie info.
  * @param logger Logger (used for logging).
@@ -133,7 +130,6 @@ export const createEntry = async (
 
 /**
  * Remove moonpie entry.
- *
  * @param databasePath Path to database.
  * @param twitchId Twitch ID.
  * @param logger Logger (used for logging).
@@ -163,7 +159,6 @@ export const removeEntry = async (
 
 /**
  * Remove moonpie entry.
- *
  * @param databasePath Path to database.
  * @param twitchName Twitch ID.
  * @param logger Logger (used for logging).
@@ -206,7 +201,6 @@ export interface GetMoonpieOut extends GetMoonpieDbOut {}
 
 /**
  * Get the moonpie count of a Twitch user.
- *
  * @param databasePath Path to database.
  * @param twitchId Twitch ID.
  * @param logger Logger (used for logging).
@@ -262,7 +256,6 @@ export const getEntry = async (
 
 /**
  * Get the moonpie count of a Twitch user.
- *
  * @param databasePath Path to database.
  * @param twitchName Twitch name.
  * @param logger Logger (used for logging).
@@ -331,7 +324,6 @@ export interface UpdateInput {
 
 /**
  * Update entry.
- *
  * @param databasePath Path to database.
  * @param input New account info.
  * @param logger Logger (used for logging).

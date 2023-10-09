@@ -432,7 +432,6 @@ export const main = async (
    * Run this method every time a new message is detected.
    * This is a method on it's own in order to maybe support more than twitch in
    * the future and to decouple it from the Twitch event logic.
-   *
    * @param channel The Twitch channel (#channel_name).
    * @param tags The Twitch message tags.
    * @param message The message.

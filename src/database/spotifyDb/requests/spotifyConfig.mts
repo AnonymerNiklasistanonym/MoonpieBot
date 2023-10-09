@@ -23,7 +23,6 @@ export interface ExistsInput {
 
 /**
  * Create spotify config option entry.
- *
  * @param databasePath Path to database.
  * @param input Create info.
  * @param logger Logger (used for logging).
@@ -66,7 +65,6 @@ export interface CreateInput {
 
 /**
  * Create spotify config option entry.
- *
  * @param databasePath Path to database.
  * @param input Create info.
  * @param logger Logger (used for logging).
@@ -119,7 +117,6 @@ export interface RemoveInput {
 
 /**
  * Remove spotify config option entry.
- *
  * @param databasePath Path to database.
  * @param input Remove input.
  * @param logger Logger (used for logging).

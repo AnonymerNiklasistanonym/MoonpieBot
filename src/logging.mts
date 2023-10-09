@@ -34,7 +34,6 @@ export interface LoggerInformation {
 
 /**
  * Function that formats the log output.
- *
  * @param logInfo The information the logger provides.
  * @returns Parsed string.
  */
@@ -53,7 +52,6 @@ const logFormat = (logInfo: DeepReadonly<LoggerInformation>): string => {
 
 /**
  * Create a global logger.
- *
  * @param name The name of the logger.
  * @param logDir The directory to log to.
  * @param logLevelConsole The log level of the console logger.
@@ -86,7 +84,6 @@ export const createLogger = (
 
 /**
  * Create a global logger.
- *
  * @param name The name of the logger.
  * @param logLevelConsole The log level of the console logger.
  * @returns Logger.
@@ -115,7 +112,6 @@ export interface LogFunc {
 
 /**
  * Create a function that will log messages with a hardcoded section.
- *
  * @param logger The logger.
  * @param section The section which the log function should log.
  * @param subsection Additional section information (subsection).

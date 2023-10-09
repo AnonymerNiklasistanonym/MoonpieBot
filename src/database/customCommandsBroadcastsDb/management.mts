@@ -14,7 +14,6 @@ import type { Logger } from "winston";
 
 /**
  * Create tables if not existing and set them up with data.
- *
  * @param databasePath Path to database.
  * @param logger Logger (for global logs).
  */

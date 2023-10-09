@@ -24,7 +24,6 @@ export interface GetMoonpieLeaderboardOut extends GetMoonpieLeaderboardDbOut {}
 
 /**
  * Get the moonpie leaderboard.
- *
  * @param databasePath Path to database.
  * @param limit Limit the number of results.
  * @param offset Offset from what position to fetch the results.
@@ -75,7 +74,6 @@ export const getEntries = async (
 
 /**
  * Get the moonpie leaderboard entry of a Twitch user.
- *
  * @param databasePath Path to database.
  * @param twitchId Twitch ID.
  * @param logger Logger (used for logging).

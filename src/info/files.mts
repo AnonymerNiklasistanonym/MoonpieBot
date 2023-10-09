@@ -29,7 +29,6 @@ export const defaultConfigDir = (platform: "win32" | "linux"): string =>
 /**
  * A function to create the directory name of an old MoonpieBot configuration depending
  * on the current date.
- *
  * @param date The current date.
  * @returns The file name.
  */

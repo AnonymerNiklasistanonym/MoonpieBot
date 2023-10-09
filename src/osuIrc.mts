@@ -18,37 +18,31 @@ export const OSU_IRC_NEWLINE = "%NEWLINE%";
 interface IrcMessage {
   /**
    * The arguments which means the *to* and the *message*.
-   *
    * @example ["osuId","Bad authentication token."]
    */
   args: [string, string];
   /**
    * The command/reason of a message.
-   *
    * @example err_passwdmismatch
    */
   command: string;
   /**
    * The type of the command.
-   *
    * @example error
    */
   commandType: string;
   /**
    * IRC message prefix.
-   *
    * @example cho.ppy.sh
    */
   prefix: string;
   /**
    * The integer value of the command.
-   *
    * @example 464
    */
   rawCommand: string;
   /**
    * IRC server URL.
-   *
    * @example cho.ppy.sh
    */
   server: string;
@@ -58,7 +52,6 @@ interface IrcMessage {
  * Establish a osu irc connection which can then be used to send messages.
  *
  * Check the docs at https://github.com/martynsmith/node-irc/blob/master/docs/API.rst for more information.
- *
  * @param osuIrcUsername The osu IRC user name.
  * @param osuIrcPassword The osu IRC user password.
  * @param id Used for logging.

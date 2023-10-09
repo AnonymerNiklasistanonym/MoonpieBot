@@ -140,7 +140,6 @@ export interface CliEnvVariableInformation<NAME = string, BLOCK = string> {
 
 /**
  * Generic method to generate CLI help output.
- *
  * @param programName The name of the program.
  * @param cliUsagesInformation A list of all CLI usages.
  * @param cliOptionsInformation A list of all CLI options.

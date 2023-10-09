@@ -33,7 +33,6 @@ export interface SetupDatabaseOptions {
 /**
  * Setup a database by creating tables if not existing, set them up with initial
  * data and migrating changes.
- *
  * @param databasePath Path to database.
  * @param tables Tables to set up.
  * @param views Views to set up.

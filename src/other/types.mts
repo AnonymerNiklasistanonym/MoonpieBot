@@ -1,18 +1,15 @@
 /**
  * Predicate with type guard that can be inserted into a filter() call to remove
  * undefined values from the array.
- *
  * @param value Any value.
  * @returns True if not undefined.
  */
-export const notUndefined = <T extends unknown>(
-  value?: Readonly<T>,
-): value is T => value !== undefined;
+export const notUndefined = <T,>(value?: Readonly<T>): value is T =>
+  value !== undefined;
 
 /**
  * Predicate with type guard to check if a value is a string array.
  * Empty arrays will also be declared as string arrays.
- *
  * @param value Possible string array.
  * @returns True if not undefined.
  */
@@ -23,7 +20,6 @@ export const isStringArray = (value: readonly unknown[]): value is string[] =>
 
 /**
  * Convert a value to a custom value if undefined.
- *
  * @param value Any value.
  * @param customValue Custom value to be used if value undefined.
  * @returns Custom value if undefined otherwise the value.
@@ -47,6 +43,7 @@ export type ImmutablePrimitive =
   | number
   // eslint-disable-next-line @typescript-eslint/ban-types
   | Function
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   | unknown;
 
 /**

@@ -16,7 +16,6 @@ export enum TwitchBadgeLevel {
 /**
  * Parse twitch tags to a simple enum of the highest twitch badge level of the
  * user.
- *
  * @param tags Twitch message user state.
  * @returns Highest twitch badge level.
  */
